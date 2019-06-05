@@ -230,6 +230,7 @@ mobile.register = {
         var $registerScreen = $('.mobile.signin-register-block');
         var $changeEmailInput = $confirmScreen.find('.change-email input');
         var $resendButton = $confirmScreen.find('.resend-button');
+        var $cancelRegistrationButton = $confirmScreen.find('.register-cancel-button');
 
         // Hide the current register screen and show the confirmation one
         $registerScreen.addClass('hidden');
@@ -243,6 +244,7 @@ mobile.register = {
 
         // Initialise the Resend button
         mobile.register.initConfirmEmailScreenResendButton($changeEmailInput, $resendButton, registrationVars);
+        mobile.register.initCancelRegistrationButton($cancelRegistrationButton);
     },
 
     /**
@@ -317,6 +319,16 @@ mobile.register = {
     },
 
     /**
+     * Initialises the cancel registration button.
+     */
+    initCancelRegistrationButton: function($button) {
+        'use strict';
+        $button.off('tap').on('tap', function() {
+            mobile.messageOverlay.show(l[5710], false, mobile.register.abort, false, false, [l[79], l[78]]);
+        });
+    },
+
+    /**
      * Shows the login screen with a few things changed so they know they are
      * confirming their account and about to proceed to the key creation step
      * @param {String} email                The user's email address from the confirm code
@@ -368,6 +380,16 @@ mobile.register = {
 
         // Show animation
         $('.mobile.registration-generating-keys').removeClass('hidden');
+    },
+
+    /**
+     * Cancel registration attempt.
+     */
+    abort: function() {
+        'use strict';
+        api_req({ a: 'ucr' });
+        delete localStorage.awaitingConfirmationAccount;
+        init_page();
     }
 };
 

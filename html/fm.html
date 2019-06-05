@@ -508,7 +508,7 @@
                     <div class="nw-fm-search-icon"></div>
                 </div>
                 <div class="nw-fm-tree-header shared-with-me">
-                    <input type="text" value="" placeholder="[$5589]" />
+                    <input type="text" value="" placeholder="[$7754]" />
                     <div class="nw-fm-search-icon"></div>
                 </div>
                 <div class="nw-fm-tree-header contacts">
@@ -529,7 +529,7 @@
                     <div class="nw-fm-search-icon"></div>
                 </div>
             </div>
-             <div class="user-management-tree-panel-header enabled-accounts active hidden">
+            <div class="user-management-tree-panel-header enabled-accounts active hidden">
                 <div class="img enabled-accounts"></div>
                 <span>[$19085]</span>
                 <!--<div class="user-management-tree-panel-arrows"></div>-->
@@ -561,6 +561,10 @@
                 <div class="content-panel inbox">
                 </div>
                 <div class="content-panel shared-with-me">
+                </div>
+                <div class="content-panel out-shares">
+                </div>
+                <div class="content-panel public-links">
                 </div>
                 <div class="content-panel contacts">
                 </div>
@@ -751,6 +755,13 @@
                 [$16316]
             </div>
 
+            <div class="shares-tabs-bl hidden">
+                <div class="shares-tab-lnk in-shares" data-folder="shares">[$16770]</div>
+                <div class="shares-tab-lnk out-shares" data-folder="out-shares">[$5543]</div>
+                <div class="shares-tab-lnk public-links" data-folder="public-links">[$16516]</div>
+                <div class="clear"></div>
+            </div>
+
             <div class="contacts-tabs-bl hidden">
                 <div class="contacts-tab-lnk contacts" data-folder="contacts">[$165]</div>
                 <div class="contacts-tab-lnk ipc" data-folder="ipc">[$5863]<span></span></div>
@@ -850,6 +861,16 @@
                         <div class="clear"></div>
                     </div>
 
+                    <div class="button link-button right fm-new-shared-folder hidden">
+                        <i class="small-icon add-shared colorized"></i>
+                        <span>[$16533]</span>
+                    </div>
+
+                    <div class="button link-button right fm-new-link hidden">
+                        <i class="small-icon blue-chain colorized"></i>
+                        <span>[$20667]</span>
+                    </div>
+
                 </div>
 
                 <div class="filter-block fm body hidden">
@@ -871,6 +892,24 @@
                 </div>
 
                 <div class="filter-block shares body hidden">
+                    <div class="filter-block info">[$17791]:</div>
+                    <div class="filter-block content">
+                    </div>
+                    <div class="filter-block close">
+                        <i class="small-icon icons-sprite small-cross"></i>
+                    </div>
+                </div>
+
+                <div class="filter-block out-shares body hidden">
+                    <div class="filter-block info">[$17791]:</div>
+                    <div class="filter-block content">
+                    </div>
+                    <div class="filter-block close">
+                        <i class="small-icon icons-sprite small-cross"></i>
+                    </div>
+                </div>
+
+                <div class="filter-block public-links body hidden">
                     <div class="filter-block info">[$17791]:</div>
                     <div class="filter-block content">
                     </div>
@@ -1042,7 +1081,7 @@
             <div class="fm-empty-incoming hidden">
                 <div class="fm-empty-pad">
                     <div class="fm-empty-incoming-bg"></div>
-                    <div class="fm-empty-cloud-txt">[$6871]</div>
+                    <div class="fm-empty-cloud-txt small">[$6871]</div>
                     <div class="fm-not-logged-text">
                         <div class="fm-not-logged-description">
                             [$8762]
@@ -1054,6 +1093,20 @@
                             &ast;[$16362]
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-outgoing hidden">
+                <div class="fm-empty-pad">
+                    <div class="fm-empty-outgoing-bg"></div>
+                    <div class="fm-empty-cloud-txt small">[$20668]</div>
+                </div>
+            </div>
+
+            <div class="fm-empty-public-link hidden">
+                <div class="fm-empty-pad">
+                    <div class="fm-empty-public-link-bg"></div>
+                    <div class="fm-empty-cloud-txt small">[$20669]</div>
                 </div>
             </div>
 
@@ -1236,7 +1289,7 @@
                                 <td>
                                     <div class="fm-user-management-user">
                                         <div class="admin-icon hidden">
-                                            <div class="tooltip">Sub administrators</div>
+                                            <div class="tooltip">[$19610]</div>
                                         </div>
                                         <div class="user-management-name"> </div>
                                     </div>
@@ -1318,7 +1371,7 @@
                                 </div>
 
                                 <div class="admin-icon role hidden">
-                                    <div class="admin-text"> </div>
+                                    <div class="admin-text">[$19610]</div>
                                 </div>
                             </div>
 
@@ -1914,6 +1967,39 @@
 
             <div class="shared-blocks-view hidden">
                 <div class="shared-blocks-scrolling">
+                </div>
+                <div class="blocks-view-data"></div>
+            </div>
+
+            <div class="out-shared-grid-view hidden">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+                    <tr>
+                        <th class="grid-first-th">
+                            <span class="grid-header-star fav"></span>
+                        </th>
+                        <th>
+                            <div class="arrow name label desc">[$86]</div>
+                        </th>
+                        <th>
+                            <div class="arrow sharedwith">[$1036]</div>
+                        </th>
+                        <th>
+                            <div class="arrow size">[$87]</div>
+                        </th>
+                        <th>
+                            <div class="arrow date">[$20670]</div>
+                        </th>
+                        <th class="grid-url-header-nw"></th>
+                    </tr>
+                </table>
+
+                <div class="grid-scrolling-table">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table out-shares"></table>
+                </div>
+            </div>
+
+            <div class="out-shared-blocks-view hidden">
+                <div class="out-shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
             </div>
@@ -2835,7 +2921,7 @@
                             <div class="title-txt">[$20170]</div>
                         </div>
                         <div class="settings-right-block">
-                            <div class="settings-sub-section border bandwith-settings no-button hidden">
+                            <div class="settings-sub-section bandwith-settings no-button disabled">
                                 <div class="subtitle-txt">[$16156]</div>
                                 <div class="bandwith-settings">
                                     <!-- code for bandwith is borrowed, need to fix to right class/id -->
@@ -2843,12 +2929,25 @@
                                     <div class="slider numbers val1">0<span>%</span></div>
                                     <div class="slider numbers val2 last">100<span>%</span></div>
                                     <div class="clear"></div>
-                                    <div class="slider-percentage-bl">
+                                    <div class="slider-percentage-bl hidden">
                                         <div class="slider-percentage">
                                             <span>50 %</span> [$496]
                                         </div>
                                         <div class="content-txt">
                                             [$16157]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section border no-padding band-grn-noti no-margin">
+                                <div class="green-notification body">
+                                    <div class="green-notification cell">
+                                        <i class="semi-big-icon grnt-quota"></i>
+                                    </div>
+                                    <div class="green-notification cell">[$20715]</div>
+                                    <div class="green-notification cell">
+                                        <div class="button default-green-button upgrade-to-pro rubschedt">
+                                            [$129]
                                         </div>
                                     </div>
                                 </div>
@@ -3622,7 +3721,7 @@
                                 <div class="account data-item">
                                     <div class="account data-td">
                                         <i class="semi-small-icon left-arrow"></i>
-                                        <span>[$5542]</span>
+                                        <span class="incoming pointer-c">[$5542]</span>
                                     </div>
                                     <div class="account data-td">
                                         0 folders
@@ -3634,7 +3733,7 @@
                                 <div class="account data-item">
                                     <div class="account data-td">
                                         <i class="semi-small-icon right-arrow"></i>
-                                        <span>[$5543]</span>
+                                        <span class="outgoing pointer-c">[$5543]</span>
                                     </div>
                                     <div class="account data-td">
                                         0 folders

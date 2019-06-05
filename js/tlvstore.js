@@ -258,8 +258,7 @@ var tlvstore = (function () {
         var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
         var nonceBytes = new Uint8Array(nonceSize);
         asmCrypto.getRandomValues(nonceBytes);
-        if ((key instanceof Array)
-                || (Object.prototype.toString.call(key) === '[object Array]')) {
+        if (Array.isArray(key)) {
             // Key is in the form of an array of four 32-bit words.
             key = a32_to_str(key);
         }
@@ -295,8 +294,7 @@ var tlvstore = (function () {
         var cipherBytes = asmCrypto.string_to_bytes(cipherText.substring(nonceSize + 1));
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
         var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
-        if ((key instanceof Array)
-                || (Object.prototype.toString.call(key) === '[object Array]')) {
+        if (Array.isArray(key)) {
             // Key is in the form of an array of four 32-bit words.
             key = a32_to_str(key);
         }

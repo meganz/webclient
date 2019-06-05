@@ -46,8 +46,11 @@ MegaData.prototype.onlineStatusClass = function(os) {
         // UserPresence.PRESENCE.ONLINE
         return [l[5923], 'online'];
     }
-    else {
+    else if (os === 1 || os === 'offline') {
         return [l[5926], 'offline'];
+    }
+    else {
+        return ['', 'black'];
     }
 };
 
@@ -420,7 +423,6 @@ MegaData.prototype.getActiveContacts = function() {
 
 // Contacts left panel handling
 MegaData.prototype.contacts = function() {
-
     // Contacts rendering not used on mobile
     if (is_mobile) {
         return true;
@@ -800,24 +802,18 @@ MegaData.prototype.syncContactEmail = function(userHash) {
      */
     var onContactChanged = function(contact) {
         if (fminitialized) {
-            if (getSitePath() === '/fm/' + contact.u) {
-                // re-render the contact view page if the presence had changed
-                M.addContactUI();
+            // throttle updates, since a lot of batched updates may come at
+            // pretty much the same moment (+/- few ms, enough to trigger tons of updates)
+            delay('onContactChanged', function() {
+                if (getSitePath() === '/fm/' + contact.u) {
+                    // re-render the contact view page if the presence had changed
+                    M.addContactUI();
+                }
+                else if (M.currentdirid === 'contacts') {
+                    M.openFolder(M.currentdirid, true);
+                }
                 eventuallyReorderContactsTreePane();
-            }
-            else if (M.currentdirid === 'contacts') {
-                // throttle updates, if the user is on the contacts page, since a lot of batched updates may come at
-                // pretty much the same moment (+/- few ms, enough to trigger tons of updates)
-                delay('onContactChanged', function() {
-                    if (M.currentdirid === 'contacts') {
-                        M.openFolder(M.currentdirid, true);
-                        eventuallyReorderContactsTreePane();
-                    }
-                }, 1000);
-            }
-            else {
-                eventuallyReorderContactsTreePane();
-            }
+            }, 1000);
         }
     };
 

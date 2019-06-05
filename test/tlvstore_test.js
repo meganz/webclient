@@ -5,23 +5,14 @@
 
 describe("tlvstore unit test", function() {
     "use strict";
-
     var assert = chai.assert;
-
     var ns = tlvstore;
 
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
-    beforeEach(function() {
-        sandbox = sinon.sandbox.create();
-    });
-
     afterEach(function() {
-        sandbox.restore();
+        mStub.restore();
     });
 
     describe('asmcrypto library test', function() {
@@ -108,7 +99,7 @@ describe("tlvstore unit test", function() {
         });
 
         it('tlvRecordsToContainer, malformed TLV (UTF-8 encoded)', function() {
-            sandbox.stub(ns._logger, '_log');
+            mStub(ns._logger, '_log');
             var test = atob('Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea');
             assert.strictEqual(ns.tlvRecordsToContainer(test), false);
             assert.strictEqual(ns._logger._log.args[0][0],
@@ -116,7 +107,7 @@ describe("tlvstore unit test", function() {
         });
 
         it('tlvRecordsToContainer, UTF-8 legacy decoding', function() {
-            sandbox.stub(ns._logger, '_log');
+            mStub(ns._logger, '_log');
             var test = atob('Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea');
             var expected = {'foo': 'bar', 'puEd255': ED25519_PUB_KEY};
             assert.deepEqual(ns.tlvRecordsToContainer(test, true), expected);
@@ -200,7 +191,7 @@ describe("tlvstore unit test", function() {
                         x[i] = nonce[i];
                     }
                 };
-                sandbox.stub(asmCrypto, 'getRandomValues', _copy);
+                mStub(asmCrypto, 'getRandomValues').callsFake(_copy);
                 for (var j = 0; j < clearVectors.length; j++) {
                     var clear = clearVectors[j];
                     assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode, true)),

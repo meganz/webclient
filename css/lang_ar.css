@@ -14,12 +14,131 @@
     font-style: normal;
 }
 
-body.ar, body.ar div, body.ar span, body.ar input, body.ar form, body.ar label, body.ar textarea, body.ar option, body.ar select,
-body.fa, body.ar div, body.ar span, body.fa input, body.fa form, body.fa label, body.fa textarea, body.fa option, body.fa select {
-    font-family: 'noto_nashk_regular', 'source_sans_proregular';
+@font-face {
+    font-family: 'cai_normal';
+    src: url('../fonts/cairo.ttf') format('truetype');
+    font-style: normal;
 }
 
-body.ar .message.user-card-name,
-body.fa .message.user-card-name {
-    font-family: 'noto_nashk_bold', 'source_sans_prosemibold';
+@font-face {
+    font-family: 'cai_bold';
+    src: url('../fonts/cairo-bold.ttf') format('truetype');
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'cai_light';
+    src: url('../fonts/cairo-light.ttf') format('truetype');
+    font-style: normal;
+}
+
+
+body.ar, body.ar div, body.ar span, body.ar input, body.ar form, body.ar label, body.ar textarea, body.ar option, body.ar select, body.ar a, body.ar h3, body.ar h5,
+body.fa, body.ar div, body.ar span, body.fa input, body.fa form, body.fa label, body.fa textarea, body.fa option, body.fa select, body.fa a {
+    font-family: 'cai_normal','noto_nashk_regular', 'source_sans_proregular' !important;
+}
+
+    body.ar .message.user-card-name, body.ar strong, body.fa strong,
+    body.ar .startpage.square-block.animated.start-animation,
+    body.fa .message.user-card-name,
+    body.ar .bottom-page.top-title.mobile span,
+    body.rtl .bottom-page.large-header.centered-txt .bold,
+    body.rtl .bottom-page.top-title.white-text span,
+    body.rtl .cmd-bg .bottom-page.top-title span,
+    body.rtl .startpage.register.top-button.clickurl,
+    body.rtl .startpage.square-bl-hover .txt .header,
+    body.rtl .main-mid-pad.big-pad.register1 .main-italic-header {
+        font-family: 'cai_bold','noto_nashk_bold', 'source_sans_prosemibold' !important;
+    }
+
+
+body.rtl .pages-nav-wrap .pages-nav.content-block,
+body.rtl .bottom-page.top-title.mobile,
+body.rtl .bottom-page.top-dark-info.medium,
+body.rtl .bottom-page.top-description,
+body.rtl .bottom-page.medium-txt.lato,
+body.rtl .big-red-button.height-48.no-l-space.create-business-acc-pp span,
+body.rtl .bottom-page.content-cell,
+body.rtl .bottom-page.slider-button.slide1,
+body.rtl .bottom-page.slider-block,
+body.rtl .bottom-page.business-header,
+body.rtl .bottom-page.business-text,
+body.rtl .bottom-page.horizontal-centered-bl.huge-pad.arrange-to-top.info.changed-order,
+body.rtl .business-cell.business-table-txt,
+body.rtl .ultra-huge-pad .business-big-header,
+body.rtl .business-mid-header.left-txt-align,
+body.rtl .business-txt-cols,
+body.rtl .bottom-page.large-header.centered-txt,
+body.rtl .uwp-windows-scrollto-button,
+body.rtl .bottom-page.bott-pad.angle-pad.blue-bg,
+/*body.rtl .bottom-page.full-block,*/
+body.rtl .bottom-page.vertical-pull-up,
+body.rtl .bottom-page.grey-blue-block.top-pad.bott-pad.sync-1,
+body.rtl .cmd-bg .bottom-page.horizontal-centered-bl,
+body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-title,
+body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
+body.rtl .top-login-warning,
+body.rtl .bottom-menu.body,
+body.rtl .membership-pad-bl .reg-st3-name-aligner span,
+body.rtl .fm-dialog.payment-address-dialog,
+body.rtl .fm-dialog.loginrequired-dialog,
+body.rtl .fm-dialog.pass-reminder,
+body.rtl .membership-st2-info .save-money,
+body.rtl .main-mid-pad.third-section .reg-st3-txt-localcurrencyprogram,
+body.rtl .rtl-block-if-rtl {
+    direction: rtl;
+}
+body.rtl .bottom-page.blue-block.top-pad.bott-pad.mcmd-pg-p,
+body.rtl .big-red-button.right,
+body.rtl .membership-pad-bl .reg-st3-name-aligner,
+body.rtl .payment-options-list.primary,
+body.rtl .register-st3-main-bl .membership-selected-block,
+body.rtl .bus-reg-btn {
+    direction: ltr;
+}
+
+body.rtl .bottom-page.slider-block,
+body.rtl .business-big-header.left-txt-align,
+body.rtl .bottom-page.horizontal-centered-bl.huge-pad.arrange-to-top.info.changed-order .bottom-page.business-text.top-pad,
+body.rtl .business-cell.business-table-txt,
+body.rtl .business-mid-header.left-txt-align,
+body.rtl .horizontal-centered-bl.huge-pad .business-txt-cols .bottom-page.business-text,
+body.rtl .horizontal-centered-bl.huge-pad .business-txt-cols .bottom-page.business-header,
+body.rtl .big-bott-pad.sync-2 .bottom-page.business-header,
+body.rtl .big-bott-pad.sync-2 .bottom-page.business-text,
+body.rtl .big-bott-pad.sync-4 .bottom-page.vertical-centered-cell.left-cell,
+body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
+body.rtl .align-right-if-rtl {
+    text-align: right;
+    text-align: justify;
+}
+
+body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-header,
+body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text {
+    text-align: center;
+}
+
+body.rtl .bus-reg-radio-block .provider {
+    margin-right: 12px;
+    margin-left: 0px;
+}
+body.rtl .bus-reg-radio-block .provider-icon {
+    margin-right: 4px;
+    margin-left: 32px;
+}
+body.rtl .bus-reg-info-block .bus-reg-checkbox {
+    margin-left: 12px;
+    margin-right: 0px;
+}
+/*body.rtl .membership-st2-info span.number {
+    left: initial;
+    right: -20px;
+}*/
+body.rtl .membership-st2-info .membership-st2-head,
+body.rtl .membership-st2-info .payment-method .provider-name,
+body.rtl .membership-st2-info .membership-radio-label,
+body.rtl .main-mid-pad.third-section .payment-instructions,
+body.rtl .main-top-info-block .main-top-info-text {
+    direction: rtl;
+    text-align: left;
 }

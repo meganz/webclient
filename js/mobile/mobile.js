@@ -511,20 +511,20 @@ mBroadcaster.once('startMega:mobile', function() {
 /* jshint -W007 */
 /* jshint strict: false */
 
-mega.ui.tpp = {
-    reset: function() {},
-    setTotalProgress: function() {},
-    pause: function() {},
-    resume: function() {},
-    getTime: function() {},
-    start: function() {},
-    setIndex: function() {},
-    isCached: function() {
+mega.tpw = {
+    addDownloadUpload: function() {},
+    updateDownloadUpload: function() {},
+    finishDownloadUpload: function() {},
+    errorDownloadUpload: function() {},
+    pauseDownloadUpload: function() {},
+    removeRow: function() {},
+    showWidget: function() { return false;},
+    isWidgetVisibile: function() {
         'use strict';
         return false;
     },
-    statusPaused: function() {},
-    hide: function() {}
+    hideWidget: function() {},
+    clearRows: function() {}
 };
 
 mega.megadrop = {
@@ -591,8 +591,22 @@ accountUI.session = {
 function msgDialog(type, title, msg, submsg, callback, checkbox) {
     'use strict';
 
+    // Some webclient calls require callback to return the selected option as a boolean. Hence two callbacks.
     // Call the mobile version
-    mobile.messageOverlay.show(msg, submsg, callback);
+    mobile.messageOverlay.show(
+        msg,
+        submsg,
+        function() {
+            if (typeof callback === 'function') {
+                callback(true);
+            }
+        },
+        function() {
+            if (typeof callback === 'function') {
+                callback(false);
+            }
+        }
+    );
 }
 
 function fm_showoverlay() {

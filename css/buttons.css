@@ -153,7 +153,7 @@
 .big-button:hover .dashed-conversation {
     background-position: 1px -1694px;
 }
-.default-white-button, .default-grey-button, .default-red-button, .default-green-button, .default-light-green-button {
+.default-white-button, .default-grey-button, .default-red-button, .default-green-button, .default-light-green-button, .default-orange-button {
     display: block;
     font-family: 'LatoWeb', 'source_sans_proregular';
     font-size: 14px;
@@ -255,7 +255,7 @@
     -moz-box-shadow: 0px 0px 0px 1px #666666;
     box-shadow: 0px 0px 0px 1px #666666;
 }
-.default-white-button::first-letter {
+body:not(.rtl) .default-white-button::first-letter {
     text-transform: uppercase;
 }
 .default-white-button.small-height {
@@ -322,6 +322,13 @@
     background: -webkit-linear-gradient(top, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
     background: linear-gradient(to bottom, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
 }
+.default-orange-button {
+    color: white;
+    background: #FFA500;
+    background: -moz-linear-gradient(top, rgba(255,174,0,1) 0%, #FFA500 100%);
+    background: -webkit-linear-gradient(top, rgba(255,174,0,1) 0%, #FFA500 100%);
+    background: linear-gradient(to bottom, rgba(255,174,0,1) 0%, #FFA500 100%);
+}
 .button.inline, .default-white-button.inline, .default-grey-button.inline {
     display: inline-block;
     margin: 0 5px;
@@ -330,10 +337,10 @@
     display: inline-block;
     margin: 0 3px;
 }
-.default-white-button.hidden, .default-grey-button.hidden, .default-red-button.hidden {
+.default-white-button.hidden, .default-grey-button.hidden, .default-red-button.hidden, .default-orange-button.hidden {
     display: none;
 }
-.button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled {
+.button.disabled, .default-white-button.disabled, .default-grey-button.disabled, .default-red-button.disabled, .default-orange-button.disabled {
     cursor: default;
     -moz-opacity: 0.3;
     -khtml-opacity: 0.3;
@@ -381,7 +388,7 @@
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before, .default-light-green-button::before, .default-light-green-button::after {
+.default-grey-button::before, .default-grey-button::after, .default-white-button:not(.light)::before, .default-white-button::after, .default-red-button::before, .default-red-button::after, .default-green-button::before, .default-light-green-button::before, .default-light-green-button::after, .default-orange-button::before, .default-orange-button::after {
     -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
@@ -452,12 +459,12 @@
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.45);
 }
 
-.default-red-button::after {
+.default-red-button::after, .default-orange-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
 }
-.default-grey-button:not(.disabled):hover, .default-red-button:not(.disabled):hover {
+.default-grey-button:not(.disabled):hover, .default-red-button:not(.disabled):hover, .default-orange-button:not(.disabled):hover {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
@@ -533,7 +540,7 @@
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite_v10.png);
+    background-image: url(../images/mega/new-chat-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }
@@ -1076,7 +1083,7 @@
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

@@ -1056,8 +1056,6 @@ function percent_megatitle() {
     var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
     var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
 
-    mega.ui.tpp.setTotalProgress(x_ul, 'ul');
-    mega.ui.tpp.setTotalProgress(x_dl, 'dl');
 
     if (dl_t && ul_t) {
         t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';
@@ -1488,7 +1486,7 @@ function constStateToText(enumMap, state) {
 function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
     "use strict";
 
-    assert(typeof newState !== "undefined", "assertStateChange: Invalid newState");
+    assert(typeof newState !== "undefined", "assertStateChange: newState is 'undefined'");
     var checksAvailable = allowedStatesMap[currentState];
     var allowed = false;
     if (checksAvailable) {
@@ -2157,7 +2155,6 @@ if (typeof sjcl !== 'undefined') {
 
         // Share button enabled
         if ($.dialog === 'share' && !$shareDialog.find('.dialog-share-button').is('.disabled')) {
-
             selectedNode = $.selected[0];
             $newContacts = $shareDialog.find('.token-input-list-mega .token-input-token-mega');
 

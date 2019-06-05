@@ -169,7 +169,7 @@ function dashboardUI() {
             var $achWidget = $('.account.widget.achievements');
             var maf = M.maf;
             var $storage = $('.account.bonuses-size.storage', $achWidget);
-            var $transfer = $('.account.bonuses-size.transfer', $achWidget);
+            var $transfer = $('.account.bonuses-size.transfers', $achWidget);
             var storageCurrentValue = maf.storage.current /*+ maf.storage.base*/;
             var transferCurrentValue = maf.transfer.current /*+ maf.transfer.base*/;
 
@@ -556,7 +556,17 @@ dashboardUI.updateCloudDataWidget = function() {
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {
-        loadSubPage('fm/links');
+        loadSubPage('fm/public-links');
+        return false;
+    });
+
+    $('.data-item .incoming').rebind('click', function() {
+        loadSubPage('fm/shares');
+        return false;
+    });
+
+    $('.data-item .outgoing').rebind('click', function() {
+        loadSubPage('fm/out-shares');
         return false;
     });
 

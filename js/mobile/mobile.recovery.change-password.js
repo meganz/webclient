@@ -18,6 +18,7 @@ mobile.recovery.changePassword = {
     init: function(type) {
 
         'use strict';
+        this.type = type;
 
         // Cache the selector for the change password process after entering the key
         this.$screen = $('.reset-password-after-entering-key');
@@ -28,15 +29,94 @@ mobile.recovery.changePassword = {
         }
 
         // Initialise page functionality
+        this.initDataLossCheckbox(type);
         this.initUpdateButton(type);
 
         // Load password strength estimator
-        mobile.initPasswordFieldsKeyupEvent(this.$screen);
+        this.initPasswordFieldsChangeEvent();
         mobile.initPasswordEstimatorLibrary(this.$screen);
         mobile.initPasswordStrengthCheck(this.$screen);
 
         // Show the screen
         this.$screen.removeClass('hidden');
+    },
+
+    /**
+     * Attach event listener to password fields to enable the button when conditions are met.
+     */
+    initPasswordFieldsChangeEvent: function() {
+        'use strict';
+
+        var $passwordField = this.$screen.find('.password-input');
+        var $confirmPasswordField = this.$screen.find('.password-confirm-input');
+        var $allFields = $passwordField.add($confirmPasswordField);
+
+        // Add keyup event to the input fields
+        var self = this;
+        $allFields.rebind('keyup.buttonenable', function() {
+            self.updateButtonState();
+        });
+    },
+
+    /**
+     * Helper function to update the button state, call whenever the active state of the button should be quuestioned.
+     */
+    updateButtonState: function() {
+        'use strict';
+
+        var $passwordField = this.$screen.find('.password-input');
+        var $confirmPasswordField = this.$screen.find('.password-confirm-input');
+        var $button = this.$screen.find('.update-password-button');
+
+        var password = $passwordField.val();
+        var confirmPassword = $confirmPasswordField.val();
+        var checkResult = this.type === "key" ? true : this.$confirmDataLossCheck.is(':checked');
+
+        // Change the button to red to enable it if they have entered something in all the fields
+        if (password.length > 0 && confirmPassword.length > 0 && checkResult) {
+
+            // Activate the button
+            $button.addClass('active');
+
+            // If the Enter key is pressed try updating
+            if (event.which === 13) {
+                $button.trigger('tap');
+            }
+        }
+        else {
+            // Grey it out if they have not completed one of the fields
+            $button.removeClass('active');
+        }
+    },
+
+    /**
+     * Init event handlers for data loss confirmation checkbox.
+     * @param type
+     */
+    initDataLossCheckbox: function(type) {
+        'use strict';
+        if (type !== "key") {
+            var self = this;
+            this.$confirmDataLossBlock = this.$screen.find('.mobile.park-account.confirm-data-loss');
+            this.$confirmDataLossCheck = this.$confirmDataLossBlock.find('input');
+            var $checkboxWrapper = this.$confirmDataLossBlock.find('.checkdiv');
+
+            this.$confirmDataLossBlock.off('tap').on('tap', function() {
+                // If checked already, uncheck it
+                if (self.$confirmDataLossCheck.is(':checked')) {
+                    $checkboxWrapper.addClass('checkboxOff').removeClass('checkboxOn');
+                    self.$confirmDataLossCheck.prop('checked', false);
+                    self.updateButtonState();
+                }
+                else {
+                    // Otherwise check it
+                    $checkboxWrapper.removeClass('checkboxOff').addClass('checkboxOn');
+                    self.$confirmDataLossCheck.prop('checked', true);
+                    self.updateButtonState();
+                }
+                return false;
+            });
+        }
     },
 
     /**
@@ -53,7 +133,10 @@ mobile.recovery.changePassword = {
 
         // Add click/tap handler to button
         $updateButton.off('tap').on('tap', function() {
-
+            if (!$updateButton.hasClass('active')) {
+                return false;
+            }
+            
             // Get the current text field values
             var password = $passwordField.val();
             var confirmPassword = $confirmPasswordField.val();

@@ -11,7 +11,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 (function() {
     chatui = function(id) {
         var roomOrUserHash = id.replace("chat/", "");
-        var isPubLink = id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
+        var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
         var roomType = false;
         megaChat.displayArchivedChats = false;
@@ -479,6 +479,7 @@ Chat.prototype.init = function() {
         }
     }
     self.is_initialized = true;
+    mBroadcaster.sendMessage('chat_initialized');
     if (!anonymouschat) {
         $('.activity-status-block, .activity-status').show();
     }
@@ -897,6 +898,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
 
     var havePendingCall = false;
+    var haveCall = false;
     self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom, k) {
         if (megaRoom.state == ChatRoom.STATE.LEFT) {
             // skip left rooms.
@@ -908,7 +910,11 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
         unreadCount += c;
-        havePendingCall = havePendingCall || megaRoom.havePendingCall();
+        if (!havePendingCall) {
+            if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
+                havePendingCall = true;
+            }
+        }
     });
 
     unreadCount = unreadCount > 9 ? "9+" : unreadCount;
@@ -919,10 +925,18 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         haveContents = true;
         $('.new-messages-indicator .chat-pending-call')
             .removeClass('hidden');
+
+        if (haveCall) {
+            $('.new-messages-indicator .chat-pending-call').addClass('call-exists');
+        }
+        else {
+            $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
+        }
     }
     else {
         $('.new-messages-indicator .chat-pending-call')
-            .addClass('hidden');
+            .addClass('hidden')
+            .removeClass("call-exists");
     }
 
     if (self._lastUnreadCount != unreadCount) {
@@ -1046,7 +1060,7 @@ Chat.prototype.userPresenceToCssClass = function(presence) {
     else if (presence === UserPresence.PRESENCE.DND) {
         return 'busy';
     }
-    else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+    else if (presence === UserPresence.PRESENCE.OFFLINE) {
         return 'offline';
     }
     else {
@@ -1240,9 +1254,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     }
 
     if (type === "group" || type == "public") {
-        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
-
         userHandles.forEach(function(contactHash) {
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1261,6 +1272,9 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 M.syncContactEmail(contactHash);
             }
         });
+
+        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
     }
 
     if (!roomId && setAsActive) {

@@ -185,6 +185,10 @@ ClassChunk.prototype.updateProgress = function(force) {
     this.Progress.dl_prevprogress = _progress;
     this.Progress.dl_lastprogress = Date.now();
 
+    if (force !== 2 && dlmanager.isOverQuota) {
+        dlmanager.onNolongerOverquota();
+    }
+
     return r;
 };
 

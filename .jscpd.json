@@ -1,0 +1,11 @@
+{
+  "mode": "weak",
+  "minLines": 12,
+  "maxLines": 9999,
+  "maxSize": "340kb",
+  "format": ["javascript", "jsx"],
+  "reporters": ["console", "badge"],
+  "ignore": ["**/node_modules/**", "**/tests/**", "**/vendor/**", "**/**/bundle.js"],
+  "tokensToSkip": ["comment", "empty", "new_line", "ignore"],
+  "gitignore": true
+}

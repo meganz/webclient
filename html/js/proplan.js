@@ -58,11 +58,14 @@ pro.proplan = {
         if (u_type === 3) {
 
             // Get user quota information, the flag 'strg: 1' includes current account storage in the response
-            api_req({ a: 'uq', strg: 1 }, {
+            api_req({ a: 'uq', strg: 1, pro: 1 }, {
                 callback : function (result) {
 
                     // Store current account storage usage for checking later
                     pro.proplan.currentStorageBytes = result.cstrg;
+
+                    // Process next and current plan data and display tag on top of the plan
+                    pro.proplan.processCurrentAndNextPlan(result);
                 }
             });
         }
@@ -632,6 +635,51 @@ pro.proplan = {
         // Sabadell needs to also show success or failure
         else if (provider === 'sabadell') {
             sabadell.showPaymentResult(status);
+        }
+    },
+
+    /**
+     * Processes current and next plan data from api response, and place tag(s) for it.
+     *
+     * @param {Object} data Api response data
+     */
+    processCurrentAndNextPlan: function(data) {
+
+        'use strict';
+
+        if (!is_mobile) {
+
+            var $plansBlock = $('.plans-block');
+            var $currPlan = $plansBlock.find('[data-payment="' + u_attr.p + '"]').addClass('current');
+
+            // Current plan
+            if (data.srenew) { // This is subscription plan
+
+                var renewTimestamp = data.srenew[0];
+                $currPlan.addClass('renew').find('.plan-tag-description.renew b').text(time2date(renewTimestamp, 2));
+            }
+            else {
+                var currentExpireTimestamp = data.nextplan ? data.nextplan.t : data.suntil;
+                $currPlan.find('.plan-tag-description.current b').text(time2date(currentExpireTimestamp, 2));
+            }
+
+            // Hide popular text on current plan
+            $currPlan.find('.pro-popular-txt').addClass('hidden');
+
+            // Next plan
+            if (data.nextplan) {
+
+                // Store next plan
+                pro.proplan.nextPlan = data.nextplan;
+                
+                var $nextPlan = $plansBlock.find('[data-payment="' + pro.proplan.nextPlan.p + '"]');
+
+                $nextPlan.addClass('next').find('.plan-time').text(time2date(pro.proplan.nextPlan.t, 2));
+                $nextPlan.find('.plan-name').text(pro.getProPlanName(pro.proplan.nextPlan.p));
+
+                // Hide popular text on next plan
+                $nextPlan.find('.pro-popular-txt').addClass('hidden');
+            }
         }
     }
 };

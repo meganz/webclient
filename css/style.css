@@ -880,7 +880,7 @@ a.account-manage-button:hover {
     background-color: rgba(255,255,255,1);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -6px -10649px;
     background-repeat: no-repeat;
     left: 0;
@@ -1042,7 +1042,7 @@ a.account-manage-button:hover {
     height: 40px;
 }
 .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -11854px;
     width: 30px;
 }
@@ -1147,9 +1147,9 @@ a.account-manage-button:hover {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 4px 8px;
+    padding: 4px;
     width: 10px;
-    min-width: 127px;
+    min-width: 135px;
     text-align: center;
 }
 .slider-percentage span {
@@ -1788,7 +1788,7 @@ a.blog-button:hover {
     line-height: 18px;
     padding: 2px 0 2px 28px;
     margin: 0 14px 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -14px -7100px;
     background-repeat: no-repeat;
 }
@@ -1798,7 +1798,7 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -27px;
     background-position: -14px -6776px;
     background-repeat: no-repeat;
@@ -3442,6 +3442,9 @@ img.blog-new-logos {
     transition: all 200ms ease-in-out;
     cursor: pointer;
 }
+.properties-context-item span{
+    white-space: nowrap;
+}
 .properties-context-item.show-more {
     color: white;
 }
@@ -3706,7 +3709,7 @@ label.iPhoneCheckLabelOff span {
     height: 24px;
     left: 10px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -1px -3036px;
     background-repeat: no-repeat;
 }
@@ -3904,16 +3907,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.dragover {
     background-color: rgba(217,0,7,0.3);
 }
-.shared-with-me .nw-fm-tree-item:hover {
+.shared-with-me .nw-fm-tree-item:hover, .out-shares .nw-fm-tree-item:hover, .public-links .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered, .out-shares .nw-fm-tree-item.hovered, .public-links .nw-fm-tree-item.hovered {
     background-color: rgba(255,179,0,0.3);
 }
-.shared-with-me .nw-fm-tree-item.selected {
+.shared-with-me .nw-fm-tree-item.selected, .out-shares .nw-fm-tree-item.selected, .public-links .nw-fm-tree-item.selected {
     background-color: rgba(255,179,0,0.5);
 }
-.shared-with-me .nw-fm-tree-item.dragover {
+.shared-with-me .nw-fm-tree-item.dragover, .out-shares .nw-fm-tree-item.dragover, .public-links .nw-fm-tree-item.dragoved {
     background-color: rgba(255,179,0,0.4);
 }
-.rubbish-bin .nw-fm-tree-item:hover {
+.rubbish-bin .nw-fm-tree-item:hover, .rubbish-bin .nw-fm-tree-item.hovered {
     background-color: rgba(39,183,0,0.3);
 }
 .rubbish-bin .nw-fm-tree-item.selected {
@@ -3938,7 +3941,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: center -9911px;
     cursor: pointer;
@@ -4120,7 +4123,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
     padding-right: 32px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -2907px;
     background-repeat: no-repeat;
 }
@@ -4145,7 +4148,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 12px;
     border: 2px solid #d9d9d9;
     padding: 0 10px 0 32px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -10px -2969px;
     background-repeat: no-repeat;
     -moz-border-radius: 5px;
@@ -4162,7 +4165,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: #868686;
 }
 .verified .nw-contact-verified-icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -19px -2827px;
     background-repeat: no-repeat;
     position: absolute;
@@ -4224,6 +4227,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .black .nw-contact-status, .black .properties-contact-status {
     background-color: black;
+    visibility: hidden;
 }
 .add-contact-item, .add-contact-pad {
     display: block;
@@ -4235,7 +4239,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     z-index: 10;
     background-position: -11px -2244px;
     -webkit-box-sizing: border-box;
@@ -4314,7 +4318,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     right: 2px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -4624,6 +4628,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 }
 .activity-status.black, .contact-status.black-status {
     background-color: black;
+    visibility: hidden;
 }
 .dropdown-item:hover .activity-status {
     -webkit-box-shadow: 0px 0px 0px 2px #FFFFFF;
@@ -4870,7 +4875,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -4944,7 +4949,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 36px;
     background-color: rgba(242,242,242,100);
 }
-.fm-left-menu.shared-with-me {
+.fm-left-menu.shared-with-me, .fm-left-menu.out-shares, .fm-left-menu.public-links {
     background-color: rgba(255,165,0,1);
 }
 .fm-left-menu.inbox {
@@ -5132,7 +5137,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-left-menu.account + div + div + .nw-tree-panel-header {
     display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .out-shares .nw-fm-tree-header.shared-with-me, .public-links .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
     display: block;
 }
 .transfers-header-bl {
@@ -5145,7 +5150,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: block;
 }
 .nw-fm-search-icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -10px -7881px;
     position: absolute;
@@ -5190,7 +5195,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 48px;
     content: '';
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -100px -100px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
@@ -5225,7 +5230,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     background-position: 3px -6142px;
 }
 .nw-fm-left-icon.shared-with-me::before {
-    background-position: 3px -88px;
+    background-position: 0 -12717px;
 }
 .nw-fm-left-icon.contacts::before {
     background-position: 3px -136px;
@@ -5373,7 +5378,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     float: left;
     height: 100%;
     position: relative;
-    z-index: 30;
+    z-index: 20;
 }
 .default-white-button.l-pane-visibility {
     display: none;
@@ -5381,6 +5386,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     top: 50%;
     margin-top: -12px;
     right: -11px;
+    z-index: 19;
 }
 .active-folder-link .l-pane-visibility {
     display: block;
@@ -5415,7 +5421,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -webkit-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
     -moz-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
     box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
-    z-index: 30;
+    z-index: 20;
 }
 .l-pane-collapsed .fm-left-panel {
     width: 6px !important;
@@ -5440,7 +5446,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     top: 49px;
     width: 36px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: center -848px;
 }
@@ -5563,7 +5569,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -5703,7 +5709,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     -khtml-opacity: 1;
     opacity: 1;
 }
-.files-grid-view, .files-grid-view.shared-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .transfer-table-wrapper {
+.files-grid-view, .files-grid-view.shared-view, .files-grid-view.out-shares-view, .files-grid-view.public-links-view, .files-grid-view.contacts-view, .contacts-grid-view, .shared-grid-view, .out-shared-grid-view, .transfer-table-wrapper {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5714,6 +5720,11 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: relative;
     top: -1px;
     overflow: hidden;
+}
+.files-grid-view.shared-view, .files-grid-view.out-shares-view, .files-grid-view.public-links-view, .shared-grid-view, .out-shared-grid-view {
+    height: -webkit-calc(100% - 73px);
+    height: -moz-calc(100% - 73px);
+    height: calc(100% - 73px);
 }
 .files-grid-view.archived-chat-view {
     height: -webkit-calc(100% );
@@ -5765,7 +5776,7 @@ th.grid-first-th {
     height: 24px;
     width: 30px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
@@ -5779,7 +5790,7 @@ th.grid-first-th {
 .grid-sixth-th {
     width: 45px;
 }
-.grid-table.shared-with-me td, .grid-table.contacts td, .grid-table.contact-requests td, .grid-table.sent-requests td {
+.grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .grid-table.contact-requests td, .grid-table.sent-requests td {
     height: 48px;
 }
 .sent-requests-grid th {
@@ -5803,7 +5814,7 @@ th.grid-first-th {
     height: 24px;
     width: 25px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -13px -4884px;
     background-size: auto;
@@ -5892,6 +5903,32 @@ th.grid-first-th {
 .linked .data-item-icon, .taken-down.linked .data-item-icon, .undecryptable.nw-fm-tree-item .data-item-icon {
     display: block;
 }
+
+/* Out Shares */
+.out-shared-grid-view .fm-chat-users-wrapper.simpletip {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+}
+.out-shared-grid-view .fm-chat-users-wrapper.simpletip:hover {
+    text-decoration: underline;
+    font-weight: 600;
+}
+.out-shared-grid-view .fm-chat-users {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.out-shared-grid-view .simpletip-parent {
+    position: static !important;
+}
+.out-shared-blocks-view .shared-folder-info-block {
+    z-index: 1;
+}
+.out-shared-blocks-view .shared-folder-info, .contact-email, .shared-contact-info {
+    display: inline-block;
+}
+/* End of Out Shares */
+
 /* FM notification */
 .fm-notification-block {
     display: none;
@@ -5961,7 +5998,7 @@ th.grid-first-th {
     height: calc(100% - 61px);
 }
 /* End of FM notification */
-.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .contacts-details-block, .contacts-blocks-view {
+.fm-blocks-view, .fm-contacts-blocks-view, .fm-blocks-view.shared-view, .shared-details-block, .shared-blocks-view, .out-shared-blocks-view, .fm-blocks-view.out-shares-view, .fm-blocks-view.public-links-view, .contacts-details-block, .contacts-blocks-view {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5974,12 +6011,12 @@ th.grid-first-th {
     padding: 0;
     overflow: hidden;
 }
-.fm-blocks-view.contacts-view, .fm-contacts-blocks-view, .contacts-details-block, .contacts-blocks-view, .files-grid-view.contacts-view {
+.fm-blocks-view.contacts-view, .fm-contacts-blocks-view, .contacts-details-block, .contacts-blocks-view, .files-grid-view.contacts-view, .shared-details-block, .shared-blocks-view, .out-shared-blocks-view, .fm-blocks-view.out-shares-view, .fm-blocks-view.public-links-view {
     height: -webkit-calc(100% - 73px);
     height: -moz-calc(100% - 73px);
     height: calc(100% - 73px);
 }
-.file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling {
+.file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling, .out-shared-blocks-scrolling {
     height: 100%;
     padding-right: 14px;
     -webkit-box-sizing: border-box;
@@ -6009,7 +6046,7 @@ th.grid-first-th {
     display: none;
 }
 */
-.file-block-scrolling .jspPane::after, .contacts-blocks-scrolling .jspPane::after, .shared-blocks-scrolling .jspPane::after {
+.file-block-scrolling .jspPane::after, .contacts-blocks-scrolling .jspPane::after, .shared-blocks-scrolling .jspPane::after, .out-shared-blocks-scrolling .jspPane::after {
     clear: both;
     display: block;
     content: '';
@@ -6260,7 +6297,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -6272,7 +6309,7 @@ th.grid-first-th {
 .clear-transfer-icon::after {
     opacity: 0.67;
     background-position: 1px -4045px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .hide-settings-icon {
     -moz-opacity: 0;
@@ -6297,7 +6334,7 @@ th.grid-first-th {
 .grid-table {
     width: 100%;
 }
-.contacts-view .grid-table, .shared-grid-view .grid-table, .contact-details-view .grid-table {
+.contacts-view .grid-table, .shared-grid-view .grid-table, .out-shared-grid-view .grid-table, .contact-details-view .grid-table {
     table-layout: fixed;
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
@@ -6313,7 +6350,7 @@ th.grid-first-th {
     box-sizing: border-box;
     position: relative;
 }
-.grid-table.shared-with-me td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
+.grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;
 }
 table {
@@ -6759,7 +6796,7 @@ table {
 .fm-blocks-view.shared-view .block-view-file-type.folder, .shared-blocks-view .block-view-file-type.folder, .fm-blocks-view.contacts-view .block-view-file-type.folder, .contacts-blocks-view .block-view-file-type.folder, .block-view-file-type.folder.inbound-share, .contact-details-view .block-view-file-type.folder-shared {
     background-position: 0 -4794px;
 }
-.block-view-file-type.folder-shared {
+.block-view-file-type.folder-shared, .out-shared-blocks-view .block-view-file-type.folder {
     background-position: 0 -5034px;
 }
 .rubbish-bin .block-view-file-type.folder-shared {
@@ -7154,7 +7191,7 @@ table {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
 }
 .transfer-table tr:nth-child(odd) td .transfer-type::before {
@@ -7194,11 +7231,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -7228,7 +7265,7 @@ table {
     display: block;
     left: 0;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -15px -700px;
     position: absolute;
@@ -7254,7 +7291,7 @@ table {
 .transfer-table .eta {
     min-width: 100px;
     display: inline-block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -15px -724px;
     background-repeat: no-repeat;
     text-indent: 17px;
@@ -7271,7 +7308,7 @@ table {
     text-indent: 18px;
 }
 .transfer-table .eta.unknown::before {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: 0 -4172px;
     background-repeat: no-repeat;
     content: '';
@@ -7325,6 +7362,9 @@ table {
     -ms-transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
     transition: opacity 200ms ease-in-out, color 200ms ease-in-out;
 }
+.fm-right-header .link-button.fm-new-shared-folder {
+    overflow: visible;
+}
 .fm-right-header .link-button > .small-icon {
     margin-right: 6px;
 }
@@ -7377,6 +7417,12 @@ table {
 .fm-breadcrumbs.shared-with-me:first-child .right-arrow-bg {
     background-position: 9px -8096px;
 }
+.fm-breadcrumbs#path_out-shares:first-child .right-arrow-bg {
+    background-position: 9px -12766px;
+}
+.fm-breadcrumbs#path_public-links:first-child .right-arrow-bg {
+    background-position: 0px -4823px;
+}
 .fm-breadcrumbs.contacts .right-arrow-bg {
     background-position: 9px -8136px;
 }
@@ -7385,7 +7431,7 @@ table {
     margin-left: -1px;
 }
 .fm-breadcrumbs.has-next-button {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: right -1434px;
 }
@@ -7416,7 +7462,7 @@ table {
     opacity: 0;
 }
 .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg {
@@ -7481,7 +7527,7 @@ table {
     font-size: 13px;
     color: #333333;
     padding: 0 20px 0 22px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -2px -3304px;
     float: right;
@@ -7560,7 +7606,7 @@ table {
     display: block;
     float: right;
     margin: 9px 11px 0 29px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -7605,7 +7651,7 @@ table {
     opacity: 0.05;
     cursor: default;
 }
-.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
+.fm-empty-cloud, .fm-empty-search, .fm-empty-trashbin, .fm-empty-contacts, .fm-empty-messages, .fm-empty-folder, .fm-empty-conversations, .fm-empty-incoming, .fm-empty-outgoing, .fm-empty-public-link, .fm-invalid-folder, .fm-empty-folder-link, .fm-empty-filter {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -7667,7 +7713,7 @@ table {
     height: 370px;
     margin-top: -186px;
 }
-.fm-empty-folder .fm-empty-pad, .fm-empty-incoming .fm-empty-pad, .fm-empty-folder-link .fm-empty-pad {
+.fm-empty-folder .fm-empty-pad, .fm-empty-folder-link .fm-empty-pad {
     height: 288px;
     margin-top: -144px;
 }
@@ -7686,8 +7732,8 @@ table {
     height: 390px;
     margin-top: -171px;
 }
-.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
-    background-image: url(../images/mega/empty-sprite_v5.png);
+.fm-empty-cloud-bg, .fm-empty-folder-bg, .fm-empty-conversations-bg, .fm-empty-incoming-bg, .fm-empty-outgoing-bg, .fm-empty-public-link-bg, .fm-empty-contacts-bg, .fm-invalid-folder-bg, .fm-empty-folder-link-bg, .fm-empty-trashbin-bg, .fm-empty-transfers-bg, .fm-empty-search-bg, .fm-empty-filter-bg {
+    background-image: url(../images/mega/empty-sprite_v6.png);
     background-repeat: no-repeat;
 }
 .fm-empty-cloud-bg {
@@ -7727,8 +7773,16 @@ table {
     background-position: center -276px;
 }
 .fm-empty-incoming-bg {
-    height: 212px;
-    background-position: center -856px;
+    height: 102px;
+    background-position: 50.4% -3921px;
+}
+.fm-empty-outgoing-bg {
+    height: 102px;
+    background-position: center -3751px;
+}
+.fm-empty-public-link-bg {
+    height: 102px;
+    background-position: center -3575px;
 }
 .fm-empty-folder-link .fm-empty-pad {
     height: 354px;
@@ -9068,7 +9122,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: right -8359px;
     -webkit-box-sizing: border-box;
@@ -10299,7 +10353,7 @@ span.orange {
     margin: 0 0 0 -6px;
     position: absolute;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -8343px;
     background-position: right -1288px;
     background-repeat: no-repeat;
@@ -10380,11 +10434,11 @@ span.orange {
     background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: left -7998px;
     display: block;
@@ -10415,7 +10469,7 @@ table {
 }
 .transfer-table-header th:first-child span {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -6px -4019px;
     height: 24px;
@@ -10711,12 +10765,12 @@ table {
     height: calc(100% - 37px);
     background-color: white;
 }
-.account.tabs-bl, .contacts-tabs-bl {
+.account.tabs-bl, .contacts-tabs-bl, .shares-tabs-bl {
     background-color: #fafafa;
     border-bottom: 1px solid #e5e5e5;
     padding: 5px 16px 0 12px;
 }
-.contacts-tabs-bl {
+.contacts-tabs-bl, .shares-tabs-bl {
     margin: -1px 0 0 0;
     display: table;
     width: 100%;
@@ -10727,7 +10781,7 @@ table {
 .fm-account-history .account.tab-content, .fm-account-reseller .account.tab-content {
     height: 100%;
 }
-.account.tab-lnk, .contacts-tab-lnk {
+.account.tab-lnk, .contacts-tab-lnk, .shares-tab-lnk {
     cursor: pointer;
     font-size: 16px;
     line-height: 20px;
@@ -10743,10 +10797,10 @@ table {
     position: relative;
     margin-bottom: -1px;
 }
-.contacts-tab-lnk.filled {
+.contacts-tab-lnk.filled, .shares-tab-lnk.filled {
     padding: 4px 5px 0 24px;
 }
-.contacts-tab-lnk span {
+.contacts-tab-lnk span, .shares-tab-lnk span {
     font-size: 12px;
     line-height: 14px;
     height: 14px;
@@ -10762,7 +10816,7 @@ table {
     border-radius: 4px;
     font-family: 'source_sans_prosemibold', Arial;
 }
-.contacts-tab-lnk.filled span {
+.contacts-tab-lnk.filled span, .shares-tab-lnk.filled span {
     display: inline-block;
 }
 .account.tab-lnk.active {
@@ -10771,6 +10825,10 @@ table {
 }
 .contacts-tab-lnk.active {
     border-color: #00897B;
+    color: #333333;
+}
+.shares-tab-lnk.active {
+    border-color: rgba(255,165,0,1);
     color: #333333;
 }
 .account.tab-lnk.achievements, .active-achievements .account.tab-lnk.payment {
@@ -10885,7 +10943,7 @@ table {
     width: 25px;
     height: 13px;
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -6063px;
     background-repeat: no-repeat;
     margin: -20px 0 0 -12px;
@@ -11405,7 +11463,7 @@ table {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     margin: 2px 0 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -13px -11775px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -15022,7 +15080,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow:not(.grid-header-star) {
     cursor: pointer;
     background-position: right top;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     padding: 0 15px 0 0;
     display: block;
@@ -15083,7 +15141,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon.cloud-drive {
     background-position: -5px -999px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
@@ -15092,19 +15150,19 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-path-icon.shared-folder {
     background-position: -12px -4369px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.recycle-item {
     background-position: -1px -8035px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.contacts-item {
     background-position: -12px -4410px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon.inbox-item {
     background-position: -3px -6717px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 .search-path-icon img {
     width: 24px;
@@ -15123,7 +15181,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 10px;
     height: 30px;
     background-repeat: no-repeat;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
@@ -15512,7 +15570,7 @@ span.incoming-call-name {
     display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: right -6265px;
     background-repeat: no-repeat;
     padding-right: 25px;
@@ -15788,7 +15846,7 @@ span.incoming-call-name {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-.shared-folder-info, .contact-email {
+.shared-folder-info, .contact-email, .shared-contact-info {
     color: #777;
     font-size: 13px;
     line-height: 18px;
@@ -15797,6 +15855,9 @@ span.incoming-call-name {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+.shared-contact-info {
+    display: inline-block;
 }
 .data-block-view.semi-big .shared-folder-info {
     line-height: 20px;
@@ -15808,7 +15869,7 @@ span.incoming-call-name {
     padding-left: 31px;
     color: #666;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -13px -4292px;
     background-repeat: no-repeat;
 }
@@ -17751,7 +17812,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .dialog-empty-icon {
     height: 128px;
-    background-image: url(../images/mega/empty-sprite_v5.png);
+    background-image: url(../images/mega/empty-sprite_v6.png);
     background-position: center -2677px;
     background-repeat: no-repeat;
 }
@@ -17893,7 +17954,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -19719,7 +19780,7 @@ body.pro:after {
 }
 .transfer-bar-overlay div {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -13px -564px;
     background-color: rgba(255,255,255,0.7);
@@ -20007,7 +20068,7 @@ body.pro:after {
 .membership-step2 .bandwidth-back-button {
     display: block;
 }
-.dropdown.body.popup.transfer-widget {
+./*dropdown.body.popup.transfer-widget {
     width: 256px;
     position: absolute;
     bottom: 4px;
@@ -20021,12 +20082,12 @@ body.pro:after {
     top: -1px;
     right: -1px;
     display: none;
-}
+}*/
 .fm-dialog-close.small {
     background-image: url(../images/mega/register-big-sprite-v15.png);
     background-position: -40px -130px;
 }
-.transfer-widget.left-arrow .dropdown-white-arrow {
+/*.transfer-widget.left-arrow .dropdown-white-arrow {
     top: auto;
     bottom: 8px;
 }
@@ -20073,7 +20134,7 @@ body.pro:after {
 }
 .transfer-widget.info-block .dark {
     color: #333333;
-}
+}*/
 .upload-overlay-body {
     width: 100%;
     position: absolute;
@@ -20883,7 +20944,7 @@ body.kr .account.chart.data {
     top: 50%;
 }
 .empty-icon {
-    background-image: url(../images/mega/empty-sprite_v5.png);
+    background-image: url(../images/mega/empty-sprite_v6.png);
     background-repeat: no-repeat;
     height: 185px;
 }
@@ -21331,7 +21392,7 @@ body.kr .account.chart.data {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v10.png);
+    background-image: url(../images/mega/new-chat-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
@@ -22979,7 +23040,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 .content-panel.user-management .user-management-status::before, .user-management-view .user-management-status::before {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     left: 0px;
     top: 0px;
@@ -23073,7 +23134,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     left: 16px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
 }
 
 .user-management-tree-panel-header .img.enabled-accounts{
@@ -23102,7 +23163,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     right: 2px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -23189,7 +23250,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: block;
     float: right;
     margin-top: 5px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -23243,6 +23304,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -24px -12257px;
     padding-right: 12px;
     opacity: 0.5;
+}
+
+.files-grid-view.user-management-view .view-icon.disabled,
+.files-grid-view.user-management-view .enable-icon.disabled,
+.files-grid-view.user-management-view .edit-icon.disabled,
+.files-grid-view.user-management-view .disabled-icon.disabled {
+    opacity: 0.3;
 }
 
 .user-management-view .overview-icon, .fm-right-header-user-management .overview-icon, .user-management-breadcrumbs-img.overview-icon, .user-management-dialog .overview-icon {
@@ -23453,7 +23521,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     bottom: 0px;
     background-color: rgba(250,250,250,1);
-    z-index: 102;
+    z-index: 19;
     cursor: pointer;
     text-align: center;
 }
@@ -23498,7 +23566,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height:24px;
     padding:0;
     margin:20px 8px 20px 0;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -23643,7 +23711,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px 4px 8px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
@@ -23668,7 +23736,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     display: inline-block;
     background-position: 0px -12216px;
@@ -23772,7 +23840,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-breadcrumb .user-management-icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: 0 -12281px;
     width:24px;
     height: 24px;
@@ -23781,7 +23849,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     cursor: pointer;
 }
 .user-management-breadcrumb .user-management-next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -23995,7 +24063,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 10px;
     border-radius: 100%;
     margin:9px 15px 9px 3px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     display: inline-block;
     position: relative;
 }
@@ -24247,7 +24315,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 16px;
     margin:4px 0;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -24344,7 +24412,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height: 24px;
     position: relative;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     opacity: 0.6;
 }
@@ -24755,7 +24823,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     margin:8px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 0;
@@ -24933,7 +25001,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 94px;
     bottom:-11px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -24px -12312px;
     opacity: 0.8;
@@ -25019,7 +25087,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -16px -4912px;
     width: 15px;
@@ -25350,7 +25418,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     width:24px;
     height:24px;
@@ -27338,7 +27406,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     position: absolute;
 }
@@ -27347,6 +27415,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     padding-right: 8px;
     float: left;
     z-index: 1130;
+    margin-left:4px;
 }
 
 .user-management-list-table .fm-user-management-user .admin-icon .tooltip{
@@ -27846,7 +27915,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .bus-input.short-input.underline-dropdown-input .list-arrow {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 8px;
@@ -28337,7 +28406,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     overflow: hidden;
 }
 .fm-picker-dialog .icon {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-size: 48px auto;
     background-repeat: no-repeat;
     width:24px;
@@ -28450,7 +28519,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 4px 0 0 9px;
 }
 .fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-size: 48px auto;
     background-position: -12px -4517px;
@@ -28544,7 +28613,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:4px 4px 0 8px;
 }
 .fm-picker-dialog .next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -28876,7 +28945,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: -11px -2244px;
 }
 .fm-picker-dialog .my-chat-list {
@@ -29065,7 +29134,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     margin:4px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -29550,3 +29619,751 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     text-align: right;
 }
 /* end terms page index table */
+
+/* Transfer tooltips */
+.float-widget.transfer-prorgess * {
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif; 
+}
+.float-widget.transfer-prorgess {
+    position: fixed;
+    height: auto;
+    bottom: 8px;
+    left: 56px;
+    z-index: 21;
+}
+.transfer-progress-widget, .banner.transfer {
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+    -moz-box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+    box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
+}
+.transfer-progress-widget.collapse {
+    height: 44px;
+    display: inline-block;
+}
+.transfer-progress-widget.expand {
+    width: 512px;
+}
+.transfer-progress-txt {
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.8px;
+    color: #ddd;
+    display: inline-block;
+    padding: 4px 0;
+    vertical-align: top;
+    margin-left: 6px;
+}
+.transfer-progress-type.overquota .transfer-progress-txt, .transfer-progress-type.almost-overquota .transfer-progress-txt {
+    margin-left: 12px;
+}
+.transfer-progress-type.error .transfer-progress-txt {
+    color: #FC5401;
+}
+.transfer-progress-type.error.overquota .transfer-progress-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    color: #F0373A;
+    font-size: 14px;
+}
+.transfer-progress-type.error.almost-overquota .transfer-progress-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    color: #FFA500;
+    font-size: 14px;
+}
+/* Transfer tooltips - head */
+.transfer-progress-head {
+    position: relative;
+    width: auto;
+    min-width: 264px;
+    -moz-border-radius: 4px 4px 0 0;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0;
+    background: -moz-linear-gradient(top, #696969 0%, #323232 100%);
+    background: -webkit-linear-gradient(top, #696969 0%,#323232 100%);
+    background: linear-gradient(to bottom, #696969 0%,#323232 100%);
+}
+.transfer-progress-widget.collapse .transfer-progress-head {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.transfer-progress-type {
+    margin: 10px 12px 10px 14px;
+    height: 28px;
+    display: inline-block;
+}
+.transfer-progress-type:nth-child(2) {
+    margin-right: 94px;
+}
+.transfer-progress-initial {
+    background-image: url("../images/mega/white-spinner-24px.svg");
+    display: none;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    margin-right: 2px;
+    opacity: 0.7;
+}
+.transfer-progress-type.initial .transfer-progress-initial {
+    display: inline-block;
+}
+.status-indicator {
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    border: 3px solid rgba(255,255,255,0.2);
+    box-sizing: border-box;
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+.transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
+    content: "";
+    background-image: url("../images/mega/icons-sprite_v27.png");
+    width: 24px;
+    height: 24px;
+    left: -1px;
+    top: -1px;
+    display: block;
+    position: absolute;
+    z-index: 11;
+}
+.transfer-progress-type.overquota .status-indicator .transfer-progress-icon.overquota, .transfer-progress-type.almost-overquota .status-indicator .transfer-progress-icon.almost-overquota {
+    position: absolute;
+    display: inline-block;
+    left: 16px;
+    top: -8px;
+    z-index: 12;
+}
+.status-indicator .transfer-progress-icon.overquota::before, .status-indicator .transfer-progress-icon.almost-overquota::before {
+    content: "";
+    margin-top: 3px;
+    margin-left: 1px;
+    z-index: 13;
+    border: 1px solid #5a5a5a;
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    border-radius: 100%;
+}
+.status-indicator-pct ul, .status-indicator-pct li, .status-indicator-pct p, .status-indicator-pct span {
+    height: 28px;
+    width: 28px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.status-indicator-pct .overlay {
+    width: 22px;
+    height: 22px;
+    background-color: #4B4B4B;
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 0px;
+    border-radius: 100%;
+    z-index: 10;
+}
+.status-indicator-pct ul li {
+    position: absolute;
+    left: -3px;
+    top: -3px;
+}
+.status-indicator-pct ul .right-c {
+    clip: rect(0, 28px, 28px, 14px);
+}
+.status-indicator-pct ul .left-c {
+    clip: rect(0, 14px, 28px, 0);
+}
+.status-indicator-pct ul .left-c p {
+    transform: rotate(60deg);
+}
+.status-indicator-pct ul .right-c p {
+    transform: rotate(180deg);
+}
+.status-indicator-pct ul li span {
+    width: 14px;
+    height: 28px;
+    display: block;
+}
+.status-indicator-pct ul li.right-c span {
+    -moz-border-radius-topleft: 14px;
+    -moz-border-radius-bottomleft: 14px;
+    -webkit-border-top-left-radius: 14px;
+    -webkit-border-bottom-left-radius: 14px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+}
+.status-indicator-pct ul li.left-c span {
+    margin-left: 14px;
+    -moz-border-radius-topright: 14px;
+    -moz-border-radius-bottomright: 14px;
+    -webkit-border-top-right-radius: 14px;
+    -webkit-border-bottom-right-radius: 14px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+}
+.transfer-progress-type.download .status-indicator-pct ul span {
+    background-color: #88FF5B;
+}
+.transfer-progress-type.upload .status-indicator-pct ul span {
+    background-color: #0EDCEE;
+}
+.transfer-progress-type.error .status-indicator-pct ul span {
+    background-color: #FC5401;
+}
+.transfer-progress-type .transfer-progress-icon {
+    display: none;
+}
+.transfer-progress-type.complete .transfer-progress-icon, .transfer-progress-type.error:not(.overquota):not(.almost-overquota) .transfer-progress-icon {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 2px;
+    margin-left: 2px;
+}
+.transfer-control-panel {
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    top: 0;
+    min-width: 44px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+.transfer-control-panel::before {
+    content: "";
+    width: 1px;
+    height: 100%;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    top: 0;
+}
+.transfer-progress-icon {
+    background-image: url("../images/mega/icons-sprite_v27.png");
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+}
+.transfer-control-panel .transfer-progress-icon {
+    margin: 12px 0 12px 12px;
+    opacity: 0.7;
+    transition: 0.2s;
+    display: inline-block;
+}
+.transfer-progress-widget.expand .transfer-progress-icon.expand, .transfer-progress-widget.collapse .transfer-progress-icon.collapse {
+    display: none;
+}
+.transfer-control-panel .transfer-progress-icon:nth-child(3) {
+    margin-right: 12px;
+}
+.transfer-control-panel .transfer-progress-icon:hover {
+    opacity: 1;
+}
+/* Transfer tooltips - body */
+.transfer-progress-widget.collapse .transfer-progress-widget-body {
+    display: none;
+}
+.transfer-progress-widget-body {
+    position: relative;
+    background-color: #fff;
+    -moz-border-radius: 0 0 4px 4px;
+    -webkit-border-radius: 0 0 4px 4px;
+    border-radius: 0 0 4px 4px;
+    /*max-height: 218px;*/
+    overflow:hidden;
+    z-index: 40;
+}
+.transfer-prorgess.tpw .widget-body-container {
+    max-height: 240px;
+}
+.transfer-task-row {
+    width: 100%;
+    height: 48px;
+    padding:12px 16px 12px 48px;
+    position: relative;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+.transfer-task-row:last-child {
+    height: 50px;
+}
+.transfer-task-row:hover {
+    background-color: #fafafa;
+}
+.transfer-task-row::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 16px;
+    width: 16px;
+    height: 16px;
+    display: block;
+    background-image: url("../images/mega/icons-sprite_v27.png");
+}
+.transfer-task-row::after {
+    content: "";
+    width: 480px;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+}
+.transfer-task-row .transfer-filetype-txt {
+    display: inline-block;
+    margin-left: 28px;
+    max-width: 176px;
+    font-size: 13px;
+    line-height: 24px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.transfer-task-row .transfer-file-size {
+    position: relative;
+    display: inline-block;
+    margin-top: 1px;
+    margin-left: 12px;
+    padding-left: 12px;
+    font-size: 13px;
+    line-height: 24px;
+    color: #999;
+    vertical-align: top;
+}
+.transfer-task-row .transfer-file-size::before {
+    content: "";
+    width: 2px;
+    height: 12px;
+    background-color: rgba(0,0,0,0.1);
+    display: block;
+    position: absolute;
+    top: 6px;
+    left: 0px;
+}
+.transfer-task-status {
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    padding-left: 28px;
+    position: absolute;
+    right: 24px;
+    top: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.transfer-task-status::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    display: none;
+    background-image: url("../images/mega/icons-sprite_v27.png");
+}
+.transfer-task-actions {
+    display: none;
+    z-index: 25;
+}
+.transfer-task-row:hover .transfer-task-actions {
+    display: inline-block;
+    position: absolute;
+    right: 24px;
+    top: 12px;
+}
+.transfer-task-row:hover .transfer-task-status {
+    display: none;
+}
+.transfer-task-actions i {
+    display: inline-block;
+    margin-left: 12px;
+    opacity: 0.6;
+    cursor: pointer;
+    position: relative;
+}
+.transfer-task-actions i:hover {
+    opacity: 1;
+}
+.transfer-complete-actions i .tooltips, .transfer-task-actions .transfer-progress-icon .tooltips{
+    height: 24px;
+    padding: 0 8px;
+    background-color: rgba(0,0,0,1);
+    line-height: 23px;
+    color: #fff;
+    font-size: 13px;
+    font-style: normal;
+    position: absolute;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    right: 20px;
+    -webkit-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -moz-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -o-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -ms-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    z-index: 99;
+    visibility: hidden;
+}
+.transfer-complete-actions i:hover .tooltips, .transfer-task-actions .transfer-progress-icon:hover .tooltips {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+    right: 28px;
+    visibility: visible;
+}
+.transfer-progress-bar, .transfer-progress-bar-pct {
+    position: absolute;
+    display: block;
+    width: 480px;
+    height: 2px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 1px;
+    left: 16px;
+    bottom: 0;
+    z-index: 8;
+}
+.transfer-task-row:last-child .transfer-progress-bar, .transfer-task-row:last-child .transfer-progress-bar-pct {
+    bottom: 2px;
+}
+.transfer-task-row.upload .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #2BA6DE;
+    left: 0px;
+    z-index: 9;
+}
+.transfer-task-row.download .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #31B500;
+    left: 0px;
+    z-index: 9;
+}
+/* complete mode */
+.transfer-task-row.complete .transfer-filetype-txt {
+    color: #666;
+}
+.transfer-task-row.complete .transfer-file-size {
+    display: none;
+}
+.transfer-task-row.complete .transfer-task-status {
+    color: #00BFA5;
+}
+.transfer-complete-actions {
+    display: none;
+    margin-left: 6px;
+}
+.transfer-task-row.complete .transfer-complete-actions {
+    display: inline-block;
+}
+.transfer-complete-actions i {
+    display: inline-block;
+    position: relative;
+    margin: 0 6px;
+    cursor: pointer;
+    opacity: 0.4;
+}
+.transfer-complete-actions i:hover {
+    opacity: 1;
+}
+.transfer-task-row.complete .transfer-progress-bar {
+    display: none;
+}
+/* error mode */
+.transfer-task-row.upload.error .transfer-progress-bar-pct, .transfer-task-row.download.error .transfer-progress-bar-pct {
+    width: 200px;
+    background-color: #D90007;
+    left: 0px;
+    z-index: 9;
+}
+.transfer-task-row.error .transfer-task-status {
+    color: #D90007;
+}
+/* inqueue mode */
+.transfer-task-row.inqueue .transfer-task-status::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    display: block;
+    position: absolute; 
+    left: 10px;
+    top: 3px;
+    background-image: url(../images/mega/dual-spinner-small.svg);
+    background-repeat: no-repeat;
+    opacity: 0.6;
+}
+/* pause mode */
+.transfer-task-row.pause .transfer-task-status {
+    color: #666;
+}
+/* deploy icons */
+.transfer-task-row.pause .transfer-task-status::before {
+    display: block;
+    background-position: -2px -37px;
+}
+.transfer-progress-icon.close {
+    background-position: -9px -1764px;
+}
+.transfer-progress-icon.expand {
+    background-position: -39px -1766px;
+}
+.transfer-progress-icon.collapse {
+    background-position: -72px -1766px;
+}
+.transfer-progress-icon.almost-overquota {
+    background-position: -147px -1767px;
+}
+.transfer-progress-icon.overquota {
+    background-position: -108px -1767px;
+}
+.transfer-progress-icon.wait {
+    background-position: -195px -342px;
+}
+.transfer-progress-icon.complete {
+    display: block;
+    background-position: -160px -1697px;
+}
+.transfer-progress-icon.transfer-error-1 {
+    background-position: -129px -1804px;
+}
+.transfer-progress-icon.link{
+    background-position: -7px -1840px;
+}
+.transfer-progress-icon.cloud-folder{
+    background-position: -49px -1840px;
+}
+.transfer-progress-icon.pause{
+    background-position: -91px -1840px;
+}
+.transfer-progress-icon.cancel{
+    background-position: -124px -1840px;
+}
+.transfer-progress-icon.restart{
+    background-position: -158px -1840px;
+}
+.transfer-progress-icon.link:hover{
+    background-position: -7px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.cloud-folder:hover {
+    background-position: -48px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.pause:hover{
+    background-position: -91px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.cancel:hover{
+    background-position: -124px -1884px;
+    opacity: 0.8;
+}
+.transfer-progress-icon.restart:hover{
+    background-position: -159px -1884px;
+    opacity: 0.8;
+}  
+.transfer-progress-type.upload .status-indicator::before {
+    background-position: -8px -1804px;
+}
+.transfer-progress-type.download .status-indicator::before {
+    background-position: -68px -1803px;
+}
+.transfer-progress-type.upload.error .status-indicator::before {
+    background-position: -38px -1804px;
+}
+.transfer-progress-type.download.error .status-indicator::before {
+    background-position: -98px -1803px;
+}
+.transfer-task-row.upload::before {
+    background-position: -227px -1239px;
+}
+.transfer-task-row.download::before {
+    background-position: -197px -1239px;
+}
+.transfer-task-row.complete .transfer-task-status::before {
+    display: block;
+    background-position: -160px -1696px;
+}
+.transfer-task-row.error .transfer-task-status::before {
+    display: block;
+    background-position: -159px -1804px;
+}
+/*overquota banner*/
+.float-widget.transfer-prorgess .banner {
+    width: 100%;
+    min-width: 148px;
+    max-width: 512px;
+    background-color: #fff;
+    padding: 24px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.float-widget.transfer-prorgess .banner .delete-img.icon {
+    background-image: url("../images//mega/fm-main-sprite_v7.png");
+    background-position: 0px -12400px;
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 12px;
+    right: 12px;
+    opacity: 0.4;
+    transition: 0.2s;
+    cursor: pointer;
+    z-index: 19;
+}
+.float-widget.transfer-prorgess .banner .delete-img.icon:hover {
+    opacity: 0.8;
+}
+.background-cloud-img {
+    content: "";
+    background-image: url("../images/mega/cloud-background.png");
+    position: absolute;
+    width: 512px;
+    height: 148px;
+    bottom: 0;
+    left: 0;
+    opacity: 0.05;
+}
+.left-section.circle-dashboard {
+    width: 108px;
+    height: 108px;
+    margin-right: 24px;
+    position: relative;
+    display: inline-block;
+    border: 5px solid #D8D8D8;
+    border-radius: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    vertical-align: top;
+}
+.quota-info-pct-txt {
+    font-size: 28px;
+    font-family: 'LatoWebLight','source_sans_proregular', Arial;
+    line-height: 32px;
+    position: relative;
+    margin-top: 18px;
+    z-index: 11;
+}
+.float-widget.transfer-prorgess .banner.almost-overquota .quota-info-pct-txt {
+    color: #FFA500;
+}
+.float-widget.transfer-prorgess .banner.overquota .quota-info-pct-txt {
+    color: #F0373A;
+}
+.quota-info-pr-txt {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-size: 12px;
+    color: #333;
+    line-height: 18px;
+    position: relative;
+    margin-top: 6px;
+    z-index: 11;
+}
+.right-section.upgrade-block {
+    width: calc(100% - 136px);
+    display: inline-block;
+}
+.right-section.upgrade-block .head-title {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    left: 0;
+    top: 0;
+    padding: 0;
+    cursor: default;
+}
+.right-section.upgrade-block .head-title:hover {
+    background-color: transparent;
+}
+.right-section.upgrade-block .head-title::before {
+    display: none;
+}
+.right-section.upgrade-block .content-txt {
+    padding-top: 12px;
+}
+.right-section.upgrade-block .button {
+    margin-top: 20px;
+    display: inline-block;
+    z-index: 14;
+}
+.quota-info-pct-circle ul, .quota-info-pct-circle li, .quota-info-pct-circle p, .quota-info-pct-circle span {
+    height: 108px;
+    width: 108px;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+.quota-info-pct-circle .overlay {
+    width: 98px;
+    height: 98px;
+    background-color: rgba(255,255,255,1);
+    position: absolute;
+    display: block;
+    left: 0px;
+    top: 0px;
+    border-radius: 100%;
+    z-index: 10;
+}
+.pro .quota-info-pct-circle li:not(.no-red-dot), .blog-new-full .quota-info-pct-circle ul li, .sync .quota-info-pct-circle li, .affiliate .quota-info-pct-circle li, .pro .quota-info-pct-circle li:not(.no-red-dot), .quota-info-pct-circle ul li {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    padding: 0;
+    background: none;
+}
+.pro .status-indicator-pct li:not(.no-red-dot), .blog-new-full .status-indicator-pct ul li, .sync .status-indicator-pct li, .affiliate .status-indicator-pct li, .pro .status-indicator-pct li:not(.no-red-dot), .status-indicator-pct ul li {
+    padding: 0;
+    background: none;
+    background-position: unset;
+}
+.quota-info-pct-circle ul .right-c {
+    clip: rect(0, 108px, 108px, 54px);
+}
+.quota-info-pct-circle ul .left-c {
+    clip: rect(0, 54px, 108px, 0);
+}
+.quota-info-pct-circle ul .left-c p {
+    transform: rotate(30deg);
+}
+.quota-info-pct-circle ul .right-c p {
+    transform: rotate(180deg);
+}
+.quota-info-pct-circle ul li span {
+    width: 54px;
+    height: 108px;
+    display: block;
+}
+.quota-info-pct-circle ul li.right-c span {
+    -moz-border-radius-topleft: 54px;
+    -moz-border-radius-bottomleft: 54px;
+    -webkit-border-top-left-radius: 54px;
+    -webkit-border-bottom-left-radius: 54px;
+    border-top-left-radius: 54px;
+    border-bottom-left-radius: 54px;
+}
+.quota-info-pct-circle ul li.left-c span {
+    margin-left: 54px;
+    -moz-border-radius-topright: 54px;
+    -moz-border-radius-bottomright: 54px;
+    -webkit-border-top-right-radius: 54px;
+    -webkit-border-bottom-right-radius: 54px;
+    border-top-right-radius: 54px;
+    border-bottom-right-radius: 54px;
+}
+.float-widget.transfer-prorgess .banner.almost-overquota .quota-info-pct-circle ul span {
+    background-color: #FFA500;
+}
+.float-widget.transfer-prorgess .banner.overquota .quota-info-pct-circle ul span {
+    background-color: #F0373A;
+}

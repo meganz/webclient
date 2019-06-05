@@ -57,7 +57,11 @@
         var contents = $(this).attr('data-simpletip');
         if (contents) {
             var $node = $template.clone();
-            $('span', $node).text(contents);
+            contents = escapeHTML(contents).replace(/\[BR\]/g, '<br>')
+                .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
+                .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
+                .replace(/\[U\]/g, '<u>').replace(/\[\/U\]/g, '</u>');
+            $('span', $node).safeHTML(contents);
             $('body').append($node);
 
             $currentNode = $node;
@@ -76,7 +80,7 @@
                 of: $this,
                 my: my,
                 at: at,
-                collision: "flip flip",
+                collision: "flipfit",
                 within: $this.parents('.ps-container,' + wrapper + 'body').first(),
                 using: function(obj, info) {
                         var vertClass = info.vertical !== "top" ? "t" : "b";
@@ -107,12 +111,40 @@
                     }
             });
 
+            // Calculate Arrow position
+            var $tooltipArrow = $node.find('.tooltip-arrow');
+
+            $tooltipArrow.position({
+                of: $this,
+                my: my,
+                at: at,
+                collision: "none",
+                using: function(obj) {
+                        $(this).css({
+                            left: obj.left + 'px'
+                        });
+                    }
+            });
         }
     });
-    $(document.body).rebind('mouseleave.simpletip', '.simpletip', function () {
-        if ($currentNode) {
-            $currentNode.remove();
+    $(document.body).rebind('mouseleave.simpletip', '.simpletip', function (e) {
+
+        var close = function _closeSimpleTip() {
+            if ($currentNode) {
+                $currentNode.remove();
+            }
+            $currentNode = null;
+        };
+
+        // Prevent blinking when mouse is hover on black triangle.
+        var $toElem = $(e.toElement || e.relatedTarget);
+        if ($toElem.is('i.small-icon.icons-sprite.tooltip-arrow')) {
+            $toElem.rebind('mouseleave', function() {
+                close();
+            });
         }
-        $currentNode = null;
+        else {
+            close();
+        }
     });
 })(jQuery);

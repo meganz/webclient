@@ -121,11 +121,20 @@ var Dropdown = React.createClass({
     },
     componentDidMount: function() {
         this.onResized();
+        var self = this;
+        $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function(e, target) {
+            if (self.props.active && target !== self) {
+                if (self.props && self.props.closeDropdown) {
+                    self.props.closeDropdown();
+                }
+            }
+        });
     },
     componentDidUpdate: function() {
         this.onResized();
     },
     componentWillUnmount: function() {
+        $(document.body).unbind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId());
         if (this.props.active) {
             // fake an active=false so that any onActiveChange handlers would simply trigger back UI to the state
             // in which this element is not active any more (since it would be removed from the DOM...)
@@ -207,7 +216,9 @@ var Dropdown = React.createClass({
                     popupWillUnmount={(popupElement) => {
                         delete self.popupElement;
                     }}>
-                    <div>
+                    <div onClick={function(e) {
+                        $(document.body).trigger('closeAllDropdownsExcept', self);
+                    }}>
                         {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
                         {child}
                     </div>

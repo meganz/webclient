@@ -8,8 +8,6 @@ var SharedFolderItem = React.createClass({
     render: function () {
         var self = this;
         var node = this.props.node;
-        var cs = M.contactstatus(node.h);
-
 
         return (<div className={"chat-shared-block incoming " + (self.props.isLoading ? "is-loading" : "")}
                      key={node.h}
@@ -22,7 +20,7 @@ var SharedFolderItem = React.createClass({
                     <div className={"medium-file-icon inbound-share"}></div>
                     <div className="chat-shared-info">
                         <span className="txt">{node.name}</span>
-                        <span className="txt small">{fm_contains(cs.files, cs.folders)}</span>
+                        <span className="txt small">{fm_contains(node.tf, node.td)}</span>
                     </div>
                 </div>);
     }

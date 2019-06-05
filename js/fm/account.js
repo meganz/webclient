@@ -93,6 +93,12 @@ accountUI.renderAccountPage = function(account) {
             break;
 
         case '/fm/account/plan':
+            if ($.openAchievemetsDialog) {
+                delete $.openAchievemetsDialog;
+                onIdle(function() {
+                    $('.fm-account-plan.fm-account-sections .btn-achievements:visible').trigger('click');
+                });
+            }
             $('.fm-account-plan').removeClass('hidden');
             sectionClass = 'plan';
             accountUI.plan.init(account);
@@ -1568,9 +1574,11 @@ accountUI.plan = {
                 }
                 else if (account.stype === 'O') {
 
+                    var expiryTimestamp = account.nextplan ? account.nextplan.t : account.expiry;
+
                     // one-time or cancelled subscription
                     $('.account.plan-info.expiry-txt').text(l[987]);
-                    $('.account.plan-info.expiry span').text(time2date(account.expiry, 2));
+                    $('.account.plan-info.expiry span').text(time2date(expiryTimestamp, 2));
                     $('.account.data-block .btn-cancel-sub').addClass('hidden');
                 }
 
@@ -2762,7 +2770,15 @@ accountUI.transfers = {
                         }
                     });
                     $('.slider-percentage span').text(bandwidthLimit + ' %');
-                    $('.bandwith-settings').removeClass('hidden');
+                    $('.bandwith-settings').removeClass('disabled').addClass('border');
+                    $('.slider-percentage-bl').removeClass('hidden');
+                    $('.band-grn-noti').addClass('hidden');
+                }
+                // Business account
+                else if (u_attr.b) {
+                    $('.bandwith-settings').addClass('hidden');
+                    $('.slider-percentage-bl').addClass('hidden');
+                    $('.band-grn-noti').addClass('hidden');
                 }
             }
         },
@@ -3080,15 +3096,18 @@ accountUI.contactAndChat = {
 
         var self = this;
 
-        // TODO: FIXME, make accountUI elements not dependant!
         if (!megaChatIsReady) {
-            // notification section was called too early, e.g. before chat's initialisation...delay the init.
-            var args = toArray.apply(null, arguments);
-            setTimeout(function() {
-                self.init.apply(self, args);
-            }, 700);
+            if (megaChatIsDisabled) {
+                console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
+            }
+            else {
+                // If chat is not ready waiting for chat_initialized broadcaster.
+                loadingDialog.show();
+                mBroadcaster.once('chat_initialized', self.delayRender.bind(self, presenceInt, autoaway));
+            }
             return true;
         }
+        loadingDialog.hide();
 
         if (!presenceInt || !presenceInt.userPresence) {
             setTimeout(function() {

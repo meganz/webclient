@@ -34,12 +34,16 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     var html;
     var prefix;
     var inshares = n.h === 'shares';
+    var outshares = n.h === 'out-shares';
+    var publiclinks = n.h === 'public-links';
+    var treeType;
     var expand = function(i, e) {
         if (i) {
             e.firstElementChild.classList.add('expanded');
         }
     };
     var labelhash = [];
+    var cvtree = {};
 
     /*
      * XXX: Initially this function was designed to render new nodes only,
@@ -66,6 +70,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             console.time('buildtree');
         }
     }
+
     if (n.h === M.RootID && !sDeepIndex) {
         if (folderlink) {
             n = {h: ''};
@@ -88,6 +93,21 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             $('.' + dialog + ' .shared-with-me .dialog-content-block').html('<ul id="mctreesub_shares"></ul>');
         }
         stype = "shared-with-me";
+    }
+    else if (outshares) {
+        $('.content-panel.out-shares').html('<ul id="treesub_os_out-shares"></ul>');
+        stype = "out-shares";
+        cvtree = M.getOutShareTree();
+    }
+    else if (publiclinks) {
+        $('.content-panel.public-links').html('<ul id="treesub_pl_public-links"></ul>');
+        stype = "public-links";
+        for (var h in M.su.EXP) {
+            if (M.d[h].t) {
+                cvtree[h] = Object.assign({}, M.d[h]);
+                cvtree[h].t = M.getTreeValue(M.d[h]);
+            }
+        }
     }
     else if (n.h === M.InboxID) {
         if (typeof dialog === 'undefined') {
@@ -118,6 +138,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         else if ($.moveDialog) {
             prefix = 'Move' + stype;
         }
+        else if ($.selectFolderDialog) {
+            prefix = 'SelectFolder' + stype;
+        }
     }
 
     var btd = d > 1;
@@ -125,14 +148,43 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         console.group('BUILDTREE for "' + n.h + '"');
     }
 
-    if (this.tree[n.h]) {
-        var tree = this.tree[n.h];
+    if (n.h && n.h.indexOf('os_') === 0) {
+        treeType = 'os';
+        n.h = n.h.substr(3);
+    }
+    else if (n.h && n.h.indexOf('pl_') === 0) {
+        treeType = 'pl';
+        n.h = n.h.substr(3);
+    }
+
+    var tree = this.tree[n.h] || cvtree;
+
+    if (tree) {
         folders = obj_values(tree);
 
         if (inshares) {
             folders = folders
                 .filter(function(n) {
                     return !M.d[n.p];
+                });
+        }
+
+        if (outshares || publiclinks) {
+            // Remove child duplication on the tree.
+            folders = folders
+                .filter(function(n) {
+                    var folderParents = {};
+                    while (n && n.p !== M.RootID) {
+                        folderParents[n.p] = 1;
+                        n = M.d[n.p];
+                    }
+
+                    for (var i in folders) {
+                        if (folderParents[folders[i].h]) {
+                            return false;
+                        }
+                    }
+                    return true;
                 });
         }
 
@@ -168,6 +220,22 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             _sub = 'mctreesub_';
         }
 
+        // Special prefixs for Out-shares and Public links
+        var typefix = '';
+
+        if (stype === 'out-shares' || treeType === 'os') {
+            _a += 'os_';
+            _li += 'os_';
+            _sub += 'os_';
+            typefix = 'os_';
+        }
+        else if (stype === 'public-links' || treeType === 'pl') {
+            _a += 'pl_';
+            _li += 'pl_';
+            _sub += 'pl_';
+            typefix = 'pl_';
+        }
+
         if (folders.length && (node = document.getElementById(_a + n.h))) {
             // render > if new folders found on an empty folder
             if (!node.classList.contains('contains-folders')) {
@@ -182,12 +250,12 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(curItemHandle)) {
+            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle)) {
                 if (containsc) {
                     buildnode = true;
                 }
                 else {
-                    fmtreenode(curItemHandle, false);
+                    fmtreenode(typefix + curItemHandle, false);
                 }
             }
 
@@ -381,32 +449,30 @@ MegaData.prototype.initTreePanelSorting = function() {
 
     var sections = [
         'folder-link', 'contacts', 'conversations', 'inbox',
-        'shared-with-me', 'cloud-drive', 'rubbish-bin' // Sorting sections for tree parts
+        'shared-with-me', 'cloud-drive', 'rubbish-bin', 'out-shares', 'public-links' // Sorting sections for tree parts
     ];
     var byType = ['name', 'status', 'last-interaction', 'label'];
-
+    var dialogs = ['Copy', 'Move', 'SelectFolder'];
+    var byDefault;
+    var type;
+    
     $.sortTreePanel = Object.create(null);
 
+    var setSortTreePanel = function _setSortTreePanel(dialog) {
+        var key = (dialog || '') + type;
+        $.sortTreePanel[key] = {
+            by: anyOf(byType, localStorage['sort' + key + 'By']) || byDefault,
+            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + key + 'Dir']) || '1')
+        };
+    };
+
     for (var i = sections.length; i--;) {
-        var type = sections[i];
-        var byDefault = type === 'contacts' ? "status" : "name";
+        type = sections[i];
+        byDefault = type === 'contacts' ? "status" : "name";
 
-        $.sortTreePanel[type] = {
-            by: anyOf(byType, localStorage['sort' + type + 'By']) || byDefault,
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + type + 'Dir']) || '1')
-        };
+        setSortTreePanel();
 
-        var dlgKey = 'Copy' + type;
-        $.sortTreePanel[dlgKey] = {
-            by: anyOf(byType, localStorage['sort' + dlgKey + 'By']) || byDefault,
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
-        };
-
-        dlgKey = 'Move' + type;
-        $.sortTreePanel[dlgKey] = {
-            by: anyOf(byType, localStorage['sort' + dlgKey + 'By']) || byDefault,
-            dir: parseInt(anyOf(['-1', '1'], localStorage['sort' + dlgKey + 'Dir']) || '1')
-        };
+        dialogs.forEach(setSortTreePanel);
     }
 };
 
@@ -765,6 +831,12 @@ MegaData.prototype.redrawTree = function(f) {
     }
     else if (M.currentrootid === 'shares') {
         M.buildtree({h: 'shares'}, force);
+    }
+    else if (M.currentrootid === 'out-shares') {
+        M.buildtree({h: 'out-shares'}, force);
+    }
+    else if (M.currentrootid === 'public-links') {
+        M.buildtree({h: 'public-links'}, force);
     }
     else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();

@@ -35,7 +35,14 @@ MegaApi.prototype.prod = function(aSave) {
 };
 
 MegaApi.prototype._apiReqInflight = Object.create(null);
+MegaApi.prototype._apiReqPollCache = Object.create(null);
 
+/**
+ * Perform an API request, with capability of de-duplicating pending requests.
+ * @param {Object|String} params The request parameters as an object.
+ *                               If an string is provided, assumes a plain request with no additional parameters.
+ * @returns {MegaPromise} The promise is rejected if API gives a negative number.
+ */
 MegaApi.prototype.req = function(params) {
     'use strict';
 
@@ -73,6 +80,103 @@ MegaApi.prototype.req = function(params) {
     return promise;
 };
 
+/**
+ * Wrapper around MegaApi.req with polling capabilities.
+ * @param {Number} seconds The number of seconds to wait between requests, returning a cached result until exhausted.
+ * @param {Object|String} params see MegaApi.req
+ * @returns {MegaPromise}
+ * @see MegaApi.req
+ */
+MegaApi.prototype.req.poll = function(seconds, params) {
+    'use strict';
+
+    var cache = M._apiReqPollCache;
+    var key = JSON.stringify(params);
+    var logger = d && MegaLogger.getLogger('req:poll');
+
+    return new Promise(function _reqPollPromise(resolve, reject) {
+        var feedback = function(entry) {
+            if (entry.e) {
+                reject(entry.r);
+            }
+            else {
+                resolve(entry.r);
+            }
+
+            cache = params = resolve = reject = undefined;
+        };
+
+        var fill = function(error, res) {
+            var entry = cache[key];
+            if (!entry) {
+                if (d) {
+                    logger.debug('Storing cache entry...', key);
+                }
+                entry = cache[key] = Object.create(null);
+            }
+
+            entry.r = res;
+            entry.e = error;
+
+            if (entry.t) {
+                clearTimeout(entry.t);
+            }
+            entry.t = setTimeout(function() {
+                if (d) {
+                    logger.debug('Expiring cache entry...', key);
+                }
+                var c = M._apiReqPollCache[key];
+                delete M._apiReqPollCache[key];
+
+                if (c && c.f) {
+                    for (var i = c.f.length; i--;) {
+                        if (d) {
+                            logger.debug('Dispatching awaiting function call...', key, c);
+                        }
+                        c.f[i]();
+                    }
+                }
+            }, Math.abs(seconds) * 1e3);
+
+            feedback(entry);
+        };
+
+        if (cache[key]) {
+            if (d) {
+                logger.warn('Preventing API request from being re-fired.', params, cache[key]);
+            }
+
+            if (seconds < 0) {
+                if (d) {
+                    logger.debug('Awaiting to re-fire request...', params);
+                }
+
+                var c = cache[key];
+                var f = _reqPollPromise.bind(this, resolve, reject);
+
+                if (c.f) {
+                    c.f.push(f);
+                }
+                else {
+                    c.f = [f];
+                }
+            }
+            else {
+                feedback(cache[key]);
+            }
+        }
+        else {
+            M.req(params).tryCatch(fill.bind(null, false), fill.bind(null, true));
+        }
+    });
+};
+
+/**
+ * A wrapper around MegaApi.req
+ * @param {Array} params An array of parameters to pass through MegaApi.req
+ * @returns {MegaPromise} The promise is *always* resolved with an Array of results for each API request.
+ * @see MegaApi.req
+ */
 MegaApi.prototype.reqA = function(params) {
     'use strict';
 
@@ -262,18 +366,13 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
         if (page !== 'download') {
-            mega.ui.tpp.reset('ul');
 
             if (mega.megadrop.isInit()) {
                 mega.megadrop.onCompletion();
             }
         }
     }
-    else {
-        if (page !== 'download') {
-            mega.ui.tpp.statusPaused(ul_queue, 'ul');
-        }
-    }
+    
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
@@ -286,16 +385,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         dlmanager._quotaPushBack = {};
         dlmanager._dlQuotaListener = [];
 
-        if (page !== 'download') {
-            mega.ui.tpp.reset('dl');
-        }
 
         $.totalDL = false;
-    }
-    else {
-        if (page !== 'download') {
-            mega.ui.tpp.statusPaused(dl_queue, 'dl');
-        }
     }
 
     if (!dlmanager.isDownloading && !ulmanager.isUploading) {
@@ -1037,6 +1128,127 @@ MegaUtils.prototype.findDupes = function() {
 };
 
 /**
+ * Search for nodes
+ * @param {String} searchTerm The search term to look for.
+ * @returns {Promise}
+ */
+MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
+    'use strict';
+
+    // Add log to see how often they use the search
+    eventlog(99603, JSON.stringify([1, pfid ? 1 : 0, Object(M.d[M.RootID]).tf, searchTerm.length]), pfid);
+
+    return new Promise(function(resolve, reject) {
+        var promise = MegaPromise.resolve();
+        var fill = function(nodes) {
+            var r = 0;
+
+            for (var i = nodes.length; i--;) {
+                var n = nodes[i];
+                if (M.nn[n.h]) {
+                    r = 1;
+                }
+                else if (!n.fv) {
+                    M.nn[n.h] = n.name;
+                }
+            }
+
+            return r;
+        };
+
+        if (d) {
+            console.time('fm-search-nodes');
+        }
+
+        if (!M.nn) {
+            M.nn = Object.create(null);
+
+            if (fmdb) {
+                loadingDialog.show();
+                promise = new Promise(function(resolve, reject) {
+                    var ts = 0;
+                    var max = 96;
+                    var options = {
+                        sortBy: 't',
+                        limit: 16384,
+
+                        query: function(db) {
+                            return db.where('t').aboveOrEqual(ts);
+                        },
+                        include: function() {
+                            return true;
+                        }
+                    };
+
+                    onIdle(function _() {
+                        var done = function(r) {
+                            if (!Array.isArray(r)) {
+                                return reject(r);
+                            }
+
+                            if (r.length) {
+                                ts = r[r.length - 1].ts + fill(r);
+
+                                if (--max && r.length === options.limit) {
+                                    return onIdle(_);
+                                }
+                            }
+
+                            resolve();
+                        };
+                        fmdb.getbykey('f', options).then(done).catch(done);
+                    });
+                });
+            }
+            else {
+                fill(Object.values(M.d));
+            }
+        }
+
+        promise.then(function() {
+            var h;
+            var filter = M.getFilterBySearchFn(searchTerm);
+
+            if (folderlink) {
+                M.v = [];
+                for (h in M.nn) {
+                    if (filter({name: M.nn[h]}) && h !== M.currentrootid) {
+                        M.v.push(M.d[h]);
+                    }
+                }
+                M.currentdirid = 'search/' + searchTerm;
+                M.renderMain();
+                M.onSectionUIOpen('cloud-drive');
+                onIdle(resolve);
+            }
+            else {
+                var handles = [];
+
+                for (h in M.nn) {
+                    if (!M.d[h] && filter({name: M.nn[h]}) && handles.push(h) > 4e3) {
+                        break;
+                    }
+                }
+
+                loadingDialog.show();
+                dbfetch.geta(handles).always(function() {
+                    loadSubPage('fm/search/' + searchTerm);
+                    onIdle(resolve);
+                });
+            }
+
+            if (d) {
+                console.timeEnd('fm-search-nodes');
+            }
+        }).catch(function(ex) {
+            loadingDialog.hide();
+            msgDialog('warninga', l[135], l[47], ex);
+            reject(ex);
+        });
+    });
+};
+
+/**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
  * and keep the user logged in at the same time
  *
@@ -1079,8 +1291,8 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 else {
                     loadSubPage(urlParts[2]);
                     // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
-                    if (urlParts[2].substr(0, 4) === "pro/") {
-                        msgDialog('warninga', l[882], l[19341]);
+                    if (String(urlParts[2]).startsWith('pro')) {
+                        later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
                     }
                     return false;
                 }

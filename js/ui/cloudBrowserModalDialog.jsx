@@ -583,8 +583,16 @@ var BrowserEntries = React.createClass({
                 }
             }
 
+            const share = M.getNodeShare(node);
 
-
+            let hasPublicLink = null;
+            let classLinked = null;
+            if (share) {
+                classLinked = 'linked';
+                hasPublicLink = (
+                    <span className="data-item-icon public-link-icon"></span>
+                );
+            }
 
             if (viewMode === "0") {
                 items.push(
@@ -607,7 +615,7 @@ var BrowserEntries = React.createClass({
                             <span className={"tranfer-filetype-txt"}>{node.name}</span>
                         </td>
                         <td>{!isFolder ? bytesToSize(node.s) : ""}</td>
-                        <td>{time2date(node.ts)}</td>
+                        <td className={classLinked}>{time2date(node.ts)} {hasPublicLink}</td>
                     </tr>
                 );
             } else {
@@ -615,7 +623,7 @@ var BrowserEntries = React.createClass({
                 if (playtime) {
                     playtime = secondsToTimeShort(playtime);
                 }
-                var share = M.getNodeShare(node);
+
                 var colorLabelClasses = "";
                 if (node.lbl) {
                     var colourLabel = M.getLabelClassFromId(node.lbl);
@@ -1001,7 +1009,7 @@ var CloudBrowserDialog = React.createClass({
         var entries = self.state.entries || self.getEntries();
         var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-        var classes = "add-from-cloud " + self.props.className;
+        var classes = "add-from-cloud " + (self.props.className || '');
 
         var folderIsHighlighted = false;
 
@@ -1070,7 +1078,7 @@ var CloudBrowserDialog = React.createClass({
 
         var buttons = [];
 
-        if (!folderIsHighlighted) {
+        if (!folderIsHighlighted || self.props.folderSelectable) {
             buttons.push({
                 "label": self.props.selectLabel,
                 "key": "select",
@@ -1154,7 +1162,7 @@ var CloudBrowserDialog = React.createClass({
 
         return (
             <ModalDialogsUI.ModalDialog
-                title={__(l[8011])}
+                title={self.props.title || __(l[8011])}
                 className={classes}
                 onClose={() => {
                     self.props.onClose(self);

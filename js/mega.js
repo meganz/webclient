@@ -509,6 +509,7 @@ function sc_node(n) {
 
 // inter-actionpacket state, gets reset in getsc()
 var scsharesuiupd;
+var scpubliclinksuiupd;
 var scContactsSharesUIUpdate;
 var loadavatars = [];
 var scinshare = Object.create(null);
@@ -801,6 +802,7 @@ scparser.$add('s', {
             // a full share contains .h param
             onIdle(sharedUInode.bind(null, a.h));
         }
+        scsharesuiupd = true;
     }
 });
 
@@ -960,10 +962,13 @@ scparser.$add('ph', {
         if (typeof a.up !== 'undefined' && typeof a.down !== 'undefined') {
             notify.notifyFromActionPacket(a);
         }
+        scpubliclinksuiupd = true;
     },
     l: function(a) {
         // exported link
         processPH([a]);
+
+        scpubliclinksuiupd = true;
     }
 });
 
@@ -1231,6 +1236,11 @@ scparser.$add('d', function(a) {
             }
         }
     }
+
+    // Remove all upload in queue that target deleted node
+    if (fminitialized && ul_queue.length > 0) {
+        ulmanager.ulClearTargetDeleted(a.n);
+    }
 });
 
 scparser.$add('la', function() {
@@ -1431,13 +1441,24 @@ scparser.$finalize = function() {
             if (scsharesuiupd) {
                 onIdle(function() {
                     M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                    M.buildtree({h: 'out-shares'}, M.buildtree.FORCE_REBUILD);
 
-                    if (M.currentrootid === 'shares') {
+                    if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
                         M.openFolder(M.currentdirid, true);
                     }
                 });
 
                 scsharesuiupd = false;
+            }
+
+            if (scpubliclinksuiupd) {
+                onIdle(function() {
+                    M.buildtree({h: 'public-links'}, M.buildtree.FORCE_REBUILD);
+
+                    if (M.currentrootid === 'public-links') {
+                        M.openFolder(M.currentdirid, true);
+                    }
+                });
             }
 
             if (scContactsSharesUIUpdate === M.currentdirid) {
@@ -1510,6 +1531,7 @@ function execsc() {
         }
 
         if (a.a === 's' || a.a === 's2') {
+            // Make this onIdle to prevent infinite loading.
             mBroadcaster.sendMessage('share-packet.' + a.n, a);
         }
 
@@ -2207,7 +2229,10 @@ function dbfetchfm() {
                         var tables = {
                             opc: processOPC,
                             ipc: processIPC,
-                            ps: processPS,
+                            ps: function _(r) {
+                                processPS(r, true);
+                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
+                            },
                             suba: process_suba,
                             puf: mega.megadrop.pufProcessDb,
                             pup: mega.megadrop.pupProcessDb,
@@ -2218,6 +2243,7 @@ function dbfetchfm() {
                             },
                             mcf: 1
                         };
+                        tables.ps.promise = new MegaPromise();
 
                         // Prevent MEGAdrop tables being created for mobile
                         if (is_mobile) {
@@ -2242,6 +2268,10 @@ function dbfetchfm() {
                                 }
                             });
                             promises.push(promise);
+
+                            if (tables[t].promise) {
+                                promises.push(tables[t].promise);
+                            }
                         });
                         mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
@@ -2792,7 +2822,6 @@ function processPH(publicHandles) {
             delete share.a;
             delete share.i;
             delete share.n;
-            share.ts = timeNow;
             share.u = 'EXP';
             share.r = 0;
 
@@ -2871,10 +2900,10 @@ function processPS(pendingShares, ignoreDB) {
                             id: M.opc[pendingContactId].m,
                             name: contactName
                         }]);
-                    addToMultiInputDropDownList('.add-contact-multiple-input', {
-                        id: M.opc[pendingContactId].m,
-                        name: contactName
-                    });
+                    addToMultiInputDropDownList('.add-contact-multiple-input', [{
+                            id: M.opc[pendingContactId].m,
+                            name: contactName
+                        }]);
                 }
             }
             else {

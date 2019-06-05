@@ -29,6 +29,7 @@
         // if the id is a file handle, then set the folder id as the file's folder.
         var n;
         var fid;
+
         if (M.d[id] && (M.d[id].t === 0)) {
             fid = fileversioning.getTopNodeSync(id);
             id = M.d[fid].p;
@@ -38,7 +39,9 @@
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
         this.currentLabelFilter = M.filterLabel[this.currentLabelType];
-        this.fmsorting = (id === 'contacts' || id === 'shares') ? 0 : fmconfig.uisorting | 0;
+        this.fmsorting = (id === 'contacts' || id === 'shares' || id === 'out-shares' || id === 'public-links') ?
+            0 : fmconfig.uisorting | 0;
+        this.currentCustomView = this.isCustomView(id);
 
         if (first) {
             fminitialized = true;
@@ -94,17 +97,6 @@
             if (id === 'transfers') {
                 this.v = [];
             }
-            else if (id === 'links') {
-                if (this.su.EXP) {
-                    this.v = Object.keys(this.su.EXP)
-                        .map(function(h) {
-                            return M.d[h];
-                        });
-                }
-                else {
-                    this.v = [];
-                }
-            }
             else if ($.ofShowNoFolders) {
                 delete $.ofShowNoFolders;
 
@@ -137,6 +129,9 @@
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
             }
+            else if (this.currentCustomView){
+                this.filterByParent(this.currentCustomView.nodeID);
+            }
             else {
                 this.filterByParent(this.currentdirid);
             }
@@ -155,6 +150,10 @@
             }
             else if (typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined') {
                 viewmode = fmconfig.viewmodes[id];
+            }
+            else if (this.currentCustomView && typeof fmconfig.viewmodes !== 'undefined'
+                && typeof fmconfig.viewmodes[this.currentCustomView.original] !== 'undefined') {
+                viewmode = fmconfig.viewmodes[this.currentCustomView.original];
             }
             else {
                 for (var i = Math.min(this.v.length, 200); i--;) {
@@ -199,7 +198,8 @@
 
             if (fminitialized && !is_mobile) {
                 var currentdirid = this.currentdirid;
-                if (id.substr(0, 6) === 'search' || id === 'links') {
+
+                if (id.substr(0, 6) === 'search') {
                     currentdirid = this.RootID;
 
                     if (this.d[this.previousdirid]) {
@@ -207,15 +207,26 @@
                     }
                 }
 
-                if ($('#treea_' + currentdirid).length === 0) {
-                    n = this.d[currentdirid];
+                var prefixPath = '';
+                var treeid = currentdirid;
+                var nodeid = currentdirid;
+                
+                if (this.currentCustomView) {
+                    treeid = this.currentCustomView.prefixTree + this.currentCustomView.nodeID;
+                    nodeid = this.currentCustomView.nodeID;
+                    prefixPath = this.currentCustomView.prefixPath;
+                }
+
+                if ($('#treea_' + treeid).length === 0) {
+                    n = this.d[nodeid];
                     if (n && n.p) {
-                        M.onTreeUIOpen(n.p, false, true);
+                        M.onTreeUIOpen(prefixPath + n.p, false, true);
                     }
                 }
+
                 M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
 
-                $('#treea_' + currentdirid).addClass('opened');
+                $('#treea_' + treeid).addClass('opened');
             }
             if (d) {
                 console.timeEnd('time for rendering');
@@ -241,10 +252,7 @@
             newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             this.lastSeenFolderLink = newHashLocation;
         }
-        else if (
-            id.substr(0, 5) === "chat/" &&
-            id.substr(6, 1) !== "/"
-        ) {
+        else if (id && id !== "chat/archived" && (id.startsWith('chat/') && id[6] !== '/')) {
             // is a chat link, e.g. chat/[^/]
             newHashLocation = this.currentdirid;
         }
@@ -273,7 +281,7 @@
             console.error(ex);
         }
 
-        this.currentTreeType = M.treePanelType();
+        this.currentTreeType = this.currentCustomView.type || M.treePanelType();
 
         M.searchPath();
         M.treeSearchUI();
@@ -302,6 +310,7 @@
         var fetchdbnodes;
         var fetchshares;
         var firstopen;
+        var cv = M.isCustomView(id);
 
         $('.fm-right-account-block, .fm-right-block.dashboard').addClass('hidden');
         $('.fm-files-view-icon').removeClass('hidden');
@@ -406,6 +415,12 @@
         else if (id === 'shares') {
             id = 'shares';
         }
+        else if (id === 'out-shares') {
+            id = 'out-shares';
+        }
+        else if (id === 'public-links') {
+            id = 'public-links';
+        }
         else if (id === 'chat') {
             if (!megaChatIsReady) {
                 id = this.RootID;
@@ -451,6 +466,10 @@
                 chatui(id);
             }
         }
+        else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
+            fetchdbnodes = true;
+            id = cv.nodeID;
+        }
         else if (String(id).length === 11) {
             if (M.u[id] && id !== u_handle) {
                 fetchshares = !M.c[id];
@@ -459,7 +478,7 @@
                 id = 'contacts';
             }
         }
-        else if (id !== 'transfers' && id !== 'links') {
+        else if (id !== 'transfers') {
             if (id && id.substr(0, 9) === 'versions/') {
                 id = id.substr(9);
             }
@@ -490,17 +509,24 @@
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
                 });
         };
-
         if (fetchdbnodes || $.ofShowNoFolders) {
             var tp = $.ofShowNoFolders ? dbfetch.tree([id]) : dbfetch.get(id);
 
             tp.always(function() {
-                if (!M.d[id]) {
+                // Check this is valid custom view page. If not head to it's root page.
+                if (cv && !M.getPath(cv.original).length) {
+                    cv = M.isCustomView(cv.type);
+                }
+                else if (!M.d[id]) {
                     id = M.RootID;
                 }
 
                 if (M.getPath(id).pop() === 'shares') {
                     fetchShares();
+                }
+                else if (cv) {
+                    M.buildtree({h: cv.type}, M.buildtree.FORCE_REBUILD, cv.type);
+                    _openFolderCompletion.call(M, cv.original, newHashLocation, firstopen, promise);
                 }
                 else {
                     _openFolderCompletion.call(M, id, newHashLocation, firstopen, promise);
@@ -509,6 +535,10 @@
         }
         else if (fetchshares || id === 'shares') {
             fetchShares();
+        }
+        else if (cv) {
+            M.buildtree({h: cv.type}, this.buildtree.FORCE_REBUILD, cv.type);
+            _openFolderCompletion.call(this, cv.original, newHashLocation, firstopen, promise);
         }
         else {
             _openFolderCompletion.call(this, id, newHashLocation, firstopen, promise);

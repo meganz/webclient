@@ -81,7 +81,6 @@ var ulmanager = {
         var $dialog = $('.fm-dialog.limited-bandwidth-dialog');
 
         ulQueue.pause();
-        mega.ui.tpp.hide();
         this.ulOverStorageQuota = true;
 
         // clear completed uploads and set over quota for the rest.
@@ -902,6 +901,11 @@ var ulmanager = {
         else {
             var ul = ul_queue[ctx.ul_queue_num];
 
+            if (!ul && error === EACCESS) {
+                ulmanager.logger.warn('This upload was already aborted, resorting to context...', ctx.file);
+                ul = ctx.file;
+            }
+
             M.ulerror(ul, ctx.inShareOQ ? ESHAREROVERQUOTA : res);
 
             if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
@@ -1086,6 +1090,31 @@ var ulmanager = {
         else {
             startUpload();
         }
+    },
+
+    /**
+     * Abort and Clear items in upload list those are targeting a deleted folder.
+     * This is triggered by `d` action packet.
+     *
+     * @param {Object} deletedNodeId  Node id of deleted node
+     */
+    ulClearTargetDeleted: function (deletedNodeId) {
+        'use strict';
+
+        var toAbort = [];
+        ul_queue.filter(isQueueActive).forEach(function(ul) {
+            if (ul.target === deletedNodeId) {
+                var gid = ulmanager.getGID(ul);
+                toAbort.push(gid);
+                $('.transfer-table #' + gid).addClass('transfer-error').find('.transfer-status').text(l[20634]);
+            }
+        });
+
+        if (toAbort.length) {
+            eventlog(99726);
+            ulmanager.abort(toAbort);
+        }
+
     }
 };
 

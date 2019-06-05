@@ -8,36 +8,26 @@ describe("account unit test", function() {
 
     var assert = chai.assert;
 
-    // Create/restore Sinon stub/spy/mock sandboxes.
-    var sandbox = null;
-
     // Some test data.
     var ED25519_PUB_KEY = atob('11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo=');
 
-    var stdoutHook;
     var _echo = function(x) { return x; };
     var ns = mega.attr;
 
     beforeEach(function() {
-        sandbox = sinon.sandbox.create();
         localStorage.clear();
-
-        sandbox.stub(window, 'api_req');
-        api_req = window.api_req;
+        api_req = mStub(window, 'api_req');
     });
 
     afterEach(function(done) {
-        attribCache.clear()
-            .always(function() {
-                sandbox.restore();
-                done();
-            });
+        mStub.restore();
+        attribCache.clear().always(done);
     });
 
     describe('user attributes', function() {
         describe('mega.attr.get', function() {
             it("internal callback error, no custom callback", function() {
-                sandbox.stub(ns._logger, 'warn');
+                mStub(ns._logger, 'warn');
 
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
@@ -52,7 +42,7 @@ describe("account unit test", function() {
             });
 
             it("internal callback error, custom callback", function() {
-                sandbox.stub(ns._logger, 'warn');
+                mStub(ns._logger, 'warn');
 
                 var myCallback = sinon.spy();
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, myCallback);
@@ -68,13 +58,13 @@ describe("account unit test", function() {
             });
 
             it("internal callback OK, no custom callback", function(done) {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window, 'd', true);
+                mStub(window, 'd', true);
                 callback('fortytwo', theCtx);
                 assert.strictEqual(aPromise.state(), 'resolved');
                 assert.strictEqual(ns._logger._log.args[0][1], "+puEd255");
@@ -91,14 +81,14 @@ describe("account unit test", function() {
             });
 
             it("internal callback OK, custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 var myCallback = sinon.spy();
                 var aPromise = mega.attr.get('me3456789xw', 'puEd255', true, false, myCallback);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window, 'd', true);
+                mStub(window, 'd', true);
                 callback('fortytwo', theCtx);
                 assert.strictEqual(aPromise.state(), 'resolved');
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
@@ -111,21 +101,21 @@ describe("account unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(window, 'd', true);
+                mStub(ns._logger, '_log');
+                mStub(window, 'u_k', 'foo');
+                mStub(tlvstore, 'blockDecrypt').callsFake(_echo);
+                mStub(tlvstore, 'tlvRecordsToContainer').callsFake(_echo);
 
                 var myCallback = sinon.spy();
-                sandbox.stub(tlvstore, 'blockDecrypt', _echo);
-                sandbox.stub(tlvstore, 'tlvRecordsToContainer', _echo);
-                sandbox.stub(window, 'u_k', 'foo');
                 var aPromise = mega.attr.get('me3456789xw', 'keyring', false, false, myCallback);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window, 'd', true);
                 callback('Zm9ydHl0d28=', theCtx);
                 assert.strictEqual(aPromise.state(), 'resolved');
                 assert.strictEqual(myCallback.args[0][0], 'fortytwo');
-                assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo'));
+                assert.ok(tlvstore.tlvRecordsToContainer.calledWith('fortytwo', true));
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
 
                 assert.strictEqual(ns._logger._log.callCount, 1);
@@ -135,19 +125,18 @@ describe("account unit test", function() {
             });
 
             it("private attribute, failed data integrity check", function(done) {
+                mStub(window, 'u_k', 'foo');
+                mStub(tlvstore, 'blockDecrypt').throws('SecurityError');
 
-                sandbox.stub(tlvstore, 'blockDecrypt').throws('SecurityError');
-                sandbox.stub(window, 'u_k', 'foo');
                 var result = mega.attr.get('me3456789xw', 'keyring', false, false);
                 assert.strictEqual(api_req.callCount, 1);
 
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 callback('Zm9ydHl0d28=', theCtx);
+
                 assert.ok(tlvstore.blockDecrypt.calledWith('fortytwo', 'foo'));
-
                 assert.strictEqual(result.state(), 'rejected');
-
 
                 result
                     .fail(function(rejectArgs) {
@@ -159,19 +148,19 @@ describe("account unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
-                sandbox.stub(window, 'assertUserHandle');
-                sandbox.stub(window, 'base64urldecode', _echo);
-                sandbox.stub(tlvstore, 'blockDecrypt', _echo);
-                sandbox.stub(tlvstore, 'tlvRecordsToContainer' , _echo);
+                mStub(window, 'assertUserHandle');
+                mStub(window, 'base64urldecode').callsFake(_echo);
+                mStub(tlvstore, 'blockDecrypt').callsFake(_echo);
+                mStub(tlvstore, 'tlvRecordsToContainer').callsFake(_echo);
                 var myCallback = sinon.spy();
                 var aPromise = mega.attr.get('me3456789xw', 'keyring', false, false, myCallback);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
                 var expected = { 'foo': 'bar', 'puEd255': ED25519_PUB_KEY };
-                sandbox.stub(window, 'd', true);
+                mStub(window, 'd', true);
                 callback(expected, theCtx);
                 assert.strictEqual(aPromise.state(), 'resolved');
                 assert.deepEqual(myCallback.callCount, 1);
@@ -222,13 +211,13 @@ describe("account unit test", function() {
 
         describe('mega.attr.set', function() {
             it("internal callback error, no custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 mega.attr.set('puEd255', 'foo', true, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window, 'd', true);
+                mStub(window, 'd', true);
                 callback(EFAILED, theCtx);
 
                 assert.strictEqual(ns._logger._log.args[0][0],
@@ -236,7 +225,7 @@ describe("account unit test", function() {
             });
 
             it("internal callback error, custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 var myCallback = sinon.spy();
                 mega.attr.set('puEd255', 'foo', true, false, myCallback);
@@ -250,20 +239,20 @@ describe("account unit test", function() {
             });
 
             it("internal callback OK, no custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 mega.attr.set('puEd255', 'foo', true, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var callback = api_req.args[0][1].callback;
                 var theCtx = api_req.args[0][1];
-                sandbox.stub(window, 'd', true);
+                mStub(window, 'd', true);
                 callback('OK', theCtx);
                 assert.strictEqual(ns._logger._log.args[0][0],
                                    'Setting user attribute "+puEd255", result: OK');
             });
 
             it("internal callback OK, custom callback", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
 
                 var myCallback = sinon.spy();
                 mega.attr.set('puEd255', 'foo', true, false, myCallback);
@@ -279,11 +268,11 @@ describe("account unit test", function() {
             });
 
             it("private attribute, internal callback OK, custom callback, crypto stubbed", function() {
-                sandbox.stub(ns._logger, '_log');
+                mStub(ns._logger, '_log');
                 var myCallback = sinon.spy();
-                sandbox.stub(tlvstore, 'blockEncrypt', _echo);
-                sandbox.stub(tlvstore, 'containerToTlvRecords', _echo);
-                sandbox.stub(window, 'u_k', 'foo');
+                mStub(tlvstore, 'blockEncrypt').callsFake(_echo);
+                mStub(tlvstore, 'containerToTlvRecords').callsFake(_echo);
+                mStub(window, 'u_k', 'foo');
                 mega.attr.set('keyring', 'fortytwo', false, false, myCallback);
                 assert.ok(tlvstore.blockEncrypt.calledWith('fortytwo', 'foo',
                     tlvstore.BLOCK_ENCRYPTION_SCHEME. AES_GCM_12_16));
@@ -298,13 +287,10 @@ describe("account unit test", function() {
             });
 
             it("private attribute, internal callback OK, no custom callback", function() {
+                mStub(window, 'u_k',
+                    asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
 
-                sandbox.stub(window, 'u_k',
-                             asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes(
-                                 '0f0e0d0c0b0a09080706050403020100')));
-                mega.attr.set('keyring', {'foo': 'bar',
-                                             'puEd255': ED25519_PUB_KEY},
-                                 false, false, undefined);
+                mega.attr.set('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var decoded = tlvstore.tlvRecordsToContainer(
                     tlvstore.blockDecrypt(base64urldecode(
@@ -331,12 +317,10 @@ describe("account unit test", function() {
             });
 
             it("private attribute", function() {
+                mStub(window, 'u_k',
+                    asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
 
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(
-                    asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
-                mega.attr.set('keyring', {'foo': 'bar',
-                                             'puEd255': ED25519_PUB_KEY},
-                                 false, false, undefined);
+                mega.attr.set('keyring', {'foo': 'bar', 'puEd255': ED25519_PUB_KEY}, false, false, undefined);
                 assert.strictEqual(api_req.callCount, 1);
                 var decoded = tlvstore.tlvRecordsToContainer(
                     tlvstore.blockDecrypt(base64urldecode(
@@ -349,8 +333,8 @@ describe("account unit test", function() {
 
             it("private attribute, compact crypto mode", function() {
 
-                sandbox.stub(window, 'u_k', asmCrypto.bytes_to_string(
-                    asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
+                mStub(window, 'u_k',
+                    asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100')));
                 mega.attr.set('keyring', {'foo': 'bar',
                                              'puEd255': ED25519_PUB_KEY},
                                  false, false, undefined, undefined,

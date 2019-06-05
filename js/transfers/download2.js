@@ -464,7 +464,7 @@ var dlmanager = {
                     });
                 delete this._newUrlQueue[gid];
             }
-            dlmanager.logger.info("Resuming, got new URL for %s:%s", gid, res.g, changed, res);
+            dlmanager.logger.info("Resuming, got new URL for %s", gid, res.g, changed, res);
             dlQueue.resume();
         }.bind(this));
     },
@@ -652,17 +652,22 @@ var dlmanager = {
             ssl: use_ssl
         };
 
-        // IF this is an anonymous chat OR a chat that I'm not a part of
-        if (M.chat && megaChatIsReady) {
-            megaChat.eventuallyAddDldTicketToReq(req);
-        }
-
         var ctx = {
             object: dl,
             next: callback,
             dl_key: dl.key,
             callback: this.dlGetUrlDone.bind(this)
         };
+
+        // IF this is an anonymous chat OR a chat that I'm not a part of
+        if (M.chat && megaChatIsReady) {
+            megaChat.eventuallyAddDldTicketToReq(req);
+        }
+
+        if (d && String(apipath).indexOf('staging') > 0) {
+            var s = sessionStorage;
+            req.f = [s.dltfefq | 0, s.dltflimit | 0];
+        }
 
         if (window.fetchStreamSupport) {
             // can handle CloudRAID downloads.
@@ -736,7 +741,7 @@ var dlmanager = {
                         ctx.object.data = new ArrayBuffer(res.s);
                     }
 
-                    dlmanager.onNolongerOverquota();
+                    // dlmanager.onNolongerOverquota();
                     return ctx.next(false, res, attr, ctx.object);
                 }
             }
@@ -1372,7 +1377,7 @@ var dlmanager = {
                 }
             }.bind(this)
 
-        M.req({a: 'uq', xfer: 1}).then(function(res) {
+        M.req.poll(-10, {a: 'uq', xfer: 1}).then(function(res) {
             delay('overquotainfo:reply.success', function() {
                 onQuotaInfo(res);
             });
@@ -2019,6 +2024,9 @@ var dlmanager = {
         if (message) {
             $elm.addClass('default-warning');
         }
+        else if (String(uad.browser).startsWith('Edg')) {
+            $elm.addClass('edge');
+        }
         else if (window.safari) {
             $elm.addClass('safari');
         }
@@ -2033,9 +2041,6 @@ var dlmanager = {
         }
         else if (uad.engine === 'Trident') {
             $elm.addClass('ie');
-        }
-        else if (uad.browser === 'Edge') {
-            $elm.addClass('edge');
         }
 
         var setText = function(locale, $elm) {

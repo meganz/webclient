@@ -36,7 +36,6 @@ function WebrtcApi() {
             console.log('This appears to be Chrome');
         }
 
-
         // enable dtls support for compat with Firefox
         this.pc_constraints = {'optional': [{'DtlsSrtpKeyAgreement': 'true'}]};
 
@@ -66,6 +65,12 @@ function WebrtcApi() {
     } else {
         throw new Error('Browser does not appear to be WebRTC-capable');
     }
+
+    this.browserVersion = parseInt(ua.details.version);
+    this.supportsReplaceTrack = !!(window.RTCRtpSender && RTCRtpSender.prototype.replaceTrack);
+    this.supportsUnifiedPlan = !!(this.supportsReplaceTrack && window.RTCRtpTransceiver);
+    this.supportsRxTxGetStats = !!(window.RTCRtpSender && RTCRtpSender.prototype.getStats);
+
     function processDevices(devices) {
         var hasAudio = false;
         var hasVideo = false;
@@ -81,19 +86,18 @@ function WebrtcApi() {
         return {audio: hasAudio, video: hasVideo};
     }
 
-    this.attachMediaStream = function (elem, stream) {
+    this.attachMediaStream = function(elem, stream) {
         if (elem.mozSrcObject) {
+            elem.mozSrcObject = null;
             elem.mozSrcObject = stream;
         } else if (typeof elem.srcObject !== 'undefined') {
+            elem.srcObject = null;
             elem.srcObject = stream;
+        } else {
+            elem.removeAttribute('src');
+            elem.setAttribute('src', URL.createObjectURL(stream));
         }
-        else {
-            if (!stream) {
-                elem.removeAttribute('src');
-            } else {
-                elem.setAttribute('src', URL.createObjectURL(stream));
-            }
-        }
+
         if (HTMLMediaElement.prototype.setSinkId) {
             elem.setSinkId('default')
             .then(function() {
@@ -138,13 +142,13 @@ function WebrtcApi() {
     }
 }
 
-WebrtcApi.prototype.getBrowserVersion = function getBrowserVersion() {
-    var browser = RTC.browser.charAt(0)+(navigator.userAgent.match(/(Android|iPhone)/i)?'m':'');
-    var ver = parseInt(ua.details.version);
-    if (!isNaN(ver)) {
-        browser += (':' + ver);
+WebrtcApi.prototype.getBrowserId = function() {
+    var ret = this.browser.charAt(0) + (navigator.userAgent.match(/(Android|iPhone)/i) ? 'm' : '');
+    var ver = this.browserVersion;
+    if (ver) {
+        ret += ":" + ver;
     }
-    return browser;
+    return ret;
 };
 
 WebrtcApi.prototype.mediaConstraintsResolution = function (res) {
@@ -205,8 +209,54 @@ WebrtcApi.prototype.fixupIceServers = function (iceServers) {
     return iceServers;
 };
 
-WebrtcApi.prototype._getBrowserVersion = function () {
-    return parseInt(ua.details.version);
+WebrtcApi.prototype.peerConnCanReplaceVideoTrack = function(peerConn) {
+    return this.supportsReplaceTrack && peerConn.videoSender;
+};
+
+WebrtcApi.prototype.peerConnAddVideoTrack = function(peerConn, track, stream) {
+    peerConn.videoSender = peerConn.addTrack(track, stream);
+};
+
+WebrtcApi.prototype.peerConnReplaceVideoTrack = function(peerConn, track) {
+    assert(this.supportsReplaceTrack);
+    assert(peerConn.videoSender);
+    return peerConn.videoSender.replaceTrack(track);
+};
+
+WebrtcApi.prototype.peerConnRemoveVideoTrack = function(peerConn) {
+    assert(this.supportsReplaceTrack);
+    if (!peerConn.videoSender) {
+        return null;
+    }
+    try {
+        return peerConn.videoSender.replaceTrack(null);
+    } catch (e) {
+        return Promise.reject("replaceTrack(null) exception: " + e);
+    }
+};
+
+WebrtcApi.prototype.peerConnAddTracksFromStream = function(peerConn, stream) {
+    var tracks = stream.getTracks();
+    var len = tracks.length;
+    for (var i = 0; i < len; i++) {
+        var track = tracks[i];
+        if (track.kind === 'video') {
+            assert(!peerConn.videoSender);
+            peerConn.videoSender = peerConn.addTrack(track, stream);
+        } else {
+            peerConn.addTrack(track, stream);
+        }
+    }
+};
+
+WebrtcApi.prototype.streamStopAndRemoveVideoTracks = function(stream) {
+    var vts = stream.getVideoTracks();
+    var len = vts.length;
+    for (var i = 0; i < len; i++) {
+        var track = vts[i];
+        track.stop();
+        stream.removeTrack(track);
+    }
 };
 
 var RTC = null;
@@ -217,7 +267,7 @@ try {
 catch (e) {
     RTC = null;
     if (window.d && console.warn) {
-        console.warn("Error enabling webrtc support: " + e);
+        console.error("Error enabling webrtc support: " + e.stack);
     }
 }
 

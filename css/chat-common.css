@@ -749,7 +749,7 @@ table.arc-chat-messages-block {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    background-image: url(../images/mega/new-chat-sprite_v10.png);
+    background-image: url(../images/mega/new-chat-sprite_v11.png);
     background-position: -41px -973px;
 }
 .chat-share-nav.button.next {
@@ -803,7 +803,7 @@ table.arc-chat-messages-block {
     -o-transition: background-color 200ms ease-in-out;
     -ms-transition: background-color 200ms ease-in-out;
     transition: background-color 200ms ease-in-out;
-    background-image: url(../images/mega/fm-main-sprite_v7.png);
+    background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-position: 0 -2516px;
     background-repeat: no-repeat;
 }

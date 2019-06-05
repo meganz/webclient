@@ -536,7 +536,7 @@ function chunkedfetch(xhr, uri, postdata, httpMethod) {
         var reader = response.body.getReader();
         var evt = { loaded: 0 };
         xhr.status = response.status;
-        xhr.totalBytes = response.headers.get('Original-Content-Length');
+        xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
 
         function chunkedread() {
             return reader.read().then(function(r) {
@@ -673,13 +673,8 @@ function api_proc(q) {
                         return;
                     }
 
-                    if (d && logger) {
-                        if (d > 1 || !window.chrome || String(response).length < 512) {
-                            logger.debug('API response: ', response);
-                        }
-                        else {
-                            logger.debug('API response: ', String(response).substr(0, 512) + '...');
-                        }
+                    if (d) {
+                        logger.debug('API response:', response);
                     }
 
                     try {
@@ -874,7 +869,7 @@ function api_reqfailed(c, e) {
         loadingInitDialog.hide();
         loadSubPage('login');
     }
-    else if (c == 2 && e == ETOOMANY) {
+    else if ((c == 2 || c == 5) && e == ETOOMANY) {
         // too many pending SC requests - reload from scratch
         fm_fullreload(this.q, 'ETOOMANY');
     }
@@ -1196,6 +1191,8 @@ mBroadcaster.once('startMega', function() {
                 mega.loadReport.invisibleTime += invisibleTime;
             }
         }
+
+        mBroadcaster.sendMessage('visibilitychange:' + Boolean(document.hidden));
     });
 });
 

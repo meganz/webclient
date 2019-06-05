@@ -174,7 +174,8 @@ var StartGroupChatWizard = React.createClass({
                 (failedToEnableChatlink ? " failed" : "")}>
                     <i className="small-icon conversations"></i>
                     <input type="search"
-                           placeholder="Enter group name" value={self.state.groupName}
+                           placeholder={l[18509]} value={self.state.groupName}
+                           maxLength={30}
                            onKeyDown={function(e) {
                                var code = e.which || e.keyCode;
                                if (allowNext && code === 13) {

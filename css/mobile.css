@@ -1208,9 +1208,9 @@ ul, li {
     background-color: #eb4444;
 }
 .mobile.red-check .mobile.fm-icon.check-mark {
-    background-image: none;
+    background: none;
     font-size: 22px;
-    line-height: 19px;
+    line-height: 18px;
     color: #fff;
     -webkit-transform: rotate(45deg);
     -moz-transform: rotate(45deg);
@@ -2206,6 +2206,29 @@ input[type='checkbox'] {
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
     opacity: 0.3;
+}
+.mobile.register-cancel-button {
+    background-image: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
+    border: 1px solid #D82928;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
+    color: #fff;
+    font-size: 16px;
+    height: 48px;
+    line-height: 48px;
+    margin-left: 16px;
+    margin-right: 16px;
+    margin-top: 8px;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .mobile.signin-button.active, .mobile.register-button.active, .mobile.resend-button.active, .mobile.create-account-botton.active {
     background: #00bfa5;
@@ -5979,7 +6002,15 @@ textarea.mobile.support-text-field {
     -khtml-opacity: 0.8;
     opacity: 0.8;
 }
-
+/* Selected UI */
+.mobile.file-manager-block.grid-view .mobile.fm-item.ui-selected {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+.mobile.file-manager-block:not(.grid-view) .mobile.fm-item.ui-selected {
+    background-color: rgba(233,233,233,1);
+}
 /* Change password page */
 .mobile.my-account-change-password-page .body-text {
     color: #818993;
@@ -6027,6 +6058,9 @@ textarea.mobile.support-text-field {
 }
 .mobile .recover-account-body-text br {
     margin-bottom: 12px;
+}
+.mobile.park-account.confirm-data-loss .checkdiv {
+    margin-right: 5px;
 }
 .mobile.recovery-key-page .mobile.recovery-key-string-block, .mobile.two-factor-qr-code-wrapper, .mobile.two-factor-verify-seed-wrapper {
     margin: 16px 24px 4px;
@@ -8216,7 +8250,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v26.png);
+    background-image: url(../images/mega/icons-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -10977,7 +11011,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin-left: 24px;
         margin-right: 19px;
     }
-    .mobile.signin-button, .mobile.register-button, .mobile.resend-button, .mobile.create-account-button {
+    .mobile.signin-button, .mobile.register-button,
+    .mobile.resend-button, .mobile.register-cancel-button, .mobile.create-account-button {
         height: 48px;
         line-height: 47px;
         margin-left: 24px;

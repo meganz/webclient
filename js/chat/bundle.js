@@ -70,7 +70,7 @@ React.makeElement = React['createElement'];
 	(function () {
 	    _chatui = function chatui(id) {
 	        var roomOrUserHash = id.replace("chat/", "");
-	        var isPubLink = id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
+	        var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
 	        var roomType = false;
 	        megaChat.displayArchivedChats = false;
@@ -447,6 +447,7 @@ React.makeElement = React['createElement'];
 	        }
 	    }
 	    self.is_initialized = true;
+	    mBroadcaster.sendMessage('chat_initialized');
 	    if (!anonymouschat) {
 	        $('.activity-status-block, .activity-status').show();
 	    } else {}
@@ -828,6 +829,7 @@ React.makeElement = React['createElement'];
 	    var unreadCount = 0;
 
 	    var havePendingCall = false;
+	    var haveCall = false;
 	    self.haveAnyActiveCall() === false && self.chats.forEach(function (megaRoom, k) {
 	        if (megaRoom.state == ChatRoom.STATE.LEFT) {
 
@@ -839,7 +841,11 @@ React.makeElement = React['createElement'];
 
 	        var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
 	        unreadCount += c;
-	        havePendingCall = havePendingCall || megaRoom.havePendingCall();
+	        if (!havePendingCall) {
+	            if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
+	                havePendingCall = true;
+	            }
+	        }
 	    });
 
 	    unreadCount = unreadCount > 9 ? "9+" : unreadCount;
@@ -849,8 +855,14 @@ React.makeElement = React['createElement'];
 	    if (havePendingCall) {
 	        haveContents = true;
 	        $('.new-messages-indicator .chat-pending-call').removeClass('hidden');
+
+	        if (haveCall) {
+	            $('.new-messages-indicator .chat-pending-call').addClass('call-exists');
+	        } else {
+	            $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
+	        }
 	    } else {
-	        $('.new-messages-indicator .chat-pending-call').addClass('hidden');
+	        $('.new-messages-indicator .chat-pending-call').addClass('hidden').removeClass("call-exists");
 	    }
 
 	    if (self._lastUnreadCount != unreadCount) {
@@ -935,7 +947,7 @@ React.makeElement = React['createElement'];
 	        return 'away';
 	    } else if (presence === UserPresence.PRESENCE.DND) {
 	        return 'busy';
-	    } else if (!presence || presence === UserPresence.PRESENCE.OFFLINE) {
+	    } else if (presence === UserPresence.PRESENCE.OFFLINE) {
 	        return 'offline';
 	    } else {
 	        return 'black';
@@ -1070,9 +1082,6 @@ React.makeElement = React['createElement'];
 	    }
 
 	    if (type === "group" || type == "public") {
-	        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-	        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
-
 	        userHandles.forEach(function (contactHash) {
 	            assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1088,6 +1097,9 @@ React.makeElement = React['createElement'];
 	                M.syncContactEmail(contactHash);
 	            }
 	        });
+
+	        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+	        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
 	    }
 
 	    if (!roomId && setAsActive) {
@@ -3172,9 +3184,14 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.handleWindowResize();
-	        this.initArchivedChatsScrolling();
+	        if (this.props.megaChat.displayArchivedChats === true) {
+	            this.initArchivedChatsScrolling();
+	        }
 	    },
 	    handleWindowResize: function handleWindowResize() {
+	        if (!M.chat) {
+	            return;
+	        }
 
 	        if (anonymouschat) {
 	            $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
@@ -3196,9 +3213,8 @@ React.makeElement = React['createElement'];
 	        loadSubPage('fm/chat/archived');
 	    },
 	    calcArchiveChats: function calcArchiveChats() {
-	        var conversations = obj_values(this.props.megaChat.chats.toJS());
 	        var count = 0;
-	        conversations.forEach(function (chatRoom) {
+	        this.props.megaChat.chats.forEach(function (chatRoom) {
 	            if (!chatRoom || !chatRoom.roomId) {
 	                return;
 	            }
@@ -4398,7 +4414,10 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
-	    doProgramaticScroll: function doProgramaticScroll(newPos, forced, isX) {
+	    doProgramaticScroll: SoonFc(function (newPos, forced, isX) {
+	        if (!this.isMounted()) {
+	            return;
+	        }
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
 	        var animFrameInner = false;
@@ -4429,7 +4448,7 @@ React.makeElement = React['createElement'];
 	            self.isUserScroll = true;
 	            $elem.off('scroll.progscroll' + idx);
 	        }.bind(this, idx));
-	    },
+	    }, 10),
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
@@ -4736,8 +4755,7 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (this.state.focused != nextState.focused && nextState.focused === true) {
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-	            document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+	            $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
 
 	            $(document).rebind('keyup.button' + self.getUniqueId(), function (e) {
 	                if (self.state.focused === true) {
@@ -4750,7 +4768,7 @@ React.makeElement = React['createElement'];
 	            if (self._pageChangeListener) {
 	                mBroadcaster.removeListener(self._pageChangeListener);
 	            }
-	            mBroadcaster.addListener('pagechange', function () {
+	            this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
 	                if (self.state.focused === true) {
 	                    self.onBlur();
 	                }
@@ -4763,6 +4781,7 @@ React.makeElement = React['createElement'];
 	            if (this.props.group) {
 	                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
 	                    _buttonGroups[this.props.group].setState({ focused: false });
+	                    _buttonGroups[this.props.group].unbindEvents();
 	                }
 	                _buttonGroups[this.props.group] = this;
 	            }
@@ -4772,6 +4791,9 @@ React.makeElement = React['createElement'];
 	            _buttonGroups[this.props.group] = null;
 	        }
 	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        this.unbindEvents();
+	    },
 	    renderChildren: function renderChildren() {
 	        var self = this;
 
@@ -4780,6 +4802,7 @@ React.makeElement = React['createElement'];
 	                active: self.state.focused,
 	                closeDropdown: function closeDropdown() {
 	                    self.setState({ 'focused': false });
+	                    self.unbindEvents();
 	                },
 	                onActiveChange: function onActiveChange(newVal) {
 	                    var $element = $(self.findDOMNode());
@@ -4814,14 +4837,18 @@ React.makeElement = React['createElement'];
 
 	        if (!e || !$(e.target).closest(".button").is($element)) {
 	            this.setState({ focused: false });
-	            $(document).off('keyup.button' + this.getUniqueId());
-	            $(document).off('closeDropdowns.' + this.getUniqueId());
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-
-	            if (this._pageChangeListener) {
-	                mBroadcaster.removeListener(this._pageChangeListener);
-	            }
+	            this.unbindEvents();
 	            this.forceUpdate();
+	        }
+	    },
+	    unbindEvents: function unbindEvents() {
+	        var self = this;
+	        $(document).off('keyup.button' + self.getUniqueId());
+	        $(document).off('closeDropdowns.' + self.getUniqueId());
+	        $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+
+	        if (self._pageChangeListener) {
+	            mBroadcaster.removeListener(self._pageChangeListener);
 	        }
 	    },
 	    onClick: function onClick(e) {
@@ -4851,7 +4878,7 @@ React.makeElement = React['createElement'];
 	            }
 	        } else if (this.state.focused === true) {
 	            this.setState({ focused: false });
-	            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+	            this.unbindEvents();
 	        }
 	    },
 	    render: function render() {
@@ -5004,11 +5031,20 @@ React.makeElement = React['createElement'];
 	    },
 	    componentDidMount: function componentDidMount() {
 	        this.onResized();
+	        var self = this;
+	        $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
+	            if (self.props.active && target !== self) {
+	                if (self.props && self.props.closeDropdown) {
+	                    self.props.closeDropdown();
+	                }
+	            }
+	        });
 	    },
 	    componentDidUpdate: function componentDidUpdate() {
 	        this.onResized();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
+	        $(document.body).unbind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId());
 	        if (this.props.active) {
 
 	            this.onActiveChange(false);
@@ -5088,7 +5124,9 @@ React.makeElement = React['createElement'];
 	                    } },
 	                React.makeElement(
 	                    "div",
-	                    null,
+	                    { onClick: function onClick(e) {
+	                            $(document.body).trigger('closeAllDropdownsExcept', self);
+	                        } },
 	                    !this.props.noArrow ? React.makeElement("i", { className: "dropdown-white-arrow" }) : null,
 	                    child
 	                )
@@ -5581,7 +5619,7 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
-	        if (!contact) {
+	        if (!contact || !contact.c) {
 	            return null;
 	        }
 
@@ -5630,7 +5668,7 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 
-	        var fingerprintCode;
+	        var fingerprintCode = null;
 	        if (infoBlocks.length > 0) {
 	            fingerprintCode = React.makeElement(
 	                "div",
@@ -6234,12 +6272,12 @@ React.makeElement = React['createElement'];
 	                    { className: "fm-dialog-footer" },
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-white-button left", onClick: onAddContact },
+	                        { className: "default-white-button left", onClick: onAddContact },
 	                        l[71]
 	                    ),
 	                    React.makeElement(
 	                        "a",
-	                        { href: "javascript:;", className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
+	                        { className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
 	                            onClick: function onClick(e) {
 	                                if (self.state.selected.length > 0) {
 	                                    onSelectDoneCb(e);
@@ -6545,7 +6583,7 @@ React.makeElement = React['createElement'];
 	            );
 	        } else {
 	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
-	            translatedCode = translatedCode.replace("[A]", '<a href="javascript:;" class="joinActiveCall">').replace('[/A]', '</a>');
+	            translatedCode = translatedCode.replace("[A]", '<a class="joinActiveCall">').replace('[/A]', '</a>');
 
 	            return React.makeElement(
 	                "div",
@@ -7225,6 +7263,9 @@ React.makeElement = React['createElement'];
 	        }
 	    },
 	    handleWindowResize: function handleWindowResize(e, scrollToBottom) {
+	        if (!M.chat) {
+	            return;
+	        }
 	        var $container = $(ReactDOM.findDOMNode(this));
 	        var self = this;
 
@@ -8652,15 +8693,16 @@ React.makeElement = React['createElement'];
 	                        { className: "empty-pad conversations" },
 	                        React.makeElement("div", { className: "fm-empty-conversations-bg" }),
 	                        React.makeElement("div", { className: "fm-empty-cloud-txt small", dangerouslySetInnerHTML: {
-	                                __html: __(emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
+	                                __html: __(anonymouschat ? "" : emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
 	                            } }),
-	                        React.makeElement(
+	                        hadLoaded && !anonymouschat ? React.makeElement(
 	                            "div",
-	                            { className: "big-red-button new-chat-link", onClick: function onClick(e) {
+	                            { className: "big-red-button new-chat-link",
+	                                onClick: function onClick(e) {
 	                                    $(document.body).trigger('startNewChatLink');
 	                                } },
 	                            l[20638]
-	                        )
+	                        ) : null
 	                    )
 	                )
 	            );
@@ -9862,6 +9904,15 @@ React.makeElement = React['createElement'];
 	                }
 	            }
 
+	            var share = M.getNodeShare(node);
+
+	            var hasPublicLink = null;
+	            var classLinked = null;
+	            if (share) {
+	                classLinked = 'linked';
+	                hasPublicLink = React.makeElement("span", { className: "data-item-icon public-link-icon" });
+	            }
+
 	            if (viewMode === "0") {
 	                items.push(React.makeElement(
 	                    "tr",
@@ -9896,8 +9947,10 @@ React.makeElement = React['createElement'];
 	                    ),
 	                    React.makeElement(
 	                        "td",
-	                        null,
-	                        time2date(node.ts)
+	                        { className: classLinked },
+	                        time2date(node.ts),
+	                        " ",
+	                        hasPublicLink
 	                    )
 	                ));
 	            } else {
@@ -9905,7 +9958,7 @@ React.makeElement = React['createElement'];
 	                if (playtime) {
 	                    playtime = secondsToTimeShort(playtime);
 	                }
-	                var share = M.getNodeShare(node);
+
 	                var colorLabelClasses = "";
 	                if (node.lbl) {
 	                    var colourLabel = M.getLabelClassFromId(node.lbl);
@@ -10290,7 +10343,7 @@ React.makeElement = React['createElement'];
 	        var entries = self.state.entries || self.getEntries();
 	        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-	        var classes = "add-from-cloud " + self.props.className;
+	        var classes = "add-from-cloud " + (self.props.className || '');
 
 	        var folderIsHighlighted = false;
 
@@ -10357,7 +10410,7 @@ React.makeElement = React['createElement'];
 
 	        var buttons = [];
 
-	        if (!folderIsHighlighted) {
+	        if (!folderIsHighlighted || self.props.folderSelectable) {
 	            buttons.push({
 	                "label": self.props.selectLabel,
 	                "key": "select",
@@ -10441,7 +10494,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            ModalDialogsUI.ModalDialog,
 	            {
-	                title: __(l[8011]),
+	                title: self.props.title || __(l[8011]),
 	                className: classes,
 	                onClose: function onClose() {
 	                    self.props.onClose(self);
@@ -15265,7 +15318,6 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 	        var node = this.props.node;
-	        var cs = M.contactstatus(node.h);
 
 	        return React.makeElement(
 	            "div",
@@ -15289,7 +15341,7 @@ React.makeElement = React['createElement'];
 	                React.makeElement(
 	                    "span",
 	                    { className: "txt small" },
-	                    fm_contains(cs.files, cs.folders)
+	                    fm_contains(node.tf, node.td)
 	                )
 	            )
 	        );
@@ -16199,15 +16251,16 @@ React.makeElement = React['createElement'];
 	            }
 	        });
 
-	        if (room.megaChat.rtc && room.megaChat.rtc.gLocalStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
-	            RTC.attachMediaStream(self.refs.localViewport, room.megaChat.rtc.gLocalStream);
+	        var localStream = room.callManagerCall.localStream();
+	        if (localStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
+	            RTC.attachMediaStream(self.refs.localViewport, localStream);
 	        }
 
 	        var bigLocalViewport = $('.bigLocalViewport')[0];
 	        var smallLocalViewport = $('.smallLocalViewport')[0];
 
-	        if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && room.megaChat.rtc && room.megaChat.rtc.gLocalStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
-	            RTC.attachMediaStream(bigLocalViewport, room.megaChat.rtc.gLocalStream);
+	        if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && localStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
+	            RTC.attachMediaStream(bigLocalViewport, localStream);
 	        }
 
 	        $(room).rebind('toggleMessages.av', function () {
@@ -16233,6 +16286,13 @@ React.makeElement = React['createElement'];
 	                    'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
 	                });
 	            }
+	        });
+
+	        this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function () {
+	            self.setState({ 'muteInProgress': true });
+	        });
+	        this.props.chatRoom.rebind('onLocalMuteComplete.ui', function () {
+	            self.setState({ 'muteInProgress': false });
 	        });
 
 	        if (self.initialRender === false && _reactDom2.default.findDOMNode(self)) {
@@ -16373,10 +16433,7 @@ React.makeElement = React['createElement'];
 	        var activeStreamIdOrPlayer = (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ? self.getCurrentStreamId() : false;
 
 	        var visiblePanelClass = "";
-	        var localPlayerStream;
-	        if (callManagerCall && chatRoom.megaChat.rtc && chatRoom.megaChat.rtc.gLocalStream) {
-	            localPlayerStream = chatRoom.megaChat.rtc.gLocalStream;
-	        }
+	        var localPlayerStream = callManagerCall.localStream();
 
 	        if (this.visiblePanel === true) {
 	            visiblePanelClass += " visible-panel";
@@ -16624,7 +16681,7 @@ React.makeElement = React['createElement'];
 	                    { className: 'call-participants-count' },
 	                    Object.keys(chatRoom.callParticipants).length
 	                ),
-	                _react2.default.createElement('a', { href: 'javascript:;', className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                _react2.default.createElement('a', { className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
 	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
 	                            return;
 	                        }
@@ -16779,7 +16836,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'button call', onClick: function onClick(e) {
+	                    { className: "button call " + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
+	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
+	                                return;
+	                            }
 	                            if (callManagerCall.getMediaOptions().audio === true) {
 	                                callManagerCall.muteAudio();
 	                            } else {
@@ -16790,7 +16850,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : ""), onClick: function onClick(e) {
+	                    { className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : "") + (this.state.muteInProgress ? " disabled" : ""), onClick: function onClick(e) {
+	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
+	                                return;
+	                            }
 	                            if (callManagerCall.getMediaOptions().video === true) {
 	                                callManagerCall.muteVideo();
 	                            } else {
@@ -17005,7 +17068,8 @@ React.makeElement = React['createElement'];
 	                    { className: "contacts-search-header left-aligned top-pad" + (failedToEnableChatlink ? " failed" : "") },
 	                    React.makeElement("i", { className: "small-icon conversations" }),
 	                    React.makeElement("input", { type: "search",
-	                        placeholder: "Enter group name", value: self.state.groupName,
+	                        placeholder: l[18509], value: self.state.groupName,
+	                        maxLength: 30,
 	                        onKeyDown: function onKeyDown(e) {
 	                            var code = e.which || e.keyCode;
 	                            if (allowNext && code === 13) {
@@ -18338,12 +18402,27 @@ React.makeElement = React['createElement'];
 	    }
 	};
 
-	ChatRoom.prototype.startAudioCall = function () {
-	    var self = this;
-	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
+	    var origFn = fn;
+	    return function () {
+	        var self = scope || this;
+	        var args = toArray.apply(null, arguments);
+	        var participants = self.protocolHandler.getTrackedParticipants();
+
+	        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).done(function () {
+	            origFn.apply(self, args);
+	        }).fail(function () {
+	            self.logger.error("Failed to retr. keys.");
+	        });
+	    };
 	};
 
-	ChatRoom.prototype.joinCall = function () {
+	ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function () {
+	    var self = this;
+	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: false });
+	});
+
+	ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    assert(self.type === "group" || self.type === "public", "Can't join non-group chat call.");
 
@@ -18352,12 +18431,12 @@ React.makeElement = React['createElement'];
 	    }
 
 	    return self.megaChat.plugins.callManager.joinCall(self, { audio: true, video: false });
-	};
+	});
 
-	ChatRoom.prototype.startVideoCall = function () {
+	ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function () {
 	    var self = this;
 	    return self.megaChat.plugins.callManager.startCall(self, { audio: true, video: true });
-	};
+	});
 
 	ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 	    return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle);

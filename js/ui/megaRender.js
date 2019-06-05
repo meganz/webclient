@@ -98,11 +98,63 @@
                     '<div class="video-thumb-details">' +
                         '<i class="small-icon small-play-icon"></i>' +
                         '<span>00:00</span>' +
-                    ' </div>' +
+                    '</div>' +
                 '</span>' +
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
                     '<span class="shared-folder-info"></span>' +
+                '</span>' +
+            '</a>'
+        ],
+
+        'out-shares': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td width="50">' +
+                        '<span class="grid-status-icon"></span>' +
+                    '</td>' +
+                    '<td>' +
+                        '<div class="shared-folder-icon medium-file-icon folder-shared"></div>' +
+                        '<div class="shared-folder-info-block">' +
+                            '<div class="shared-folder-name"></div>' +
+                            '<div class="shared-folder-info"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td width="240" class="simpletip-parent">' +
+                        '<div class="fm-chat-users-wrapper">' +
+                            '<div class="fm-chat-users"></div>' +
+                            '<div class="fm-chat-users-other"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td width="100">' +
+                        '<div class="shared-folder-size"></div>' +
+                    '</td>' +
+                    '<td width="200">' +
+                        '<div class="last-shared-time"></div>' +
+                    '</td>' +
+                    '<td class="grid-url-header-nw">' +
+                        '<a class="grid-url-arrow"></a>' +
+                    '</td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode
+            '<a class="data-block-view folder">' +
+                '<span class="data-block-bg">' +
+                    '<span class="data-block-indicators">' +
+                       '<span class="file-status-icon indicator"></span>' +
+                    '</span>' +
+                    '<span class="block-view-file-type"></span>' +
+                    '<span class="file-settings-icon"></span>' +
+                    '<div class="video-thumb-details">' +
+                        '<i class="small-icon small-play-icon"></i>' +
+                        '<span>00:00</span>' +
+                    ' </div>' +
+                '</span>' +
+                '<span class="shared-folder-info-block">' +
+                    '<span class="shared-folder-name"></span>' +
+                    '<span class="shared-contact-info"></span>' +
                 '</span>' +
             '</a>'
         ],
@@ -225,6 +277,10 @@
             '.shared-grid-view .grid-table.shared-with-me',
             '.shared-blocks-scrolling'
         ],
+        'out-shares': [
+            '.out-shared-grid-view .grid-table.out-shares',
+            '.out-shared-blocks-scrolling'
+        ],
         'contact-shares': [
             '.contacts-details-block .grid-table.shared-with-me',
             '.fm-blocks-view.contact-details-view .file-block-scrolling'
@@ -290,6 +346,10 @@
 
             section = 'shares';
         }
+        else if (M.currentdirid === 'out-shares') {
+
+            section = 'out-shares';
+        }
         else if (M.currentrootid === 'contacts'
                 && M.currentdirid.length === 11) {
 
@@ -312,7 +372,6 @@
         }
 
         this.numInsertedDOMNodes = 0;
-
 
         define(this, 'viewmode',            aViewMode);
         define(this, 'nodeMap',             Object.create(null));
@@ -370,6 +429,7 @@
                 deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
                 deleteScrollPanel('.file-block-scrolling', 'jsp');
                 deleteScrollPanel('.shared-blocks-scrolling', 'jsp');
+                deleteScrollPanel('.out-shared-blocks-scrolling', 'jsp');
 
                 initOpcGridScrolling();
                 initIpcGridScrolling();
@@ -377,6 +437,7 @@
                 $('.grid-table:not(.arc-chat-messages-block) tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
+                $('.out-shared-blocks-scrolling a').remove();
                 $('.contacts-blocks-scrolling .content a').remove();
 
                 $(lSel).show().parent().children('table').show();
@@ -403,10 +464,6 @@
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
-                else if (M.currentdirid === 'links') {
-                    // TODO: a dedicated splash
-                    $('.fm-empty-folder').removeClass('hidden');
-                }
                 else if (M.currentdirid === M.RootID && folderlink) {
                     // FIXME: implement
                     /*if (!isValidShareLink()) {
@@ -428,6 +485,22 @@
                     }
                     else if (M.currentdirid === M.RootID) {
                         $('.fm-empty-cloud').removeClass('hidden');
+                    }
+                    else {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
+                }
+                else if (M.currentrootid === 'out-shares') {
+                    if (M.currentdirid === 'out-shares') {
+                        $('.fm-empty-outgoing').removeClass('hidden');
+                    }
+                    else {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
+                }
+                else if (M.currentrootid === 'public-links') {
+                    if (M.currentdirid === 'public-links') {
+                        $('.fm-empty-public-link').removeClass('hidden');
                     }
                     else {
                         $('.fm-empty-folder').removeClass('hidden');
@@ -791,7 +864,10 @@
                     props.icon = fileIcon(aNode);
 
                     if (!this.viewmode) {
-                        if (M.lastColumn && aNode.p !== "contacts") {
+                        if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
+                            props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
+                        }
+                        else if (M.lastColumn && aNode.p !== "contacts") {
                             props.time = time2date(aNode[M.lastColumn] || aNode.ts);
                         }
                         else {
@@ -837,14 +913,7 @@
                     }
                 }
                 else {
-                    var cs = M.contactstatus(aHandle);
-
-                    if (cs.files === 0 && cs.folders === 0) {
-                        props.shareInfo = l[782];// Empty Folder
-                    }
-                    else {
-                        props.shareInfo = fm_contains(cs.files, cs.folders);
-                    }
+                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
 
                     if (this.chatIsReady) {
                         var contact = M.u[props.userHandle];
@@ -862,6 +931,54 @@
 
                 if (avatar) {
                     props.avatar = parseHTML(avatar).firstChild;
+                }
+
+                // Colour label
+                if (aNode.lbl && !folderlink && (aNode.su !== u_handle)) {
+                    var colourLabel = M.getLabelClassFromId(aNode.lbl);
+                    props.classNames.push('colour-label');
+                    props.classNames.push(colourLabel);
+                }
+
+                return props;
+            },
+            'out-shares': function(aNode, aHandle, aExtendedInfo) {
+                var props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                props.lastSharedAt = 0;
+                props.userNames = [];
+                props.userHandles = [];
+                props.avatars = [];
+                for (var i in aNode.shares) {
+                    if (i !== 'EXP') {
+                        props.lastSharedAt = Math.max(props.lastSharedAt, aNode.shares[i].ts);
+                        props.userNames.push(M.getNameByHandle(i));
+                        props.userHandles.push(aNode.shares[i].u);
+                    }
+                }
+
+                // Adding pending shares data
+                for (var suh in M.ps[aNode.h]) {
+                    if (M.ps[aNode.h] && M.opc[suh]) {
+                        props.lastSharedAt = Math.max(props.lastSharedAt, M.ps[aNode.h][suh].ts);
+                        props.userNames.push(M.opc[suh].m);
+                        props.userHandles.push(suh);
+                    }
+                }
+
+                props.userNames = props.userNames.sort();
+                props.lastSharedAt = time2date(props.lastSharedAt);
+                props.folderSize = bytesToSize(aNode.tb + (aNode.tvb || 0));
+
+                if (this.viewmode) {
+                    if (aExtendedInfo !== false) {
+                        for (i = 0; i < props.userHandles.length && i < 4; i++) {
+                            props.avatars.push(parseHTML(useravatar.contact(props.userHandles[i], '', 'span'))
+                                .firstChild);
+                        }
+                    }
+                }
+                else {
+                    props.shareInfo = fm_contains(aNode.tf, aNode.td);
                 }
 
                 // Colour label
@@ -1036,6 +1153,85 @@
                     aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
+                }
+
+                return aTemplate;
+            },
+            'out-shares': function(aNode, aProperties, aTemplate) {
+
+                if (aNode.fav && !folderlink) {
+                    var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
+                    aTemplate.querySelector(selector).classList.add('star');
+                }
+
+                aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
+
+                if (this.viewmode) {
+                    if (aProperties.avatars) {
+
+                        var avatarElement;
+                        var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';
+                        avatar = aTemplate.querySelector(avatar);
+
+                        if (aProperties.avatars.length === 1) {
+                            avatarElement = aProperties.avatars[0];
+                        }
+                        else {
+                            avatarElement = document.createElement("div");
+                            avatarElement.classList = 'multi-avatar multi-avatar-' + aProperties.avatars.length;
+
+                            for (var i in aProperties.avatars) {
+                                if (aProperties.avatars[i]) {
+                                    aProperties.avatars[i].classList += ' avatar-' + i;
+                                    avatarElement.appendChild(aProperties.avatars[i]);
+                                }
+                            }
+                        }
+
+                        avatar.parentNode.insertBefore(avatarElement, avatar);
+
+                    }
+
+
+                    if (aProperties.icon) {
+                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
+                    }
+
+                    var shareContactInfo = aTemplate.querySelector('.shared-contact-info');
+                    shareContactInfo.textContent = escapeHTML(l[989]).replace('[X]', aProperties.userNames.length);
+                    if (aProperties.userNames.length === 1) {
+                        shareContactInfo.textContent = escapeHTML(l[990]);
+                    }
+                    else {
+                        shareContactInfo.textContent = escapeHTML(l[989]).replace('[X]', aProperties.userNames.length);
+                    }
+                    shareContactInfo.classList += ' simpletip';
+                    shareContactInfo.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                }
+                else {
+                    tmp = aTemplate.querySelector('.fm-chat-user-info');
+
+                    var otherCount = 0;
+                    var userNames = aProperties.userNames;
+                    if (aProperties.userNames.length > 3) {
+                        userNames = userNames.slice(0, 3);
+                        otherCount = aProperties.userNames.length - 3;
+                        var sharedUserWrapper = aTemplate.querySelector('.fm-chat-users-wrapper');
+                        sharedUserWrapper.classList += ' simpletip';
+                        sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
+                    }
+                    aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
+                    
+                    if (otherCount === 1) {
+                        aTemplate.querySelector('.fm-chat-users-other').textContent = l[20652];
+                    }
+                    else if (otherCount > 1) {
+                        aTemplate.querySelector('.fm-chat-users-other').textContent = l[20653]
+                            .replace('$1', otherCount);
+                    }
+                    aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
+                    aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
+                    aTemplate.querySelector('.last-shared-time').textContent = aProperties.lastSharedAt;
                 }
 
                 return aTemplate;
@@ -1271,7 +1467,7 @@
                             // newnodes, and update may be triggered by an move op (because of the newly modified
                             // lack of 'i' property), so the newnodes may contain unrelated nodes (to the current
                             // view)
-                            if (v.p === M.currentdirid) {
+                            if (v.p === M.currentdirid || v.p === M.currentCustomView.nodeID) {
                                 foundNodesForAdding = true;
                                 sortedNodeList[k] = v.h;
                                 if (!M.v[k] || M.v[k].h !== v.h) {

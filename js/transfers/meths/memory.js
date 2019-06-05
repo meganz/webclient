@@ -139,7 +139,17 @@
                 reader.readAsDataURL(blob);
             }
             else {
-                location.href = myURL.createObjectURL(blob);
+                // XXX: As of Chrome 69+ the object/blob uri may gets automatically revoked
+                //      when leaving the site, causing a later Download invocation to fail.
+                var blobURI = myURL.createObjectURL(blob);
+
+                mBroadcaster.once('visibilitychange:false', function() {
+                    later(function() {
+                        myURL.revokeObjectURL(blobURI);
+                    });
+                });
+
+                window.open(blobURI);
             }
         };
 

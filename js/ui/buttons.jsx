@@ -20,8 +20,7 @@ var Button = React.createClass({
         }
 
         if (this.state.focused != nextState.focused && nextState.focused === true) {
-            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-            document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+            $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
 
             $(document).rebind('keyup.button' + self.getUniqueId(), function(e) {
                 if (self.state.focused === true) {
@@ -34,7 +33,7 @@ var Button = React.createClass({
             if (self._pageChangeListener) {
                 mBroadcaster.removeListener(self._pageChangeListener);
             }
-            mBroadcaster.addListener('pagechange', function() {
+            this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
                 if (self.state.focused === true) {
                     self.onBlur();
                 }
@@ -48,6 +47,7 @@ var Button = React.createClass({
             if (this.props.group) {
                 if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
                     _buttonGroups[this.props.group].setState({focused: false});
+                    _buttonGroups[this.props.group].unbindEvents();
                 }
                 _buttonGroups[this.props.group] = this;
             }
@@ -58,6 +58,9 @@ var Button = React.createClass({
             _buttonGroups[this.props.group] = null;
         }
     },
+    componentWillUnmount: function() {
+        this.unbindEvents();
+    },
     renderChildren: function () {
         var self = this;
 
@@ -66,6 +69,7 @@ var Button = React.createClass({
                 active: self.state.focused,
                 closeDropdown: function() {
                     self.setState({'focused': false});
+                    self.unbindEvents();
                 },
                 onActiveChange: function(newVal) {
                     var $element = $(self.findDOMNode());
@@ -100,20 +104,27 @@ var Button = React.createClass({
         var $element = $(ReactDOM.findDOMNode(this));
 
         if(
-            (!e || !$(e.target).closest(".button").is($element))
+            (!e || (
+                    !$(e.target).closest(".button").is($element)
+                )
+            )
         ) {
             this.setState({focused: false});
-            $(document).off('keyup.button' + this.getUniqueId());
-            $(document).off('closeDropdowns.' + this.getUniqueId());
-            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
-
-            if (this._pageChangeListener) {
-                mBroadcaster.removeListener(this._pageChangeListener);
-            }
+            this.unbindEvents();
             this.forceUpdate();
         }
 
 
+    },
+    unbindEvents: function() {
+        var self = this;
+        $(document).off('keyup.button' + self.getUniqueId());
+        $(document).off('closeDropdowns.' + self.getUniqueId());
+        $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+
+        if (self._pageChangeListener) {
+            mBroadcaster.removeListener(self._pageChangeListener);
+        }
     },
     onClick: function(e) {
         var $element = $(ReactDOM.findDOMNode(this));
@@ -147,7 +158,7 @@ var Button = React.createClass({
         }
         else if (this.state.focused === true) {
             this.setState({focused: false});
-            document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
+            this.unbindEvents();
         }
     },
     render: function () {

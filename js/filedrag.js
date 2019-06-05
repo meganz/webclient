@@ -222,6 +222,9 @@
                 target = $.onDroppedTreeFolder;
                 delete $.onDroppedTreeFolder;
             }
+            else if (M.currentCustomView) {
+                target = M.currentCustomView.nodeID;
+            }
             else if (String(M.currentdirid).length !== 8) {
                 target = M.lastSeenCloudFolder || M.RootID;
             }
@@ -291,7 +294,7 @@
             return;
         }
         e.stopPropagation();
-        
+
         if (d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
@@ -329,7 +332,7 @@
 
         useMegaSync = -1;
 
-        var currentDir = M.currentdirid;
+        var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
 
         // Clear drag element
         touchedElement = 0;
@@ -494,6 +497,8 @@
         if (is_fm() && // if page is fm,
             (slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
                 M.currentdirid === 'shares' || // Share root page
+                M.currentdirid === 'out-shares' || // Out-share root page
+                M.currentdirid === 'public-links' || // Public-link root page
                 M.currentrootid === 'contacts' || // Contacts pages
                 M.currentrootid === 'ipc' || // IPC
                 M.currentrootid === 'opc' || // OPC
@@ -598,4 +603,25 @@ function fakeDropEvent(target) {
 
     target = target || document.getElementById("startholder");
     target.dispatchEvent(ev);
+}
+
+function ulDummyFiles(count, len) {
+    'use strict';
+
+    var ul = [];
+    var ts = 1e8;
+    for (var n = M.v.length; n--;) {
+        ts = Math.max(ts, M.v[n].mtime | 0);
+    }
+
+    for (var i = count || 6e3; i--;) {
+        var now = Date.now();
+        var rnd = Math.random();
+        var nam = (rnd * now).toString(36);
+        var buf = asmCrypto.getRandomValues(new Uint8Array(rnd * (len || 512)));
+
+        ul.push(new File([buf], nam, {type: 'application/octet-stream', lastModified: ++ts * 1e3}));
+    }
+
+    M.addUpload(ul, true);
 }

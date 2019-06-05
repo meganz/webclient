@@ -1415,8 +1415,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 if (self.loggerIsEnabled) {
                     self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
                 }
-
-                // self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
                 self.chatd.rtcHandler.handleMessage(self, cmd, len);
                 break;
             case Chatd.Opcode.CALLDATA:
@@ -1891,6 +1889,7 @@ Chatd.Messages = function(chatd, shard, chatId, oldInstance) {
     // expired message list
     this.expired = {};
     this.needsRestore = true;
+    this.callParticipants = {};
     this._loginState = oldInstance ? oldInstance._loginState : LoginState.DISCONN;
 };
 
@@ -1920,7 +1919,6 @@ Chatd.Messages.prototype.join = function() {
     // reset chat state before join
     self.callParticipants = {}; // map of userid->array[clientid]
     self._setLoginState(LoginState.JOIN_SENT); // joining
-
     // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
     if (
         Object.keys(self.buf).length === 0 &&
@@ -2252,7 +2250,7 @@ Chatd.Messages.prototype._joinrangehistViaMessagesBuff = function() {
     assert(self._loginState === LoginState.JOIN_SENT);
     var firstLast;
     if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
-        firstLast = chatRoom.messagesBuff.getLowHighIds();
+        var firstLast = chatRoom.messagesBuff.getLowHighIds();
         if (firstLast) {
             // queued this as last to execute after this current .done cb.
             self.chatd.trigger('onMessagesHistoryRequest', {
@@ -3206,7 +3204,7 @@ Chatd.Messages.prototype.onInCall = function(userid, clientid) {
     if (self._loginState < LoginState.JOIN_RECEIVED) {
         return;
     }
-    var parts = self.callParticipants || {};
+    var parts = self.callParticipants;
     var endpointId = userid + clientid;
     if (parts[endpointId]) {
         self.chatd.logger.warn("INCALL received for user that is already known to be in the call");
@@ -3223,7 +3221,7 @@ Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
         return;
     }
 
-    var parts = self.callParticipants || {};
+    var parts = self.callParticipants;
     var endpointId = userid + clientid;
     if (!parts[endpointId]) {
         self.chatd.logger.warn("ENDCALL received for user that is not known to be in the call", JSON.stringify(parts));
@@ -3235,7 +3233,7 @@ Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
 
 Chatd.Messages.prototype.onUserLeftRoom = function(userid) {
     var self = this;
-    var parts = self.callParticipants || {};
+    var parts = self.callParticipants;
     for (var k in parts) {
         if (k.substr(0, 8) === userid) {
             delete parts[k];

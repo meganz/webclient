@@ -2654,7 +2654,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             case 'M4V ':
             case 'avc1': // JVT
             case 'f4v ': // Adobe Flash (MPEG-4 Part 12)
-            case 'qt  ':
+            case 'qt  ' + (d > 1 ? '' : '$'):
                 if (videocodec === 'avc1') {
                     mime = 'video/mp4; codecs="avc1.640029';
 

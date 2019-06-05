@@ -3466,5 +3466,10 @@
     "20795": "\uc704\uce58 \uc804\uc1a1",
     "20799": "\uc774 \uc704\uce58 \uc804\uc1a1",
     "20803": "\uace0\uc815\ub41c \uc704\uce58",
-    "20808": "{0}\uac1c \ub0a8\uc74c"
+    "20808": "{0}\uac1c \ub0a8\uc74c",
+    "20816": "Your account has been removed by your administrator. You may contact your business account administrators for further details.",
+    "20817": "Your in-browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "20818": "The file could be downloaded as a ZIP file. This can happen if the file was taken down.",
+    "20819": "None of the files could be downloaded as a ZIP file. This can happen if the files were taken down.",
+    "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully."
 }

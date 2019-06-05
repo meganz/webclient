@@ -1158,7 +1158,7 @@
     "8597": "Votre abonnement PRO arrivera \u00e0 expiration dans %1 jours.",
     "8598": "Votre abonnement PRO arrivera bient\u00f4t \u00e0 expiration",
     "8602": "Ce fichier sera d\u00e9chiffr\u00e9 d\u00e8s que la cl\u00e9 cryptographique sera disponible.",
-    "8623": "populaire\u2009!",
+    "8623": "Populaire\u2009!",
     "8628": "Envoyer un contact",
     "8629": "%1 est en train d\u2019\u00e9crire",
     "8631": "Ajouter \u00e0 la conversation",
@@ -3466,5 +3466,10 @@
     "20795": "Envoyer la position",
     "20799": "Envoyer cette position",
     "20803": "Position \u00e9pingl\u00e9e",
-    "20808": "Il en reste {0}"
+    "20808": "Il en reste {0}",
+    "20816": "Your account has been removed by your administrator. You may contact your business account administrators for further details.",
+    "20817": "Your in-browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
+    "20818": "The file could be downloaded as a ZIP file. This can happen if the file was taken down.",
+    "20819": "None of the files could be downloaded as a ZIP file. This can happen if the files were taken down.",
+    "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully."
 }

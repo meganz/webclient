@@ -540,7 +540,7 @@ body:not(.rtl) .default-white-button::first-letter {
     opacity: 0.6;
 }
 .icon-dropdown:not(.disabled):hover, .icon-dropdown.active {
-    background-image: url(../images/mega/new-chat-sprite_v11.png);
+    background-image: url(../images/mega/new-chat-sprite_v12.png);
     background-repeat: no-repeat;
     background-position: -64px -657px;
 }
@@ -1026,7 +1026,7 @@ body:not(.rtl) .default-white-button::first-letter {
     position: relative;
     font-size: 14px;
     line-height: 34px;
-    padding: 0px 15px; 
+    padding: 0px 15px;
     cursor: pointer;
     -webkit-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     -moz-transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;

@@ -3,10 +3,9 @@
     "use strict";
 
 
-    var RtcSessionEventHandler = function (callEventHandler, rtcCallSession) {
-        this.callEventHandler = callEventHandler;
-        this.rtcCallSession = rtcCallSession;
-        this.chatRoom = callEventHandler.chatRoom;
+    var RtcSessionEventHandler = function (callManagerCall, rtcSession) {
+        this.call = callManagerCall;
+        this.rtcSession = rtcSession;
     };
 
     /**
@@ -28,31 +27,17 @@
          attachToStream() polyfill function
          stream - the stream object to which a player should be attached
          */
-        return this.chatRoom.megaChat.plugins.callManager.onRemoteStreamAdded(
-            this.callEventHandler.call,
-            this,
-            stream
-        );
+        this.call.onRemoteStreamAdded(this.rtcSession, stream);
     };
 
     RtcSessionEventHandler.prototype.onRemoteStreamRemoved = function () {
         //  The peer's stream is about to be removed.
-        return this.chatRoom.megaChat.plugins.callManager.onRemoteStreamRemoved(this.callEventHandler.call, this);
+        this.call.onRemoteStreamRemoved(this.rtcSession);
     };
 
     RtcSessionEventHandler.prototype.onRemoteMute = function (stream) {
-        return this.chatRoom.megaChat.plugins.callManager.onRemoteMute(this.callEventHandler.call, this, stream);
+        this.call.onRemoteMute();
     };
-
-
-    /**
-     *
-     * @param {AvFlags} av
-     */
-    RtcSessionEventHandler.prototype.onPeerMute = function (av) {
-        // unused
-    };
-
 
     /**
      *  Called when network quality for this session changes.
@@ -60,17 +45,15 @@
      * @param {Number} q
      */
     RtcSessionEventHandler.prototype.onPeerNetworkQualityChange = function(q) {
-        var peerId = base64urlencode(this.rtcCallSession.peer);
-        var clientId = base64urlencode(this.rtcCallSession.peerClient);
-        var sid = base64urlencode(this.rtcCallSession.sid);
+        var sess = this.rtcSession;
+        var peerId = base64urlencode(sess.peer);
+        var clientId = base64urlencode(sess.peerClient);
+        var sid = base64urlencode(sess.sid);
         var idx = peerId + ":" + clientId + ":" + sid;
-
-        var callManagerCall = this.chatRoom.callManagerCall;
-        if (callManagerCall) {
-            if (callManagerCall.peerQuality[idx] !== q) {
-                callManagerCall.peerQuality[idx] = q;
-                this.chatRoom.trackDataChange();
-            }
+        var call = this.call;
+        if (call && (call.peerQuality[idx] !== q)) {
+            call.peerQuality[idx] = q;
+            call.room.trackDataChange();
         }
     };
 
@@ -80,59 +63,22 @@
      * @param {Number} level 0-100
      */
     RtcSessionEventHandler.prototype.onAudioLevelChange = function(level) {
-        var peerId = base64urlencode(this.rtcCallSession.peer);
-        var clientId = base64urlencode(this.rtcCallSession.peerClient);
-        var sid = base64urlencode(this.rtcCallSession.sid);
+        var sess = this.rtcSession;
+        var peerId = base64urlencode(sess.peer);
+        var clientId = base64urlencode(sess.peerClient);
+        var sid = base64urlencode(sess.sid);
         var idx = peerId + ":" + clientId + ":" + sid;
 
-        if (this.chatRoom.callManagerCall) {
+        if (this.call) {
             // call ended?
-            this.chatRoom.callManagerCall.trigger('onAudioLevelChange', [idx, level]);
+            call.trigger('onAudioLevelChange', [idx, level]);
         }
     };
 
-    /**
-     *
-     * @param {ChatRoom} chatRoom
-     * @constructor
-     */
-    var RtcCallEventHandler = function (chatRoom) {
-        this.chatRoom = chatRoom;
-    };
-
-    RtcCallEventHandler.prototype.onStateChange = function () {
-        // unused
-    };
-
-    RtcCallEventHandler.prototype.onDestroy = function (terminationReasonCode, wasFromPeer) {
-        this.chatRoom.megaChat.plugins.callManager.onDestroy(
-            this.call,
-            terminationReasonCode,
-            wasFromPeer
-        );
-    };
-
-    RtcCallEventHandler.prototype.onNewSession = function (rtcCallSession) {
-        return new RtcSessionEventHandler(this, rtcCallSession);
-    };
-
-    RtcCallEventHandler.prototype.onCallStarted = function (tsCallStart) {
-        return this.chatRoom.megaChat.plugins.callManager.onCallStarted(this.call, tsCallStart);
-    };
-    RtcCallEventHandler.prototype.onCallStarting = function () {
-        return this.chatRoom.megaChat.plugins.callManager.onCallStarting(this.call);
-    };
-    RtcCallEventHandler.prototype.onLocalMuteInProgress = function () {
-        return this.chatRoom.callManagerCall.onLocalMuteInProgress();
-    };
-    RtcCallEventHandler.prototype.onLocalMuteComplete = function () {
-        return this.chatRoom.callManagerCall.onLocalMuteComplete();
-    };
     var RtcGlobalEventHandler = function (megaChat) {
         var self = this;
         self.megaChat = megaChat;
     };
-
 
     var webrtcCalculateSharedKey = function webrtcCalculateSharedKey(peer) {
         var pubKey = pubCu25519[base64urlencode(peer)];
@@ -204,17 +150,14 @@
             }
         }
 
-        var callHandler = new RtcCallEventHandler(chatRoom, call);
-        callHandler.call = call;
-        var callManagerCall = callManager.registerCall(chatRoom, call);
-        callManagerCall.initiator = fromUser;
-        if (avAutoAnswer != null) {
-            callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_INCOMING);
-            return callHandler;
-        }
+        var callManagerCall = callManager.registerCall(chatRoom, call, fromUser);
         callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_INCOMING);
+
+        if (avAutoAnswer != null) {
+            return callManagerCall;
+        }
         callManager.trigger('WaitingResponseIncoming', [callManagerCall]);
-        return callHandler;
+        return callManagerCall;
     };
 
     RtcGlobalEventHandler.prototype.isGroupChat = function(chatId) {
@@ -281,5 +224,5 @@
 
 
     scope.RtcGlobalEventHandler = RtcGlobalEventHandler;
-    scope.RtcCallEventHandler = RtcCallEventHandler;
+    scope.RtcSessionEventHandler = RtcSessionEventHandler;
 })(window);

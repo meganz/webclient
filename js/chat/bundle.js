@@ -16816,6 +16816,15 @@ React.makeElement = React['createElement'];
 	            additionalClass = additionalClass + " participants-a-lot";
 	        }
 
+	        var reconnectingDiv = null;
+	        if (chatRoom.callReconnecting === true) {
+	            reconnectingDiv = _react2.default.createElement(
+	                'div',
+	                { className: 'callReconnecting' },
+	                _react2.default.createElement('i', { className: 'huge-icon crossed-phone' })
+	            );
+	        }
+
 	        return _react2.default.createElement(
 	            'div',
 	            { className: "call-block" + additionalClass, id: 'call-block' },
@@ -16824,6 +16833,7 @@ React.makeElement = React['createElement'];
 	            notifBar,
 	            networkQualityBar,
 	            players,
+	            reconnectingDiv,
 	            topPanel,
 	            _react2.default.createElement(
 	                'div',

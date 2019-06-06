@@ -578,6 +578,7 @@ mega.tpw = new function TransferProgressWidget() {
         var $tempRows = new Array(entriesArray.length);
         var tempRowPos = 0;
         var reverted = false;
+
         if (type === this.UPLOAD) {
             tempRowPos = entriesArray.length - 1;
             reverted = true;
@@ -892,6 +893,62 @@ mega.tpw = new function TransferProgressWidget() {
 
 
 
+    this.resumeDownloadUpload = function(type, entry) {
+        'use strict';
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+            return;
+        }
+
+        var dId = entry.id;
+        var prefix;
+        var toolTipText;
+
+        if (type === this.DOWNLOAD) {
+            prefix = downloadRowPrefix;
+            toolTipText = l[1196];
+            if (entry.zipid) {
+                dId = entry.zipid;
+            }
+        }
+        else {
+            prefix = uploadRowPrefix;
+            toolTipText = l[1617];
+        }
+
+        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
+
+        if (!$targetedRow || !$targetedRow.length) {
+            return;
+        }
+        if (!$targetedRow.hasClass('paused')) {
+            return;
+        }
+
+        if (monitors[dId]) {
+            clearTimeout(monitors[dId]);
+            delete monitors[dId];
+        }
+        monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
+
+        var $enqueueAction = $transferActionTemplate.clone().addClass('cancel');
+        $enqueueAction.find('.tooltips').text(toolTipText);
+        $targetedRow.find('.transfer-task-actions').empty().append($enqueueAction);
+
+        $targetedRow.removeClass('complete error progress paused').addClass('inqueue');
+
+        setStatus($targetedRow, this.INITIALIZING);
+
+        cleanOverLimitRows();
+
+        updateHeaderAndContent();
+
+        if (!this.isWidgetVisibile()) {
+            mega.tpw.showWidget();
+        }
+
+        updateJSP();
+
+    };
 
 
     this.pauseDownloadUpload = function(type, entry) {
@@ -929,6 +986,7 @@ mega.tpw = new function TransferProgressWidget() {
             clearTimeout(monitors[dId]);
             delete monitors[dId];
         }
+
 
         $targetedRow.removeClass('error complete progress inqueue').addClass('paused');
         setStatus($targetedRow, this.PAUSED);

@@ -3199,10 +3199,12 @@ li.token-input-token-invite .input-close {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    left: 0;
-    right: 0;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
     top: 50%;
-    margin: -64px auto 0 auto;
+    margin-top: -64px;
 }
 .drag-n-drop.header {
     height: 211px;

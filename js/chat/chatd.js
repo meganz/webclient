@@ -71,7 +71,8 @@ var Chatd = function(userId, megaChat, options) {
                     callid + String.fromCharCode(Term.kErrNotSupported));
             }
         },
-        onShutdown: function() {}
+        onShutdown: function() {},
+        onShardOnline: function(shard) {}
     };
     /* jshint +W098 */
 
@@ -130,7 +131,7 @@ var Chatd = function(userId, megaChat, options) {
             }
         });
     });
-    window.addEventListener('unload', function() {
+    window.addEventListener('beforeunload', function() {
         self.shutdown();
     });
 };
@@ -503,7 +504,6 @@ Chatd.Shard.prototype.getRelatedChatIds = function() {
     return chatIds;
 };
 
-
 Chatd.Shard.prototype.reconnect = function() {
     var self = this;
 
@@ -607,6 +607,7 @@ Chatd.Shard.prototype.handleDisconnect = function() {
     chatd.trigger('onClose', {
         shard: self
     });
+    delete self.clientId;
     self.connectionRetryManager.gotDisconnected();
 };
 
@@ -1468,6 +1469,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     self.logger.log("Assigned CLIENTID " + Chatd.clientIdToString(self.clientId),
                         " for shard", self.shard);
                 }
+                self.chatd.rtcHandler.onShardOnline(self);
                 break;
             case Chatd.Opcode.SEEN:
                 self.keepAlive.restart();

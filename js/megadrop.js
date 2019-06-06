@@ -1599,6 +1599,8 @@ mega.megadrop = (function() {
                 uiOpts.dlg.widget.$.url.text(uiOpts.dlg.widget.url2);
                 uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
+
+            uiOpts.dlg.widget.$.find('.tab-url-link').click();
         };
 
         var widgetDialog = function uiWidgetDialog(pupHandle) {

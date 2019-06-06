@@ -1,4 +1,4 @@
-﻿function RepayPage() {
+function RepayPage() {
     this.noOverduePaymentErrorCode = -1;
     this.unknownErrorCode = -99;
 };

@@ -201,43 +201,59 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             };
             var files = [];
 
-            var addNode = function(node) {
-                if (!node.a && node.k) {
-                    var item = {
-                        t: node.t,
-                        h: node.h,
-                        p: node.p,
-                        n: base64urlencode(to8(M.getSafeName(node.name)))
-                    };
-                    if (!node.t) {
-                        item.s = node.s;
-                        item.ts = node.mtime || node.ts;
-                        item.k = a32_to_base64(node.k);
-                    }
-                    files.push(item);
-                }
+            try {
 
-                if (node.t) {
-                    foreach(M.getNodesSync(node.h, false, false, true));
-                }
-            };
-
-            var foreach = function(nodes) {
-                for (var i = 0; i < nodes.length; i++) {
-                    var node = M.d[nodes[i]];
+                var addNodeToArray = function(arr, node) {
                     if (!node) {
-                        if (nodes[i].h && nodes[i].name) {
-                            node = nodes[i];
-                            addNode(node);
+                        return;
+                    }
+                    if (!node.a && node.k) {
+                        if (!node.t) {
+                            arr.push({
+                                t: node.t,
+                                h: node.h,
+                                p: node.p,
+                                n: base64urlencode(to8(M.getSafeName(node.name))),
+                                s: node.s,
+                                ts: node.mtime || node.ts,
+                                k: a32_to_base64(node.k)
+                            });
+                        }
+                        else {
+                            arr.push({
+                                t: node.t,
+                                h: node.h,
+                                p: node.p,
+                                n: base64urlencode(to8(M.getSafeName(node.name)))
+                            });
                         }
                     }
-                    else {
-                        addNode(node);
+                };
+
+                var recursivelyLoadNodes = function(arr, nodes) {
+                    if (!nodes) {
+                        return;
                     }
-                }
-            };
-            try {
-                foreach(n);
+                    for (var k = 0; k < nodes.length; k++) {
+                        if (typeof nodes[k] === 'string') {
+                            addNodeToArray(files, M.d[nodes[k]]);
+                            if (M.d[nodes[k]].t) {
+                                if (M.c[nodes[k]]) {
+                                    recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k]]));
+                                }
+                            }
+                        }
+                        else { // it's object
+                            addNodeToArray(files, nodes[k]);
+                            if (nodes[k].t) {
+                                recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k].h]));
+                            }
+                        }
+                    }
+                };
+
+                recursivelyLoadNodes(files, n);
+                
             }
             catch (exx) {
                 if (d) {

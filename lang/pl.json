@@ -3467,9 +3467,10 @@
     "20799": "Wy\u015blij t\u0119 lokalizacj\u0119",
     "20803": "Przypi\u0119ta lokalizacja",
     "20808": "{0} pozosta\u0142o",
-    "20816": "Your account has been removed by your administrator. You may contact your business account administrators for further details.",
+    "20816": "Your account has been removed by your administrator. Please contact your business account administrator for further details.",
     "20817": "Your in-browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
     "20818": "The file could be downloaded as a ZIP file. This can happen if the file was taken down.",
     "20819": "None of the files could be downloaded as a ZIP file. This can happen if the files were taken down.",
-    "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully."
+    "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
+    "20822": "Not accessible due to the file owner status."
 }

@@ -1971,10 +1971,13 @@ function fm_tfsresume(gid) {
     'use strict';
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         if (gid[0] === 'u') {
-            ulQueue.resume(gid);
+            mega.tpw.resumeDownloadUpload(mega.tpw.UPLOAD, { id: gid.split('_').pop() });
 
+            ulQueue.resume(gid);
         }
         else {
+            mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: gid.split('_').pop() });
+
             var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
@@ -2012,6 +2015,7 @@ function fm_tfsresume(gid) {
                 }
             }
         }
+
         if (uldl_hold) {
             dlQueue.resume();
             ulQueue.resume();

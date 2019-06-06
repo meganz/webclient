@@ -503,7 +503,18 @@ mega.tpw = new function TransferProgressWidget() {
                 $downloadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainD));
             }
             else {
+                var initialDownloadHeadText = $downloadHeader.find('.transfer-progress-txt').text();
                 $downloadHeader.find('.transfer-progress-txt').text(l[1418]);
+
+                if (initialDownloadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
+                    if ($uploadHeader.hasClass('hidden') ||
+                        $uploadHeader.find('.transfer-progress-txt').text() === l[1418]) {
+                        if ($widgetHeadAndBody.hasClass('expand')) {
+                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                            isMinimizedByUser = false;
+                        }
+                    }
+                }
             }
             setProgressCircle($downloadHeader, totalD, doneD);
             $downloadHeader.removeClass('hidden');
@@ -523,7 +534,18 @@ mega.tpw = new function TransferProgressWidget() {
                 $uploadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainU));
             }
             else {
+                var initialUploadHeadText = $uploadHeader.find('.transfer-progress-txt').text();
                 $uploadHeader.find('.transfer-progress-txt').text(l[1418]);
+
+                if (initialUploadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
+                    if ($downloadHeader.hasClass('hidden') ||
+                        $downloadHeader.find('.transfer-progress-txt').text() === l[1418]) {
+                        if ($widgetHeadAndBody.hasClass('expand')) {
+                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                            isMinimizedByUser = false;
+                        }
+                    }
+                }
             }
             setProgressCircle($uploadHeader, totalU, doneU);
             $uploadHeader.removeClass('hidden');

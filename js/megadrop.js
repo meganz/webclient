@@ -177,7 +177,13 @@ mega.megadrop = (function() {
                     a: 'ul',
                     n: '',      // Folder handle
                     d: 0,       // Create public upload folder
-                    i: requesti
+                    i: requesti,
+                    s: 2,
+                    data: {
+                        name: '',
+                        email: '',
+                        msg: ''
+                    }
                 },
                 remove: {       // Remove PUF
                     a: 'ul',
@@ -328,12 +334,10 @@ mega.megadrop = (function() {
 
             for (var i = ap.length; i--;) {
                 var puh = Object.assign({}, ap[i]);
+
                 if (puh.d) {// 'puh' AP delete
                     if (requesti === puh.i) {
-                        if (puh.p) {
-                            pup.remove(puh.p);
-                        }
-                        else {// Make sure that PUF is synced
+                        if (!puh.p) { // Make sure that PUF is synced
                             _del(puh);
                         }
                     }
@@ -341,7 +345,7 @@ mega.megadrop = (function() {
                 else {
                     add(puh).done(function () {
                         if (requesti === puh.i) {
-                            pup.create(puh.h);
+                            mBroadcaster.sendMessageAfterReady('MEGAdrop:puhProcessed');
                         }
                     });
                 }
@@ -374,10 +378,10 @@ mega.megadrop = (function() {
         };
 
         /**
-         * Create public upload folder (PUF)
+         * Create public upload folder (PUF) and public upload page (PUP)
          * @param {String} handle Folder handle
          */
-        var create = function pufCreate(handle) {
+        var create = function pufCreateV2(handle) {
             if (d) {
                 console.log('puf.create');
             }
@@ -391,7 +395,12 @@ mega.megadrop = (function() {
                 }
                 else {// Create new PUF
                     loadingDialog.show();// .hide() is called in ui.widgetDialog() or on res != 0
+
+                    req.data.name = u_attr.name;
+                    req.data.email = u_attr.email;
+                    req.data.msg = M.getNameByHandle(handle) || 'unknown'; // Folder name instead of custom msg
                     req.n = handle;
+
                     api_req(req, {
                         callback: function (res) {
                             if (res < 0) {
@@ -621,10 +630,6 @@ mega.megadrop = (function() {
                             h: nodeId
                         }
                     });
-                }
-
-                if (!pupOpts.items[pupId]) {
-                    pupOpts.items[pupId] = {};
                 }
 
                 pupOpts.items[pupId] = {};
@@ -962,26 +967,40 @@ mega.megadrop = (function() {
             var pupId = '';
             var delayHide = false;
 
+            var pupAddAndUpdate = function _pupAddAndUpdate() {
+                add(item);
+                folderId = pupOpts.items[pupId].h;
+
+                // In case that pup data is updated remotely
+                if (item.u) {
+                    onRename(folderId, M.d[folderId].name);
+                }
+                settings.add(pupId, folderId);
+            };
+
+            var onPuhProcessed = function _onPuhProcessed() {
+                pupAddAndUpdate();
+
+                // Show dialog if this is local packet and not update action
+                ui.widgetDialog(pupId);
+            };
+
             for (var i = ap.length; i--;) {
                 item = Object.assign({}, ap[i]);
                 pupId = item.p;
                 pufHandle = item.ph;
                 state = item.s ? item.s : 0;
-                if (state === 2) {// Active PUP
-                    add(item);
-                    folderId = pupOpts.items[pupId].h;
-                    if (item.u) {// In case that pup data is updated
-                        onRename(folderId, M.d[folderId].name);
-                    }
-                    settings.add(pupId, folderId);
-                    $('.fm-account-button.megadrop').removeClass('hidden');
 
-                    // Don't show dialog if PUP data is updated
+                if (state === 2) { // Active PUP
+                    // If this is local action of create or delete, waiting for puh to be processed
                     if (requesti === item.i && !item.u) {
-                        ui.widgetDialog(pupId);
+                        mBroadcaster.onceAfterReady('MEGAdrop:puhProcessed', onPuhProcessed);
+                    }
+                    else {
+                        pupAddAndUpdate();
                     }
                 }
-                else {
+                else { // Inactive PUP
                     if (pupOpts.items[pupId]) {
                         folderId = pupOpts.items[pupId].h;
                         _del(pupId);
@@ -1047,6 +1066,7 @@ mega.megadrop = (function() {
         };
 
         return {
+            pageReq: pupOpts.req,
             add: add,
             get: get,
             list: list,

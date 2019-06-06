@@ -1022,6 +1022,54 @@ function mObjectURL(data, type)
         });
     },
 
+    /**
+     * Send message when there is listener for it, if there is not listener for it,
+     * wait for listener to be initialize and send message at that point.
+     * Reason for this function is make sure callback is executed,
+     * even there is race condition between sender and listener.
+     * This function should be paired with 'onceAfterReady'.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Interger} [timeout] Time for waiting listener to be init in ms, if it passed destroy awaiting.
+     * @memberOf mBroadcaster
+     */
+    sendMessageAfterReady: function mBroadcaster_sendMessageAfterReady(topic, timeout) {
+        'use strict';
+
+        if (this.hasListener(topic)) {
+            this.sendMessage(topic);
+        }
+        else {
+            this.once(topic + '_awaiting_listener', this.sendMessage.bind(this, topic));
+            if (timeout) {
+                setTimeout(function() {
+                    if (this.hasListener(topic + '_awaiting_listener')) {
+                        this.removeListener.bind(this, topic + '_awaiting_listener');
+                    }
+                }, timeout);
+            }
+        }
+    },
+
+    /**
+     * Add once listener and if there is sendMessage waiting for listner to be init,
+     * made it init and trigger message to be sent so it can execute callback
+     * Reason for this function is make sure callback is executed,
+     * even there is race condition between sender and listener.
+     * This function should be paired with 'sendMessageAfterReady'.
+     * @param {String} topic A string representing the event type to listen for.
+     * @param {Function} callback The function to invoke
+     * @memberOf mBroadcaster
+     */
+    onceAfterReady: function mBroadcaster_onceAfterReady(topic, callback) {
+        'use strict';
+
+        this.once(topic, callback);
+
+        if (this.hasListener(topic + '_awaiting_listener')) {
+            this.sendMessage(topic + '_awaiting_listener');
+        }
+    },
+
     crossTab: {
         eTag: '$CTE$!_',
 

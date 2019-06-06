@@ -2860,9 +2860,11 @@ FileManager.prototype.addGridUI = function(refresh) {
     // Change title for Public link page
     if (page === 'fm/public-links') {
         $('.fm .grid-table-header .ts').text(l[20694]);
+        $('.fm .grid-table-header .mtime').text(l[20694]);
     }
     else {
         $('.fm .grid-table-header .ts').text(l[17445]);
+        $('.fm .grid-table-header .mtime').text(l[94]);
     }
 
     // $.gridDragging=false;

@@ -1,387 +1,99 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>MEGA update browser</title>
-<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-<style type="text/css">
-@font-face {
-	font-family: 'source_sans_proregular';
-	src: url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.eot');
-	src: url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.woff2') format('woff2'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.woff') format('woff'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.ttf') format('truetype'), url('https://eu.static.mega.co.nz/3/fonts/SourceSansPro-Regular.svg#source_sans_proregular') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-@font-face {
-	font-family: 'Open Sans Semibold Italic';
-	src: url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.eot');
-	src: url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.eot?#iefix') format('embedded-opentype'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic.woff2') format('woff2'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.woff') format('woff'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.ttf') format('truetype'), url('https://eu.static.mega.co.nz/3/fonts/OpenSans-SemiboldItalic_v3.svg#open_sanssemibold_italic') format('svg');
-	font-weight: normal;
-	font-style: normal;
-}
-body, td, th {
-	font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
-	font-size: 14px;
-	color: #333333;
-	line-height: 15px;
-}
-html {
-	font-size: 100%;
-	-webkit-text-size-adjust: 100%;
-	-ms-text-size-adjust: 100%;
-	width: 100%;
-	height: 100%;
-}
-body {
-	background-color: #FFFFFF;
-	margin: 0px;
-	padding: 0px;
-	width: 100%;
-	overflow: auto;
-	height: 100%;
-	min-width: 987px;
-	min-height: 434px;
-	position: relative;
-}
-a, a:link, a:visited, a:hover, a:active {
-	text-decoration: none;
-	outline: none;
-}
-.div, span, input {
-	outline: none;
-}
-.hidden {
-	display: none;
-}
-.clear {
-	clear: both;
-	margin: 0px;
-	padding: 0px;
-	display: block;
-}
-.left {
-	float: left;
-}
-.top-head {
-	height: 50px;
-}
-.logo {
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/logo-black-ie6-v1.png);
-	background-position: 10px 13px;
-	background-repeat: no-repeat;
-	display: block;
-	width: 178px;
-	height: 45px;
-	float: left;
-	margin: 0 0 0 6px;
-	cursor: pointer;
-}
-.browsers-mid {
-	min-height: 434px;
-}
-.browsers-centered-block {
-	width: 940px;
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin: -182px 0 0 -470px;
-	height: 344px;
-}
-.browsers-header {
-	font-size: 20px;
-	line-height: 30px;
-	color: #D22400;
-	font-family: "Open Sans Semibold Italic", Arial;
-	padding-bottom: 17px;
-}
-.browsers-centered-block img {
-	width: 24px;
-	margin-left: -4px;
-}
-.browser-title {
-	font-size: 14px;
-	line-height: 24px;
-	color: #999999;
-	margin: 0 0 0 23px;
-}
-.browsers-notification {
-	font-size: 14px;
-	line-height: 21px;
-	color: #333333;
-	margin: 20px 0 42px 0;
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page.png);
-	background-position: 0 4px;
-	background-repeat: no-repeat;
-	padding-left: 23px;
-}
-.browsers-logo {
-	float: left;
-	width: auto;
-	border: 2px solid #d9d9d9;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	margin-left: 10px;
-}
-.browsers-logo-lnk {
-	display: block;
-	width: 176px;
-	height: 176px;
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page.png);
-	background-position: center 30px;
-	background-repeat: no-repeat;
-	position: relative;
-	-moz-border-radius: 8px;
-	-webkit-border-radius: 8px;
-	border-radius: 8px;
-	overflow: hidden;
-}
-.firefox .browsers-logo-lnk {
-	background-position: 0 -69px;
-}
-.chrome .browsers-logo-lnk {
-	background-position: -190px -69px;
-}
-.opera .browsers-logo-lnk {
-	background-position: -380px -69px;
-}
-span.browsers-update {
-	position: absolute;
-	top: 2px;
-	left: 2px;
-	font-size: 12px;
-	line-height: 19px;
-	height: 20px;
-	padding: 0 5px;
-	display: block;
-	background-color: #D22400;
-	color: white;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	display: none;
-}
-.browsers-logo-lnk:hover .browsers-update {
-	display: block;
-}
-.browsers-recommendations {
-	position: absolute;
-	display: block;
-	bottom: 2px;
-	right: 2px;
-	font-size: 12px;
-	line-height: 19px;
-	height: 20px;
-	padding: 0 5px;
-	display: block;
-	background-color: #7BB328;
-	color: white;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-}
-.browsers-recommendations.supported {
-	background-color: #FFBC00;
-}
-.browsers-recommendations.partial-support {
-	background-color: #b2b2b2;
-}
-.browsers-logo.first-child {
-	margin: 0;
-}
-.safari .browsers-logo-lnk {
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page.png);
-	background-position: -570px -69px;
-	background-repeat: no-repeat;
-}
-.ie .browsers-logo-lnk {
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page.png);
-	background-position: -764px -69px;
-	background-repeat: no-repeat;
-}
-.browsers-bottom {
-	position: absolute;
-	bottom: 0;
-	height: 43px;
-	width: 940px;
-	left: 50%;
-	margin-left: -470px;
-}
-.nw-bottom-copyrights {
-	font-size: 13px;
-	color: #333333;
-	line-height: 21px;
-	padding: 10px 0 10px 20px;
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite-ie6.png);
-	background-repeat: no-repeat;
-	background-position: left -207px;
-	float: left;
-}
-.nw-bottom-copyrights span {
-	color: #666666;
-	padding-left: 5px;
-}
-.nw-bottom-social {
-	width: 26px;
-	height: 26px;
-	float: right;
-	background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite-ie6.png);
-	background-repeat: no-repeat;
-	background-position: -46px -277px;
-	margin: 7px 0 0 17px;
-	display: block;
-	cursor: pointer;
-}
-.nw-bottom-social:hover {
-	background-position: -46px -317px;
-}
-.nw-bottom-social.twitter {
-	background-position: -2px -277px;
-}
-.nw-bottom-social.twitter:hover {
-	background-position: -2px -317px;
-}
-a.continue-button {
-    color: #d22400;
-    display: block;
-    font-size: 16px;
-    font-family: 'source_sans_proregular', Arial;
-    font-size: 16px;
-    line-height: 30px;
-    padding-top: 20px;
-    text-decoration: underline;
-}
-a.continue-button.hidden {
-    display: none;
-}
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>MEGA update browser</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <link href="update.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div id="nstartholder" class="fmholder">
+            <div class="browsers-main-block">
+                <div class="top-head">
+                    <a class="logo"></a>
+                </div>
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.logo {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/logo-black-v1@2x.png);
- background-size: 128px auto;
- background-position: 10px 13px;
- background-repeat: no-repeat;
-}
-.browsers-notification {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page@2x.png);
- background-position: 0 4px;
- background-repeat: no-repeat;
- background-size: 892px auto;
-}
-.nw-bottom-copyrights {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite@2x.png);
- background-size: 170px auto;
- background-repeat: no-repeat;
- background-position: left -207px;
-}
-.nw-bottom-social {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/bottom-sprite@2x.png);
- background-size: 170px auto;
- background-repeat: no-repeat;
- background-position: -46px -277px;
-}
-.safari .browsers-logo-lnk {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page@2x.png);
- background-position: -570px -69px;
- background-repeat: no-repeat;
- background-size: 892px auto;
-}
-.ie .browsers-logo-lnk {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-page@2x.png);
- background-position: -764px -69px;
- background-repeat: no-repeat;
- background-size: 892px auto;
-}
-.browsers-logo-lnk {
- background-image: url(https://eu.static.mega.co.nz/3/images/mega/browsers-sprite.png);
- background-position: center 30px;
- background-repeat: no-repeat;
- background-size: 100px auto;
-}
-.firefox .browsers-logo-lnk {
- background-position: center -299px;
-}
-.chrome .browsers-logo-lnk {
- background-position: center -480px;
-}
-.opera .browsers-logo-lnk {
- background-position: center -138px;
-}
-}
-</style>
-</head>
+                <div class="browsers-mid">
 
-<body>
+                    <div class="browsers-centered-block">
+                        <div class="browsers-header">
+                            Your browser seems a bit outdated
+                        </div>
+                        <div class="clear"></div>
+                        <div class="browsers-notification">
+                            Please update to the latest version or switch to a recommended browser.<br />
+                            <br />
+                            Our recommended browsers respect your privacy, are open source, quickly add support for new web standards and they provide timely security updates.
+                        </div>
+                        <div>
+                            <!-- Open source, privacy respecting, modern web standards browsers -->
+                            <div class="browsers-logo firefox first-child">
+                                <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update recommended">Download Firefox</span>
+                                    <span class="browsers-recommendations recommended">Recommended!</span>
+                                </a>
+                            </div>
+                            <div class="browsers-logo chromium">
+                                <a href="https://www.chromium.org/Home" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update recommended">Download Chromium</span>
+                                    <span class="browsers-recommendations recommended">Recommended!</span>
+                                </a>
+                            </div>
+                            <div class="browsers-logo brave">
+                                <a href="https://brave.com/download/" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update recommended">Download Brave</span>
+                                    <span class="browsers-recommendations recommended">Recommended!</span>
+                                </a>
+                            </div>
 
-<div id="nstartholder" class="fmholder">
-  <div class="browsers-main-block">
-    <div class="top-head">
-        <a class="logo"></a>
-    </div>
+                            <!-- Closed source, modern web standards browsers -->
+                            <div class="browsers-logo chrome">
+                                <a href="https://www.google.com/chrome" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update supported">Download Chrome</span>
+                                    <span class="browsers-recommendations supported">Supported</span>
+                                </a>
+                            </div>
+                            <div class="browsers-logo opera">
+                                <a href="http://www.opera.com/" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update supported">Download Opera</span>
+                                    <span class="browsers-recommendations supported">Supported</span>
+                                </a>
+                            </div>
+                            <div class="browsers-logo edge">
+                                <a href="https://www.microsoft.com/en-nz/windows/microsoft-edge" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update supported">Download Edge</span>
+                                    <span class="browsers-recommendations supported">Supported</span>
+                                </a>
+                            </div>
 
-    <div class="browsers-mid">
+                            <!-- Closed source, partial web standards supporting browsers -->
+                            <div class="browsers-logo safari">
+                                <a href="http://www.apple.com/safari/" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update partial-support">Download Safari</span>
+                                    <span class="browsers-recommendations partial-support">Partial support</span>
+                                </a>
+                            </div>
+                            <div class="browsers-logo ie">
+                                <a href="https://www.microsoft.com/en-nz/download/Internet-Explorer-11-for-Windows-7-details.aspx" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
+                                    <span class="browsers-update partial-support">Download Internet Explorer 11</span>
+                                    <span class="browsers-recommendations partial-support">Partial support</span>
+                                </a>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <a id="continue-button" class="continue-button hidden" href="#">Continue anyway...</a>
+                    </div>
 
-      <div class="browsers-centered-block">
-        <div class="browsers-header">
-          Your browser seems a bit outdated
+                    <div class="browsers-bottom">
+                        <div class="nw-bottom-copyrights"> MEGA 2019 <span>All rights reserved</span> </div>
+                        <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="nw-bottom-social facebook"></a>
+                        <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="nw-bottom-social twitter"></a>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-		<!--
-        <div class="left">
-          <img alt="" src="https://eu.static.mega.co.nz/images/mega/icons/retina/firefox@2x.png"  />
-        </div>
-        <div class="browser-title">
-          Firefox v. 1.54321
-        </div>
-		-->
-        <div class="clear"></div>
-        <div class="browsers-notification">
-           Please update to the latest version or switch to a recommended browser:
-        </div>
-        <div>
-        <div class="browsers-logo firefox first-child">
-          <a href="http://www.mozilla.org/firefox/" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
-            <span class="browsers-update">Download</span>
-            <span class="browsers-recommendations recommended">Recommended!</span>
-          </a>
-        </div>
-        <div class="browsers-logo chrome">
-          <a href="https://www.google.com/chrome" class="browsers-logo-lnk" target="_blank" rel="noopener noreferrer">
-            <span class="browsers-update">Download</span>
-            <span class="browsers-recommendations recommender">Recommended!</span>
-          </a>
-        </div>
-        <div class="browsers-logo opera">
-          <a href="http://www.opera.com/" target="_blank" rel="noopener noreferrer" class="browsers-logo-lnk">
-            <span class="browsers-update">Download</span>
-            <span class="browsers-recommendations supported">Supported</span>
-          </a>
-        </div>
-        <div class="browsers-logo safari">
-          <a href="http://www.apple.com/safari/" target="_blank" rel="noopener noreferrer" class="browsers-logo-lnk">
-            <span class="browsers-update">Download</span>
-            <span class="browsers-recommendations partial-support">Partial support</span>
-          </a>
-        </div>
-        <div class="browsers-logo ie">
-          <a href="https://www.microsoft.com/en-nz/download/Internet-Explorer-11-for-Windows-7-details.aspx" target="_blank" rel="noopener noreferrer" class="browsers-logo-lnk">
-            <span class="browsers-update">Download</span>
-            <span class="browsers-recommendations partial-support">Partial support</span>
-          </a>
-        </div>
-        <div class="clear"></div>
-        </div>
-        <a id="continue-button" class="continue-button hidden" href="#">Continue anyway...</a>
-      </div>
-
-      <div class="browsers-bottom">
-          <div class="nw-bottom-copyrights"> MEGA 2019 <span>All rights reserved</span> </div>
-          <a href="https://www.facebook.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="nw-bottom-social facebook"></a>
-          <a href="https://www.twitter.com/MEGAprivacy" target="_blank" rel="noopener noreferrer" class="nw-bottom-social twitter"></a>
-          <div class="clear"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<script type="text/javascript" src="update.js" charset="utf-8"></script>
-</body>
+        <script type="text/javascript" src="update.js" charset="utf-8"></script>
+    </body>
 </html>

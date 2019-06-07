@@ -1143,7 +1143,7 @@
     "8597": "Il tuo piano di iscrizione PRO scadr\u00e0 tra %1 giorni.",
     "8598": "Il piano di iscrizione PRO scadr\u00e0 a breve",
     "8602": "Questo file verr\u00e0 decriptato quando la chiave di decriptazione sar\u00e0 disponibile.",
-    "8623": "popolare!",
+    "8623": "Popolare!",
     "8628": "Invia contatto",
     "8629": "%1 sta scrivendo",
     "8631": "Aggiungi alla chat",
@@ -3228,5 +3228,6 @@
     "20714": "Dopo il [B1]%1[\/B1], il piano del tuo account diventer\u00e0 [B2]%2[\/B2].",
     "20715": "Vuoi avere questa opzione?",
     "20759": "Si rinnova il [B]%1[\/B]",
-    "20808": "{0} rimasti"
+    "20808": "{0} rimasti",
+    "20816": "Your account has been removed by your administrator. Please contact your business account administrator for further details."
 }

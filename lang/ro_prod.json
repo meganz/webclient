@@ -3228,5 +3228,6 @@
     "20714": "After [B1]%1[\/B1], your account's plan will be the [B2]%2[\/B2] subscription.",
     "20715": "Do you want this feature?",
     "20759": "Renews on [B]%1[\/B]",
-    "20808": "{0} left"
+    "20808": "{0} left",
+    "20816": "Your account has been removed by your administrator. Please contact your business account administrator for further details."
 }

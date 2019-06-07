@@ -1143,7 +1143,7 @@
     "8597": "Uw PRO abonnement zal binnen %1 dagen verlopen.",
     "8598": "PRO abonnement verloopt binnenkort",
     "8602": "Dit bestand zal worden gedecodeerd zodra de coderingssleutel beschikbaar komt.",
-    "8623": "populair!",
+    "8623": "Populair!",
     "8628": "Zend contactgegevens",
     "8629": "%1 is aan het typen",
     "8631": "Voeg toe aan chat",
@@ -3228,5 +3228,6 @@
     "20714": "Na [B1]%1[\/B1], uw account's abonnement wordt de  [B2]%2[\/B2] abonnement.",
     "20715": "Wilt u dit kenmerk?",
     "20759": "Vernieuwd op [B]%1[\/B]",
-    "20808": "{0} left"
+    "20808": "{0} over",
+    "20816": "Your account has been removed by your administrator. Please contact your business account administrator for further details."
 }

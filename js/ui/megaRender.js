@@ -17,9 +17,11 @@
                         '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
+                    '<td width="70" class="label"></td>' +
                     '<td width="100" class="size"></td>' +
                     '<td width="130" class="type"></td>' +
-                    '<td width="120" class="time"></td>' +
+                    '<td width="120" class="time ad"></td>' +
+                    '<td width="120" class="time md"></td>' +
                     '<td width="93" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
@@ -285,6 +287,16 @@
             '.contacts-details-block .grid-table.shared-with-me',
             '.fm-blocks-view.contact-details-view .file-block-scrolling'
         ]
+    };
+
+    var labelsColors = {
+        'red': l[16223] || 'Red',
+        'orange': l[16224] || 'Orange',
+        'yellow': l[16225] || 'Yellow',
+        'green': l[16226] || 'Green',
+        'blue': l[16227] || 'Blue',
+        'purple': l[16228] || 'Purple',
+        'grey': l[16229] || 'Grey'
     };
 
     mBroadcaster.once('startMega', function() {
@@ -866,13 +878,17 @@
                     if (!this.viewmode) {
                         if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
                             props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
+                            props.mTime = aNode.shares.EXP.mtime ? time2date(aNode.shares.EXP.mtime) : '';
                         }
-                        else if (M.lastColumn && aNode.p !== "contacts") {
-                            props.time = time2date(aNode[M.lastColumn] || aNode.ts);
+                        else if (aNode.p !== "contacts") {
+                            // props.time = time2date(aNode[M.lastColumn] || aNode.ts);
+                            props.time = time2date(aNode.ts);
+                            props.mTime = time2date(aNode.mtime || aNode.ts);
                         }
                         else {
                             props.time = time2date(aNode.ts
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
+                            props.mTime = props.time;
                         }
                     }
 
@@ -881,6 +897,7 @@
                         var colourLabel = M.getLabelClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
+                        props.labelC = labelsColors[colourLabel];
                     }
                 }
 
@@ -1093,6 +1110,8 @@
                     }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
+                    aTemplate.querySelector('.time.md').textContent = aProperties.mTime;
+                    aTemplate.querySelector('.label').textContent = aProperties.labelC || '';
 
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
                     tmp.textContent = aProperties.name;

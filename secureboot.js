@@ -750,7 +750,7 @@ if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) 
 // If they need to update their browser, store the current page before going to the update page
 if (browserUpdate) {
     localStorage.prevPage = page;
-    document.location = 'update.html';
+    window.location = (is_extension ? '' : '/') + 'update.html';
 }
 
 // Mapping of user's browser language preference to language codes and native/english names

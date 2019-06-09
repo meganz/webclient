@@ -1907,7 +1907,17 @@ function passwordManager(form) {
             $(form).find('input').val('');
         }, 1000);
         return false;
-    }).submit();
+    });
+
+    // For trigger FF Password Manager, submit the form by making submit button and click it.
+    var submitButton = document.createElement("input");
+    submitButton.setAttribute("type", "submit");
+    submitButton.style.opacity = '0';
+
+    $(form)[0].appendChild(submitButton);
+
+    submitButton.click();
+
     return true;
 }
 passwordManager.knownForms = Object.freeze({

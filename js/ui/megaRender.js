@@ -22,6 +22,7 @@
                     '<td width="130" class="type"></td>' +
                     '<td width="120" class="time ad"></td>' +
                     '<td width="120" class="time md"></td>' +
+                    '<td width="120" class="hd-versions"></td>' +
                     '<td width="93" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
@@ -297,6 +298,22 @@
         'blue': l[16227] || 'Blue',
         'purple': l[16228] || 'Purple',
         'grey': l[16229] || 'Grey'
+    };
+
+
+    var versionColumnPrepare = function(versionsNb, VersionsSize) {
+        var versionsTemplate = '<div class="ver-col-container">' +
+            '<div class="ver-nb">' + versionsNb + '</div>' +
+            '<div class="ver-icon versioning">' +
+            '<span class="versioning-indicator"><i class="small-icon icons-sprite grey-clock"></i></span>' +
+            '</div>' +
+            '<div class="ver-size">' +
+            '<div class="ver-size-nb">' + bytesToSize(VersionsSize) + '</div>' +
+            '</div>' +
+            '</div>';
+
+        // safe will remove any scripts
+        return parseHTML(versionsTemplate).firstChild;
     };
 
     mBroadcaster.once('startMega', function() {
@@ -1066,6 +1083,8 @@
 
                 if (!aNode.t && aNode.tvf) {
                     aTemplate.classList.add('versioning');
+                    aTemplate.querySelector('.hd-versions').appendChild(versionColumnPrepare
+                        (aNode.tvf, aNode.tvb || 0));
                 }
 
                 if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {

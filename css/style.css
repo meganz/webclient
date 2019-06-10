@@ -30379,3 +30379,33 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .float-widget.transfer-prorgess .banner.overquota .quota-info-pct-circle ul span {
     background-color: #F0373A;
 }
+.grid-table .ver-col-container .ver-nb {
+height: 18px;
+width: 7px;
+color: #666666;
+font-family: "Source Sans Pro";
+font-size: 13px;
+font-weight: 600;
+float: left;
+}
+.grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
+left: 23px;
+}
+.grid-table .ver-col-container .ver-size {
+margin-left: 30px;
+height: 16px;
+border-radius: 8px;
+background-color: #666666;
+float: left;
+margin-top: 4px;
+}
+.grid-table .ver-col-container .ver-size .ver-size-nb {
+height: 15px;
+color: #FFFFFF;
+font-family: "Source Sans Pro";
+font-size: 12px;
+line-height: 15px;
+text-align: center;
+padding-left: 7px;
+padding-right: 7px;
+}

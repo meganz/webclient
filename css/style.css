@@ -18625,6 +18625,10 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 600px;
     height: 590px;
 }
+.collected-data-review-dialog .fm-mega-dialog-bottom {
+    height: 54px;
+    padding-top: 0px;
+}
 .collected-data-textarea {
     overflow: hidden;
     max-height: 462px;

@@ -497,6 +497,7 @@ MegaData.prototype.doSort = function(n, d) {
 };
 
 MegaData.prototype.setLastColumn = function(col) {
+    return;
     switch (col) {
         case 'ts':
         case 'mtime':

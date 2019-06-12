@@ -2,6 +2,22 @@ function FileManager() {
     "use strict";
 
     this.logger = new MegaLogger('FileManager');
+    this.columnsWidth = {
+        cloud: Object.create(null),
+        inshare: Object.create(null),
+        outshare: Object.create(null)
+    };
+
+    this.columnsWidth.cloud.fav = { min: 50, curr: 50 };
+    this.columnsWidth.cloud.fname = { min: 120, curr: null };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70 };
+    this.columnsWidth.cloud.size = { min: 100, curr: 100 };
+    this.columnsWidth.cloud.type = { min: 130, curr: 130 };
+    this.columnsWidth.cloud.timeAd = { min: 120, curr: 120 };
+    this.columnsWidth.cloud.timeMd = { min: 120, curr: 120 };
+    this.columnsWidth.cloud.versions = { min: 120, curr: 120 };
+    this.columnsWidth.cloud.extras = { min: 93, curr: 93 };
+
 }
 FileManager.prototype.constructor = FileManager;
 
@@ -487,6 +503,52 @@ FileManager.prototype.initFileManagerUI = function() {
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     onIdle(topmenuUI);
+
+    var thElm;
+    var startOffset;
+    $('.grid-table-header .grid-view-resize').rebind('mousedown', function(col) {
+        var $me = $(this);
+        var th = $me.closest('th');
+        thElm = th;
+        //startOffset = th[0].offsetWidth - col.pageX;
+        //startOffset = th.width() - col.pageX;
+        startOffset = th.outerWidth() - col.pageX;
+    });
+
+    $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+        if (thElm && thElm.length) {
+            //thElm[0].style.width = startOffset + col.pageX + 'px';
+            var newWidth = startOffset + col.pageX;
+            
+
+            var colType = thElm.attr('megatype');
+            if (colType) {
+                if (newWidth < M.columnsWidth.cloud[colType].min) {
+                    return;
+                }
+                thElm.outerWidth(newWidth);
+                M.columnsWidth.cloud[colType].curr = thElm.outerWidth();
+                $(".grid-table td[megatype='" + colType + "']").
+                    outerWidth(M.columnsWidth.cloud[colType].curr);
+                // initGridScrolling();
+            }
+            else {
+                thElm.outerWidth(newWidth);
+            }
+
+            $('#fmholder').css('cursor', 'col-resize');
+        }
+    });
+
+    $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+        //if (thElm && thElm.length) {
+        //    var colType = thElm.attr('megatype');
+        //    if (colType) {
+        //    }
+        //}
+        thElm = undefined;
+        $('#fmholder').css('cursor', '');
+    });
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
@@ -2871,18 +2933,45 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.fm-files-view-icon.block-view').removeClass('active');
 
     $.gridHeader = function() {
-        var headerColumn = '';
-        var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        if ($firstChildTd.length === 0) {
-            // if the first <tr> does not contain any TDs, pick the next one
-            // this can happen when MegaList's prepusher (empty <TR/> is first)
-            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
-        }
+        // reference to fixed initial width set (hard-coded) in MegaRender.js
+        var headers = $('.files-grid-view.fm .grid-table-header th');
+        var usedWidth = 0;
+        for (var k = 0; k < headers.length; k++) {
+            var $curHeader = $(headers[k]);
+            var colType = $curHeader.attr('megatype');
 
-        $firstChildTd.each(function(i, e) {
-            headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
+            if (M.columnsWidth.cloud[colType].curr
+                && M.columnsWidth.cloud[colType].curr !== $curHeader.outerWidth()) {
+                $curHeader.outerWidth(M.columnsWidth.cloud[colType].curr);
+                
+                $(".grid-table td[megatype='" + colType + "']").
+                    outerWidth(M.columnsWidth.cloud[colType].curr);
+            }
+            usedWidth += M.columnsWidth.cloud[colType].curr || 0;
+        }
+        if (!M.columnsWidth.cloud.fname.curr) {
+            var availableWidth = $('.files-grid-view.fm').width();
+            var remainingWidth = availableWidth - usedWidth - 10;
+
+            var setWidth = (remainingWidth > M.columnsWidth.cloud.fname.min) ? remainingWidth : M.columnsWidth.cloud.fname.min;
+            if (headers.filter("[megatype='fname']").outerWidth() !== setWidth) {
+                headers.filter("[megatype='fname']").outerWidth(setWidth);
+                $(".grid-table td[megatype='fname']").
+                    outerWidth(M.columnsWidth.cloud.fname.curr);
+            }
+        }
+        //var headerColumn = '';
+        //var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        //if ($firstChildTd.length === 0) {
+        //    // if the first <tr> does not contain any TDs, pick the next one
+        //    // this can happen when MegaList's prepusher (empty <TR/> is first)
+        //    $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        //}
+
+        //$firstChildTd.each(function(i, e) {
+        //    headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
+        //    $(headerColumn).width($(e).width());
+        //});
     };
 
 

@@ -10,20 +10,20 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="50">' +
+                    '<td megatype="fav" width="50">' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
-                    '<td>' +
+                    '<td megatype="fname">' +
                         '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
-                    '<td width="70" class="label"></td>' +
-                    '<td width="100" class="size"></td>' +
-                    '<td width="130" class="type"></td>' +
-                    '<td width="120" class="time ad"></td>' +
-                    '<td width="120" class="time md"></td>' +
-                    '<td width="120" class="hd-versions"></td>' +
-                    '<td width="93" class="grid-url-field own-data">' +
+                    '<td megatype="label" width="70" class="label"></td>' +
+                    '<td megatype="size" width="100" class="size"></td>' +
+                    '<td megatype="type" width="130" class="type"></td>' +
+                    '<td megatype="timeAd" width="120" class="time ad"></td>' +
+                    '<td megatype="timeMd" width="120" class="time md"></td>' +
+                    '<td megatype="versions" width="120" class="hd-versions"></td>' +
+                    '<td megatype="extras" width="93" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
                             '<i class="small-icon icons-sprite grey-clock"></i>' +
@@ -1082,7 +1082,7 @@
                 }
 
                 if (!aNode.t && aNode.tvf) {
-                    aTemplate.classList.add('versioning');
+                    // aTemplate.classList.add('versioning');
                     aTemplate.querySelector('.hd-versions').appendChild(versionColumnPrepare
                         (aNode.tvf, aNode.tvb || 0));
                 }

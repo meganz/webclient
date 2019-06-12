@@ -10649,6 +10649,7 @@ table {
 }
 .fm-account-main {
     height: 100%;
+    width: 100%;
 }
 .fm-account-header {
     font-size: 16px;

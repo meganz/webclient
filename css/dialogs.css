@@ -2515,6 +2515,11 @@ li.token-input-token-invite .input-close {
     overflow: hidden;
 }
 .megasync-img.img2::before {
+    background-image: none;
+}
+.megasync-img.img2 {
+    background-image: url(../images/mega/download-dialog_v1@2x.png);
+    background-size: 768px auto;
     background-position: center -621px;
 }
 .megasync-header {

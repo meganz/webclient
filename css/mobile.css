@@ -4318,6 +4318,7 @@ div.checkboxOn, div.checkboxOff {
     text-transform: lowercase;
     margin: 0 16px 8px;
     position: relative;
+    overflow: visible;
 }
 .payment-address-dialog .payment-buy-now:first-letter {
     text-transform: uppercase;

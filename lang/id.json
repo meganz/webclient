@@ -1771,6 +1771,7 @@
     "16763": "Disalin ke clipboard",
     "16770": "Berbagi masuk",
     "16820": "Tambah ke Cloud Drive",
+    "16858": "Kontak request baru",
     "16861": "Install klien MEGA desktop",
     "16862": "Meningkatkan kinerja transfer file dari browser Anda",
     "16863": "Alat sinkronisasi yang kuat",
@@ -1958,6 +1959,7 @@
     "17767": "File dikirim ke obrolan",
     "17768": "Akun yang dihentikan",
     "17777": "Versi sekarang",
+    "17788": "%1$s telah menerima kontak request anda",
     "17789": "Nomor pajak yang dimasukkan tidak valid.",
     "17791": "Filter",
     "17792": "Volume disk utama Anda penuh. Silakan kosongkan beberapa ruang dan coba lagi.",
@@ -2839,6 +2841,7 @@
     "19748": "Akun Anda telah dinonaktifkan oleh administrator Anda. Anda dapat menghubungi administrator akun bisnis Anda untuk rincian lebih lanjut.",
     "19749": "Aktif Terakhir",
     "19750": "Migrasi Data Pengguna",
+    "19770": "Anda mungkin memiliki pesan baru",
     "19772": "Sampah dibersihkan untuk Anda secara otomatis.",
     "19774": "Jangka waktu minimum adalah 7 hari dan periode maksimum Anda adalah 30 hari.",
     "19775": "%d hari",
@@ -3469,8 +3472,8 @@
     "20808": "{0} left",
     "20816": "Your account has been removed by your administrator. Please contact your business account administrator for further details.",
     "20817": "Your in-browser storage for MEGA is full. Your download will continue automatically after you free up some space.",
-    "20818": "The file could be downloaded as a ZIP file. This can happen if the file was taken down.",
-    "20819": "None of the files could be downloaded as a ZIP file. This can happen if the files were taken down.",
+    "20818": "The file could not be downloaded as a ZIP file. This can happen if the file was taken down.",
+    "20819": "None of the files were able to be downloaded as a ZIP file. This can happen if the files were taken down.",
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
-    "20822": "Not accessible due to the file owner status."
+    "20822": "Not accessible due to the account status of the file owner."
 }

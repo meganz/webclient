@@ -11666,7 +11666,6 @@ table {
     position: relative;
 }
 .top-login-input-block, .affiliate-input-block {
-    height: 30px;
     border: 1px solid #d9d9d9;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -11680,6 +11679,9 @@ table {
     background-repeat: no-repeat;
     padding: 1px 11px 1px 31px;
     position: relative;
+}
+.top-login-input-block, .affiliate-input-block:not(.dynamic-height) {
+    height: 30px;
 }
 .top-login-input-block.focused, .affiliate-input-block.focused {
     border-color: #b2b2b2;
@@ -11699,16 +11701,18 @@ table {
 .top-login-input-block.password.incorrect {
     background-position: 6px -193px;
 }
-.top-login-input-block input, .affiliate-input-block input {
+.top-login-input-block input, .affiliate-input-block input, .affiliate-input-block textarea {
     border: 0;
     width: 100%;
     padding: 0;
     margin: 0;
     font-size: 13px;
     color: #666;
-    height: 25px;
     line-height: 25px;
     font-family: 'source_sans_proregular', Arial;
+}
+.top-login-input-block input, .affiliate-input-block input {
+    height: 25px;
 }
 .top-login-input-block input::-webkit-input-placeholder, .affiliate-input-block input::-webkit-input-placeholder {
     color: #878787 !important;

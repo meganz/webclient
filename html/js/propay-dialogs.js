@@ -1193,17 +1193,16 @@ var addressDialog = {
         }
 
         loadingDialog.show();
-        mega.attr.get(u_attr.u, 'billinginfo', false, true)
-        .always(function(billingInfo) {
-            var selectedCountry = (billingInfo && billingInfo.hasOwnProperty('country')) ? billingInfo.country
-                : u_attr.country ? u_attr.country : u_attr.ipcc || false;
 
-            var selectedState = ((selectedCountry === 'US' || selectedCountry === 'CA')
-                && billingInfo && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+        this.fetchBillingInfo().always(function (billingInfo) {
+            billingInfo = billingInfo || {};
+            var selectedState = ((billingInfo.country === 'US' || billingInfo.country === 'CA')
+                && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+
             self.showDialog();
             self.prefillInfo(billingInfo);
-            self.initStateDropDown(selectedState, selectedCountry);
-            self.initCountryDropDown(selectedCountry);
+            self.initStateDropDown(selectedState, billingInfo.country);
+            self.initCountryDropDown(billingInfo.country);
             loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
@@ -1493,6 +1492,91 @@ var addressDialog = {
         }
     },
 
+    /**
+     * Generate a list of billing info values either saved previously or guessed where applicable.
+     * @returns {MegaPromise}
+     */
+    fetchBillingInfo: function() {
+        'use strict';
+        var self = this;
+        var promise = new MegaPromise();
+        mega.attr.get(u_attr.u, 'billinginfo', false, true).always(function(billingInfo) {
+            if (typeof billingInfo !== "object") {
+                billingInfo = {};
+            }
+
+            var finished = function() {
+                if (!billingInfo.hasOwnProperty('country') || !billingInfo.country) {
+                    billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
+                }
+                promise.resolve(billingInfo);
+            };
+
+            if (self.businessPlan && u_attr.b) {
+                self.fetchBusinessInfo().always(function(businessInfo) {
+                    businessInfo = businessInfo || {};
+                    var attributes = ["address1","address2","city","state","country","postcode"];
+                    for (var i = 0; i < attributes.length; i++) {
+                        var attr = attributes[i];
+                        var battr = attr === "postcode" ? '%zip' : '%' + attr;
+                        if (!billingInfo.hasOwnProperty(attr) || !billingInfo[attr]) {
+                            if (businessInfo.hasOwnProperty(battr) && businessInfo[battr]) {
+                                billingInfo[attr] = businessInfo[battr];
+                            }
+                        }
+                    }
+                    finished();
+                });
+            } else {
+                finished();
+            }
+        });
+        return promise;
+    },
+
+    /**
+     * Load required business account attributes for payment dialog.
+     * @param requiredAttributes
+     * @returns {MegaPromise}
+     */
+    fetchBusinessInfo: function(requiredAttributes) {
+        'use strict';
+
+        var promise = new MegaPromise();
+        requiredAttributes = requiredAttributes || [
+            '%name', '%address1', '%address2', '%city', '%state', '%country', '%zip'
+        ];
+        var done = 0;
+        var businessInfo = {};
+        var timeout = null;
+
+        var loaded = function(res, ctx) {
+            if (typeof res !== 'number') {
+                businessInfo[ctx.ua] = from8(base64urldecode(res));
+            }
+
+            if (++done === requiredAttributes.length) {
+                clearTimeout(timeout);
+                promise.resolve(businessInfo);
+            }
+        };
+
+        for (var i = 0; i < requiredAttributes.length; i++) {
+            var attr = requiredAttributes[i];
+            mega.attr.get(u_attr.b.bu, attr, -1, undefined, loaded);
+        }
+
+        // If it takes too long just return what we have so far.
+        timeout = setTimeout(function() {
+            promise.resolve(businessInfo);
+        }, 3000);
+
+        return promise;
+    },
+
+    /**
+     * Initialize the remember billing information checkbox.
+     */
     initRememberDetailsCheckbox: function() {
         'use strict';
         var self = this;
@@ -1507,7 +1591,6 @@ var addressDialog = {
             return false;
         });
     },
-
 
     /**
      * Initialise the X (close) button in the top right corner of the dialog

@@ -869,25 +869,29 @@ mega.tpw = new function TransferProgressWidget() {
         var prefix;
         var subHeaderClass;
         var cancelText;
+        var dId = entry.id;
 
         if (type === this.DOWNLOAD) {
             prefix = downloadRowPrefix;
             subHeaderClass = 'download';
             cancelText = l[1196];
+            if (entry.zipid) {
+                dId = entry.zipid;
+            }
         }
         else {
             prefix = uploadRowPrefix;
             subHeaderClass = 'upload';
             cancelText = l[1617];
         }
-        var $targetedRow = $rowsContainer.find('#' + prefix + entry.id);
+        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
 
         if (!$targetedRow || !$targetedRow.length) {
             return;
         }
-        if (monitors[entry.id]) {
-            clearTimeout(monitors[entry.id]);
-            delete monitors[entry.id];
+        if (monitors[dId]) {
+            clearTimeout(monitors[dId]);
+            delete monitors[dId];
         }
         $targetedRow.removeClass('complete progress inqueue paused').addClass('error');
         setStatus($targetedRow, this.FAILED, errorStr);

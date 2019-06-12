@@ -788,11 +788,19 @@ var dlmanager = {
             later(function() {
                 dlmanager.abort(dl, eekey);
             });
-
             if (M.chat) {
                 $('.toast-notification').removeClass('visible');
                 showToast('download', eekey ? l[24] : l[20228]);
             }
+            else if (code === ETOOMANY) {
+
+                // If `g` request return ETOOMANY, it means the user who originally owned the file is suspended.
+                showToast('download', l[20822]);
+            }
+        }
+
+        if (code === EBLOCKED) {
+            showToast('download', l[20228]);
         }
 
         if (eekey) {

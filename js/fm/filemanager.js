@@ -2940,12 +2940,18 @@ FileManager.prototype.addGridUI = function(refresh) {
             var $curHeader = $(headers[k]);
             var colType = $curHeader.attr('megatype');
 
-            if (M.columnsWidth.cloud[colType].curr
-                && M.columnsWidth.cloud[colType].curr !== $curHeader.outerWidth()) {
-                $curHeader.outerWidth(M.columnsWidth.cloud[colType].curr);
-                
-                $(".grid-table td[megatype='" + colType + "']").
-                    outerWidth(M.columnsWidth.cloud[colType].curr);
+            if (M.columnsWidth.cloud[colType].curr) {
+                if (M.columnsWidth.cloud[colType].curr !== $curHeader.outerWidth()) {
+                    $curHeader.outerWidth(M.columnsWidth.cloud[colType].curr);
+
+                    $(".grid-table td[megatype='" + colType + "']").
+                        outerWidth(M.columnsWidth.cloud[colType].curr);
+                }
+                else if ($(".grid-table td[megatype='" + colType + "']").
+                    outerWidth() !== M.columnsWidth.cloud[colType].curr) {
+                    $(".grid-table td[megatype='" + colType + "']").
+                        outerWidth(M.columnsWidth.cloud[colType].curr);
+                }
             }
             usedWidth += M.columnsWidth.cloud[colType].curr || 0;
         }
@@ -2957,7 +2963,11 @@ FileManager.prototype.addGridUI = function(refresh) {
             if (headers.filter("[megatype='fname']").outerWidth() !== setWidth) {
                 headers.filter("[megatype='fname']").outerWidth(setWidth);
                 $(".grid-table td[megatype='fname']").
-                    outerWidth(M.columnsWidth.cloud.fname.curr);
+                    outerWidth(setWidth);
+            }
+            else if ($(".grid-table td[megatype='fname']").outerWidth() !== setWidth) {
+                $(".grid-table td[megatype='fname']").
+                    outerWidth(setWidth);
             }
         }
         //var headerColumn = '';

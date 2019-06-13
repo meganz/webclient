@@ -30417,6 +30417,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     right: 0;
 }
-.grid-table.fm td[megatype="fname"] {
+/*.grid-table.fm td[megatype="fname"] {
     position: absolute;
-}
+}*/

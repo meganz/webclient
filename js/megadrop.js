@@ -1503,7 +1503,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17408]);
                 uiOpts.dlg.widget.$.embedForm.removeClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.addClass('hidden');
-                $('.widget-dialog').addClass('centre');
+                dialogPositioning('.widget-dialog');
             });
 
             // Widget dialog url tab
@@ -1516,7 +1516,7 @@ mega.megadrop = (function() {
                     .find('span').safeHTML(l[17835]);
                 uiOpts.dlg.widget.$.embedForm.addClass('hidden');
                 uiOpts.dlg.widget.$.urlForm.removeClass('hidden');
-                $('.widget-dialog').removeClass('centre');
+                dialogPositioning('.widget-dialog');
             });
 
             // Widget dialog light theme

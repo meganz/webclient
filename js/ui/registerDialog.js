@@ -5,16 +5,23 @@
     // ^ zxcvbn stuff..
 
     function closeRegisterDialog($dialog, isUserTriggered) {
-        closeDialog();
-        $(window).off('resize.proregdialog');
-        $('.fm-dialog-overlay').off('click.proDialog');
-        $('.fm-dialog-close', $dialog).off('click.proDialog');
+        console.assert(options.closeDialog || $.dialog === 'register', 'Invalid state...');
 
-        if (isUserTriggered && options.onDialogClosed) {
-            options.onDialogClosed($dialog);
+        if (options.closeDialog) {
+            options.closeDialog();
         }
+        else if ($.dialog === 'register') {
+            delete $.registerDialog;
+            closeDialog();
 
-        delete $.registerDialog;
+            $(window).off('resize.proregdialog');
+            $('.fm-dialog-overlay').off('click.registerDialog');
+            $('.fm-dialog-close', $dialog).off('click.registerDialog');
+
+            if (isUserTriggered && options.onDialogClosed) {
+                options.onDialogClosed($dialog);
+            }
+        }
 
         options = {};
     }
@@ -41,7 +48,7 @@
 
         var registrationDone = function(login) {
 
-            var onAccountCreated = options.onAccountCreated;
+            var onAccountCreated = options.onAccountCreated && options.onAccountCreated.bind(options);
 
             hideOverlay();
             closeRegisterDialog($dialog);
@@ -67,53 +74,41 @@
         };
 
         /**
-         * When the user has an account already, show them the Pro Login dialog instead so they can log in
-         */
-        var redirectToProLoginForExistingAccount = function() {
-
-            // Log out the ephemeral account that was created
-            u_logout();
-
-            // Close the Pro register dialog, pre-set email and password into the Pro login dialog
-            closeRegisterDialog($dialog, false);
-            if (!(page === "chat" || page && page.indexOf("chat/") > -1)) {
-                showLoginDialog(rv.email, rv.password);
-            }
-
-            // Show a message dialog telling them to log in
-            msgDialog('warninga', l[882], l[1783], l[1768]);
-        };
-
-        /**
          * Continue the old method Pro registration
          * @param {Number} result The result of the 'uc' API request
+         * @param {Boolean} oldMethod Using old registration method.
          */
-        var continueOldProRegistration = function(result) {
-
+        var continueProRegistration = function(result, oldMethod) {
             if (result === 0) {
-                var ops = {
-                    a: 'up'
-                };
+                if (oldMethod) {
+                    var ops = {
+                        a: 'up',
+                        terms: 'Mq',
+                        name2: base64urlencode(to8(rv.name)),
+                        lastname: base64urlencode(to8(rv.last)),
+                        firstname: base64urlencode(to8(rv.first))
+                    };
+                    u_attr.terms = 1;
 
-                ops.terms = 'Mq';
-                ops.firstname = base64urlencode(to8(rv.first));
-                ops.lastname = base64urlencode(to8(rv.last));
-                ops.name2 = base64urlencode(to8(rv.name));
-                u_attr.terms = 1;
+                    if (mega.affid) {
+                        ops.aff = mega.affid;
+                    }
 
-                if (mega.affid) {
-                    ops.aff = mega.affid;
+                    api_req(ops);
                 }
-
-                api_req(ops);
                 registrationDone();
             }
-            else if (result === EACCESS || result === EEXIST) {
-                redirectToProLoginForExistingAccount();
-            }
             else {
+                u_logout();
                 hideOverlay();
-                msgDialog('warninga', 'Error', l[200], result);
+                // closeRegisterDialog($dialog, true);
+                $('.fm-dialog:visible').addClass('arrange-to-back');
+                msgDialog('warninga', l[1578], l[200], result === EEXIST ? l[1783] : api_strerror(result),
+                    function() {
+                        if ($('.fm-dialog:visible').removeClass('arrange-to-back').length) {
+                            fm_showoverlay();
+                        }
+                    });
             }
         };
 
@@ -121,18 +116,16 @@
          * Continue the new method registration
          * @param {Number} result The result of the 'uc2' API request
          */
-        var continueNewProRegistration = function(result) {
+        var continueOldProRegistration = function(result) {
+            continueProRegistration(result, true);
+        };
 
-            if (result === 0) {
-                registrationDone();
-            }
-            else if (result === EACCESS || result === EEXIST) {
-                redirectToProLoginForExistingAccount();
-            }
-            else {
-                loadingDialog.hide();
-                msgDialog('warninga', l[1578], l[200], result);
-            }
+        /**
+         * Continue the new method registration
+         * @param {Number} result The result of the 'uc2' API request
+         */
+        var continueNewProRegistration = function(result) {
+            continueProRegistration(result, false);
         };
 
         /**
@@ -140,14 +133,14 @@
          */
         var registeraccount = function() {
 
-            rv.password = $('#register-password', $dialog).val();
-            rv.first = $.trim($('#register-firstname', $dialog).val());
-            rv.last = $.trim($('#register-lastname', $dialog).val());
-            rv.email = $.trim($('#register-email', $dialog).val());
+            rv.password = $('.input-wrapper.first input', $dialog).val();
+            rv.first = $.trim($('.input-wrapper.name input.f-name', $dialog).val());
+            rv.last = $.trim($('.input-wrapper.name input.l-name', $dialog).val());
+            rv.email = $.trim($('.input-wrapper.email input', $dialog).val());
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
-            var fromProPage = true;
+            var fromProPage = localStorage.getItem('proPageContinuePlanNum') !== null;
 
             // Set a flag indicating the registration came from the webclient.
             localStorage.signUpStartedInWebclient = '1';
@@ -165,8 +158,8 @@
 
         var err = false;
         var $formWrapper = $dialog.find('form');
-        var $firstName = $('.input-wrapper.name .f-name', $formWrapper);
-        var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
+        var $firstName = $('.input-wrapper.name input.f-name', $formWrapper);
+        var $lastName = $('.input-wrapper.name input.l-name', $formWrapper);
         var $email = $('.input-wrapper.email input', $formWrapper);
         var $password = $('.input-wrapper.first input', $formWrapper);
         var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
@@ -236,112 +229,93 @@
     }
 
     function showRegisterDialog(opts) {
-        var $dialog = $('.fm-dialog.pro-register-dialog');
+        if ($.len(options)) {
+            closeRegisterDialog(options.$dialog, true);
+        }
+        options = Object(opts);
+        var $dialog = options.$wrapper || $('.fm-dialog.pro-register-dialog');
         var $inputs = $dialog.find('.account.input-wrapper input');
-        var $button = $dialog.find('.big-red-button');
+        var $button = $dialog.find('.button');
         var $password = $dialog.find('.account.input-wrapper.password input');
 
-
-
-
-
-        if (typeof page !== 'undefined' && page === 'chat') {
-            $('.fm-dialog-subheading').html(
-                htmlentities(l[20636])
-                    .replace("[A]", "<a>")
-                    .replace("[/A]", "</a>")
-            );
-
-            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
-            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
-                closeDialog();
-                megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
-            });
+        // Controls events, close button etc
+        if (options.controls) {
+            options.controls();
         }
         else {
-            $('.fm-dialog-subheading', $dialog).addClass('hidden');
+            // controls
+            $('.fm-dialog-close', $dialog).rebind('click.registerDialog', function() {
+                closeRegisterDialog($dialog, true);
+                return false;
+            });
+
+            // close dialog by click on overlay
+            $('.fm-dialog-overlay').rebind('click.registerDialog', function() {
+                if ($.registerDialog === $.dialog) {
+                    closeRegisterDialog($dialog, true);
+                }
+                else {
+                    closeDialog();
+                }
+                return false;
+            });
+        }
+        console.assert(options.showDialog || $.dialog !== 'register', 'Invalid state...');
+        options.$dialog = $dialog;
+
+        // Show dialog function
+        if (options.showDialog) {
+            options.showDialog();
+        }
+        else {
+            M.safeShowDialog('register', function() {
+                $.registerDialog = 'register';
+                return $dialog;
+            });
         }
 
-        var dialogBodyScroll = function() {
-            var bodyHeight = $('body').height();
-            var $scrollBlock =  $('.pro-register-scroll', $dialog);
-            var scrollBlockHeight = $scrollBlock.height();
-            $scrollBlock.css({
-                'max-height': bodyHeight - 100
-            });
+        // Init inputs events
+        accountinputs.init($dialog);
 
-            if (scrollBlockHeight + 140 > bodyHeight) {
-                $scrollBlock.jScrollPane({
-                    enableKeyboardNavigation: false,
-                    showArrows: true,
-                    arrowSize: 5,
-                    animateScroll: true
+        if (typeof page !== 'undefined' && page === 'chat') {
+            $('.dialog-dark-bottom.login', $dialog).removeClass('hidden').find('a')
+                .rebind('click.doSignup', function() {
+                    closeDialog();
+                    megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
                 });
-            }
-            else {
-                deleteScrollPanel('.pro-register-scroll', 'jsp');
-                $scrollBlock.removeAttr('style');
-            }
-        };
+        }
+        else if (options.showLogin) {
+            $('.dialog-dark-bottom.login, .register-side-pane.header', $dialog).removeClass('hidden').find('a')
+                .rebind('click.doSignup', function() {
+                    var onAccountCreated = options.onAccountCreated && options.onAccountCreated.bind(options);
 
-        var reposition = function() {
-            $dialog.css({
-                'margin-left': -1 * ($dialog.outerWidth() / 2),
-                'margin-top': -1 * ($dialog.outerHeight() / 2)
-            });
-        };
-
-        var redraw = function() {
-            onIdle(function() {
-                dialogBodyScroll();
-                reposition();
-            });
-        };
-
-        M.safeShowDialog('register', function() {
-            options = Object(opts);
-
-            $('.dialog-title', $dialog).text(options.title || l[968]);
-
-            if (options.body) {
-                $('.fm-dialog-body', $dialog).removeClass('hidden').safeHTML(options.body);
-            }
-            else {
-                $('.fm-dialog-body', $dialog).addClass('hidden').text('');
-            }
-
-            redraw();
-            $('.pro-register-scroll', $dialog).removeAttr('style');
-            $(window).rebind('resize.proregdialog', redraw);
-            deleteScrollPanel('.pro-register-scroll', 'jsp');
-
-            // Init inputs events
-            accountinputs.init($dialog);
-
-            $.registerDialog = 'register';
-
-            return $dialog;
-        });
+                    closeRegisterDialog($dialog, true);
+                    mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1})
+                        .then(function() {
+                            if (typeof onAccountCreated === 'function') {
+                                onAccountCreated(2, false);
+                            }
+                            else if (d) {
+                                console.warn('Completed login, but have no way to notify the caller...');
+                            }
+                        }).catch(console.debug.bind(console));
+                });
+        }
+        else {
+            $('.dialog-dark-bottom.login', $dialog).addClass('hidden');
+        }
 
         $inputs.val('');
         $password.parent().find('.password-status').removeClass('checked');
 
-        // controls
-        $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
-            closeRegisterDialog($dialog, true);
-            return false;
-        });
-
-        // close dialog by click on overlay
-        $('.fm-dialog-overlay').rebind('click.proDialog', function() {
-            if ($.registerDialog === $.dialog) {
-                closeRegisterDialog($dialog, true);
-            }
-            else {
-                closeDialog();
-            }
-            return false;
-        });
+        $('.register-side-pane.header span', $dialog).text(options.title || l[20755]);
+        if (options.body) {
+            $('.register-side-pane.header-info', $dialog)
+                .safeHTML(options.body);
+        }
+        else {
+            $('.register-side-pane.header-info', $dialog).safeHTML(l[20757]);
+        }
 
         var registerpwcheck = function() {
             $('.account.password-status', $dialog)
@@ -356,9 +330,7 @@
                 return false;
             }
 
-            classifyPassword(password);
-            reposition();
-            dialogBodyScroll();
+            classifyPassword(password, $dialog);
         };
 
         if (typeof zxcvbn === 'undefined') {
@@ -393,9 +365,9 @@
             }
         });
 
-        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208s']);
+        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208g']);
 
-        $('.checkbox-block.register span', $dialog).rebind('click', function(e) {
+        $('.checkbox-block.register a', $dialog).rebind('click', function(e) {
             e.preventDefault();
             $.termsAgree = function() {
                 $('.register-check', $dialog).removeClass('checkboxOff')
@@ -511,6 +483,17 @@
         else {
             // Hide dialog close button
             $('.fm-dialog-header', $dialog).addClass('hidden');
+        }
+
+        if (onCloseCallback === true) {
+            // we just want the close button to be show and to not trigger anything closing it.
+            $('.fm-dialog-header', $dialog).removeClass('hidden');
+            $('.fm-dialog-close', $dialog).rebind('click', function() {
+                // TODO: Move this to safeShowDialog();
+                $dialog.addClass('hidden');
+                fm_hideoverlay();
+                return false;
+            });
         }
 
         fm_showoverlay();

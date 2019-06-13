@@ -1794,6 +1794,10 @@ div.pro-feature-icon {
     line-height: 24px;
     padding: 0 30px;
 }
+.fm-dialog .reg-st3-txt-localcurrencyprogram {
+    font-size: 12px;
+    white-space: normal;
+}
 .local-currency .reg-st3-bott-title.price .green-star-img {
     display: inline-block;
 }

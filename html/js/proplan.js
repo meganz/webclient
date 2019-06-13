@@ -693,68 +693,49 @@ pro.proplan = {
  * @param {String} password A password to be optionally pre-filled into the dialog
  */
 function showLoginDialog(email, password) {
-
-    if (typeof page !== 'undefined' && page !== 'chat') {
-        megaAnalytics.log("pro", "loginDialog");
-    }
-
-    $.dialog = 'pro-login-dialog';
-
+    'use strict';
     var $dialog = $('.pro-login-dialog');
     var $inputs = $dialog.find('.account.input-wrapper input');
     var $button = $dialog.find('.big-red-button');
 
-    M.safeShowDialog('pro-login-dialog', function() {
+    var closeLoginDialog = function() {
+        $('.fm-dialog-overlay').unbind('click.proDialog');
+        $('.fm-dialog-close', $dialog).unbind('click.proDialog');
+        closeDialog();
+        return false;
+    };
 
-        $dialog.css({
-            'margin-left': -1 * ($dialog.outerWidth() / 2),
-            'margin-top': -1 * ($dialog.outerHeight() / 2)
-        });
+    M.safeShowDialog('pro-login-dialog', function() {
 
         // Init inputs events
         accountinputs.init($dialog);
 
-        return $dialog;
-    });
+        // controls
+        $('.fm-dialog-close', $dialog).rebind('click.proDialog', closeLoginDialog);
+        $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
 
-    // controls
-    $('.fm-dialog-close', $dialog).rebind('click.proDialog', function() {
-        closeLoginDialog($dialog);
-    });
+        $('.input-email', $dialog).val(email || '');
+        $('.input-password', $dialog).val(password || '');
 
-    $('.fm-dialog-overlay')
-        .rebind('click.proDialog', function() {
-            closeLoginDialog($dialog);
+        $inputs.rebind('keydown.initdialog', function(e) {
+            if (e.keyCode === 13) {
+                doProLogin($dialog);
+            }
         });
 
-    $('.input-email', $dialog).val(email || '');
-    $('.input-password', $dialog).val(password || '');
-
-    $inputs.rebind('keydown.initdialog', function(e) {
-        if (e.keyCode === 13) {
+        $button.rebind('click.initdialog', function() {
             doProLogin($dialog);
-        }
+        });
+
+        $button.rebind('keydown.initdialog', function(e) {
+            if (e.keyCode === 13) {
+                doProLogin($dialog);
+            }
+        });
+
+        onIdle(clickURLs);
+        return $dialog;
     });
-
-    $button.rebind('click.initdialog', function() {
-        doProLogin($dialog);
-    });
-
-    $button.rebind('keydown.initdialog', function (e) {
-        if (e.keyCode === 13) {
-            doProLogin($dialog);
-        }
-    });
-
-    clickURLs();
-}
-
-function closeLoginDialog($dialog) {
-    'use strict';
-
-    closeDialog();
-    $('.fm-dialog-overlay').unbind('click.proDialog');
-    $('.fm-dialog-close', $dialog).unbind('click.proDialog');
 }
 
 var doProLogin = function($dialog) {

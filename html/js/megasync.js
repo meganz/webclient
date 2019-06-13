@@ -442,14 +442,16 @@ var megasync = (function() {
             $overlay.addClass('hidden').removeClass('downloading');
             $('body').removeClass('overlayed');
             $('body').off('keyup.msd');
-            $overlay.hide();
-            return false;
+            lastDownload = null;
+            return clearInterval(retryTimer);
         });
 
         $('body').rebind('keyup.sdd', function(e) {
             if (e.keyCode === 27) {
                 $overlay.addClass('hidden');
                 $('body').removeClass('overlayed');
+                lastDownload = null;
+                return clearInterval(retryTimer);
             }
         });
 
@@ -583,6 +585,7 @@ var megasync = (function() {
 
     function api_handle(next, response, requestArgs) {
         "use strict";
+        var $topBar;
         next = (typeof next === "function") ? next : function () { };
         var _uploadTick = function _upTick() {
             if (currBid === requestArgs.bid) {
@@ -656,9 +659,8 @@ var megasync = (function() {
                     dlprogress(requestArgs.h, prec.toPrecision(3), response.p, response.t, response.v);
                     if (currStatus !== l[17592]) { // 'Downloading with MEGAsync .'
                         currStatus = l[17592]; // 'Downloading with MEGAsync .'
-                        var infoContainer = $('.download.main-transfer-info');
-                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
-                        $('.download.scroll-block').removeClass('paused'); // in case any
+                        $topBar = $('.download.top-bar').removeClass('paused');
+                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 1000);
                 }
@@ -673,10 +675,10 @@ var megasync = (function() {
                     else {
                         if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync .'
                             $('.download.progress-bar').width('100%');
-                            $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
+                            $('.download.top-bar').removeClass('downloading').addClass('download-complete');
                             currStatus = l[17593]; // 'Download is queued in MEGAsync .'
-                            var infoContainer = $('.download.main-transfer-info');
-                            $('.download.complete-block .dark-numbers', infoContainer).text(currStatus);
+                            $topBar = $('.download.top-bar');
+                            $('.download.eta-block .light-txt', $topBar).text(currStatus);
                         }
                     }
                 }
@@ -694,11 +696,17 @@ var megasync = (function() {
                 else if (response.s && response.s == 6) { // allow implied convert
                     // STATE_COMPLETED = 6
                     dlprogress(-0xbadf, 100, response.t, response.t);
-                    $('.download.scroll-block').removeClass('paused');
+                    $('.download.top-bar').removeClass('paused');
                     $('.download.progress-bar').width('100%');
-                    $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
+                    $('.download.top-bar').removeClass('downloading').addClass('download-complete');
                     var $pageScrollBlock = $('.bottom-page.scroll-block');
                     $pageScrollBlock.addClass('resumable');
+                    if (window.dlpage_ph) {
+                        $('.open-in-folder').removeClass('hidden').rebind('click', function() {
+                            ns.megaSyncRequest({a: 'sf', h: dlpage_ph}).dump();
+                            return false;
+                        });
+                    }
                 }
                 else if (response.s && response.s == 7) {
                     setTransferStatus(0, l[17586]);// 'Downloading canceled in MEGAsync'
@@ -714,9 +722,8 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17594]) { // 'Download-Paused in MEGAsync !'
                         currStatus = l[17594]; // 'Download-Paused in MEGAsync !'
-                        var infoContainer = $('.download.main-transfer-info');
-                        $('.download.scroll-block').addClass('paused');
-                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                        $topBar = $('.download.top-bar').addClass('paused');
+                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 3000);
                 }
@@ -725,9 +732,8 @@ var megasync = (function() {
                     // then send a new update status request after longer timeout 3 sec
                     if (currStatus !== l[17603]) { // 'Download retrying in MEGAsync !'
                         currStatus = l[17603]; // 'Download retrying in MEGAsync !'
-                        var infoContainer = $('.download.main-transfer-info');
-                        $('.download.scroll-block').addClass('paused');
-                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                        $topBar = $('.download.top-bar').addClass('paused');
+                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 3000);
                 }
@@ -736,9 +742,8 @@ var megasync = (function() {
                     // then send a new update status request
                     if (currStatus !== l[17604]) { // 'Download completing in MEGAsync .'
                         currStatus = l[17604]; // 'Download completing in MEGAsync .'
-                        var infoContainer = $('.download.main-transfer-info');
-                        $('.download.scroll-block').addClass('paused');
-                        $('.download.speed-block .light-txt', infoContainer).text(currStatus);
+                        $topBar = $('.download.top-bar').addClass('paused');
+                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                     setTimeout(_statusTick, 1000);
                 }

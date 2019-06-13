@@ -905,6 +905,7 @@
         onIdle(function() {
             /** @name $.copyDialog */
             /** @name $.moveDialog */
+            /** @name $.selectFolderDialog */
             $[$.dialog + 'Dialog'] = $.dialog;
 
             if (aMode) {

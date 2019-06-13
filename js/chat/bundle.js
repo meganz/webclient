@@ -2115,8 +2115,6 @@ React.makeElement = React['createElement'];
 	            minUserType: 3,
 	            skipInitialDialog: 1
 	        }).done(function () {
-	            closeDialog();
-	            topmenuUI();
 	            if (page !== 'login') {
 	                if (!notJoinReq) {
 	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);

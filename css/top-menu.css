@@ -149,7 +149,7 @@
 .top-mega-version {
     font-size: 14px;
     line-height: 18px;
-    color: #999999;
+    color: #666;
     padding: 21px 25px 0 30px;
     font-family: 'source_sans_prosemibold';
 }
@@ -161,7 +161,7 @@
     font-size: 14px;
     line-height: 21px;
     min-height: 32px;
-    color: #666666;
+    color: #333;
     font-family: 'source_sans_prosemibold';
     padding: 5px 25px 5px 22px;
     -webkit-transition: all 200ms ease-in-out;
@@ -186,15 +186,15 @@
     margin-top: 2px;
 }
 .top-menu-item:hover, .top-menu-item.active {
-    color: #333333;
+    color: #111;
 }
 .top-menu-item:hover .right-el, .top-menu-item.active .right-el {
-    color: #666666;
+    color: #333;
 }
 .top-menu-item .right-el {
     float: right;
     text-transform: uppercase;
-    color: #999999 !important;
+    color: #666 !important;
     padding-left: 15px;
 }
 .free .top-menu-item.upgrade-your-account, .free .top-menu-item.upgrade-your-account:hover {
@@ -227,10 +227,10 @@
     opacity: 1;
 }
 .top-submenu .top-menu-item {
-    color: #999999;
+    color: #666;
 }
 .top-submenu .top-menu-item:hover, .top-submenu .top-menu-item.active {
-    color: #666666;
+    color: #333;
 }
 .top-menu-item.submenu-item::before {
     content: '';
@@ -239,12 +239,9 @@
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -12px -1303px;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
+    opacity: 0.7;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
     -o-transition: opacity 200ms ease-in-out;
@@ -252,10 +249,7 @@
     transition: opacity 200ms ease-in-out;
 }
 .top-menu-item.submenu-item:hover::before {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
-    opacity: 0.7;
+    opacity: 0.9;
 }
 .top-menu-item.submenu-item.expanded::before {
     background-position: -12px -1333px;
@@ -274,7 +268,7 @@
 }
 .top-menu-popup .top-icon {
     margin-top: 0px;
-    padding: 6px 6px 0 13px;
+    padding: 12px 12px 0 0;
     position: absolute;
     right: 0;
     z-index: 10;
@@ -295,7 +289,7 @@
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -310,22 +304,27 @@
 .top-head .top-icon::after, .top-bar .top-icon::after {
     content: '';
     width: 1px;
-    height: 24px;
-    background-color: rgba(0,0,0,0.05);
+    height: 20px;
+    background-color: rgba(0,0,0,0.1);
     position: absolute;
     top: 6px;
-    margin: 0 0 0 -13px;
+    margin: 2px 0 0 -13px;
+}
+.top-head .top-icon.close::after, .top-bar .top-icon.close::after {
+    display: none;
+}
+.top-head .top-icon.menu::before, .top-bar .top-icon.menu::before {
+    background-position: -6px -60px;
+    opacity: 0.7;
+}
+.top-menu-popup .top-icon.close::before {
+    background-position: -7px -1232px;
+    opacity: 0.7;
 }
 .top-head .top-icon:hover::before, .top-head .top-icon.active::before,
 .top-menu-popup .top-icon:hover::before, .top-menu-popup .top-icon.active:hover::before,
 .top-bar .top-icon:hover::before, .top-bar .top-icon:hover::before {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
     opacity: 1;
-}
-.top-head .top-icon.menu::before, .top-bar .top-icon.menu::before {
-    background-position: -6px -60px;
 }
 .top-head .top-icon.notification::before {
     background-position: -7px -202px;
@@ -341,9 +340,6 @@
 }
 .top-head .top-icon.warning.over-quota::before {
     background-position: -7px -1136px;
-}
-.top-menu-popup .top-icon.close::before {
-    background-position: -7px -1232px;
 }
 .top-head .top-icon.language::before {
     background-position: -7px -286px;

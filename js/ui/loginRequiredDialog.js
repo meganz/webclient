@@ -11,7 +11,7 @@
             });
         }
         else if (options.skipInitialDialog) {
-            showLoginDialog(promise);
+            showLoginDialog(promise, options);
         }
         else {
             var icon;
@@ -47,7 +47,7 @@
                 $('.default-white-button.pro-login', this.$dialog)
                     .rebind('click.loginrequired', function() {
                         loginRequiredDialog.hide();
-                        showLoginDialog(promise);
+                        showLoginDialog(promise, options);
                         promise = undefined;
                         return false;
                     });
@@ -76,22 +76,38 @@
         return promise;
     }
 
-    function showLoginDialog(aPromise) {
+    function showLoginDialog(aPromise, options) {
         var $dialog = $('.fm-dialog.pro-login-dialog');
         var $inputs = $dialog.find('.account.input-wrapper input');
         var $button = $dialog.find('.big-red-button');
 
         if (typeof page !== 'undefined' && page === 'chat') {
-            $('.fm-dialog-subheading').html(
-                htmlentities(l[20635])
-                    .replace("[A]", "<a>")
-                    .replace("[/A]", "</a>")
-            );
-
             $('.fm-dialog-subheading', $dialog).removeClass('hidden');
             $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
                 closeDialog();
                 megaChat.loginOrRegisterBeforeJoining(undefined, true, false);
+            });
+        }
+        else if (options.showRegister) {
+            $('.fm-dialog-subheading', $dialog).removeClass('hidden');
+            $('.fm-dialog-subheading > a', $dialog).rebind('click.doSignup', function() {
+                closeDialog();
+                mega.ui.showRegisterDialog({
+                    showLogin: true,
+                    body: options.showRegister,
+                    onAccountCreated: function(gotLoggedIn, accountData) {
+                        if (gotLoggedIn) {
+                            completeLogin(u_type);
+                        }
+                        else {
+                            security.register.cacheRegistrationData(accountData);
+
+                            if (!options.noSignupLinkDialog) {
+                                mega.ui.sendSignupLinkDialog(accountData);
+                            }
+                        }
+                    }
+                });
             });
         }
         else {
@@ -99,11 +115,6 @@
         }
 
         M.safeShowDialog('pro-login-dialog', function() {
-
-            $dialog.css({
-                'margin-left': -1 * ($dialog.outerWidth() / 2),
-                'margin-top': -1 * ($dialog.outerHeight() / 2)
-            });
 
             // Init inputs events
             accountinputs.init($dialog);
@@ -237,6 +248,11 @@
             u_checked = true;
 
             if (u_type === 3) {
+                onIdle(topmenuUI);
+                console.assert($.dialog === 'pro-login-dialog', 'Uhm, unexpected dialog... ' + $.dialog);
+                if ($.dialog === 'pro-login-dialog') {
+                    closeDialog();
+                }
                 if (window.n_h) {
                     // set new u_sid under folderlinks
                     api_setfolder(n_h);

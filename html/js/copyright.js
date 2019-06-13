@@ -182,56 +182,63 @@ copyright.step2Submit = function() {
         var copyrightwork = $('.copyrightwork');
         var proceed = false;
         var takedownType = $('.select.type select').val();
+        var doStep2Submit = function() {
+            copyright.step2Submit();
+        };
         $('.contenturl').each(function(i, e) {
             proceed = true;
-            var eVal = String($(e).val()).trim();
             var cVal = String($(copyrightwork[i]).val()).trim();
-            if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
-                proceed = false;
-                msgDialog('warninga', l[135], escapeHTML(l[660]));
-                copyright.markInputWrong(copyrightwork[i]);
-                return false;
-            }
-            if (eVal === '' || cVal === '') {
-                proceed = false;
-                msgDialog('warninga', l[135], escapeHTML(l[659]));
-                copyright.markInputWrong(eVal ? copyrightwork[i] : e);
-                return false;
-            }
+            var urls = String($(e).val()).split(/\n/);
+            urls = urls.map(String.trim).filter(function(url) {
+                return url !== "";
+            });
+            
+            for (var k = 0; k < urls.length; k++) {
+                var eVal = urls[k];
+                if (eVal !== ''  && cVal === '' || invalidWords.indexOf(cVal.toLowerCase()) !== -1) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[660]));
+                    copyright.markInputWrong(copyrightwork[i]);
+                    return false;
+                }
+                if (eVal === '' || cVal === '') {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[659]));
+                    copyright.markInputWrong(eVal ? copyrightwork[i] : e);
+                    return false;
+                }
 
-            if (!copyright.validateUrl(eVal)) {
-                proceed = false;
-                msgDialog('warninga', l[135], escapeHTML(l[7686]));
-                copyright.markInputWrong(e);
-                return false;
-            }
+                if (!copyright.validateUrl(eVal)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[7686]));
+                    copyright.markInputWrong(e);
+                    return false;
+                }
 
-            if (copyright.validateUrl(cVal)) {
-                proceed = false;
-                msgDialog('warninga', l[135], escapeHTML(l[9056]));
-                copyright.markInputWrong(copyrightwork[i]);
-                return false;
-            }
+                if (copyright.validateUrl(cVal)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], escapeHTML(l[9056]));
+                    copyright.markInputWrong(copyrightwork[i]);
+                    return false;
+                }
 
-            if (takedownType === "1" && copyright.isFolderLink(eVal) && !copyright.isFolderWithoutSubHandle(eVal)) {
-                proceed = false;
-                msgDialog('warninga', l[135], l[19804]);
-                return false;
-            }
+                if (takedownType === "1" && copyright.isFolderLink(eVal)
+                    && !copyright.isFolderWithoutSubHandle(eVal)) {
+                    proceed = false;
+                    msgDialog('warninga', l[135], l[19804]);
+                    return false;
+                }
 
-            if ((takedownType === "2" || takedownType === "3")
-                && localStorage.tdFolderlinkWarning !== "1"
-                && copyright.isFolderWithoutSubHandle(eVal)) {
-                localStorage.tdFolderlinkWarning = 1;
-                proceed = false;
-                msgDialog('info', l[621], escapeHTML(l[19802]), null, function() {
-                    copyright.step2Submit();
-                });
-                return false;
+                if ((takedownType === "2" || takedownType === "3")
+                    && localStorage.tdFolderlinkWarning !== "1"
+                    && copyright.isFolderWithoutSubHandle(eVal)) {
+                    localStorage.tdFolderlinkWarning = 1;
+                    proceed = false;
+                    msgDialog('info', l[621], escapeHTML(l[19802]), null, doStep2Submit);
+                    return false;
+                }
             }
-
             $(e).removeClass("red");
-
         });
 
         if (proceed && !$('.cn_check1 .checkinput').prop('checked')) {
@@ -257,8 +264,8 @@ copyright.init_cn = function() {
         $('#cn_urls').safeAppend('<div class="new-affiliate-label">' +
             '<div class="new-affiliate-star"></div>@@</div>' +
             '<div class="clear"></div>' +
-            '<div class="affiliate-input-block">' +
-                '<input type="text" class="contenturl" value="">' +
+            '<div class="affiliate-input-block dynamic-height">' +
+                '<textarea class="contenturl" rows="3"></textarea>' +
             '</div>' +
             '<div class="new-affiliate-label">' +
                 '<div class="new-affiliate-star"></div>@@' +
@@ -343,11 +350,18 @@ copyright.init_cn = function() {
 
             var cn_post_urls = [];
             var cn_post_works = [];
-            $('.contenturl').each(function(a, b) {
-                cn_post_urls.push(b.value);
-            });
-            $('.copyrightwork').each(function(a, b) {
-                cn_post_works.push(b.value);
+
+            var copyrightwork = $('.copyrightwork');
+            $('.contenturl').each(function(i, e) {
+                var cVal = String($(copyrightwork[i]).val()).trim();
+                var urls = String($(e).val() || $(e).html()).split(/\n/);
+                urls = urls.map(String.trim).filter(function (url) {
+                    return url !== "";
+                });
+                for (var k = 0; k < urls.length; k++) {
+                    cn_post_urls.push(urls[k]);
+                    cn_post_works.push(cVal);
+                }
             });
             var cn_works_json = JSON.stringify([cn_post_urls, cn_post_works]);
             loadingDialog.show();

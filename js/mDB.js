@@ -44,6 +44,9 @@ function FMDB(plainname, schema, channelmap) {
     // -1: idle, 0: deleted sn and writing (or write-through), 1: transaction open and writing
     this.state = -1;
 
+    // flag indicating whether there is a pending write
+    this.writing = false;
+
     // [tid, tablename, action] of .pending[] hash item currently being written
     this.inflight = false;
 
@@ -570,55 +573,30 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (fmdb.inval_cb && t.t & 1 && table[0] == '_') fmdb.inval_ready = true;
 
                 // ...and send update off to IndexedDB for writing
-                fmdb.db[table][t.t & 1 ? 'bulkDelete' : 'bulkPut'](t[t.t++]).then(function(){
-                    if (d) {
-                        fmdb.logger.log('DB write successful'
-                            + (fmdb.commit ? ' - transaction complete' : '') + ', state: ' + fmdb.state);
-                    }
+                var op = t.t & 1 ? 'bulkDelete' : 'bulkPut';
+                var data = t[t.t++];
+                var limit = 4096;
 
-                    // if we are non-transactional, remove the written data from pending
-                    // (we have to keep it for the transactional case because it needs to
-                    // be visible to the pending updates search that getbykey() performs)
-                    if (!fmdb.state) {
-                        delete fmdb.inflight[fmdb.inflight.t-1];
-                        fmdb.inflight = false;
+                if (data.length < limit) {
+                    fmdb.db[table][op](data).then(writeend).catch(writeerror);
+                }
+                else {
+                    var idx = 0;
+                    (function bulkTick() {
+                        var rows = data.slice(idx, idx += limit);
 
-                        // in non-transactional loop back when the browser is idle so that we'll
-                        // prevent unnecessarily hanging the main thread and short writes...
-                        if (!fmdb.commit) {
-                            if (loadfm.loaded) {
-                                onIdle(dispatchputs);
+                        if (rows.length) {
+                            if (d > 1) {
+                                fmdb.logger.debug('%s for %d rows, %d remaining...',
+                                    op, rows.length, idx > data.length ? 0 : data.length - idx);
                             }
-                            else {
-                                setTimeout(dispatchputs, 2600);
-                            }
-                            return;
+                            fmdb.db[table][op](rows).then(bulkTick).catch(writeerror);
                         }
-                    }
-
-                    // loop back to write more pending data (or to commit the transaction)
-                    fmdb.inflight = false;
-                    dispatchputs();
-                }).catch(function(e) {
-                    // TODO: retry instead?
-
-                    if (e instanceof Dexie.BulkError) {
-                        fmdb.logger.error('Bulk operation error, %s records failed.', e.failures.length, e);
-                    }
-                    else {
-                        fmdb.logger.error('Unexpected error in bulk operation...', e);
-                    }
-
-                    fmdb.state = -1;
-                    fmdb.inflight = false;
-                    fmdb.invalidate();
-
-                    if (d) {
-                        fmdb.logger.warn('Marked DB as crashed...', e.name);
-                    }
-
-                    eventlog(99724, String(e), true);
-                });
+                        else {
+                            writeend();
+                        }
+                    })();
+                }
 
                 // we don't send more than one transaction (looking at you, Microsoft!)
                 return;
@@ -640,6 +618,66 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             fmdb.writing = null;
             fmdb.writepending(fmdb.head.length - 1);
         }
+    }
+
+    // event handler for bulk operation completion
+    function writeend() {
+        if (d) {
+            fmdb.logger.log('DB write successful'
+                + (fmdb.commit ? ' - transaction complete' : '') + ', state: ' + fmdb.state);
+        }
+
+        // if we are non-transactional, remove the written data from pending
+        // (we have to keep it for the transactional case because it needs to
+        // be visible to the pending updates search that getbykey() performs)
+        if (!fmdb.state) {
+            delete fmdb.inflight[fmdb.inflight.t - 1];
+            fmdb.inflight = false;
+
+            // in non-transactional loop back when the browser is idle so that we'll
+            // prevent unnecessarily hanging the main thread and short writes...
+            if (!fmdb.commit) {
+                if (loadfm.loaded) {
+                    onIdle(dispatchputs);
+                }
+                else {
+                    setTimeout(dispatchputs, 2600);
+                }
+                return;
+            }
+        }
+
+        // loop back to write more pending data (or to commit the transaction)
+        fmdb.inflight = false;
+        dispatchputs();
+    }
+
+    // event handler for bulk operation error
+    function writeerror(ex) {
+        if (ex instanceof Dexie.BulkError) {
+            fmdb.logger.error('Bulk operation error, %s records failed.', ex.failures.length, ex);
+        }
+        else {
+            fmdb.logger.error('Unexpected error in bulk operation...', ex);
+        }
+
+        fmdb.state = -1;
+        fmdb.inflight = false;
+
+        // If there is an invalidation request pending, dispatch it.
+        if (fmdb.inval_cb) {
+            console.assert(fmdb.crashed, 'Invalid state, the DB must be crashed already...');
+            fmdb.inval_cb();
+        }
+        else {
+            fmdb.invalidate();
+        }
+
+        if (d) {
+            fmdb.logger.warn('Marked DB as crashed...', ex.name);
+        }
+
+        eventlog(99724, String(ex), true);
     }
 };
 
@@ -1215,7 +1253,18 @@ FMDB.prototype.invalidate = function fmdb_invalidate(cb, readop) {
     this.crashed = readop ? 2 : 1;
 
     // set completion callback
-    this.inval_cb = cb;
+    this.inval_cb = function() {
+        // XXX: Just invalidating the DB may causes a timeout trying to open it on the next page load, since we
+        // do attempt to delete it when no sn is found, which would take a while to complete for large accounts.
+        // This is currently the 20% of hits we do receive through 99724 so from now on we will hold the current
+        // session until the DB has been deleted.
+        if (readop || !this.db) {
+            onIdle(cb);
+        }
+        else {
+            this.db.delete().then(cb).catch(cb);
+        }
+    };
 
     // force a non-treecache on the next load
     // localStorage.force = 1;

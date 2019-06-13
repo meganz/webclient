@@ -2676,7 +2676,7 @@ function classifyPassword(password, $wrapper) {
     // Calculate the password score using the ZXCVBN library and its length
     var passwordScore = zxcvbn(password).score;
     var passwordLength = password.length;
-    var $passStatus = $wrapper.length ? $wrapper.find('.account.password-status')
+    var $passStatus = $wrapper ? $wrapper.find('.account.password-status')
         : $('.account.password-status');
     var className = '';
     var string1 = '';

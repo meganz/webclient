@@ -1283,13 +1283,13 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
-        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
+        $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);

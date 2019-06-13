@@ -9446,6 +9446,7 @@ body:not(.en) .warning-dialog-a.wide {
 }
 .fm-notification-info p, .fm-notification-info h1, .fm-notification-info h2 {
     font-size: 15px;
+    font-weight: 400;
     line-height: 21px;
     padding: 0 0 0 0;
     margin: 0;

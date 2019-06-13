@@ -3475,5 +3475,6 @@
     "20818": "Het bestand kon niet gedownload worden als een ZIP bestand. Dit kan gebeuren als het bestand was neergehaald.",
     "20819": "Geen van de bestanden kon worden gedownload als een ZIP-bestand. Dit kan gebeuren als de bestanden zijn neergehaald.",
     "20820": "Niet alle bestanden konden worden gedownload als ZIP bestand. Dit kan gebeuren als sommige bestanden waren neergehaald. De bewerking is voltooid met %1 van %2 items die met succes zijn gedownload.",
-    "20822": "Niet toegankelijk door de accountstatus van de bestandseigenaar."
+    "20822": "Niet toegankelijk door de accountstatus van de bestandseigenaar.",
+    "20826": "Download MEGA app"
 }

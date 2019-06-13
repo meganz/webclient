@@ -3475,5 +3475,6 @@
     "20818": "The file could not be downloaded as a ZIP file. This can happen if the file was taken down.",
     "20819": "None of the files were able to be downloaded as a ZIP file. This can happen if the files were taken down.",
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
-    "20822": "Not accessible due to the account status of the file owner."
+    "20822": "Not accessible due to the account status of the file owner.",
+    "20826": "Download MEGA app"
 }

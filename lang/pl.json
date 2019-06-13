@@ -3476,5 +3476,6 @@
     "20819": "\u017baden z plik\u00f3w nie m\u00f3g\u0142 zosta\u0107 pobrany jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli pliki zostan\u0105 usuni\u0119te.",
     "20820": "Nie wszystkie pliki mo\u017cna pobra\u0107 jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli niekt\u00f3re pliki zostan\u0105 usuni\u0119te. Operacja zako\u0144czy\u0142a si\u0119, gdy %1 z %2 element\u00f3w zosta\u0142o pomy\u015blnie pobranych.",
     "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku.",
-    "20826": "Download MEGA app"
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

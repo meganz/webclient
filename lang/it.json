@@ -3476,5 +3476,6 @@
     "20819": "Non \u00e8 stato possibile scaricare i file come un singolo file ZIP. Questo pu\u00f2 succedere se i file sono stati rimossi.",
     "20820": "Non \u00e8 stato possibile scaricare tutti i file come un singolo file ZIP. Questo pu\u00f2 succedere se alcuni dei file sono stati rimossi. L'operazione \u00e8 terminata con %1 oggetti su %2 scaricati con successo.",
     "20822": "Non accessibile a causa dello status dell'account del proprietario del file.",
-    "20826": "Download MEGA app"
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

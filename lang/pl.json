@@ -3042,7 +3042,7 @@
     "20140": "Brak historii",
     "20141": "Niedawne",
     "20145": "Cloud Drive jest pe\u0142ny. Uaktualnij do PRO i uzyskaj do 8 TB pami\u0119ci masowej i 16 TB limitu transferu.",
-    "20152": "Brak ostatniej aktywno\u015bci",
+    "20152": "Brak aktywno\u015bci",
     "20153": "Plan PRO wygasa w",
     "20154": "Subskrypcja odnawia si\u0119 w",
     "20162": "Plik jest zablokowany lub nie mo\u017cna go odczyta\u0107",
@@ -3477,5 +3477,7 @@
     "20820": "Nie wszystkie pliki mo\u017cna pobra\u0107 jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli niekt\u00f3re pliki zostan\u0105 usuni\u0119te. Operacja zako\u0144czy\u0142a si\u0119, gdy %1 z %2 element\u00f3w zosta\u0142o pomy\u015blnie pobranych.",
     "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku.",
     "20826": "Download MEGA app",
-    "20827": "Continue with browser"
+    "20827": "Continue with browser",
+    "20828": "Set Nickname",
+    "20829": "Alias \/ Nickname"
 }

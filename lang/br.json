@@ -3477,5 +3477,7 @@
     "20820": "N\u00e3o foi poss\u00edvel fazer o download de todos os arquivos como ZIP. Isso pode acontecer se alguns arquivos tiverem sido removidos. Foi feito o download de %1 de %2 itens.",
     "20822": "N\u00e3o acess\u00edvel devido ao status da conta do propriet\u00e1rio do arquivo.",
     "20826": "Download MEGA app",
-    "20827": "Continue with browser"
+    "20827": "Continue with browser",
+    "20828": "Set Nickname",
+    "20829": "Alias \/ Nickname"
 }

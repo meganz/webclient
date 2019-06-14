@@ -3477,5 +3477,7 @@
     "20820": "Les fichiers n\u2019ont pas tous pu \u00eatre t\u00e9l\u00e9charg\u00e9s en tant que fichier ZIP. Cela peut arriver si certains des fichiers ont \u00e9t\u00e9 retir\u00e9s. L\u2019op\u00e9ration s\u2019est termin\u00e9e avec %1 \u00e9l\u00e9ments sur %2 t\u00e9l\u00e9charg\u00e9s avec succ\u00e8s.",
     "20822": "Inaccessible en raison de l\u2019\u00e9tat du compte du propri\u00e9taire du fichier.",
     "20826": "Download MEGA app",
-    "20827": "Continue with browser"
+    "20827": "Continue with browser",
+    "20828": "Set Nickname",
+    "20829": "Alias \/ Nickname"
 }

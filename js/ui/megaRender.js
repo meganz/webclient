@@ -10,20 +10,20 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td megatype="fav" width="50">' +
+                    '<td megatype="fav" >' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
                         '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
-                    '<td megatype="label" width="70" class="label"></td>' +
-                    '<td megatype="size" width="100" class="size"></td>' +
-                    '<td megatype="type" width="130" class="type"></td>' +
-                    '<td megatype="timeAd" width="120" class="time ad"></td>' +
-                    '<td megatype="timeMd" width="120" class="time md"></td>' +
-                    '<td megatype="versions" width="120" class="hd-versions"></td>' +
-                    '<td megatype="extras" width="93" class="grid-url-field own-data">' +
+                    '<td megatype="label" class="label"></td>' +
+                    '<td megatype="size" class="size"></td>' +
+                    '<td megatype="type" class="type"></td>' +
+                    '<td megatype="timeAd" class="time ad"></td>' +
+                    '<td megatype="timeMd" class="time md"></td>' +
+                    '<td megatype="versions" class="hd-versions"></td>' +
+                    '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
                             '<i class="small-icon icons-sprite grey-clock"></i>' +
@@ -700,6 +700,22 @@
                 this.nodeMap[aHandle] = this.buildDOMNode(aNode, properties, template);
             }
 
+            // setting widths
+            if (M && M.columnsWidth && M.columnsWidth.cloud) {
+                var knownColumnsWidths = Object.keys(M.columnsWidth.cloud) || [];
+                for (var col = 0; col < knownColumnsWidths.length; col++) {
+                    var tCol = this.nodeMap[aHandle].querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
+                    if (tCol) {
+                        if (typeof M.columnsWidth.cloud[knownColumnsWidths[col]].curr === 'number') {
+                            tCol.style.width = M.columnsWidth.cloud[knownColumnsWidths[col]].curr + 'px';
+                        }
+                        else {
+                            tCol.style.width = M.columnsWidth.cloud[knownColumnsWidths[col]].curr || '';
+                        }
+                    }
+                }
+            }
+
             return this.nodeMap[aHandle];
         },
 
@@ -1083,8 +1099,10 @@
 
                 if (!aNode.t && aNode.tvf) {
                     // aTemplate.classList.add('versioning');
-                    aTemplate.querySelector('.hd-versions').appendChild(versionColumnPrepare
-                        (aNode.tvf, aNode.tvb || 0));
+                    var vTemplate = aTemplate.querySelector('.hd-versions');
+                    if (vTemplate) {
+                        vTemplate.appendChild(versionColumnPrepare(aNode.tvf, aNode.tvb || 0));
+                    }
                 }
 
                 if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {

@@ -9,12 +9,12 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { min: 50, curr: 50 };
-    this.columnsWidth.cloud.fname = { min: 120, curr: null };
+    this.columnsWidth.cloud.fname = { min: 120, curr: /*null*/ 'calc(100% - 823px)' };
     this.columnsWidth.cloud.label = { min: 70, curr: 70 };
     this.columnsWidth.cloud.size = { min: 100, curr: 100 };
     this.columnsWidth.cloud.type = { min: 130, curr: 130 };
-    this.columnsWidth.cloud.timeAd = { min: 120, curr: 120 };
-    this.columnsWidth.cloud.timeMd = { min: 120, curr: 120 };
+    this.columnsWidth.cloud.timeAd = { min: 130, curr: 130 };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130 };
     this.columnsWidth.cloud.versions = { min: 120, curr: 120 };
     this.columnsWidth.cloud.extras = { min: 93, curr: 93 };
 
@@ -2933,55 +2933,79 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.fm-files-view-icon.block-view').removeClass('active');
 
     $.gridHeader = function() {
-        // reference to fixed initial width set (hard-coded) in MegaRender.js
-        var headers = $('.files-grid-view.fm .grid-table-header th');
-        var usedWidth = 0;
-        for (var k = 0; k < headers.length; k++) {
-            var $curHeader = $(headers[k]);
-            var colType = $curHeader.attr('megatype');
+        //// reference to fixed initial width set (hard-coded) in MegaRender.js
+        //var headers = $('.files-grid-view.fm .grid-table-header th');
+        //// var usedWidth = 0;
+        //var h1 = false;
+        //var h2 = false;
+        //var h3 = false;
+        //var h4 = false;
+        //for (var k = 0; k < headers.length; k++) {
+        //    var $curHeader = $(headers[k]);
+        //    var colType = $curHeader.attr('megatype');
 
-            if (M.columnsWidth.cloud[colType].curr) {
-                if (M.columnsWidth.cloud[colType].curr !== $curHeader.outerWidth()) {
-                    $curHeader.outerWidth(M.columnsWidth.cloud[colType].curr);
-
-                    $(".grid-table td[megatype='" + colType + "']").
-                        outerWidth(M.columnsWidth.cloud[colType].curr);
-                }
-                else if ($(".grid-table td[megatype='" + colType + "']").
-                    outerWidth() !== M.columnsWidth.cloud[colType].curr) {
-                    $(".grid-table td[megatype='" + colType + "']").
-                        outerWidth(M.columnsWidth.cloud[colType].curr);
-                }
-            }
-            usedWidth += M.columnsWidth.cloud[colType].curr || 0;
-        }
-        if (!M.columnsWidth.cloud.fname.curr) {
-            var availableWidth = $('.files-grid-view.fm').width();
-            var remainingWidth = availableWidth - usedWidth - 10;
-
-            var setWidth = (remainingWidth > M.columnsWidth.cloud.fname.min) ? remainingWidth : M.columnsWidth.cloud.fname.min;
-            if (headers.filter("[megatype='fname']").outerWidth() !== setWidth) {
-                headers.filter("[megatype='fname']").outerWidth(setWidth);
-                $(".grid-table td[megatype='fname']").
-                    outerWidth(setWidth);
-            }
-            else if ($(".grid-table td[megatype='fname']").outerWidth() !== setWidth) {
-                $(".grid-table td[megatype='fname']").
-                    outerWidth(setWidth);
-            }
-        }
-        //var headerColumn = '';
-        //var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        //if ($firstChildTd.length === 0) {
-        //    // if the first <tr> does not contain any TDs, pick the next one
-        //    // this can happen when MegaList's prepusher (empty <TR/> is first)
-        //    $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        //    if (M.columnsWidth.cloud[colType].curr &&
+        //        typeof M.columnsWidth.cloud[colType].curr === 'number') {
+        //        if (M.columnsWidth.cloud[colType].curr !== $curHeader.outerWidth()) {
+        //            $curHeader.outerWidth(M.columnsWidth.cloud[colType].curr);
+        //            h1 = true;
+        //            $(".grid-table td[megatype='" + colType + "']").
+        //                outerWidth(M.columnsWidth.cloud[colType].curr);
+        //        }
+        //        else if ($(".grid-table td[megatype='" + colType + "']").
+        //            outerWidth() !== M.columnsWidth.cloud[colType].curr) {
+        //            $(".grid-table td[megatype='" + colType + "']").
+        //                outerWidth(M.columnsWidth.cloud[colType].curr);
+        //            h2 = true;
+        //        }
+        //    }
+        //    // usedWidth += M.columnsWidth.cloud[colType].curr || 0;
         //}
+        ////if (!M.columnsWidth.cloud.fname.curr) {
+        ////    var availableWidth = $('.files-grid-view.fm').width();
+        ////    var remainingWidth = availableWidth - usedWidth - 10;
 
-        //$firstChildTd.each(function(i, e) {
-        //    headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
-        //    $(headerColumn).width($(e).width());
-        //});
+        ////    var setWidth = (remainingWidth > M.columnsWidth.cloud.fname.min) ? remainingWidth : M.columnsWidth.cloud.fname.min;
+        ////    if (headers.filter("[megatype='fname']").outerWidth() !== setWidth) {
+        ////        headers.filter("[megatype='fname']").outerWidth(setWidth);
+        ////        $(".grid-table td[megatype='fname']").
+        ////            outerWidth(setWidth);
+        ////        h3 = true;
+        ////    }
+        ////    else if ($(".grid-table td[megatype='fname']").outerWidth() !== setWidth) {
+        ////        $(".grid-table td[megatype='fname']").
+        ////            outerWidth(setWidth);
+        ////        h4 = true;
+        ////    }
+        ////}
+        //var str = 'Grid Header';
+        //if (h1) {
+        //    str += ' --- col header setting ';
+        //}
+        //if (h2) {
+        //    str += ' --- col content setting ';
+        //}
+        //if (h3) {
+        //    str += ' --- fm header setting ';
+        //}
+        //if (h4) {
+        //    str += ' --- fm content setting ';
+        //}
+        //console.warn(str);
+
+
+        var headerColumn = '';
+        var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        if ($firstChildTd.length === 0) {
+            // if the first <tr> does not contain any TDs, pick the next one
+            // this can happen when MegaList's prepusher (empty <TR/> is first)
+            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        }
+
+        $firstChildTd.each(function(i, e) {
+            headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
+            $(headerColumn).width($(e).width());
+        });
     };
 
 

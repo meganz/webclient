@@ -1311,10 +1311,8 @@ var addressDialog = {
         });
 
         $statesSelect.selectmenu('refresh');
+        $statesSelect.selectmenu(preselected || country === 'US' || country === 'CA' ? 'enable' : 'disable');
 
-        if (preselected || country === 'US' || country === 'CA') {
-            $statesSelect.selectmenu('enable');
-        }
     },
 
     /**
@@ -1422,11 +1420,14 @@ var addressDialog = {
                             $stateOption.prop('disabled', true);
                         }
                     });
+
+                    $statesSelect.selectmenu('enable');
+                } else {
+                    $statesSelect.selectmenu('disable');
                 }
 
-                // Refresh the selectmenu to show/hide disabled options and enable the dropdown so it works
+                // Refresh the selectmenu to show/hide disabled options
                 $statesSelect.selectmenu('refresh');
-                $statesSelect.selectmenu('enable');
 
                 // Remove any previous validation error
                 $stateSelectmenuButton.removeClass('error');

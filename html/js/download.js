@@ -71,32 +71,39 @@ function dl_g(res) {
 
         if (dlQueue.isPaused(gid)) {
             fm_tfspause(gid);
-            $('.download .pause-transfer').addClass('active');
+            $('.download .pause-transfer').removeClass('hidden').addClass('active')
+                .find('span').text(l[1649]);
         }
     }
 
     loadingDialog.hide();
     fdl_queue_var = null;
 
+    //  Hide Register Panel
+    showRegisterSidePane(1);
     $('.widget-block').addClass('hidden');
-    $('.download.top-bar').addClass('hidden');
 
     if (res === ETOOMANY) {
-        $('.download.scroll-block').addClass('not-available-user');
+        $('.download.top-bar').addClass('global-error not-available-user');
+        setTransferStatus(0, l[243]);
     }
     else if (typeof res === 'number' && res < 0) {
         if (res === -2) {
-            $('.download.scroll-block').addClass('invalid-url');
+            $('.download.top-bar').addClass('global-error invalid-url');
+            setTransferStatus(0,l[20198]);
         }
         else {
-            $('.download.scroll-block').addClass('na-some-reason');
+            $('.download.top-bar').addClass('global-error na-some-reason');
+            setTransferStatus(0, l[243]);
         }
     }
     else if (res.e === ETEMPUNAVAIL) {
-        $('.download.scroll-block').addClass('temporary-na');
+        $('.download.top-bar').addClass('global-error temporary-na');
+        setTransferStatus(0, l[1191]);
     }
     else if (res.d) {
-        $('.download.scroll-block').addClass('na-some-reason');
+        $('.download.top-bar').addClass('global-error na-some-reason');
+        setTransferStatus(0, l[243]);
     }
     else if (res.at)
     {
@@ -126,7 +133,7 @@ function dl_g(res) {
         }
         if (fdl_file.name)
         {
-            var $pageScrollBlock = $('.bottom-page.scroll-block')
+            var $pageScrollBlock = $(is_mobile ? '.bottom-page.scroll-block' : '.download.top-bar')
                 .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
             var filenameLength = filename.length;
@@ -177,38 +184,40 @@ function dl_g(res) {
             var checkMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOff').addClass('checkboxOn');
                 $('.checkdiv.megaapp-download input').prop('checked', true);
-                $('.download.big-button.download-file span').text(l[58]);
-                $('.download.big-button.download-file i').removeClass('save resume');
+                $('.download.download-file span').text(l[58]);
+                $('.download.download-file i').removeClass('save resume');
             };
             var uncheckMegaSyncDownload = function() {
                 $('.checkdiv.megaapp-download').removeClass('checkboxOn').addClass('checkboxOff');
-                $('.checkdiv.megaapp-download input').prop('checked', false);
-                var $but = $('.download.big-button.download-file span');
+                $('.checkdiv.megaapp-download input').prop('checked', false)
+                    .closest('.checkbox-bl').removeClass('checked');
+                var $but = $('.download.download-file span');
                 if (dlResumeInfo) {
                     if (dlResumeInfo.byteLength === fdl_filesize) {
                         $but.text(l[776]);
-                        $('.download.big-button.download-file i').removeClass('resume').addClass('save');
+                        $('.download.download-file i').removeClass('resume').addClass('save');
                     }
                     else {
                         $but.text(l[1649]);
-                        $('.download.big-button.download-file i').removeClass('save').addClass('resume');
+                        $('.download.download-file i').removeClass('save').addClass('resume');
                     }
+                    $('.download.info-block .checkbox-bl').css('display', 'none');
                 }
                 else {
                     $but.text(l[58]);
-                    $('.download.big-button.download-file i').removeClass('save resume');
+                    $('.download.download-file i').removeClass('save resume');
                 }
             };
             var onDownloadReady = function() {
+                uncheckMegaSyncDownload();
                 dlprogress(-0xbadf, 100, fdl_filesize, fdl_filesize);
 
                 $pageScrollBlock.addClass('resumable');
-                $('.progress-resume').removeClass('hidden');
                 $('.download.state-text.resume').addClass('hidden');
                 $('.download.state-text.save').removeClass('hidden');
                 $('.download.transfer-buttons a').addClass('hidden');
-                $('.download.big-button.download-file span').text(l[776]);
-                $('.download.big-button.download-file i').removeClass('resume').addClass('save');
+                $('.download.download-file span').text(l[776]);
+                $('.download.download-file i').removeClass('resume').addClass('save');
 
                 if (is_mobile) {
                     $('body').addClass('download-complete');
@@ -217,13 +226,13 @@ function dl_g(res) {
                     $('.mobile.download-speed, .mobile.download-percents').text('');
                     $('.download-progress').rebind('click', function() {
                         if (fdl_queue_var) {
-                            browserDownload();
+                            dlPageStartDownload();
                         }
                         return false;
                     });
                 }
             };
-            $('.download.big-button.download-file span').text(l[58]);
+            $('.download.download-file span').text(l[58]);
 
             if (is_mobile) {
                 setMobileAppInfo();
@@ -289,17 +298,16 @@ function dl_g(res) {
                                 }
                             }
                             else if (size === fdl_filesize) {
-                                onDownloadReady();
+                                onIdle(onDownloadReady);
                             }
                             else if (size === dlResumeInfo.byteOffset) {
                                 dlprogress(-0xbadf, perc, dlResumeInfo.byteOffset, fdl_filesize);
 
                                 $pageScrollBlock.addClass('resumable');
-                                $('.progress-resume').removeClass('hidden');
                                 $('.download.state-text.save').addClass('hidden');
                                 $('.download.state-text.resume').removeClass('hidden');
-                                $('.download.big-button.download-file span').text(l[1649]);
-                                $('.download.big-button.download-file i').removeClass('save').addClass('resume');
+                                $('.download.download-file span').text(l[1649]);
+                                $('.download.download-file i').removeClass('save').addClass('resume');
 
                                 if (is_mobile) {
                                     var $progress = $('.mobile .download-progress span');
@@ -309,7 +317,7 @@ function dl_g(res) {
                                     $('.download-progress').rebind('click', function() {
                                         $('.download-progress').off('click');
                                         $progress.text(l[5740]).removeClass('resume-bttn');
-                                        browserDownload();
+                                        dlPageStartDownload();
                                         return false;
                                     });
                                 }
@@ -348,6 +356,7 @@ function dl_g(res) {
                 else if (fdl_filesize > maxDownloadSize) {
                     checkMegaSyncDownload();
                     dlmanager.setBrowserWarningClasses('.download.warning-block');
+                    $(window).trigger('resize');
                 }
                 else {
                     uncheckMegaSyncDownload();
@@ -355,7 +364,7 @@ function dl_g(res) {
                 }
             });
 
-            $('.big-button.share, .viewer-button.right.share').rebind('click', function() {
+            $('.video-share-button, .viewer-button.right.share').rebind('click', function() {
                 $(document).fullScreen(false);
                 $.itemExport = [dlpage_ph];
                 var exportLink = new mega.Share.ExportLink({
@@ -368,6 +377,9 @@ function dl_g(res) {
 
             $('.mid-button.download-file, .big-button.download-file, .mobile.dl-browser')
                 .rebind('click', function() {
+                    $('.download.progress-bar').width('0%');
+                    $('.open-in-folder').addClass('hidden');
+
                     if ($('.checkdiv.megaapp-download input').prop('checked')) {
                         loadingDialog.show();
                         megasync.isInstalled(function(err, is) {
@@ -377,7 +389,7 @@ function dl_g(res) {
                             if (res.msd !== 0 && (!err || is)) {
                                 $('.megasync-overlay').removeClass('downloading');
                                 megasync.download(dlpage_ph, a32_to_base64(base64_to_a32(dlkey).slice(0, 8)));
-                                browserDownload(true);
+                                dlPageStartDownload(true);
                             }
                             else {
                                 dlmanager.showMEGASyncOverlay(fdl_filesize > maxDownloadSize);
@@ -389,10 +401,12 @@ function dl_g(res) {
                         M.saveAs(previews[dlpage_ph].buffer, filename);
                     }
                     else if (dlResumeInfo && dlResumeInfo.byteLength === fdl_filesize) {
-                        browserDownload();
+                        dlPageStartDownload();
                     }
                     else {
-
+                        if (!u_type && !is_mobile) {
+                            setTimeout(showRegisterSidePane, 1000);
+                        }
                         watchdog.query('dling')
                             .always(function(res) {
                                 var proceed = true;
@@ -407,17 +421,15 @@ function dl_g(res) {
                                         .always(function(size) {
                                             if (size === fdl_filesize) {
                                                 // another tab finished the download
+                                                dlResumeInfo = Object.assign({}, dlResumeInfo, {byteLength: size});
                                                 onDownloadReady();
                                             }
-                                            else {
-                                                browserDownload();
-                                            }
+                                            dlPageStartDownload();
                                         });
                                 }
                                 else {
                                     $('.download.state-text.resume').addClass('hidden');
-                                    $('.progress-resume').addClass('hidden');
-                                    $('.download.scroll-block')
+                                    $('.download.top-bar')
                                         .removeClass('download-complete resumable')
                                         .addClass('downloading');
 
@@ -444,17 +456,17 @@ function dl_g(res) {
             $fileinfoBlock.find('.big-txt .extension').text(fileExt);
             $fileinfoBlock.find('.small-txt').text(fileSize);
 
-            $('.download.top-bar').removeClass('hidden');
             $('.download.bar-filename').text(filename).attr('title', filename);
             $('.bar-cell .download.bar-filesize').text(fileSize);
             $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
                 .addClass(fileIcon({ name: filename }));
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
-                $('.download.scroll-block').addClass('paused-transfer');
-                $('.download.eta-block span').text('');
-                $('.download.speed-block .dark-numbers').text('');
-                $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
+                $('.download.top-bar').addClass('paused-transfer');
+                $('.download.eta-block .dark-numbers').text('');
+                $('.download.eta-block .light-txt').text(l[1651]);
+                $('.download.speed-block .dark-numbers').safeHTML('&mdash; KB/s');
+                $('.download.speed-block .light-txt').text('');
             }
 
             var showPreviewButton = function($infoBlock) {
@@ -462,13 +474,6 @@ function dl_g(res) {
 
                 if (is_image(filename) || isVideo) {
                     var $ipb = $infoBlock.find('.img-preview-button');
-
-                    if (fileext(filename) === 'pdf') {
-                        $ipb.find('span').text(l[17489]);
-                    }
-                    else if (isVideo) {
-                        $ipb.find('span').text(l[17732]);
-                    }
 
                     $ipb.removeClass('hidden')
                         .rebind('click', function() {
@@ -509,6 +514,7 @@ function dl_g(res) {
                     $fileinfoBlock.find('.big-txt .filename').text(fileTitle);
                     $fileinfoBlock.find('.big-txt .extension').text(fileExt);
                     $('.mobile.filetype-img').addClass('hidden');
+                    $(window).trigger('resize');
 
                 }).catch(function(ex) {
                     if (ex) {
@@ -540,7 +546,7 @@ function dl_g(res) {
         }
     }
     else {
-        $('.download.scroll-block').addClass('na-some-reason');
+        $('.download.top-bar').addClass('na-some-reason');
     }
 
     if (is_mobile) {
@@ -571,6 +577,51 @@ function dl_g(res) {
             $('#mobile-ui-main').removeClass('hidden');
         }
     }
+    else {
+        // Expand top bar
+        setTimeout(function _expand() {
+            var $topBar = $('.download.top-bar').addClass('expanded');
+
+            (function _resizer() {
+                // Set height to  top  bar if it doesn't fit min height
+                if ($topBar.hasClass('expanded')) {
+                    var contentHeight = $topBar.find('.download.main-pad').outerHeight(true);
+                    if (contentHeight > $topBar.find('.download-content').outerHeight()) {
+                        $topBar.css({
+                            'height': contentHeight +
+                                $topBar.find('.download.bar-table').outerHeight() +
+                                $topBar.find('.pages-nav.content-block').height()
+                        });
+                    }
+                }
+                $(window).rebind('resize.download-bar', _resizer);
+            })();
+
+            // Collapse/Expand top bar events
+            $('.top-expand-button, .top-expand-txt').rebind('click', function() {
+                if ($(this).hasClass('active')) {
+                    $topBar.removeClass('expanded').css('height', '');
+                    return $(window).unbind('resize.download-bar');
+                }
+                _expand();
+            });
+
+            // Collapse top bar if user scrolls over it
+            $topBar.rebind('mousewheel.dlpage', function(ev) {
+                var $this = $(this);
+
+                if (!$this.is('.expanded.floating') || $this.is('.video-theatre-mode')) {
+                    return;
+                }
+                var delta = ev.wheelDelta || ev.detail || ev.originalEvent.wheelDelta
+                    || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;
+
+                if ((delta > 120 || delta < -120) && $this.is('.activated')) {
+                    $this.removeClass('expanded').css('height', '');
+                }
+            });
+        }, 1500);
+    }
 
     var pf = navigator.platform.toUpperCase();
     if (page.substr(-5) == 'linux') sync_switchOS('linux');
@@ -580,66 +631,94 @@ function dl_g(res) {
 
     if ($.doFireDownload) {
         delete $.doFireDownload;
-        browserDownload();
+        dlPageStartDownload();
     }
 }
 
-function browserDownload(isDlWithMegaSync) {
-    // If regular download using Firefox and the total download is over 1GB then show the dialog
-    // to use the extension, but not if they've seen the dialog before and ticked the checkbox
-    /*if (dlMethod === MemoryIO && !localStorage.firefoxDialog
-        && fdl_filesize > MemoryIO.fileSizeLimit && ua.engine === 'Gecko') {
-        firefoxDialog();
-    }
-    else if (!is_mobile
-            && browserDialog.isWeak()
-            && fdl_filesize > 1048576000
-            && !localStorage.browserDialog) {
-        browserDialog();
-    }
-    else*/
-    {
-        var $downloadPage = $('.download.scroll-block');
-        $downloadPage.addClass('downloading').removeClass('resumable');
-        $downloadPage.find('.download.state-text').addClass('hidden');
-        $downloadPage.find('.img-preview-button:visible').addClass('hidden');
-        $downloadPage.find('.standalone-download-message').removeClass('hidden');
-        $downloadPage.find('.download.speed-block .light-txt').text(l[1042] + '\u2026');
-        $('.download.warning-block').removeClass('visible');
-        $('.progress-resume').addClass('hidden');
-        $('.download-state-text').addClass('hidden');
-        if (!isDlWithMegaSync) {
-            $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
-            if ($('.download .pause-transfer').hasClass('hidden')) {
-                $('.download .pause-transfer').removeClass('hidden');
-                $('.download .pause-transfer').css('display', '');
-            }
-            if (is_mobile) {
-                if (!Object(fdl_queue_var).lastProgress) {
-                    $('body').addClass('downloading').find('.bar').width('1%');
-                }
-            }
-            else if (mediaCollectFn) {
-                onIdle(mediaCollectFn);
-                mediaCollectFn = null;
-            }
+// Show register side panel
+function showRegisterSidePane(close) {
+    'use strict';
+    var $pane = $('.register-side-pane.container');
 
-            if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
-                dlmanager.isDownloading = true;
+    if (close || !$pane.length) {
+        $pane.removeClass('visible');
+        return false;
+    }
 
-                if (dlResumeInfo) {
-                    fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
-                }
-                dl_queue.push(fdl_queue_var);
+    mega.ui.showRegisterDialog({
+        body: l[20750],
+        $wrapper: $pane,
+        showLogin: true,
+        initFormEvents: true,
+        controls: function() {
+            $('.fm-dialog-close', $pane).rebind('click.registerSidePane', function() {
+                $pane.removeClass('visible');
+                return false;
+            });
+        },
+        showDialog: function() {
+            $pane.addClass('visible');
+        },
+        closeDialog: function() {
+            $pane.removeClass('visible');
+        },
+        onAccountCreated: function(gotLoggedIn, accountData) {
+            this.closeDialog();
+
+            if (!gotLoggedIn) {
+                security.register.cacheRegistrationData(accountData);
+                mega.ui.sendSignupLinkDialog(accountData, true);
             }
-            $.dlhash = getSitePath();
         }
-        else {
-            $('.download.transfer-buttons', $downloadPage).addClass('hidden');
-            $('.download .pause-transfer').addClass('hidden');
-            $('.download .pause-transfer').hide();
+    });
+}
+
+function dlPageStartDownload(isDlWithMegaSync) {
+    'use strict';
+    var $downloadPage = $('.download.top-bar');
+
+    // Collapse top bar
+    $downloadPage.removeClass('expanded').css('height', '');
+    $('.download .pause-transfer').removeClass('hidden active').find('span').text(l[9112]);
+    $(window).unbind('resize.download-bar');
+
+    // Initializing...
+    $downloadPage.addClass('downloading').removeClass('resumable');
+    $downloadPage.find('.download.state-text').addClass('hidden');
+    $downloadPage.find('.img-preview-button:visible').addClass('hidden');
+    $downloadPage.find('.standalone-download-message').removeClass('hidden');
+    $downloadPage.find('.download.eta-block .dark-numbers').text('');
+    $downloadPage.find('.download.eta-block .light-txt').text(l[1042] + '\u2026');
+    $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
+    $('.download.warning-block').removeClass('visible');
+    $('.download-state-text').addClass('hidden');
+
+    if (isDlWithMegaSync) {
+        $('.download .pause-transfer').addClass('hidden');
+        $('.download.speed-block .dark-numbers').css('display', 'none');
+        $('.download.transfer-buttons', $downloadPage).addClass('hidden');
+        return;
+    }
+
+    if (is_mobile) {
+        if (!Object(fdl_queue_var).lastProgress) {
+            $('body').addClass('downloading').find('.bar').width('1%');
         }
     }
+    else if (mediaCollectFn) {
+        onIdle(mediaCollectFn);
+        mediaCollectFn = null;
+    }
+
+    if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
+        dlmanager.isDownloading = true;
+
+        if (dlResumeInfo) {
+            fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
+        }
+        dl_queue.push(fdl_queue_var);
+    }
+    $.dlhash = getSitePath();
 }
 
 function getStoreLink() {
@@ -689,19 +768,27 @@ function importFile() {
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 {
     var now = Date.now();
+    var $dowloadWrapper = $('.download.top-bar');
 
     Object(fdl_queue_var).lastProgress =
         [fileid, perc, bytesloaded, bytestotal, kbps, dl_queue_num];
 
     if (fileid !== -0xbadf) {
-        $('.download.scroll-block').removeClass('download-complete').addClass('downloading');
+        $dowloadWrapper.removeClass('download-complete').addClass('downloading');
         if (!kbps) {
             return;
         }
     }
-    $('.download.error-text, .download.main-transfer-error').addClass('hidden');
-    $('.download.main-transfer-info').removeClass('hidden');
-    $('.download.state-text').addClass('hidden');
+
+    $dowloadWrapper.removeClass('error');
+    $('.download.speed-block', $dowloadWrapper).removeClass('hidden');
+    $('.download.eta-block', $dowloadWrapper).removeClass('hidden');
+    $('.bar-table .progress-block', $dowloadWrapper).removeClass('hidden');
+    $('.download.error-text', $dowloadWrapper).addClass('hidden');
+    $('.download.main-transfer-error', $dowloadWrapper).addClass('hidden');
+    $('.download.overquoata-error', $dowloadWrapper).addClass('hidden');
+    $('.download.state-text', $dowloadWrapper).addClass('hidden');
+    $('.see-our-plans, .get-more-bonuses, .create-account-button.inline', $dowloadWrapper).addClass('hidden');
 
     if (dl_queue[dl_queue_num]) {
         if (!dl_queue[dl_queue_num].starttime) {
@@ -712,9 +799,9 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
     if (!m)
     {
-        $('.download.scroll-block').removeClass('temporary-na');
-        $('.download.progress-bar').width(perc + '%');
-        $('.file-info .download.info-txt.small-txt')
+        $dowloadWrapper.removeClass('temporary-na');
+        $('.download.progress-bar', $dowloadWrapper).width(perc + '%');
+        $('.file-info .download.info-txt.small-txt', $dowloadWrapper)
             .safeHTML(
                 '<span class="dark">' +
                     bytesToSize(bytesloaded) +
@@ -724,8 +811,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
                     fileSize +
                 '</span>'
             );
-            $('.bar-cell .download.bar-filesize')
-                .safeHTML(bytesToSize(bytesloaded) + '<hr />' + fileSize);
+        $('.bar-cell .download.bar-filesize', $dowloadWrapper)
+            .safeHTML('<span class="green">' + bytesToSize(bytesloaded) + '</span><hr />' + fileSize);
         megatitle(' ' + perc + '%');
     }
 
@@ -741,8 +828,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     }
 
     if (bytesloaded === bytestotal) {
-        $('.download.speed-block .dark-numbers').text('');
-        $('.download.speed-block .light-txt').text(l[8579] + '\u2026');
+        $('.download.eta-block .dark-numbers', $dowloadWrapper).text('');
+        $('.download.eta-block .light-txt', $dowloadWrapper).text(l[8579] + '\u2026');
 
         // Change button text to DECRYPTING... which can take some time
         if (is_mobile) {
@@ -753,14 +840,13 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
         var speed  = numOfBytes(bps, 1);
-        $('.download.speed-block .dark-numbers').text(speed.size);
-        $('.download.speed-block .light-txt').text(speed.unit + '/s');
-        // TODO: Implement new format
-        $('.download.eta-block .dark-numbers').text(secondsToTime(retime));
-        $('.download.eta-block .light-txt').text('left');
+        $('.download.speed-block .dark-numbers', $dowloadWrapper).text(speed.size);
+        $('.download.speed-block .light-txt', $dowloadWrapper).text(speed.unit + '/s');
+        $('.download.eta-block .dark-numbers', $dowloadWrapper).safeHTML(secondsToTime(retime, 1));
+        $('.download.eta-block .light-txt', $dowloadWrapper).text('');
 
         if (is_mobile) {
-            $('.mobile.download-speed').text(Math.round(speed.size) + speed.unit + '/s');
+            $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit + '/s');
         }
     }
     if (page !== 'download' || $.infoscroll)
@@ -793,26 +879,47 @@ function start_import() {
         if (fminitialized) {
             importFile();
         }
+        return;
     }
-    else if (u_wasloggedin()) {
-        msgDialog('confirmation', l[1193], l[1194], l[1195], function(e) {
-            if (e) {
-                start_anoimport();
-            }
-            else {
-                tooltiplogin.init();
 
-                mBroadcaster.once('login', function() {
-                    setTimeout(function() {
-                        loadSubPage('fm');
-                    }, 750);
-                });
+    var dialogHeader = l[20751];
+    var dialogTxt = l[20753];
+    var dialogType = 'import_register';
+    var buttonEvent = function() {
+        mega.ui.showRegisterDialog({
+            body: l[20756],
+            showLogin: true,
+            onAccountCreated: function(gotLoggedIn, accountData) {
+                if (gotLoggedIn) {
+                    console.assert(u_type, 'Invalid procedure...');
+                    return start_import();
+                }
+
+                security.register.cacheRegistrationData(accountData);
+                mega.ui.sendSignupLinkDialog(accountData);
             }
         });
+    };
+
+    if (u_wasloggedin()) {
+        dialogTxt = l[20752];
+        dialogType = 'import_login';
+        buttonEvent = function() {
+            mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
+        };
     }
-    else {
-        start_anoimport();
-    }
+
+    msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
+        if (e === true) {
+            buttonEvent();
+        }
+        else if (e === false) {
+            start_anoimport();
+        }
+        else {
+            dl_import = false;
+        }
+    });
 }
 
 function start_anoimport()
@@ -872,7 +979,7 @@ function dlcomplete(dl) {
     else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
     else $('.widget-circle').attr('class','widget-circle percents-0');
     Soon(M.resetUploadDownload);
-    $('.download.scroll-block').removeClass('downloading').addClass('download-complete');
+    $('.download.top-bar').removeClass('downloading').addClass('download-complete');
     fdl_queue_var = false;
 }
 
@@ -966,6 +1073,8 @@ function dlPageCleanup() {
     }
 
     if (dl_node) {
+        $(window).unbind('resize.download-bar');
+        $('.download.top-bar').removeClass('expanded');
         $(window).trigger('video-destroy');
         dl_node = false;
     }

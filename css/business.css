@@ -19,11 +19,6 @@
     position: relative;
     padding: 6px 0 0 8px;
 }
-.default-white-button.individual:before {
-    -webkit-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
-    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
-    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
-}
 .business .bottom-page .top-business-title::after {
     content: '';
     width: 4px;
@@ -38,8 +33,9 @@
 }
 .top-head .default-white-button.individual {
     margin: 4px 0 0 30px;
-    font-size: 14px;
-    font-family: 'source_sans_proregular', Arial;
+}
+.business-info-block {
+    text-align: center;
 }
 /*.business .bottom-page .default-white-button.individual {
     margin: 4px 0 0 30px;

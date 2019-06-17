@@ -206,6 +206,10 @@ html.gbot {
     background-color: #F0F2F5;
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.15);
 }
+.bottom-page.light-grey-top .top-head, .bottom-page.light-grey-top .top-head.floating {
+    background-color: #FAFAFA;
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
+}
 .bottom-page.top-bl {
     max-height: 700px;
     min-height: 455px;
@@ -1192,7 +1196,7 @@ iframe.security-video-container {
     white-space: nowrap;
     position: relative;
 }
-.pages-nav.content-block.floating, .download .pages-nav.content-block.floating {
+.pages-nav.content-block.floating {
     position: fixed;
     top: -119px;
     width: 100%;
@@ -1205,7 +1209,7 @@ iframe.security-video-container {
     transition: top 600ms ease-in-out;
     bottom: auto;
 }
-.pages-nav.content-block.floating.activated, .download .pages-nav.content-block.floating.activated {
+.pages-nav.content-block.floating.activated {
     top: 0;
 }
 .pages-nav.text-content {
@@ -1401,6 +1405,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
     display: inline-block;
     text-align: center;
     white-space: nowrap;
+    font-family: 'source_sans_proregular', Arial;
 }
 body:not(.en) .pages-nav.content-block .button-label, body:not(.en) .pages-nav.content-block .nav-button.active.greyed-out .button-label {
     display: table-cell;
@@ -2404,7 +2409,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 .default-dropdown-item.icon {
     padding: 0 30px 0 34px;
-    background-image: url(../images/mega/download-sprite-v9.png);
+    background-image: url(../images/mega/download-sprite_v10.png);
     background-position: 0 64px;
     background-repeat: no-repeat;
 }

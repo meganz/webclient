@@ -17,10 +17,17 @@ var accountinputs = {
         var $loginForm = $formWrapper.find('form');
         var $inputs = $('.account.input-wrapper input',  $loginForm);
         var $checkbox = $loginForm.find('.account.checkbox-block input');
-        var $button = $loginForm.find('.big-red-button');
+        var $button = $loginForm.find('.button');
+        var $tooltip  = $loginForm.find('.account.input-tooltip');
 
         $loginForm.removeClass('both-incorrect-inputs');
         $inputs.parent().removeClass('incorrect');
+
+        $tooltip.rebind('click.commonevent', function() {
+            $(this).parent().removeClass('incorrect');
+            $loginForm.removeClass('both-incorrect-inputs');
+            $(this).parent().find('input').first().focus();
+        });
 
         $inputs.rebind('click.commonevent', function() {
             $(this).parent().removeClass('incorrect');
@@ -317,7 +324,17 @@ var tooltiplogin = {
             else if (M && M.currentdirid && M.currentdirid.substr(0, 5) === "chat/") {
                 // is a chat link
                 window.location.reload();
-                login_next = false;
+            }
+            else if (page === 'download') {
+                onIdle(function() {
+                    topmenuUI();
+                    tooltiplogin.init(1);
+                    showRegisterSidePane(1);
+
+                    if (dlmanager.isOverQuota) {
+                        dlmanager._onOverquotaDispatchRetry();
+                    }
+                });
             }
             else if (page !== 'login') {
                 page = getSitePath().substr(1);

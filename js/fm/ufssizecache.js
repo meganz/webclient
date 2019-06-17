@@ -104,7 +104,7 @@ UFSSizeCache.prototype.save = function(rootNode) {
         }
     }
 
-    if (d) {
+    if (d > 1) {
         this._cache = this.cache;
     }
     delete this.cache;

@@ -448,7 +448,6 @@
             }
 
             uiCheckboxes($dialog);
-            dialogPositioning($dialog);
             M.safeShowDialog('fileconflict-dialog', $dialog);
 
             return promise;

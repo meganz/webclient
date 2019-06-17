@@ -201,43 +201,59 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             };
             var files = [];
 
-            var addNode = function(node) {
-                if (!node.a && node.k) {
-                    var item = {
-                        t: node.t,
-                        h: node.h,
-                        p: node.p,
-                        n: base64urlencode(to8(M.getSafeName(node.name)))
-                    };
-                    if (!node.t) {
-                        item.s = node.s;
-                        item.ts = node.mtime || node.ts;
-                        item.k = a32_to_base64(node.k);
-                    }
-                    files.push(item);
-                }
+            try {
 
-                if (node.t) {
-                    foreach(M.getNodesSync(node.h, false, false, true));
-                }
-            };
-
-            var foreach = function(nodes) {
-                for (var i = 0; i < nodes.length; i++) {
-                    var node = M.d[nodes[i]];
+                var addNodeToArray = function(arr, node) {
                     if (!node) {
-                        if (nodes[i].h && nodes[i].name) {
-                            node = nodes[i];
-                            addNode(node);
+                        return;
+                    }
+                    if (!node.a && node.k) {
+                        if (!node.t) {
+                            arr.push({
+                                t: node.t,
+                                h: node.h,
+                                p: node.p,
+                                n: base64urlencode(to8(M.getSafeName(node.name))),
+                                s: node.s,
+                                ts: node.mtime || node.ts,
+                                k: a32_to_base64(node.k)
+                            });
+                        }
+                        else {
+                            arr.push({
+                                t: node.t,
+                                h: node.h,
+                                p: node.p,
+                                n: base64urlencode(to8(M.getSafeName(node.name)))
+                            });
                         }
                     }
-                    else {
-                        addNode(node);
+                };
+
+                var recursivelyLoadNodes = function(arr, nodes) {
+                    if (!nodes) {
+                        return;
                     }
-                }
-            };
-            try {
-                foreach(n);
+                    for (var k = 0; k < nodes.length; k++) {
+                        if (typeof nodes[k] === 'string') {
+                            addNodeToArray(files, M.d[nodes[k]]);
+                            if (M.d[nodes[k]].t) {
+                                if (M.c[nodes[k]]) {
+                                    recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k]]));
+                                }
+                            }
+                        }
+                        else { // it's object
+                            addNodeToArray(files, nodes[k]);
+                            if (nodes[k].t) {
+                                recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k].h]));
+                            }
+                        }
+                    }
+                };
+
+                recursivelyLoadNodes(files, n);
+                
             }
             catch (exx) {
                 if (d) {
@@ -742,7 +758,7 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[24];
             break;
         case EOVERQUOTA:
-            errorstr = l[1673];
+            errorstr = l[20666];
             break;
         // case EAGAIN:               errorstr = l[233]; break;
         // case ETEMPUNAVAIL:         errorstr = l[233]; break;
@@ -772,13 +788,14 @@ MegaData.prototype.dlerror = function(dl, error) {
              */
             if (page === 'download') {
                 if (error === EOVERQUOTA) {
-                    $('.download.eta-block span').text('');
+                    $('.download.eta-block .span').text('');
                     $('.download.speed-block span').text('');
-                    $('.download .pause-transfer').addClass('active');
-                    $('.download.file-info').addClass('overquota');
+                    $('.download .pause-transfer').removeClass('hidden').addClass('active')
+                        .find('span').text(l[1649]);
+                    $('.download.top-bar').addClass('overquota');
                 }
                 else {
-                    $('.download.file-info').removeClass('overquota');
+                    $('.download.top-bar').removeClass('overquota');
                 }
             }
             else {
@@ -1928,14 +1945,16 @@ function fm_tfspause(gid, overquota) {
 
         if (page === 'download') {
             if (overquota === true) {
-                setTransferStatus(gid, l[1673]);
-                $('.download.file-info').addClass('overquota');
+                setTransferStatus(gid, l[20666]);
+                $('.download.top-bar').addClass('overquota');
             }
-            $('.download .pause-transfer span').text(l[9118]);
-            $('.download.scroll-block').addClass('paused-transfer');
-            $('.download.eta-block span').text('');
+            $('.download .pause-transfer').removeClass('hidden').addClass('active')
+                .find('span').text(l[1649]);
+            $('.download.top-bar').addClass('paused-transfer');
+            $('.download.eta-block .dark-numbers').text('');
+            $('.download.eta-block .light-txt').text(l[1651]);
             $('.download.speed-block .dark-numbers').text('');
-            $('.download.speed-block .light-txt').text(l[1651]).addClass('small');
+            $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -1971,19 +1990,22 @@ function fm_tfsresume(gid) {
     'use strict';
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
         if (gid[0] === 'u') {
-            ulQueue.resume(gid);
+            mega.tpw.resumeDownloadUpload(mega.tpw.UPLOAD, { id: gid.split('_').pop() });
 
+            ulQueue.resume(gid);
         }
         else {
+            mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: gid.split('_').pop() });
+
             var $tr = $('.transfer-table tr#' + gid);
 
             if (page === 'download'
-                && $('.download.file-info').hasClass('overquota')
+                && $('.download.top-bar').hasClass('overquota')
                 || $tr.find('.transfer-status').hasClass('overquota')) {
 
                 if (page === 'download') {
-                    $('.download .pause-transfer').addClass('active');
-                    $('.download.scroll-block').addClass('paused-transfer');
+                    $('.download .pause-transfer').removeClass('hidden').addClass('active');
+                    $('.download.top-bar').addClass('paused-transfer');
                 }
 
                 if (dlmanager.isOverFreeQuota) {
@@ -1995,9 +2017,9 @@ function fm_tfsresume(gid) {
             dlQueue.resume(gid);
 
             if (page === 'download') {
-                $('.download .pause-transfer span').text(l[9112]);
-                $('.download.scroll-block').removeClass('paused-transfer');
-                $('.download.speed-block .light-txt').text('').removeClass('small');
+                $('.download .pause-transfer').removeClass('active').find('span').text(l[9112]);
+                $('.download.top-bar').removeClass('paused-transfer');
+                $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
             }
             else {
                 $tr.removeClass('transfer-paused');
@@ -2012,6 +2034,7 @@ function fm_tfsresume(gid) {
                 }
             }
         }
+
         if (uldl_hold) {
             dlQueue.resume();
             ulQueue.resume();

@@ -119,6 +119,12 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         if (progress) {
             $('.loader-percents').width(progress + '%');
+
+            if (progress > 99) {
+                onIdle(function() {
+                    loadingInitDialog.step3();
+                });
+            }
         }
         this.progress = true;
     };
@@ -611,9 +617,9 @@ scparser.$add('s', {
                         notify.notifyFromActionPacket({
                             a: 'dshare',
                             n: a.n,
-                            u: a.o,
+                            u: a.u,
                             orig: a.ou,
-                            rece: a.u
+                            rece: a.o
                         });
                     }
                 }
@@ -1983,7 +1989,10 @@ function worker_procmsg(ev) {
                 }
             }
 
-            if (fmdb) {
+            if (ufsc.cache) {
+                ufsc.feednode(ev.data);
+            }
+            else if (fmdb) {
                 fmdb.add('f', {
                     h : ev.data.h,
                     p : ev.data.p,
@@ -1995,10 +2004,6 @@ function worker_procmsg(ev) {
             }
 
             emplacenode(ev.data);
-
-            if (ufsc.cache) {
-                ufsc.feednode(ev.data);
-            }
         }
     }
     else if (ev.data[0] === 'console') {
@@ -2031,8 +2036,10 @@ function worker_procmsg(ev) {
                 }
             }
 
-            loadfm_callback(residualfm);
-            residualfm = false;
+            setTimeout(function() {
+                loadfm_callback(residualfm);
+                residualfm = false;
+            }, 350);
         }
     }
     else {
@@ -2289,6 +2296,13 @@ function dbfetchfm() {
                                 if (fmdb) {
                                     fmdb.crashed = 666;
                                 }
+                            }
+
+                            if (ufsc) {
+                                if (d && $.len(ufsc.cache || {})) {
+                                    console.warn('found non-flushed ufs-cache entries...', [ufsc.cache], ufsc);
+                                }
+                                delete ufsc.cache;
                             }
 
                             // fetch & process new actionpackets

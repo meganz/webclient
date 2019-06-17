@@ -1253,7 +1253,7 @@ var exportExpiry = {
             // set the data-select input value
             var exDate = new Date(lastExpireTime * 1000);
             $('.export-links-dialog .expiry-date-select').datepicker('setDate', exDate);
-            
+
             // $('.export-links-dialog .expiry-date-select').val(time2date(lastExpireTime, 1).replace('\\', '-'));
         }
         else {
@@ -1547,7 +1547,7 @@ var exportExpiry = {
                 return false;
             });
 
-            centerDialog();
+            onIdle(centerDialog);
             return $linksDialog;
         });
 

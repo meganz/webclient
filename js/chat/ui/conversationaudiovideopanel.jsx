@@ -1032,6 +1032,13 @@ var ConversationAudioVideoPanel = React.createClass({
             additionalClass = additionalClass + " participants-a-lot";
         }
 
+        var reconnectingDiv = null;
+        if (chatRoom.callReconnecting === true) {
+            reconnectingDiv = <div className="callReconnecting">
+                    <i className="huge-icon crossed-phone"></i>
+                </div>;
+        }
+
         return <div className={"call-block" + additionalClass} id="call-block">
             <div className={"av-resize-handler ui-resizable-handle ui-resizable-s " + (
                 this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ?
@@ -1041,6 +1048,7 @@ var ConversationAudioVideoPanel = React.createClass({
             {notifBar}
             {networkQualityBar}
             {players}
+            {reconnectingDiv}
 
             {topPanel}
 

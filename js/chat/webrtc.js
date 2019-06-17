@@ -1556,7 +1556,14 @@ RtcModule.prototype._setupCallRecovery = function(call) {
             if (recovery.callid === callid) {
                 delete self.callRecoveries[chatid];
                 fireEvent(recovery.callHandler, self.logger, ['onCallRecoveryTimeout', Term.kErrCallRecoveryFailed]);
-                fireEvent(recovery.callHandler, self.logger, ['onDestroy']);
+                var call = self.calls[chatid];
+                if (call && call.id === callid) {
+                    // recovered call already in progress, we have to terminate it
+                    self.logger.log("Call recovery timed out while recovery call is being set up - destroying call");
+                    call._destroy(Term.kErrCallRecoveryFailed, true);
+                } else {
+                    fireEvent(recovery.callHandler, self.logger, ['onDestroy', Term.kErrCallRecoveryFailed]);
+                }
             }
         }, RtcModule.kCallRecoveryTimeout)
     };

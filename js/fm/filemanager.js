@@ -8,15 +8,15 @@ function FileManager() {
         outshare: Object.create(null)
     };
 
-    this.columnsWidth.cloud.fav = { min: 50, curr: 50 };
-    this.columnsWidth.cloud.fname = { min: 120, curr: /*null*/ 'calc(100% - 823px)' };
-    this.columnsWidth.cloud.label = { min: 70, curr: 70 };
-    this.columnsWidth.cloud.size = { min: 100, curr: 100 };
-    this.columnsWidth.cloud.type = { min: 130, curr: 130 };
-    this.columnsWidth.cloud.timeAd = { min: 130, curr: 130 };
-    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130 };
-    this.columnsWidth.cloud.versions = { min: 120, curr: 120 };
-    this.columnsWidth.cloud.extras = { min: 93, curr: 93 };
+    this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
+    this.columnsWidth.cloud.fname = { min: 120, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
+    this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
+    this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: true };
+    this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
 
 }
 FileManager.prototype.constructor = FileManager;
@@ -2994,18 +2994,40 @@ FileManager.prototype.addGridUI = function(refresh) {
         //console.warn(str);
 
 
-        var headerColumn = '';
-        var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        if ($firstChildTd.length === 0) {
-            // if the first <tr> does not contain any TDs, pick the next one
-            // this can happen when MegaList's prepusher (empty <TR/> is first)
-            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+
+
+        if (M && M.columnsWidth && M.columnsWidth.cloud) {
+            for (var col in M.columnsWidth.cloud) {
+                var $header = $('.files-grid-view.fm .grid-table-header th[megatype="' + col + '"]');
+                if (!$header) {
+                    continue;
+                }
+
+                if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].curr) {
+                    if (typeof M.columnsWidth.cloud[col].curr === 'number') {
+                        if (M.columnsWidth.cloud[col].curr !== $header.outerWidth()) {
+                            $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                        }
+                    }
+                    else {
+                        $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                    }
+                }
+            }
         }
 
-        $firstChildTd.each(function(i, e) {
-            headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
+        //var headerColumn = '';
+        //var $firstChildTd = $('.grid-table tr:first-child td:visible');
+        //if ($firstChildTd.length === 0) {
+        //    // if the first <tr> does not contain any TDs, pick the next one
+        //    // this can happen when MegaList's prepusher (empty <TR/> is first)
+        //    $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        //}
+
+        //$firstChildTd.each(function(i, e) {
+        //    headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
+        //    $(headerColumn).width($(e).width());
+        //});
     };
 
 
@@ -3123,19 +3145,19 @@ FileManager.prototype.addGridUI = function(refresh) {
         $('.grid-url-header').text('');
     // }
 
-    $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
-        // Disable this for Public link page
-        if (M.currentdirid === 'public-links') {
-            return false;
-        }
-        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
-        if (selectionManager) {
-            selectionManager.clear_selection();
-        }
-        $.selected = [];
-        $.hideTopMenu();
-        return !!M.contextMenuUI(e, 6);
-    });
+    // $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
+    //    // Disable this for Public link page
+    //    if (M.currentdirid === 'public-links') {
+    //        return false;
+    //    }
+    //    $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
+    //    if (selectionManager) {
+    //        selectionManager.clear_selection();
+    //    }
+    //    $.selected = [];
+    //    $.hideTopMenu();
+    //    return !!M.contextMenuUI(e, 6);
+    // });
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
         '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content,' +
@@ -3191,6 +3213,29 @@ FileManager.prototype.addGridUI = function(refresh) {
                 }
             }
         }
+    });
+
+    $('.grid-table-header').rebind('contextmenu', function(e) {
+        M.contextMenuUI(e, 7);
+        return false;
+    });
+
+    $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
+        var $me = $(this);
+        if ($me.attr('isviewed')) {
+            $me.removeAttr('isviewed').find('i').removeClass('icons-sprite tiny-grey-tick');
+            M.columnsWidth.cloud[$me.attr('megatype')].viewed = false;
+            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').hide();
+            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').hide();
+
+        }
+        else {
+            $me.attr('isviewed', 'y').find('i').addClass('icons-sprite tiny-grey-tick');
+            M.columnsWidth.cloud[$me.attr('megatype')].viewed = true;
+            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
+            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
+        }
+        return false;
     });
 
     $('.grid-first-th').rebind('click', function() {

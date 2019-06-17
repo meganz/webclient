@@ -675,6 +675,36 @@
 
         },
 
+        setDOMColumnsWidth: function(nodeDOM) {
+            var sectionName = 'cloud';
+            if (this.section !== 'cloud-drive') {
+                sectionName = this.section;
+            }
+            // setting widths
+            if (M && M.columnsWidth && M.columnsWidth[sectionName]) {
+                var knownColumnsWidths = Object.keys(M.columnsWidth[sectionName]) || [];
+                for (var col = 0; col < knownColumnsWidths.length; col++) {
+                    var tCol = nodeDOM.querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
+                    if (tCol) {
+                        if (typeof M.columnsWidth[sectionName][knownColumnsWidths[col]].curr === 'number') {
+                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr + 'px';
+                        }
+                        else {
+                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr || '';
+                        }
+
+                        if (M.columnsWidth[sectionName][knownColumnsWidths[col]].viewed) {
+                            tCol.style.display = "";
+                        }
+                        else {
+                            tCol.style.display = "none";
+                        }
+                    }
+                }
+            }
+        },
+
+
         /**
          * Retrieves a DOM node stored in the `nodeMap`,
          * creating it if it doesn't exists.
@@ -700,21 +730,7 @@
                 this.nodeMap[aHandle] = this.buildDOMNode(aNode, properties, template);
             }
 
-            // setting widths
-            if (M && M.columnsWidth && M.columnsWidth.cloud) {
-                var knownColumnsWidths = Object.keys(M.columnsWidth.cloud) || [];
-                for (var col = 0; col < knownColumnsWidths.length; col++) {
-                    var tCol = this.nodeMap[aHandle].querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
-                    if (tCol) {
-                        if (typeof M.columnsWidth.cloud[knownColumnsWidths[col]].curr === 'number') {
-                            tCol.style.width = M.columnsWidth.cloud[knownColumnsWidths[col]].curr + 'px';
-                        }
-                        else {
-                            tCol.style.width = M.columnsWidth.cloud[knownColumnsWidths[col]].curr || '';
-                        }
-                    }
-                }
-            }
+            this.setDOMColumnsWidth(this.nodeMap[aHandle]);
 
             return this.nodeMap[aHandle];
         },

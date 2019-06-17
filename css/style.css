@@ -15908,7 +15908,7 @@ span.incoming-call-name {
     background-position: -13px -4292px;
     background-repeat: no-repeat;
 }
-.contacts-interation {
+body:not(.de) .contacts-interation {
     text-transform: lowercase;
 }
 .shared-folder-access.read-and-write {

@@ -1455,7 +1455,7 @@ function init_page() {
         pro.proplan.processReturnUrlFromProvider(page);
     }
     else if (page === 'repay') {
-        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
+        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
             var repayPage = new RepayPage();
             repayPage.initPage();
         }

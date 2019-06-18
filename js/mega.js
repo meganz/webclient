@@ -557,7 +557,10 @@ scparser.$helper.c = function(a) {
     if (megaChatIsReady) {
         $.each(a.u, function(k, v) {
             if (v.c !== 0) {
+                // load all keys.
                 crypt.getPubRSA(v.u);
+                crypt.getPubCu25519(v.u);
+                crypt.getPubEd25519(v.u);
             }
             megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
         });

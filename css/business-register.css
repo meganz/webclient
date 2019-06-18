@@ -704,12 +704,12 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	box-sizing: border-box;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-	width: 176px;
+	width: 150px;
 	padding-right: 4px;
 	box-sizing: border-box;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-	width: 72px;
+	width: 100px;
 	padding-right: 12px;
 	box-sizing: border-box;
 }

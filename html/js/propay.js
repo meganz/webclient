@@ -41,8 +41,8 @@ pro.propay = {
             loadSubPage('start');
             return;
         }
-        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
-            loadSubPage('registerb');
+        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            loadSubPage('repay');
             return;
         }
 

@@ -1601,6 +1601,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
             msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
                 .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
             $('.fm-notification-block.grace-business').safeHTML(msg).show();
+            clickURLs();
         }
     }
 };

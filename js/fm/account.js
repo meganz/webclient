@@ -193,7 +193,12 @@ accountUI.general = {
 
         // Upgrade Account Button
         $('.upgrade-to-pro').rebind('click', function() {
-            loadSubPage('pro');
+            if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+                loadSubPage('repay');
+            }
+            else {
+                loadSubPage('pro');
+            }
         });
     },
 

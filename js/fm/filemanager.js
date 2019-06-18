@@ -3235,6 +3235,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
             $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
         }
+        $.hideContextMenu && $.hideContextMenu();
         return false;
     });
 

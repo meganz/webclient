@@ -1451,7 +1451,7 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         });
     }
     else if (businessPlan.pastInvoice && businessPlan.pastInvoice.si) {
-        utcApiCallback(usinessPlan.pastInvoice.si);
+        utcApiCallback(businessPlan.pastInvoice.si);
     }
     else {
         return operationPromise.reject(0, 20, 'Not valid paying(repaying) arguments');

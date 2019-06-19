@@ -2783,8 +2783,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             initFileblocksScrolling2();
         }
     }
-    else if (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID) {
-        //console.error("Inbox iconUI");
+    else if (this.currentdirid !== 'user-management' &&
+        (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
         if (this.v.length > 0) {
             $('.fm-blocks-view.fm').removeClass('hidden');
             initFileblocksScrolling();

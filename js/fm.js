@@ -1415,8 +1415,8 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             $.warningCheckbox = false;
             $('#msgDialog .checkbox-block').removeClass('hidden');
             $('#msgDialog .checkbox-block').rebind('click', function() {
-                var $o = $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input');
-                if ($('#msgDialog .left.checkbox-block input').hasClass('checkboxOff')) {
+                var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
+                if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
                     $o.removeClass('checkboxOff').addClass('checkboxOn');
                     localStorage.skipDelWarning = 1;
                 }

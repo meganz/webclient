@@ -2346,8 +2346,10 @@ function topmenuUI() {
     });
 
     $topHeader.find('.top-search-input').rebind('focus', function () {
-        $topHeader.find('.top-search-button').removeClass('hidden');
-        $topHeader.find('.top-clear-button').addClass('hidden');
+        if ($(this).closest('.top-search-bl').hasClass('active')) {
+            $topHeader.find('.top-search-button').removeClass('hidden');
+            $topHeader.find('.top-clear-button').addClass('hidden');
+        }
     });
 
     $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {

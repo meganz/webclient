@@ -429,9 +429,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 }
             }
         }
-        else {
-            return false;
+        if (M.viewmode) {
+            $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
         }
+
     }
     else if (ll === 3) {// we want just the download menu
         $(menuCMI).hide();

@@ -2881,6 +2881,37 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             $.selected = [];
             $.hideTopMenu();
             return !!M.contextMenuUI(e, 2);
+        });
+
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').rebind('click', function(e) {
+        var sortType;
+        var $me = $(this);
+
+        if ($me.hasClass('sort-size')) {
+            sortType = 'size';
+        }
+        else if ($me.hasClass('sort-name')) {
+            sortType = 'name';
+        }
+        else if ($me.hasClass('sort-label')) {
+            sortType = 'label';
+        }
+        else if ($me.hasClass('sort-type')) {
+            sortType = 'type';
+        }
+        else if ($me.hasClass('sort-timeAd')) {
+            sortType = 'ts';
+        }
+        else if ($me.hasClass('sort-timeMd')) {
+            sortType = 'mtime';
+        }
+        else if ($me.hasClass('sort-fav')) {
+            sortType = 'fav';
+        }
+
+
+        M.doSort(sortType, 1);
+        M.renderMain();
     });
 
     if (this.currentdirid === 'contacts') {
@@ -3234,10 +3265,12 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud[$me.attr('megatype')].viewed = true;
             $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
             $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
+
         }
         $.hideContextMenu && $.hideContextMenu();
         return false;
     });
+
 
     $('.grid-first-th').rebind('click', function() {
         var $el = $(this).children().first();

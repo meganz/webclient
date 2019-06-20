@@ -1518,6 +1518,13 @@ function execsc() {
         delete scq[scqtail++];
         delete a.scqi;
 
+        var idtag = a.i;
+        if (a.i !== requesti && M.scAckQueue[a.i] === requesti) {
+            // An API request triggered locally wanting to get notified when the associated packet is processed.
+            delete M.scAckQueue[a.i];
+            a.i = requesti;
+        }
+
         if (d) {
             console.info('Received SC command "' + a.a + '"' + (a.i === requesti ? ' (triggered locally)' : ''), a);
         }
@@ -1537,8 +1544,7 @@ function execsc() {
         }
 
         if (a.a === 's' || a.a === 's2') {
-            // Make this onIdle to prevent infinite loading.
-            mBroadcaster.sendMessage('share-packet.' + a.n, a);
+            mBroadcaster.sendMessage('share-packet.' + idtag, a);
         }
 
         tickcount++;

@@ -2231,8 +2231,29 @@ if (typeof sjcl !== 'undefined') {
                 var userEmail = elem.userEmail;
                 var selectedNodeHandle = elem.selectedNodeHandle;
                 var handleOrEmail = elem.handleOrEmail;
+                var step = 2;
+                var packet = null;
+                var idtag = mRandomToken('s2');
+                var promise = new MegaPromise();
+                var resolve = function() {
+                    if (!--step) {
+                        if (packet.okd && u_sharekeys[selectedNodeHandle]) {
+                            console.error('The sharekey should have been removed...');
+                        }
+                        promise.resolve(packet);
+                    }
+                };
 
-                promises.push(new MegaPromise());
+                promises.push(promise);
+                M.scAckQueue[idtag] = requesti;
+
+                // Wait for action-packet acknowledge, this is needed so that removing the last user
+                // from a share will issue an `okd` flag which removes the associated sharekey that we
+                // have to wait for *if* we're going to re-share to a different user next...
+                mBroadcaster.once('share-packet.' + idtag, function(a) {
+                    packet = a;
+                    resolve();
+                });
 
                 // The s2 api call can remove both shares and pending shares
                 api_req({
@@ -2240,15 +2261,13 @@ if (typeof sjcl !== 'undefined') {
                     n:  selectedNodeHandle,
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
-                    i: requesti
+                    i: idtag
                 }, {
                     userEmail: userEmail,
                     selectedNodeHandle: selectedNodeHandle,
                     handleOrEmail: handleOrEmail,
-                    promise: promises[promises.length - 1],
 
                     callback : function(res, ctx) {
-                        var promise = ctx.promise;
 
                         if (typeof res === 'object') {
                             // FIXME: examine error codes in res.r, display error
@@ -2269,15 +2288,7 @@ if (typeof sjcl !== 'undefined') {
                                 self.removeFromPermissionQueue(ctx.userEmail);
                             }
 
-                            // Wait for action-packet acknowledge, this is needed so that removing the last user
-                            // from a share will issue an `okd` flag which removes the associated sharekey that we
-                            // have to wait for *if* we're going to re-share to a different user next...
-                            mBroadcaster.once('share-packet.' + ctx.selectedNodeHandle, function(packet) {
-                                if (packet.okd && u_sharekeys[ctx.selectedNodeHandle]) {
-                                    console.error('The sharekey should have been removed...');
-                                }
-                                promise.resolve(packet);
-                            });
+                            resolve();
                         }
                         else {
                             // FIXME: display error to user

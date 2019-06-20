@@ -1565,83 +1565,54 @@ FileUpload.prototype.run = function(done) {
             ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
         }
 
-        file = self = undefined;
+        file = self = false;
         done();
     };
 
-    var readError = function(code) {
-        var errorstr;
-
-        if (code === 0x8052000e) {
-            // File is locked
-            errorstr = l[7399] || l[1517];
+    getFingerprint(file).then(function(result) {
+        if (!(file && self.file)) {
+            ulmanager.logger.info('Fingerprint generation finished, but the upload was canceled meanwhile...');
         }
-        else if (code === 0x80520015) {
+        else if (file.hash === result.hash) {
+            // Retrying.
+            ulmanager.ulStart(this);
+        }
+        else {
+            file.ts = result.ts;
+            file.hash = result.hash;
+            ulmanager.ulSetup(self, file);
+        }
+    }).catch(function(ex) {
+        // TODO: Improve further what error message we do show to the user.
+        var error = ex.name !== 'Error' && ex.name || ex;
+
+        eventlog(99727, JSON.stringify([1, String(error)]));
+
+        if (error === 0x8052000e) {
+            // File is locked
+            error = l[7399];
+        }
+        else if (error === 'SecurityError') {
             // "Access denied"
-            errorstr = l[1667];
+            error = l[1667];
         }
         else {
             // "Read error"
-            errorstr = l[1677];
+            error = l[1677];
         }
 
-        $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
-
-        ulmanager.abort(file);
-        this.destroy();
-    }.bind(this);
-
-    try {
-        if (file.hash && file.ts) {
-            throw "The fingerprint exists already.";
-        }
-        if (!is_extension && file.gecko && !file.size
-                && ua.indexOf('windows') < 0 && parseInt(ua.details.version) < 55) {
-
-            throw new Error('!ZeroByte');
-        }
-
-        fingerprint(file, function(hash, ts) {
-            if (!(file && self.file)) {
-                if (d) {
-                    ulmanager.logger.info('fingerprint', hash, 'UPLOAD CANCELED');
-                }
-                return;
-            }
-            if (hash === 0xBADF) {
-                return readError(ts);
-            }
-            file.hash = hash;
-            file.ts = ts;
-
-            ulmanager.ulSetup(self, file);
-        });
-    }
-    catch (e) {
         if (d) {
-            ulmanager.logger.error('FINGERPRINT ERROR', file.name, file.size, e.message || e);
+            ulmanager.logger.error('FINGERPRINT ERROR ("%s")', error, file.name, file.size, ex.message, [ex]);
         }
 
-        if (!is_extension && e.result === 0x80520015 /* NS_ERROR_FILE_ACCESS_DENIED */ || e.message === '!ZeroByte') {
-            var msg =
-                "Sorry, upload failed. " +
-                "If you were trying to upload a folder, " +
-                "please note you will need to use our extension for this to work.";
+        if (file && self.file) {
+            $('.transfer-table #ul_' + file.id + ' .transfer-status').text(error);
 
-            if (!window['!ZeroByte']) {
-                window['!ZeroByte'] = true;
-                msgDialog('warninga',
-                    str_mtrunc(file.name, 40), msg, l[1677] + ': ' + (e.message || e.name || e));
-            }
-            readError(e.result);
+            var that = self;
+            ulmanager.abort(file);
+            that.destroy();
         }
-        else if (e.result === 0x8052000e /* NS_ERROR_FILE_IS_LOCKED */) {
-            readError(e.result);
-        }
-        else {
-            ulmanager.ulStart(this);
-        }
-    }
+    });
 };
 
 function isQueueActive(q) {

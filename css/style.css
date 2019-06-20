@@ -29763,7 +29763,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-type .transfer-progress-icon {
     display: none;
 }
-.transfer-progress-type.complete .transfer-progress-icon, .transfer-progress-type.error:not(.overquota):not(.almost-overquota) .transfer-progress-icon {
+.transfer-progress-type .status-indicator .transfer-progress-icon.overquota, .transfer-progress-type.complete .transfer-progress-icon.overquota,  .transfer-progress-type.complete .transfer-progress-icon.almost-overquota, .transfer-progress-type.error .transfer-progress-icon.overquota, .transfer-progress-type.error .transfer-progress-icon.almost-overquota {
+    display: none;
+}
+.transfer-progress-type.complete .transfer-progress-icon, .transfer-progress-type.error .transfer-progress-icon {
     display: inline-block;
     vertical-align: top;
     margin-top: 2px;

@@ -5382,7 +5382,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     float: left;
     height: 100%;
     position: relative;
-    z-index: 20;
+    z-index: 21;
 }
 .default-white-button.l-pane-visibility {
     display: none;
@@ -15114,7 +15114,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow:not(.grid-header-star) {
     cursor: pointer;
-    background-position: right top;
+    background-position: right 40px;
     background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     padding: 0 15px 0 0;

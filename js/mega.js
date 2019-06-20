@@ -1989,7 +1989,7 @@ function worker_procmsg(ev) {
                 }
             }
 
-            if (ufsc.cache) {
+            if (ufsc.cache && ev.data.p) {
                 ufsc.feednode(ev.data);
             }
             else if (fmdb) {

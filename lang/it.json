@@ -1132,6 +1132,7 @@
     "8439": "Le app del nostro lato client sono distribuite sotto una licenza modificata e le nostre librerie di base (come le Software Development Kit) sono distribuite sotto delle licenze pi\u00f9 permissive. La licenza di ogni progetto pu\u00f2 essere trovata alla fine del suo codice di repository.",
     "8440": "Puoi trovare i link del nostro pi\u00f9 popolare codice sorgente qui sotto. Puoi trovare le nostre librerie pi\u00f9 piccole sulla [A]nostra pagina generale su GitHub[\/A].Se vuoi usare il nostro codice commercialmente in un modo che va fuori gli scopi della licenza, per favore [A2]contattaci[\/A2] per discuterne.",
     "8441": "Se trovi un bug o un problema di sicurezza nel nostro codice, per favore mandaci un'email a [A]bugs@mega.nz[\/A] spiegando il problema. Abbiamo un servizio di rimborsi per aver trovato vulnerabilit\u00e0 che paga molto bene, e i criteri di invio sono spiegati [A2]qui[\/A2].",
+    "8444": "Abbonati",
     "8512": "Leggi di pi\u00f9",
     "8521": "Avviso di chiusura",
     "8522": "Il\/la tuo\/a %1 condiviso\/a pubblicamente (%2) \u00e8 stato\/a chiuso\/a.",
@@ -3476,8 +3477,11 @@
     "20819": "Non \u00e8 stato possibile scaricare i file come un singolo file ZIP. Questo pu\u00f2 succedere se i file sono stati rimossi.",
     "20820": "Non \u00e8 stato possibile scaricare tutti i file come un singolo file ZIP. Questo pu\u00f2 succedere se alcuni dei file sono stati rimossi. L'operazione \u00e8 terminata con %1 oggetti su %2 scaricati con successo.",
     "20822": "Non accessibile a causa dello status dell'account del proprietario del file.",
-    "20826": "Download MEGA app",
-    "20827": "Continue with browser",
-    "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20826": "Scarica l'app di MEGA",
+    "20827": "Continua tramite browser",
+    "20828": "Imposta un nickname",
+    "20829": "Alias \/ Nickname",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

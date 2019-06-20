@@ -1132,6 +1132,7 @@
     "8439": "C\u00e1c ch\u01b0\u01a1ng tr\u00ecnh v\u00e0 \u1ee9ng d\u1ee5ng c\u1ee7a ch\u00fang t\u00f4i ph\u00e2n ph\u1ed1i \u0111\u1ebfn ng\u01b0\u1eddi d\u00f9ng \u0111\u1ec1u \u0111\u01b0\u1ee3c c\u1ea5p ph\u00e9p d\u01b0\u1edbi t\u00ean MEGA c\u00f9ng v\u1edbi th\u01b0 vi\u1ec7n m\u00e3 ngu\u1ed3n c\u1ed1t l\u00f5i (nh\u01b0 l\u00e0 Software Development Kit). B\u1eb1ng c\u1ea5p ph\u00e9p cho m\u1ed7i d\u1ef1 \u00e1n hay ch\u01b0\u01a1ng tr\u00ecnh \u0111\u1ec1u c\u00f3 th\u1ec3 t\u00ecm th\u1ea5y \u1edf c\u00e1c kho l\u01b0u tr\u1eef m\u00e3 t\u01b0\u01a1ng \u1ee9ng.",
     "8440": "B\u1ea1n c\u00f3 th\u1ec3 t\u00ecm th\u1ea5y c\u00e1c li\u00ean k\u1ebft \u0111\u1ebfn c\u00e1c kho m\u00e3 ngu\u1ed3n ph\u1ed5 bi\u1ebfn nh\u1ea5t c\u1ee7a ch\u00fang t\u00f4i \u0111\u1ec1u \u0111\u01b0\u1ee3c li\u1ec7t k\u00ea d\u01b0\u1edbi \u0111\u00e2y. V\u1edbi th\u01b0 vi\u1ec7n nh\u1ecf c\u1ee7a ch\u00fang t\u00f4i, b\u1ea1n c\u00f3 th\u1ec3 t\u00ecm th\u1ea5y \u1edf trang [A]GitHub[\/A]. N\u1ebfu b\u1ea1n mu\u1ed1n s\u1eed d\u1ee5ng m\u00e3 ngu\u1ed3n c\u1ee7a ch\u00fang t\u00f4i v\u1edbi m\u1ee5c \u0111\u00edch th\u01b0\u01a1ng m\u1ea1i h\u01a1n n\u1eefa, xin vui l\u00f2ng [A2]li\u00ean h\u1ec7 v\u1edbi ch\u00fang t\u00f4i[\/A2] \u0111\u1ec3 b\u00e0n lu\u1eadn th\u00eam.",
     "8441": "N\u1ebfu b\u1ea1n ph\u00e1t hi\u1ec7n ra m\u1ed9t l\u1ed7i b\u00e0o m\u1eadt trong b\u1ed9 m\u00e3 c\u1ee7a ch\u00fang t\u00f4i, xin g\u1eedi m\u1ed9t email t\u1edbi [A]bugs@mega.nz[\/A] v\u00e0 gi\u1ea3i th\u00edch m\u00f4 t\u1ea3 l\u1ed7i. Ch\u00fang t\u00f4i s\u1ebd chi tr\u1ea3 x\u1ee9ng \u0111\u00e1ng cho b\u1ea5t k\u1ef3 t\u00ecm ra \u0111\u01b0\u1ee3c l\u1ed7 h\u1ed5ng b\u1ea3o m\u1eadt v\u00e0 c\u00e1c ti\u00eau chu\u1ea9n c\u00f3 th\u1ec3 t\u00ecm th\u1ea5y [A2]\u1edf \u0111\u00e2y[\/A2].",
+    "8444": "\u0110\u0103ng k\u00fd",
     "8512": "\u0110\u1ecdc th\u00eam",
     "8521": "Th\u00f4ng b\u00e1o tranh ch\u1ea5p",
     "8522": "M\u1ed9t %1 c\u1ee7a b\u1ea1n (t\u00ean %2) \u0111\u00e3 b\u1ecb th\u00e1o b\u1ecf do vi ph\u1ea1m b\u1ea3n quy\u1ec1n.",
@@ -3479,5 +3480,8 @@
     "20826": "Download MEGA app",
     "20827": "Continue with browser",
     "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20829": "Alias \/ Nickname",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

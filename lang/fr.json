@@ -1132,6 +1132,7 @@
     "8439": "Nos applis c\u00f4t\u00e9 client sont munies d\u2019une licence personnalis\u00e9e et nos biblioth\u00e8ques de base (telles que la trousse de d\u00e9veloppement logiciel) sont munies de licences plus permissives. Les licences des diff\u00e9rents projets se trouvent dans les d\u00e9p\u00f4ts de code respectifs.",
     "8440": "Vous trouverez ci-dessous des liens vers nos d\u00e9p\u00f4ts de code source les plus populaires. Vous trouverez nos plus petites biblioth\u00e8ques sur [A]notre page GitHub[\/A]. Si vous souhaitez utiliser notre code pour un usage commercial qui d\u00e9passe le cadre de ces licences, veuillez [A2]nous contacter[\/A2] pour en discuter.",
     "8441": "Si vous trouvez un bogue ou une vuln\u00e9rabilit\u00e9 informatique dans notre code, veuillez envoyer un courriel \u00e0 [A]bugs@mega.nz[\/A] en expliquant le probl\u00e8me. Notre programme de signalement des vuln\u00e9rabilit\u00e9s est bien r\u00e9tribu\u00e9 et ses crit\u00e8res d\u2019admissibilit\u00e9 sont expliqu\u00e9s [A2]ici[\/A2].",
+    "8444": "S'abonner",
     "8512": "Lire davantage",
     "8521": "Avis de retrait",
     "8522": "Votre partage public %1 (%2) a \u00e9t\u00e9 retir\u00e9.",
@@ -3476,8 +3477,11 @@
     "20819": "Aucun des fichiers n\u2019a pu \u00eatre t\u00e9l\u00e9charg\u00e9 en tant que fichier ZIP. Cela peut arriver si les fichiers ont \u00e9t\u00e9 retir\u00e9s.",
     "20820": "Les fichiers n\u2019ont pas tous pu \u00eatre t\u00e9l\u00e9charg\u00e9s en tant que fichier ZIP. Cela peut arriver si certains des fichiers ont \u00e9t\u00e9 retir\u00e9s. L\u2019op\u00e9ration s\u2019est termin\u00e9e avec %1 \u00e9l\u00e9ments sur %2 t\u00e9l\u00e9charg\u00e9s avec succ\u00e8s.",
     "20822": "Inaccessible en raison de l\u2019\u00e9tat du compte du propri\u00e9taire du fichier.",
-    "20826": "Download MEGA app",
-    "20827": "Continue with browser",
-    "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20826": "T\u00e9l\u00e9charger l\u2019appli MEGA",
+    "20827": "Poursuivre dans le navigateur",
+    "20828": "D\u00e9finir un pseudonyme",
+    "20829": "Alias\/pseudonyme",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

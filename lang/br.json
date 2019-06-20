@@ -1132,6 +1132,7 @@
     "8439": "Os nossos aplicativos est\u00e3o protegidos sob uma licen\u00e7a personalizada, e as nossas bibliotecas centrais (tais como o Kit de desenvolvimento de software) est\u00e3o autorizadas sob licen\u00e7as mais permissivas. As licen\u00e7as para cada projeto podem ser encontradas nos respectivos reposit\u00f3rios de c\u00f3digo.",
     "8440": "Veja abaixo os links para os nossos reposit\u00f3rios de c\u00f3digo-fonte mais populares. Os links para as nossas bibliotecas menores est\u00e3o [A]na nossa p\u00e1gina geral do GitHub[\/A]. Se voc\u00ea quiser usar o nosso c\u00f3digo comercialmente de uma forma que estiver fora do \u00e2mbito destas licen\u00e7as, por favor, [A2]entre em contato conosco[\/A2] para discuti-lo.",
     "8441": "Se voc\u00ea encontrar um bug ou uma falha de seguran\u00e7a no nosso c\u00f3digo, por favor, escreva explicando o problema a [A]bugs@mega.nz[\/A]. N\u00f3s temos um \u00f3timo programa de recompensas cujos detalhes podem ser vistos [A2]aqui[\/A2].",
+    "8444": "Assinar",
     "8512": "Leia mais",
     "8521": "Aviso de remo\u00e7\u00e3o",
     "8522": "O(a) %1 (%2) compartilhado publicamente foi removido(a).",
@@ -3042,7 +3043,7 @@
     "20140": "N\u00e3o h\u00e1 hist\u00f3rico",
     "20141": "Atividades recentes",
     "20145": "A sua Nuvem de arquivos est\u00e1 cheia. Fa\u00e7a o upgrade a PRO e obtenha at\u00e9 8 TB de espa\u00e7o de armazenamento e 16 TB de cota de transfer\u00eancia.",
-    "20152": "N\u00e3o h\u00e1 atividades recentes",
+    "20152": "N\u00e3o h\u00e1 atividade recente",
     "20153": "O plano PRO expira em",
     "20154": "A assinatura ser\u00e1 renovada em",
     "20162": "O arquivo est\u00e1 bloqueado ou \u00e9 ileg\u00edvel",
@@ -3476,8 +3477,11 @@
     "20819": "N\u00e3o foi poss\u00edvel fazer o download de nenhum dos arquivos como ZIP. Isso pode acontecer se os arquivos tiverem sido removidos.",
     "20820": "N\u00e3o foi poss\u00edvel fazer o download de todos os arquivos como ZIP. Isso pode acontecer se alguns arquivos tiverem sido removidos. Foi feito o download de %1 de %2 itens.",
     "20822": "N\u00e3o acess\u00edvel devido ao status da conta do propriet\u00e1rio do arquivo.",
-    "20826": "Download MEGA app",
-    "20827": "Continue with browser",
-    "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20826": "Fa\u00e7a o download do aplicativo do MEGA",
+    "20827": "Continuar com o navegador",
+    "20828": "Definir apelido",
+    "20829": "Apelido",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

@@ -1132,6 +1132,7 @@
     "8439": "Our client side apps are licensed under a custom licence and our core libraries (such as the Software Development Kit) are licensed under more permissive licences. The licence for each project can be found in the respective code repositories.",
     "8440": "You can find links to our most popular source code repositories below. For our smaller libraries you can find them on [A]our general GitHub page[\/A]. If you would like to use our code commercially in a way which is outside the scope of these licences, please [A2]contact us[\/A2] to discuss.",
     "8441": "If you find a bug or security flaw in our code, please send an email to [A]bugs@mega.nz[\/A] explaining the problem. We have a well paying vulnerability rewards program and the submission criteria is explained [A2]here[\/A2].",
+    "8444": "El\u0151fizet\u00e9s",
     "8512": "Olvas\u00e1s tov\u00e1bb",
     "8521": "Takedown notice",
     "8522": "Your publicly shared %1 (%2) has been taken down.",
@@ -3479,5 +3480,8 @@
     "20826": "Download MEGA app",
     "20827": "Continue with browser",
     "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20829": "Alias \/ Nickname",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

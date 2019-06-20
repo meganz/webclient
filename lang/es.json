@@ -1132,6 +1132,7 @@
     "8439": "Nuestras aplicaciones cliente est\u00e1n autorizadas por una licencia personalizada y nuestras librer\u00edas principales (como el Kit de desarrollo de software) tienen una licencia m\u00e1s permisiva. La licencia para cada proyecto puede encontrarse en su repositorio de c\u00f3digo correspondiente.",
     "8440": "A continuaci\u00f3n encontrar\u00e1s varios enlaces a nuestros repositorios de c\u00f3digo fuente m\u00e1s conocidos. Puedes encontrar las librer\u00edas m\u00e1s peque\u00f1as en [A]nuestra p\u00e1gina general de GitHub[\/A]. Si quieres utilizar nuestro c\u00f3digo de forma comercial, no incluida en estas licencias, por favor [A2]contacta con nosotros[\/A2] para discutirlo.",
     "8441": "Si encuentras un bug o fallo de seguridad en nuestro c\u00f3digo, por favor env\u00eda un email a [A]bugs@mega.nz[\/A] explic\u00e1ndonos el problema. Tenemos un programa de premios por vulnerabilidades bien pagado y el criterio de env\u00edo est\u00e1 explicado [A2]aqu\u00ed[\/A2].",
+    "8444": "Hazte PRO",
     "8512": "Leer m\u00e1s",
     "8521": "Notificaci\u00f3n y retirada",
     "8522": "Tu  %1 (%2) que has compartido p\u00fablicamente ha sido eliminado\/a.",
@@ -3479,5 +3480,8 @@
     "20826": "Download MEGA app",
     "20827": "Continue with browser",
     "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20829": "Alias \/ Nickname",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

@@ -1132,6 +1132,7 @@
     "8439": "Nasze aplikacje oparte s\u0105 o w\u0142asne licencje, a g\u0142\u00f3wna biblioteka aplikacji (tj. SDK) s\u0105 na bardziej dost\u0119pnych licencjach. Lista dost\u0119pnych licencji umieszczona jest w odpowiednich repozytoriach.",
     "8440": "Poni\u017cej znajdziesz linki do repozytori\u00f3w najbardziej popularnych element\u00f3w naszych aplikacji. Mniejsze elementy znajdziesz [A]na stronie g\u0142\u00f3wnej GitHub[\/A]. Je\u017celi chcia\u0142by\u015b u\u017cywa\u0107\u00a0naszego kodu komerycjnie prosimy o [A2]kontakt z nami[\/A2] w celu om\u00f3wienia zasad.",
     "8441": "Je\u017celi znajdziesz b\u0142\u0105d lub dziur\u0119 w naszym oprogramowaniu, prosimy o przes\u0142anie do nas maila na [A]bugs@mega.nz[\/A] z opisem problemu. Dla dobrze opisanych problem\u00f3w spe\u0142niaj\u0105ych kryteria opisane [A2]tutaj[\/A2] mamy gratyfikacje pieni\u0119\u017cne.",
+    "8444": "Subskrybuj",
     "8512": "Wi\u0119cej",
     "8521": "Pro\u015bba o zablokowanie tre\u015bci",
     "8522": "Tw\u00f3j udost\u0119pniony publicznie katalog  %1 (%2) zosta\u0142 zablokowany.",
@@ -3476,8 +3477,11 @@
     "20819": "\u017baden z plik\u00f3w nie m\u00f3g\u0142 zosta\u0107 pobrany jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli pliki zostan\u0105 usuni\u0119te.",
     "20820": "Nie wszystkie pliki mo\u017cna pobra\u0107 jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli niekt\u00f3re pliki zostan\u0105 usuni\u0119te. Operacja zako\u0144czy\u0142a si\u0119, gdy %1 z %2 element\u00f3w zosta\u0142o pomy\u015blnie pobranych.",
     "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku.",
-    "20826": "Download MEGA app",
-    "20827": "Continue with browser",
-    "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20826": "Pobierz aplikacj\u0119 MEGA",
+    "20827": "Kontynuuj w przegl\u0105darce",
+    "20828": "Ustaw pseudonim",
+    "20829": "Alias \/ pseudonim",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

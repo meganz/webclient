@@ -1132,6 +1132,7 @@
     "8439": "Client side apps kami dilisensikan dengan custom license dan libraries utama (seperti Software Development Kit) dilisensikan dengan lisensi yang lebih ringan. Lisensi untuk setiap proyek dapat ditemukan pada masing masing code repositories.",
     "8440": "Anda dapat menemukan link ke source code repositories kami yang paling popular dibawah. Untuk libraries yang lebih kecil anda dapat menemukannya di [A]halaman GitHub kami[\/A]. Jika anda ingin menggunakan program kami secara komersial yang mana diluar cakupan dari lisensi ini, harap [A2]hubungi kami[\/A2] untuk diskusi.",
     "8441": "Jika anda menemukan bug atau flaw keamanan pada program kami, harap kirim email ke [A]bugs@mega.nz[\/A] dan jelaskan permasalahannya. Kami memiliki program rewards yang membayar dengan baik untuk yang menemukan celah dan kriteria pengajuan dijelaskan [A2]disini[\/A2].",
+    "8444": "Subscribe",
     "8512": "Selengkapnya",
     "8521": "Pemberitahuan pencopotan",
     "8522": "Anda punya %1 (%2) telah dicopot.",
@@ -3479,5 +3480,8 @@
     "20826": "Download MEGA app",
     "20827": "Continue with browser",
     "20828": "Set Nickname",
-    "20829": "Alias \/ Nickname"
+    "20829": "Alias \/ Nickname",
+    "20831": "You have successfully unsubscribed",
+    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
+    "20833": "Did you unsubscribe by mistake?"
 }

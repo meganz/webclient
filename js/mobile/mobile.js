@@ -632,8 +632,8 @@ function closeDialog() {
     }
 
     fm_hideoverlay();
-    $('.fm-dialog').trigger('dialog-closed').addClass('hidden');
-    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    $('.fm-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
 
     delete $.dialog;
     mBroadcaster.sendMessage('closedialog');

@@ -4432,7 +4432,7 @@ FileManager.prototype.getLinkAction = function() {
                 }
 
                 if ($dialog) {
-                    if (!$dialog.hasClass('fm-dialog')) {
+                    if (!$dialog.hasClass('fm-dialog') && !$dialog.hasClass('fm-dialog-mobile')) {
                         throw new Error('Unexpected dialog type...');
                     }
 
@@ -4443,11 +4443,13 @@ FileManager.prototype.getLinkAction = function() {
                     fm_showoverlay();
                     $dialog.removeClass('hidden arrange-to-back');
 
-                    // Center dialogs
-                    $dialog.css({
-                        'margin-left': -1 * ($dialog.outerWidth() / 2),
-                        'margin-top': -1 * ($dialog.outerHeight() / 2)
-                    });
+                    if (!is_mobile) {
+                        // Center dialogs
+                        $dialog.css({
+                            'margin-left': -1 * ($dialog.outerWidth() / 2),
+                            'margin-top': -1 * ($dialog.outerHeight() / 2)
+                        });
+                    }
                 }
                 $.dialog = String(name);
             }, function(ex) {

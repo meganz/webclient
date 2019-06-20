@@ -536,7 +536,6 @@
     "1498": "\u0110ang x\u1eed l\u00fd t\u1ec7p tin",
     "1513": "\u0110\u1ecba ch\u1ec9 email kh\u00f4ng ph\u00f9 h\u1ee3p",
     "1514": "L\u1ed7i k\u1ebft n\u1ed1i m\u1ea1ng, xin th\u1eed l\u1ea1i sau",
-    "1517": "Ch\u1ee7 s\u1edf h\u1eefu t\u1ec7p n\u00e0y \u0111\u00e3 b\u1ecb ch\u1eb7n",
     "1523": "Ch\u1ecdn",
     "1565": "Tho\u1ea1i",
     "1566": "Video",
@@ -3241,5 +3240,7 @@
     "20818": "The file could not be downloaded as a ZIP file. This can happen if the file was taken down.",
     "20819": "None of the files were able to be downloaded as a ZIP file. This can happen if the files were taken down.",
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
-    "20822": "Not accessible due to the account status of the file owner."
+    "20822": "Not accessible due to the account status of the file owner.",
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

@@ -536,7 +536,6 @@
     "1498": "Przetwarzanie pliku",
     "1513": "Niepoprawny adres email",
     "1514": "Problemy z po\u0142\u0105czeniem do sieci, spr\u00f3buj ponownie",
-    "1517": "W\u0142a\u015bciciel tego pliku zosta\u0142 zablokowany",
     "1523": "Wybierz",
     "1565": "Dzwi\u0119k",
     "1566": "Film",
@@ -2843,7 +2842,7 @@
     "20140": "Brak historii",
     "20141": "Niedawne",
     "20145": "Cloud Drive jest pe\u0142ny. Uaktualnij do PRO i uzyskaj do 8 TB pami\u0119ci masowej i 16 TB limitu transferu.",
-    "20152": "Brak ostatniej aktywno\u015bci",
+    "20152": "Brak aktywno\u015bci",
     "20153": "Plan PRO wygasa w",
     "20154": "Subskrypcja odnawia si\u0119 w",
     "20164": "Avatar",
@@ -3241,5 +3240,7 @@
     "20818": "Plik nie mo\u017ce zosta\u0107 pobrany jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, gdy plik zostanie usuni\u0119ty.",
     "20819": "\u017baden z plik\u00f3w nie m\u00f3g\u0142 zosta\u0107 pobrany jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli pliki zostan\u0105 usuni\u0119te.",
     "20820": "Nie wszystkie pliki mo\u017cna pobra\u0107 jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli niekt\u00f3re pliki zostan\u0105 usuni\u0119te. Operacja zako\u0144czy\u0142a si\u0119, gdy %1 z %2 element\u00f3w zosta\u0142o pomy\u015blnie pobranych.",
-    "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku."
+    "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku.",
+    "20826": "Pobierz aplikacj\u0119 MEGA",
+    "20827": "Kontynuuj w przegl\u0105darce"
 }

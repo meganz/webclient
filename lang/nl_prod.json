@@ -536,7 +536,6 @@
     "1498": "Bestand verwerken",
     "1513": "Ongeldig e-mailadres",
     "1514": "Probleem met netwerk verbinding, probeer later opnieuw",
-    "1517": "Eigenaar van dit bestand is geblokkeerd",
     "1523": "Selecteer",
     "1565": "Audio",
     "1566": "Video",
@@ -2843,7 +2842,7 @@
     "20140": "Geen geschiedenis",
     "20141": "Recent",
     "20145": "Cloud Schijf is vol. Upgrade naar PRO en krijg tot 8 TB aan opslag en 16 TB aan overdracht tegoed.",
-    "20152": "Geen recente activiteit",
+    "20152": "Geen Recente Activiteit",
     "20153": "PRO Abonnement Verloopt Op",
     "20154": "Abonnement Vernieuwd Op",
     "20164": "Profiel",
@@ -3241,5 +3240,7 @@
     "20818": "Het bestand kon niet gedownload worden als een ZIP bestand. Dit kan gebeuren als het bestand was neergehaald.",
     "20819": "Geen van de bestanden kon worden gedownload als een ZIP-bestand. Dit kan gebeuren als de bestanden zijn neergehaald.",
     "20820": "Niet alle bestanden konden worden gedownload als ZIP bestand. Dit kan gebeuren als sommige bestanden waren neergehaald. De bewerking is voltooid met %1 van %2 items die met succes zijn gedownload.",
-    "20822": "Niet toegankelijk door de accountstatus van de bestandseigenaar."
+    "20822": "Niet toegankelijk door de accountstatus van de bestandseigenaar.",
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

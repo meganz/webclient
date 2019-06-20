@@ -536,7 +536,6 @@
     "1498": "Processando arquivo",
     "1513": "Endere\u00e7o de e-mail inv\u00e1lido",
     "1514": "Erro na conex\u00e3o, por favor tente novamente mais tarde",
-    "1517": "Propriet\u00e1rio deste arquivo est\u00e1 bloqueado",
     "1523": "Selecionar",
     "1565": "\u00c1udio",
     "1566": "V\u00eddeo",
@@ -2843,7 +2842,7 @@
     "20140": "N\u00e3o h\u00e1 hist\u00f3rico",
     "20141": "Atividades recentes",
     "20145": "A sua Nuvem de arquivos est\u00e1 cheia. Fa\u00e7a o upgrade a PRO e obtenha at\u00e9 8 TB de espa\u00e7o de armazenamento e 16 TB de cota de transfer\u00eancia.",
-    "20152": "N\u00e3o h\u00e1 atividades recentes",
+    "20152": "N\u00e3o h\u00e1 atividade recente",
     "20153": "O plano PRO expira em",
     "20154": "A assinatura ser\u00e1 renovada em",
     "20164": "Avatar",
@@ -3241,5 +3240,7 @@
     "20818": "N\u00e3o foi poss\u00edvel fazer o download do arquivo como ZIP. Isso pode acontecer se o arquivo tiver sido removido.",
     "20819": "N\u00e3o foi poss\u00edvel fazer o download de nenhum dos arquivos como ZIP. Isso pode acontecer se os arquivos tiverem sido removidos.",
     "20820": "N\u00e3o foi poss\u00edvel fazer o download de todos os arquivos como ZIP. Isso pode acontecer se alguns arquivos tiverem sido removidos. Foi feito o download de %1 de %2 itens.",
-    "20822": "N\u00e3o acess\u00edvel devido ao status da conta do propriet\u00e1rio do arquivo."
+    "20822": "N\u00e3o acess\u00edvel devido ao status da conta do propriet\u00e1rio do arquivo.",
+    "20826": "Fa\u00e7a o download do aplicativo do MEGA",
+    "20827": "Continuar com o navegador"
 }

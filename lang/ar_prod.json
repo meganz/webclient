@@ -536,7 +536,6 @@
     "1498": "\u062c\u0627\u0631\u064a \u0645\u0639\u0627\u0644\u062c\u0629 \u0627\u0644\u0645\u0644\u0641",
     "1513": "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0628\u0631\u064a\u062f \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u063a\u064a\u0631 \u0635\u062d\u064a\u062d",
     "1514": "\u0645\u0634\u0643\u0644\u0629 \u0627\u062a\u0635\u0627\u0644 \u0628\u0627\u0644\u0634\u0628\u0643\u0629\u060c \u064a\u0631\u062c\u0649 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062e\u0631\u0649 \u0641\u064a \u0648\u0642\u062a \u0644\u0627\u062d\u0642",
-    "1517": "\u062a\u0645 \u062d\u0638\u0631 \u0635\u0627\u062d\u0628 \u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641",
     "1523": "\u062a\u062d\u062f\u064a\u062f",
     "1565": "\u0635\u0648\u062a\u064a",
     "1566": "\u0641\u064a\u062f\u064a\u0648",
@@ -3241,5 +3240,7 @@
     "20818": "The file could not be downloaded as a ZIP file. This can happen if the file was taken down.",
     "20819": "None of the files were able to be downloaded as a ZIP file. This can happen if the files were taken down.",
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
-    "20822": "Not accessible due to the account status of the file owner."
+    "20822": "Not accessible due to the account status of the file owner.",
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

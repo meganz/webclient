@@ -536,7 +536,6 @@
     "1498": "File in elaborazione",
     "1513": "Indirizzo email non valido",
     "1514": "Problema di connessione di rete, riprova pi\u00f9 tardi",
-    "1517": "Il proprietario di questo file \u00e8 bloccato",
     "1523": "Seleziona",
     "1565": "Audio",
     "1566": "Video",
@@ -3241,5 +3240,7 @@
     "20818": "Non \u00e8 stato possibile scaricare il file come un file ZIP. Questo pu\u00f2 succedere se il file \u00e8 stato rimosso.",
     "20819": "Non \u00e8 stato possibile scaricare i file come un singolo file ZIP. Questo pu\u00f2 succedere se i file sono stati rimossi.",
     "20820": "Non \u00e8 stato possibile scaricare tutti i file come un singolo file ZIP. Questo pu\u00f2 succedere se alcuni dei file sono stati rimossi. L'operazione \u00e8 terminata con %1 oggetti su %2 scaricati con successo.",
-    "20822": "Non accessibile a causa dello status dell'account del proprietario del file."
+    "20822": "Non accessibile a causa dello status dell'account del proprietario del file.",
+    "20826": "Scarica l'app di MEGA",
+    "20827": "Continua tramite browser"
 }

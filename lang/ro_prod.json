@@ -536,7 +536,6 @@
     "1498": "Se proceseaz\u0103 fi\u0219ierul",
     "1513": "Adres\u0103 de e-mail nevalid\u0103",
     "1514": "Problem\u0103 cu conexiunea de re\u021bea, te rug\u0103m s\u0103 re\u00eencerci mai t\u00e2rziu",
-    "1517": "Proprietarul acestui cont este blocat",
     "1523": "Selecteaz\u0103",
     "1565": "Audio",
     "1566": "Video",
@@ -3241,5 +3240,7 @@
     "20818": "The file could not be downloaded as a ZIP file. This can happen if the file was taken down.",
     "20819": "None of the files were able to be downloaded as a ZIP file. This can happen if the files were taken down.",
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
-    "20822": "Not accessible due to the account status of the file owner."
+    "20822": "Not accessible due to the account status of the file owner.",
+    "20826": "Download MEGA app",
+    "20827": "Continue with browser"
 }

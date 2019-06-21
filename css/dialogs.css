@@ -1277,7 +1277,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     padding-left: 96px;
 }
 .achieved-block.invitees .new-dialog-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -22px -12279px;
     background-size: 48px auto;
@@ -1394,7 +1394,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     height: 112px;
 }
 .achievements-cell .medium-icon.remind-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -22px -12374px;
     background-size: 48px auto;
@@ -1917,12 +1917,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -1992,7 +1992,7 @@ li.token-input-token-invite .input-close {
     margin-top: 12px;
 }
 .create-folder-size-icon, .add-user-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -2048,7 +2048,7 @@ li.token-input-token-invite .input-close {
     position: absolute;
     width: 19px;
     height: 18px;
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v10.png);
     background-repeat: no-repeat;
     background-position: -14px -10610px;
     right: 6px;

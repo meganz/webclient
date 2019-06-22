@@ -1169,6 +1169,9 @@
     background-position: -1px -147px;
     margin-left: -1px;
 }
+.small-icon.context.sortgrid {
+    background-position: -1px -111px;
+}
 .small-icon.context.handset {
     background-position: -1px -333px;
 }

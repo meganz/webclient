@@ -10403,8 +10403,9 @@ span.orange {
     background-repeat: no-repeat;
 }
 .dropdown-item.sort-grid-item.selected i {
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 3px -2394px;
+    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-position: -1px -1546px;
+    background-size: 262px auto;
     background-repeat: no-repeat;
 }
 .dropdown-item.do-sort.selected:hover i {

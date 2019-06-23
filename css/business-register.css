@@ -192,6 +192,7 @@
 	-webkit-box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
 	-moz-box-shadow: 0 0 0 rgba(0,191,165, 0.5);
 	box-shadow: 0 0 0 1px rgba(0,191,165, 0.5);
+	border: 1px solid rgba(0,191,165, 1);
 }
 .bus-reg-body .bus-reg-radio::before, .card-container.bus-repay .bus-reg-radio::before {
 	width:12px;
@@ -204,9 +205,6 @@
 	left: 2px;
 	top: 2px;
 	content: " ";
-	-webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	-moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
 }
 .bus-reg-body .bus-reg-radio.checkOn::before, .card-container.bus-repay .bus-reg-radio.checkOn::before {
 	background: rgb(0,191,165);
@@ -700,7 +698,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:first-child, .bus-reg-plan.repay .repay-breakdown-tb tr td:first-child {
 	width: 90px;
-	padding: 0 8px 0 12px;
+	padding: 12px 8px 8px 12px;
 	box-sizing: border-box;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {

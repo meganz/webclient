@@ -140,15 +140,30 @@ function addNewContact($addButton, cd) {
 
             mailNum = $mails.length;
 
+            // temp array to hold emails of current contacts to exclude from inviting.
+            // note: didn't use "getContactsEMails()" to optimize memory usage, since the returned array
+            // there is bigger (contains: email, name, handle, type)
+
+            var currentContactsEmails = [];
+
+            M.u.forEach(function(contact) {
+                // Active contacts with email set
+                if (contact.c === 1 && contact.m) {
+                    currentContactsEmails.push(contact.m);
+                }
+            });
+
             if (mailNum) {
                 // Loop through new email list
                 $mails.each(function(index, value) {
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    // if invitation is sent, push as added Emails.
-                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
-                        addedEmails.push(res);
-                    }));
+                    if (currentContactsEmails.indexOf(email) === -1) {
+                        // if invitation is sent, push as added Emails.
+                        promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                            addedEmails.push(res);
+                        }));
+                    }
                 });
             }
 
@@ -2211,6 +2226,8 @@ function initShareDialog() {
      */
     $('.dialog-share-button', $dialog).rebind('click', function(e) {
         e.stopPropagation();
+        // since addNewContact goes by itself and fetch data from HTML. we cant intercept exited
+        // contacts here.
         addNewContact($(this), false).done(function() {
             var share = new mega.Share();
             share.updateNodeShares().always(function() {

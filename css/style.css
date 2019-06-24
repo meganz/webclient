@@ -2213,8 +2213,8 @@ a.nt-settings-button:hover span {
     height: 100%;
 }
 .fm-tree-panel .jspVerticalBar {
-    right: 3px;
-    width: 8px;
+    right: 11px;
+    width: 0px;
 }
 .jspHorizontalBar {
     position: absolute;
@@ -3620,6 +3620,7 @@ label.iPhoneCheckLabelOff span {
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+    width: 0px;
 }
 .fm-tree-panel:hover .jspTrack {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

@@ -8831,7 +8831,7 @@ React.makeElement = React['createElement'];
 	            self.props.buttons.forEach(function (v) {
 	                buttons.push(React.makeElement(
 	                    "a",
-	                    { href: "javascript:;",
+	                    {
 	                        className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
 	                        onClick: function onClick(e) {
 	                            if ($(e.target).is(".disabled")) {

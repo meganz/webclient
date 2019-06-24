@@ -19,7 +19,6 @@ var ChatHandleMessage = React.createClass({
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
-        var name = "";
 
 
         var datetime = <div className="message date-time"
@@ -41,7 +40,6 @@ var ChatHandleMessage = React.createClass({
             avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time"
                             title={time2date(timestampInt)}>{timestamp}</div>;
-            name = <div className="message user-card-name">{displayName}</div>;
         }
 
 

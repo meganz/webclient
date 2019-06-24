@@ -12,15 +12,32 @@ var ConversationMessageMixin = {
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
         var contact = self.getContact();
+        var changedCb = function(contact, oldData, k, v) {
+            if (k === "ts") {
+                // no updates needed in case of 'ts' change
+                // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
+                return;
+            }
+            self.debouncedForceUpdate();
+        };
+
         if (contact && contact.addChangeListener && !self._contactChangeListener) {
-            self._contactChangeListener = contact.addChangeListener(function(contact, oldData, k, v) {
-                if (k === "ts") {
-                    // no updates needed in case of 'ts' change
-                    // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
-                    return;
+            self._contactChangeListener = contact.addChangeListener(changedCb);
+        }
+        if (self.haveMoreContactListeners) {
+            if (!self._contactChangeListeners) {
+                self._contactChangeListeners = [];
+                var moreIds = self.haveMoreContactListeners();
+                if (moreIds && moreIds.forEach) {
+                    moreIds.forEach(function(handle) {
+                        if (M.u[handle] && M.u[handle].addChangeListener) {
+                            self._contactChangeListeners.push(
+                                [M.u[handle], M.u[handle].addChangeListener(changedCb)]
+                            )
+                        }
+                    });
                 }
-                self.debouncedForceUpdate();
-            });
+            }
         }
     },
     componentWillUnmount: function() {
@@ -30,8 +47,18 @@ var ConversationMessageMixin = {
         if (self._contactChangeListener && contact && contact.removeChangeListener) {
             contact.removeChangeListener(self._contactChangeListener);
         }
+        if (this._contactChangeListeners) {
+            this._contactChangeListeners.forEach(function(listener) {
+                listener[0].removeChangeListener(listener[1]);
+            });
+            this._contactChangeListeners = [];
+        }
     },
     getContact: function() {
+        if (this.props.contact) {
+            // optimization
+            return this.props.contact;
+        }
         var message = this.props.message;
 
         return Message.getContactForMessage(message);

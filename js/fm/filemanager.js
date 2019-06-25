@@ -3261,7 +3261,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     $('.grid-table-header').rebind('contextmenu', function(e) {
-        if (M.currentdirid === 'shares' || M.currentdirid === 'out-shares') {
+        var notAllowedTabs = ['shares', 'out-shares', 'contacts', 'ipc', 'opc'];
+        if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
             return false;
         }
         M.contextMenuUI(e, 7);

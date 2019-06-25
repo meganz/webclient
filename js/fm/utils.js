@@ -1274,10 +1274,12 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
         }
 
         if (urlParts) {
+
+            var toPage = String(urlParts[2] || 'fm').replace('#', '');
             // If the user is already logged in here with the same account
             // we can avoid a lot and just take them to the correct page
             if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
-                loadSubPage(urlParts[2]);
+                loadSubPage(toPage);
                 return false;
             }
 
@@ -1289,7 +1291,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     return false;
                 }
                 else {
-                    loadSubPage(urlParts[2]);
+                    loadSubPage(toPage);
                     // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
                     if (String(urlParts[2]).startsWith('pro')) {
                         later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
@@ -1301,9 +1303,6 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             // Likely that they have never logged in here before so we must set this
             localStorage.wasloggedin = true;
             u_logout();
-
-            // Get the page to load
-            var toPage = String(urlParts[2] || 'fm').replace('#', '');
 
             // Set master key, session ID and RSA private key
             u_storage = init_storage(sessionStorage);

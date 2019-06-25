@@ -416,6 +416,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         fupload.dispatchEvent(mEvent);
 
         $(menuCMI).filter('.dropdown-item').hide();
+        var itemsViewed = false;
 
         if (M.currentdirid !== 'shares' && M.currentdirid !== 'out-shares') {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
@@ -430,9 +431,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         $(menuCMI).filter('.folderupload-item').show();
                     }
                 }
+                itemsViewed = true;
             }
         }
         if (M.viewmode) {
+            itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
             if (M.currentdirid === 'shares') {
                 $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
@@ -447,7 +450,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').attr('style', '');
             }
         }
-
+        if (!itemsViewed) {
+            return false;
+        }
     }
     else if (ll === 3) {// we want just the download menu
         $(menuCMI).hide();

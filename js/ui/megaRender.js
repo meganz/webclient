@@ -927,7 +927,7 @@
                     if (!this.viewmode) {
                         if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
                             props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
-                            props.mTime = aNode.shares.EXP.mtime ? time2date(aNode.shares.EXP.mtime) : '';
+                            props.mTime = time2date(aNode.mtime || aNode.ts);
                         }
                         else if (aNode.p !== "contacts") {
                             // props.time = time2date(aNode[M.lastColumn] || aNode.ts);

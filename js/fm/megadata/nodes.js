@@ -1943,12 +1943,19 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            if (n.p === M.currentdirid) {
+            var curDir = M.currentdirid.replace('out-shares/', '').replace('public-links/', '');
+            var refresh = false;
+            if (curDir ==='public-links') {
+                if (M.v.indexOf(n) !== -1) {
+                    refresh = true;
+                }
+            }
+            if (refresh || n.p === curDir) {
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');
                 var currentScrollPosition = $megaContainer.prop('scrollTop');
 
-                M.openFolder(n.p, true).always(function() {
+                M.openFolder(M.currentdirid, true).always(function() {
                     $megaContainer.prop('scrollTop', currentScrollPosition);
                 }).done(reselect);
             }

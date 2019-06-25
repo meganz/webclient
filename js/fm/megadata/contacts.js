@@ -1008,6 +1008,8 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
             }
             M.u[userHandle].firstName = '';
             M.u[userHandle].lastName = '';
+
+            M.syncUsersFullname(userHandle);
         }
     }
 

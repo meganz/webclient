@@ -1057,6 +1057,7 @@
                 $.selected = [];
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = function() {
+                    closeDialog();
                     $.selected = [$.mcselected];
                     M.openSharingDialog();
                 };
@@ -1529,7 +1530,9 @@
 
             if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
                 $.selectFolderCallback();
+                return false;
             }
+
             closeDialog();
 
             if (saveToDialog) {

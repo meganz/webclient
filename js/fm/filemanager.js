@@ -3038,7 +3038,14 @@ FileManager.prototype.addGridUI = function(refresh) {
         //}
         //console.warn(str);
 
-
+        if (folderlink) {
+            M.columnsWidth.cloud.versions.viewed = false;
+            M.columnsWidth.cloud.versions.disabled = true;
+            M.columnsWidth.cloud.fav.viewed = false;
+            M.columnsWidth.cloud.fav.disabled = true;
+            M.columnsWidth.cloud.label.viewed = false;
+            M.columnsWidth.cloud.label.disabled = true;
+        }
 
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -3048,14 +3055,21 @@ FileManager.prototype.addGridUI = function(refresh) {
                     continue;
                 }
 
-                if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].curr) {
-                    if (typeof M.columnsWidth.cloud[col].curr === 'number') {
-                        if (M.columnsWidth.cloud[col].curr !== $header.outerWidth()) {
+                if (M.columnsWidth.cloud[col]) {
+                    if (M.columnsWidth.cloud[col].curr) {
+                        if (typeof M.columnsWidth.cloud[col].curr === 'number') {
+                            if (M.columnsWidth.cloud[col].curr !== $header.outerWidth()) {
+                                $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                            }
+                        }
+                        else {
                             $header.outerWidth(M.columnsWidth.cloud[col].curr);
                         }
                     }
-                    else {
-                        $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                    ////
+                    if (!M.columnsWidth.cloud[col].viewed && $header.is(':visible')) {
+                        $header.hide();
+                        $('.grid-table.fm td[megatype="' + col + '"]').hide();
                     }
                 }
             }

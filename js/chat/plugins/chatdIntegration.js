@@ -1073,7 +1073,7 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
             }
         });
     }
-    if (Array.isArray(users)) {
+    if (Array.isArray(users) || users instanceof Set) {
         users.forEach(function (userId) {
             if (typeof(userId) === "undefined" || userId === null) {
                 return;
@@ -1119,7 +1119,7 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
 
 
 ChatdIntegration._ensureNamesAreLoaded = function(users, chathandle) {
-    if (Array.isArray(users)) {
+    if (Array.isArray(users) || users instanceof Set) {
         users.forEach(function (userId) {
             if (userId === strongvelope.COMMANDER) {
                 return;

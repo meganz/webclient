@@ -6072,6 +6072,10 @@ React.makeElement = React['createElement'];
 
 	            return false;
 	        }
+	        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+
+	            return false;
+	        }
 
 	        var pres = self.props.megaChat.getPresence(v.u);
 

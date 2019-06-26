@@ -742,6 +742,10 @@ var ContactPickerWidget = React.createClass({
             // continue;
             return false;
         }
+        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+            // keys not loaded, don't allow starting of new chats/any interaction with that user yet
+            return false;
+        }
 
         var pres = self.props.megaChat.getPresence(
             v.u

@@ -10265,6 +10265,17 @@ React.makeElement = React['createElement'];
 	                });
 	                return;
 	            }
+
+	            var $jspElem = $(self.findDOMNode()).find('.jspScrollable');
+	            if ($jspElem) {
+	                var $jsp = $jspElem.data('jsp');
+	                if ($jsp) {
+	                    Soon(function () {
+
+	                        $jsp.scrollTo(0, 0, false);
+	                    });
+	                }
+	            }
 	        }
 
 	        this.setState({ entries: null });
@@ -10295,6 +10306,8 @@ React.makeElement = React['createElement'];
 	            sortFunc = M.getSortBySizeFn();
 	        } else if (self.state.sortBy[0] === "ts") {
 	            sortFunc = M.getSortByDateTimeFn();
+
+	            order = order === 1 ? -1 : 1;
 	        } else {
 	            sortFunc = M.sortByFavFn(order);
 	        }
@@ -10471,7 +10484,8 @@ React.makeElement = React['createElement'];
 	                            onClick: self.toggleSortBy }),
 	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy,
 	                            onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "ts", label: __(l[16169]), sortBy: self.state.sortBy,
+	                        React.makeElement(BrowserCol, { id: "ts", label: __(l[16169]),
+	                            sortBy: self.state.sortBy && self.state.sortBy[0] === "ts" ? ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] : self.state.sortBy,
 	                            onClick: self.toggleSortBy })
 	                    )
 	                )

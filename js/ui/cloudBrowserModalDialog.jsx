@@ -632,7 +632,7 @@ var BrowserEntries = React.createClass({
                 }
 
                 items.push(
-                    <div 
+                    <div
                         className={
                             "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
                             (isHighlighted ? " ui-selected" : "") +
@@ -827,6 +827,7 @@ var CloudBrowserDialog = React.createClass({
     onClearSearchIconClick: function() {
         var self = this;
 
+
         self.setState({
             'searchValue': '',
             'currentlyViewedEntry': M.RootID
@@ -922,6 +923,19 @@ var CloudBrowserDialog = React.createClass({
                     });
                 return;
             }
+
+            var $jspElem = $(self.findDOMNode()).find('.jspScrollable');
+            if ($jspElem) {
+                var $jsp = $jspElem.data('jsp');
+                if ($jsp) {
+                    Soon(function() {
+                        // seems like there is a bug in JSP, if I call this too early the scroll won't move, but the area
+                        // would scroll to 0, 0
+                        $jsp.scrollTo(0, 0, false);
+                    });
+                }
+
+            }
         }
 
         this.setState({entries: null});
@@ -961,6 +975,8 @@ var CloudBrowserDialog = React.createClass({
         }
         else if(self.state.sortBy[0] === "ts") {
             sortFunc = M.getSortByDateTimeFn();
+            // invert
+            order = order === 1 ? -1 : 1;
         }
         else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
             sortFunc = M.sortByFavFn(order);
@@ -1138,7 +1154,12 @@ var CloudBrowserDialog = React.createClass({
                                     onClick={self.toggleSortBy}/>
                         <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy}
                                     onClick={self.toggleSortBy}/>
-                        <BrowserCol id="ts" label={__(l[16169])} sortBy={self.state.sortBy}
+                        <BrowserCol id="ts" label={__(l[16169])}
+                                    sortBy={
+                                        self.state.sortBy && self.state.sortBy[0] === "ts" ?
+                                            ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] :
+                                            self.state.sortBy
+                                    }
                                     onClick={self.toggleSortBy}/>
                     </tr>
                     </tbody>

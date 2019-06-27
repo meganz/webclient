@@ -3266,8 +3266,33 @@ FileManager.prototype.addGridUI = function(refresh) {
             }
             for (var sortBy in M.sortRules) {
                 if (cls.indexOf(sortBy) !== -1) {
+
+                    var $sortMenu = $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item')
+                        .removeClass('selected');
+                    var sortitem = sortBy;
+
+                    if (sortitem === 'ts') {
+                        sortitem = 'timeAd';
+                    }
+                    else if (sortitem === 'mtime') {
+                        sortitem = 'timeMd';
+                    }
+                    else if (sortitem === 'date') {
+                        sortitem = 'sharecreated, .sort-timeAd';
+                    }
+
+                    $sortMenu.filter('.sort-' + sortitem).addClass('selected');
+
+                    if (dir !== -1 && sortitem !== sortBy) {
+                        if (cls.indexOf('asc') === -1) {
+                            dir = -1;
+                        }
+                    }
+
+
                     M.doSort(sortBy, dir);
                     M.renderMain();
+
                     break;
                 }
             }

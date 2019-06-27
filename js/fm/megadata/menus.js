@@ -417,12 +417,14 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         $(menuCMI).filter('.dropdown-item').hide();
         var itemsViewed = false;
+        var ignoreGridextras = false;
 
         if (M.currentdirid !== 'shares' && M.currentdirid !== 'out-shares') {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
             if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').show();
+                    ignoreGridextras = true;
                 }
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
@@ -434,7 +436,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 itemsViewed = true;
             }
         }
-        if (M.viewmode) {
+        if (!ignoreGridextras && M.viewmode) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
             if (M.currentdirid === 'shares') {
@@ -859,12 +861,13 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
+
+        var difference = 0;
+
         if (b > maxY) {
-            top = (maxY - nmH + nTop - tB) - pE.top + 'px';
+            difference = b - maxY;
         }
-        else {
-            top = pPos.top - tB + 'px';
-        }
+        top = pPos.top - tB - difference + 'px';
 
         return top;
     };

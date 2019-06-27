@@ -1883,6 +1883,8 @@ function onUploadError(ul, errorstr, reason, xhr) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
+    mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, false);
+
     ul._gotTransferError = true;
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
     $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);

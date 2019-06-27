@@ -1606,7 +1606,7 @@ FileUpload.prototype.run = function(done) {
         }
 
         if (file && self.file) {
-            $('.transfer-table #ul_' + file.id + ' .transfer-status').text(error);
+            onUploadError(file, error);
 
             var that = self;
             ulmanager.abort(file);

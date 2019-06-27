@@ -278,9 +278,9 @@
     "823": "\u8bbe\u5b9a",
     "824": "\u65b0\u7684\u5206\u4eab\u6587\u4ef6\u5939\u4ece[X]",
     "825": "\u65b0\u7684\u5206\u4eab\u6587\u4ef6\u5939",
-    "828": "[X1]\u4e2a\u6587\u4ef6\u5939\u4e0e[X2]\u4e2a\u6587\u4ef6",
-    "829": "[X]\u4e2a\u6587\u4ef6\u5939\u4e0e\u4e00\u4e2a\u6587\u4ef6",
-    "830": "\u4e00\u4e2a\u6587\u4ef6\u5939\u4e0e[X]\u4e2a\u6587\u4ef6",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "\u4e00\u4e2a\u6587\u4ef6\u5939\u4e0e\u4e00\u4e2a\u6587\u4ef6",
     "832": "[X]\u4e2a\u6587\u4ef6\u5939",
     "833": "[X]\u4e2a\u6587\u4ef6",
@@ -557,6 +557,7 @@
     "1617": "\u53d6\u6d88\u4e0a\u4f20",
     "1624": "\u4e0b\u8f7d\u4e2d",
     "1626": "MEGAsync",
+    "1631": "\u60a8\u7684\u540c\u6b65\"%1\"\u56e0\u8fdc\u7a0b\u6587\u4ef6\u5939\u5728\u5783\u573e\u6876\u4e2d\u6545\u5df2\u88ab\u505c\u7528",
     "1642": "\u6b64\u94fe\u63a5\u5df2\u590d\u5236\u5230\u526a\u8d34\u677f",
     "1647": "\u6682\u505c",
     "1649": "\u6062\u590d",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

@@ -278,9 +278,9 @@
     "823": "Instellingen",
     "824": "Nieuwe gedeelde map van [X]",
     "825": "Nieuwe gedeelde map",
-    "828": "[X1] mappen en [X2] bestanden",
-    "829": "[X] mappen en 1 bestand",
-    "830": "1 map en [X] bestanden",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 map en 1 bestand",
     "832": "[X] mappen",
     "833": "[X] bestanden",
@@ -557,6 +557,7 @@
     "1617": "Annuleer upload",
     "1624": "Aan het downloaden",
     "1626": "MEGAsync",
+    "1631": "Uw sync \"%1\" is uitgeschakeldomdat de externe map zich in de vuilnisbak bevindt",
     "1642": "De koppeling is gekopieerd naar het klembord",
     "1647": "Pauzeer",
     "1649": "Doorgaan",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

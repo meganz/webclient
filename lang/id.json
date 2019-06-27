@@ -278,9 +278,9 @@
     "823": "Pengaturan",
     "824": "Folder Berbagi baru dari [X]",
     "825": "Folder Berbagi baru",
-    "828": "[X1] folder dan [X2] berkas",
-    "829": "[X] folder dan 1 berkas",
-    "830": "1 folder dan [X] berkas",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 berkas dan 1 file",
     "832": "[X] folder",
     "833": "[X] berkas",
@@ -557,6 +557,7 @@
     "1617": "Batalkan upload",
     "1624": "Downloading",
     "1626": "MEGAsync",
+    "1631": "Sync anda \"%1\" telah dibatalkan karena remote folder di dalam rubbish bin",
     "1642": "Link telah disalin ke clipboard",
     "1647": "Hentikan sementara",
     "1649": "Lanjutkan",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

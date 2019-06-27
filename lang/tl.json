@@ -278,9 +278,9 @@
     "823": "Mga Settings",
     "824": "Bagong shared folder galing kay [X]",
     "825": "Bagong shared folder",
-    "828": "[X1] folders at [X2] files",
-    "829": "[X] folders at 1 file",
-    "830": "1 folder at [X] files",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 folder at 1 file",
     "832": "[X]mga folder",
     "833": "[X]mga files",
@@ -557,6 +557,7 @@
     "1617": "Itigil ang pagpapasa",
     "1624": "Downloading",
     "1626": "MEGAsync",
+    "1631": "Ang inyong \"%1\" ay itinigil dahil ang remote folder ay nasa basurahan na.",
     "1642": "Ang link ay nagaya na sa clipboard",
     "1647": "Itigil",
     "1649": "I-resume",
@@ -3492,5 +3493,6 @@
     "20831": "Success ang pag unsubscribed mo",
     "20832": "Hindi ka makaka-receive ng emails sa MEGA. Paalala na kapag nag register ka ng MEGA account sa susunod itutuloy namin ang pag send sayo ng emails.",
     "20833": "Nag unsubscribe ka ba ng aksidente?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

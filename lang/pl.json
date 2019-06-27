@@ -278,9 +278,9 @@
     "823": "Ustawienia",
     "824": "Nowy udost\u0119pniony katalog od [X]",
     "825": "Nowy udost\u0119pniony katalog",
-    "828": "[X1] katalog\u00f3w i [X2] plik\u00f3w",
-    "829": "[X] katalog\u00f3w i 1 plik",
-    "830": "1 katalog i [X] plik\u00f3w",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 katalog i 1 plik",
     "832": "[X] katalog\u00f3w",
     "833": "[X] plik\u00f3w",
@@ -557,6 +557,7 @@
     "1617": "Anuluj wgrywanie",
     "1624": "Pobieranie",
     "1626": "MEGAsync",
+    "1631": "Synchonizacja \"%1\" zosta\u0142a wstrzymana poniewa\u017c katalog zdalny zosta\u0142 umieszczony w koszu",
     "1642": "Link zosta\u0142\u00a0skopiowany do schowka",
     "1647": "Wstrzymaj",
     "1649": "Wzn\u00f3w",
@@ -3492,5 +3493,6 @@
     "20831": "Subskrypcja zosta\u0142a anulowana pomy\u015blnie",
     "20832": "Nie b\u0119dziesz otrzymywa\u0107 wiadomo\u015bci e-mail od MEGA. Pami\u0119taj, \u017ce je\u015bli zarejestrujesz si\u0119 na konto MEGA w przysz\u0142o\u015bci, wznowimy wysy\u0142anie Ci e-maili.",
     "20833": "Czy zrezygnowa\u0142e\u015b z subskrypcji przez pomy\u0142k\u0119?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

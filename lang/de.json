@@ -278,9 +278,9 @@
     "823": "Einstellungen",
     "824": "Neue Freigabe von [X]",
     "825": "Neue Freigabe",
-    "828": "[X1] Ordner und [X2] Dateien",
-    "829": "[X] Ordner und eine Datei",
-    "830": "Ein Ordner und [X] Dateien",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "Ein Ordner und eine Datei",
     "832": "[X] Ordner",
     "833": "[X] Dateien",
@@ -557,6 +557,7 @@
     "1617": "Upload abbrechen",
     "1624": "Downloade",
     "1626": "MEGAsync",
+    "1631": "Ihr Sync \"%1\" wurde deaktiviert, weil der Zielordner in Ihren Cloud-Papierkorb verschoben wurde.",
     "1642": "Der Link wurde in Ihre Zwischenablage kopiert",
     "1647": "Anhalten",
     "1649": "Fortsetzen",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

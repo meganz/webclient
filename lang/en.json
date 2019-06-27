@@ -278,9 +278,9 @@
     "823": "Settings",
     "824": "New shared folder from [X]",
     "825": "New shared folder",
-    "828": "[S1][X1] folders[\/S1] [S1]and[\/S1] [S1][X2] files[\/S1]",
-    "829": "[S1][X] folders[\/S1] [S1]and 1 file[\/S1]",
-    "830": "[S1]1 folder and[\/S1] [S1][X] files[\/S1]",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 folder and 1 file",
     "832": "[X] folders",
     "833": "[X] files",
@@ -557,6 +557,7 @@
     "1617": "Cancel upload",
     "1624": "Downloading",
     "1626": "MEGAsync",
+    "1631": "Your sync \u201c%1\u201d has been disabledbecause the remote folder is in the Rubbish Bin",
     "1642": "The link has been copied to the clipboard",
     "1647": "Pause",
     "1649": "Resume",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

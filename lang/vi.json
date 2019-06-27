@@ -278,9 +278,9 @@
     "823": "Thi\u1ebft \u0110\u1eb7t",
     "824": "Th\u01b0 m\u1ee5c chia s\u1ebb m\u1edbi t\u1eeb [X]",
     "825": "Th\u01b0 m\u1ee5c chia s\u1ebb m\u1edbi",
-    "828": "[X1] Th\u01b0 m\u1ee5c v\u00e0 [X2] t\u1ec7p tin",
-    "829": "[X] th\u01b0 m\u1ee5c v\u00e0 1 t\u1ec7p tin",
-    "830": "1 th\u01b0 m\u1ee5c v\u00e0 [X] t\u1ec7p tin",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 th\u01b0 m\u1ee5c v\u00e0 1 t\u1ec7p tin",
     "832": "[X] th\u01b0 m\u1ee5c",
     "833": "[X] t\u1ec7p tin",
@@ -557,6 +557,7 @@
     "1617": "H\u1ee7y t\u1ea3i l\u00ean",
     "1624": "\u0110ang t\u1ea3i v\u1ec1",
     "1626": "MEGAsync",
+    "1631": "\u0110\u1ed3ng b\u1ed9 cho \"%1\" \u0111\u00e3 b\u1ecb t\u1eaftv\u00ec th\u01b0 m\u1ee5c \u0111\u00e3 b\u1ecb chuy\u1ec3n v\u00e0o th\u00f9ng r\u00e1c \u1edf n\u01a1i kh\u00e1c",
     "1642": "\u0110\u01b0\u1eddng li\u00ean k\u1ebft \u0111\u00e3 \u0111\u01b0\u1ee3c ghi v\u00e0o b\u1ed9 nh\u1edb",
     "1647": "T\u1ea1m d\u1eebng",
     "1649": "Ti\u1ebfp t\u1ee5c truy\u1ec1n t\u1ea3i",
@@ -3492,5 +3493,6 @@
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

@@ -278,9 +278,9 @@
     "823": "Ajustes",
     "824": "Nueva carpeta compartida de [X]",
     "825": "Nueva carpeta compartida",
-    "828": "[X1] carpetas y [X2]  archivos",
-    "829": "[X] carpetas y 1 archivo",
-    "830": "1 carpeta y [X] archivos",
+    "828": "[X1] folders and [X2] files",
+    "829": "[X] folders and 1 file",
+    "830": "1 folder and [X] files",
     "831": "1 carpeta y un archivo",
     "832": "[X] carpetas",
     "833": "[X] archivos",
@@ -557,6 +557,7 @@
     "1617": "Cancelar subida",
     "1624": "Descargando",
     "1626": "MEGAsync",
+    "1631": "Tu sincronizaci\u00f3n \"%1\" se ha desactivado porque la carpeta remota est\u00e1 en la Papelera",
     "1642": "El enlace se ha copiado al portapapeles",
     "1647": "Pausa",
     "1649": "Reanudar",
@@ -3492,5 +3493,6 @@
     "20831": "Has cancelado la suscripci\u00f3n",
     "20832": "No recibir\u00e1s correos electr\u00f3nicos de MEGA. Ten en cuenta que si registras una cuenta MEGA en el futuro, te volveremos a enviar correos electr\u00f3nicos.",
     "20833": "\u00bfHas cancelado la suscripci\u00f3n por error?",
-    "20840": "Copy All"
+    "20840": "Copy All",
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
 }

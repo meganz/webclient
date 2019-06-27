@@ -197,7 +197,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .loading .top-head {
     z-index: 1111;
 }
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after {
+.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after,  .fm-right-header-user-management::after {
     content: '';
     width: 100%;
     height: 1px;
@@ -23248,7 +23248,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .overview-icon, .fm-right-header-user-management .overview-icon, .user-management-breadcrumbs-img.overview-icon, .user-management-dialog .overview-icon {
-    background-position: 0px -12033px;
+    background-position: 0px -12032px;
     opacity: 0.5;
 }
 
@@ -24018,7 +24018,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -18px -12243px;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .view-status-row .user-management-view-status.text{
+.user-management-subuser-profile .view-status-row .user-management-view-status.text{
     color:#666666;
     font-size: 14px;
     line-height: 28px;
@@ -24027,7 +24027,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     white-space: nowrap;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .view-status-row .initial-pw-bar {
+.user-management-subuser-profile .view-status-row .initial-pw-bar {
     width:auto;
     height: 28px;
     margin-left: 108px;
@@ -24039,7 +24039,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar .icon-button {
+.user-management-subuser-profile .initial-pw-bar .icon-button {
     width:40px;
     height: 28px;
     position: relative;
@@ -24051,11 +24051,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.1s;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar .icon-button:hover {
+.user-management-subuser-profile .initial-pw-bar .icon-button:hover {
     background-color: rgba(0,0,0,0.1);
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar .icon-button::before {
+.user-management-subuser-profile .initial-pw-bar .icon-button::before {
     content: "";
     height: 100%;
     width: 1px;
@@ -24064,12 +24064,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 0;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar .icon {
+.user-management-subuser-profile .initial-pw-bar .icon {
     margin: 2px 8px;
     position: relative;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar span {
+.user-management-subuser-profile .initial-pw-bar span {
     font-size: 14px;
     line-height: 28px;
     padding:0 12px 0 0;
@@ -24079,23 +24079,23 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     float: left;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .initial-pw-bar span b {
+.user-management-subuser-profile .initial-pw-bar span b {
     color:#fafafa;
     font-weight: 600;
     margin:0 12px 0 0;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .user-management-view-status.text{
+.user-management-subuser-profile .user-management-view-status.text{
     margin:0;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .admin-icon.role{
+.user-management-subuser-profile .admin-icon.role {
     margin:0px 12px 0px 0;
     position: relative;
     width: 100%;
 }
 
-.user-management-subuser-profile-container .user-management-subuser-profile .admin-icon .admin-text{
+.user-management-subuser-profile .admin-icon .admin-text {
     position: relative;
     margin-left: 28px;
     color: #666666;
@@ -24110,25 +24110,18 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-subuser-profile-container .default-white-button-user-management,
-.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management,
-.user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+.user-management-subuser-profile-container  .default-red-button-user-management,
+.user-management-subuser-profile-container  .default-green-button-user-management {
     margin-right: 12px;
     vertical-align: top;
     margin-bottom: 8px;
 }
-.user-management-subuser-profile-container .default-white-button-user-management {
-    margin-right: 12px;
-}
-.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management,
-.user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
+.user-management-subuser-profile-container .default-red-button-user-management,
+.user-management-subuser-profile-container .default-green-button-user-management {
     margin-right: 40px;
-}
-.user-management-subuser-profile-container .user-management-subuser-profile .default-red-button-user-management,
-.user-management-subuser-profile-container .user-management-subuser-profile .default-green-button-user-management{
     float:right;
 }
-
-.files-grid-view.user-management-view .user-management-view-data{
+.files-grid-view.user-management-view .user-management-view-data {
     width:100%;
     height: 580px;
     box-sizing:border-box;
@@ -24206,7 +24199,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-text,
-.business-dashboard .view-info .storage-transfer-text{
+.business-dashboard .view-info .storage-transfer-text {
    font-size: 16px;
    font-weight: 600;
    line-height: 18px;
@@ -24216,7 +24209,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view-data .user-management-view-overall-usage .view-info .storage-transfer-data,
-.business-dashboard .view-info .storage-transfer-data{
+.business-dashboard .view-info .storage-transfer-data {
    font-size: 42px;
    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
    line-height: 60px;
@@ -24228,99 +24221,107 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: auto;
     position: relative;
     display: block;
-    padding:0px 40px;
+    padding: 0px 40px;
 }
-
-.subaccount-view-used-data .used-storage-info{
-    width:100%;
-    height: 24px;
-    margin-bottom: 16px;
+.used-storage-wrap {
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
     max-width: 960px;
     min-width: 500px;
 }
+.data-container .used-storage-wrap  {
+    padding: 0 24px 0 24px;
+}
+.used-storage-icon-cell {
+    display: table-cell;
+    width: 16px;
+    vertical-align: top;
+}
+.used-storage-info {
+    height: 40px;
+    box-sizing: border-box;
+    padding-bottom: 16px;
+    display: table-row;
+}
 
-.business-dashboard-container .used-storage-info{
-    width:100%;
-}
-.business-dashboard-container .subaccount-view-used-data .used-storage-info .ff-name {
-    width: 180px;
-}
-.subaccount-view-used-data .used-storage-info .folder-small-icon{
+.used-storage-info .folder-small-icon {
     width:16px;
     height: 16px;
-    margin:4px 0;
+    margin: 4px 0;
     background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     float: left;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share,
-.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share {
+.used-storage-info .folder-small-icon.ex-out-share,
+.used-storage-info .folder-small-icon.ex-in-share {
     background-image: url(../images/mega/top-sprite_v7.png);
     background-size: 38px auto;
 }
-.subaccount-view-used-data .used-storage-info .folder-small-icon.cloud{
+.used-storage-info .folder-small-icon.cloud{
     background-position: -3px -11896px;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.inbox{
+.used-storage-info .folder-small-icon.inbox{
     background-position: -29px -11896px;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.income{
+.used-storage-info .folder-small-icon.income{
     background-position: -3px -11917px;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.rubbish{
+.used-storage-info .folder-small-icon.rubbish{
     background-position: -28px -11917px;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.files{
+.used-storage-info .folder-small-icon.files{
     background-position: -4px -11022px;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.tiny-clock{
+.used-storage-info .folder-small-icon.tiny-clock{
     background-position: -13px -728px;
 }
 
-.subaccount-view-used-data .used-storage-info .ff-name{
+.used-storage-info .ff-name {
     font-size: 14px;
     color: #666666;
     line-height: 24px;
+    box-sizing: border-box;
+    height: 40px;
     position: relative;
-    display: inline-block;
-    margin-left: 12px;
-    float: left;
-    width: 280px;
-    white-space: nowrap;
+    padding-left: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     text-transform: capitalize;
+    display: table-cell;
+    vertical-align: top;
 }
-.subaccount-view-used-data .used-storage-info .tiny-icon.cog {
+.used-storage-info .tiny-icon.cog {
     margin: 5px 0 5px 6px;
     cursor: pointer;
 }
-.subaccount-view-used-data .used-storage-info .ff-number{
+.used-storage-info .ff-number {
     font-size: 14px;
     color: #999;
     line-height: 24px;
     position: relative;
     display: inline-block;
-    width: 190px;
-    white-space: nowrap;
+    display: table-cell;
+    vertical-align: top;
 }
 
-.subaccount-view-used-data .used-storage-info .file-number,
-.subaccount-view-used-data .used-storage-info .folder-number{
+.used-storage-info .file-number,
+.used-storage-info .folder-number{
     font-size: 14px;
     color: #999;
     line-height: 24px;
     position: relative;
     display: inline-block;
     padding:0 12px;
+    vertical-align: top;
 }
-.subaccount-view-used-data .used-storage-info .folder-number::after {
+.used-storage-info .folder-number::after {
     content: " ";
     height: 16px;
     width: 2px;
@@ -24331,13 +24332,15 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
 }
 
-.subaccount-view-used-data .used-storage-info .ff-occupy{
+.used-storage-info .ff-occupy {
     font-size: 14px;
     color: #999999;
     line-height: 24px;
     position: relative;
-    display: inline-block;
-    float: right;
+    display: table-cell;
+    vertical-align: top;
+    white-space: nowrap;
+    text-align: right;
 }
 
 .user-management-breadcrumbs-img {
@@ -24351,20 +24354,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     opacity: 0.6;
 }
 
-.user-management-overview-buttons{
+.user-management-overview-buttons {
     position: absolute;
     right: 12px;
     top: 8px;
     box-sizing: border-box;
 }
 
-.user-management-overview-buttons .default-white-button-user-management{
+.user-management-overview-buttons .default-white-button-user-management {
     float: right;
     margin-right: 12px;
     line-height: 32px;
 }
 
-.fm-right-header-user-management .user-management-overview-buttons .default-white-button-user-management .icon, .user-management-account-settings .default-white-button-user-management .icon  {
+.user-management-overview-buttons .default-white-button-user-management .icon, .default-white-button-user-management .icon  {
     margin:4px 8px 4px 0;
 }
 
@@ -24374,7 +24377,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 100%;
 }
 
-.user-management-overview-container .user-analysis-container {
+.user-analysis-container {
     position: relative;
     min-width: 695px;
     max-width:1400px;
@@ -24384,7 +24387,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     box-sizing: border-box;
 }
 
-.user-management-view .view-title, .business-dashboard .view-title{
+.user-management-view .view-title, .business-dashboard .view-title {
     color:#333333;
     font-size: 18px;
     display: block;
@@ -24397,10 +24400,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .business-dashboard .view-title {
     padding-left: 24px;
+    text-align: left;
     margin-bottom: 16px;
 }
 
-.user-management-view .user-management-overview-container .view-title{
+.user-management-overview-container .view-title{
     padding-left: 24px;
 }
 
@@ -24410,7 +24414,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 
 .business-dashboard .view-title::before,
-.user-management-view .user-management-overview-container .view-title::before{
+.user-management-overview-container .view-title::before{
     content: '';
     position: absolute;
     width:100%;
@@ -24420,20 +24424,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 0;
 }
 
-.user-management-overview-container .user-analysis-container .user-segments-container {
+.user-segments-container {
     width:25%;
     height: 184px;
     float: left;
     position: relative;
 }
 
-.user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) {
+.user-segments-container:nth-child(2) {
     background-color: rgba(0,191,165,1);
     border-bottom-left-radius: 8px;
 }
 
 
-.user-management-overview-container .user-analysis-container .user-segments-container .user-segment-title{
+.user-segment-title {
     width:100%;
     height: 24px;
     text-align: center;
@@ -24444,7 +24448,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top:24px;
 }
 
-.user-management-overview-container .user-analysis-container .user-segments-container .user-segment-number{
+.user-segment-number {
     width:100%;
     text-align: center;
     color:#333333;
@@ -24454,19 +24458,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
 }
 
-.user-management-overview-container b{
+.user-management-overview-container b {
     font-weight: 900;
 }
 
-.user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) .user-segment-title {
+.user-segments-container:nth-child(2) .user-segment-title {
    color:rgba(250,250,250,0.95);
 }
 
-.user-management-overview-container .user-analysis-container .user-segments-container:nth-child(2) .user-segment-number {
+.user-segments-container:nth-child(2) .user-segment-number {
       color:#ffffff;
 }
 
-.user-management-overview-container .data-analysis-container {
+.data-analysis-container {
     position: relative;
     min-width: 695px;
     max-width:1400px;
@@ -24474,26 +24478,25 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: auto;
     margin: 12px auto 12px auto;
     display: block;
-    overflow: hidden;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container {
+.storage-analysis-container {
     position: relative;
     width: 40%;
     height: auto;
-    margin: 0 0 12px 1px;
+    margin: 0 0 12px 0;
     display: inline-block;
     box-sizing: border-box;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart {
+.storage-analysis-container .storage-big-chart {
     position: relative;
     width:160px;
     height: 160px;
     margin: 24px auto;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-big-chart2 {
+.storage-analysis-container .storage-big-chart2 {
     position: relative;
     margin: 24px auto 36px auto;
 }
@@ -24561,7 +24564,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal2, .user-management-overview-container .storage-big-chart .pie:nth-of-type(4) .pie-internal {
     background-color:rgba(88,103,195,100);
 }
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle {
+.storage-small-circle {
     position: absolute;
     /*width: 144px;
     height: 144px;*/
@@ -24575,7 +24578,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 24%;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container  .storage-small-circle .total-storage-title {
+.storage-small-circle .total-storage-title {
     position: relative;
     text-align: center;
     /*width:144px;*/
@@ -24590,7 +24593,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: block;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-small-circle .total-storage-number {
+.storage-small-circle .total-storage-number {
     position: relative;
     text-align: center;
     /*width:144px;*/
@@ -24605,18 +24608,18 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     /*margin-left: 12%;*/
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container {
+.storage-division-container {
     position: relative;
     width: auto;
     margin: 0 24px 16px 24px;
     cursor: pointer;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container:last-child {
+.storage-division-container:last-child {
     margin:0 24px 24px 24px;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per {
+.storage-division-container .storage-division-per {
     position: relative;
     width:48px;
     height: 18px;
@@ -24630,7 +24633,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     vertical-align: top;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-name {
+.storage-division-name {
     position: relative;
     margin-left: 12px;
     font-size: 14px;
@@ -24640,7 +24643,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: calc(100% - 140px);
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-num {
+.storage-division-num {
     position: absolute;
     font-size: 14px;
     line-height: 18px;
@@ -24649,25 +24652,25 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     top: 0;
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per.cloud-drive-color {
+.storage-division-per.cloud-drive-color {
     background-color: rgba(88,103,195,100);
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per.inbox-color {
+.storage-division-per.inbox-color {
     background-color: rgba(0,191,165,100);
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per.incoming-color {
+.storage-division-per.incoming-color {
     background-color: rgba(245,166,35,100);
 }
 
-.user-management-overview-container .data-analysis-container .storage-analysis-container .storage-division-container .storage-division-per.rubbish-color {
+.storage-division-per.rubbish-color {
     background-color: #bbbbbb;
 }
 
-.user-management-overview-container .data-analysis-container .transfer-analysis-container {
+.transfer-analysis-container {
     position: relative;
-    right: 1px;
+    right: 0;
     width: 58.5%;
     height: auto;
     box-sizing: border-box;
@@ -24675,7 +24678,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-bottom: 24px;
 }
 
-.user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary {
+.transfer-analysis-summary {
     width:100%;
     height: 96px;
     background-color: rgba(250,250,250,1);
@@ -24684,7 +24687,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     line-height: 128px;
 }
 
-.user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-title{
+.transfer-analysis-summary .total-transfer-title{
     margin-left: 24px;
     line-height: 96px;
     font-size: 16px;
@@ -24693,7 +24696,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 
-.user-management-overview-container .data-analysis-container .transfer-analysis-container .transfer-analysis-summary .total-transfer-number{
+.transfer-analysis-summary .total-transfer-number {
     margin-left: 16px;
     line-height: 96px;
     font-size: 36px;
@@ -24764,7 +24767,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
 }
 
-.user-management-view .user-management-overview-container .default-white-drop-box {
+.user-management-overview-container .default-white-drop-box {
     margin-right: 24px;
     top:32px;
     right: 0;
@@ -24772,14 +24775,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:150px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container {
+.daily-transfer-flow-container {
     width:90%;
     height: 150px;
     position: relative;
     margin: 60px auto 24px auto;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-flow {
+.daily-transfer-flow-container .daily-transfer-flow {
     width:7%;
     height: 120px;
     box-sizing: border-box;
@@ -24789,7 +24792,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     z-index: 3;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-flow span {
+.daily-transfer-flow-container .daily-transfer-flow span {
     font-size: 13px;
     color:#999999;
     position: absolute;
@@ -24797,15 +24800,15 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     z-index: 4;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-flow span:first-child {
+.daily-transfer-flow-container .daily-transfer-flow span:first-child {
     top:10px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-flow span:last-child {
+.daily-transfer-flow-container .daily-transfer-flow span:last-child {
     bottom:-3px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-measure {
+.daily-transfer-flow-container .daily-transfer-measure {
     width:93%;
     height: 120px;
     box-sizing: border-box;
@@ -24814,7 +24817,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     z-index: 1;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-measure .daily-transfer-flow-background {
+.daily-transfer-flow-container .daily-transfer-flow-background {
     width:100%;
     height: 24px;
     position: relative;
@@ -24822,7 +24825,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data {
+.daily-transfer-flow-container .daily-transfer-data {
     width:93%;
     height: 120px;
     box-sizing: border-box;
@@ -24831,7 +24834,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     z-index: 5;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data .daily-transfer-flow-bar{
+.daily-transfer-flow-container .daily-transfer-flow-bar {
     width: 1.5%;
     margin-right: 1.725%;
     box-sizing: border-box;
@@ -24841,27 +24844,27 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.3s;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data .daily-transfer-flow-bar:hover {
+.daily-transfer-flow-container .daily-transfer-flow-bar:hover {
     background-color: rgba(30,42,119,1);
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data .daily-transfer-flow-bar.bar1{
+.daily-transfer-flow-container .daily-transfer-flow-bar.bar1 {
     margin-top:70px;
     height: 50px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data .daily-transfer-flow-bar.bar2{
+.daily-transfer-flow-container .daily-transfer-flow-bar.bar2 {
     margin-top:0px;
     height: 120px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-data .daily-transfer-flow-bar.bar3{
+.daily-transfer-flow-container .daily-transfer-flow-bar.bar3{
     margin-top:20px;
     height: 100px;
 }
 
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-date {
+.daily-transfer-flow-container .daily-transfer-date {
     width:100%;
     height: 30px;
     box-sizing: border-box;
@@ -24869,7 +24872,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     bottom: 0;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-date .date {
+.daily-transfer-flow-container .daily-transfer-date .date {
     font-size: 13px;
     color: #999999;
     position: relative;
@@ -24877,31 +24880,31 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top:12px;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-date .date.date1 {
+.daily-transfer-flow-container .daily-transfer-date .date.date1 {
     margin-left: 5%;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-date .date.date2 {
+.daily-transfer-flow-container .daily-transfer-date .date.date2 {
     margin-left: 37%;
 }
 
-.user-management-overview-container .daily-transfer-flow-container .daily-transfer-date .date.date3 {
+.daily-transfer-flow-container .daily-transfer-date .date.date3 {
     position: absolute;
     right: 0%;
 }
 
-.user-management-overview-container .daily-transfer-container>span {
+.daily-transfer-container>span {
     font-size: 13px;
     color: #999999;
     position: relative;
     margin: 0 24px 24px 24px;
 }
 
-.user-management-overview-container .daily-transfer-container span:last-child {
+.daily-transfer-container span:last-child {
     float: right;
 }
 
-.user-management-overview-container .daily-transfer-flow-bar .tooltip{
+.daily-transfer-flow-bar .tooltip {
     height: 32px;
     width: 210px;
     padding:0;
@@ -24927,7 +24930,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     visibility: hidden;
 }
 
-.user-management-overview-container .daily-transfer-flow-bar .tooltip::after {
+.daily-transfer-flow-bar .tooltip::after {
     content: "";
     width:24px;
     height: 12px;
@@ -24941,7 +24944,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     opacity: 0.8;
 }
 
-.user-management-overview-container .daily-transfer-flow-bar:hover .tooltip{
+.daily-transfer-flow-bar:hover .tooltip{
     visibility: visible;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -24952,7 +24955,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 
 
- .user-management-overview-container .daily-transfer-flow-bar .tooltip span{
+.daily-transfer-flow-bar .tooltip span{
     color: #CCCCCC;
     font-size: 14px;
     margin: 0 24px;
@@ -24961,7 +24964,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
  }
 
-  .user-management-overview-container .daily-transfer-flow-bar .tooltip .border{
+ .daily-transfer-flow-bar .tooltip .border{
     content: "";
     width:1px;
     height: 16px;
@@ -24995,7 +24998,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
 }
 
-.user-management-grid-table .subaccount-img-big {
+.subaccount-img-big {
     margin: 4px 4px 0 4px;
     position: relative;
     box-sizing: border-box;
@@ -25004,7 +25007,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     overflow: visible;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button {
+.subaccount-img-big .subaccount-selection-button {
     width: 15px;
     height: 15px;
     border-radius: 100%;
@@ -25016,11 +25019,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.2s;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button:hover {
+.subaccount-img-big .subaccount-selection-button:hover {
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
+.subaccount-img-big .subaccount-selection-button::before {
     background-image: url(../images/mega/fm-main-sprite_v9.png);
     background-repeat: no-repeat;
     background-position: -16px -4912px;
@@ -25032,19 +25035,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.2s;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button.select-on::before {
+.subaccount-img-big .subaccount-selection-button.select-on::before {
     opacity: 1;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button.select-off::before {
+.subaccount-img-big .subaccount-selection-button.select-off::before {
     opacity: 0;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-selection-button.select-off:hover::before {
+.subaccount-img-big .subaccount-selection-button.select-off:hover::before {
     opacity: 0.3;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-button {
+.subaccount-img-big .subaccount-button {
     width: 25px;
     height: 16px;
     border-radius: 6px;
@@ -25057,11 +25060,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.2s;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-button:hover {
+.subaccount-img-big .subaccount-button:hover {
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-button .subaccount-button-dot {
+.subaccount-img-big .subaccount-button .subaccount-button-dot {
     width: 3px;
     height: 3px;
     background-color: #999999;
@@ -25071,11 +25074,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 6.5px 0;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-button .subaccount-button-dot:first-child {
+.subaccount-img-big .subaccount-button .subaccount-button-dot:first-child {
     margin-left: 5px;
 }
 
-.user-management-grid-table .subaccount-img-big .subaccount-button .subaccount-button-dot:nth-child(2) {
+.subaccount-img-big .subaccount-button .subaccount-button-dot:nth-child(2) {
     margin: 6.5px 3px;
 }
 
@@ -25474,7 +25477,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:12px 12px 0 0;
 }
 .user-management-dialog .dialog-button-container .default-green-button-user-management.add-sub-user {
-    margin:12px 32px 0 0px;
+    margin:12px 32px 12px 0px;
 }
 .user-management-dialog .delete-img.icon {
     position: absolute;
@@ -27276,7 +27279,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-list-table tr .name {
-    padding: 0px 15px;
+    padding: 0px 12px;
 }
 
 .user-management-list-table .header-table-user-management tr th, .user-management-list-table tr td {
@@ -27925,7 +27928,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .business-dashboard .overall-usage-container {
-    width: calc(100% - 48px);
     margin:24px 24px 12px 24px;
     clear: both;
 }
@@ -27942,24 +27944,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     padding: 0;
 }
 
-.business-dashboard .subaccount-view-used-data .used-storage-info{
-    box-sizing: border-box;
-    padding-left: 24px;
-}
-
 .business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links{
     cursor: pointer;
 }
 
-.business-dashboard .subaccount-view-used-data .used-storage-info .used-storage-info {
-    box-sizing: border-box;
-    padding-left: 24px;
-}
-
-.business-dashboard .subaccount-view-used-data .used-storage-info .ff-occupy {
-    float: right;
-    width: 100px;
-}
 .business-dashboard .qr-container {
     width:calc(34% - 42px);
     height: 352px;
@@ -27967,21 +27955,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
     vertical-align: top;
     position: relative;
+    text-align: center;
 }
 
 .business-dashboard .qr-code {
     width: 120px;
     height: 120px;
     position: relative;
-    margin-top: 12px;
-    margin-left: calc(50% - 53px);
-    margin-bottom: 12px;
+    margin: 12px auto;
 }
 
 .business-dashboard .qr-container .default-white-button-user-management {
-    width:150px;
-    text-align: center;
-    margin-left: calc(50% - 75px);
+    min-width: 150px;
+    float: none;
+    margin: 0;
 }
 
 .business-dashboard .qr-container .note {

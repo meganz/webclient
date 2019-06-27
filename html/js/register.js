@@ -236,11 +236,7 @@ function continueNewRegistration(result) {
 
         $('.fm-dialog.registration-page-success').off('click');
 
-
-        mega.ui.sendSignupLinkDialog(rv, function () {
-            delete localStorage.awaitingConfirmationAccount;
-            init_page();
-        });
+        mega.ui.sendSignupLinkDialog(rv);
 
         u_attr.terms = 1;
 

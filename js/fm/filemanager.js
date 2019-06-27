@@ -2958,11 +2958,11 @@ FileManager.prototype.addGridUI = function(refresh) {
     // Change title for Public link page
     if (page === 'fm/public-links') {
         $('.fm .grid-table-header .ts').text(l[20694]);
-        $('.fm .grid-table-header .mtime').text(l[20694]);
+        $('.fm .grid-table-header .date').text(l[20694]);
     }
     else {
         $('.fm .grid-table-header .ts').text(l[17445]);
-        $('.fm .grid-table-header .mtime').text(l[94]);
+        $('.fm .grid-table-header .date').text(l[17445]);
     }
 
     // $.gridDragging=false;
@@ -2996,6 +2996,9 @@ FileManager.prototype.addGridUI = function(refresh) {
                         }
                         else {
                             $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                            if ($header.outerWidth() < M.columnsWidth.cloud[col].min) {
+                                $header.outerWidth(M.columnsWidth.cloud[col].min);
+                            }
                         }
                     }
 

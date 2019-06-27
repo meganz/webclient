@@ -1114,7 +1114,7 @@
                 }
 
                 if (!aNode.t && aNode.tvf) {
-                    // aTemplate.classList.add('versioning');
+                    aTemplate.classList.add('versioning');
                     var vTemplate = aTemplate.querySelector('.hd-versions');
                     if (vTemplate) {
                         vTemplate.appendChild(versionColumnPrepare(aNode.tvf, aNode.tvb || 0));

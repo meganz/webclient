@@ -417,14 +417,14 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         $(menuCMI).filter('.dropdown-item').hide();
         var itemsViewed = false;
-        var ignoreGridextras = false;
+        var ignoreGrideExtras = false;
 
         if (M.currentdirid !== 'shares' && M.currentdirid !== 'out-shares') {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
             if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').show();
-                    ignoreGridextras = true;
+                    ignoreGrideExtras = true;
                 }
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
@@ -436,7 +436,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 itemsViewed = true;
             }
         }
-        if (!ignoreGridextras && M.viewmode) {
+        if (!ignoreGrideExtras && M.viewmode) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
             if (M.currentdirid === 'shares') {
@@ -519,7 +519,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 }
             }
         }
-        // asyncShow = true;
     }
     else if (ll) {// Click on item
 
@@ -841,8 +840,6 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
-
-
     };
 
     /**

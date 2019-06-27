@@ -291,13 +291,13 @@
     };
 
     var labelsColors = {
-        'red': l[16223] || 'Red',
-        'orange': l[16224] || 'Orange',
-        'yellow': l[16225] || 'Yellow',
-        'green': l[16226] || 'Green',
-        'blue': l[16227] || 'Blue',
-        'purple': l[16228] || 'Purple',
-        'grey': l[16229] || 'Grey'
+        'red': l[16223],
+        'orange': l[16224],
+        'yellow': l[16225],
+        'green': l[16226],
+        'blue': l[16227],
+        'purple': l[16228],
+        'grey': l[16229]
     };
 
 

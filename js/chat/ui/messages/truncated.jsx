@@ -42,7 +42,6 @@ var TruncatedMessage = React.createClass({
                                         className="message avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time simpletip"
                             data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-            name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
         }
 
 

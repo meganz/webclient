@@ -8,7 +8,19 @@ var getMessageString = require('./utils.jsx').getMessageString;
 
 var PrivilegeChange = React.createClass({
     mixins: [ConversationMessageMixin],
+    haveMoreContactListeners: function() {
+        if (!this.props.message.meta || !this.props.message.meta.targetUserId) {
+            return false;
+        }
 
+        var uid = this.props.message.meta.targetUserId;
+        if (uid && M.u[uid]) {
+            return uid;
+        }
+        else {
+            return false;
+        }
+    },
     render: function () {
         var self = this;
         var cssClasses = "message body";

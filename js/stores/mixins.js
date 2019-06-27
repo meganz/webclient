@@ -100,7 +100,8 @@ var MegaRenderMixin = {
         if (this.props.requiresUpdateOnResize) {
             $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
         }
-        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize);
+        window.addEventListener('hashchange', this.queuedUpdateOnResize);
 
         // init on data structure change events
         if (this.props) {
@@ -133,11 +134,10 @@ var MegaRenderMixin = {
         return ReactDOM.findDOMNode(this);
     },
     componentWillUnmount: function() {
-        if (this.props.requiresUpdateOnResize) {
-            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-        }
+        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
+        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
 
-        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+        window.removeEventListener('hashchange', this.queuedUpdateOnResize);
 
         this._isMounted = false;
     },
@@ -197,6 +197,7 @@ var MegaRenderMixin = {
             return;
         }
         if (!self.isComponentEventuallyVisible()) {
+            this._requiresUpdateOnResize = true;
             return;
         }
 
@@ -223,6 +224,12 @@ var MegaRenderMixin = {
         clearTimeout(this._updatesReenableTimer);
         this._updatesDisabled = false;
         this.eventuallyUpdate();
+    },
+    queuedUpdateOnResize: function() {
+        if (this.isMounted() && this._requiresUpdateOnResize && this.isComponentEventuallyVisible()) {
+            this._requiresUpdateOnResize = false;
+            this.eventuallyUpdate();
+        }
     },
     onResizeDoUpdate: function() {
         if (!this.isMounted() || this._pendingForceUpdate === true) {

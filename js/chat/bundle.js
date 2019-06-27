@@ -13262,7 +13262,9 @@ React.makeElement = React['createElement'];
 	                                                label: __(l[1187]),
 	                                                onClick: self._startDownload.bind(self, v) });
 
-	                                            self._addLinkButtons(v.h, linkButtons);
+	                                            if (M.getNodeRoot(v.h) !== M.RubbishID) {
+	                                                self._addLinkButtons(v.h, linkButtons);
+	                                            }
 
 	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
 	                                                key: 'infoDialog',

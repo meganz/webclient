@@ -8858,7 +8858,7 @@ body:not(.en) .warning-dialog-a.wide {
     width: 27px;
     margin: 2px 0 0 0;
 }
-.fm-blocks-view .versioning .versioning-indicator {
+.fm-blocks-view .versioning .versioning-indicator, .ver-col-container .versioning .versioning-indicator {
     display: block;
 }
 .taken-down .dialog.versioning-indicator {

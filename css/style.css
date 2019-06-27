@@ -8858,7 +8858,7 @@ body:not(.en) .warning-dialog-a.wide {
     width: 27px;
     margin: 2px 0 0 0;
 }
-.versioning .versioning-indicator {
+.fm-blocks-view .versioning .versioning-indicator {
     display: block;
 }
 .taken-down .dialog.versioning-indicator {
@@ -30448,4 +30448,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .grid-table.fm tr {
     white-space: nowrap;
+}
+.megaList.grid-scrolling-table.ps-container.ps-active-x > .ps-scrollbar-x-rail {
+    display: none;
+}
+.grid-table.fm td[megatype="fname"] {
+    min-width: 180px;
 }

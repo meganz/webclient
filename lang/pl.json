@@ -278,9 +278,9 @@
     "823": "Ustawienia",
     "824": "Nowy udost\u0119pniony katalog od [X]",
     "825": "Nowy udost\u0119pniony katalog",
-    "828": "[X1] folders and [X2] files",
-    "829": "[X] folders and 1 file",
-    "830": "1 folder and [X] files",
+    "828": "[X1] katalog\u00f3w i [X2] plik\u00f3w",
+    "829": "[X] katalog\u00f3w i 1 plik",
+    "830": "1 katalog i [X] plik\u00f3w",
     "831": "1 katalog i 1 plik",
     "832": "[X] katalog\u00f3w",
     "833": "[X] plik\u00f3w",
@@ -358,7 +358,7 @@
     "999": "Czy chcesz obecn\u0105 sesj\u0119 doda\u0107 do darmowego konta?",
     "1000": "Unikniesz utraty dost\u0119pu. Darmowa rejestracja jest zalecana!",
     "1001": "Usu\u0144 kontakt",
-    "1002": "Czy na pewno chcesz usun\u0105c [X] z listy swoich kontakt\u00f3w?",
+    "1002": "Czy na pewno chcesz usun\u0105\u0107 [X] z listy kontakt\u00f3w?",
     "1003": "Potwierd\u017a usuni\u0119cie",
     "1004": "Czy na pewno chcesz przenie\u015b\u0107 [X] do kosza?",
     "1005": "Tworzenie link\u00f3w dost\u0119pne dla zarejestrowanych u\u017cytkownik\u00f3w.",
@@ -3493,6 +3493,6 @@
     "20831": "Subskrypcja zosta\u0142a anulowana pomy\u015blnie",
     "20832": "Nie b\u0119dziesz otrzymywa\u0107 wiadomo\u015bci e-mail od MEGA. Pami\u0119taj, \u017ce je\u015bli zarejestrujesz si\u0119 na konto MEGA w przysz\u0142o\u015bci, wznowimy wysy\u0142anie Ci e-maili.",
     "20833": "Czy zrezygnowa\u0142e\u015b z subskrypcji przez pomy\u0142k\u0119?",
-    "20840": "Copy All",
-    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
+    "20840": "Skopiuj wszystko",
+    "20846": "Nie mo\u017cesz znale\u017a\u0107 tego, czego szukasz? [A]Wszystkie pliki do pobrania[\/A]"
 }

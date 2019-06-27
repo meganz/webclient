@@ -30354,3 +30354,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .grid-table.fm tr {
     white-space: nowrap;
 }
+.megaList.grid-scrolling-table.ps-container.ps-active-x > .ps-scrollbar-x-rail {
+    display: none;
+}
+.grid-table.fm td[megatype="fname"] {
+    min-width: 180px;
+}

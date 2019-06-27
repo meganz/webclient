@@ -9,7 +9,7 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { min: 120, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
+    this.columnsWidth.cloud.fname = { min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
     this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
     this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
@@ -2959,10 +2959,12 @@ FileManager.prototype.addGridUI = function(refresh) {
     if (page === 'fm/public-links') {
         $('.fm .grid-table-header .ts').text(l[20694]);
         $('.fm .grid-table-header .date').text(l[20694]);
+        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[20694]);
     }
     else {
         $('.fm .grid-table-header .ts').text(l[17445]);
         $('.fm .grid-table-header .date').text(l[17445]);
+        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[17445]);
     }
 
     // $.gridDragging=false;

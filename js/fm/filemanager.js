@@ -759,7 +759,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         // do if there's no transfers, we will allow going to transfers page
                         return false;
                     }
-                    
+
                 }
                 else {
                     mega.tpw.hideWidget();
@@ -1196,7 +1196,7 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction.bind(this));
+    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction);
 
     $(c + '.removelink-item').rebind('click', function() {
         // check if this is a business expired account
@@ -1685,7 +1685,7 @@ FileManager.prototype.initContextUI = function() {
 
         if ($(this).hasClass('transfer-play')) {
             ids.map(fm_tfsresume);
-            
+
         }
         else {
             ids.map(fm_tfspause);
@@ -2845,8 +2845,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             initFileblocksScrolling2();
         }
     }
-    else if (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID) {
-        //console.error("Inbox iconUI");
+    else if (this.currentdirid !== 'user-management' &&
+        (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
         if (this.v.length > 0) {
             $('.fm-blocks-view.fm').removeClass('hidden');
             initFileblocksScrolling();
@@ -2967,9 +2967,11 @@ FileManager.prototype.addGridUI = function(refresh) {
     // Change title for Public link page
     if (page === 'fm/public-links') {
         $('.fm .grid-table-header .ts').text(l[20694]);
+        $('.fm .grid-table-header .mtime').text(l[20694]);
     }
     else {
         $('.fm .grid-table-header .ts').text(l[17445]);
+        $('.fm .grid-table-header .mtime').text(l[94]);
     }
 
     // $.gridDragging=false;
@@ -4506,6 +4508,116 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     return promise;
 };
 
+FileManager.prototype.openSharingDialog = function() {
+    'use strict';
+
+    // check if this is a business expired account
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        M.showExpiredBusiness();
+        return;
+    }
+    if (u_type === 0) {
+        return ephemeralDialog(l[1006]);
+    }
+    var $dialog = $('.fm-dialog.share-dialog');
+
+    var showShareDlg = function() {
+        $.hideContextMenu();
+        clearScrollPanel($('.share-dialog-contacts', $dialog));
+
+        // Show the share dialog
+        $dialog.removeClass('hidden');
+
+        // Hide the optional message by default.
+        // This gets enabled if user want to share
+        $dialog.find('.share-message').hide();
+
+        $dialog.find('.dialog-share-button').addClass('disabled');
+
+        fillShareDialogWithContent();
+
+        // Taking care about share dialog button 'Done'/share and scroll
+        shareDialogContentCheck();
+
+        // Clear text area message
+        $('.share-message textarea', $dialog).val(l[6853]);
+
+        // Maintain drop down list updated
+        updateDialogDropDownList('.share-multiple-input');
+
+        $('.share-dialog-icon.permissions-icon')
+            .removeClass('active full-access read-and-write')
+            .safeHTML('<span></span>' + l[55])
+            .addClass('read-only');
+
+        // Update dialog title text
+        $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
+        $('.multiple-input .token-input-token-mega', $dialog).remove();
+        initTokenInputsScroll($('.multiple-input', $dialog));
+        Soon(function() {
+            $('.token-input-input-token-mega input', $dialog).trigger("focus");
+        });
+
+        dialogPositioning($dialog);
+
+        return $dialog;
+    };
+
+    var mdList = mega.megadrop.isDropExist($.selected);
+    if (mdList.length) {
+        mega.megadrop.showRemoveWarning(mdList).done(function() {
+            M.safeShowDialog('share', showShareDlg);
+        });
+    }
+    else {
+        M.safeShowDialog('share', showShareDlg);
+    }
+};
+
+FileManager.prototype.getLinkAction = function() {
+    'use strict';
+
+    // check if this is a business expired account
+    if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        $.hideContextMenu();
+        showExpiredBusiness();
+        return;
+    }
+
+    // ToDo: Selected can be more than one folder $.selected
+    // Avoid multiple referencing $.selected instead use event
+    // add new translation message '... for multiple folders.'
+    // cancel descendant MEGAdrops after copyRights are accepted
+    if (u_type === 0) {
+        ephemeralDialog(l[1005]);
+    }
+    else {
+        var isEmbed = $(this).hasClass('embedcode-item');
+        var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
+        var showDialog = function() {
+            mega.Share.initCopyrightsDialog(selNodes, isEmbed);
+        };
+
+        var mdList = mega.megadrop.isDropExist(selNodes);
+        if (mdList.length) {
+            var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
+
+            msgDialog('confirmation', l[1003], fldName, false, function(e) {
+                if (e) {
+                    mega.megadrop.pufRemove(mdList);
+                    // set showDialog as callback for after delete puf.
+                    mega.megadrop.pufCallbacks[selNodes[0]] = {del: showDialog};
+                }
+            });
+        }
+        else {
+            showDialog();
+        }
+    }
+};
+
+
 (function(global) {
     'use strict';
 
@@ -4518,7 +4630,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         copy: ['createfolder'],
         move: ['createfolder'],
         register: ['terms'],
-        selectFolder: ['createfolder'],
+        selectFolder: ['createfolder']
     };
 
     var _openDialog = function(name, dsp) {
@@ -4581,7 +4693,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
                 }
 
                 if ($dialog) {
-                    if (!$dialog.hasClass('fm-dialog')) {
+                    if (!$dialog.hasClass('fm-dialog') && !$dialog.hasClass('fm-dialog-mobile')) {
                         throw new Error('Unexpected dialog type...');
                     }
 
@@ -4591,6 +4703,14 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
                     fm_showoverlay();
                     $dialog.removeClass('hidden arrange-to-back');
+
+                    if (!is_mobile) {
+                        // Center dialogs
+                        $dialog.css({
+                            'margin-left': -1 * ($dialog.outerWidth() / 2),
+                            'margin-top': -1 * ($dialog.outerHeight() / 2)
+                        });
+                    }
                 }
                 $.dialog = String(name);
             }, function(ex) {
@@ -4603,110 +4723,5 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         })(dialogName, dispatcher);
 
         _openDialog(dialogName, dispatcher);
-    };
-
-    FileManager.prototype.openSharingDialog = function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
-            return;
-        }
-        if (u_type === 0) {
-            return ephemeralDialog(l[1006]);
-        }
-        var $dialog = $('.fm-dialog.share-dialog');
-
-        var showShareDlg = function() {
-            $.hideContextMenu();
-            clearScrollPanel($('.share-dialog-contacts', $dialog));
-
-            // Show the share dialog
-            $dialog.removeClass('hidden');
-
-            // Hide the optional message by default.
-            // This gets enabled if user want to share
-            $dialog.find('.share-message').hide();
-
-            $dialog.find('.dialog-share-button').addClass('disabled');
-
-            fillShareDialogWithContent();
-
-            // Taking care about share dialog button 'Done'/share and scroll
-            shareDialogContentCheck();
-
-            // Clear text area message
-            $('.share-message textarea', $dialog).val(l[6853]);
-
-            // Maintain drop down list updated
-            updateDialogDropDownList('.share-multiple-input');
-
-            $('.share-dialog-icon.permissions-icon')
-                .removeClass('active full-access read-and-write')
-                .safeHTML('<span></span>' + l[55])
-                .addClass('read-only');
-
-            // Update dialog title text
-            $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
-            $('.multiple-input .token-input-token-mega', $dialog).remove();
-            initTokenInputsScroll($('.multiple-input', $dialog));
-            Soon(function() {
-                $('.token-input-input-token-mega input', $dialog).trigger("focus");
-            });
-
-            dialogPositioning($dialog);
-
-            return $dialog;
-        };
-
-        var mdList = mega.megadrop.isDropExist($.selected);
-        if (mdList.length) {
-            mega.megadrop.showRemoveWarning(mdList).done(function() {
-                M.safeShowDialog('share', showShareDlg);
-            });
-        }
-        else {
-            M.safeShowDialog('share', showShareDlg);
-        }
-    };
-
-    FileManager.prototype.getLinkAction = function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
-            return;
-        }
-
-        // ToDo: Selected can be more than one folder $.selected
-        // Avoid multiple referencing $.selected instead use event
-        // add new translation message '... for multiple folders.'
-        // cancel descendant MEGAdrops after copyRights are accepted
-        if (u_type === 0) {
-            ephemeralDialog(l[1005]);
-        }
-        else {
-            var isEmbed = $(this).hasClass('embedcode-item');
-            var selNodes = Array.isArray($.selected) ? $.selected.concat() : [];
-            var showDialog = function() {
-                mega.Share.initCopyrightsDialog(selNodes, isEmbed);
-            };
-
-            var mdList = mega.megadrop.isDropExist(selNodes);
-            if (mdList.length) {
-                var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
-
-                msgDialog('confirmation', l[1003], fldName, false, function(e) {
-                    if (e) {
-                        mega.megadrop.pufRemove(mdList);
-                        // set showDialog as callback for after delete puf.
-                        mega.megadrop.pufCallbacks[selNodes[0]] = {del:showDialog};
-                    }
-                });
-            }
-            else {
-                showDialog();
-            }
-        }
     };
 })(self);

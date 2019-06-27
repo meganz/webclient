@@ -54,7 +54,7 @@ var bottompage = {
                     bottompage.topBlockHeight();
                 });
             }
-        } 
+        }
     },
 
     initBackToScroll: function() {
@@ -62,6 +62,9 @@ var bottompage = {
 
         $('#startholder').bind('scroll.bottompage', function() {
             sessionStorage.setItem('scrollPosition_' + page, $(this).scrollTop());
+            if (page === 'download') {
+                $(window).unbind('resize.download-bar');
+            }
         });
 
         window.onpopstate = function() {
@@ -69,6 +72,10 @@ var bottompage = {
 
             if ($('body').hasClass('bottom-pages') && sessionData) {
                 $('#startholder').scrollTop(sessionData);
+                if (page === 'download') {
+                    $('.download.top-bar').removeClass('expanded').css('height', '');
+                    $(window).unbind('resize.download-bar');
+                }
             }
         };
     },
@@ -131,7 +138,7 @@ var bottompage = {
             }
 
             navDropdownPos();
-            
+
             $('body, html').rebind('touchmove.bodyscroll', function () {
                 hiddenNavDropdown();
             });
@@ -160,7 +167,7 @@ var bottompage = {
         "use strict";
 
         var $slider = $('.bottom-page.slider-body');
-        
+
         $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
             var $this = $(this);
             var $buttons;
@@ -235,11 +242,11 @@ var bottompage = {
             if ($topHeader.hasClass('floating')) {
                 $topHeader.width($topHeader.parent().outerWidth());
                 if (page !== 'download') {
-                    $navBar.parent().height($navBar.outerHeight());
+                    $navBar.parent().width($navBar.outerWidth());
                 }
             }
             else {
-                $topHeader.removeAttr('style');
+                $topHeader.css('width',  '');
                 $navBar.parent().removeAttr('style');
             }
         }
@@ -254,8 +261,11 @@ var bottompage = {
             var topPos = $(this).scrollTop();
             var navTopPos;
 
+            if (topPos > 150) {
+                $topHeader.removeClass('expanded');
+            }
             if (topPos > 300) {
-                $topHeader.addClass('floating');
+                $topHeader.removeClass('expanded').addClass('floating');
                 topResize();
                 if (topPos > 600) {
                     $topHeader.addClass('activated');
@@ -265,10 +275,10 @@ var bottompage = {
                 $topHeader.removeClass('activated');
             }
             else {
-                $topHeader.removeClass('floating activated').removeAttr('style');
+                $topHeader.removeClass('floating activated').css('width',  '');
             }
 
-            if ($navBar.length === 0) {
+            if ($navBar.length === 0 || page === 'download') {
                 return;
             }
 
@@ -308,7 +318,7 @@ var bottompage = {
 
         var $videoWrapper = $('.security-page-video-block');
         var videoWidth = $videoWrapper.outerWidth();
-        
+
         if ($videoWrapper.length > 0 && videoWidth < 640) {
             $videoWrapper.height(Math.round(videoWidth * 0.54));
         }

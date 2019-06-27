@@ -26,8 +26,8 @@ body.pro:after {
     background-image: url(../images/mega/context-top@2x.png);
     background-size: 27px auto;
 }
-.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .video .play-video-button {
-    background-image: url(../images/mega/download-sprite-v9@2x.png);
+.download-dialog-icon, .download-chrome-lnk, a.download-chrome-lnk, .download-user-icon, .new-download-sync-app, .new-download-red-button, .mega-list-arrow, .megasync-logo, .megasync-table table th span, .megasync-table table td span, .default-dropdown-item.icon, .camera-bottom-icon, .camera-top-icon, .button.download-button.down-arrow, .button.download-button.to-clouddrive, .download-icon, .download.error-text.na-icon, .download.error-text.cross-icon, .download.error-text.error-icon, .megasync-info-arrow, .megasync-dark-logo, .megasync-icon, .video .play-video-button, .download.error-big-icon {
+    background-image: url(../images/mega/download-sprite_v10@2x.png);
     background-size: 257px auto;
 }
 .top-login-full, .top-login-input-block, .top-login-warning-close, .top-login-warning-icon, .top-login-popup .top-login-warning-bott .checkboxOn, .top-login-popup .top-login-warning-bott .checkboxOff, .top-login-tooltip-arrow, .password-tooltip-arrow, .login-register-input, .register-st2-button, .register-st2-button-arrow, .password-status-icon, .login-notification-icon, .top-login-forgot-pass, .login-forgot-password, .checkboxOn::after, .checkboxOff::after, .contains-value .top-clear-button, .account-history-drop-items.active, .account-warning-icon, .warning-gray-icon, .membership-arrow, .small-icon.membership, .dropdown-white-arrow, .dropdown-item.tick-item.active::before, .dropdown-item.do-sort.selected i, .fm-dialog:not(exceeded) .pro-plan-descr::after, .dropdown.close-button, .fm-picker-dialog .fm-dialog-body .nw-contact-item .nw-contact-checkbox::before {
@@ -36,7 +36,7 @@ body.pro:after {
 }
 
 .small-icon.membership.pro100, .tiny-icon.membership-status.pro100 {
-    background-image: url(../images/mega/big-icons_v3@2x.png);
+    background-image: url(../images/mega/big-icons_v4@2x.png);
     background-size: 192px auto;
 }
 
@@ -145,7 +145,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 436px auto;
 }
 .logo, .languages-dialog .show-more-languages .round-arrow span, .top-head .top-icon::before, .top-menu-popup .top-icon::before, .top-bar .top-icon::before, .main-top.top-icon::before, .notification-txt, .nw-bottom-copyrights, .nw-bottom-social, .top-login-warning-arrow, .main-top-info-text, .new-notification-icon, .feedback-button, .semi-small-icon.grey-mega, .semi-small-icon.white-mega, .semi-small-icon.yellow-triangle, .tiny-icon.membership-status, .top-menu-item.submenu-item::before, .medium-icon.rocket, .nlanguage-bottom, .tiny-icon.green-tick, .tiny-icon.red-cross, .site-update-available .mega-icon, .megasync-close, .improved-recovery-steps .list-point b.megasync-logo, i.account-icon, .fm-files-search i.search, .send-chat .toast-icon {
-    background-image: url(../images/mega/top-sprite_v6@2x.png);
+    background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
 }
 .block-view-file-type, .dragger-icon, .export-icon, .new-download-file-icon, .share-folder-icon div, .transfer-filetype-icon, .medium-file-icon, .shared-folder-icon, .nw-fm-tree-folder::before, .shared-details-icon, .contact-share-notification::before, .search-path-icon.folder, .search-path-icon.shared-folder, .search-path-icon-span {
@@ -157,8 +157,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 560px auto;
 }
 .download.big-icon, .fm-dialog-close.big, .megasync-img::before, .megasync-slider.button::after {
-    background-image: url(../images/mega/download-dialog_v1@2x.png);
-    background-size: 768px auto;
+    background-image: url(../images/mega/download-dialog_v2@2x.png);
+    background-size: 853px auto;
 }
 .upload-overlay-icon {
     background-image: url(../images/mega/startpage-sprite_v9@2x.png);
@@ -185,12 +185,12 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .cn .dropdown.hint-thumb {
     background-image: url(../images/mega/hints-sprite-cn_v1@2x.png);
 }
-.widget-dialog .fm-body-text .widget-folder-icon, .tab-icon.url, .tab-icon.embed, .widget-card .widget-minimise, .widget-card .widget-maximise, .shared .contact-list-icon, .properties-context-arrow, .properties-share-icon, .fm-notification-close, .dlkey-dialog .decryption-key .icon, .password-dialog .decryption-password .icon, .fm-dialog-close, .btn-close-dialog, .export-links-warning-close, .fm-notification-icon, .delete-contact.multiple .fm-del-contact-avatar, .fm-notification-warning::before, .export-gradient, .export-link-expiry-icon, .export-links-warning-close, .shared-with-me.read-only .properties-elements-counter span, .shared-with-me.read-and-write .properties-elements-counter span, .shared-with-me.full-access .properties-elements-counter span, .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon, .notification-empty-icon, .start-chat-button, .start-chat-button span, .multiple-input-warning .arrow, .duplicated-input-warning .arrow, li.token-input-token-mega .input-close, li.token-input-token-invite .input-close, .share-pending-arrow, .email .search-avatar::after, .gmail .search-avatar::after, .gmail .avatar-wrapper::after, .email .avatar-wrapper::after, .pending .search-avatar::after, .pending-indicator::after, .share-search-result.selected, .share-dialog-img, .share-dialog-icon, .add-user-icon, .import-contacts-link span, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e, #ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close, .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon, .information-icon, .information-icon div span, .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span, .share-dialog-remove-button, .import-contacts-service.imported, .import-contacts-service span, .import-contacts-info, .import-contacts-info-txt .import-arrow, .imported-notification-close, .rating a, .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-question.stats-button, .nw-fm-dialog-title span, .bandwidth-text-bl .star, .bandwidth-back-button, .copyrights-dialog-icon, .embed-content-block .tab-icon.url, .embed-content-block .tab-icon.embed, .bottom-info.fm-dialog-close, .notification-loading-icon, .verify-ph-icon {
-    background-image: url(../images/mega/dialog-sprite_v5@2x.png);
+.widget-dialog .fm-body-text .widget-folder-icon, .tab-icon.url, .tab-icon.embed, .widget-card .widget-minimise, .widget-card .widget-maximise, .shared .contact-list-icon, .properties-context-arrow, .properties-share-icon, .fm-notification-close, .dlkey-dialog .decryption-key .icon, .password-dialog .decryption-password .icon, .fm-dialog-close, .btn-close-dialog, .export-links-warning-close, .fm-notification-icon, .delete-contact.multiple .fm-del-contact-avatar, .fm-notification-info p.red::before, .export-gradient, .export-link-expiry-icon, .export-links-warning-close, .shared-with-me.read-only .properties-elements-counter span, .shared-with-me.read-and-write .properties-elements-counter span, .shared-with-me.full-access .properties-elements-counter span, .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon, .notification-empty-icon, .start-chat-button, .start-chat-button span, .multiple-input-warning .arrow, .duplicated-input-warning .arrow, li.token-input-token-mega .input-close, li.token-input-token-invite .input-close, .share-pending-arrow, .email .search-avatar::after, .gmail .search-avatar::after, .gmail .avatar-wrapper::after, .email .avatar-wrapper::after, .pending .search-avatar::after, .pending-indicator::after, .share-search-result.selected, .share-dialog-img, .share-dialog-icon, .add-user-icon, .import-contacts-link span, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w, #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e, #ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close, .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon, .information-icon, .information-icon div span, .share-dialog-permissions span, .share-dialog-icon.permissions-icon span, .permissions-menu span, .fm-dialogs-select span, .fm-dialogs-dropdown span, .share-dialog-remove-button, .import-contacts-service.imported, .import-contacts-service span, .import-contacts-info, .import-contacts-info-txt .import-arrow, .imported-notification-close, .rating a, .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff, .membership-question.stats-button, .nw-fm-dialog-title span, .bandwidth-text-bl .star, .bandwidth-back-button, .copyrights-dialog-icon, .embed-content-block .tab-icon.url, .embed-content-block .tab-icon.embed, .bottom-info.fm-dialog-close, .notification-loading-icon, .verify-ph-icon {
+    background-image: url(../images/mega/dialog-sprite_v7@2x.png);
     background-size: 160px auto;
 }
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .huge-grey-warning, .round-icon, .call-icon, .verified .verified_icon, .icon-dropdown:not(.disabled):hover, .icon-dropdown.active, .user-card-verified, div.message.richpreview.confirmation-icon, .dropdown-fingerprint, div.chat-topic-icon::before, div.chat-share-nav.button::before, div.chat-topic-icon::before, div.chat-share-nav.button::before, .chat-topic-block.privateChat .privateChatDiv, .privateChat + .privateChatDiv {
-    background-image: url(../images/mega/new-chat-sprite_v11@2x.png);
+    background-image: url(../images/mega/new-chat-sprite_v12@2x.png);
     background-size: 237px auto;
 }
     .invitation-dialog.table-cell span.desc, .invitation-dialog.table-cell span.asc, .tiny-icon.cog, .big-icon.cloud, .big-icon.speedometer, .semi-big-icon.cloud-up, .semi-big-icon.cloud-down, .medium-icon.cloud, .medium-icon.speedometer, .small-icon.grey-plus:not(.icons-sprite), .semi-small-icon.file, .semi-small-icon.folder, .semi-small-icon.left-arrow, .semi-small-icon.right-arrow, .semi-small-icon.rubbish, .semi-small-icon.rubbish-arrows, .semi-small-icon.linked, .semi-small-icon.star, .semi-small-icon.cloud, .semi-small-icon.down-arrow, .semi-small-icon.left-arrow-with-dot, .semi-small-icon.circle, .semi-big-icon.cloud, .semi-big-icon.speedometer, .semi-small-icon.tick, .semi-small-icon.dots, .semi-small-icon.rounded-arrow, .semi-small-icon.exclamation-point, .small-icon.dark-grey-plus, .small-icon.small-red-cross, .small-icon.file-upload:not(.context), .small-icon.folder-upload:not(.context), .small-icon.import-to-cloud, .small-icon.download-as-zip:not(.context), .small-icon.pause-icon, .small-icon.play-icon, .small-icon.refresh-icon, .ui-slider-handle::before, .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt, .fm-contact-requests span, .fm-received-requests span, .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon, .fm-add-user-scrolling .nw-contact-item, .fm-dialog-search, .verified .nw-contact-verified-icon, .nw-verified-icon, .nw-tree-panel-arrows, .fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows, .nw-fm-search-icon, .nw-fm-left-icon::before, .arrow.desc.grid-header-star, .arrow.asc.grid-header-star, .grid-header-star, .grid-status-icon.star, .grid-status-icon, .file-status-icon.star, .contact-status-icon, .linked .data-item-icon, .taken-down .file-status-icon, .undecryptable .file-status-icon, .clear-transfer-icon::after, .transfer-type::before, .transfer-status::before, .transfer-table .eta, .transfer-table .eta.unknown::before, .fm-breadcrumbs.has-next-button, .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg, .contact-request-ignored, .fm-files-view-icon, .fm-contacts-view-icon, .create-folder-size-icon, .add-user-size-icon, .fm-account-input::before, .fm-share-dropdown, .share-dialog-permissions, .share-dialog-icon.permissions-icon, .fm-dialogs-select, .default-select, .ui-selectmenu-button, .context-top-arrow, .context-bottom-arrow, .sorting-menu-item.active, .sorting-menu-item.selected, .sorting-menu-arrow, .transfer-table-header th:first-child span, .redeem-voucher .notification-arrow, .fm-close-all-sessions span, .settings-logout, .account.rounded-icon, .arrow:not(.grid-header-star), .search-path-icon.cloud-drive, .search-path-icon.recycle-item, .search-path-icon.inbox-item, .search-path-arrow, .star .incoming-contact-info span.incoming-call-name, .fm-mega-dialog-size-icon, .transfer-bar-overlay div, .fm-account-button::before, .search-path-icon.shared-folder, .search-path-icon.contacts-item, .shared-folder-access, .contacts-interation, .small-icon.fm-s, .notification-accepted, .notification-avatar-icon, .fm-picker-dialog .icon, .semi-big-icon.grnt-quota, .semi-big-icon.xscheduler, .fm-picker-dialog .next-arrow, .big-icon.fm-s, .achievements-cell .medium-icon.remind-icon, .fm-right-account-block .icon, .achieved-block.invitees .new-dialog-icon, .fm-right-account-block .underline-dropdown-input .list-arrow, .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control, .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control, .fm-right-account-block .tooltip-icon .medium-icon.info-icon, .float-widget.transfer-prorgess .banner .delete-img.icon {
@@ -198,7 +198,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
         background-size: 48px auto;
     }
 .fm-picker-dialog-button::before {
-    background-image: url(../images/mega/big-icons_v3@2x.png);
+    background-image: url(../images/mega/big-icons_v4@2x.png);
     background-size: 192px auto;
 }
 .achievements-scroll .achievements-icon, .achievements-scroll .green-tick, .verify-ph-bonus-valid-days .valid-days-title::before, .fm-dialog.verify-phone .achievements-icon {
@@ -278,9 +278,9 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 48px auto;
 }
 
-.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
+.subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share,
 .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share{
-    background-image: url(../images/mega/top-sprite_v6@2x.png);
+    background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
 }
 
@@ -313,24 +313,23 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/fm-main-sprite_v11@2x.png);
     background-size: 48px auto;
 }
-
-    .user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon, .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24, .user-management-dialog .icon102, .user-management-storage .img, .user-management-transfer .img {
-        background-image: url(../images/mega/big-icons_v3@2x.png);
-        background-size: 192px auto;
-    }
+.user-management-view .icon48, .user-management-dialog .icon48, .user-management-view .icon56, .user-management-dialog .icon56, .user-management-view-data .user-management-view-overall-usage .user-management-storage .img, .user-management-view-data .user-management-view-overall-usage .user-management-transfer .img, .user-management-landing-page .mega-56px-icon, .user-management-view .icon64, .user-management-dialog .icon64, .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon, .user-management-dialog .dialog-heading-img, .user-management-dialog .sent-email-logo, .bus-reg-btn .next-arrow, .bus-reg-btn-2 .next-arrow, .bus-plan-icon64, .bus-reg-featureImg100, .bus-confirm-body .bus-confirmImg, .user-management-account-settings .setting-icon24, .user-management-dialog .icon102, .user-management-storage .img, .user-management-transfer .img {
+    background-image: url(../images/mega/big-icons_v4@2x.png);
+    background-size: 192px auto;
+}
 .user-management-account-settings .invoice-detail .mega-logo, .user-management-account-settings .icon12 {
     background-image: url(../images/mega/invoice-image_v1@2x.png);
     background-size: 120px auto;
 }
-.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share, 
-.fm-right-header-user-management .folder-small-icon.ex-out-share, 
+.user-management-view .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share,
+.fm-right-header-user-management .folder-small-icon.ex-out-share,
 .user-management-dialog .folder-small-icon.ex-out-share,
 .business-dashboard .folder-small-icon.ex-out-share{
-    background-image: url(../images/mega/top-sprite_v6@2x.png);
+    background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
 }
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v6@2x.png);
+    background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
 }
 .bus-reg-checkbox.checkOn::before {
@@ -351,5 +350,9 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .background-cloud-img {
     background-image: url("../images/mega/cloud-background@2x.png");
     background-size: 512px auto;
+}
+.register-side-pane.top-block, .register-side-pane.top-bg {
+    background-image: url(../images/mega/register-sprite_v1@2x.png);
+    background-size: 612px auto;
 }
 }

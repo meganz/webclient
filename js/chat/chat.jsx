@@ -2645,8 +2645,6 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
                 skipInitialDialog: 1
             })
             .done(function () {
-                closeDialog();
-                topmenuUI();
                 if (page !== 'login') {
                     if (!notJoinReq) {
                         localStorage.autoJoinOnLoginChat = JSON.stringify(

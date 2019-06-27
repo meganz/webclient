@@ -57,6 +57,9 @@ function ui_keycomplete() {
             }
         }
         else {
+            onIdle(function() {
+                authring.initAuthenticationSystem();
+            });
             // Load the Pro page to choose plan, or the redeem page if a pending voucher is found.
             loadSubPage(localStorage.voucher ? 'redeem' : 'pro');
         }

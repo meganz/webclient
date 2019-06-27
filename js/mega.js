@@ -119,6 +119,12 @@ if (typeof loadingInitDialog === 'undefined') {
         }
         if (progress) {
             $('.loader-percents').width(progress + '%');
+
+            if (progress > 99) {
+                onIdle(function() {
+                    loadingInitDialog.step3();
+                });
+            }
         }
         this.progress = true;
     };
@@ -551,7 +557,10 @@ scparser.$helper.c = function(a) {
     if (megaChatIsReady) {
         $.each(a.u, function(k, v) {
             if (v.c !== 0) {
+                // load all keys.
                 crypt.getPubRSA(v.u);
+                crypt.getPubCu25519(v.u);
+                crypt.getPubEd25519(v.u);
             }
             megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
         });
@@ -611,9 +620,9 @@ scparser.$add('s', {
                         notify.notifyFromActionPacket({
                             a: 'dshare',
                             n: a.n,
-                            u: a.o,
+                            u: a.u,
                             orig: a.ou,
-                            rece: a.u
+                            rece: a.o
                         });
                     }
                 }
@@ -1512,6 +1521,13 @@ function execsc() {
         delete scq[scqtail++];
         delete a.scqi;
 
+        var idtag = a.i;
+        if (a.i !== requesti && M.scAckQueue[a.i] === requesti) {
+            // An API request triggered locally wanting to get notified when the associated packet is processed.
+            delete M.scAckQueue[a.i];
+            a.i = requesti;
+        }
+
         if (d) {
             console.info('Received SC command "' + a.a + '"' + (a.i === requesti ? ' (triggered locally)' : ''), a);
         }
@@ -1531,8 +1547,7 @@ function execsc() {
         }
 
         if (a.a === 's' || a.a === 's2') {
-            // Make this onIdle to prevent infinite loading.
-            mBroadcaster.sendMessage('share-packet.' + a.n, a);
+            mBroadcaster.sendMessage('share-packet.' + idtag, a);
         }
 
         tickcount++;
@@ -1983,7 +1998,10 @@ function worker_procmsg(ev) {
                 }
             }
 
-            if (fmdb) {
+            if (ufsc.cache && ev.data.p) {
+                ufsc.feednode(ev.data);
+            }
+            else if (fmdb) {
                 fmdb.add('f', {
                     h : ev.data.h,
                     p : ev.data.p,
@@ -1995,10 +2013,6 @@ function worker_procmsg(ev) {
             }
 
             emplacenode(ev.data);
-
-            if (ufsc.cache) {
-                ufsc.feednode(ev.data);
-            }
         }
     }
     else if (ev.data[0] === 'console') {
@@ -2031,8 +2045,10 @@ function worker_procmsg(ev) {
                 }
             }
 
-            loadfm_callback(residualfm);
-            residualfm = false;
+            setTimeout(function() {
+                loadfm_callback(residualfm);
+                residualfm = false;
+            }, 350);
         }
     }
     else {
@@ -2289,6 +2305,13 @@ function dbfetchfm() {
                                 if (fmdb) {
                                     fmdb.crashed = 666;
                                 }
+                            }
+
+                            if (ufsc) {
+                                if (d && $.len(ufsc.cache || {})) {
+                                    console.warn('found non-flushed ufs-cache entries...', [ufsc.cache], ufsc);
+                                }
+                                delete ufsc.cache;
                             }
 
                             // fetch & process new actionpackets

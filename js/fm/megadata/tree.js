@@ -102,12 +102,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
     else if (publiclinks) {
         $('.content-panel.public-links').html('<ul id="treesub_pl_public-links"></ul>');
         stype = "public-links";
-        for (var h in M.su.EXP) {
-            if (M.d[h].t) {
-                cvtree[h] = Object.assign({}, M.d[h]);
-                cvtree[h].t = M.getTreeValue(M.d[h]);
-            }
-        }
+        cvtree = M.getPublicLinkTree();
     }
     else if (n.h === M.InboxID) {
         if (typeof dialog === 'undefined') {
@@ -202,8 +197,14 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                 sortFn = M.sortByFavFn(sortDirection);
                 break;
             case 'created':
-                sortFn = function(a, b) {
-                    return (a.ts < b.ts ? -1 : 1) * sortDirection;
+                var type;
+
+                if (outshares || publiclinks) {
+                    type = stype;
+                }
+
+                sortFn = function (a, b) {
+                    return M.getSortByDateTimeFn(type)(a, b, sortDirection);
                 };
                 break;
             case 'label':
@@ -656,9 +657,10 @@ MegaData.prototype.treeSortUI = function() {
                 type = M.lastActiveTab || 'cloud-drive';
             }
 
+            menu.find('.sorting-item-divider,.dropdown-item').removeClass('hidden');
+
             // Show only contacts related sorting options
             if (type === 'contacts') {
-                menu.find('.sorting-item-divider,.dropdown-item').removeClass('hidden');
                 menu.find('*[data-by=fav],*[data-by=created],*[data-by=label]').addClass('hidden');
                 menu.find('.dropdown-section.labels').addClass('hidden');
                 menu.find('hr').addClass('hidden');
@@ -666,12 +668,16 @@ MegaData.prototype.treeSortUI = function() {
 
             }
             else { // Hide status and last-interaction sorting options in sort dialog
-                menu.find('.sorting-item-divider,.dropdown-item').removeClass('hidden');
                 menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
                 menu.find('hr').removeClass('hidden');
                 menu.find('.dropdown-section.labels').removeClass('hidden');
                 menu.find('.filter-by').removeClass('hidden');
             }
+
+            if (type === 'shared-with-me') {
+                menu.find('*[data-by=created]').addClass('hidden');
+            }
+
             sortMenuPos = $self.offset().top - 9;
 
             if (sortMenuPos < 3) {
@@ -886,10 +892,81 @@ MegaData.prototype.isLabelExistTree = function(handle) {
     handle = handle ? handle : M.currentrootid;
     var ct = M.tree[handle];
 
+    if (handle === 'out-shares') {
+        ct = M.getOutShareTree();
+    }
+    else if (handle === 'public-links') {
+        ct = M.getPublicLinkTree();
+    }
+
     for (var h in ct) {
         if (ct[h].lbl > 0 || (M.tree[h] && M.isLabelExistTree(h))) {
             return true;
         }
     }
     return false;
+};
+
+/**
+ * Create tree of public-link's children. Same structure as M.tree
+ * @return {Object}
+ */
+MegaData.prototype.getPublicLinkTree = function() {
+
+    'use strict';
+
+    var pltree = {};
+    for (var h in M.su.EXP) {
+        if (M.d[h].t) {
+            pltree[h] = Object.assign({}, M.d[h]);
+            pltree[h].t = this.getTreeValue(M.d[h]);
+        }
+    }
+    return pltree;
+};
+
+/**
+ * Create tree of out-share's children. Same structure as M.tree
+ * @return {Object}
+ */
+MegaData.prototype.getOutShareTree = function() {
+
+    'use strict';
+
+    var ostree = {};
+    for (var suh in M.su) {
+        if (suh !== 'EXP') {
+            for (var h in M.su[suh]) {
+                if (M.d[h]) {
+                    ostree[h] = Object.assign({}, M.d[h]);
+                    ostree[h].t = this.getTreeValue(M.d[h]);
+                }
+            }
+        }
+    }
+    return ostree;
+};
+
+/**
+ * Get t value of custom view trees
+ * @return {Interger}
+ */
+MegaData.prototype.getTreeValue = function(n) {
+
+    'use strict';
+
+    var t = n.t;
+    if (n.fav) {
+        t |= M.IS_FAV;
+    }
+    if (M.su.EXP && M.su.EXP[n.h]) {
+        t |= M.IS_LINKED;
+    }
+    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
+        t |= M.IS_SHARED;
+    }
+    if (M.getNodeShare(n).down === 1) {
+        t |= M.IS_TAKENDOWN;
+    }
+    return t;
 };

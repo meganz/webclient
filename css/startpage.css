@@ -18,6 +18,12 @@
     color: #373737;
     padding: 76px 40px 35px 40px;
 }
+.download .startpage.top-header {
+    margin-top: 118px;
+}
+body:not(.en) .download .startpage.top-header {
+    margin-top: 128px;
+}
 .startpage.top-info {
     font-size: 16px;
     line-height: 18px;
@@ -634,12 +640,15 @@
     color: white;
     white-space: nowrap;
     cursor: pointer;
-    -webkit-transition: background-color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out;
+    -webkit-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
 }
 .startpage.button-48-height:hover {
     background-color: #00AC94;
     border-color: #00AC94;
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
 }
 .startpage.button-48-height.orange {
     background-color: #FBA500;
@@ -648,6 +657,9 @@
 .startpage.button-48-height.orange:hover {
     background-color: #EE9200;
     border-color: #EE9200;
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(251, 165, 0,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(251, 165, 0,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(251, 165, 0,0.2);
 }
 .startpage.button-48-height.white {
     border-color: #CFCFCF;
@@ -656,6 +668,9 @@
 }
 .startpage.button-48-height.white:hover {
     background-color: #FAFAFA;
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
 }
 .startpage.buttons-block {
     padding: 80px 0 40px 0;
@@ -1287,8 +1302,8 @@
 
 @media only screen and (min-width: 783px) {
 .startpage.top-header, .startpage.top-info, .startpage.img1, .startpage.top-button, .startpage.img-wrap::before, .startpage.img-wrap::after, .startpage.top-notice {
-    -webkit-transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
-    transition: opacity 200ms ease-in-out, transform 200ms ease-in-out, background-color 200ms ease-in-out ;
+    -webkit-transition: all 200ms ease-in-out ;
+    transition: all 200ms ease-in-out ;
     -webkit-transition-timing-function: ease-in-out;
     transition-timing-function: ease-in-out;
     opacity: 0;

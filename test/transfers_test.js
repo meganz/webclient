@@ -162,8 +162,8 @@ describe("Transfers Unit Test", function() {
         var file = new Blob([new Array(8195).join("0")]);
         file.lastModifiedDate = new Date(1445816183620);
         file.name = 'foo.bin';
-        fingerprint(file, function(hash) {
-            chai.assert.strictEqual(hash, 'xUNCAcVDQgHFQ0IBxUNCAQR3Zy1W');
+        getFingerprint(file).then(function(r) {
+            chai.assert.strictEqual(r.hash, 'xUNCAcVDQgHFQ0IBxUNCAQR3Zy1W');
             done();
         });
     });

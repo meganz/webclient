@@ -1,9 +1,9 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v11.png);
+    background-image: url(../images/mega/new-chat-sprite_v12.png);
     background-repeat: no-repeat;
-    background-position: -2px -1446px;
+    background-position: 0px -1442px;
     display: inline-block;
     vertical-align: top;
 }
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v11.png);
+    background-image: url(../images/mega/new-chat-sprite_v12.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -65,7 +65,7 @@
 }
 .icon56 {
     width: 56px;
-    height: 56px; 
+    height: 56px;
 }
 .semi-huge-icon {
     width: 64px;
@@ -125,7 +125,7 @@
     background-position: -51px -3609px;
 }
 .tiny-icon.green-tick, .tiny-icon.red-cross {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -12px -1437px;
 }
 .tiny-icon.red-cross {
@@ -504,7 +504,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v11.png);
+    background-image: url(../images/mega/new-chat-sprite_v12.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -682,7 +682,7 @@
 }
 
 .small-icon.membership.pro100 {
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
     background-position: -149px -415px;
     position: relative;
@@ -695,7 +695,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -711,6 +711,9 @@
 }
 .medium-icon.icons-img.chain {
     background-position: -237px -129px;
+}
+.medium-icon.icons-img.grey-chain {
+    background-position: -197px -129px;
 }
 .medium-icon.icons-img.share {
         background-position: -230px -1005px;
@@ -902,6 +905,11 @@
     height: 96px;
     background-position: -50px -1074px;
 }
+.huge-icon.crossed-phone {
+    background-position: -74px -2989px;
+    width: 70px;
+    height: 70px;
+}
 .big-icon.group-chat {
     width: 48px;
     height: 48px;
@@ -1016,7 +1024,7 @@
     background-position: -5px -12796px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -1033,22 +1041,22 @@
     background-position: -10px -1059px;
 }
 .tiny-icon.membership-status.pro100{
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     background-position: -127px -418px;
     width: 16px;
     height: 16px;
 }
 
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.white-mega {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -10px -701px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
@@ -1297,6 +1305,11 @@
 }
 .small-icon.icons-sprite.right-white-arrow {
     background-position: -33px -1396px;
+}
+.small-icon.icons-sprite.red-cross-in-circle {
+    background-position: -237px -1546px;
+    width: 22px;
+    height: 22px;
 }
 .dropdown-item:hover .small-icon.icons-sprite.grey-plus {
     background-position: -240px -391px;
@@ -1571,6 +1584,11 @@
     width: 20px;
     height:22px;
 }
+.small-icon.icons-sprite.tiny-grey-clock {
+    background-position: -83px -1728px;
+    width: 20px;
+    height:22px;
+}
 .small-icon.icons-sprite.email {
     background-position: -3px -1596px;
     width: 22px;
@@ -1648,6 +1666,9 @@
 .small-icon.icons-sprite.small-cross {
     background-position: 1px -1316px;
 }
+.small-icon.icons-sprite.lens {
+    background-position: -205px -1731px;
+}
 i.icons-sprite, i.small-icon.icons-sprite {
     background-image: url(../images/mega/icons-sprite_v27.png);
 }
@@ -1657,14 +1678,23 @@ i.icons-sprite, i.small-icon.icons-sprite {
 .medium-icon.icons-sprite.big-mega, .big-button .medium-icon.icons-sprite.mega {
     background-position: 2px -1006px;
 }
-.medium-icon.icons-sprite.download {
-    background-position: 0 -953px;
+.medium-icon.icons-sprite.download.big {
+    background-position: 0px -953px;
 }
-.medium-icon.icons-sprite.download.resume {
+.medium-icon.icons-sprite.download.big.resume {
     background-position: -55px -953px;
 }
-.medium-icon.icons-sprite.download.save {
+.medium-icon.icons-sprite.download.big.save {
     background-position: -106px -953px;
+}
+.semi-small-icon.icons-sprite.download {
+    background-position: -84px -1925px;
+}
+.semi-small-icon.icons-sprite.download.resume {
+    background-position: -12px -1925px;
+}
+.semi-small-icon.icons-sprite.download.save {
+    background-position: -49px -1925px;
 }
 .medium-icon.icons-sprite.share {
     background-position: -194px -1006px;
@@ -1689,11 +1719,25 @@ i.icons-sprite, i.small-icon.icons-sprite {
 .paused .small-icon.icons-sprite.red-down-arrow {
     background-position: -55px -870px;
 }
+.small-icon.icons-sprite.green-down-arrow {
+    background-position: -44px -1729px;
+}
 .small-icon.icons-sprite.mid-pause {
     background-position: -86px -872px;
 }
 .small-icon.icons-sprite.mid-pause.active {
     background-position: -146px -871px;
+}
+.small-icon.icons-sprite.pause-transfer {
+    background-position: -123px -1729px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.small-icon.icons-sprite.pause-transfer:hover {
+    opacity: 0.8;
+}
+.small-icon.icons-sprite.pause-transfer.active {
+    background-position: -163px -1729px;
 }
 .semi-small-icon.icons-sprite.pause {
     background-position: -117px -872px;
@@ -1701,15 +1745,36 @@ i.icons-sprite, i.small-icon.icons-sprite {
 .active .semi-small-icon.icons-sprite.pause {
     background-position: -146px -872px;
 }
-.semi-small-icon.icons-sprite.red-cross {
-    background-position: -71px -911px;
+.small-icon.icons-sprite.red-cross {
+    background-position: -202px -1699px;
+    height: 22px;
+}
+.semi-small-icon.icons-sprite.folder-with-loupe {
+    background-position: -203px -1549px;
+}
+.semi-small-icon.icons-sprite.white-warning {
+    background-position: -236px -1731px;
+}
+.small-icon.icons-sprite.share {
+    background-position: -235px -1633px;
 }
 .semi-small-icon.icons-sprite.grey-down-arrow {
     background-position: 4px -873px;
 }
 .semi-small-icon.icons-sprite.green-tick {
-    background-position: -28px -910px;
+    background-position: -28px -911px;
     width: 23px;
+}
+.small-icon.icons-sprite.arrows-to-bottom {
+    background-position: -84px -1699px;
+}
+.small-icon.icons-sprite.arrows-to-top, .active .small-icon.icons-sprite.arrows-to-bottom {
+    background-position: -124px -1699px;
+}
+.small-icon.icons-sprite.lime-tick {
+    background-position: -161px -1698px;
+    width: 23px;
+    height: 22px;
 }
 .semi-small-icon.icons-sprite.tiny-clock {
     background-position: -124px -1160px;
@@ -1723,7 +1788,7 @@ i.icons-sprite, i.small-icon.icons-sprite {
 .download.big-icon {
     width: 74px;
     height: 74px;
-    background-image: url(../images/mega/download-dialog_v1.png);
+    background-image: url(../images/mega/download-dialog_v2.png);
     background-position: -622px -81px;
 }
 .chrome .download.big-icon {
@@ -1758,7 +1823,7 @@ i.icons-sprite, i.small-icon.icons-sprite {
 i.account-icon {
     width: 26px;
     height: 26px;
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-repeat: no-repeat;
 }
 i.account-icon.building {

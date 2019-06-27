@@ -788,11 +788,19 @@ var dlmanager = {
             later(function() {
                 dlmanager.abort(dl, eekey);
             });
-
             if (M.chat) {
                 $('.toast-notification').removeClass('visible');
                 showToast('download', eekey ? l[24] : l[20228]);
             }
+            else if (code === ETOOMANY) {
+
+                // If `g` request return ETOOMANY, it means the user who originally owned the file is suspended.
+                showToast('download', l[20822]);
+            }
+        }
+
+        if (code === EBLOCKED) {
+            showToast('download', l[20228]);
         }
 
         if (eekey) {
@@ -1181,10 +1189,13 @@ var dlmanager = {
         }
 
         if (page === 'download') {
-            var $dlPageTW = $('.download.transfer-wrapper');
-            $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
-            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
-            $('.download.file-info').removeClass('overquota');
+            var $dtb = $('.download.top-bar');
+            $dtb.removeClass('stream-overquota overquota');
+            $('.see-our-plans', $dtb).addClass('hidden').off('click');
+            $('.create-account-button', $dtb).addClass('hidden').off('click');
+            $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
+            $('.download.over-transfer-quota', $dtb).addClass('hidden');
+            $(window).trigger('resize');
         }
         else if (ids.length) {
             $('#' + ids.join(',#'))
@@ -1459,10 +1470,6 @@ var dlmanager = {
             }
         }
         else {
-            var $dlPageTW = $('.download.transfer-wrapper');
-
-            $('.download.over-transfer-quota', $dlPageTW).addClass('hidden');
-            $('.download.in-progress, .video-mode-wrapper', $dlPageTW).removeClass('over-quota');
 
             $('.msg-overquota', $dialog).removeClass('hidden');
             $('.msg-prewarning', $dialog).addClass('hidden');
@@ -1472,7 +1479,7 @@ var dlmanager = {
             $('.video-theatre-mode:visible').addClass('paused');
 
             if (page === 'download') {
-                var $dtb = $('.download.transfer-buttons, .download.video-transfer-buttons');
+                var $dtb = $('.download.top-bar');
 
                 $('.create-account-button', $dtb).addClass('hidden').off('click');
                 $('.get-more-bonuses', $dtb).addClass('hidden').off('click');
@@ -1492,8 +1499,9 @@ var dlmanager = {
 
                 $('.see-our-plans', $dtb).removeClass('hidden').rebind('click', onclick);
 
-                $('.download.video .download.over-transfer-quota').removeClass('hidden');
-                $('.download.in-progress, .video-mode-wrapper', $dlPageTW).addClass('over-quota');
+                $('.download.over-transfer-quota', $dtb).removeClass('hidden');
+                $dtb.addClass('stream-overquota');
+                $(window).trigger('resize');
             }
         }
 
@@ -1531,8 +1539,6 @@ var dlmanager = {
                         })
                         .done(function() {
                             api_req({a: 'log', e: 99645, m: 'on overquota logged into account.'});
-                            closeDialog();
-                            topmenuUI();
                             dlmanager._onQuotaRetry(true);
                         })
                         .fail(showOverQuotaRegisterDialog);
@@ -1608,6 +1614,7 @@ var dlmanager = {
         mega.ui.showRegisterDialog({
             title: l[17],
             body: '<p>' + l[8834] + '</p><p>' + l[8833] + '</p><h2>' + l[1095] + '</h2>',
+            showLogin: true,
 
             onAccountCreated: function(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
@@ -2099,8 +2106,29 @@ var dlmanager = {
                 text = text.replace('%2', '(' + l[16868] + ')');
             }
 
-            $elm.find('span').safeHTML(text);
+            $elm.find('span.txt').safeHTML(text);
         };
+
+        $elm.find('.default-white-button').rebind('click', function() {
+            if (typeof megasync === 'undefined') {
+                console.error('Failed to load megasync.js');
+            }
+            else {
+                if (typeof dlpage_ph === 'string') {
+                    megasync.download(dlpage_ph, dlpage_key);
+                }
+                else {
+                    open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
+                }
+            }
+            if ($('.download.top-bar').hasClass('video')) {
+                $elm.removeClass('visible');
+            }
+        });
+
+        $elm.find('.fm-dialog-close').rebind('click', function() {
+            $elm.removeClass('visible');
+        });
 
         if ($container && $elm) {
             setText(l[16866], $elm);
@@ -2150,6 +2178,10 @@ var dlmanager = {
             var $currentSlide = $overlay.find('.megasync-slide.current');
             var $prevSlide = $currentSlide.prev().not('.hidden');
             var $nextSlide = $currentSlide.next().not('.hidden');
+
+            if ($this.hasClass('disabled')) {
+                return false;
+            }
 
             if ($this.hasClass('prev') && $prevSlide.length) {
                 $slides.removeClass('prev current next');

@@ -82,6 +82,19 @@ var CallNotificationsEngine = function(chatRoom, callManagerCall) {
             self.notify(CallNotificationsEngine.ACTIONS.LEFT, [eventData.userId]);
         }
     });
+
+    $(chatRoom).rebind('onCallSessReconnecting.cne' + self.idx, function(e, eventData) {
+        self.notify(CallNotificationsEngine.ACTIONS.SESS_RECONNECTING);
+        chatRoom.callReconnecting = true;
+        chatRoom.trackDataChange();
+    });
+
+    $(chatRoom).rebind('onCallSessReconnected.cne' + self.idx, function(e, eventData) {
+        self.notify(CallNotificationsEngine.ACTIONS.SESS_RECONNECTED);
+        delete chatRoom.callReconnecting;
+        chatRoom.trackDataChange();
+    });
+
 };
 makeObservable(CallNotificationsEngine);
 
@@ -112,6 +125,8 @@ CallNotificationsEngine.ACTIONS = {
     'SLOW_CONNECTION' : 3,
     'OFFLINE' : 4,
     'ONLINE' : 5,
+    'SESS_RECONNECTING' : 6,
+    'SESS_RECONNECTED' : 7,
 };
 
 CallNotificationsEngine.ACTIONS_INT = {};
@@ -187,6 +202,22 @@ CallNotificationsEngine.ACTIONS_META = {
             "use strict";
             return !callNotifsEngine._isOffline;
         }
+    ),
+    'SESS_RECONNECTING': new CallNotificationsEngine.ActionMeta(
+        'green',
+        'Call session - reconnecting',
+        undefined,
+        true,
+        false,
+        false
+    ),
+    'SESS_RECONNECTED': new CallNotificationsEngine.ActionMeta(
+        'green',
+        'Call session - reconnected',
+        undefined,
+        true,
+        false,
+        false
     ),
 };
 

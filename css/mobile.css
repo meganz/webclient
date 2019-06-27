@@ -3787,7 +3787,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
-    background-size: 280px 2232px;
+    background-size: 280px 3383px;
 }
 .mobile.header-icon.gray-mega {
     background-position: -126px -14px;
@@ -4318,6 +4318,7 @@ div.checkboxOn, div.checkboxOff {
     text-transform: lowercase;
     margin: 0 16px 8px;
     position: relative;
+    overflow: visible;
 }
 .payment-address-dialog .payment-buy-now:first-letter {
     text-transform: uppercase;
@@ -4379,6 +4380,7 @@ div.checkboxOn, div.checkboxOff {
     z-index: 1200;
     left: 0;
     top: 0;
+    margin: 0 !important;
 }
 .limited-bandwidth-dialog .mobile.white-block {
     margin: 0;
@@ -5392,7 +5394,7 @@ div.checkboxOn, div.checkboxOff {
     background-position: -2px -1960px;
 }
 .mobile.icon.pro-mini.pro100 {
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
     background-position: -149px -415px;
     height: 22px;
@@ -6960,9 +6962,9 @@ textarea.mobile.support-text-field {
     z-index: 10;
     cursor: pointer;
     background-color: #F52929;
-    background-image: url(../images/mega/download-sprite-v9.png);
-    background-position: -31px -1141.5px;
-    background-size: 128.5px auto;
+    background-image: url(../images/mega/download-sprite_v10.png);
+    background-position: -32px -1142.5px;
+    background-size: 128.5px auto !important;
 }
 .mobile.video .viewer-image-bl {
     width: 100%;
@@ -8127,7 +8129,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .warning-icon  {
     margin-top: 6px;
-    background-image: url(../images/mega/download-dialog_v1.png);
+    background-image: url(../images/mega/download-dialog_v2.png);
     background-size: 384px auto;
     background-position: -355px -46px;
     width: 30px;
@@ -8149,7 +8151,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     background-repeat: no-repeat;
     padding-left: 29px;
     margin: -16px 2px 2px 3px;
@@ -11206,6 +11208,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    .mobile.video .play-video-button {
+        background-image: url(../images/mega/download-sprite_v10@2x.png);
+        background-size: 257px auto;
+    }
     .mobile.tablet-img {
         background-image: url(../images/mobile/ipad-big@2x.png);
     }
@@ -11229,7 +11235,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 250px auto;
     }
     .mobile .improved-recovery-steps .list-point b.megasync-logo {
-        background-image: url(../images/mega/top-sprite_v6@2x.png);
+        background-image: url(../images/mega/top-sprite_v7@2x.png);
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {

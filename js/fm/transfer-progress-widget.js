@@ -503,7 +503,18 @@ mega.tpw = new function TransferProgressWidget() {
                 $downloadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainD));
             }
             else {
+                var initialDownloadHeadText = $downloadHeader.find('.transfer-progress-txt').text();
                 $downloadHeader.find('.transfer-progress-txt').text(l[1418]);
+
+                if (initialDownloadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
+                    if ($uploadHeader.hasClass('hidden') ||
+                        $uploadHeader.find('.transfer-progress-txt').text() === l[1418]) {
+                        if ($widgetHeadAndBody.hasClass('expand')) {
+                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                            isMinimizedByUser = false;
+                        }
+                    }
+                }
             }
             setProgressCircle($downloadHeader, totalD, doneD);
             $downloadHeader.removeClass('hidden');
@@ -523,7 +534,18 @@ mega.tpw = new function TransferProgressWidget() {
                 $uploadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainU));
             }
             else {
+                var initialUploadHeadText = $uploadHeader.find('.transfer-progress-txt').text();
                 $uploadHeader.find('.transfer-progress-txt').text(l[1418]);
+
+                if (initialUploadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
+                    if ($downloadHeader.hasClass('hidden') ||
+                        $downloadHeader.find('.transfer-progress-txt').text() === l[1418]) {
+                        if ($widgetHeadAndBody.hasClass('expand')) {
+                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                            isMinimizedByUser = false;
+                        }
+                    }
+                }
             }
             setProgressCircle($uploadHeader, totalU, doneU);
             $uploadHeader.removeClass('hidden');
@@ -578,6 +600,7 @@ mega.tpw = new function TransferProgressWidget() {
         var $tempRows = new Array(entriesArray.length);
         var tempRowPos = 0;
         var reverted = false;
+
         if (type === this.UPLOAD) {
             tempRowPos = entriesArray.length - 1;
             reverted = true;
@@ -846,25 +869,29 @@ mega.tpw = new function TransferProgressWidget() {
         var prefix;
         var subHeaderClass;
         var cancelText;
+        var dId = entry.id;
 
         if (type === this.DOWNLOAD) {
             prefix = downloadRowPrefix;
             subHeaderClass = 'download';
             cancelText = l[1196];
+            if (entry.zipid) {
+                dId = entry.zipid;
+            }
         }
         else {
             prefix = uploadRowPrefix;
             subHeaderClass = 'upload';
             cancelText = l[1617];
         }
-        var $targetedRow = $rowsContainer.find('#' + prefix + entry.id);
+        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
 
         if (!$targetedRow || !$targetedRow.length) {
             return;
         }
-        if (monitors[entry.id]) {
-            clearTimeout(monitors[entry.id]);
-            delete monitors[entry.id];
+        if (monitors[dId]) {
+            clearTimeout(monitors[dId]);
+            delete monitors[dId];
         }
         $targetedRow.removeClass('complete progress inqueue paused').addClass('error');
         setStatus($targetedRow, this.FAILED, errorStr);
@@ -892,6 +919,62 @@ mega.tpw = new function TransferProgressWidget() {
 
 
 
+    this.resumeDownloadUpload = function(type, entry) {
+        'use strict';
+        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+            return;
+        }
+
+        var dId = entry.id;
+        var prefix;
+        var toolTipText;
+
+        if (type === this.DOWNLOAD) {
+            prefix = downloadRowPrefix;
+            toolTipText = l[1196];
+            if (entry.zipid) {
+                dId = entry.zipid;
+            }
+        }
+        else {
+            prefix = uploadRowPrefix;
+            toolTipText = l[1617];
+        }
+
+        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
+
+        if (!$targetedRow || !$targetedRow.length) {
+            return;
+        }
+        if (!$targetedRow.hasClass('paused')) {
+            return;
+        }
+
+        if (monitors[dId]) {
+            clearTimeout(monitors[dId]);
+            delete monitors[dId];
+        }
+        monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
+
+        var $enqueueAction = $transferActionTemplate.clone().addClass('cancel');
+        $enqueueAction.find('.tooltips').text(toolTipText);
+        $targetedRow.find('.transfer-task-actions').empty().append($enqueueAction);
+
+        $targetedRow.removeClass('complete error progress paused').addClass('inqueue');
+
+        setStatus($targetedRow, this.INITIALIZING);
+
+        cleanOverLimitRows();
+
+        updateHeaderAndContent();
+
+        if (!this.isWidgetVisibile()) {
+            mega.tpw.showWidget();
+        }
+
+        updateJSP();
+
+    };
 
 
     this.pauseDownloadUpload = function(type, entry) {
@@ -929,6 +1012,7 @@ mega.tpw = new function TransferProgressWidget() {
             clearTimeout(monitors[dId]);
             delete monitors[dId];
         }
+
 
         $targetedRow.removeClass('error complete progress inqueue').addClass('paused');
         setStatus($targetedRow, this.PAUSED);

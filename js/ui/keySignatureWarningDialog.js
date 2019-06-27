@@ -87,7 +87,7 @@
         var description = l[8436];
         description = description.replace('%1', '<span class="emailAddress">'
                       + contactEmail + '</span>');
-        description = description.replace('[A]', '<a href="mailto:support@mega.nz">');
+        description = description.replace('[A]', '<a class="red" href="mailto:support@mega.nz">');
         description = description.replace('[/A]', '</a>');
         $dialog.find('.information .description').html(description);
 

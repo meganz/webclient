@@ -314,52 +314,6 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 };
 
 /**
- * Create tree of out-share's children. Same structure as M.tree
- * @return {Object}
- */
-MegaData.prototype.getOutShareTree = function() {
-
-    'use strict';
-
-    var ostree = {};
-    for (var suh in M.su) {
-        if (suh !== 'EXP') {
-            for (var h in M.su[suh]) {
-                if (M.d[h]) {
-                    ostree[h] = Object.assign({}, M.d[h]);
-                    ostree[h].t = this.getTreeValue(M.d[h]);
-                }
-            }
-        }
-    }
-    return ostree;
-};
-
-/**
- * Get t value of custom view trees
- * @return {Interger}
- */
-MegaData.prototype.getTreeValue = function(n) {
-
-    'use strict';
-
-    var t = n.t;
-    if (n.fav) {
-        t |= M.IS_FAV;
-    }
-    if (M.su.EXP && M.su.EXP[n.h]) {
-        t |= M.IS_LINKED;
-    }
-    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
-        t |= M.IS_SHARED;
-    }
-    if (M.getNodeShare(n).down === 1) {
-        t |= M.IS_TAKENDOWN;
-    }
-    return t;
-};
-
-/**
  * Handle rubbish bin permanent items removal
  * How this works?
  * In case that param 'all' is true, then all items from rubbish are removed

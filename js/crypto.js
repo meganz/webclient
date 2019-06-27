@@ -899,7 +899,10 @@ function api_reqfailed(c, e) {
                     reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
                 }
                 else if (reasonCode === 400) {
-                    reasonText = l[19748];// Your account was terminated due to breach of Mega's Terms of Service...
+                    reasonText = l[19748];// Your account is disabled by administrator
+                }
+                else if (reasonCode === 401) {
+                    reasonText = l[20816];// Your account is deleted (business user)
                 }
                 else if (reasonCode === 500) {
 

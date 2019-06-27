@@ -94,7 +94,7 @@
 }
 
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v6.png);
+    background-image: url(../images/mega/top-sprite_v7.png);
     width: 24px;
     height: 24px;
 }
@@ -368,7 +368,7 @@
 	width: 24px;
 	height: 24px;
 	background-position: -93px -414px;
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     display: inline-block;
     margin-left: 12px;
     margin-top: 12px;
@@ -394,7 +394,7 @@
 	width: 64px;
 	height: 64px;
 	background-position: -128px -339px;
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
 	margin:40px auto 0 auto;
 }
@@ -518,7 +518,7 @@
 	width: 100px;
 	height: 100px;
 	margin: auto;
-	background-image: url(../images/mega/big-icons_v3.png);
+	background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
 }
 
@@ -576,7 +576,7 @@
 .bus-confirm-body .bus-confirmImg {
 	width:160px;
 	height: 120px;
-	background-image: url(../images/mega/big-icons_v3.png);
+	background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
     background-position: -16px -809px;
 	margin:0 auto 48px auto;

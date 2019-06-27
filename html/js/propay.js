@@ -617,7 +617,7 @@ pro.propay = {
         if (recurringEnabled) {
             $step2.find('.subscription-instructions').removeClass('hidden');
             $step2.find('.subscription-instructions').rebind('click', function() {
-                bottomPageDialog(false, 'general', l[1712]);
+                bottomPageDialog(false, 'terms', l[1712], true);
             });
             $paymentAddressDialog.find('.payment-note-first.recurring').removeClass('hidden');
             $paymentAddressDialog.find('.payment-note-first.one-time').addClass('hidden');

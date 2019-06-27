@@ -140,15 +140,30 @@ function addNewContact($addButton, cd) {
 
             mailNum = $mails.length;
 
+            // temp array to hold emails of current contacts to exclude from inviting.
+            // note: didn't use "getContactsEMails()" to optimize memory usage, since the returned array
+            // there is bigger (contains: email, name, handle, type)
+
+            var currentContactsEmails = [];
+
+            M.u.forEach(function(contact) {
+                // Active contacts with email set
+                if (contact.c === 1 && contact.m) {
+                    currentContactsEmails.push(contact.m);
+                }
+            });
+
             if (mailNum) {
                 // Loop through new email list
                 $mails.each(function(index, value) {
                     // Extract email addresses one by one
                     email = $(value).contents().eq(1).text();
-                    // if invitation is sent, push as added Emails.
-                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
-                        addedEmails.push(res);
-                    }));
+                    if (currentContactsEmails.indexOf(email) === -1) {
+                        // if invitation is sent, push as added Emails.
+                        promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
+                            addedEmails.push(res);
+                        }));
+                    }
                 });
             }
 
@@ -1104,12 +1119,7 @@ function fm_showoverlay() {
 
     $('.fm-dialog-overlay').removeClass('hidden');
 
-    if (is_mobile) {
-        $('body').addClass('overlayed');
-    }
-    else if (!$('body').hasClass('bottom-pages')) {
-        $('body').addClass('overlayed');
-    }
+    $('body').addClass('overlayed');
 }
 
 /**
@@ -1273,7 +1283,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.warningCallback = callback;
 
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple');
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
 
@@ -1281,17 +1291,20 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog').addClass('clear-bin-dialog');
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
-                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
+            .safeHTML(
+                '<div class="default-green-button button right notification-button confirm semi-big">' +
+                    '<span>@@</span>' +
+                '</div>' +
+                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
-        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
+        $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1301,17 +1314,19 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
-                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
+            .safeHTML('<div class="default-green-button right notification-button confirm button semi-big">' +
+                '<span>@@</span></div>' +
+                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
+        $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
+        /*!1*/
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1321,17 +1336,24 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'warninga' || type === 'warningb' || type === 'info') {
         if (extraButton) {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
-                    '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
-                    '<div class="clear"></div>', doneButton, extraButton);
+                .safeHTML(
+                    '<div class="default-green-button right notification-button confirm  button semi-big">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="default-white-button right notification-button cancel semi-big">' +
+                        '<span>@@</span>' +
+                    '</div>' +
+                    '<div class="clear"></div>', doneButton, extraButton
+                );
 
-            $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
+            $('#msgDialog .default-green-button').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
                 }
             });
-            $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
+            /*!2*/
+            $('#msgDialog .default-white-button').rebind('click', function() {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
@@ -1340,8 +1362,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         }
         else {
             $('#msgDialog .fm-notifications-bottom')
-                .safeHTML('<div class="default-white-button right notification-button"><span>@@</span></div>' +
-                    '<div class="clear"></div>', l[81]);
+                .safeHTML(
+                    '<div class="default-white-button right notification-button semi-big"><span>@@</span></div>' +
+                    '<div class="clear"></div>', l[81]
+                );
 
             $('#msgDialog .default-white-button').rebind('click', function() {
                 closeMsg();
@@ -1367,24 +1391,26 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             doneButton = false;
         }
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="left checkbox-block hidden">' +
+            .safeHTML('<div class="checkbox-block top-pad hidden">' +
                 '<div class="checkdiv checkboxOff">' +
                     '<input type="checkbox" name="confirmation-checkbox" ' +
                         'id="confirmation-checkbox" class="checkboxOff">' +
                 '</div>' +
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="default-white-button right notification-button confirm"><span>@@</span></div>' +
-                '<div class="default-white-button right notification-button cancel"><span>@@</span></div>' +
+                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                    '<span>@@</span>' +
+                '</div>' +
+                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], doneButton || l[78], extraButton || l[79]);
 
-        $('#msgDialog .default-white-button').eq(0).rebind('click', function() {
+        $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
             }
         });
-
-        $('#msgDialog .default-white-button').eq(1).rebind('click', function() {
+        /*!3*/
+        $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
@@ -1397,15 +1423,15 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         }
 
         if (checkbox) {
-            $('#msgDialog .left.checkbox-block .checkdiv,' +
-                '#msgDialog .left.checkbox-block input')
+            $('#msgDialog .checkbox-block .checkdiv,' +
+                '#msgDialog .checkbox-block input')
                     .removeClass('checkboxOn').addClass('checkboxOff');
 
             $.warningCheckbox = false;
-            $('#msgDialog .left.checkbox-block').removeClass('hidden');
-            $('#msgDialog .left.checkbox-block').rebind('click', function(e) {
-                var $o = $('#msgDialog .left.checkbox-block .checkdiv, #msgDialog .left.checkbox-block input');
-                if ($('#msgDialog .left.checkbox-block input').hasClass('checkboxOff')) {
+            $('#msgDialog .checkbox-block').removeClass('hidden');
+            $('#msgDialog .checkbox-block').rebind('click', function() {
+                var $o = $('#msgDialog .checkbox-block .checkdiv, #msgDialog .checkbox-block input');
+                if ($('#msgDialog .checkbox-block input').hasClass('checkboxOff')) {
                     $o.removeClass('checkboxOff').addClass('checkboxOn');
                     localStorage.skipDelWarning = 1;
                 }
@@ -1450,17 +1476,51 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .removeClass('plan4')
             .addClass('plan' + plan);
     }
+    else if (type === 'import_login' || type === 'import_register') {
+        var buttonLabel = type === 'import_login' ? l[171] : l[170];
+
+        $('#msgDialog').addClass('warning-dialog-a wide');
+        $('#msgDialog .fm-notifications-bottom')
+            .safeHTML('<div class="bottom-bar-link">@@</div>' +
+                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                    '<span>@@</span>' +
+                '</div>' +
+                '<div class="default-white-button right notification-button cancel semi-big">' +
+                    '<span>@@</span>' +
+                '</div>' +
+                '<div class="clear"></div></div>', l[20754], buttonLabel, l[79]);
+
+        $('#msgDialog .default-green-button').rebind('click', function() {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(true);
+            }
+        });
+        /*!4*/
+        $('#msgDialog .default-white-button').rebind('click', function() {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(undefined);
+            }
+        });
+        $('#msgDialog .bottom-bar-link').rebind('click', function() {
+            closeMsg();
+            if ($.warningCallback) {
+                $.warningCallback(false);
+            }
+        });
+    }
 
     $('#msgDialog .fm-dialog-title span').text(title);
 
-    $('#msgDialog .fm-notification-info p').safeHTML(msg);
+    $('#msgDialog .fm-notification-info h1').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-warning').text(submsg);
-        $('#msgDialog .fm-notification-warning').show();
+        $('#msgDialog .fm-notification-info p').text(submsg);
+        $('#msgDialog .fm-notification-info p').removeClass('hidden');
     }
     else {
-        $('#msgDialog .fm-notification-warning').hide();
+        $('#msgDialog .fm-notification-info p').addClass('hidden');
     }
 
     $('#msgDialog .fm-dialog-close').rebind('click', function() {
@@ -2166,6 +2226,8 @@ function initShareDialog() {
      */
     $('.dialog-share-button', $dialog).rebind('click', function(e) {
         e.stopPropagation();
+        // since addNewContact goes by itself and fetch data from HTML. we cant intercept exited
+        // contacts here.
         addNewContact($(this), false).done(function() {
             var share = new mega.Share();
             share.updateNodeShares().always(function() {
@@ -3451,14 +3513,7 @@ function fingerprintDialog(userid) {
         closeFngrPrntDialog();
     });
 
-    M.safeShowDialog('fingerprint-dialog', function() {
-        $dialog.removeClass('hidden')
-            .css({
-                'margin-top': '-' + $dialog.height() / 2 + 'px',
-                'margin-left': '-' + $dialog.width() / 2 + 'px'
-            });
-        return $dialog;
-    });
+    M.safeShowDialog('fingerprint-dialog', $dialog);
 }
 
 /**

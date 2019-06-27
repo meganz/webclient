@@ -41,7 +41,6 @@ var CloseOpenModeMessage = React.createClass({
             avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time"
                             title={time2date(timestampInt)}>{timestamp}</div>;
-            name = <div className="message user-card-name">{displayName}</div>;
         }
 
 

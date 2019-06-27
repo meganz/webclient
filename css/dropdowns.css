@@ -53,7 +53,8 @@
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
     left: 100%;
     right: auto;
-    width: 160px;
+    min-width: 202px;
+    max-width: 240px;
     margin: -8px -4px 0 -4px;
     visibility: hidden;
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
@@ -1020,7 +1021,7 @@ z-index: 1;
     -moz-box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     margin: -8px -8px 9px -8px;
-    background-image: url(../images/mega/new-chat-sprite_v11.png);
+    background-image: url(../images/mega/new-chat-sprite_v12.png);
     background-position: 0 -3881px;
     background-repeat: repeat-x;
     height: 80px;

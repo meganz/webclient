@@ -526,7 +526,7 @@
 
                                         msgDialog('warningb:' + l[103],
                                             WRITERR_DIAGTITLE,
-                                            l[16890],
+                                            l[20817],
                                             str_mtrunc(dl_filename), function(cancel) {
                                                 if (cancel) {
                                                     dlFatalError(dl, WRITERR_DIAGTITLE, false);

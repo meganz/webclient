@@ -2115,8 +2115,6 @@ React.makeElement = React['createElement'];
 	            minUserType: 3,
 	            skipInitialDialog: 1
 	        }).done(function () {
-	            closeDialog();
-	            topmenuUI();
 	            if (page !== 'login') {
 	                if (!notJoinReq) {
 	                    localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
@@ -3786,7 +3784,8 @@ React.makeElement = React['createElement'];
 	        if (this.props.requiresUpdateOnResize) {
 	            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
 	        }
-	        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+	        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize);
+	        window.addEventListener('hashchange', this.queuedUpdateOnResize);
 
 	        // init on data structure change events
 	        if (this.props) {
@@ -3819,11 +3818,10 @@ React.makeElement = React['createElement'];
 	        return ReactDOM.findDOMNode(this);
 	    },
 	    componentWillUnmount: function() {
-	        if (this.props.requiresUpdateOnResize) {
-	            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-	        }
+	        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
+	        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
 
-	        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
+	        window.removeEventListener('hashchange', this.queuedUpdateOnResize);
 
 	        this._isMounted = false;
 	    },
@@ -3883,6 +3881,7 @@ React.makeElement = React['createElement'];
 	            return;
 	        }
 	        if (!self.isComponentEventuallyVisible()) {
+	            this._requiresUpdateOnResize = true;
 	            return;
 	        }
 
@@ -3909,6 +3908,12 @@ React.makeElement = React['createElement'];
 	        clearTimeout(this._updatesReenableTimer);
 	        this._updatesDisabled = false;
 	        this.eventuallyUpdate();
+	    },
+	    queuedUpdateOnResize: function() {
+	        if (this.isMounted() && this._requiresUpdateOnResize && this.isComponentEventuallyVisible()) {
+	            this._requiresUpdateOnResize = false;
+	            this.eventuallyUpdate();
+	        }
 	    },
 	    onResizeDoUpdate: function() {
 	        if (!this.isMounted() || this._pendingForceUpdate === true) {
@@ -6074,6 +6079,10 @@ React.makeElement = React['createElement'];
 
 	            return false;
 	        }
+	        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+
+	            return false;
+	        }
 
 	        var pres = self.props.megaChat.getPresence(v.u);
 
@@ -7578,42 +7587,42 @@ React.makeElement = React['createElement'];
 	                        messageInstance = React.makeElement(AlterParticipantsConversationMessage, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'truncated') {
 	                        messageInstance = React.makeElement(TruncatedMessage, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'privilegeChange') {
 	                        messageInstance = React.makeElement(PrivilegeChange, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'topicChange') {
 	                        messageInstance = React.makeElement(TopicChange, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'openModeClosed') {
 	                        messageInstance = React.makeElement(CloseOpenModeMessage, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'chatHandleUpdate') {
 	                        messageInstance = React.makeElement(ChatHandleMessage, {
 	                            message: v,
 	                            key: v.messageId,
-	                            contact: M.u[v.userId],
+	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    }
@@ -7628,7 +7637,7 @@ React.makeElement = React['createElement'];
 	                        message: v,
 	                        state: v.state,
 	                        key: v.messageId,
-	                        contact: contact,
+	                        contact: Message.getContactForMessage(v),
 	                        grouped: grouped,
 	                        onUpdate: function onUpdate() {
 	                            self.onResizeDoUpdate();
@@ -8833,7 +8842,7 @@ React.makeElement = React['createElement'];
 	            self.props.buttons.forEach(function (v) {
 	                buttons.push(React.makeElement(
 	                    "a",
-	                    { href: "javascript:;",
+	                    {
 	                        className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
 	                        onClick: function onClick(e) {
 	                            if ($(e.target).is(".disabled")) {
@@ -10267,6 +10276,17 @@ React.makeElement = React['createElement'];
 	                });
 	                return;
 	            }
+
+	            var $jspElem = $(self.findDOMNode()).find('.jspScrollable');
+	            if ($jspElem) {
+	                var $jsp = $jspElem.data('jsp');
+	                if ($jsp) {
+	                    Soon(function () {
+
+	                        $jsp.scrollTo(0, 0, false);
+	                    });
+	                }
+	            }
 	        }
 
 	        this.setState({ entries: null });
@@ -10297,6 +10317,8 @@ React.makeElement = React['createElement'];
 	            sortFunc = M.getSortBySizeFn();
 	        } else if (self.state.sortBy[0] === "ts") {
 	            sortFunc = M.getSortByDateTimeFn();
+
+	            order = order === 1 ? -1 : 1;
 	        } else {
 	            sortFunc = M.sortByFavFn(order);
 	        }
@@ -10473,7 +10495,8 @@ React.makeElement = React['createElement'];
 	                            onClick: self.toggleSortBy }),
 	                        React.makeElement(BrowserCol, { id: "size", label: __(l[87]), sortBy: self.state.sortBy,
 	                            onClick: self.toggleSortBy }),
-	                        React.makeElement(BrowserCol, { id: "ts", label: __(l[16169]), sortBy: self.state.sortBy,
+	                        React.makeElement(BrowserCol, { id: "ts", label: __(l[16169]),
+	                            sortBy: self.state.sortBy && self.state.sortBy[0] === "ts" ? ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] : self.state.sortBy,
 	                            onClick: self.toggleSortBy })
 	                    )
 	                )
@@ -12854,6 +12877,22 @@ React.makeElement = React['createElement'];
 	        $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
 	        $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
 	    },
+	    haveMoreContactListeners: function haveMoreContactListeners() {
+	        if (!this.props.message || !this.props.message.meta) {
+	            return false;
+	        }
+
+	        if (this.props.message.meta) {
+	            if (this.props.message.meta.participants) {
+
+	                return this.props.message.meta.participants;
+	            } else {
+	                return false;
+	            }
+	        } else {
+	            return false;
+	        }
+	    },
 	    _nodeUpdated: function _nodeUpdated(h) {
 	        var self = this;
 
@@ -13223,7 +13262,9 @@ React.makeElement = React['createElement'];
 	                                                label: __(l[1187]),
 	                                                onClick: self._startDownload.bind(self, v) });
 
-	                                            self._addLinkButtons(v.h, linkButtons);
+	                                            if (M.getNodeRoot(v.h) !== M.RubbishID) {
+	                                                self._addLinkButtons(v.h, linkButtons);
+	                                            }
 
 	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
 	                                                key: 'infoDialog',
@@ -14076,14 +14117,29 @@ React.makeElement = React['createElement'];
 	        var chatRoom = self.props.message.chatRoom;
 	        var megaChat = chatRoom.megaChat;
 	        var contact = self.getContact();
-	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
-	            self._contactChangeListener = contact.addChangeListener(function (contact, oldData, k, v) {
-	                if (k === "ts") {
+	        var changedCb = function changedCb(contact, oldData, k, v) {
+	            if (k === "ts") {
 
-	                    return;
+	                return;
+	            }
+	            self.debouncedForceUpdate();
+	        };
+
+	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(changedCb);
+	        }
+	        if (self.haveMoreContactListeners) {
+	            if (!self._contactChangeListeners) {
+	                self._contactChangeListeners = [];
+	                var moreIds = self.haveMoreContactListeners();
+	                if (moreIds && moreIds.forEach) {
+	                    moreIds.forEach(function (handle) {
+	                        if (M.u[handle] && M.u[handle].addChangeListener) {
+	                            self._contactChangeListeners.push([M.u[handle], M.u[handle].addChangeListener(changedCb)]);
+	                        }
+	                    });
 	                }
-	                self.debouncedForceUpdate();
-	            });
+	            }
 	        }
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
@@ -14093,8 +14149,18 @@ React.makeElement = React['createElement'];
 	        if (self._contactChangeListener && contact && contact.removeChangeListener) {
 	            contact.removeChangeListener(self._contactChangeListener);
 	        }
+	        if (this._contactChangeListeners) {
+	            this._contactChangeListeners.forEach(function (listener) {
+	                listener[0].removeChangeListener(listener[1]);
+	            });
+	            this._contactChangeListeners = [];
+	        }
 	    },
 	    getContact: function getContact() {
+	        if (this.props.contact) {
+
+	            return this.props.contact;
+	        }
 	        var message = this.props.message;
 
 	        return Message.getContactForMessage(message);
@@ -14644,6 +14710,23 @@ React.makeElement = React['createElement'];
 	            });
 	        }
 	    },
+	    haveMoreContactListeners: function haveMoreContactListeners() {
+	        if (!this.props.message || !this.props.message.meta) {
+	            return false;
+	        }
+
+	        if (this.props.message.meta) {
+	            if (this.props.message.meta.included) {
+	                return this.props.message.meta.included;
+	            } else if (this.props.message.meta.excluded) {
+	                return this.props.message.meta.excluded;
+	            } else {
+	                return false;
+	            }
+	        } else {
+	            return false;
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -14801,7 +14884,6 @@ React.makeElement = React['createElement'];
 	                    "data-simpletip": time2date(timestampInt) },
 	                timestamp
 	            );
-	            name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: "message", label: displayName });
 	        }
 
 	        return React.makeElement(
@@ -14845,7 +14927,18 @@ React.makeElement = React['createElement'];
 	    displayName: "PrivilegeChange",
 
 	    mixins: [ConversationMessageMixin],
+	    haveMoreContactListeners: function haveMoreContactListeners() {
+	        if (!this.props.message.meta || !this.props.message.meta.targetUserId) {
+	            return false;
+	        }
 
+	        var uid = this.props.message.meta.targetUserId;
+	        if (uid && M.u[uid]) {
+	            return uid;
+	        } else {
+	            return false;
+	        }
+	    },
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -15542,11 +15635,6 @@ React.makeElement = React['createElement'];
 	                    title: time2date(timestampInt) },
 	                timestamp
 	            );
-	            name = React.makeElement(
-	                "div",
-	                { className: "message user-card-name" },
-	                displayName
-	            );
 	        }
 
 	        return React.makeElement(
@@ -15605,7 +15693,6 @@ React.makeElement = React['createElement'];
 	        var contact = self.getContact();
 	        var timestampInt = self.getTimestamp();
 	        var timestamp = self.getTimestampAsString();
-	        var name = "";
 
 	        var datetime = React.makeElement(
 	            "div",
@@ -15631,11 +15718,6 @@ React.makeElement = React['createElement'];
 	                { className: "message date-time",
 	                    title: time2date(timestampInt) },
 	                timestamp
-	            );
-	            name = React.makeElement(
-	                "div",
-	                { className: "message user-card-name" },
-	                displayName
 	            );
 	        }
 
@@ -16816,6 +16898,15 @@ React.makeElement = React['createElement'];
 	            additionalClass = additionalClass + " participants-a-lot";
 	        }
 
+	        var reconnectingDiv = null;
+	        if (chatRoom.callReconnecting === true) {
+	            reconnectingDiv = _react2.default.createElement(
+	                'div',
+	                { className: 'callReconnecting' },
+	                _react2.default.createElement('i', { className: 'huge-icon crossed-phone' })
+	            );
+	        }
+
 	        return _react2.default.createElement(
 	            'div',
 	            { className: "call-block" + additionalClass, id: 'call-block' },
@@ -16824,6 +16915,7 @@ React.makeElement = React['createElement'];
 	            notifBar,
 	            networkQualityBar,
 	            players,
+	            reconnectingDiv,
 	            topPanel,
 	            _react2.default.createElement(
 	                'div',

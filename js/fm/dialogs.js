@@ -905,6 +905,7 @@
         onIdle(function() {
             /** @name $.copyDialog */
             /** @name $.moveDialog */
+            /** @name $.selectFolderDialog */
             $[$.dialog + 'Dialog'] = $.dialog;
 
             if (aMode) {
@@ -1056,6 +1057,7 @@
                 $.selected = [];
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = function() {
+                    closeDialog();
                     $.selected = [$.mcselected];
                     M.openSharingDialog();
                 };
@@ -1528,7 +1530,9 @@
 
             if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
                 $.selectFolderCallback();
+                return false;
             }
+
             closeDialog();
 
             if (saveToDialog) {

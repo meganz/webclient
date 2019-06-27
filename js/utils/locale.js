@@ -575,6 +575,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l['208a'] = l['208a'].replace('[/A]', '</a>');
     l['208s'] = l[208].replace('[A]', '<span class="red">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
+    l['208g'] = l[208].replace('[A]', '<a class="green">');
+    l['208g'] = l['208g'].replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
@@ -873,9 +875,18 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
         .replace('[/A2]', '</a>');
     l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
+    l[20707] = escapeHTML(l[20707]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[20709] = escapeHTML(l[20709]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[20710] = escapeHTML(l[20710]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b></b>');
-    l[20714] = escapeHTML(l[20714]).replace('[B1]%1[/B1]', '<b class="plan-time"></b>')
-                    .replace('[B2]%2[/B2]', '<b class="plan-name"></b>');
+    l[20714] = escapeHTML(l[20714])
+        .replace('[B1]%1[/B1]', '<b class="plan-time"></b>')
+        .replace('[B2]%2[/B2]', '<b class="plan-name"></b>');
+    l[20750] = escapeHTML(l[20750]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
 
     var common = [

@@ -862,7 +862,7 @@ div.pro-feature-icon {
     font-size: 13px;
     letter-spacing: 0.2px;
 }
-.membership-step2 .charge-information .duration-text {
+body:not(.de) .membership-step2 .charge-information .duration-text {
     text-transform: lowercase;
 }
 .membership-step2 .payment-period {
@@ -1215,7 +1215,6 @@ div.pro-feature-icon {
     font-size: 20px;
     line-height: 20px;
     color: #FF333A;
-    text-transform: lowercase;
     display: block;
     margin-top: -5px;
 }
@@ -1793,6 +1792,10 @@ div.pro-feature-icon {
     color: #666666;
     line-height: 24px;
     padding: 0 30px;
+}
+.fm-dialog .reg-st3-txt-localcurrencyprogram {
+    font-size: 12px;
+    white-space: normal;
 }
 .local-currency .reg-st3-bott-title.price .green-star-img {
     display: inline-block;

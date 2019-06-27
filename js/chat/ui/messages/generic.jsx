@@ -109,6 +109,24 @@ var GenericConversationMessage = React.createClass({
         $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
     },
+    haveMoreContactListeners: function() {
+        if (!this.props.message || !this.props.message.meta) {
+            return false;
+        }
+
+        if (this.props.message.meta) {
+            if (this.props.message.meta.participants) {
+                // call ended type of message
+                return this.props.message.meta.participants;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    },
     _nodeUpdated: function(h) {
         var self = this;
         // because it seems the webclient can trigger stuff before the actual
@@ -510,7 +528,9 @@ var GenericConversationMessage = React.createClass({
                                                 label={__(l[1187])}
                                                 onClick={self._startDownload.bind(self, v)}/>;
 
-                                            self._addLinkButtons(v.h, linkButtons);
+                                            if (M.getNodeRoot(v.h) !== M.RubbishID) {
+                                                self._addLinkButtons(v.h, linkButtons);
+                                            }
 
                                             firstGroupOfButtons.push(
                                                 <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}

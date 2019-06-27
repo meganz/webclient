@@ -1263,7 +1263,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <AlterParticipantsConversationMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1271,7 +1271,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <TruncatedMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1279,7 +1279,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <PrivilegeChange
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1287,7 +1287,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <TopicChange
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1295,7 +1295,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <CloseOpenModeMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1303,7 +1303,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <ChatHandleMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1320,7 +1320,7 @@ var ConversationPanel = React.createClass({
                             message={v}
                             state={v.state}
                             key={v.messageId}
-                            contact={contact}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                             onUpdate={() => {
                                 self.onResizeDoUpdate();

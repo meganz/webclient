@@ -40,7 +40,7 @@
         <div class="reset-small-txt">[$6220]</div>
 
         <div class="fm-account-input">
-            <input id="reset_success_st2_pass" type="password" value="" />
+            <input id="reset_success_st2_pass" type="password" value="" autocomplete="new-password" />
         </div>
         <div class="reset-pass-error">
             [$6001]
@@ -214,9 +214,9 @@
                 </div>
             </div>
         </div>
-        <div class="default-dialog-bottom">
-            <div class="fm-dialog-new-folder-button default-white-button right"><span>[$1027]</span></div>
-        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-new-folder-button default-white-button right"><span>[$1027]</span></div>
     </div>
 </div>
 
@@ -261,11 +261,11 @@
             </div>
             <div class="password-link-decrypt-error"></div>
         </div>
-        <div class="default-dialog-bottom">
-            <div class="fm-dialog-new-folder-button default-white-button right decrypt-link-button">
-                <span class="decrypt-text">[$1027]</span>
-                <i class="small-icon decryption-in-progress hidden"></i>
-            </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-new-folder-button default-white-button right decrypt-link-button">
+            <span class="decrypt-text">[$1027]</span>
+            <i class="small-icon decryption-in-progress hidden"></i>
         </div>
     </div>
 </div>
@@ -491,7 +491,7 @@
         <div class="default-white-button left dialog-newfolder-button">
             [$68]
         </div>
-        <div class="fm-picker-notagain left checkbox-block hidden">
+        <div class="fm-picker-notagain checkbox-block hidden">
             <div class="checkdiv checkboxOff">
                 <input type="checkbox" id="fm-picker-notagain" class="notagain" />
             </div>
@@ -525,19 +525,21 @@
             </div>
         </div>
         <div class="fm-notification-info">
-            <p>[$15]</p>
-            <div class="fm-notification-warning">[$1007]</div>
+            <h1></h1>
+            <h2 class="hidden"></h2>
+            <p class="hidden">[$15]</p>
+            <div class="fm-notification-warning hidden">[$1007]</div>
         </div>
 
         <div class="clear"></div>
     </div>
-    <div class="fm-notifications-bottom">
+    <div class="fm-notifications-bottom grey-bg">
         <div class="left">
             <div class="checkdiv checkboxOff"> <input type="checkbox" name="confirmation-checkbox" id="confirmation-checkbox" class="checkboxOff"> </div>
             <label for="export-checkbox" class="radio-txt">[$229]</label>
         </div>
-        <div class="default-white-button right notification-button"><span>[$1018]</span></div>
-        <div class="default-white-button right notification-button"><span>[$82]</span></div>
+        <div class="default-green-button right notification-button button"><span>[$1018]</span></div>
+        <div class="default-white-button right notification-button button"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
@@ -607,11 +609,11 @@
                     <div class="password-protect-inputs">
                         <div class="password-protect-input-container">
                             <div class="estimator-loading-icon"></div>
-                            <input class="password-protect-input first" type="password" placeholder="[$9074]">
+                            <input class="password-protect-input first" type="password" placeholder="[$9074]" autocomplete="new-password">
                         </div>
                         <div class="spacer"></div>
                         <div class="password-protect-input-container">
-                            <input class="password-protect-input second" type="password" placeholder="[$9075]">
+                            <input class="password-protect-input second" type="password" placeholder="[$9075]" autocomplete="new-password">
                         </div>
                     </div>
                     <div class="password-protect-error"></div>
@@ -958,36 +960,6 @@
     </div>
 </div>
 
-<div class="fm-dialog firefox-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$752]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
-    </div>
-    <div>
-        <div class="ff-extension-icon"></div>
-        <div class="ff-extension-content">
-            <div class="ff-extension-head">[$752]</div>
-            <div class="ff-extension-txt">
-                Please install our extension for improved download performance and added security. Unfortunately, there is a <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=939510" class="red" target="_blank" rel="noopener noreferrer">bug</a> in the current version of Firefox that will cause excessive memory consumption during and after large downloads.
-            </div>
-            <a href="/firefox" class="ff-extension-button clickurl">
-                [$1178]
-            </a>
-            <div class="clear"></div>
-        </div>
-        <div class="clear"></div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="checkboxOff"> <input type="checkbox" name="firefox-checkbox" id="firefox-checkbox" class="checkboxOff"> </div>
-        <label for="firefox-checkbox" class="radio-txt">[$229]</label>
-        <div class="default-white-button right close-button">
-            <span>[$148]</span>
-        </div>
-        <div class="clear"></div>
-    </div>
-</div>
-
 <div class="create-new-folder dropdown body popup dropdown-arrow hidden">
     <i class="dropdown-white-arrow"></i>
     <div class="create-folder-size-icon full-size hidden"></div>
@@ -1327,7 +1299,7 @@
                 </div>
                 <label class="radio-txt">[$192]</label>
             </div>
-            <div class="big-red-button height-48 top-dialog-login-button right" tabindex="0">
+            <div class="big-red-button height-48 top-dialog-login-button button right" tabindex="0">
                 [$16345]
                 <i class="medium-icon right-arrow icons-sprite"></i>
             </div>
@@ -1336,67 +1308,86 @@
     </form>
 </div>
 
-<div class="top-login-popup sign fm-dialog pro-register-dialog big-radius hidden">
-    <div class="fm-dialog-header">
-        <div class="account top-header login left small">
-            <div class="dialog-title">[$968]</div>
-            <div class="fm-dialog-subheading">[$20636]</div>
+<div class="top-login-popup sign fm-dialog pro-register-dialog hidden">
+    <div class="register-side-pane top-block wide">
+        <div class="register-side-pane top-bg">
+            <div class="register-side-pane top-bg-txt">
+                <span>
+                    [$20707]
+                </span>
+            </div>
         </div>
-        <div class="fm-dialog-close mid"></div>
-        <div class="clear"></div>
+        <div class="fm-dialog-close medium"></div>
+    </div>
+    <div class="register-side-pane header">
+        <span>[$968]</span>
+    </div>
+    <div class="register-side-pane header-info">
     </div>
 
     <div class="pro-register-scroll">
         <div class="fm-dialog-body hidden"></div>
         <form class="account dialog-register-form">
-            <div class="top-login-pad">
-
-                <div class="account input-wrapper name double">
-                    <div class="account input-tooltip">
-                        [$1098]<br>[$1099]
-                    </div>
-                    <i class="account-icon person"></i>
-                    <input type="text" name="register-name" id="register-firstname" placeholder="[$1096]" maxlength="40" class="f-name" />
-                    <input type="text" name="register-familyname" id="register-lastname" placeholder="[$1097]" maxlength="40" class="l-name" />
-                </div>
-                <div class="account input-wrapper email">
-                    <div class="account input-tooltip">
-                        [$1100]<br>[$1101].
-                    </div>
-                    <i class="account-icon email"></i>
-                    <input type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
-                </div>
-                <div class="account input-wrapper password first">
-                    <div class="account input-tooltip">
-                        [$1102]<br>[$1104]
-                    </div>
-                    <div class="password-status-icon">
-                        <div class="password-status-warning hidden"> </div>
-                    </div>
-                    <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
-                    <i class="account-icon lock"></i>
-                    <input type="password" name="register-password" id="register-password" placeholder="[$909]" />
-                    <div class="account password-status hidden">
-                        [$1106]
+            <div class="register-side-pane content">
+                <div class="account half-sized-block l">
+                    <div class="account input-wrapper name double">
+                        <div class="account input-tooltip bottom">
+                            [$1098]<br>[$1099]
+                        </div>
+                        <i class="account-icon person"></i>
+                        <input type="text" name="register-name" id="register-firstname" placeholder="[$1096]" maxlength="40" class="f-name" />
+                        <input type="text" name="register-familyname" id="register-lastname" placeholder="[$1097]" maxlength="40" class="l-name" />
                     </div>
                 </div>
-                <div class="account input-wrapper password confirm">
-                    <i class="account-icon lock"></i>
-                    <input type="password" name="register-password2" id="register-password2" placeholder="[$1114]" />
+                <div class="account half-sized-block r">
+                    <div class="account input-wrapper email">
+                        <div class="account input-tooltip bottom">
+                            [$1100]<br>[$1101].
+                        </div>
+                        <i class="account-icon email"></i>
+                        <input type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
+                    </div>
                 </div>
-                <div class="account checkbox-block register">
+                <div class="account half-sized-block l">
+                    <div class="account input-wrapper password first">
+                        <div class="account input-tooltip bottom">
+                            [$1102]<br>[$1104]
+                        </div>
+                        <div class="password-status-icon">
+                            <div class="password-status-warning hidden"> </div>
+                        </div>
+                        <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
+                        <i class="account-icon lock"></i>
+                        <input type="password" name="register-password" id="register-password" placeholder="[$909]" autocomplete="new-password" />
+                        <div class="account password-status hidden">
+                            [$1106]
+                        </div>
+                    </div>
+                </div>
+                <div class="account half-sized-block r">
+                    <div class="account input-wrapper password confirm">
+                        <i class="account-icon lock"></i>
+                        <input type="password" name="register-password2" id="register-password2" placeholder="[$1114]" autocomplete="new-password" />
+                    </div>
+                </div>
+                <div class="clear"></div>
+                <div class="account checkbox-block register left">
                     <div class="register-check checkboxOff checkbox">
                         <input class="checkboxOff" type="checkbox" name="reset-pass" id="reset-pass" checked="">
                     </div>
 
-                    <label class="radio-txt">[$208]</label>
+                    <label class="radio-txt">[$'208g']</label>
                     <div class="clear"></div>
                 </div>
-                <div class="big-red-button height-48 register-button right active" tabindex="0">
-                    [$1108]
-                    <i class="medium-icon right-arrow icons-sprite"></i>
+                <div class="default-green-button big outer-shadow button right" tabindex="0">
+                    <span>[$1108]</span>
                 </div>
                 <div class="clear"></div>
+            </div>
+            <div class="account  achievements-tip">*[$16362]</div>
+            <div class="account dialog-dark-bottom login">
+                [$5585]
+                <a>[$171]</a>
             </div>
         </form>
     </div>
@@ -1902,11 +1893,11 @@
         <div class="cancel-subscription-txt">
             [$6998]
         </div>
-        <div class="default-dialog-bottom">
-            <div class="default-white-button right continue-cancel-subscription disabled"><span>[$507]</span></div>
-            <div class="default-white-button right cancel"><span>[$822]</span></div>
-            <div class="clear"></div>
-        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="default-white-button right continue-cancel-subscription disabled"><span>[$507]</span></div>
+        <div class="default-white-button right cancel"><span>[$822]</span></div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -1995,7 +1986,7 @@
     </div>
     <div class="megasync-content slider slide1">
         <div class="fm-dialog-header">
-            <div class="fm-dialog-close big"></div>
+            <div class="fm-dialog-close medium"></div>
             <div class="clear"></div>
         </div>
         <div class="megasync-body">
@@ -2015,12 +2006,18 @@
                         </div>
 
                         <div class="megasync-slide slide1">
-                            <div class="megasync-header">
-                                [$16861]
-                            </div>
+                            <div class="megasync-header">[$20758]</div>
                             <div class="megasync-img img1">
-                                <div class="megasync-text">
-                                    [$16862]
+                                <div class="megasync-slide-info">
+                                    <div class="small-header">
+                                        [$19639]
+                                    </div>
+                                    <div class="big-header">
+                                        [$19646]
+                                    </div>
+                                    <div class="txt">
+                                        [$19647]
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2067,23 +2064,23 @@
                         </div>
                     </div>
 
-                    <div class="megasync-slider button prev"></div>
-                    <div class="megasync-slider button next"></div>
+                    <div class="megasync-slider button prev transition"></div>
+                    <div class="megasync-slider button next transition"></div>
 
                     <div class="megasync-buttons">
-                        <div class="download big-button red download-megasync transition">
-                            <span>Download MEGA app</span>
+                        <div class="download big-button green download-megasync transition height-56">
+                            <span>[$20826]</span>
                         </div>
-                        <div class="download big-button continue-with-browser transition hidden">
-                            <span>Continue with browser</span>
+                        <div class="download big-button continue-with-browser transition hidden height-56">
+                            <span>[$20827]</span>
                         </div>
                     </div>
                 </div>
                 <!-- Please add "waring" classname to ".megasync-overlay" !-->
                 <!-- Please add "ff"/"safari"/"opera"/"edge"/"ie" classname !-->
                 <div class="megasync-bottom-warning">
-                    <i class="download big-icon"></i>
-                    <span>[$16865]</span>
+                    <span><i class="download big-icon"></i></span>
+                    <span class="txt">[$16865]</span>
                 </div>
             </div>
         </div>
@@ -2367,7 +2364,7 @@
 
 <div class="fm-dialog copyrights-dialog hidden">
     <div class="fm-dialog-close"></div>
-    <div class="voucher-dialog-body">
+    <div class="fm-dialog-body">
         <div class="copyrights-dialog-icon"></div>
         <div class="copyrights-dialog-head">
             [$7696]
@@ -2742,15 +2739,15 @@
         </div>
 
         <div class="dialog limited-bottom">
-            <div class="download big-button continue-download red transition">
-                <i class="medium-icon icons-sprite download"></i>
+            <div class="download big-button continue-download green transition">
+                <i class="medium-icon icons-sprite download big"></i>
                 <span>[$17091]</span>
             </div>
             <div class="centered-checkbox dialog-bottom">
                 <div class="checkdiv checkboxOff">
                     <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
                 </div>
-                <label for="limit-warning-checkbox" class="radio-txt medium">[$229]</label>
+                <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
             </div>
         </div>
 
@@ -3462,7 +3459,7 @@
         </div>
 
     </div>
-    <div class="fm-notifications-bottom">
+    <div class="fm-notifications-bottom no-bott-pad">
         <div class="default-white-button right notification-button skip-button hidden"><span>[$1379]</span></div>
         <div class="default-white-button right notification-button cancel-button"><span>[$82]</span></div>
         <!-- Please add "hidden" class !-->
@@ -4115,7 +4112,7 @@
             <div class="dialog input-wrapper ">
                 <!-- Please add 'wrong' class is password is incorrect !-->
                 <div class="dialog big-input-bg">
-                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="disabled">
+                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="new-password">
                 </div>
                 <div class="dialog input-button">
                     <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">
@@ -4177,8 +4174,8 @@
             [$17085]
         </div>
         <div class="dialog resume-transfer buttons">
-            <div class="download big-button red transition inline">
-                <i class="medium-icon icons-sprite download resume"></i>
+            <div class="download big-button green transition inline">
+                <i class="medium-icon icons-sprite download resume big"></i>
                 <span>[$1649]</span>
             </div>
             <div class="download big-button transition inline cancel">
@@ -4318,6 +4315,7 @@
             <span>[$17835]</span>
         </div>
         <div class="default-white-button close-button right"><span>[$148]</span></div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -4361,15 +4359,15 @@
                 Do you wish to continue?
             </div>
         </div>
-        <div class="default-dialog-bottom">
-            <div class="default-widget-buttons">
-                <div class="fm-dialog-new-folder-button default-green-button right"><span>[$148]</span></div>
-                <div class="fm-dialog-new-folder-button default-white-button right"><span>More settings</span></div>
-            </div>
-            <div class="remove-widget-buttons hidden">
-                <div class="fm-dialog-new-folder-button default-green-button right"><span>Remove</span></div>
-                <div class="fm-dialog-new-folder-button default-white-button right"><span>Cancel</span></div>
-            </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="default-widget-buttons">
+            <div class="fm-dialog-new-folder-button default-green-button button right"><span>[$148]</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button button right"><span>More settings</span></div>
+        </div>
+        <div class="remove-widget-buttons hidden">
+            <div class="fm-dialog-new-folder-button default-green-button button right"><span>Remove</span></div>
+            <div class="fm-dialog-new-folder-button default-white-button button right"><span>Cancel</span></div>
         </div>
     </div>
 </div>
@@ -4510,6 +4508,7 @@
         <div class="default-white-button left supportbtn"><span>[$18148]</span></div>
         <div class="default-green-button right parkbtn button"><span>[$1947]</span></div>
         <div class="default-white-button right closebtn"><span>[$82]</span></div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -4558,7 +4557,7 @@
         <div class="default-white-button left links-button copy-to-clipboard" id="qr-dlg-cpy-lnk">
             <span>[$17835]</span>
         </div>
-        <div class="default-grey-button right links-button " id="qr-dlg-close">
+        <div class="default-green-button right links-button button" id="qr-dlg-close">
             <span>[$148]</span>
         </div>
         <div class="clear"></div>

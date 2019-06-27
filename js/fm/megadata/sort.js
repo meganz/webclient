@@ -154,7 +154,7 @@ MegaData.prototype.sortByDateTime = function(d) {
     this.sort();
 };
 
-MegaData.prototype.getSortByDateTimeFn = function() {
+MegaData.prototype.getSortByDateTimeFn = function(type) {
 
     var sortfn;
 
@@ -172,14 +172,23 @@ MegaData.prototype.getSortByDateTimeFn = function() {
         var time1 = a.ts - a.ts % 60;
         var time2 = b.ts - b.ts % 60;
 
-        if (M.currentdirid === 'out-shares') {
-            time1 = getMaxShared(a.shares);
-            time2 = getMaxShared(b.shares);
+        if (M.currentdirid === 'out-shares' || type === 'out-shares') {
+            time1 = M.ps[a.h] ? getMaxShared(M.ps[a.h]) : getMaxShared(a.shares);
+            time2 = M.ps[b.h] ? getMaxShared(M.ps[b.h]) : getMaxShared(b.shares);
         }
 
-        if (M.currentdirid === 'public-links' && !$.dialog) {
-            time1 = a.shares.EXP.ts;
-            time2 = b.shares.EXP.ts;
+        if ((M.currentdirid === 'public-links' && !$.dialog) || type === 'public-links') {
+            var largeNum = 99999999999 * d;
+
+            if (a.shares === undefined && M.su.EXP[a.h]) {
+                a = M.d[a.h];
+            }
+            if (b.shares === undefined && M.su.EXP[b.h]) {
+                b = M.d[b.h];
+            }
+
+            time1 = (a.shares && a.shares.EXP) ? a.shares.EXP.ts : largeNum;
+            time2 = (b.shares && b.shares.EXP) ? b.shares.EXP.ts : largeNum;
         }
 
         if (time1 !== time2) {

@@ -499,9 +499,6 @@ mega.achievem.achievementsListDialog = function achievementsListDialog(onDialogC
             deleteScrollPanel($scrollBlock, 'jsp');
         }
 
-        // Dialog aligment
-        $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
-
         return $dialog;
     });
 
@@ -562,12 +559,6 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
                 $('.token-input-input-token-mega input', $dialog).trigger("focus");
             });
         }
-
-        $dialog.position({
-            'my': 'center center',
-            'at': 'center center',
-            'of': $(window)
-        });
 
         return $dialog;
     });
@@ -1010,9 +1001,6 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     else {
         deleteScrollPanel($scrollBlock, 'jsp');
     }
-
-    // Dialog aligment
-    $dialog.css('margin-top', '-' + $dialog.outerHeight() / 2 + 'px');
 
     $('.button.invite-more', $dialog).rebind('click', function() {
         closeDialog();

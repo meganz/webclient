@@ -498,9 +498,9 @@
                     /*if (!isValidShareLink()) {
                         $('.fm-invalid-folder').removeClass('hidden');
                     }
-                    else*/ {
+                    else {*/
                         $('.fm-empty-folder-link').removeClass('hidden');
-                    }
+                    /*} */
                 }
                 else if (M.currentdirid === M.InboxID) {
                     $('.fm-empty-messages').removeClass('hidden');
@@ -515,7 +515,7 @@
                     else if (M.currentdirid === M.RootID) {
                         $('.fm-empty-cloud').removeClass('hidden');
                     }
-                    else {
+                    else if (M.currentrootid) {
                         $('.fm-empty-folder').removeClass('hidden');
                     }
                 }

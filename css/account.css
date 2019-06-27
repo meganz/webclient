@@ -48,6 +48,17 @@
 .account.small-header-txt a:hover {
     text-decoration: underline;
 }
+.account.half-sized-block {
+    width: 50%;
+    float: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 0 0 16px;
+}
+.account.half-sized-block:first-child, .account.half-sized-block.l {
+    padding: 0 16px 0 0;
+}
 .account.input-wrapper {
     border-bottom: 1px solid rgba(0,0,0,0.2);
     padding: 9px 0 9px 38px;
@@ -61,6 +72,9 @@
     -o-transition: border-color 200ms ease-in-out;
     -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
+}
+.register-side-pane .account.input-wrapper {
+    margin: 0 8px 24px 8px;
 }
 .account.input-wrapper.small {
     margin: 0 0 8px 0;
@@ -257,7 +271,7 @@ body.ar .sms-verification-number-input {
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 18px;
     min-height: 24px;
     padding: 4px 0;
@@ -276,6 +290,7 @@ body.ar .sms-verification-number-input {
     margin: 0 0 0 20px;
     display: none;
     z-index: 10;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .both-input-tooltip {
     bottom: -22px;
@@ -432,8 +447,34 @@ body.ar .sms-verification-number-input {
     line-height: 18px;
     padding-top: 7px;
 }
+.account.checkbox-block.small {
+    padding: 0 0 14px 1px;
+}
+.register-side-pane .account.checkbox-block.small {
+    padding: 24px 0 20px 8px;
+}
+.account.checkbox-block.small .radio-txt {
+    font-size: 13px;
+}
+.account.checkbox-block.small .checkboxOn, .account.checkbox-block.small .checkboxOff  {
+    margin-top: 5px;
+}
+.account.checkbox-block.small .radio-txt  {
+        padding: 4px 0 0 0
+}
+.account.achievements-tip  {
+    font-size: 12px;
+    line-height: 15px;
+    color: #999999;
+    padding: 40px 0 0 0;
+    margin: 0 -10px 0 -10px;
+    text-align: center;
+}
 .top-login-popup .account.checkbox-block .radio-txt {
     padding-top: 0;
+    font-size: 13px;
+    line-height: 19px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .account.business-plan {
     width: 360px;

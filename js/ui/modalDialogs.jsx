@@ -112,7 +112,7 @@ var ModalDialog = React.createClass({
             var buttons = [];
             self.props.buttons.forEach(function(v) {
                 buttons.push(
-                    <a href="javascript:;"
+                    <a
                         className={(v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : "")}
                         onClick={(e) => {
                             if ($(e.target).is(".disabled")) {

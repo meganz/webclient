@@ -337,15 +337,29 @@ body.de .fm-dialog.new-group-chat {
 .fm-dialog.add-from-cloud .tooltip-handler {
     z-index: 10;
 }
-.fm-dialog .fm-breadcrumbs-wrapper {
-    max-width: -webkit-calc(100% - 152px);
-    max-width: -moz-calc(100% - 152px);
-    max-width: calc(100% - 152px);
-}
+
 .fm-dialog .fm-breadcrumbs-block {
+    float: none;
     height: 46px;
     margin: 0 0 0 0;
     padding: 12px 0 0 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    width: -webkit-calc(100% - 156x);
+    width: -moz-calc(100% - 156px);
+    width: calc(100% - 156px);
+}
+.fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
+    width: -webkit-calc(100% - 320x);
+    width: -moz-calc(100% - 320px);
+    width: calc(100% - 320px);
+}
+.fm-dialog .breadcrumbs-wrapper {
+    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);

@@ -770,6 +770,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK",
     "6168": "Privacybeleid",
+    "6170": "Sorteer op",
     "6172": "inschrijven",
     "6181": "Annuleer uw account",
     "6182": "Be\u00ebindig uw account",
@@ -1534,6 +1535,13 @@
     "16200": "Spraak en Video oproepen",
     "16217": "Deelnemers",
     "16221": "Voeg label toe %1",
+    "16223": "Rood",
+    "16224": "Oranje",
+    "16225": "Geel",
+    "16226": "Groen",
+    "16227": "Blauw",
+    "16228": "Paars",
+    "16229": "Grijs",
     "16258": "Mijn status",
     "16259": "Automatisch op afwezig",
     "16264": "Interactief",
@@ -3483,5 +3491,6 @@
     "20829": "Alias \/ Nickname",
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20833": "Did you unsubscribe by mistake?",
+    "20840": "Copy All"
 }

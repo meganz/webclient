@@ -770,6 +770,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK",
     "6168": "Polityka prywatno\u015bci",
+    "6170": "SORTUJ",
     "6172": "subskrybuj",
     "6181": "Usu\u0144 swoje konto",
     "6182": "Zamknij swoje konto",
@@ -1534,6 +1535,13 @@
     "16200": "Rozmowy i Video",
     "16217": "Uczestnicy",
     "16221": "Dodaj etykiet\u0119 %1",
+    "16223": "Czerwony",
+    "16224": "Pomara\u0144czowy",
+    "16225": "\u017b\u00f3\u0142ty",
+    "16226": "Zielony",
+    "16227": "Niebieski",
+    "16228": "Purpurowy",
+    "16229": "Szary",
     "16258": "Status widoczno\u015bci",
     "16259": "Auto-drzemka",
     "16264": "Interaktywny",
@@ -3481,7 +3489,8 @@
     "20827": "Kontynuuj w przegl\u0105darce",
     "20828": "Ustaw pseudonim",
     "20829": "Alias \/ pseudonim",
-    "20831": "You have successfully unsubscribed",
-    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20831": "Subskrypcja zosta\u0142a anulowana pomy\u015blnie",
+    "20832": "Nie b\u0119dziesz otrzymywa\u0107 wiadomo\u015bci e-mail od MEGA. Pami\u0119taj, \u017ce je\u015bli zarejestrujesz si\u0119 na konto MEGA w przysz\u0142o\u015bci, wznowimy wysy\u0142anie Ci e-maili.",
+    "20833": "Czy zrezygnowa\u0142e\u015b z subskrypcji przez pomy\u0142k\u0119?",
+    "20840": "Copy All"
 }

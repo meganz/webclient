@@ -770,6 +770,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK",
     "6168": "Datenschutzrichtlinien",
+    "6170": "Sortierung nach",
     "6172": "abonnieren",
     "6181": "Account stornieren",
     "6182": "Account schlie\u00dfen",
@@ -1534,6 +1535,13 @@
     "16200": "Audio- und Videoanrufe",
     "16217": "Teilnehmer",
     "16221": "Mit %1 markieren",
+    "16223": "Rot",
+    "16224": "Orange",
+    "16225": "Gelb",
+    "16226": "Gr\u00fcn",
+    "16227": "Blau",
+    "16228": "Violett",
+    "16229": "Grau",
     "16258": "Ihr Onlinestatus",
     "16259": "Auto-Abwesend",
     "16264": "Interaktiv",
@@ -3483,5 +3491,6 @@
     "20829": "Aliasname",
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20833": "Did you unsubscribe by mistake?",
+    "20840": "Copy All"
 }

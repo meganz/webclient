@@ -770,6 +770,7 @@
     "6126": "\ud504\ub85c III",
     "6159": "MEGA SDK",
     "6168": "\uac1c\uc778 \uc815\ubcf4 \ubcf4\ud638 \uc815\ucc45",
+    "6170": "\uc815\ub82c \uae30\uc900",
     "6172": "\uad6c\ub3c5",
     "6181": "\uacc4\uc815 \ucde8\uc18c",
     "6182": "\uacc4\uc815 \ub2eb\uae30",
@@ -1534,6 +1535,13 @@
     "16200": "\uc74c\uc131\uacfc \uc601\uc0c1 \ud1b5\ud654",
     "16217": "\ucc38\uc5ec\uc790",
     "16221": "%1 \ub77c\ubca8 \ucd94\uac00",
+    "16223": "\ube68\uac15",
+    "16224": "\uc8fc\ud669",
+    "16225": "\ub178\ub791",
+    "16226": "\ucd08\ub85d",
+    "16227": "\ud30c\ub791",
+    "16228": "\ubcf4\ub77c",
+    "16229": "\ud68c\uc0c9",
     "16258": "\uc0c1\ud0dc \ud45c\uc2dc",
     "16259": "\uc790\ub3d9 \ubd80\uc7ac\uc911",
     "16264": "\uc0c1\ud638\uc791\uc6a9",
@@ -3481,7 +3489,8 @@
     "20827": "\ube0c\ub77c\uc6b0\uc800\ub85c \uacc4\uc18d \ud558\uae30",
     "20828": "\ubcc4\uba85 \uc124\uc815",
     "20829": "\uac00\uba85 \/ \ubcc4\uba85",
-    "20831": "You have successfully unsubscribed",
-    "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20831": "\uc131\uacf5\uc801\uc73c\ub85c \uad6c\ub3c5 \ud574\uc9c0\ud558\uc600\uc2b5\ub2c8\ub2e4",
+    "20832": "\ub2f9\uc2e0\uc740 \uc55e\uc73c\ub85c MEGA\ub85c\ubd80\ud130 \uc774\uba54\uc77c\uc744 \ubc1b\uc9c0 \uc54a\uc744 \uac83\uc785\ub2c8\ub2e4. \ub9cc\uc57d \ub098\uc911\uc5d0 MEGA \uacc4\uc815\uc744 \ub4f1\ub85d\ud55c\ub2e4\uba74 \uc774\uba54\uc77c \ubc1c\uc1a1\uc744 \uc7ac\uac1c\ud560 \uac83\uc784\uc744 \ucc38\uace0\ud558\uc138\uc694.",
+    "20833": "\uc2e4\uc218\ub85c \uad6c\ub3c5 \ud574\uc9c0\ud558\uc600\ub098\uc694?",
+    "20840": "Copy All"
 }

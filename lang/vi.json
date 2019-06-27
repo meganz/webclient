@@ -770,6 +770,7 @@
     "6126": "PRO III",
     "6159": "B\u1ed9 MEGA SDK",
     "6168": "Ch\u00ednh s\u00e1ch quy\u1ec1n ri\u00eang t\u01b0",
+    "6170": "X\u1ebfp theo",
     "6172": "thu\u00ea bao",
     "6181": "X\u00f3a b\u1ecf t\u00e0i kho\u1ea3n n\u00e0y",
     "6182": "X\u00f3a t\u00e0i kho\u1ea3n",
@@ -1534,6 +1535,13 @@
     "16200": "G\u1ecdi Tho\u1ea1i v\u00e0 Video",
     "16217": "C\u00e1c Th\u00e0nh Vi\u00ean",
     "16221": "D\u00e1n nh\u00e3n m\u00e0u %1",
+    "16223": "M\u00e0u \u0111\u1ecf",
+    "16224": "M\u00e0u cam",
+    "16225": "M\u00e0u v\u00e0ng",
+    "16226": "M\u00e0u l\u1ee5c",
+    "16227": "M\u00e0u lam",
+    "16228": "M\u00e0u t\u00edm",
+    "16229": "M\u00e0u x\u00e1m",
     "16258": "Tr\u1ea1ng th\u00e1i ho\u1ea1t \u0111\u1ed9ng online",
     "16259": "T\u1ef1 \u0111\u1ed9ng v\u1eafng m\u1eb7t",
     "16264": "T\u00ednh T\u01b0\u01a1ng T\u00e1c",
@@ -3483,5 +3491,6 @@
     "20829": "Alias \/ Nickname",
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20833": "Did you unsubscribe by mistake?",
+    "20840": "Copy All"
 }

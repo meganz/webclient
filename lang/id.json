@@ -770,6 +770,7 @@
     "6126": "PRO III",
     "6159": "MEGA SDK",
     "6168": "Kebijakan Privasi",
+    "6170": "URUTKAN BERDASAR",
     "6172": "subscribe",
     "6181": "Hapus akun anda",
     "6182": "Tutup akun anda",
@@ -1534,6 +1535,13 @@
     "16200": "Suara dan Panggilan Suara",
     "16217": "Partisipan",
     "16221": "Tambah label %1",
+    "16223": "Merah",
+    "16224": "Oranye",
+    "16225": "Kuning",
+    "16226": "Hijau",
+    "16227": "Biru",
+    "16228": "Ungu",
+    "16229": "Abu",
     "16258": "Tampilan status",
     "16259": "Auto-away",
     "16264": "Interaktif",
@@ -3483,5 +3491,6 @@
     "20829": "Alias \/ Nickname",
     "20831": "You have successfully unsubscribed",
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
-    "20833": "Did you unsubscribe by mistake?"
+    "20833": "Did you unsubscribe by mistake?",
+    "20840": "Copy All"
 }

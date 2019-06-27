@@ -416,23 +416,23 @@ accountUI.inputs = {
             var $inputs = $('.fm-account-main input').add('.fm-voucher-popup input');
 
             $inputs.rebind('focus', function() {
-                $(this).parent().addClass('active');
+                $(this).parents('.dialog-input-title-ontop').addClass('active');
             });
 
             $inputs.rebind('blur', function() {
 
                 if ($(this).val()) {
-                    $(this).parent().addClass('valued');
+                    $(this).parents('.dialog-input-title-ontop').addClass('valued');
                 }
                 else {
-                    $(this).parent().removeClass('valued');
+                    $(this).parents('.dialog-input-title-ontop').removeClass('valued');
                 }
-                $(this).parent().removeClass('active');
+                $(this).parents('.dialog-input-title-ontop').removeClass('active');
             });
 
             $inputs.prev('.title').rebind('click', function() {
 
-                if (!$(this).parent().hasClass('active')) {
+                if (!$(this).parents('.dialog-input-title-ontop').hasClass('active')) {
                     $(this).next('input').trigger('focus');
                 }
             });

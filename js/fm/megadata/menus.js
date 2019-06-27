@@ -450,6 +450,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             else {
                 $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
                 $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').attr('style', '');
+                if (folderlink) {
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label')
+                        .attr('style', 'display:none !important');
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav')
+                        .attr('style', 'display:none !important');
+                }
             }
         }
         if (!itemsViewed) {

@@ -1907,7 +1907,17 @@ function passwordManager(form) {
             $(form).find('input').val('');
         }, 1000);
         return false;
-    }).submit();
+    });
+
+    // For trigger FF Password Manager, submit the form by making submit button and click it.
+    var submitButton = document.createElement("input");
+    submitButton.setAttribute("type", "submit");
+    submitButton.style.opacity = '0';
+
+    $(form)[0].appendChild(submitButton);
+
+    submitButton.click();
+
     return true;
 }
 passwordManager.knownForms = Object.freeze({
@@ -1924,33 +1934,6 @@ passwordManager.knownForms = Object.freeze({
         pwd: '#register-password'
     }
 });
-passwordManager.getStoredCredentials = function(password) {
-    // Retrieve `keypw` and `userhash` from pwd string
-    var result = null;
-
-    if (String(password).substr(0, 2) === '~:') {
-        var parts = password.substr(2).split(':');
-
-        if (parts.length === 2) {
-            try {
-                var hash = parts[1];
-                var keypw = base64_to_a32(parts[0]);
-
-                if (base64_to_a32(hash).length === 2
-                        && keypw.length === 4) {
-
-                    result = {
-                        hash: hash,
-                        keypw: keypw
-                    };
-                }
-            }
-            catch (e) {}
-        }
-    }
-
-    return result;
-};
 passwordManager.pickFormFields = function(form) {
     var result = null;
     var $form = $(form);

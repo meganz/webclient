@@ -506,32 +506,8 @@ MegaData.prototype.doSort = function(n, d) {
 };
 
 MegaData.prototype.setLastColumn = function(col) {
-    switch (col) {
-        case 'ts':
-        case 'mtime':
-            // It's valid
-            break;
-        default:
-            // Default value
-            col = "ts";
-            break;
-    }
-
-    if (col === this.lastColumn) {
-        return;
-    }
-
-    this.lastColumn = col;
-    localStorage._lastColumn = this.lastColumn;
-
-    if ($('.do-sort[data-by="' + col + '"]').length > 0) {
-        // swap the column label
-        $('.dropdown-item.do-sort').removeClass('selected');
-        $('.grid-url-header').prev().find('div')
-            .removeClass().addClass('arrow ' + col)
-            .text($('.do-sort[data-by="' + col + '"]').text());
-        $('.do-sort[data-by="' + col + '"]').addClass('selected');
-    }
+    "use strict";
+    return;
 };
 
 MegaData.prototype.sortByLabel = function(d) {

@@ -2,6 +2,22 @@ function FileManager() {
     "use strict";
 
     this.logger = new MegaLogger('FileManager');
+    this.columnsWidth = {
+        cloud: Object.create(null),
+        inshare: Object.create(null),
+        outshare: Object.create(null)
+    };
+
+    this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
+    this.columnsWidth.cloud.fname = { min: 120, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
+    this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
+    this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: true };
+    this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
+
 }
 FileManager.prototype.constructor = FileManager;
 
@@ -487,6 +503,43 @@ FileManager.prototype.initFileManagerUI = function() {
     M.addTransferPanelUI();
     M.initUIKeyEvents();
     onIdle(topmenuUI);
+
+    var thElm;
+    var startOffset;
+    $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
+        var $me = $(this);
+        var th = $me.closest('th');
+        thElm = th;
+        startOffset = th.outerWidth() - col.pageX;
+    });
+
+    $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+        if (thElm && thElm.length) {
+
+            var newWidth = startOffset + col.pageX;
+
+            var colType = thElm.attr('megatype');
+            if (colType) {
+                if (newWidth < M.columnsWidth.cloud[colType].min) {
+                    return;
+                }
+                thElm.outerWidth(newWidth);
+                M.columnsWidth.cloud[colType].curr = thElm.outerWidth();
+                $(".grid-table td[megatype='" + colType + "']").
+                    outerWidth(M.columnsWidth.cloud[colType].curr);
+            }
+            else {
+                thElm.outerWidth(newWidth);
+            }
+
+            $('#fmholder').css('cursor', 'col-resize');
+        }
+    });
+
+    $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+        thElm = undefined;
+        $('#fmholder').css('cursor', '');
+    });
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
@@ -2806,7 +2859,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,.shared-blocks-view, .out-shared-blocks-view')
         .rebind('contextmenu.fm', function(e) {
             if (page === "fm/links") { // Remove context menu option from filtered view
                 return false;
@@ -2819,6 +2872,51 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             $.selected = [];
             $.hideTopMenu();
             return !!M.contextMenuUI(e, 2);
+        });
+
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').rebind('click', function(e) {
+        var sortType;
+        var $me = $(this);
+
+        if ($me.hasClass('sort-size')) {
+            sortType = 'size';
+        }
+        else if ($me.hasClass('sort-name')) {
+            sortType = 'name';
+        }
+        else if ($me.hasClass('sort-label')) {
+            sortType = 'label';
+        }
+        else if ($me.hasClass('sort-type')) {
+            sortType = 'type';
+        }
+        else if ($me.hasClass('sort-timeAd')) {
+            sortType = 'ts';
+        }
+        else if ($me.hasClass('sort-timeMd')) {
+            sortType = 'mtime';
+        }
+        else if ($me.hasClass('sort-fav')) {
+            sortType = 'fav';
+        }
+        else if ($me.hasClass('sort-owner')) {
+            sortType = 'owner';
+        }
+        else if ($me.hasClass('sort-access')) {
+            sortType = 'access';
+        }
+        else if ($me.hasClass('sort-sharedwith')) {
+            sortType = 'sharedwith';
+        }
+        else if ($me.hasClass('sort-sharecreated')) {
+            sortType = 'date';
+        }
+
+        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
+        $me.addClass('selected');
+
+        M.doSort(sortType, 1);
+        M.renderMain();
     });
 
     if (this.currentdirid === 'contacts') {
@@ -2873,18 +2971,41 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.fm-files-view-icon.block-view').removeClass('active');
 
     $.gridHeader = function() {
-        var headerColumn = '';
-        var $firstChildTd = $('.grid-table tr:first-child td:visible');
-        if ($firstChildTd.length === 0) {
-            // if the first <tr> does not contain any TDs, pick the next one
-            // this can happen when MegaList's prepusher (empty <TR/> is first)
-            $firstChildTd = $('.grid-table tr:nth-child(2) td:visible');
+        if (folderlink) {
+            M.columnsWidth.cloud.versions.viewed = false;
+            M.columnsWidth.cloud.versions.disabled = true;
+            M.columnsWidth.cloud.fav.viewed = false;
+            M.columnsWidth.cloud.fav.disabled = true;
+            M.columnsWidth.cloud.label.viewed = false;
+            M.columnsWidth.cloud.label.disabled = true;
         }
 
-        $firstChildTd.each(function(i, e) {
-            headerColumn = $('.files-grid-view.fm .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
+        if (M && M.columnsWidth && M.columnsWidth.cloud) {
+            for (var col in M.columnsWidth.cloud) {
+                var $header = $('.files-grid-view.fm .grid-table-header th[megatype="' + col + '"]');
+                if (!$header) {
+                    continue;
+                }
+
+                if (M.columnsWidth.cloud[col]) {
+                    if (M.columnsWidth.cloud[col].curr) {
+                        if (typeof M.columnsWidth.cloud[col].curr === 'number') {
+                            if (M.columnsWidth.cloud[col].curr !== $header.outerWidth()) {
+                                $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                            }
+                        }
+                        else {
+                            $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                        }
+                    }
+
+                    if (!M.columnsWidth.cloud[col].viewed && $header.is(':visible')) {
+                        $header.hide();
+                        $('.grid-table.fm td[megatype="' + col + '"]').hide();
+                    }
+                }
+            }
+        }
     };
 
 
@@ -2993,28 +3114,8 @@ FileManager.prototype.addGridUI = function(refresh) {
         $.gridHeader();
     }
 
-    // if (folderlink) {
-    //    $('.grid-url-arrow').hide();
-    //    $('.grid-url-header').text('');
-    // }
-    // else {
-        $('.grid-url-arrow').show();
-        $('.grid-url-header').text('');
-    // }
-
-    $('.fm .grid-table-header th:nth-child(5)').rebind('contextmenu.column_time', function(e) {
-        // Disable this for Public link page
-        if (M.currentdirid === 'public-links') {
-            return false;
-        }
-        $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
-        if (selectionManager) {
-            selectionManager.clear_selection();
-        }
-        $.selected = [];
-        $.hideTopMenu();
-        return !!M.contextMenuUI(e, 6);
-    });
+    $('.grid-url-arrow').show();
+    $('.grid-url-header').text('');
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
         '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content,' +
@@ -3064,13 +3165,65 @@ FileManager.prototype.addGridUI = function(refresh) {
             }
             for (var sortBy in M.sortRules) {
                 if (cls.indexOf(sortBy) !== -1) {
+
+                    var $sortMenu = $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item')
+                        .removeClass('selected');
+                    var sortitem = sortBy;
+
+                    if (sortitem === 'ts') {
+                        sortitem = 'timeAd';
+                    }
+                    else if (sortitem === 'mtime') {
+                        sortitem = 'timeMd';
+                    }
+                    else if (sortitem === 'date') {
+                        sortitem = 'sharecreated, .sort-timeAd';
+                    }
+
+                    $sortMenu.filter('.sort-' + sortitem).addClass('selected');
+
+                    if (dir !== -1 && sortitem !== sortBy) {
+                        if (cls.indexOf('asc') === -1) {
+                            dir = -1;
+                        }
+                    }
+
                     M.doSort(sortBy, dir);
                     M.renderMain();
+
                     break;
                 }
             }
         }
     });
+
+    $('.grid-table-header').rebind('contextmenu', function(e) {
+        var notAllowedTabs = ['shares', 'out-shares', 'contacts', 'ipc', 'opc'];
+        if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
+            return false;
+        }
+        M.contextMenuUI(e, 7);
+        return false;
+    });
+
+    $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
+        var $me = $(this);
+        if ($me.attr('isviewed')) {
+            $me.removeAttr('isviewed').find('i').removeClass('icons-sprite tiny-grey-tick');
+            M.columnsWidth.cloud[$me.attr('megatype')].viewed = false;
+            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').hide();
+            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').hide();
+        }
+        else {
+            $me.attr('isviewed', 'y').find('i').addClass('icons-sprite tiny-grey-tick');
+            M.columnsWidth.cloud[$me.attr('megatype')].viewed = true;
+            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
+            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
+        }
+        $.hideContextMenu && $.hideContextMenu();
+        return false;
+    });
+
 
     $('.grid-first-th').rebind('click', function() {
         var $el = $(this).children().first();

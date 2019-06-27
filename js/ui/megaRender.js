@@ -10,17 +10,20 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="50">' +
+                    '<td megatype="fav" >' +
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
-                    '<td>' +
+                    '<td megatype="fname">' +
                         '<span class="transfer-filetype-icon"></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
-                    '<td width="100" class="size"></td>' +
-                    '<td width="130" class="type"></td>' +
-                    '<td width="120" class="time"></td>' +
-                    '<td width="93" class="grid-url-field own-data">' +
+                    '<td megatype="label" class="label"></td>' +
+                    '<td megatype="size" class="size"></td>' +
+                    '<td megatype="type" class="type"></td>' +
+                    '<td megatype="timeAd" class="time ad"></td>' +
+                    '<td megatype="timeMd" class="time md"></td>' +
+                    '<td megatype="versions" class="hd-versions"></td>' +
+                    '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"></a>' +
                         '<span class="versioning-indicator">' +
                             '<i class="small-icon icons-sprite grey-clock"></i>' +
@@ -285,6 +288,32 @@
             '.contacts-details-block .grid-table.shared-with-me',
             '.fm-blocks-view.contact-details-view .file-block-scrolling'
         ]
+    };
+
+    var labelsColors = {
+        'red': l[16223],
+        'orange': l[16224],
+        'yellow': l[16225],
+        'green': l[16226],
+        'blue': l[16227],
+        'purple': l[16228],
+        'grey': l[16229]
+    };
+
+
+    var versionColumnPrepare = function(versionsNb, VersionsSize) {
+        var versionsTemplate = '<div class="ver-col-container">' +
+            '<div class="ver-nb">' + versionsNb + '</div>' +
+            '<div class="ver-icon versioning">' +
+            '<span class="versioning-indicator"><i class="small-icon icons-sprite grey-clock"></i></span>' +
+            '</div>' +
+            '<div class="ver-size">' +
+            '<div class="ver-size-nb">' + bytesToSize(VersionsSize) + '</div>' +
+            '</div>' +
+            '</div>';
+
+        // safe will remove any scripts
+        return parseHTML(versionsTemplate).firstChild;
     };
 
     mBroadcaster.once('startMega', function() {
@@ -646,6 +675,36 @@
 
         },
 
+        setDOMColumnsWidth: function(nodeDOM) {
+            var sectionName = 'cloud';
+            if (this.section !== 'cloud-drive') {
+                sectionName = this.section;
+            }
+            // setting widths
+            if (M && M.columnsWidth && M.columnsWidth[sectionName]) {
+                var knownColumnsWidths = Object.keys(M.columnsWidth[sectionName]) || [];
+                for (var col = 0; col < knownColumnsWidths.length; col++) {
+                    var tCol = nodeDOM.querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
+                    if (tCol) {
+                        if (typeof M.columnsWidth[sectionName][knownColumnsWidths[col]].curr === 'number') {
+                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr + 'px';
+                        }
+                        else {
+                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr || '';
+                        }
+
+                        if (M.columnsWidth[sectionName][knownColumnsWidths[col]].viewed) {
+                            tCol.style.display = "";
+                        }
+                        else {
+                            tCol.style.display = "none";
+                        }
+                    }
+                }
+            }
+        },
+
+
         /**
          * Retrieves a DOM node stored in the `nodeMap`,
          * creating it if it doesn't exists.
@@ -670,6 +729,8 @@
                 // Construct a new DOM node, and store it for any further use.
                 this.nodeMap[aHandle] = this.buildDOMNode(aNode, properties, template);
             }
+
+            this.setDOMColumnsWidth(this.nodeMap[aHandle]);
 
             return this.nodeMap[aHandle];
         },
@@ -866,13 +927,17 @@
                     if (!this.viewmode) {
                         if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
                             props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
+                            props.mTime = time2date(aNode.mtime || aNode.ts);
                         }
-                        else if (M.lastColumn && aNode.p !== "contacts") {
-                            props.time = time2date(aNode[M.lastColumn] || aNode.ts);
+                        else if (aNode.p !== "contacts") {
+                            // props.time = time2date(aNode[M.lastColumn] || aNode.ts);
+                            props.time = time2date(aNode.ts);
+                            props.mTime = time2date(aNode.mtime || aNode.ts);
                         }
                         else {
                             props.time = time2date(aNode.ts
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
+                            props.mTime = props.time;
                         }
                     }
 
@@ -881,6 +946,7 @@
                         var colourLabel = M.getLabelClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
+                        props.labelC = labelsColors[colourLabel];
                     }
                 }
 
@@ -1048,7 +1114,11 @@
                 }
 
                 if (!aNode.t && aNode.tvf) {
-                    aTemplate.classList.add('versioning');
+                    // aTemplate.classList.add('versioning');
+                    var vTemplate = aTemplate.querySelector('.hd-versions');
+                    if (vTemplate) {
+                        vTemplate.appendChild(versionColumnPrepare(aNode.tvf, aNode.tvb || 0));
+                    }
                 }
 
                 if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {
@@ -1093,6 +1163,8 @@
                     }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
+                    aTemplate.querySelector('.time.md').textContent = aProperties.mTime;
+                    aTemplate.querySelector('.label').textContent = aProperties.labelC || '';
 
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
                     tmp.textContent = aProperties.name;

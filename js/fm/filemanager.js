@@ -3213,6 +3213,9 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
         var $me = $(this);
+        if ($me.hasClass('notactive')) {
+            return false;
+        }
         if ($me.attr('isviewed')) {
             $me.removeAttr('isviewed').find('i').removeClass('icons-sprite tiny-grey-tick');
             M.columnsWidth.cloud[$me.attr('megatype')].viewed = false;

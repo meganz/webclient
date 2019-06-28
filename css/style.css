@@ -28773,7 +28773,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .dialog-tree-panel-scroll .nw-fm-tree-item.selected span, .dialog-tree-panel-scroll .nw-fm-tree-item.dragover span, .dialog-tree-panel-scroll .nw-fm-tree-item:hover span, .fm-picker-dialog .nw-contact-item:hover span, .fm-picker-dialog .nw-contact-item.selected span {
     color: white;
 }
-.fm-picker-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled {
+.fm-picker-dialog .nw-fm-tree-item.disabled, .dropdown-item.disabled, .dropdown-item.notactive {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;

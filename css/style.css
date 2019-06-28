@@ -9865,6 +9865,9 @@ span.orange {
     left: 225px;
     top: 13px;
 }
+.properties-dialog .propreties-dark-txt.t7, .properties-dialog .propreties-dark-txt.t11 {
+    line-height: 22px;
+}
 .properties-file-icon div:nth-child(1) {
     display: block;
 }

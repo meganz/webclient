@@ -139,6 +139,10 @@ var notify = {
             userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
         };
 
+        if (actionPacket.a === 'dshare' && actionPacket.orig && actionPacket.orig !== u_handle) {
+            newNotification.userHandle = actionPacket.orig;
+        }
+
         // Update store of user emails that it knows about if a contact request was recently accepted
         notify.addUserEmails();
 
@@ -1088,8 +1092,8 @@ var notify = {
 
         // first we are parsing an action packet.
         if (notification.data.orig) {
-            notificationOwner = notification.data.rece;
-            notificationTarget = notification.data.u;
+            notificationOwner = notification.data.u;
+            notificationTarget = notification.data.rece;
             notificationOrginating = notification.data.orig;
         }
         else {

@@ -1620,7 +1620,6 @@ mega.megadrop = (function() {
                 uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
 
-            uiOpts.dlg.widget.$.find('.tab-url-link').click();
         };
 
         var widgetDialog = function uiWidgetDialog(pupHandle) {
@@ -1629,6 +1628,9 @@ mega.megadrop = (function() {
             // Is there a related public upload page handle
             if (puf.items[handle] && puf.items[handle].p) {
                 _widgetDlgContent(handle);
+
+                // Reset active tab
+                uiOpts.dlg.widget.$.find('.tab-url-link').click();
                 M.safeShowDialog('megadrop-dialog', uiOpts.dlg.widget.$[0]);
             }
             loadingDialog.hide();

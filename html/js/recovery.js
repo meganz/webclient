@@ -55,6 +55,7 @@ function AccountRecoveryControl() {
 
     this.$emailBlock.find('input').rebind('keydown.recoverpageemail', function (e) {
         self.$emailBlockError.addClass('hidden');
+        self.$emailBlock.removeClass('incorrect');
         if (e.keyCode === 13) {
             self.$btnYes.click();
             return false;

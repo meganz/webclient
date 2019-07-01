@@ -1883,9 +1883,11 @@ function topmenuUI() {
 
     if (fminitialized) {
         $topHeader.find('.top-search-bl').removeClass('hidden');
+        $topHeader.find('.top-icon.notification').removeClass('hidden');
     }
     else {
         $topHeader.find('.top-search-bl').addClass('hidden');
+        $topHeader.find('.top-icon.notification').addClass('hidden');
     }
 
     if (page === 'download') {
@@ -1962,7 +1964,6 @@ function topmenuUI() {
         $topHeader.find('.top-change-language').addClass('hidden');
         $topHeader.find('.create-account-button').addClass('hidden');
         $topHeader.find('.membership-status-block').removeClass('hidden');
-        $topHeader.find('.top-icon.notification').removeClass('hidden');
         $topHeader.find('.left.individual').addClass('hidden');
 
         // Show the rocket icon if achievements are enabled

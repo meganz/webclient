@@ -3476,9 +3476,6 @@
     "20758": "Wala ka pang MEGA Desktop App, gusto mo bang install ito?",
     "20759": "Mare-renew sa [B]%1[\/B]",
     "20762": "Itago",
-    "20795": "Send Location",
-    "20799": "Send This Location",
-    "20803": "Pinned Location",
     "20808": "{0} ang natitira",
     "20816": "Ang iyong account ay inalis ng iyong administrator. Pakiusap kontakin ang iyong business account administrator para sa dagdag impormasyon.",
     "20817": "Ang iyong browser storage para sa MEGA ay puno na. Ang iyong download ay magtutuloy kusa kapag nag alis ka ng ibang space.",
@@ -3494,5 +3491,10 @@
     "20832": "Hindi ka makaka-receive ng emails sa MEGA. Paalala na kapag nag register ka ng MEGA account sa susunod itutuloy namin ang pag send sayo ng emails.",
     "20833": "Nag unsubscribe ka ba ng aksidente?",
     "20840": "Copy All",
-    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]",
+    "20856": "Your link has expired.",
+    "20857": "Your link is invalid.",
+    "20858": "Please contact support@mega.nz for assistance.",
+    "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
+    "20860": "Your password was successfully reverted to the previous one."
 }

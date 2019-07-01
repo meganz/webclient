@@ -3476,9 +3476,6 @@
     "20758": "Nie masz jeszcze aplikacji MEGA Desktop, czy chcesz j\u0105 zainstalowa\u0107?",
     "20759": "Odnawia [B]%1[\/B]",
     "20762": "Zwi\u0144",
-    "20795": "Wy\u015blij lokalizacj\u0119",
-    "20799": "Wy\u015blij t\u0119 lokalizacj\u0119",
-    "20803": "Przypi\u0119ta lokalizacja",
     "20808": "{0} pozosta\u0142o",
     "20816": "Twoje konto zosta\u0142o usuni\u0119te przez administratora. Aby uzyska\u0107 wi\u0119cej informacji, skontaktuj si\u0119 z administratorem konta biznesowego.",
     "20817": "Twoja pami\u0119\u0107 w przegl\u0105darce dla MEGA jest pe\u0142na. Pobieranie zostanie automatycznie kontynuowane po zwolnieniu troch\u0119 miejsca.",
@@ -3494,5 +3491,10 @@
     "20832": "Nie b\u0119dziesz otrzymywa\u0107 wiadomo\u015bci e-mail od MEGA. Pami\u0119taj, \u017ce je\u015bli zarejestrujesz si\u0119 na konto MEGA w przysz\u0142o\u015bci, wznowimy wysy\u0142anie Ci e-maili.",
     "20833": "Czy zrezygnowa\u0142e\u015b z subskrypcji przez pomy\u0142k\u0119?",
     "20840": "Skopiuj wszystko",
-    "20846": "Nie mo\u017cesz znale\u017a\u0107 tego, czego szukasz? [A]Wszystkie pliki do pobrania[\/A]"
+    "20846": "Nie mo\u017cesz znale\u017a\u0107 tego, czego szukasz? [A]Wszystkie pliki do pobrania[\/A]",
+    "20856": "Your link has expired.",
+    "20857": "Your link is invalid.",
+    "20858": "Please contact support@mega.nz for assistance.",
+    "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
+    "20860": "Your password was successfully reverted to the previous one."
 }

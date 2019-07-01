@@ -3476,9 +3476,6 @@
     "20758": "Sie haben die MEGA-Desktop App noch nicht installiert.",
     "20759": "Verl\u00e4ngert sich am [B]%1[\/B]",
     "20762": "Schlie\u00dfen",
-    "20795": "Send Location",
-    "20799": "Send This Location",
-    "20803": "Pinned Location",
     "20808": "{0} \u00fcbrig",
     "20816": "Ihr Account wurde von Ihrem Administrator entfernt. Bitte setzen Sie sich mit ihm in Verbindung.",
     "20817": "Der lokale Browser-Speicher f\u00fcr MEGA ist voll. Der Download wird automatisch fortgesetzt, sobald Sie Speicherplatz freigeben.",
@@ -3494,5 +3491,10 @@
     "20832": "You will not receive emails from MEGA. Please note that if you register for a MEGA account in the future we will resume sending you emails.",
     "20833": "Did you unsubscribe by mistake?",
     "20840": "Copy All",
-    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]"
+    "20846": "Can't find what you're looking for? [A]All Downloads[\/A]",
+    "20856": "Your link has expired.",
+    "20857": "Your link is invalid.",
+    "20858": "Please contact support@mega.nz for assistance.",
+    "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
+    "20860": "Your password was successfully reverted to the previous one."
 }

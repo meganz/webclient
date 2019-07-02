@@ -103,7 +103,12 @@ sudo chgrp -R www-data /var/www/html/
 sudo chown -R <your-username> /var/www/html/
 ```
 
-10. Visit http://webclient.local in your browser.
+10. Pull language files:
+```
+/var/www/html/webclient.local/scripts/lang.sh
+```
+
+11. Visit http://webclient.local in your browser.
 
 
 Directories

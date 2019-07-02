@@ -509,9 +509,15 @@ mega.tpw = new function TransferProgressWidget() {
                 if (initialDownloadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
                     if ($uploadHeader.hasClass('hidden') ||
                         $uploadHeader.find('.transfer-progress-txt').text() === l[1418]) {
-                        if ($widgetHeadAndBody.hasClass('expand')) {
-                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
-                            isMinimizedByUser = false;
+                        // widget minimizing code, kept for comparing
+                        // if ($widgetHeadAndBody.hasClass('expand')) {
+                        //    $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                        //    isMinimizedByUser = false;
+                        // }
+
+                        if ($widgetHeadAndBody.is(':visible')) {
+                            $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                            isHiddenByUser = false;
                         }
                     }
                 }
@@ -540,9 +546,15 @@ mega.tpw = new function TransferProgressWidget() {
                 if (initialUploadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
                     if ($downloadHeader.hasClass('hidden') ||
                         $downloadHeader.find('.transfer-progress-txt').text() === l[1418]) {
-                        if ($widgetHeadAndBody.hasClass('expand')) {
-                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
-                            isMinimizedByUser = false;
+                        // widget minimizing code, kept for comparing
+                        // if ($widgetHeadAndBody.hasClass('expand')) {
+                        //    $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                        //    isMinimizedByUser = false;
+                        // }
+
+                        if ($widgetHeadAndBody.is(':visible')) {
+                            $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                            isHiddenByUser = false;
                         }
                     }
                 }

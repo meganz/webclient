@@ -558,7 +558,7 @@ sms.verifyCode = {
                         $warningMessage.addClass('visible').text(l[20225]);
                         $verifyButton.addClass('disabled');
                     }
-                    else if (result === EEXIST) {
+                    else if (result === EEXIST || result === ENOENT) {
                         $warningMessage.addClass('visible').text(l[20226]);
                         $verifyButton.addClass('disabled');
                     }

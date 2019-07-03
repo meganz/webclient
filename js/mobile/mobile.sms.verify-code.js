@@ -91,7 +91,7 @@ mobile.sms.verifyCode = {
 
         // Add keyup handler
         $codeInput.off('keyup.codehandler').on('keyup.codehandler', function() {
-           
+
             // Clean up the phone number and trim to max 6 chars
             var code = $(this).val();
             var codeCleaned = code.replace(/\D+/g, '');
@@ -153,7 +153,7 @@ mobile.sms.verifyCode = {
                     else if (result === EFAILED) {
                         $warningMessage.removeClass('hidden').text(l[20225]);
                     }
-                    else if (result === EEXIST) {
+                    else if (result === EEXIST || result === ENOENT) {
                         $warningMessage.removeClass('hidden').text(l[20226]);
                     }
                     else if (result < 0) {

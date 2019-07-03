@@ -445,7 +445,11 @@ var mobile = {
 
         'use strict';
 
-        history.pushState({ subpage: page }, "", "/" + page);
+        if (pfid) {
+            history.pushState({ subpage: page }, "", "#" + page);
+        } else {
+            history.pushState({ subpage: page }, "", "/" + page);
+        }
 
         var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
 

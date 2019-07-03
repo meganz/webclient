@@ -234,7 +234,7 @@
 
             if (foldercnt) {
                 p.t6 = l[897] + ':';
-                p.t7 = fm_contains(sfilecnt, sfoldercnt);
+                p.t7 = fm_contains(sfilecnt, sfoldercnt, true);
                 p.t15 = l[17148] + ':';
                 if ($dialog.hasClass('shared')) {
                     users = M.getSharingUsers($.selected, true);
@@ -269,7 +269,7 @@
                     p.t8 = l[894] + ':';
                     p.t9 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
                     p.t10 = l[897] + ':';
-                    p.t11 = fm_contains(sfilecnt, sfoldercnt);
+                    p.t11 = fm_contains(sfilecnt, sfoldercnt, true);
                 }
             }
             if (filecnt && versioningFlag) {
@@ -307,7 +307,7 @@
         var singlenodeinfohtml  = (((filecnt + foldercnt) === 1) || (versioningFlag === false))
             ?
             '<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t7 + '</span></div>'
+            + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>'
             : '';
         var shareinfohtml = (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined')
             ? ''

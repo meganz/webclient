@@ -180,9 +180,6 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     // if in folder link and logged-in and download using mSync is set to 0
     if (folderlink && u_type) {
         if (fmconfig.dlThroughMEGAsync === 0) {
-            if (typeof fmconfig.tpp === 'undefined') {
-                // mega.ui.tpp.setEnabled(1);
-            }
             return webdl();
         }
     }
@@ -1801,7 +1798,7 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
-    if ((M.currentdirid !== 'transfers' && fmconfig.tpp === false) || slideshowid) {
+    if (slideshowid) {
         var $toast;
         var $second_toast;
         var timer = 0;

@@ -2703,9 +2703,6 @@ accountUI.transfers = {
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
 
-        // Transfer Tools - Tooltip
-        this.transferTools.tooltip.render();
-
         // MEGAdrop folders table
         mega.megadrop.stngsDraw();
 
@@ -2895,22 +2892,6 @@ accountUI.transfers = {
                     fmconfig.dlThroughMEGAsync,
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
-                    });
-            }
-        },
-
-        tooltip: {
-
-            render: function() {
-
-                'use strict';
-
-                accountUI.inputs.switch.init(
-                    '#transfers-tooltip',
-                    $('#transfers-tooltip').parent(),
-                    fmconfig.tpp,
-                    function(val) {
-                        mega.config.setn('tpp', val);
                     });
             }
         }

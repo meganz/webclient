@@ -1128,29 +1128,24 @@ function waitsc() {
                     // clearTimeout(waittimeout); mo need for clearing, we stopped
                     // immediately re-connect.
                     waittimeout = setTimeout(waitsc, 0);
-                    return;
                 }
-                if ($.isNumeric(delieveredResponse)) {
-                    if (delieveredResponse == ENOENT && apixs[5].sid[0] === 'n') {
-                        // WSC is stopped at the beginning.
-                        return;
-                    }
+                else if ($.isNumeric(delieveredResponse)) {
                     if (delieveredResponse == ETOOMANY) {
                         // WSC is stopped at the beginning.
                         fm_fullreload(null, 'ETOOMANY');
-                        return;
                     }
-                    waittimeout = setTimeout(waitsc, waitbackoff);
-                    return;
+                    else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
+                        // WSC is stopped at the beginning.
+                        waittimeout = setTimeout(waitsc, waitbackoff);
+                    }
                 }
-                if (!apixs[5].split) {
+                else if (!apixs[5].split) {
                     console.error('WSC has no splitter !!!!');
                 }
                 else {
                     var wscSplitter = new JSONSplitter(apixs[5].split, waitxhr, false);
                     if (!wscSplitter.chunkproc(delieveredResponse, true)) {
                         fm_fullreload(null, 'onload JSON Syntax Error');
-                        return;
                     }
                 }
             }

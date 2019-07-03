@@ -1556,7 +1556,7 @@ var exportExpiry = {
         toastTxt = linksNum > 1 ? l[7655].replace('%d', linksNum) : l[7654];
 
         // Setup the copy to clipboard buttons
-        $span.text(l[1990]);
+        $span.text(Object($.itemExport).length > 1 ? l[20840] : l[1990]);
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function(e) {
@@ -1623,7 +1623,7 @@ var exportExpiry = {
 
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-            $span.text(l[1990]);
+            $span.text(Object($.itemExport).length > 1 ? l[20840] : l[1990]);
 
             // If decryption key, grey out options for expiry date and password protect because it doesn't make sense
             if (keyOption === 'decryption-key') {

@@ -31,6 +31,8 @@
             u_type = 3;
             u_attr = Object(window.u_attr);
             u_handle = u_handle || "AAAAAAAAAAA";
+            u_attr.flags = Object(u_attr.flags);
+            u_attr.flags.ach = flags & 4;
         }
 
         if (flags & 2 && !u_attr.p) {
@@ -44,6 +46,24 @@
         else if (data.type === 'upload') {
             dlmanager.lmtUserFlags = flags;
             ulmanager.ulShowOverStorageQuotaDialog();
+        }
+        else if (data.type === 'import' || data.type === 'storage') {
+            var val = 4294967297;
+            var cur = 210453397504;
+
+            if (data.state === 'full') {
+                val = -1;
+                cur = 214748364800;
+            }
+
+            patchAccountData({cstrg: cur});
+
+            if (data.type === 'import') {
+                M.checkGoingOverStorageQuota(val);
+            }
+            else {
+                M.checkStorageQuota(1);
+            }
         }
         else {
             if (data.efq) {
@@ -137,6 +157,17 @@
         M['account' + 'Data'] = function(cb) {
             return cb(data);
         };
+
+        M['getStor' + 'ageQuota'] = function() {
+            var res = data;
+            return MegaPromise.resolve(Object.assign({}, res, {
+                max: res.mstrg,
+                used: res.cstrg,
+                isFull: res.cstrg / res.mstrg >= 1,
+                percent: Math.floor(res.cstrg / res.mstrg * 100),
+                isAlmostFull: res.cstrg / res.mstrg >= res.uslw / 10000
+            }));
+        };
     };
 
     global.test = function(data) {
@@ -145,6 +176,10 @@
         for (var i = 1; i < data.length; i += 2) {
             data[data[i] = String(data[i]).replace(/\W/g, '')] = mURIDecode(data[i + 1]);
         }
+        window.addEventListener('click', function(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }, true);
 
         var name = data[1];
         return storage[name] ? (storage[name][data[name]] || storage[name])(data) : loadSubPage('debug');

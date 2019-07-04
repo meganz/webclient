@@ -360,25 +360,25 @@ var DropdownItem = React.createClass({
         }
     },
     render: function() {
-        var self = this;
+        const self = this;
 
-        var icon;
-        if (this.props.icon) {
-            icon = <i className={"small-icon " + this.props.icon}></i>
+        let icon;
+        if (self.props.icon) {
+            icon = <i className={"small-icon " + self.props.icon}></i>
         }
-        var label;
-        if (this.props.label) {
-            label = this.props.label;
+        let label;
+        if (self.props.label) {
+            label = self.props.label;
         }
 
-        var child = null;
+        let child = null;
 
         child = <div>
                 {self.renderChildren()}
             </div>;
 
         return <div
-                    className={"dropdown-item " + self.props.className}
+                    className={`dropdown-item ${self.props.className ? self.props.className : ''}`}
                     onClick={self.props.onClick ? (e) => {
                         $(document).trigger('closeDropdowns');
                         !self.props.disabled && self.props.onClick(e);

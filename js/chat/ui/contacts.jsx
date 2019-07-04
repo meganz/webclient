@@ -536,7 +536,7 @@ var ContactCard = React.createClass({
         var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
 
         var usernameBlock;
-        if (!noContextMenu && !anonymouschat) {
+        if (!noContextMenu) {
             usernameBlock = <ContactButton key="lnk" dropdowns={dropdowns}
                     noContextMenu={noContextMenu}
                     contact={contact}

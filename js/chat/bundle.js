@@ -4907,7 +4907,11 @@ React.makeElement = React['createElement'];
 
 	        return React.makeElement(
 	            "div",
-	            { className: classes, onClick: this.onClick, style: this.props.style },
+	            {
+	                className: classes,
+	                onClick: this.onClick,
+	                style: this.props.style ? this.props.style : null
+	            },
 	            icon,
 	            label,
 	            this.renderChildren()
@@ -5274,13 +5278,13 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var self = this;
 
-	        var icon;
-	        if (this.props.icon) {
-	            icon = React.makeElement("i", { className: "small-icon " + this.props.icon });
+	        var icon = void 0;
+	        if (self.props.icon) {
+	            icon = React.makeElement("i", { className: "small-icon " + self.props.icon });
 	        }
-	        var label;
-	        if (this.props.label) {
-	            label = this.props.label;
+	        var label = void 0;
+	        if (self.props.label) {
+	            label = self.props.label;
 	        }
 
 	        var child = null;
@@ -5294,7 +5298,7 @@ React.makeElement = React['createElement'];
 	        return React.makeElement(
 	            "div",
 	            {
-	                className: "dropdown-item " + self.props.className,
+	                className: "dropdown-item " + (self.props.className ? self.props.className : ''),
 	                onClick: self.props.onClick ? function (e) {
 	                    $(document).trigger('closeDropdowns');
 	                    !self.props.disabled && self.props.onClick(e);
@@ -5864,7 +5868,7 @@ React.makeElement = React['createElement'];
 	        var dropdownRemoveButton = self.props.dropdownRemoveButton ? self.props.dropdownRemoveButton : [];
 
 	        var usernameBlock;
-	        if (!noContextMenu && !anonymouschat) {
+	        if (!noContextMenu) {
 	            usernameBlock = React.makeElement(ContactButton, { key: "lnk", dropdowns: dropdowns,
 	                noContextMenu: noContextMenu,
 	                contact: contact,
@@ -12622,7 +12626,6 @@ React.makeElement = React['createElement'];
 	            'contactCardHeight': 32,
 	            'scrollPositionY': 0,
 	            'scrollHeight': 32 * 4
-
 	        };
 	    },
 	    getInitialState: function getInitialState() {

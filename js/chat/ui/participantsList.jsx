@@ -132,7 +132,6 @@ var ParticipantsListInner = React.createClass({
             'contactCardHeight': 32,
             'scrollPositionY': 0,
             'scrollHeight': 32*4
-
         }
     },
     getInitialState: function() {

@@ -162,7 +162,7 @@ var Button = React.createClass({
         }
     },
     render: function () {
-        var classes = this.props.className ? "button " + this.props.className : "button";
+        var classes = this.props.className ? `button ${this.props.className}` : "button";
 
         if (this.props.disabled == true || this.props.disabled == "true") {
             classes += " disabled";
@@ -182,7 +182,11 @@ var Button = React.createClass({
         }
 
         return (
-            <div className={classes} onClick={this.onClick} style={this.props.style}>
+            <div 
+                className={classes}
+                onClick={this.onClick}
+                style={this.props.style ? this.props.style : null}
+            >
                 {icon}
                 {label}
                 {this.renderChildren()}

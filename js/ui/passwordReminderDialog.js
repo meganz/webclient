@@ -354,6 +354,8 @@
             this.passwordField.value = "";
         }
 
+        delete $.dialog;
+
         loadSubPage('/backup');
     };
 
@@ -368,6 +370,8 @@
             // clear the password field, so that if it was filled in the dialog would hide
             this.passwordField.value = "";
         }
+
+        delete $.dialog;
 
         loadSubPage('/fm/account/security');
     };

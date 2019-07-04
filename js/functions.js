@@ -2541,6 +2541,14 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         .replace('debuggerScriptPath: \'./debugger.js\',',
         ' ');
 
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.cMapUrl = \'../web/cmaps/\';',
+        'PDFJS.cMapUrl = \'' + staticpath + '/cmaps/\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.cMapPacked = true;',
+        'PDFJS.cMapPacked = false;');
+
     // algorithm to remove 'mozL10n.get'
     var st = 5000; // start from char 50000
 

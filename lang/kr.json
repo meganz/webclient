@@ -3492,9 +3492,9 @@
     "20833": "\uc2e4\uc218\ub85c \uad6c\ub3c5 \ud574\uc9c0\ud558\uc600\ub098\uc694?",
     "20840": "\ubaa8\ub450 \ubcf5\uc0ac",
     "20846": "\ucc3e\uace0 \uc788\ub294 \uac83\uc744 \ubabb \ucc3e\uaca0\ub098\uc694? [A]\ubaa8\ub4e0 \ub2e4\uc6b4\ub85c\ub4dc[\/A]",
-    "20856": "Your link has expired.",
-    "20857": "Your link is invalid.",
-    "20858": "Please contact support@mega.nz for assistance.",
-    "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
-    "20860": "Your password was successfully reverted to the previous one."
+    "20856": "\ub2f9\uc2e0\uc758 \ub9c1\ud06c\uac00 \ub9cc\ub8cc\ub418\uc5c8\uc2b5\ub2c8\ub2e4.",
+    "20857": "\ub2f9\uc2e0\uc758 \ub9c1\ud06c\uac00 \uc720\ud6a8\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4.",
+    "20858": "\ub3c4\uc6c0\uc744 \ubc1b\uc73c\ub824\uba74 support@mega.nz\ub85c \uc5f0\ub77d\ud558\uc138\uc694.",
+    "20859": "\uacc4\uc815 %1\uc5d0 \ub300\ud55c \ube44\ubc00\ubc88\ud638\ub97c \uc774\uc804 \ube44\ubc00\ubc88\ud638\ub85c \ub418\ub3cc\ub9ac\uc2dc\uaca0\uc2b5\ub2c8\uae4c?",
+    "20860": "\ube44\ubc00\ubc88\ud638\ub97c \uc131\uacf5\uc801\uc73c\ub85c \uc774\uc804 \ube44\ubc00\ubc88\ud638\ub85c \ub418\ub3cc\ub838\uc2b5\ub2c8\ub2e4."
 }

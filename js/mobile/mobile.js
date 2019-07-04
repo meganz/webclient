@@ -12,6 +12,15 @@ var mobile = {
     toastTimer: null,
 
     /**
+     * Load the `mobile.html` page and initialize the main menu.
+     */
+    initDOM: function() {
+        'use strict';
+        parsepage(pages['mobile']);
+        topmenuUI();
+    },
+
+    /**
      * Show a simple toast message and hide it after 3 seconds
      * @param {String} message The message to show
      * @param {String} position Optional flag to show the position at the top, by default it shows at the bottom

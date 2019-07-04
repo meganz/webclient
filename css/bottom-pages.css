@@ -250,9 +250,10 @@ html.gbot {
     background-color: white;
     background-image: none;
 }
-.bottom-page.scroll-block {
+.fmholder .bottom-page.scroll-block {
     height: 100%;
     position: relative;
+    display: block;
 }
 .bottom-page.vertical-centered-bl {
     display: table;

@@ -9865,6 +9865,10 @@ span.orange {
     left: 225px;
     top: 13px;
 }
+.properties-dialog .propreties-dark-txt.t7 {
+    max-width: 150px;
+    word-break: break-word;
+}
 .properties-dialog .propreties-dark-txt.t7, .properties-dialog .propreties-dark-txt.t11 {
     line-height: 22px;
 }

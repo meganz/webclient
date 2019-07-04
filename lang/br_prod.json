@@ -273,9 +273,9 @@
     "823": "Configura\u00e7\u00f5es",
     "824": "Nova pasta compartilhada por [X]",
     "825": "Nova pasta compartilhada",
-    "828": "[X1] folders and [X2] files",
-    "829": "[X] folders and 1 file",
-    "830": "1 folder and [X] files",
+    "828": "[X1] pastas e [X2] arquivos",
+    "829": "[X] pastas e 1 arquivo",
+    "830": "1 pasta e [X] arquivos",
     "831": "1 pasta e 1 arquivo",
     "832": "[X] pastas",
     "833": "[X] arquivos",
@@ -353,7 +353,7 @@
     "999": "Voc\u00ea gostaria de transformar a sua conta tempor\u00e1ria em uma conta gratuita?",
     "1000": "Evite perder o acesso. O cadastro gratuito \u00e9 altamente recomendado!",
     "1001": "Remover contato",
-    "1002": "Voc\u00ea tem certeza que deseja remover [X] da sua lista de contatos?",
+    "1002": "Voc\u00ea tem certeza de que quer remover [X] da sua lista de contatos?",
     "1003": "Confirmar remo\u00e7\u00e3o",
     "1004": "Voc\u00ea tem certeza de que quer mover [X] para a sua lixeira?",
     "1005": "Criar links \u00e9 permitido apenas para usu\u00e1rios cadastrados.",
@@ -1504,8 +1504,6 @@
     "16264": "Interativo",
     "16266": "Program\u00e1vel",
     "16268": "Importar contatos...",
-    "16272": "Informa\u00e7\u00f5es sobre transfer\u00eancias",
-    "16273": "Mostrar automaticamente o progresso da transfer\u00eancia quando uma transfer\u00eancia estiver ativa.",
     "16274": "Ver a imagem",
     "16275": "Reproduzir v\u00eddeo",
     "16278": "Instalar o MEGAsync",
@@ -3250,5 +3248,6 @@
     "20820": "N\u00e3o foi poss\u00edvel fazer o download de todos os arquivos como ZIP. Isso pode acontecer se alguns arquivos tiverem sido removidos. Foi feito o download de %1 de %2 itens.",
     "20822": "N\u00e3o acess\u00edvel devido ao status da conta do propriet\u00e1rio do arquivo.",
     "20826": "Fa\u00e7a o download do aplicativo do MEGA",
-    "20827": "Continuar com o navegador"
+    "20827": "Continuar com o navegador",
+    "20840": "Copiar todos"
 }

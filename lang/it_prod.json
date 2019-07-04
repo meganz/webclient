@@ -1504,8 +1504,6 @@
     "16264": "Interattiva",
     "16266": "Scriptabile",
     "16268": "Importa contatti...",
-    "16272": "Strumento di trasferimento",
-    "16273": "Mostra automaticamente il popup dei trasferimenti quando un trasferimento \u00e8 attivo.",
     "16274": "Visualizza immagine",
     "16275": "Riproduci video",
     "16278": "Installa MEGAsync",
@@ -3250,5 +3248,6 @@
     "20820": "Non \u00e8 stato possibile scaricare tutti i file come un singolo file ZIP. Questo pu\u00f2 succedere se alcuni dei file sono stati rimossi. L'operazione \u00e8 terminata con %1 oggetti su %2 scaricati con successo.",
     "20822": "Non accessibile a causa dello status dell'account del proprietario del file.",
     "20826": "Scarica l'app di MEGA",
-    "20827": "Continua tramite browser"
+    "20827": "Continua tramite browser",
+    "20840": "Copia tutto"
 }

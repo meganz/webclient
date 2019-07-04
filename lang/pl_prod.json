@@ -1504,8 +1504,6 @@
     "16264": "Interaktywny",
     "16266": "Komendy",
     "16268": "Importuj kontakty...",
-    "16272": "Etykietka przeniesienia",
-    "16273": "Pokazuj podpowiedzi automatycznie gdy transfer jest aktywny.",
     "16274": "Poka\u017c zdj\u0119cie",
     "16275": "Uruchom video",
     "16278": "Zainstaluj MEGAsync",
@@ -3250,5 +3248,6 @@
     "20820": "Nie wszystkie pliki mo\u017cna pobra\u0107 jako plik ZIP. Mo\u017ce si\u0119 tak zdarzy\u0107, je\u015bli niekt\u00f3re pliki zostan\u0105 usuni\u0119te. Operacja zako\u0144czy\u0142a si\u0119, gdy %1 z %2 element\u00f3w zosta\u0142o pomy\u015blnie pobranych.",
     "20822": "Niedost\u0119pny ze wzgl\u0119du na status konta w\u0142a\u015bciciela pliku.",
     "20826": "Pobierz aplikacj\u0119 MEGA",
-    "20827": "Kontynuuj w przegl\u0105darce"
+    "20827": "Kontynuuj w przegl\u0105darce",
+    "20840": "Skopiuj wszystko"
 }

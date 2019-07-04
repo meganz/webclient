@@ -273,9 +273,9 @@
     "823": "Einstellungen",
     "824": "Neue Freigabe von [X]",
     "825": "Neue Freigabe",
-    "828": "[X1] folders and [X2] files",
-    "829": "[X] folders and 1 file",
-    "830": "1 folder and [X] files",
+    "828": "[X1] Ordner und [X2] Dateien",
+    "829": "[X] Ordner und 1 Datei",
+    "830": "1 Ordner and [X] Dateien",
     "831": "Ein Ordner und eine Datei",
     "832": "[X] Ordner",
     "833": "[X] Dateien",
@@ -1504,8 +1504,6 @@
     "16264": "Interaktiv",
     "16266": "Fernsteuerbar",
     "16268": "Kontakte importieren...",
-    "16272": "Transfer-Tooltip:",
-    "16273": "Transfer-Tooltip automatisch einblenden, solange ein Transfer l\u00e4uft.",
     "16274": "Anzeigen",
     "16275": "Vorschau",
     "16278": "MEGAsync installieren",
@@ -3250,5 +3248,6 @@
     "20820": "Die ZIP-Datei ist unvollst\u00e4ndig, da einige Dateien aufgrund von L\u00f6schanfragen nicht verf\u00fcgbar sind. Es wurden %1 von %2 Dateien erfolgreich heruntergeladen.",
     "20822": "Nicht verf\u00fcgbar - der Account des Eigent\u00fcmers ist gesperrt.",
     "20826": "MEGA-App herunterladen",
-    "20827": "Nein danke, ich bevorzuge den Browser"
+    "20827": "Nein danke, ich bevorzuge den Browser",
+    "20840": "Copy All"
 }

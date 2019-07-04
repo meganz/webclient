@@ -1504,8 +1504,6 @@
     "16264": "Interactive",
     "16266": "Scriptable",
     "16268": "Import contacts\u2026",
-    "16272": "Transfers tooltip",
-    "16273": "Automatically show the transfers tooltip when a transfer is active.",
     "16274": "View Image",
     "16275": "Play Video",
     "16278": "Install MEGAsync",
@@ -3250,5 +3248,6 @@
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
     "20822": "Not accessible due to the account status of the file owner.",
     "20826": "Download MEGA app",
-    "20827": "Continue with browser"
+    "20827": "Continue with browser",
+    "20840": "Copy All"
 }

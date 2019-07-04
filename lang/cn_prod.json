@@ -1504,8 +1504,6 @@
     "16264": "\u4e92\u52a8\u7279\u8272",
     "16266": "\u53ef\u7528\u6279\u6b21\u6307\u4ee4",
     "16268": "\u5bfc\u5165\u8054\u7cfb\u4eba...",
-    "16272": "\u4f20\u8f93\u63d0\u793a",
-    "16273": "\u4f20\u8f93\u8fdb\u884c\u65f6\uff0c\u81ea\u52a8\u663e\u793a\u4f20\u8f93\u5de5\u5177\u63d0\u793a\u3002",
     "16274": "\u67e5\u770b\u56fe\u7247",
     "16275": "\u64ad\u653e\u5f71\u7247",
     "16278": "\u5b89\u88c5MEGAsync",
@@ -3250,5 +3248,6 @@
     "20820": "Not all of the files could be downloaded as a ZIP file. This can happen if some of the files were taken down. The operation finished with %1 of %2 items downloaded successfully.",
     "20822": "Not accessible due to the account status of the file owner.",
     "20826": "Download MEGA app",
-    "20827": "Continue with browser"
+    "20827": "Continue with browser",
+    "20840": "Copy All"
 }

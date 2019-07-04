@@ -725,7 +725,6 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountScreen(res, true);
                 }
                 else {

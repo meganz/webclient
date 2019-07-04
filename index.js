@@ -460,7 +460,7 @@ function init_page() {
             else {
                 // If mobile, show the decryption key overlay
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
+                    mobile.initDOM();
                     mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
                 }
                 else {
@@ -566,9 +566,8 @@ function init_page() {
         else {
             // Show signup link dialog for mobile
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.register.showConfirmEmailScreen(acc);
-                topmenuUI();
                 return false;
             }
             else {
@@ -793,6 +792,9 @@ function init_page() {
 
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
+        if (is_mobile) {
+            mobile.initDOM();
+        }
         var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
             var business = new BusinessAccountUI();
@@ -811,7 +813,7 @@ function init_page() {
             page = 'login';
 
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.register.showConfirmAccountScreen(email);
             }
             else {
@@ -926,7 +928,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.signin.show();
         }
         else {
@@ -1063,7 +1065,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.register.show();
         }
         else {
@@ -1087,7 +1089,7 @@ function init_page() {
     }
     else if (page == 'key') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.register.showGeneratingKeysScreen();
         }
         else {
@@ -1097,7 +1099,7 @@ function init_page() {
     }
     else if (page === 'support') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.support.init();
         }
         else if (u_type === 0) {
@@ -1175,7 +1177,7 @@ function init_page() {
     }
     else if (page == 'backup') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.backup.init();
         }
         else {
@@ -1186,7 +1188,7 @@ function init_page() {
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
         if (is_mobile) {
             if (u_type) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.account.cancel.init();
             }
             else {
@@ -1273,20 +1275,20 @@ function init_page() {
 
     // Page for mobile to let them recover by Master/Recovery Key
     else if (is_mobile && page === 'recoverybykey') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
     }
 
     // Page for mobile to let them park their account (start a new account with the same email)
     else if (is_mobile && page === 'recoverybypark') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
     }
 
     // Code for handling the return from a #recover email link
     else if (page.substr(0, 7) === 'recover' && page.length > 25) {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.recovery.fromEmailLink.init();
         }
         else {
@@ -1297,19 +1299,19 @@ function init_page() {
 
     // Page for mobile to enter (or upload) their Master/Recovery Key
     else if (is_mobile && page === 'recoveryenterkey') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.enterKey.init();
     }
 
     // Page for mobile to let them change their password after they have entered their Master/Recovery key
     else if (is_mobile && page === 'recoverykeychangepass') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.changePassword.init('key');
     }
 
     // Page for mobile to let the user change their password and finish parking their account
     else if (is_mobile && page === 'recoveryparkchangepass') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.changePassword.init('park');
     }
     else if (page == 'sdkterms') {
@@ -1360,7 +1362,7 @@ function init_page() {
     }
     else if (page === 'terms') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.terms.show();
         }
         else {
@@ -1381,7 +1383,7 @@ function init_page() {
     else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
 
         // Show message that the copyright takedown should be submitted in a desktop browser
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.messageOverlay.show(l[621], l[19628]).always(function() {
 
             // On clicking OK in the dialog, go to the file manager if logged in, or start page if not

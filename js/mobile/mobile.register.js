@@ -346,6 +346,7 @@ mobile.register = {
         window.scrollTo(0, 0);
         $loginScreen.find('.fm-header-txt.sign-in').text(l[812]);            // Confirm Account
         $loginScreen.find('.signin-input.login input').val(isBusinessSubUser ? email.e : email);
+        $loginScreen.find('.mobile.forgot-password-button, .mobile.top-links').addClass('hidden');
     },
 
     /**

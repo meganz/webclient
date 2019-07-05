@@ -15,7 +15,7 @@ function FileManager() {
     this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: true };
+    this.columnsWidth.cloud.versions = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
 
 }

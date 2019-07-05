@@ -10,12 +10,12 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
-    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: false };
     this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: true };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: false };
     this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
 
 }

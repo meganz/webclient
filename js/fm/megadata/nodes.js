@@ -3390,6 +3390,12 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
 
         var a;
         for (var i in this.d[h].shares) {
+
+            // If there is only public link in shares, and deletion is not target public link.
+            if (i === 'EXP' && Object.keys(this.d[h].shares).length === 1 && u !== 'EXP') {
+                updnode = true;
+            }
+
             if (this.d[h].shares[i]) {
                 a = true;
                 break;

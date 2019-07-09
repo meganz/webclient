@@ -158,9 +158,11 @@ mega.megadrop = (function() {
     };
 
     var updatePUPUserName = function updatePUPUserName(newName) {
-        $.each(mega.megadrop.pufs, function(index) {
-            mega.megadrop.pupUpdate(index, 'name', newName);
-        });
+        for (var h in mega.megadrop.pufs) {
+            if (mega.megadrop.pups[mega.megadrop.pufs[h].p]) {
+                mega.megadrop.pupUpdate(h, 'name', newName);
+            }
+        }
     };
     
     /**

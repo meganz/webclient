@@ -1881,18 +1881,27 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
+
+    'use strict';
+
+    var $form = $(form);
+
+    if ($form.length === 0) {
+        return false;
+    }
+
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
             mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
-        $(form).find('input').val('');
+        $form.find('input').val('');
         return;
     }
     if (typeof history !== "object") {
         return false;
     }
-    $(form).rebind('submit', function() {
+    $form.rebind('submit', function() {
         setTimeout(function() {
             var path = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
@@ -1904,7 +1913,7 @@ function passwordManager(form) {
                 }
             }
             history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
-            $(form).find('input').val('');
+            $form.find('input').val('');
         }, 1000);
         return false;
     });
@@ -1914,7 +1923,7 @@ function passwordManager(form) {
     submitButton.setAttribute("type", "submit");
     submitButton.style.opacity = '0';
 
-    $(form)[0].appendChild(submitButton);
+    $form[0].appendChild(submitButton);
 
     submitButton.click();
 

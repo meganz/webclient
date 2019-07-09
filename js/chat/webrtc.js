@@ -1515,7 +1515,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         self.logger.warn("Destroying call immediately due to kAppTerminating");
         destroyCall();
         self._destroyPromise = Promise.resolve();
-    } else if (code === Term.kErrNetSignalling) {
+    } else if (code === Term.kErrNetSignalling && self.predestroyState !== CallState.kRingIn) {
         self.logger.warn("Destroying call immediately due to kErrNetSignalling and setting up a recovery attempt");
         // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
         self.manager._setupCallRecovery(self);

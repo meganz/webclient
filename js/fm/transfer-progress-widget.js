@@ -571,6 +571,10 @@ mega.tpw = new function TransferProgressWidget() {
     var initUI = function() {
         var $currWidget = clearAndReturnWidget();
 
+        if (!$currWidget) {
+            return;
+        }
+
         var rows = $currWidget.find('.transfer-task-row');
         if (rows.length) {
             if (!$(rows[0]).attr('id')) {

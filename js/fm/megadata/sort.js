@@ -479,6 +479,7 @@ MegaData.prototype.sortByInteraction = function(d) {
 
 MegaData.prototype.doSort = function(n, d) {
     $('.grid-table-header .arrow').removeClass('asc desc');
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     n = String(n).replace(/\W/g, '');
     if (d > 0) {
@@ -487,6 +488,20 @@ MegaData.prototype.doSort = function(n, d) {
     else {
         $('.arrow.' + n).addClass('asc');
     }
+
+    var sortClassinSubMenu = '.sort-' + n;
+
+    if (n === 'ts') {
+        sortClassinSubMenu = '.sort-timeAd';
+    }
+    else if (n === 'mtime') {
+        sortClassinSubMenu = '.sort-timeMd';
+    }
+    else if (n === 'date') {
+        sortClassinSubMenu = '.sort-sharecreated, .sort-timeAd';
+    }
+
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item' + sortClassinSubMenu).addClass('selected');
 
     this.sortmode = {n: n, d: d};
 

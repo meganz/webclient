@@ -27590,7 +27590,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:0 56px;
     width: calc(100% - 132px);
     max-width: 1200px;
-    height: calc(100% - 40px);
+    height: calc(100% - 152px);
 }
 .user-management-account-settings .invoice .invoice-table-header tr {
     background-color: rgba(245,245,245,1);
@@ -27615,7 +27615,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .invoice .invoice-table tr:hover {
     background-color: rgba(252,252,252,1);
 }
-
 .user-management-account-settings .invoice .invoice-table td {
     padding:0 12px;
     line-height: 56px;

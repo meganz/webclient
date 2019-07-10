@@ -232,6 +232,14 @@ var LoginState = Chatd.LoginState = Object.freeze({
     HISTDONE: 3
 });
 
+/**
+ * Global sendingnum (for generating msxid). Reasonably high id for pending messages in buf.
+ *
+ * @type {Number}
+ */
+Chatd.sendingnum = 2 << 30;
+
+
 // add a new chatd shard
 Chatd.prototype._addShardAndChat = function(chatId, shardNo, url) {
     // instantiate Chatd.Shard object for this shard if needed
@@ -704,8 +712,8 @@ Chatd.cmdToString = function(cmd, tx) {
 
         case Chatd.Opcode.NEWMSGID:
             var msgId = base64urlencode(cmd.substr(9, 8));
-            chatId = base64urlencode(cmd.substr(1, 8));
-            result += " chatId: " + chatId + " msgId: " + msgId;
+            var msgxid = base64urlencode(cmd.substr(1, 8));
+            result += " msgxid: " + msgxid + " msgId: " + msgId;
             return [result, 17];
 
         case Chatd.Opcode.KEYID:
@@ -1873,7 +1881,6 @@ Chatd.Messages = function(chatd, shard, chatId, oldInstance) {
     this.lownum = 2 << 28; // oldest message in buf
     this.highnum = 2 << 28; // newest message in buf
     this.lowSharedFiles = 2 << 28; // newest message in buf
-    this.sendingnum = 2 << 30;// reasonly high id for pending messages in buf
 
     this.sentid = false;
     this.receivedid = false;
@@ -1978,9 +1985,9 @@ Chatd.Messages.prototype.submit = function(messages, keyId, isAttachment) {
         // write the new message to the message buffer and mark as in sending state
         // FIXME: there is a tiny chance of a namespace clash between msgid and msgxid, FIX
         var messagekey = this.getmessagekey(msgxid, message.type);
-        this.sendingbuf[++this.sendingnum] =
+        this.sendingbuf[++Chatd.sendingnum] =
             [msgxid, this.chatd.userId, timestamp, message.message, (keyId >>> 0), 0, message.type];
-        this.sending[messagekey] = this.sendingnum;
+        this.sending[messagekey] = Chatd.sendingnum;
         this.sendingList.push(messagekey);
         this.persist(messagekey);
 
@@ -2000,7 +2007,7 @@ Chatd.Messages.prototype.submit = function(messages, keyId, isAttachment) {
             chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.sendingListFlushed) {
         this.chatd.chatIdShard[this.chatId].msg(this.chatId, messageConstructs);
     }
-    return this.sendingnum >>> 0;
+    return Chatd.sendingnum >>> 0;
 };
 
 Chatd.Messages.prototype.getShard = function() {
@@ -2060,13 +2067,13 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
         }
         // if there is no any pending edit, append a pending edit.
         else {
-            self.sendingbuf[++self.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID],
+            self.sendingbuf[++Chatd.sendingnum] = [self.sendingbuf[msgnum][Chatd.MsgField.MSGID],
                 self.sendingbuf[msgnum][Chatd.MsgField.USERID],
                 self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP],
                 message, self.sendingbuf[msgnum][Chatd.MsgField.KEYID],
                 mintimestamp - self.sendingbuf[msgnum][Chatd.MsgField.TIMESTAMP] + 1, Chatd.MsgType.EDIT];
 
-            self.sending[messagekey] = self.sendingnum;
+            self.sending[messagekey] = Chatd.sendingnum;
             self.sendingList.push(messagekey);
         }
         if (self.chatd.chatIdShard[self.chatId].isOnline()) {
@@ -2091,7 +2098,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
             }
         }
 
-        self.sendingbuf[++self.sendingnum] = [
+        self.sendingbuf[++Chatd.sendingnum] = [
             self.buf[msgnum][Chatd.MsgField.MSGID],
             self.buf[msgnum][Chatd.MsgField.USERID],
             self.buf[msgnum][Chatd.MsgField.TIMESTAMP],
@@ -2101,7 +2108,7 @@ Chatd.Messages.prototype.modify = function(msgnum, message) {
             Chatd.MsgType.EDIT
         ];
 
-        self.sending[messagekey] = self.sendingnum;
+        self.sending[messagekey] = Chatd.sendingnum;
         self.sendingList.push(messagekey);
         self.persist(messagekey);
 
@@ -2551,7 +2558,6 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
         [
             'lownum',
             'highnum',
-            'sendingnum',
             'sending',
             'sentid',
             'receivedid',
@@ -2629,7 +2635,7 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
         var msgnum = self.getmessagenum(msgid);
         var neweditkeyid = msgnum ?
             self.buf[msgnum][Chatd.MsgField.KEYID] : self.sendingbuf[editmsgnum][Chatd.MsgField.KEYID];
-        self.sendingbuf[++self.sendingnum] =
+        self.sendingbuf[++Chatd.sendingnum] =
             [msgid,
             self.chatd.userId,
             self.sendingbuf[editmsgnum][Chatd.MsgField.TIMESTAMP],
@@ -2638,7 +2644,7 @@ Chatd.Messages.prototype.reject = function(msgxid, msgid) {
             self.sendingbuf[editmsgnum][Chatd.MsgField.UPDATED],
             self.sendingbuf[editmsgnum][Chatd.MsgField.TYPE]
             ];
-        self.sending[neweditmessagekey] = self.sendingnum;
+        self.sending[neweditmessagekey] = Chatd.sendingnum;
         self.sendingList.push(neweditmessagekey);
         self.persist(neweditmessagekey);
 
@@ -3154,9 +3160,9 @@ Chatd.Messages.prototype.restore = function() {
                     // pending list, restore it.
                     var messagekey = self.getmessagekey(v.messageId, v.type);
                     if (!self.sending[messagekey]) {
-                        self.sendingbuf[++self.sendingnum] =
+                        self.sendingbuf[++Chatd.sendingnum] =
                             [v.messageId, v.userId, v.timestamp, v.message, v.keyId, v.updated, v.type];
-                        self.sending[messagekey] = self.sendingnum;
+                        self.sending[messagekey] = Chatd.sendingnum;
                         self.sendingList.push(messagekey);
                         count++;
                     }

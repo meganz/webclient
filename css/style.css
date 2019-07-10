@@ -29692,7 +29692,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
 }
 .transfer-progress-widget.expand {
-    width: 512px;
+    width: 536px;
 }
 .transfer-progress-txt {
     font-size: 14px;
@@ -29958,7 +29958,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-task-row::after {
     content: "";
-    width: 480px;
+    width: 504px;
     height: 1px;
     background-color: rgba(0,0,0,0.1);
     display: block;
@@ -29969,7 +29969,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row .transfer-filetype-txt {
     display: inline-block;
     margin-left: 28px;
-    max-width: 176px;
+    max-width: 160px;
     font-size: 13px;
     line-height: 24px;
     color: #333;
@@ -29980,8 +29980,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row .transfer-file-size {
     position: relative;
     display: inline-block;
-    margin-top: 1px;
-    margin-left: 12px;
+    margin-left: 8px;
     padding-left: 12px;
     font-size: 13px;
     line-height: 24px;
@@ -30006,6 +30005,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     right: 24px;
     top: 12px;
+    min-height: 24px;
+    max-width: 162px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     cursor: pointer;
     transition: 0.3s;
 }
@@ -30079,10 +30083,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-bar, .transfer-progress-bar-pct {
     position: absolute;
     display: block;
-    width: 480px;
-    height: 2px;
+    width: 504px;
+    height: 3px;
+    border-radius: 1.5px;
     background-color: rgba(0,0,0,0.05);
-    border-radius: 1px;
     left: 16px;
     bottom: 0;
     z-index: 8;
@@ -30156,11 +30160,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     opacity: 0.6;
 }
 /* pause mode */
-.transfer-task-row.pause .transfer-task-status {
+.transfer-task-row.paused .transfer-task-status {
     color: #666;
 }
 /* deploy icons */
-.transfer-task-row.pause .transfer-task-status::before {
+.transfer-task-row.paused .transfer-task-status::before {
     display: block;
     background-position: -2px -37px;
 }
@@ -30254,7 +30258,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .float-widget.transfer-prorgess .banner {
     width: 100%;
     min-width: 148px;
-    max-width: 512px;
+    max-width: 536px;
     background-color: #fff;
     padding: 24px;
     margin-bottom: 8px;
@@ -30281,7 +30285,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     content: "";
     background-image: url("../images/mega/cloud-background.png");
     position: absolute;
-    width: 512px;
+    width: 536px;
     height: 148px;
     bottom: 0;
     left: 0;

@@ -3187,6 +3187,8 @@ React.makeElement = React['createElement'];
 	            self.setState({ 'quickSearchText': '' });
 	            treesearch = false;
 	        });
+
+	        M.treeSearchUI();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        window.removeEventListener('resize', this.handleWindowResize);

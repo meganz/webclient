@@ -1051,6 +1051,7 @@ var ConversationsApp = React.createClass({
             treesearch = false;
         });
 
+        M.treeSearchUI();
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);

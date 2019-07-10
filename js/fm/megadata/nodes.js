@@ -3650,6 +3650,12 @@ MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
 
         if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
             this.delPS(pendingContactId, nodeHandle);
+
+            if (this.ps[nodeHandle] === undefined &&
+                (this.d[nodeHandle].shares === undefined ||
+                ('EXP' in this.d[nodeHandle].shares && Object.keys(this.d[nodeHandle].shares).length === 1))) {
+                this.nodeUpdated(M.d[nodeHandle]);
+            }
         }
     }
 };

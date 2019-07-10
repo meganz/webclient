@@ -6559,7 +6559,7 @@ table {
 .transfer-filetype-icon.web-lang, .search-path-icon-span.web-lang {
     background-position: -296px -37px;
 }
-.transfer-filetype-icon.web-data, .search-path-icon-span.web-datal {
+.transfer-filetype-icon.web-data, .search-path-icon-span.web-data {
     background-position: -296px -77px;
 }
 .transfer-filetype-icon.video, .search-path-icon-span.video {
@@ -7383,7 +7383,9 @@ table {
     display: none;
 }
 .fm-header-buttons {
-    float: right;
+    position: absolute;
+    top: 0;
+    right: 0;
     font-size: 0;
     white-space: nowrap;
     background-color: #ffffff;
@@ -7412,6 +7414,19 @@ table {
     font-size: 0;
     white-space: nowrap;
 }
+.fm-breadcrumbs-wrapper {
+    max-width: 100%;
+    max-width: -webkit-calc(100% - 214px);
+    max-width: -moz-calc(100% - 214x);
+    max-width: calc(100% - 214px);
+    display: inline-block;
+    overflow: hidden;
+}
+.fm-breadcrumbs-wrapper .fm-breadcrumbs-block {
+    min-width: 100%;
+    display: inline-block;
+    float: right;
+}
 .fm-breadcrumbs-block.deactivated {
     display: none;
 }
@@ -7421,6 +7436,30 @@ table {
     padding: 0 15px 0 0px;
     display: inline-block;
     vertical-align: top;
+}
+.fm-breadcrumbs:first-child {
+    position: absolute;
+    left: 0;
+    background-color: white;
+    z-index: 1;
+}
+.fm-breadcrumbs:nth-child(2) {
+    margin-left: 54px;
+}
+.overflowed-path .fm-breadcrumbs:first-child {
+    background-position: right -11264px;
+    padding-right: 22px;
+}
+.overflowed-path .fm-breadcrumbs:first-child::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 100%;
+    width: 17px;
+    height: 100%;
+    background: -moz-linear-gradient(left, rgba(255,255,255,1) 40%, rgba(255,255,255,0) 100%);
+    background: -webkit-linear-gradient(left, rgba(255,255,255,1) 40%,rgba(255,255,255,0) 100%);
+    background: linear-gradient(to right, rgba(255,255,255,1) 40%,rgba(255,255,255,0) 100%);
 }
 .fm-breadcrumbs:first-child:not(.account):not(.public-links):not(.folder-link) .right-arrow-bg span {
     display: none;
@@ -7668,7 +7707,7 @@ table {
     box-sizing: border-box;
     height: 100%;
     height: -webkit-calc(100% - 37px);
-    height: -moz-calc(100% - 37x);
+    height: -moz-calc(100% - 37px);
     height: calc(100% - 37px);
     position: relative;
     min-height: 280px !important;
@@ -15142,19 +15181,26 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow.asc {
     background-position: right -1225px;
 }
-.search-bottom-menu {
+.search-bottom-wrapper {
     background-color: #EEEEEE;
     height: 36px;
     position: absolute;
     bottom: 0;
-    width: 100%;
-    padding: 3px 0 0 7px;
     display: none;
+    width: 100%;
+}
+.search-bottom-menu {
+    min-width: 100%;
+    float: right;
+    display: inline-block;
+    padding: 3px 0 0 4px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    font-size: 0;
+    white-space: nowrap;
 }
-.search .search-bottom-menu {
+.search .search-bottom-wrapper {
     display: block;
 }
 .empty-search-bottom-menu {
@@ -15169,7 +15215,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     margin-left: 2px;
 }
 .search-path-icon {
-    float: left;
+    display: inline-block;
+    vertical-align: top;
     margin: 3px 0 0 5px;
     width: 24px;
     background-repeat: no-repeat;
@@ -15219,16 +15266,68 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 24px;
 }
 .search-path-txt {
-    float: left;
+    display: inline-block;
+    vertical-align: top;
     margin: 0 7px 0 0;
     font-size: 14px;
     line-height: 28px;
     color: #333333;
     cursor: pointer;
     padding: 0 0 0 7px;
+    overflow: hidden;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.search-path-item {
+    display: inline-block;
+    position: relative;
+}
+.search-bottom-menu .search-path-txt.short-foldername {
+    max-width: 110px;
+}
+.search-bottom-menu .search-path-txt.ultra-short-foldername {
+    max-width: 40px;
+}
+.long-path .search-path-item .search-path-icon {
+    display: none;
+}
+.long-path .search-path-item:first-child .search-path-icon {
+    display: inline-block;
+}
+.overflowed-path .search-path-item:first-child {
+    position: absolute;
+    left: 0;
+    background-color: #EEEEEE;
+    z-index: 1;
+    padding-left: 4px;
+}
+.overflowed-path .search-path-item:first-child .search-path-txt {
+    display: none;
+}
+.overflowed-path .search-path-item:first-child .search-path-arrow {
+    background-position: center -11280px;
+    width: 20px;
+    margin: 0 0 0 5px;
+    opacity: 0.6;
+    position: relative;
+}
+.overflowed-path .search-path-item:first-child::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 100%;
+    width: 17px;
+    height: 100%;
+    background: -moz-linear-gradient(left, rgba(238,238,238,1) 40%, rgba(238,238,238,0) 100%);
+    background: -webkit-linear-gradient(left, rgba(238,238,238,1) 40%,rgba(238,238,238,0) 100%);
+    background: linear-gradient(to right, rgba(238,238,238,1) 40%,rgba(238,238,238,0) 100%);
+}
+.overflowed-path .search-path-item:nth-child(2) {
+    margin-left: 108px;
 }
 .search-path-arrow {
-    float: left;
+    display: inline-block;
+    vertical-align: top;
     width: 10px;
     height: 30px;
     background-repeat: no-repeat;

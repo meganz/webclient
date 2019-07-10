@@ -299,6 +299,10 @@
             if (this.correctLabel) {
                 this.correctLabel.classList.add('hidden');
             }
+            if (this.passwordField) {
+                this.passwordField.value = "";
+                $(this.passwordField).focus();
+            }
         }
     };
 
@@ -308,6 +312,9 @@
         }
         else {
             this.hideIcon();
+        }
+        if (this.passwordField) {
+            this.passwordField.classList.add('hidden');
         }
 
         this.hide();
@@ -520,6 +527,17 @@
         this.dialog = document.querySelector('.dropdown.body.pass-reminder');
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
+        $(this.passwordField).rebind('focus.hack', function() {
+            if (ua.details.browser === "Chrome") {
+                $(this).attr('style', '-webkit-text-security: disc;');
+            }
+            else {
+                $(this).attr('type', 'password');
+            }
+            $(this).removeAttr('readonly');
+            $(this).attr('autocomplete', 'section-off' + rand_range(1, 123244) + ' off disabled nope no none');
+        });
+        this.passwordField.classList.remove('hidden');
         this.passwordField.value = "";
 
         this.wrongLabel = this.dialog.querySelector('.pass-reminder.wrong');

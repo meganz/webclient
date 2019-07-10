@@ -686,3 +686,26 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
 
     return node;
 };
+
+/**
+ * Render a simplified "chat is loading" state UI for when the chat is still not ready but an /fm/chat(?/...) url was
+ * accessed.
+ */
+MegaData.prototype.renderChatIsLoading = function() {
+    M.onSectionUIOpen('conversations');
+
+    M.hideEmptyGrids();
+
+    $('.fm-files-view-icon').addClass('hidden');
+    $('.fm-blocks-view').addClass('hidden');
+    $('.files-grid-view').addClass('hidden');
+    $('.fm-right-account-block').addClass('hidden');
+    $('.contacts-details-block').addClass('hidden');
+
+    $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+
+    $('.fm-right-files-block, .fm-left-panel, .fm-transfers-block').addClass('hidden');
+
+    $('.section.conversations').removeClass('hidden');
+    $('.section.conversations .fm-chat-is-loading').removeClass('hidden');
+};

@@ -3295,6 +3295,7 @@ function init_chat() {
             loadingInitDialog.hide();
         }
     }
+
     if (anonymouschat) {
         __init_chat();
     }

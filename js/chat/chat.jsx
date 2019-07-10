@@ -1642,6 +1642,7 @@ Chat.prototype.refreshConversations = function() {
         $('.fm-chat-block').hide();
         return false;
     }
+    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
     // move to the proper place if loaded before the FM
     if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);

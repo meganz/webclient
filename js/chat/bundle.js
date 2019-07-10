@@ -3387,7 +3387,7 @@ React.makeElement = React['createElement'];
 	                            },
 	                            value: self.state.quickSearchText,
 	                            placeholder: l[7997] }),
-	                        React.makeElement("div", { className: "nw-fm-search-icon" }),
+	                        React.makeElement("div", { className: "small-icon thin-search-icon" }),
 	                        React.makeElement(
 	                            ButtonsUI.Button,
 	                            {

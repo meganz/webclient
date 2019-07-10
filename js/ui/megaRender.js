@@ -411,6 +411,7 @@
         define(this, 'render',              renderer || this.renderer[section] || this.renderer['*']);
         define(this, 'getNodeProperties',   this.nodeProperties[section] || this.nodeProperties['*']);
         define(this, 'section',             section);
+        this.versionColumnPrepare = versionColumnPrepare;
 
         if (scope.d) {
             var options = {

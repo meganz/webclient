@@ -2273,12 +2273,20 @@ MegaData.prototype.isFavourite = function(nodesId) {
  */
 MegaData.prototype.versioningDomUpdate = function(fh) {
     var $nodeView = $('#' + fh);
+    var $versionsCol = $nodeView.find('td[megatype="versions"]');
 
     if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            var $verHtml = M.megaRender.versionColumnPrepare(M.d[fh].tvf, M.d[fh].tvb || 0);
+            $versionsCol.empty().append($verHtml);
+        }
     }
     else {// Remove versioning
         $nodeView.removeClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            $versionsCol.empty();
+        }
     }
 };
 

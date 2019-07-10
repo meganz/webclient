@@ -1,6 +1,39 @@
-.conversations .nw-fm-tree-header span {
+.conversations .nw-fm-tree-header span, .conversations .nw-fm-tree-header input.chat-quick-search {
     color: #333333;
 }
+
+.conversations .nw-fm-tree-header input.chat-quick-search::-webkit-input-placeholder {
+    color: #333333;
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:-moz-placeholder {
+    color: #333333;
+    opacity: 1;
+}
+.conversations .nw-fm-tree-header input.chat-quick-search::-moz-placeholder {
+    color: #333333;
+    opacity: 1;
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-ms-input-placeholder {
+    color:rgba(255,255,255,0.3);
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus::-webkit-input-placeholder {
+    color:rgba(255,255,255,0.3);
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-moz-placeholder {
+    color:rgba(255,255,255,0.3);
+    opacity: 1;
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus::-moz-placeholder {
+    color:rgba(255,255,255,0.3);
+    opacity: 1;
+}
+.conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-ms-input-placeholder {
+    color:rgba(255,255,255,0.3);
+}
+.conversations .nw-fm-tree-header .nw-fm-search-icon {
+    margin-right: 30px;
+}
+
 .fm-left-menu.conversations {
     background-color: #FAFAFA;
 }

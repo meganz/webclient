@@ -1253,7 +1253,7 @@ var ConversationsApp = React.createClass({
                                    }}
                                    value={self.state.quickSearchText}
                                    placeholder={l[7997]} />
-                            <div className="nw-fm-search-icon"></div>
+                            <div className="small-icon thin-search-icon"></div>
 
                             <ButtonsUI.Button
                                 group="conversationsListing"

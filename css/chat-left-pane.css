@@ -1,7 +1,30 @@
+.nw-fm-tree-header.conversations {
+    padding: 5px 36px 0 5px;
+    box-sizing: border-box;
+}
+.nw-fm-tree-header.conversations .button {
+    right: 7px;
+}
+.nw-fm-tree-header.conversations input {
+    margin: 0;
+    padding: 0;
+    padding: 0 0 0 32px;
+    border-radius: 4px;
+    -webkit-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
+}
+.nw-fm-tree-header.conversations input:focus, .nw-fm-tree-header.conversations.filled-input input {
+    background-color: white;
+     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    font-size: 13px;
+    padding: 1px 2px 1px 26px;
+    font-family: 'LatoWeb', 'source_sans_proregular';
+}
 .conversations .nw-fm-tree-header span, .conversations .nw-fm-tree-header input.chat-quick-search {
     color: #333333;
 }
-
 .conversations .nw-fm-tree-header input.chat-quick-search::-webkit-input-placeholder {
     color: #333333;
 }
@@ -14,26 +37,38 @@
     opacity: 1;
 }
 .conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-ms-input-placeholder {
-    color:rgba(255,255,255,0.3);
+    font-size: 13px;
+    color: #777777;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus::-webkit-input-placeholder {
-    color:rgba(255,255,255,0.3);
+    font-size: 13px;
+    color: #777777;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-moz-placeholder {
-    color:rgba(255,255,255,0.3);
+    font-size: 13px;
+    color: #777777;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     opacity: 1;
 }
 .conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus::-moz-placeholder {
-    color:rgba(255,255,255,0.3);
+    font-size: 13px;
+    color: #777777;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     opacity: 1;
 }
 .conversations .nw-fm-tree-header input.chat-quick-search:not([readonly]):focus:-ms-input-placeholder {
-    color:rgba(255,255,255,0.3);
+    font-size: 13px;
+    color: #777777;
+    font-family: 'LatoWeb', 'source_sans_proregular';
 }
-.conversations .nw-fm-tree-header .nw-fm-search-icon {
-    margin-right: 30px;
+.conversations .nw-fm-tree-header .thin-search-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 8px 0 0 8px;
 }
-
 .fm-left-menu.conversations {
     background-color: #FAFAFA;
 }

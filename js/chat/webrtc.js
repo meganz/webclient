@@ -282,11 +282,18 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
         var call = self.calls[parsedCallData.chatid];
         if (call) {
             if (parsedCallData.callid !== call.id) {
-                self.logger.error("Ignoring CALLDATA because its callid is different " +
-                    "than the call that we have in that chatroom");
+                if ((call.state === CallState.kCallingOut || call.state === CallState.kReqSent) && ringing) {
+                    // Incoming while outgoing call request
+                    self._updatePeerAvState(parsedCallData);
+                    self.handleCallRequest(parsedCallData); // decides which call to honor
+                } else {
+                    self.logger.error("Ignoring CALLDATA because its callid is different " +
+                        "than the call that we have in that chatroom");
+                }
                 return;
+            } else { // callid-s are equal
+                parsedCallData.call = call;
             }
-            parsedCallData.call = call;
         }
 
         self._updatePeerAvState(parsedCallData);
@@ -358,7 +365,7 @@ RtcModule.prototype.getActiveCall = function() {
             result = call;
         } else {
             assert(call.state === CallState.kRingIn);
-            assert(!call.isUserInitiated);
+            assert(!call.isCallerOrJoiner);
         }
     }
     return result;
@@ -437,9 +444,16 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
     var parts = chat.callParticipants;
     for (var k in parts) {
         if (k.substr(0, 8) === thisUser) {
-            // we are already in the call from another client
-            self.logger.log("Ignoring call request: We are already in the call from another client");
-            return;
+            if (k.substr(8) !== parsedCallData.shard.clientId) {
+                self.logger.log("Ignoring call request: We are already in the call from another client");
+                return;
+            } else {
+                // We appear to already be in the call from our own client. This can happen only
+                // if we are simultaneously calling each other with a peer. In this case, we must
+                // have an existing outgoing call
+                var call = self.calls[parsedCallData.chatid];
+                assert(call && call.isCallerOrJoiner);
+            }
         }
     }
     function createNewCall(replacedCall, avAutoAnswer) {
@@ -479,13 +493,13 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
             // Both calls are in same 1on1 chatroom
             if (activeCall.state < CallState.kJoining) {
                 // Concurrent call requests to each other?
-                if (!activeCall.isUserInitiated) {
+                if (!activeCall.isCallerOrJoiner) {
                     // No, just two incoming calls from different clients in same 1on1 room
                     self.logger.warn("Another incoming call during an incoming call, sending kErrAlready");
                     sendBusy(true);
                     return;
                 }
-
+                // activeCall is outgoing
                 // Concurrent call requests to each other in a 1on1 room
                 // If our user handle is greater than the calldata sender's, our outgoing call
                 // survives, and their call request is declined. Otherwise, our existing outgoing
@@ -496,14 +510,17 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
                     // answer() of the newly created call destroys all other calls in the .calls map,
                     // but in this case we are overwriting the activeCall with the new call (same chatid),
                     // so we must take care ourselves of the previous call
-                    activeCall.hangup()
+                    // If we don't delete activeCall.incallPingTimer, activeCall._destroy() will send an ENDCALL,
+                    // server will reply with an ENDCALL, which will terminate the other (surviving) call
+                    delete activeCall._inCallPingTimer;
+                    activeCall._destroy(Term.kCancelOutAnswerIn, false)
                     .then(function() {
                         // Create an incoming call from the packet, and auto answer it
                         createNewCall(activeCall, activeCall._startOrJoinAv);
                     });
                 }  else {
                     self.logger.warn("Simultaneously calling each other with peer - we have priority.",
-                        "Peer should abort their call and answer ours");
+                        "Ignoring incoming call request, peer should abort it and answer ours");
                 }
                 return;
             } else {
@@ -1005,7 +1022,7 @@ function Call(rtcModule, info, isGroup, role, handler) {
         this.state = CallState.kRingIn;
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     } else {
-        this.isUserInitiated = true; // both kCaller and kJoiner are user-initiated
+        this.isCallerOrJoiner = true;
         this.state = (role === CallRole.kJoiner) ? CallState.kJoining : CallState.kCallingOut;
     }
     this.handler = (handler instanceof Function) ? handler(this) : handler;
@@ -1602,7 +1619,7 @@ Call.prototype._broadcastCallReq = function() {
     }
     assert(!self._obtainingLocalStream);
     assert(self.localAv() != null);
-    assert(self.isUserInitiated);
+    assert(self.isCallerOrJoiner);
     self.isRingingOut = true;
     if (!self._bcastCallData(CallDataType.kRinging)) {
         return false;
@@ -1653,8 +1670,8 @@ Call.prototype._stopIncallPingTimer = function() {
     if (self._inCallPingTimer) {
         clearInterval(self._inCallPingTimer);
         delete self._inCallPingTimer;
+        self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
     }
-    self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
 };
 Call.prototype.hasNoSessions = function() {
     return (Object.keys(this.sessions).length === 0);
@@ -1827,6 +1844,9 @@ Call.prototype._startOrJoin = function(av) {
             av &= ~Av.Audio;
         }
     }
+    // we need _startOrJoinAv immediately after creating an outgoing call, so we can't set it
+    // after obtaining the local stream (which is an async operation)
+    self._startOrJoinAv = av;
     var pms = self._initialGetLocalStream(av);
     return pms
     .catch(function(err) {
@@ -3679,6 +3699,8 @@ var Term = Object.freeze({
     kStreamChange: 10,      // < Session was force closed by a client because it wants to change the media stream.
                             // < This is a fallback if one of the peers doesn't support Unified Plan
                             // < stream renegotiation
+    kCancelOutAnswerIn: 11, // < Simultaneous call resolution: the outgoing 1on1 call was destroyed because we
+                             // < received an incoming call request from the same peer
     kNormalHangupLast: 20,  // < Last enum specifying a normal call termination
     kErrorFirst: 21,        // < First enum specifying call termination due to error
     kErrApiTimeout: 22,     // < Mega API timed out on some request (usually for RSA keys)
@@ -3741,7 +3763,8 @@ var CallState = Object.freeze({
 
 var CallStateAllowedStateTransitions = {};
 CallStateAllowedStateTransitions[CallState.kCallingOut] = [
-    CallState.kReqSent
+    CallState.kReqSent,
+    CallState.kTerminating
 ];
 CallStateAllowedStateTransitions[CallState.kReqSent] = [
     CallState.kCallInProgress,
@@ -3872,6 +3895,8 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return UICallTerm.REJECTED;
         case Term.kErrAlready:
             return UICallTerm.FAILED;
+        case Term.kCancelOutAnswerIn:
+            return UICallTerm.ABORTED;
         case Term.kErrNotSupported:
             return UICallTerm.FAILED;
         case Term.kAppTerminating:
@@ -3999,6 +4024,8 @@ Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
             return CallManager.CALL_END_REMOTE_REASON.REJECTED;
         case Term.kErrAlready:
             return CallManager.CALL_END_REMOTE_REASON.FAILED;
+        case Term.kCancelOutAnswerIn:
+        return CallManager.CALL_END_REMOTE_REASON.CANCELED;
         case Term.kErrNotSupported:
             return CallManager.CALL_END_REMOTE_REASON.FAILED;
         case Term.kAppTerminating:

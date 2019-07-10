@@ -1167,6 +1167,12 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
         var state = self.rtcCall.termCodeToUIState(terminationCode);
         self.setState(state);
         var callMgr = self.getCallManager();
+        if (terminationCode === Term.kCancelOutAnswerIn) {
+            // @lp Simultaneous 1on1 call to each other
+            // Terminate the call but don't display anything in the history
+            self.onCallTerminated();
+            return;
+        }
         switch (state) {
             case CallManagerCall.STATE.REJECTED:
                 callMgr.trigger('CallRejected', [self, terminationCode]);

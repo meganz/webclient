@@ -2981,6 +2981,11 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.label.viewed = false;
             M.columnsWidth.cloud.label.disabled = true;
         }
+        else {
+            M.columnsWidth.cloud.versions.disabled = false;
+            M.columnsWidth.cloud.fav.disabled = false;
+            M.columnsWidth.cloud.label.disabled = false;
+        }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
             for (var col in M.columnsWidth.cloud) {

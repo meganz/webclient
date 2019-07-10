@@ -1345,6 +1345,7 @@ React.makeElement = React['createElement'];
 	        $('.fm-chat-block').hide();
 	        return false;
 	    }
+	    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
 
 	    if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
 	        $('.section.conversations .fm-right-files-block').append(self.$container);

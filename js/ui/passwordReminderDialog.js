@@ -318,6 +318,7 @@
         }
 
         this.hide();
+        delete $.dialog;
 
         this.onLogoutDialogUserAction();
     };

@@ -2984,6 +2984,10 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.label.disabled = true;
         }
         else {
+            if (M.columnsWidth.cloud.fav.disabled) {
+                // came from folder-link
+                M.columnsWidth.cloud.fav.viewed = true;
+            }
             M.columnsWidth.cloud.versions.disabled = false;
             M.columnsWidth.cloud.fav.disabled = false;
             M.columnsWidth.cloud.label.disabled = false;
@@ -3015,6 +3019,11 @@ FileManager.prototype.addGridUI = function(refresh) {
                         $header.hide();
                         $('.grid-table.fm td[megatype="' + col + '"]').hide();
                     }
+                    else if (M.columnsWidth.cloud[col].viewed && !$header.is(':visible')) {
+                        $header.show();
+                        $('.grid-table.fm td[megatype="' + col + '"]').show();
+                    }
+
                 }
             }
         }

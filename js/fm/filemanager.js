@@ -8,15 +8,15 @@ function FileManager() {
         outshare: Object.create(null)
     };
 
-    this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
-    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: false };
-    this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
-    this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: false };
-    this.columnsWidth.cloud.versions = { min: 130, curr: 130, viewed: false };
-    this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
+    this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
+    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
+    this.columnsWidth.cloud.label = { max: 130, min: 70, curr: 70, viewed: false };
+    this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
+    this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false }
+    this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
 }
 FileManager.prototype.constructor = FileManager;
@@ -521,6 +521,9 @@ FileManager.prototype.initFileManagerUI = function() {
             var colType = thElm.attr('megatype');
             if (colType) {
                 if (newWidth < M.columnsWidth.cloud[colType].min) {
+                    return;
+                }
+                if (newWidth > M.columnsWidth.cloud[colType].max) {
                     return;
                 }
                 thElm.outerWidth(newWidth);
@@ -2994,6 +2997,15 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
+
+            // fname is special since it might be dynamic width
+            var $fnameCol = $('.files-grid-view.fm .grid-table.fm td[megatype="fname"]').first();
+
+            // check if it's still dynamic
+            if ($fnameCol.attr('style').indexOf('calc(100% -') !== -1) {
+                M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 400);
+            }
+
             for (var col in M.columnsWidth.cloud) {
                 var $header = $('.files-grid-view.fm .grid-table-header th[megatype="' + col + '"]');
                 if (!$header) {

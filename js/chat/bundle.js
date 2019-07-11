@@ -60,7 +60,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(41);
+	var ChatRoom = __webpack_require__(43);
 
 	var EMOJI_DATASET_VERSION = 3;
 
@@ -2214,7 +2214,7 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(11);
 	var ConversationPanelUI = __webpack_require__(12);
 	var ModalDialogsUI = __webpack_require__(13);
-	var StartGroupChatWizard = __webpack_require__(39).StartGroupChatWizard;
+	var StartGroupChatWizard = __webpack_require__(41).StartGroupChatWizard;
 
 	var renderMessageSummary = function renderMessageSummary(lastMessage) {
 	    var renderableSummary;
@@ -2417,6 +2417,14 @@ React.makeElement = React['createElement'];
 	                classString += " call-exists";
 	            }
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
+	            var voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+	            if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+	                lastMessageDiv = React.makeElement(
+	                    "div",
+	                    { className: lastMsgDivClasses },
+	                    'Voice Message'
+	                );
+	            }
 
 	            var timestamp = lastMessage.delay;
 	            var curTimeMarker;
@@ -6558,20 +6566,20 @@ React.makeElement = React['createElement'];
 	var ParticipantsList = __webpack_require__(22).ParticipantsList;
 
 	var GenericConversationMessage = __webpack_require__(23).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(29).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(30).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(31).PrivilegeChange;
-	var TopicChange = __webpack_require__(32).TopicChange;
-	var SharedFilesAccordionPanel = __webpack_require__(33).SharedFilesAccordionPanel;
-	var IncomingSharesAccordionPanel = __webpack_require__(34).IncomingSharesAccordionPanel;
+	var AlterParticipantsConversationMessage = __webpack_require__(31).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(32).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(33).PrivilegeChange;
+	var TopicChange = __webpack_require__(34).TopicChange;
+	var SharedFilesAccordionPanel = __webpack_require__(35).SharedFilesAccordionPanel;
+	var IncomingSharesAccordionPanel = __webpack_require__(36).IncomingSharesAccordionPanel;
 
-	var CloseOpenModeMessage = __webpack_require__(35).CloseOpenModeMessage;
-	var ChatHandleMessage = __webpack_require__(36).ChatHandleMessage;
-	var ChatlinkDialog = __webpack_require__(37).ChatlinkDialog;
+	var CloseOpenModeMessage = __webpack_require__(37).CloseOpenModeMessage;
+	var ChatHandleMessage = __webpack_require__(38).ChatHandleMessage;
+	var ChatlinkDialog = __webpack_require__(39).ChatlinkDialog;
 
 	var ENABLE_GROUP_CALLING_FLAG = true;
 
-	var ConversationAudioVideoPanel = __webpack_require__(38).ConversationAudioVideoPanel;
+	var ConversationAudioVideoPanel = __webpack_require__(40).ConversationAudioVideoPanel;
 
 	var JoinCallNotification = React.createClass({
 	    displayName: "JoinCallNotification",
@@ -7939,6 +7947,16 @@ React.makeElement = React['createElement'];
 	                        }
 	                        var chatdint = room.megaChat.plugins.chatdIntegration;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
+	                            var textContents = msg.textContents || '';
+
+	                            if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+	                                var attachmentMetadata = msg.getAttachmentMeta() || [];
+
+	                                attachmentMetadata.forEach(function (v) {
+	                                    M.moveToRubbish(v.h);
+	                                });
+	                            }
+
 	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                            msg.deleted = true;
 	                            msg.textContents = "";
@@ -7970,10 +7988,11 @@ React.makeElement = React['createElement'];
 	                        __(l[8879])
 	                    ),
 	                    React.makeElement(GenericConversationMessage, {
-	                        className: "dialog-wrapper",
+	                        className: " dialog-wrapper",
 	                        message: self.state.messageToBeDeleted,
 	                        hideActionButtons: true,
-	                        initTextScrolling: true
+	                        initTextScrolling: true,
+	                        dialog: true
 	                    })
 	                )
 	            );
@@ -12788,15 +12807,22 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	var _AudioContainer = __webpack_require__(24);
+
+	var _AudioContainer2 = _interopRequireDefault(_AudioContainer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
-	var MetaRichpreview = __webpack_require__(25).MetaRichpreview;
-	var MetaRichpreviewConfirmation = __webpack_require__(27).MetaRichpreviewConfirmation;
-	var MetaRichpreviewMegaLinks = __webpack_require__(28).MetaRichpreviewMegaLinks;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var MetaRichpreview = __webpack_require__(27).MetaRichpreview;
+	var MetaRichpreviewConfirmation = __webpack_require__(29).MetaRichpreviewConfirmation;
+	var MetaRichpreviewMegaLinks = __webpack_require__(30).MetaRichpreviewMegaLinks;
 	var ContactsUI = __webpack_require__(11);
 	var TypingAreaUI = __webpack_require__(17);
+
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
@@ -13681,6 +13707,92 @@ React.makeElement = React['createElement'];
 	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
 
 	                    return null;
+	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+	                    var _avatar = null;
+	                    var _messageActionButtons = null;
+
+	                    if (this.props.grouped) {
+	                        additionalClasses += " grouped";
+	                    } else {
+	                        _avatar = React.makeElement(ContactsUI.Avatar, {
+	                            contact: contact,
+	                            className: 'message avatar-wrapper small-rounded-avatar'
+	                        });
+	                        datetime = React.makeElement(
+	                            'div',
+	                            { className: 'message date-time simpletip',
+	                                'data-simpletip': time2date(timestampInt) },
+	                            timestamp
+	                        );
+	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                    }
+
+	                    var attachmentMetadata = message.getAttachmentMeta() || [];
+	                    var audioContainer = null;
+
+	                    attachmentMetadata.forEach(function (v) {
+	                        audioContainer = React.makeElement(_AudioContainer2.default, {
+	                            h: v.h,
+	                            mime: v.mime,
+	                            playtime: v.playtime,
+	                            audioId: 'vm' + message.messageId
+	                        });
+	                    });
+
+	                    var iAmSender = contact && contact.u === u_handle;
+	                    var stillEditable = unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT;
+	                    var isBeingEdited = self.isBeingEdited() === true;
+	                    var chatIsReadOnly = chatRoom.isReadOnly() === true;
+
+	                    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !self.props.dialog) {
+	                        var deleteButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                            icon: 'red-cross',
+	                            label: __(l[1730]),
+	                            className: 'red',
+	                            onClick: function onClick(e) {
+	                                self.doDelete(e, message);
+	                            }
+	                        });
+
+	                        _messageActionButtons = React.makeElement(
+	                            ButtonsUI.Button,
+	                            {
+	                                className: 'default-white-button tiny-button',
+	                                icon: 'tiny-icon icons-sprite grey-dots' },
+	                            React.makeElement(
+	                                DropdownsUI.Dropdown,
+	                                {
+	                                    className: 'white-context-menu attachments-dropdown',
+	                                    noArrow: true,
+	                                    positionMy: 'left bottom',
+	                                    positionAt: 'right bottom',
+	                                    horizOffset: 4
+	                                },
+	                                deleteButton
+	                            )
+	                        );
+	                    }
+
+	                    return React.makeElement(
+	                        'div',
+	                        { className: message.messageId + " message body" + additionalClasses },
+	                        _avatar,
+	                        React.makeElement(
+	                            'div',
+	                            { className: 'message content-area' },
+	                            name,
+	                            datetime,
+	                            _messageActionButtons,
+	                            React.makeElement(
+	                                'div',
+	                                { className: 'message shared-block' },
+	                                files
+	                            ),
+	                            buttonsBlock,
+	                            spinnerElement,
+	                            audioContainer
+	                        )
+	                    );
 	                } else {
 	                    chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
 	                    return null;
@@ -14115,6 +14227,413 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _AudioPlayer = __webpack_require__(25);
+
+	var _AudioPlayer2 = _interopRequireDefault(_AudioPlayer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var AudioContainer = function (_React$Component) {
+	    _inherits(AudioContainer, _React$Component);
+
+	    function AudioContainer(props) {
+	        _classCallCheck(this, AudioContainer);
+
+	        var _this = _possibleConstructorReturn(this, (AudioContainer.__proto__ || Object.getPrototypeOf(AudioContainer)).call(this, props));
+
+	        _this.state = {
+	            audioBlobUrl: null,
+	            loading: false
+	        };
+
+	        _this.getAudioFile = _this.getAudioFile.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(AudioContainer, [{
+	        key: 'getAudioFile',
+	        value: function getAudioFile() {
+	            var self = this;
+	            var _props = this.props,
+	                mime = _props.mime,
+	                h = _props.h;
+
+	            var blobUrl = null;
+
+	            self.setState({
+	                loading: true
+	            });
+
+	            if (mime === 'audio/mp4') {
+	                blobUrl = new Promise(function (resolve, reject) {
+
+	                    M.gfsfetch(h, 0, -1, null).done(function (data) {
+	                        resolve({
+	                            buffer: data.buffer
+	                        });
+	                    }).fail(function (e) {
+	                        reject(e);
+	                    });
+	                }).then(function (_ref) {
+	                    var buffer = _ref.buffer;
+
+	                    var uint8Array = new Uint8Array(buffer);
+	                    var arrayBuffer = uint8Array.buffer;
+
+	                    self.setState(function (prevState) {
+	                        return {
+	                            audioBlobUrl: mObjectURL([arrayBuffer], 'audio/mp4'),
+	                            loading: false
+	                        };
+	                    });
+	                }).catch(function (e) {
+	                    console.error(e);
+	                });
+	            }
+
+	            return blobUrl;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var self = this;
+	            var _self$state = self.state,
+	                audioBlobUrl = _self$state.audioBlobUrl,
+	                loading = _self$state.loading;
+	            var _self$props = self.props,
+	                playtime = _self$props.playtime,
+	                mime = _self$props.mime;
+
+
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'audio-container' },
+	                _react2.default.createElement(_AudioPlayer2.default, {
+	                    source: audioBlobUrl ? audioBlobUrl : null,
+	                    audioId: self.props.audioId,
+	                    loading: loading,
+	                    mime: mime,
+	                    getAudioFile: self.getAudioFile,
+	                    playtime: playtime
+	                })
+	            );
+	        }
+	    }]);
+
+	    return AudioContainer;
+	}(_react2.default.Component);
+
+	AudioContainer.propTypes = {
+	    h: _react2.default.PropTypes.string.isRequired,
+	    mime: _react2.default.PropTypes.string.isRequired
+	};
+
+	AudioContainer.defaultProps = {
+	    h: null,
+	    mime: null
+	};
+
+	exports.default = AudioContainer;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var AudioPlayer = function (_React$Component) {
+	    _inherits(AudioPlayer, _React$Component);
+
+	    function AudioPlayer(props) {
+	        _classCallCheck(this, AudioPlayer);
+
+	        var _this = _possibleConstructorReturn(this, (AudioPlayer.__proto__ || Object.getPrototypeOf(AudioPlayer)).call(this, props));
+
+	        _this.state = {
+	            currentTime: null,
+	            progressWidth: 0,
+	            isBeingPlayed: false,
+	            isPaused: false
+	        };
+
+	        _this.handleOnPlaying = _this.handleOnPlaying.bind(_this);
+	        _this.handleOnTimeUpdate = _this.handleOnTimeUpdate.bind(_this);
+	        _this.handleOnEnded = _this.handleOnEnded.bind(_this);
+	        _this.handleOnPause = _this.handleOnPause.bind(_this);
+	        _this.handleOnMouseDown = _this.handleOnMouseDown.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(AudioPlayer, [{
+	        key: 'play',
+	        value: function play(e) {
+	            var self = this;
+	            var audio = self.audioEl;
+
+	            if (audio.paused) {
+	                var result = audio.play();
+	                if (result instanceof Promise) {
+	                    result.catch(function (e) {
+	                        console.error(e);
+	                    });
+	                }
+
+	                var audios = document.getElementsByClassName('audio-player__player');
+
+	                Array.prototype.filter.call(audios, function (audioElement) {
+	                    return audioElement.id !== self.props.audioId;
+	                }).forEach(function (audioElement) {
+	                    if (!audioElement.paused) {
+	                        audioElement.pause();
+	                    }
+	                });
+
+	                self.setState({
+	                    isPaused: false
+	                });
+	            } else {
+	                audio.pause();
+	                self.setState({
+	                    isPaused: true
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'handleOnPause',
+	        value: function handleOnPause(e) {
+	            this.setState({
+	                isPaused: true
+	            });
+	        }
+	    }, {
+	        key: 'handleOnPlaying',
+	        value: function handleOnPlaying(e) {
+	            this.setState(function (prevState) {
+	                return {
+	                    isBeingPlayed: true
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnTimeUpdate',
+	        value: function handleOnTimeUpdate(e) {
+	            var _audioEl = this.audioEl,
+	                currentTime = _audioEl.currentTime,
+	                duration = _audioEl.duration;
+
+	            var percent = currentTime / duration * 100;
+
+	            this.setState(function (prevState) {
+	                return {
+	                    currentTime: secondsToTimeShort(currentTime),
+	                    progressWidth: percent
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnEnded',
+	        value: function handleOnEnded(e) {
+	            this.setState(function (prevState) {
+	                return {
+	                    progressWidth: 0,
+	                    isBeingPlayed: false,
+	                    currentTime: 0
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnMouseDown',
+	        value: function handleOnMouseDown(event) {
+	            event.preventDefault();
+	            var self = this;
+	            var sliderPin = self.sliderPin;
+	            var slider = self.slider;
+	            var shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
+
+	            document.addEventListener('mousemove', onMouseMove);
+	            document.addEventListener('mouseup', onMouseUp);
+
+	            function onMouseMove(event) {
+	                var newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+
+	                if (newLeft < 0) {
+	                    newLeft = 0;
+	                }
+	                var rightEdge = slider.offsetWidth - sliderPin.offsetWidth;
+	                if (newLeft > rightEdge) {
+	                    newLeft = rightEdge;
+	                }
+
+	                sliderPin.style.left = newLeft + 'px';
+
+	                var pinPosition = newLeft / slider.getBoundingClientRect().width;
+
+	                var newTime = Math.ceil(self.props.playtime * pinPosition);
+	                var newCurrentTime = secondsToTimeShort(newTime);
+	                self.audioEl.currentTime = newTime;
+
+	                self.setState(function (prevState) {
+	                    return {
+	                        currentTime: newCurrentTime,
+	                        progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
+	                    };
+	                });
+	            }
+
+	            function onMouseUp() {
+	                document.removeEventListener('mouseup', onMouseUp);
+	                document.removeEventListener('mousemove', onMouseMove);
+	            }
+
+	            sliderPin.ondragstart = function () {
+	                return false;
+	            };
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this,
+	                _React$createElement;
+
+	            var self = this;
+	            var _self$props = self.props,
+	                source = _self$props.source,
+	                audioId = _self$props.audioId,
+	                loading = _self$props.loading,
+	                playtime = _self$props.playtime;
+	            var _self$state = self.state,
+	                progressWidth = _self$state.progressWidth,
+	                isBeingPlayed = _self$state.isBeingPlayed,
+	                isPaused = _self$state.isPaused,
+	                currentTime = _self$state.currentTime;
+
+
+	            var progressStyles = {
+	                width: progressWidth + '%'
+	            };
+
+	            var playtimeStyles = null;
+
+	            if (isBeingPlayed) {
+	                playtimeStyles = {
+	                    color: '#EB4444'
+	                };
+	            }
+
+	            var btnClass = 'audio-player__pause-btn';
+	            if (!isBeingPlayed || isPaused) {
+	                btnClass = 'audio-player__play-btn';
+	            }
+
+	            var controls = _react2.default.createElement('span', {
+	                className: btnClass,
+	                onClick: function onClick() {
+	                    if (self.props.source === null) {
+	                        self.props.getAudioFile().then(function () {
+	                            self.play();
+	                        });
+	                    } else {
+	                        self.play();
+	                    }
+	                } });
+
+	            if (loading) {
+	                controls = _react2.default.createElement('div', { className: 'small-blue-spinner audio-player__spinner' });
+	            }
+
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'audio-player' },
+	                controls,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'slider', ref: function ref(slider) {
+	                            _this2.slider = slider;
+	                        } },
+	                    _react2.default.createElement('div', { className: 'slider__progress', style: progressStyles }),
+	                    _react2.default.createElement('div', {
+	                        className: 'slider__progress__pin',
+	                        style: { left: progressWidth + '%' },
+	                        ref: function ref(sliderPin) {
+	                            _this2.sliderPin = sliderPin;
+	                        },
+	                        onMouseDown: this.handleOnMouseDown
+	                    })
+	                ),
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'audio-player__time', style: playtimeStyles },
+	                    currentTime ? currentTime : secondsToTimeShort(playtime)
+	                ),
+	                _react2.default.createElement('audio', (_React$createElement = {
+	                    src: source,
+	                    className: 'audio-player__player',
+	                    onPause: self.handleOnPause,
+	                    id: audioId,
+	                    ref: function ref(audio) {
+	                        _this2.audioEl = audio;
+	                    },
+	                    onPlaying: self.handleOnPlaying
+	                }, _defineProperty(_React$createElement, 'onPause', self.handleOnPause), _defineProperty(_React$createElement, 'onEnded', self.handleOnEnded), _defineProperty(_React$createElement, 'onTimeUpdate', self.handleOnTimeUpdate), _React$createElement))
+	            );
+	        }
+	    }]);
+
+	    return AudioPlayer;
+	}(_react2.default.Component);
+
+	AudioPlayer.propTypes = {
+	    source: _react2.default.PropTypes.string,
+	    audioId: _react2.default.PropTypes.string.isRequired,
+	    loading: _react2.default.PropTypes.bool.isRequired,
+	    getAudioFile: _react2.default.PropTypes.func.isRequired,
+	    playtime: _react2.default.PropTypes.number.isRequired
+	};
+
+	exports.default = AudioPlayer;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	var React = __webpack_require__(2);
 
 	var utils = __webpack_require__(5);
@@ -14226,7 +14745,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14236,9 +14755,9 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(26).MetaRichpreviewLoading;
+	var MetaRichPreviewLoading = __webpack_require__(28).MetaRichpreviewLoading;
 
 	var MetaRichpreview = React.createClass({
 	    displayName: "MetaRichpreview",
@@ -14363,7 +14882,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14372,7 +14891,7 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 
 	var MetaRichpreviewLoading = React.createClass({
 	    displayName: "MetaRichpreviewLoading",
@@ -14392,7 +14911,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14402,7 +14921,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var MetaRichpreviewConfirmation = React.createClass({
@@ -14536,7 +15055,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14546,9 +15065,9 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(26).MetaRichpreviewLoading;
+	var MetaRichPreviewLoading = __webpack_require__(28).MetaRichpreviewLoading;
 
 	var MetaRichpreviewMegaLinks = React.createClass({
 	    displayName: "MetaRichpreviewMegaLinks",
@@ -14684,7 +15203,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14694,7 +15213,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
@@ -14841,7 +15360,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14851,7 +15370,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TruncatedMessage = React.createClass({
@@ -14922,7 +15441,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14932,7 +15451,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var PrivilegeChange = React.createClass({
@@ -15025,7 +15544,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15035,7 +15554,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TopicChange = React.createClass({
@@ -15103,7 +15622,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15406,7 +15925,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15593,7 +16112,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15603,7 +16122,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var CloseOpenModeMessage = React.createClass({
@@ -15677,7 +16196,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15687,7 +16206,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var ChatHandleMessage = React.createClass({
@@ -15761,7 +16280,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15988,7 +16507,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16992,7 +17511,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17003,7 +17522,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var Tooltips = __webpack_require__(14);
 	var Forms = __webpack_require__(15);
-	var MiniUI = __webpack_require__(40);
+	var MiniUI = __webpack_require__(42);
 	var ContactsUI = __webpack_require__(11);
 	var ModalDialogsUI = __webpack_require__(13);
 
@@ -17272,7 +17791,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17411,12 +17930,12 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var utils = __webpack_require__(42);
+	var utils = __webpack_require__(44);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(12);
 
@@ -18736,7 +19255,7 @@ React.makeElement = React['createElement'];
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports) {
 
 	'use strict';

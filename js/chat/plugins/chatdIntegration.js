@@ -1164,8 +1164,10 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
         message.trackDataChange();
     }
     else if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-        if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+        var messageHasAttachment = (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT);
+        var messageIsVoiceClip = (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP);
 
+        if (messageHasAttachment || messageIsVoiceClip) {
             message._onAttachmentReceived(textContents.substr(2));
         }
         else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {

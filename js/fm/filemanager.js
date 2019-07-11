@@ -3178,8 +3178,9 @@ FileManager.prototype.addGridUI = function(refresh) {
             for (var sortBy in M.sortRules) {
                 if (cls.indexOf(sortBy) !== -1) {
 
+                    var dateColumns = ['ts', 'mtime', 'date'];
 
-                    if (dir !== -1 && sortitem !== sortBy) {
+                    if (dir !== -1 && dateColumns.indexOf(sortBy) !== -1) {
                         if (cls.indexOf('asc') === -1) {
                             dir = -1;
                         }

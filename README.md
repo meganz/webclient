@@ -114,6 +114,7 @@ Directories
 * ``js/html/`` contains all JavaScript files that belong to the
   specific HTML file of the parent folder
 * ``js/vendor/`` -- contains all JavaScript files from external developers
+* ``cmaps/`` -- contains all Character mapping files for Pdf preview's Adobe font
 
 
 Our JavaScript Files

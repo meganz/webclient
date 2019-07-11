@@ -1660,16 +1660,16 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
 
-        if ($trs.filter('.transfer-upload').length) {
-            if (ulmanager.ulOverStorageQuota) {
+        if ($(this).hasClass('transfer-play')) {
+            if ($trs.filter('.transfer-upload').length && ulmanager.ulOverStorageQuota) {
                 ulmanager.ulShowOverStorageQuotaDialog();
                 return;
             }
-        }
 
-        if (dlmanager.isOverQuota) {
-            dlmanager.showOverQuotaDialog();
-            return;
+            if (dlmanager.isOverQuota) {
+                dlmanager.showOverQuotaDialog();
+                return;
+            }
         }
 
         var ids = $trs.attrs('id');
@@ -2512,13 +2512,15 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $('.transfer-pause-icon').rebind('click', function() {
 
-        if (dlmanager.isOverQuota) {
-            return dlmanager.showOverQuotaDialog();
-        }
+        if ($(this).hasClass('active')) { 
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
+            }
 
-        if (ulmanager.ulOverStorageQuota) {
-            ulmanager.ulShowOverStorageQuotaDialog();
-            return false;
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return false;
+            }
         }
 
         if (!$(this).hasClass('disabled')) {

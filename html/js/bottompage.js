@@ -60,7 +60,7 @@ var bottompage = {
     initBackToScroll: function() {
         "use strict";
 
-        $('#startholder').bind('scroll.bottompage', function() {
+        $('#startholder').rebind('scroll.bottompage', function() {
             sessionStorage.setItem('scrollPosition_' + page, $(this).scrollTop());
             if (page === 'download') {
                 $(window).unbind('resize.download-bar');

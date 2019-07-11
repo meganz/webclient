@@ -609,11 +609,11 @@
                     <div class="password-protect-inputs">
                         <div class="password-protect-input-container">
                             <div class="estimator-loading-icon"></div>
-                            <input class="password-protect-input first" type="password" placeholder="[$9074]" autocomplete="new-password">
+                            <input class="password-protect-input first" type="password" placeholder="[$9074]">
                         </div>
                         <div class="spacer"></div>
                         <div class="password-protect-input-container">
-                            <input class="password-protect-input second" type="password" placeholder="[$9075]" autocomplete="new-password">
+                            <input class="password-protect-input second" type="password" placeholder="[$9075]">
                         </div>
                     </div>
                     <div class="password-protect-error"></div>
@@ -1000,7 +1000,9 @@
     <div class="add-user-popup-pad">
         <div class="multiple-input">
             <i class="small-icon icons-sprite email"></i>
-            <input type="text" class="add-contact-multiple-input" id="add-user-dialog-input" name="" />
+            <form autocomplete="disabled">
+                <input type="text" class="add-contact-multiple-input" id="add-user-dialog-input" name="" />
+            </form>
             <div class="clear"></div>
         </div>
         <div class="multiple-input-warning">
@@ -4112,7 +4114,7 @@
             <div class="dialog input-wrapper ">
                 <!-- Please add 'wrong' class is password is incorrect !-->
                 <div class="dialog big-input-bg">
-                    <input type="password" value="" name="test-pass1" id="test-pass" placeholder="[$16896]" autocomplete="new-password">
+                    <input type="text" value="" name="test-pass1" id="test-pass" readonly placeholder="[$16896]" autocomplete="user-password">
                 </div>
                 <div class="dialog input-button">
                     <div class="default-white-button semi-big grey-txt confirm-password button-prd-confirm">

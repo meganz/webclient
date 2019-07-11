@@ -873,17 +873,23 @@ var CloudBrowserDialog = React.createClass({
         this.onHighlighted([]);
     },
     resizeBreadcrumbs: function() {
-        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
-        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
+        var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
 
         setTimeout(function() {
-            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+            var wrapperWidth = $breadcrumbsWrapper.outerWidth();
             var $el = $breadcrumbs.find('.right-arrow-bg');
             var i = 0;
             var j = 0;
             $el.removeClass('short-foldername ultra-short-foldername invisible');
 
-            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+            $breadcrumbsWrapper.removeClass('long-path overflowed-path');
+            if ($breadcrumbs.outerWidth() > wrapperWidth) {
+                $breadcrumbsWrapper.addClass('long-path');
+            }
+
+
+            while ($breadcrumbs.outerWidth() > wrapperWidth) {
                 if (i < $el.length - 1) {
                     $($el[i]).addClass('short-foldername');
                     i++;
@@ -894,6 +900,7 @@ var CloudBrowserDialog = React.createClass({
                     $($el[j]).addClass('short-foldername');
                 } else {
                     $($el[j]).addClass('ultra-short-foldername');
+                    $breadcrumbsWrapper.addClass('overflowed-path');
                     break;
                 }
             }
@@ -1057,6 +1064,13 @@ var CloudBrowserDialog = React.createClass({
                     breadcrumbClasses += " shared-with-me";
                 }
 
+                var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) :
+                    (
+                        breadcrumbNodeId === "shares" ?
+                            l[5589] :
+                            M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
+                    );
+
                 (function (breadcrumbNodeId) {
                     breadcrumb.unshift(
                         <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
@@ -1072,14 +1086,8 @@ var CloudBrowserDialog = React.createClass({
                                self.onSelected([]);
                                self.onHighlighted([]);
                            }}>
-                        <span className="right-arrow-bg">
-                            <span>{breadcrumbNodeId === M.RootID ? __(l[164]) :
-                                (
-                                    breadcrumbNodeId === "shares" ?
-                                        l[5589] :
-                                        M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
-                                )
-                            }</span>
+                        <span className="right-arrow-bg" title={folderName}>
+                            <span>{folderName}</span>
                         </span>
                         </a>
                     );
@@ -1231,8 +1239,8 @@ var CloudBrowserDialog = React.createClass({
                         </div>
                         <div className="clear"></div>
                     </div>
-                    <div className="fm-breadcrumbs-block add-from-cloud">
-                        <div className="breadcrumbs-wrapper">
+                    <div className="fm-breadcrumbs-wrapper add-from-cloud">
+                         <div className="fm-breadcrumbs-block">
                             {breadcrumb}
                             <div className="clear"></div>
                         </div>

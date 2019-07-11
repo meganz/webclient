@@ -268,7 +268,7 @@ function init_start() {
 
     showAnimated();
 
-    $('#startholder').add(window).bind('scroll.startpage', function() {
+    $('#startholder').add(window).rebind('scroll.startpage', function() {
         if (page === 'start' || page === 'download') {
 
             showAnimated();

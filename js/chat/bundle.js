@@ -1345,6 +1345,7 @@ React.makeElement = React['createElement'];
 	        $('.fm-chat-block').hide();
 	        return false;
 	    }
+	    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
 
 	    if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
 	        $('.section.conversations .fm-right-files-block').append(self.$container);
@@ -10232,17 +10233,22 @@ React.makeElement = React['createElement'];
 	        this.onHighlighted([]);
 	    },
 	    resizeBreadcrumbs: function resizeBreadcrumbs() {
-	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
-	        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+	        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
+	        var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
 
 	        setTimeout(function () {
-	            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+	            var wrapperWidth = $breadcrumbsWrapper.outerWidth();
 	            var $el = $breadcrumbs.find('.right-arrow-bg');
 	            var i = 0;
 	            var j = 0;
 	            $el.removeClass('short-foldername ultra-short-foldername invisible');
 
-	            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+	            $breadcrumbsWrapper.removeClass('long-path overflowed-path');
+	            if ($breadcrumbs.outerWidth() > wrapperWidth) {
+	                $breadcrumbsWrapper.addClass('long-path');
+	            }
+
+	            while ($breadcrumbs.outerWidth() > wrapperWidth) {
 	                if (i < $el.length - 1) {
 	                    $($el[i]).addClass('short-foldername');
 	                    i++;
@@ -10253,6 +10259,7 @@ React.makeElement = React['createElement'];
 	                    $($el[j]).addClass('short-foldername');
 	                } else {
 	                    $($el[j]).addClass('ultra-short-foldername');
+	                    $breadcrumbsWrapper.addClass('overflowed-path');
 	                    break;
 	                }
 	            }
@@ -10399,6 +10406,8 @@ React.makeElement = React['createElement'];
 	                breadcrumbClasses += " shared-with-me";
 	            }
 
+	            var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name;
+
 	            (function (breadcrumbNodeId) {
 	                breadcrumb.unshift(React.makeElement(
 	                    "a",
@@ -10417,11 +10426,11 @@ React.makeElement = React['createElement'];
 	                        } },
 	                    React.makeElement(
 	                        "span",
-	                        { className: "right-arrow-bg" },
+	                        { className: "right-arrow-bg", title: folderName },
 	                        React.makeElement(
 	                            "span",
 	                            null,
-	                            breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
+	                            folderName
 	                        )
 	                    )
 	                ));
@@ -10584,10 +10593,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "fm-breadcrumbs-block add-from-cloud" },
+	                    { className: "fm-breadcrumbs-wrapper add-from-cloud" },
 	                    React.makeElement(
 	                        "div",
-	                        { className: "breadcrumbs-wrapper" },
+	                        { className: "fm-breadcrumbs-block" },
 	                        breadcrumb,
 	                        React.makeElement("div", { className: "clear" })
 	                    )

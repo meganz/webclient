@@ -2360,6 +2360,10 @@ function topmenuUI() {
         }
     });
 
+    $topHeader.find('#search-fake-form').rebind('submit', function () {
+        return false;
+    })
+
     $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
         var val = $.trim($('.top-search-input').val());
 

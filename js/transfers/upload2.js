@@ -87,7 +87,9 @@ var ulmanager = {
         if ($.removeTransferItems) {
             $.removeTransferItems();
         }
-        $("tr[id^='ul_']").addClass('transfer-error').find('.transfer-status').text(l[1010]);
+        for (var kk = 0; kk < ul_queue.length; kk++) {
+            onUploadError(ul_queue[kk], l[1010], l[1010], null, true);
+        }
 
         // Store the entry whose upload ticket failed to resume it later
         if (aFileUpload) {

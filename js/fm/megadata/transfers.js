@@ -1873,14 +1873,18 @@ MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
 };
 
 // report a transient upload error
-function onUploadError(ul, errorstr, reason, xhr) {
+function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
     'use strict';
+
+    if (!ul || !ul.id) {
+        return;
+    }
 
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
-    mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, false);
+    mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, isOverQuota);
 
     ul._gotTransferError = true;
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');

@@ -183,7 +183,7 @@ mega.tpw = new function TransferProgressWidget() {
             }
             else {
                 $overQuotaBanner.find('.head-title').text(l[5932]);
-                $overQuotaBanner.find('.content-txt').text(l[7014].replace('[A]', '<b>').replace('[/A]', '[/b]'));
+                $overQuotaBanner.find('.content-txt').safeHTML(l[7014].replace('[A]', '<b>').replace('[/A]', '</b> '));
 
                 var perc = Math.round(acc.space_used * 100 / acc.space);
 

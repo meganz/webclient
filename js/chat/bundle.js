@@ -10255,22 +10255,17 @@ React.makeElement = React['createElement'];
 	        this.onHighlighted([]);
 	    },
 	    resizeBreadcrumbs: function resizeBreadcrumbs() {
-	        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-	        var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
+	        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
+	        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
 
 	        setTimeout(function () {
-	            var wrapperWidth = $breadcrumbsWrapper.outerWidth();
+	            var breadcrumbsWidth = $breadcrumbs.outerWidth();
 	            var $el = $breadcrumbs.find('.right-arrow-bg');
 	            var i = 0;
 	            var j = 0;
 	            $el.removeClass('short-foldername ultra-short-foldername invisible');
 
-	            $breadcrumbsWrapper.removeClass('long-path overflowed-path');
-	            if ($breadcrumbs.outerWidth() > wrapperWidth) {
-	                $breadcrumbsWrapper.addClass('long-path');
-	            }
-
-	            while ($breadcrumbs.outerWidth() > wrapperWidth) {
+	            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
 	                if (i < $el.length - 1) {
 	                    $($el[i]).addClass('short-foldername');
 	                    i++;
@@ -10281,7 +10276,6 @@ React.makeElement = React['createElement'];
 	                    $($el[j]).addClass('short-foldername');
 	                } else {
 	                    $($el[j]).addClass('ultra-short-foldername');
-	                    $breadcrumbsWrapper.addClass('overflowed-path');
 	                    break;
 	                }
 	            }
@@ -10428,8 +10422,6 @@ React.makeElement = React['createElement'];
 	                breadcrumbClasses += " shared-with-me";
 	            }
 
-	            var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name;
-
 	            (function (breadcrumbNodeId) {
 	                breadcrumb.unshift(React.makeElement(
 	                    "a",
@@ -10448,11 +10440,11 @@ React.makeElement = React['createElement'];
 	                        } },
 	                    React.makeElement(
 	                        "span",
-	                        { className: "right-arrow-bg", title: folderName },
+	                        { className: "right-arrow-bg" },
 	                        React.makeElement(
 	                            "span",
 	                            null,
-	                            folderName
+	                            breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
 	                        )
 	                    )
 	                ));
@@ -10615,10 +10607,10 @@ React.makeElement = React['createElement'];
 	                ),
 	                React.makeElement(
 	                    "div",
-	                    { className: "fm-breadcrumbs-wrapper add-from-cloud" },
+	                    { className: "fm-breadcrumbs-block add-from-cloud" },
 	                    React.makeElement(
 	                        "div",
-	                        { className: "fm-breadcrumbs-block" },
+	                        { className: "breadcrumbs-wrapper" },
 	                        breadcrumb,
 	                        React.makeElement("div", { className: "clear" })
 	                    )

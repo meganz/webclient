@@ -44,7 +44,7 @@
             // 1- must be 1 item
             // 2- must be to 1 target.
             // --> no need to consider in all logical space of file/folder conflicts
-            if (M.d[target] && M.d[target].name === 'My chat files') {
+            if (M.d[target] && M.d[target].name === M.myChatFilesFolder.name) {
                 defaultAction = ns.KEEPBOTH;
             }
 

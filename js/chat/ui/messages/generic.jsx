@@ -246,9 +246,9 @@ var GenericConversationMessage = React.createClass({
         $.selected = [v.h];
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
-                megaChat.getMyChatFilesFolder()
-                    .then(function(myChatFolderId) {
-                        M.injectNodes(node, myChatFolderId, function(res) {
+                M.myChatFilesFolder.get(true)
+                    .then(function(myChatFolder) {
+                        M.injectNodes(node, myChatFolder.h, function(res) {
                             if (Array.isArray(res) && res.length) {
                                 megaChat.openChatAndAttachNodes(target, res).dump();
                             }

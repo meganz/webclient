@@ -2543,7 +2543,7 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.cMapUrl = \'../web/cmaps/\';',
-        'PDFJS.cMapUrl = \'' + staticpath + '/cmaps/\';');
+        'PDFJS.cMapUrl = \'' + staticpath + 'cmaps/\';');
 
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('PDFJS.cMapPacked = true;',

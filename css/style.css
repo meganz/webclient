@@ -5662,7 +5662,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     height: 24px;
     line-height: 24px;
     font-size: 13px;
-    padding: 0 10px 0 12px;
+    padding: 0 13px 0 5px;
     color: #707070;
     font-weight: normal;
     text-align: left;
@@ -5764,11 +5764,12 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .fm-right-files-block th::after, .account.tab-content th::after, .transfer-table-wrapper th::after, .grid-table-header th::after {
     content: '';
     position: absolute;
-    right: 0;
+    right: 7px;
     bottom: 1px;
     height: 20px;
     width: 1px;
     background-color: rgba(0,0,0,0.1);
+    cursor:col-resize;
 }
 th.grid-first-th {
     width: 50px;
@@ -6350,7 +6351,7 @@ th.grid-first-th {
 }
 .transfer-table td, .grid-table td, .grid-share-table td, .contacts-grid-table td {
     color: #333;
-    padding-left: 12px;
+    padding-left: 5px;
     height: 24px;
     line-height: 24px;
     vertical-align: top;
@@ -15170,7 +15171,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: right bottom;
     background-image: url(../images/mega/fm-main-sprite_v11.png);
     background-repeat: no-repeat;
-    padding: 0 8px 0 0;
     display: block;
     float: left;
     width: 100%;
@@ -30422,28 +30422,29 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .grid-table .ver-col-container .ver-nb {
     height: 18px;
-    width: 7px;
     color: #666666;
-    font-family: "Source Sans Pro";
     font-size: 13px;
     font-weight: 600;
-    float: left;
+    display: inline-block;
+}
+.grid-table .ver-col-container .ver-icon.versioning {
+    display: inline-block;
 }
 .grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
-    left: 23px;
+    position: relative;
+    display: inline-block;
 }
 .grid-table .ver-col-container .ver-size {
-    margin-left: 30px;
+    margin-left: 8px;
     height: 16px;
     border-radius: 8px;
     background-color: #666666;
-    float: left;
     margin-top: 4px;
+    display: inline-block;
 }
 .grid-table .ver-col-container .ver-size .ver-size-nb {
     height: 15px;
     color: #FFFFFF;
-    font-family: "Source Sans Pro";
     font-size: 12px;
     line-height: 15px;
     text-align: center;
@@ -30452,7 +30453,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .grid-table-header .grid-view-resize {
     cursor: col-resize;
-    width: 5px;
+    width: 16px;
     position: absolute;
     right: 0;
 }

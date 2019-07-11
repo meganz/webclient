@@ -2253,6 +2253,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 .uwp .business-info-block {
     max-width: 400px;
+    display: inline-block;
 }
 .uwp .advertise-chat img:first-of-type {
     width: auto;

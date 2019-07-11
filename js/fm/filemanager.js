@@ -10,12 +10,12 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
-    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: false };
     this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.versions = { min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.versions = { min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
 
 }
@@ -2981,6 +2981,11 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.label.viewed = false;
             M.columnsWidth.cloud.label.disabled = true;
         }
+        else {
+            M.columnsWidth.cloud.versions.disabled = false;
+            M.columnsWidth.cloud.fav.disabled = false;
+            M.columnsWidth.cloud.label.disabled = false;
+        }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
             for (var col in M.columnsWidth.cloud) {
@@ -3171,21 +3176,6 @@ FileManager.prototype.addGridUI = function(refresh) {
             for (var sortBy in M.sortRules) {
                 if (cls.indexOf(sortBy) !== -1) {
 
-                    var $sortMenu = $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item')
-                        .removeClass('selected');
-                    var sortitem = sortBy;
-
-                    if (sortitem === 'ts') {
-                        sortitem = 'timeAd';
-                    }
-                    else if (sortitem === 'mtime') {
-                        sortitem = 'timeMd';
-                    }
-                    else if (sortitem === 'date') {
-                        sortitem = 'sharecreated, .sort-timeAd';
-                    }
-
-                    $sortMenu.filter('.sort-' + sortitem).addClass('selected');
 
                     if (dir !== -1 && sortitem !== sortBy) {
                         if (cls.indexOf('asc') === -1) {

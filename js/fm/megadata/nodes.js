@@ -2273,12 +2273,20 @@ MegaData.prototype.isFavourite = function(nodesId) {
  */
 MegaData.prototype.versioningDomUpdate = function(fh) {
     var $nodeView = $('#' + fh);
+    var $versionsCol = $nodeView.find('td[megatype="versions"]');
 
     if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            var $verHtml = M.megaRender.versionColumnPrepare(M.d[fh].tvf, M.d[fh].tvb || 0);
+            $versionsCol.empty().append($verHtml);
+        }
     }
     else {// Remove versioning
         $nodeView.removeClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            $versionsCol.empty();
+        }
     }
 };
 
@@ -3390,6 +3398,12 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
 
         var a;
         for (var i in this.d[h].shares) {
+
+            // If there is only public link in shares, and deletion is not target public link.
+            if (i === 'EXP' && Object.keys(this.d[h].shares).length === 1 && u !== 'EXP') {
+                updnode = true;
+            }
+
             if (this.d[h].shares[i]) {
                 a = true;
                 break;
@@ -3650,6 +3664,12 @@ MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
 
         if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
             this.delPS(pendingContactId, nodeHandle);
+
+            if (this.ps[nodeHandle] === undefined &&
+                (this.d[nodeHandle].shares === undefined ||
+                ('EXP' in this.d[nodeHandle].shares && Object.keys(this.d[nodeHandle].shares).length === 1))) {
+                this.nodeUpdated(M.d[nodeHandle]);
+            }
         }
     }
 };

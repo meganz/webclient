@@ -210,7 +210,7 @@
                 var prefixPath = '';
                 var treeid = currentdirid;
                 var nodeid = currentdirid;
-                
+
                 if (this.currentCustomView) {
                     treeid = this.currentCustomView.prefixTree + this.currentCustomView.nodeID;
                     nodeid = this.currentCustomView.nodeID;
@@ -422,11 +422,8 @@
             id = 'public-links';
         }
         else if (id === 'chat') {
-            if (!megaChatIsReady) {
-                id = this.RootID;
-            }
-            else {
-                this.chat = true;
+            this.chat = true;
+            if (megaChatIsReady) {
                 megaChat.displayArchivedChats = false;
                 megaChat.refreshConversations();
                 M.addTreeUI();
@@ -434,13 +431,24 @@
 
                 if (room) {
                     newHashLocation = room.getRoomUrl();
-                }
-                else {
+                } else {
                     if (megaChat.$conversationsAppInstance) {
                         megaChat.$conversationsAppInstance.safeForceUpdate();
                     }
                 }
             }
+            else {
+                this.renderChatIsLoading();
+                mBroadcaster.addListener('chat_initialized', function() {
+                    if (M.currentdirid === 'chat') {
+                        setTimeout(function () {
+                            loadSubPage('fm/chat');
+                            M.openFolder('chat');
+                        }, 100);
+                    }
+                });
+            }
+
         }
         else if (id && id.substr(0, 7) === 'account') {
             M.onFileManagerReady(accountUI);

@@ -289,14 +289,14 @@ var strongvelope = {};
      *     Symmetric encryption key in a binary string.
      * @param nonce {String}
      *     Nonce to decrypt a message with in a binary string.
-     * @returns {String}
-     *     Clear text of message content, `null` if no cipher text is given.
+     * @returns {String|Boolean}
+     *     Clear text of message content, `false` if no cipher text or key is given.
      * @private
      */
     strongvelope._symmetricDecryptMessage = function(cipher, key, nonce) {
 
-        if ((cipher === null) || (typeof cipher === 'undefined')) {
-            return null;
+        if (!cipher || !key || !nonce) {
+            return false;
         }
 
         var keyBytes = asmCrypto.string_to_bytes(key);
@@ -1754,16 +1754,15 @@ var strongvelope = {};
             }
 
             // Decrypt message payload.
-            var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                senderKey,
-                parsedMessage.nonce);
             try {
-                cleartext = from8(cleartext);
+                var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload, senderKey, parsedMessage.nonce);
+
                 // Bail out if decryption failed.
                 if (cleartext === false) {
                     proxyPromise.reject(false);
                     return false;
                 }
+                cleartext = from8(cleartext);
 
                 var result = {
                     version: parsedMessage.protocolVersion,
@@ -1779,13 +1778,13 @@ var strongvelope = {};
             catch (e) {
                 if (e instanceof URIError) {
                     logger.critical('Could not decrypt message, probably a wrong key/nonce.');
-
                     proxyPromise.reject(e);
-                    return false;
                 }
                 else {
+                    onIdle(function() {
+                        throw e;
+                    });
                     proxyPromise.reject(e);
-                    throw e;
                 }
             }
         });
@@ -1870,17 +1869,20 @@ var strongvelope = {};
                     logger.error('Signature invalid for message from ' + sender);
                 }
 
-                // Decrypt message payload.
-                var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload,
-                    senderKey,
-                    parsedMessage.nonce);
+                try {
+                    // Decrypt message payload.
+                    var cleartext = ns._symmetricDecryptMessage(parsedMessage.payload, senderKey, parsedMessage.nonce);
 
-                // Bail out if decryption failed.
-                if (cleartext === false) {
-                    logger.warn("Decryption failed [1]: ", sender, keyId);
+                    // Bail out if decryption failed.
+                    if (cleartext === false) {
+                        throw new Error('Invalid parameters passed to symmetricDecryptMessage');
+                    }
+                    proxyPromise.resolve(cleartext);
+                }
+                catch (ex) {
+                    logger.warn("Decryption failed [1]: ", sender, keyId, ex);
                     proxyPromise.reject(false);
                 }
-                proxyPromise.resolve(cleartext);
             });
             return proxyPromise;
         }

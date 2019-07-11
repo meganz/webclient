@@ -627,6 +627,14 @@ var ConversationsList = React.createClass({
             if (!chatRoom.isDisplayable()) {
                 return;
             }
+            if (self.props.quickSearchText) {
+                var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
+                var s2 = String(self.props.quickSearchText).toLowerCase();
+                if (s1.indexOf(s2) === -1) {
+                    return;
+                }
+            }
+
             // Checking if this a business user with expired status
             if (u_attr && u_attr.b && u_attr.b.s === -1) {
                 chatRoom.privateReadOnlyChat = true;
@@ -883,7 +891,8 @@ var ConversationsApp = React.createClass({
     getInitialState: function() {
         return {
             'leftPaneWidth': mega.config.get('leftPaneWidth'),
-            'startGroupChatDialogShown': false
+            'startGroupChatDialogShown': false,
+            'quickSearchText': ''
         };
     },
     startChatClicked: function(selected) {
@@ -1045,6 +1054,12 @@ var ConversationsApp = React.createClass({
         }
         this.handleWindowResize();
 
+        $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function(e) {
+            self.setState({'quickSearchText': ''});
+            treesearch = false;
+        });
+
+        M.treeSearchUI();
     },
     componentWillUnmount: function() {
         window.removeEventListener('resize', this.handleWindowResize);
@@ -1231,7 +1246,22 @@ var ConversationsApp = React.createClass({
 
                     <div className="fm-left-menu conversations">
                         <div className="nw-fm-tree-header conversations">
-                            <span>{__(l[7997])}</span>
+                            <input type="text" className="chat-quick-search"
+                                   onChange={function(e) {
+                                       if (e.target.value) {
+                                           treesearch = e.target.value;
+                                       }
+                                        self.setState({'quickSearchText': e.target.value});
+                                   }}
+                                   onBlur={function(e) {
+                                       if (e.target.value) {
+                                           treesearch = e.target.value;
+                                       }
+                                        self.setState({'quickSearchText': e.target.value});
+                                   }}
+                                   value={self.state.quickSearchText}
+                                   placeholder={l[7997]} />
+                            <div className="small-icon thin-search-icon"></div>
 
                             <ButtonsUI.Button
                                 group="conversationsListing"
@@ -1257,8 +1287,10 @@ var ConversationsApp = React.createClass({
                                     getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
-                                <ConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat}
-                                                   contacts={this.props.contacts}/>
+                                <ConversationsList chats={this.props.megaChat.chats}
+                                                   megaChat={this.props.megaChat}
+                                                   contacts={this.props.contacts}
+                                                   quickSearchText={this.state.quickSearchText} />
                             </div>
                         </PerfectScrollbar>
                         <div className="left-pane-button new-link" onClick={function(e) {

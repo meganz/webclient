@@ -2770,6 +2770,13 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom.isDisplayable()) {
 	                return;
 	            }
+	            if (self.props.quickSearchText) {
+	                var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
+	                var s2 = String(self.props.quickSearchText).toLowerCase();
+	                if (s1.indexOf(s2) === -1) {
+	                    return;
+	                }
+	            }
 
 	            if (u_attr && u_attr.b && u_attr.b.s === -1) {
 	                chatRoom.privateReadOnlyChat = true;
@@ -3054,7 +3061,8 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {
 	            'leftPaneWidth': mega.config.get('leftPaneWidth'),
-	            'startGroupChatDialogShown': false
+	            'startGroupChatDialogShown': false,
+	            'quickSearchText': ''
 	        };
 	    },
 	    startChatClicked: function startChatClicked(selected) {
@@ -3183,6 +3191,13 @@ React.makeElement = React['createElement'];
 	            $('.conversationsApp .fm-left-panel').removeClass('hidden');
 	        }
 	        this.handleWindowResize();
+
+	        $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function (e) {
+	            self.setState({ 'quickSearchText': '' });
+	            treesearch = false;
+	        });
+
+	        M.treeSearchUI();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        window.removeEventListener('resize', this.handleWindowResize);
@@ -3366,11 +3381,22 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "nw-fm-tree-header conversations" },
-	                        React.makeElement(
-	                            "span",
-	                            null,
-	                            __(l[7997])
-	                        ),
+	                        React.makeElement("input", { type: "text", className: "chat-quick-search",
+	                            onChange: function onChange(e) {
+	                                if (e.target.value) {
+	                                    treesearch = e.target.value;
+	                                }
+	                                self.setState({ 'quickSearchText': e.target.value });
+	                            },
+	                            onBlur: function onBlur(e) {
+	                                if (e.target.value) {
+	                                    treesearch = e.target.value;
+	                                }
+	                                self.setState({ 'quickSearchText': e.target.value });
+	                            },
+	                            value: self.state.quickSearchText,
+	                            placeholder: l[7997] }),
+	                        React.makeElement("div", { className: "small-icon thin-search-icon" }),
 	                        React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
@@ -3398,8 +3424,10 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "div",
 	                            { className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "") },
-	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat,
-	                                contacts: this.props.contacts })
+	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats,
+	                                megaChat: this.props.megaChat,
+	                                contacts: this.props.contacts,
+	                                quickSearchText: this.state.quickSearchText })
 	                        )
 	                    ),
 	                    React.makeElement(

@@ -456,7 +456,7 @@ MegaData.prototype.initTreePanelSorting = function() {
     var dialogs = ['Copy', 'Move', 'SelectFolder'];
     var byDefault;
     var type;
-    
+
     $.sortTreePanel = Object.create(null);
 
     var setSortTreePanel = function _setSortTreePanel(dialog) {
@@ -527,7 +527,7 @@ MegaData.prototype.treeSearchUI = function() {
             treesearch = false;
             M.redrawTree();
             $self.prev().val('');
-            $self.parent().find('input').trigger("blur");
+            $self.parent().find('input').trigger("blur").trigger('cleared');
         });
 
         $('.nw-fm-tree-header input')

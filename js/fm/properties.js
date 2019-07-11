@@ -331,6 +331,10 @@
 
         $('.properties-txt-pad').html(html);
 
+        if ($dialog.hasClass('shared-with-me')) {
+            $('.properties-txt-pad').find('.contact-list-icon').remove();
+        }
+
         $('.properties-body', $dialog).rebind('click', function() {
 
             // Clicking anywhere in the dialog will close the context-menu, if open
@@ -407,7 +411,7 @@
 
             $('.properties-dialog').rebind('click', function() {
                 var $list = $('.contact-list-icon');
-                if ($list.attr('class').indexOf('active') !== -1) {
+                if ($list.hasClass('active')) {
                     $list.removeClass('active');
                     $('.properties-context-menu').fadeOut(200);
                 }

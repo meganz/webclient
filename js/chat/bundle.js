@@ -1880,31 +1880,6 @@ React.makeElement = React['createElement'];
 	    return found ? found : false;
 	};
 
-	Chat.prototype.getMyChatFilesFolder = function () {
-	    var promise = new MegaPromise();
-
-	    var folderName = "My chat files";
-	    var paths = [folderName];
-	    var safePath = M.getSafePath(paths);
-
-	    if (safePath.length === 1) {
-	        safePath = safePath[0];
-	    }
-
-	    var target = M.RootID;
-
-	    M.createFolder(target, safePath, new MegaPromise()).always(function (_target) {
-	        if (typeof _target === 'number') {
-	            ulmanager.logger.warn('Unable to create folder "%s" on target "%s"', path, target, api_strerror(_target));
-	            promise.reject();
-	        } else {
-	            promise.resolve(_target);
-	        }
-	    });
-
-	    return promise;
-	};
-
 	Chat.prototype.haveAnyIncomingOrOutgoingCall = function (chatIdBin) {
 	    if (chatIdBin) {
 	        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
@@ -13061,8 +13036,8 @@ React.makeElement = React['createElement'];
 	        $.selected = [v.h];
 	        openSaveToDialog(v, function (node, target) {
 	            if (Array.isArray(target)) {
-	                megaChat.getMyChatFilesFolder().then(function (myChatFolderId) {
-	                    M.injectNodes(node, myChatFolderId, function (res) {
+	                M.myChatFilesFolder.get(true).then(function (myChatFolder) {
+	                    M.injectNodes(node, myChatFolder.h, function (res) {
 	                        if (Array.isArray(res) && res.length) {
 	                            megaChat.openChatAndAttachNodes(target, res).dump();
 	                        } else if (d) {
@@ -18927,8 +18902,8 @@ React.makeElement = React['createElement'];
 
 	        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
 
-	            self.megaChat.getMyChatFilesFolder().then(function (myChatFilesFolderHandle) {
-	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).then(function (copyNodesResponse) {
+	            M.myChatFilesFolder.get(true).then(function (myChatFilesFolder) {
+	                M.copyNodes([nodeId], myChatFilesFolder.h, false, new MegaPromise()).then(function (copyNodesResponse) {
 	                    if (copyNodesResponse && copyNodesResponse[0]) {
 	                        proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
 	                    } else {

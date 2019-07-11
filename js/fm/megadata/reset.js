@@ -25,6 +25,7 @@ MegaData.prototype.reset = function() {
 
     this.nn = false;
     this.sn = false;
+    this.cf = false;
     this.filter = false;
     this.sortfn = false;
     this.sortd = false;

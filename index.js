@@ -1,3 +1,8 @@
+/**
+ * global MegaData instance
+ * @name M
+ */
+var M = null;
 var dlid = false;
 var dlkey = false;
 var cn_url = false;

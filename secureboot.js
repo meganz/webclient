@@ -3563,6 +3563,7 @@ else if (!browserUpdate) {
     }
 }
 
+/* jshint -W098 */
 /**
  * Determines whether to show an ad or not
  * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
@@ -3681,6 +3682,32 @@ function inherits(target, source) {
         value: target,
         enumerable: false
     });
+}
+
+function lazy(target, property, stub) {
+    'use strict';
+    Object.defineProperty(target, property, {
+        get: function() {
+            Object.defineProperty(target, property, {
+                value: stub(),
+                enumerable: true
+            });
+            return target[property];
+        },
+        configurable: true
+    });
+    return target;
+}
+
+function promisify(fc) {
+    'use strict';
+    return function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            fc.apply(self, [resolve, reject].concat(args));
+        });
+    };
 }
 
 mBroadcaster.once('startMega', function() {

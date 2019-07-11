@@ -1829,11 +1829,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @returns {MegaPromise}
          * @memberOf dbfetch
          */
-        node: function fetchnode(handles) {
+        node: promisify(function fetchnode(resolve, reject, handles) {
             "use strict";
-
-            var promise = new MegaPromise();
-            var inflight = Object.create(null);
             var result = [];
 
             for (var i = handles.length; i--;) {
@@ -1841,26 +1838,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     result.push(M.d[handles[i]]);
                     handles.splice(i, 1);
                 }
-                /*else if (node_inflight[handles[i]]) {
-                    inflight[handles[i]] = node_inflight[handles[i]];
-                    handles.splice(i, 1);
-                }
-                else {
-                    node_inflight[handles[i]] = promise;
-                }*/
             }
-            // console.warn('fetchnode', arguments, handles, inflight);
 
-            var masterPromise = promise;
-            /*if ($.len(inflight)) {
-             masterPromise = MegaPromise.allDone(array.unique(obj_values(inflight)).concat(promise));
-            }
-             else*/
             if (!handles.length || !fmdb) {
                 if (d && handles.length) {
                     console.warn('Unknown nodes: ' + handles);
                 }
-                return MegaPromise.resolve(result);
+                return resolve(result);
             }
 
             fmdb.getbykey('f', 'h', ['h', handles.concat()])
@@ -1873,11 +1857,9 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         delete node_inflight[handles[i]];
                     }
 
-                    promise.resolve(result.concat(r));
+                    resolve(result.concat(r));
                 });
-
-            return masterPromise;
-        },
+        }),
 
         /**
          * Retrieve a node by its hash.

@@ -1309,11 +1309,11 @@ ChatRoom.prototype.attachNodes = function(ids) {
         if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
             // I'm not the owner of this file.
             // can be a d&d to a chat or Send to contact from a share
-            self.megaChat.getMyChatFilesFolder()
-                .then(function(myChatFilesFolderHandle) {
+            M.myChatFilesFolder.get(true)
+                .then(function(myChatFilesFolder) {
                     M.copyNodes(
                             [nodeId],
-                            myChatFilesFolderHandle,
+                            myChatFilesFolder.h,
                             false,
                             new MegaPromise()
                         )

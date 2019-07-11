@@ -1682,6 +1682,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             this.nn[n.h] = n.name;
         }
 
+        // update My chat files folder
+        if (this.cf.h === n.h) {
+            this.cf = n.p === M.RubbishID ? false : n;
+        }
+
         // sync missingkeys with this node's key status
         if (crypto_keyok(n)) {
             // mark as fixed if necessary
@@ -3964,3 +3969,15 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
         });
     }
 };
+
+/**
+ * Utility functions to handle 'My chat files' folder.
+ * @name myChatFilesFolder
+ * @memberOf MegaData
+ * @type {Object}
+ */
+lazy(MegaData.prototype, 'myChatFilesFolder', function() {
+    'use strict';
+    return mega.attr.getFolderFactory("cf", false, true, 'h',
+        [l[-'TODO'], 'My chat files'], base64urlencode, base64urldecode);
+});

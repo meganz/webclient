@@ -1515,7 +1515,8 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         self.logger.warn("Destroying call immediately due to kAppTerminating");
         destroyCall();
         self._destroyPromise = Promise.resolve();
-    } else if (code === Term.kErrNetSignalling && self.predestroyState !== CallState.kRingIn) {
+    } else if (code === Term.kErrNetSignalling && ((self.predestroyState === CallState.kCallInProgress)
+            || (self.predestroyState === CallState.kJoining))) {
         self.logger.warn("Destroying call immediately due to kErrNetSignalling and setting up a recovery attempt");
         // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
         self.manager._setupCallRecovery(self);
@@ -1548,7 +1549,7 @@ RtcModule.prototype._setupCallRecovery = function(call) {
         callid: callid,
         av: call.localAv(),
         callHandler: call.handler,
-        timer: setTimeout(function() {
+        timeoutTimer: setTimeout(function() {
             var recovery = self.callRecoveries[chatid];
             if (!recovery) {
                 return;
@@ -1575,7 +1576,7 @@ RtcModule.prototype.clearCallRecovery = function(chatid) {
     if (!recovery) {
         return;
     }
-    clearTimeout(recovery.timer);
+    clearTimeout(recovery.timeoutTimer);
     delete this.callRecoveries[chatid];
 };
 

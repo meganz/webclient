@@ -3883,6 +3883,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
     var _import = function(data) {
         M.onFileManagerReady(function() {
+            loadingDialog.hide('import');
             openCopyDialog(function() {
                 $.mcImport = true;
                 $.selected = data[0];
@@ -3897,7 +3898,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     };
 
     if (localStorage.folderLinkImport && !folderlink) {
-
+        loadingDialog.show('import');
         if ($.onImportCopyNodes) {
             _import($.onImportCopyNodes);
         }

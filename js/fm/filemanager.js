@@ -948,7 +948,6 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
         window.fmShortcuts = new FMShortcuts();
     }
 
-
     if (!aUpdate) {
         if (window.selectionManager) {
             window.selectionManager.destroy();

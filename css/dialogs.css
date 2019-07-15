@@ -337,29 +337,22 @@ body.de .fm-dialog.new-group-chat {
 .fm-dialog.add-from-cloud .tooltip-handler {
     z-index: 10;
 }
-
+.fm-dialog .fm-breadcrumbs-wrapper {
+    max-width: -webkit-calc(100% - 152px);
+    max-width: -moz-calc(100% - 152px);
+    max-width: calc(100% - 152px);
+    -webkit-transition: max-width 200ms ease-in-out;
+    transition: max-width 200ms ease-in-out;
+}
+.fm-dialog .active-search + .fm-breadcrumbs-wrapper {
+    max-width: -webkit-calc(100% - 302px);
+    max-width: -moz-calc(100% - 302px);
+    max-width: calc(100% - 302px);
+}
 .fm-dialog .fm-breadcrumbs-block {
-    float: none;
     height: 46px;
     margin: 0 0 0 0;
     padding: 12px 0 0 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    width: -webkit-calc(100% - 156x);
-    width: -moz-calc(100% - 156px);
-    width: calc(100% - 156px);
-}
-.fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
-    width: -webkit-calc(100% - 320x);
-    width: -moz-calc(100% - 320px);
-    width: calc(100% - 320px);
-}
-.fm-dialog .breadcrumbs-wrapper {
-    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -1289,7 +1282,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     padding-left: 96px;
 }
 .achieved-block.invitees .new-dialog-icon {
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-repeat: no-repeat;
     background-position: -22px -12279px;
     background-size: 48px auto;
@@ -1406,7 +1399,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     height: 112px;
 }
 .achievements-cell .medium-icon.remind-icon {
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-repeat: no-repeat;
     background-position: -22px -12374px;
     background-size: 48px auto;
@@ -1929,12 +1922,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -2004,7 +1997,7 @@ li.token-input-token-invite .input-close {
     margin-top: 12px;
 }
 .create-folder-size-icon, .add-user-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -2060,7 +2053,7 @@ li.token-input-token-invite .input-close {
     position: absolute;
     width: 19px;
     height: 18px;
-    background-image: url(../images/mega/fm-main-sprite_v11.png);
+    background-image: url(../images/mega/fm-main-sprite_v12.png);
     background-repeat: no-repeat;
     background-position: -14px -10610px;
     right: 6px;

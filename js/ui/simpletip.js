@@ -54,6 +54,10 @@
             $currentNode = null;
         }
 
+        if ($this.is('.deactivated') || $this.parent().is('.deactivated')) {
+            return false;
+        }
+
         var contents = $(this).attr('data-simpletip');
         if (contents) {
             var $node = $template.clone();
@@ -88,7 +92,7 @@
                         this.classList.remove(
                             "simpletip-v-t", "simpletip-v-b", "simpletip-h-l", "simpletip-h-r"
                         );
-                        this.classList.add("simpletip-h-" + horizClass, "simpletip-v-" + vertClass);
+                        this.classList.add("simpletip-h-" + horizClass, "simpletip-v-" + vertClass, "visible");
 
                         var topOffset = 0;
                         if (vertClass === "t") {

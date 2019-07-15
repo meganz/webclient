@@ -39,7 +39,6 @@
             <i class="small-icon"></i>[$17150]</a>
         <a class="dropdown-item visible-col-select" megatype="label">
             <i class="small-icon"></i>[$17398]</a>
-        
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item play-item"><i class="small-icon context videocam"></i><span>[$16275]</span></a>
@@ -833,35 +832,6 @@
 
             <div class="fm-right-header fm hidden">
 
-                <a class="fm-back-button"></a>
-                <div class="fm-breadcrumbs-block">
-                    <a class="fm-breadcrumbs contacts contains-directories has-next-button hidden">
-                        <span class="right-arrow-bg">
-                            <span>[$165]</span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs public-links hidden">
-                        <span class="right-arrow-bg ui-draggable">
-                            <span>
-                                <i class="small-icon context get-link"></i>
-                                [$16516]
-                                <span class="public-links-cnt">0</span>
-                            </span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs received-requests contains-directories hidden">
-                        <span class="right-arrow-bg ui-draggable">
-                            <span>[$5863]</span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs sent-requests contains-directories hidden">
-                        <span class="left-arrow-bg ui-draggable">
-                            <span>[$5862]</span>
-                        </span>
-                    </a>
-                    <div class="clear"></div>
-                </div>
-
                 <div class="fm-header-buttons">
                     <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldnt be clicked !-->
                     <a class="fm-files-view-icon block-view" title="[$5552]"></a>
@@ -979,8 +949,10 @@
                         <i class="small-icon icons-sprite small-cross"></i>
                     </div>
                 </div>
-
-                <div class="clear"></div>
+                
+                <div class="fm-breadcrumbs-wrapper">
+                    <div class="fm-breadcrumbs-block"></div>
+                </div>
 
             </div>
 
@@ -1218,61 +1190,31 @@
                         </tr>
                     </table>
                 </div>
-                    <div class="grid-scrolling-table megaListContainer">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">
-                            <tr class="clone-of-header">
-                                <th class="grid-first-th">
-                                    <span class="grid-header-star fav"></span>
-                                </th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th class="grid-sixth-th grid-url-header">URL</th>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="search-bottom-menu">
-                        <div class="search-path-icon cloud-drive"></div>
-                        <div class="search-path-txt">
-                            [$164]
-                        </div>
-                        <div class="search-path-arrow"></div>
-                        <div class="search-path-icon folder"></div>
-                        <div class="search-path-txt">
-                            [$1049]
-                        </div>
-                        <div class="search-path-arrow"></div>
-                        <div class="search-path-icon text">
-                        </div>
-                        <div class="search-path-txt">
-                            [$164]
-                        </div>
-                        <div class="clear"></div>
-                    </div>
+                <div class="grid-scrolling-table megaListContainer">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">
+                        <tr class="clone-of-header">
+                            <th class="grid-first-th">
+                                <span class="grid-header-star fav"></span>
+                            </th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class="grid-sixth-th grid-url-header">URL</th>
+                        </tr>
+                    </table>
                 </div>
+                <div class="search-bottom-wrapper">
+                    <div class="search-bottom-menu"></div>
+                </div>
+            </div>
 
 
             <div class="fm-blocks-view fm hidden">
                 <div class="file-block-scrolling"></div>
                 <div class="blocks-view-data"></div>
-                <div class="search-bottom-menu">
-                    <div class="search-path-icon cloud-drive"></div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon folder"></div>
-                    <div class="search-path-txt">
-                        [$1049]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon text">
-                    </div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="clear"></div>
+                <div class="search-bottom-wrapper">
+                    <div class="search-bottom-menu"></div>
                 </div>
             </div>
 

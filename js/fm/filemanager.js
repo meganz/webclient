@@ -527,6 +527,14 @@ FileManager.prototype.initFileManagerUI = function() {
                 M.columnsWidth.cloud[colType].curr = thElm.outerWidth();
                 $(".grid-table td[megatype='" + colType + "']").
                     outerWidth(M.columnsWidth.cloud[colType].curr);
+                if (M.megaRender && M.megaRender.megaList) {
+                    if (!M.megaRender.megaList._scrollIsInitialized) {
+                        M.megaRender.megaList.resized();
+                    }
+                    else {
+                        M.megaRender.megaList.scrollUpdate();
+                    }
+                }
             }
             else {
                 thElm.outerWidth(newWidth);
@@ -537,9 +545,29 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+        thElm && initGridScrolling();
         thElm = undefined;
         $('#fmholder').css('cursor', '');
     });
+
+    $('#fmholder')
+        .off('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll')
+        .on('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
+            if (!e || !e.target) {
+                console.warn('no scroll event info...!');
+                console.warn(e);
+                return;
+            }
+            var $target = $(e.target);
+            if (!$target.hasClass('grid-scrolling-table megaListContainer')) {
+                return;
+            }
+
+
+            var scroller = $('.files-grid-view.fm .grid-table-header');
+            scroller.css('left', -1 * e.target.scrollLeft);
+
+        });
 
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
@@ -3023,7 +3051,14 @@ FileManager.prototype.addGridUI = function(refresh) {
                         $header.show();
                         $('.grid-table.fm td[megatype="' + col + '"]').show();
                     }
-
+                }
+            }
+            if (M.megaRender && M.megaRender.megaList) {
+                if (!M.megaRender.megaList._scrollIsInitialized) {
+                    M.megaRender.megaList.resized();
+                }
+                else {
+                    M.megaRender.megaList.scrollUpdate();
                 }
             }
         }

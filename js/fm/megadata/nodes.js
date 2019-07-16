@@ -743,9 +743,16 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             if (typeof res === 'number' && res < 0) {
                 loadingDialog.phide();
                 if (promise) {
-                    return promise.reject(res);
+                    promise.reject(res);
                 }
-                return M.ulerror(null, res);
+
+                // If target of copy/move is in-shared folder, -17 may means ESHAREROVERQUOTA
+                if (res === EOVERQUOTA && sharer(ctx.t)) {
+                    return M.ulerror(null, ESHAREROVERQUOTA);
+                }
+                else {
+                    return M.ulerror(null, res);
+                }
             }
 
             if (ctx.del) {

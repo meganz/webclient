@@ -366,14 +366,20 @@ RtcModule.prototype.getActiveCall = function() {
 
 RtcModule.prototype._updatePeerAvState = function(parsedCallData, peerIsUs) {
     var chatid = parsedCallData.chatid;
-    var userid = parsedCallData.fromUser;
-    var clientid = parsedCallData.fromClient;
-    var av = parsedCallData.av;
-    var peerid = userid + clientid;
     var roomCallState = this.offCallStates[chatid];
     if (!roomCallState) {
+        if (parsedCallData.av === 0) {
+            return;
+        }
         roomCallState = this.offCallStates[chatid] = { callId: parsedCallData.callid, peerAv: {} };
     }
+
+    var userid = parsedCallData.fromUser;
+    var clientid = parsedCallData.fromClient;
+    // clientid can be undefined only if we were disconnected from the shard, but that case is handled above
+    assert(clientid);
+    var av = parsedCallData.av;
+    var peerid = userid + clientid;
     var peerAvs = roomCallState.peerAv;
     var oldAv = peerAvs[peerid];
     if (av !== oldAv) {
@@ -1480,6 +1486,16 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         }
         self.logger.log(logMsg);
 
+        if (self.gLocalStream) {
+            RTC.stopMediaStream(self.gLocalStream);
+            delete self.gLocalStream;
+            delete self.localMediaPromise;
+        }
+        if (self._audioMutedChecker) {
+            self._audioMutedChecker.stop();
+            delete self._audioMutedChecker;
+        }
+
         // reasonNoPeer can be kBusy even in a group call if we are the callee, and another client of ours
         // is already in a call. In that case, our other client will broadcast a decline with kBusy,
         // and we will see it and abort the incoming call request
@@ -1499,15 +1515,6 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             delete self._peerCallRecoveryWaitTimer;
         }
         self._setState(CallState.kDestroyed);
-        if (self.gLocalStream) {
-            RTC.stopMediaStream(self.gLocalStream);
-            delete self.gLocalStream;
-            delete self.localMediaPromise;
-        }
-        if (self._audioMutedChecker) {
-            self._audioMutedChecker.stop();
-            delete self._audioMutedChecker;
-        }
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, willRecover);
         self.manager._removeCall(self);
     };

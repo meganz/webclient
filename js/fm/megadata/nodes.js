@@ -758,7 +758,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
             nodesCount = importNodes - Object.keys(res).length;
-            if (t.length === 11) {
+            if (ctx.t && ctx.t.length === 11) {
                 getsc(true);
             }
         }

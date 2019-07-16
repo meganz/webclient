@@ -322,7 +322,7 @@ function init_start() {
         'files': ''
     };
     if (is_mobile) {
-        $(window).rebind('scroll.counter', function () {
+        $(window).add('#startholder').rebind('scroll.counter', function () {
             if (page === 'start') {
                 $.lastScrollTime = Date.now();
                 start_counts();

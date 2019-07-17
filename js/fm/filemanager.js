@@ -3265,6 +3265,15 @@ FileManager.prototype.addGridUI = function(refresh) {
             $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
             $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
         }
+
+        if (M.megaRender && M.megaRender.megaList) {
+            if (!M.megaRender.megaList._scrollIsInitialized) {
+                M.megaRender.megaList.resized();
+            }
+            else {
+                M.megaRender.megaList.scrollUpdate();
+            }
+        }
         $.hideContextMenu && $.hideContextMenu();
         return false;
     });

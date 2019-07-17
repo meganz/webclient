@@ -2225,9 +2225,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});    
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-
+    
     if (!is_mobile) {
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
@@ -2654,6 +2655,7 @@ else if (!browserUpdate) {
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
             'cne_js': {f:'js/chat/callNotificationsEngine.js', n: 'cne_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
@@ -3563,6 +3565,7 @@ else if (!browserUpdate) {
     }
 }
 
+/* jshint -W098 */
 /**
  * Determines whether to show an ad or not
  * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
@@ -3681,6 +3684,32 @@ function inherits(target, source) {
         value: target,
         enumerable: false
     });
+}
+
+function lazy(target, property, stub) {
+    'use strict';
+    Object.defineProperty(target, property, {
+        get: function() {
+            Object.defineProperty(target, property, {
+                value: stub(),
+                enumerable: true
+            });
+            return target[property];
+        },
+        configurable: true
+    });
+    return target;
+}
+
+function promisify(fc) {
+    'use strict';
+    return function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            fc.apply(self, [resolve, reject].concat(args));
+        });
+    };
 }
 
 mBroadcaster.once('startMega', function() {

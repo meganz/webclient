@@ -268,7 +268,7 @@ function init_start() {
 
     showAnimated();
 
-    $('#startholder').add(window).bind('scroll.startpage', function() {
+    $('#startholder').add(window).rebind('scroll.startpage', function() {
         if (page === 'start' || page === 'download') {
 
             showAnimated();
@@ -322,7 +322,7 @@ function init_start() {
         'files': ''
     };
     if (is_mobile) {
-        $(window).rebind('scroll.counter', function () {
+        $(window).add('#startholder').rebind('scroll.counter', function () {
             if (page === 'start') {
                 $.lastScrollTime = Date.now();
                 start_counts();

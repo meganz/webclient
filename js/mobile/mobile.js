@@ -582,7 +582,8 @@ var alarm = {
     },
     siteUpdate: {
         init: function() {}
-    }
+    },
+    hideAllWarningPopups: function() {}
 };
 
 /* jshint strict: true */

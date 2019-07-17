@@ -749,7 +749,7 @@ table.arc-chat-messages-block {
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-    background-image: url(../images/mega/new-chat-sprite_v12.png);
+    background-image: url(../images/mega/new-chat-sprite_v15.png);
     background-position: -41px -973px;
 }
 .chat-share-nav.button.next {

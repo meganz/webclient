@@ -1,4 +1,3 @@
-var M = null; // global MegaData instance
 var newnodes = [];
 var currsn;     // current *network* sn (not to be confused with the IndexedDB/memory state)
 var fminitialized = false;
@@ -3295,6 +3294,7 @@ function init_chat() {
             loadingInitDialog.hide();
         }
     }
+
     if (anonymouschat) {
         __init_chat();
     }
@@ -3668,6 +3668,7 @@ function loadfm_done(mDBload) {
                         M.checkStorageQuota(50);
                     }
                 });
+                M.myChatFilesFolder.init();
             }
         }
         else {

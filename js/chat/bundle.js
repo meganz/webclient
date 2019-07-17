@@ -60,7 +60,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(41);
+	var ChatRoom = __webpack_require__(44);
 
 	var EMOJI_DATASET_VERSION = 3;
 
@@ -272,7 +272,8 @@ React.makeElement = React['createElement'];
 	            'persistedTypeArea': PersistedTypeArea,
 	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter,
-	            'richpreviewsFilter': RichpreviewsFilter
+	            'richpreviewsFilter': RichpreviewsFilter,
+	            'geoLocationLinks': GeoLocationLinks
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -1345,6 +1346,7 @@ React.makeElement = React['createElement'];
 	        $('.fm-chat-block').hide();
 	        return false;
 	    }
+	    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
 
 	    if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
 	        $('.section.conversations .fm-right-files-block').append(self.$container);
@@ -1879,31 +1881,6 @@ React.makeElement = React['createElement'];
 	    return found ? found : false;
 	};
 
-	Chat.prototype.getMyChatFilesFolder = function () {
-	    var promise = new MegaPromise();
-
-	    var folderName = "My chat files";
-	    var paths = [folderName];
-	    var safePath = M.getSafePath(paths);
-
-	    if (safePath.length === 1) {
-	        safePath = safePath[0];
-	    }
-
-	    var target = M.RootID;
-
-	    M.createFolder(target, safePath, new MegaPromise()).always(function (_target) {
-	        if (typeof _target === 'number') {
-	            ulmanager.logger.warn('Unable to create folder "%s" on target "%s"', path, target, api_strerror(_target));
-	            promise.reject();
-	        } else {
-	            promise.resolve(_target);
-	        }
-	    });
-
-	    return promise;
-	};
-
 	Chat.prototype.haveAnyIncomingOrOutgoingCall = function (chatIdBin) {
 	    if (chatIdBin) {
 	        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
@@ -2213,7 +2190,7 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(11);
 	var ConversationPanelUI = __webpack_require__(12);
 	var ModalDialogsUI = __webpack_require__(13);
-	var StartGroupChatWizard = __webpack_require__(39).StartGroupChatWizard;
+	var StartGroupChatWizard = __webpack_require__(42).StartGroupChatWizard;
 
 	var renderMessageSummary = function renderMessageSummary(lastMessage) {
 	    var renderableSummary;
@@ -2416,6 +2393,23 @@ React.makeElement = React['createElement'];
 	                classString += " call-exists";
 	            }
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
+	            var voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+	            if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+	                lastMessageDiv = React.makeElement(
+	                    "div",
+	                    { className: lastMsgDivClasses },
+	                    'Voice Message'
+	                );
+	            }
+
+	            if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+	                lastMessageDiv = React.makeElement(
+	                    "div",
+	                    { className: lastMsgDivClasses },
+	                    React.makeElement("span", { className: "geolocation-icon" }),
+	                    l[20789]
+	                );
+	            }
 
 	            var timestamp = lastMessage.delay;
 	            var curTimeMarker;
@@ -2761,6 +2755,13 @@ React.makeElement = React['createElement'];
 	            if (!chatRoom.isDisplayable()) {
 	                return;
 	            }
+	            if (self.props.quickSearchText) {
+	                var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
+	                var s2 = String(self.props.quickSearchText).toLowerCase();
+	                if (s1.indexOf(s2) === -1) {
+	                    return;
+	                }
+	            }
 
 	            if (u_attr && u_attr.b && u_attr.b.s === -1) {
 	                chatRoom.privateReadOnlyChat = true;
@@ -3045,7 +3046,8 @@ React.makeElement = React['createElement'];
 	    getInitialState: function getInitialState() {
 	        return {
 	            'leftPaneWidth': mega.config.get('leftPaneWidth'),
-	            'startGroupChatDialogShown': false
+	            'startGroupChatDialogShown': false,
+	            'quickSearchText': ''
 	        };
 	    },
 	    startChatClicked: function startChatClicked(selected) {
@@ -3174,6 +3176,13 @@ React.makeElement = React['createElement'];
 	            $('.conversationsApp .fm-left-panel').removeClass('hidden');
 	        }
 	        this.handleWindowResize();
+
+	        $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function (e) {
+	            self.setState({ 'quickSearchText': '' });
+	            treesearch = false;
+	        });
+
+	        M.treeSearchUI();
 	    },
 	    componentWillUnmount: function componentWillUnmount() {
 	        window.removeEventListener('resize', this.handleWindowResize);
@@ -3357,11 +3366,22 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "nw-fm-tree-header conversations" },
-	                        React.makeElement(
-	                            "span",
-	                            null,
-	                            __(l[7997])
-	                        ),
+	                        React.makeElement("input", { type: "text", className: "chat-quick-search",
+	                            onChange: function onChange(e) {
+	                                if (e.target.value) {
+	                                    treesearch = e.target.value;
+	                                }
+	                                self.setState({ 'quickSearchText': e.target.value });
+	                            },
+	                            onBlur: function onBlur(e) {
+	                                if (e.target.value) {
+	                                    treesearch = e.target.value;
+	                                }
+	                                self.setState({ 'quickSearchText': e.target.value });
+	                            },
+	                            value: self.state.quickSearchText,
+	                            placeholder: l[7997] }),
+	                        React.makeElement("div", { className: "small-icon thin-search-icon" }),
 	                        React.makeElement(
 	                            ButtonsUI.Button,
 	                            {
@@ -3389,8 +3409,10 @@ React.makeElement = React['createElement'];
 	                        React.makeElement(
 	                            "div",
 	                            { className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "") },
-	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats, megaChat: this.props.megaChat,
-	                                contacts: this.props.contacts })
+	                            React.makeElement(ConversationsList, { chats: this.props.megaChat.chats,
+	                                megaChat: this.props.megaChat,
+	                                contacts: this.props.contacts,
+	                                quickSearchText: this.state.quickSearchText })
 	                        )
 	                    ),
 	                    React.makeElement(
@@ -6557,20 +6579,20 @@ React.makeElement = React['createElement'];
 	var ParticipantsList = __webpack_require__(22).ParticipantsList;
 
 	var GenericConversationMessage = __webpack_require__(23).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(29).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(30).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(31).PrivilegeChange;
-	var TopicChange = __webpack_require__(32).TopicChange;
-	var SharedFilesAccordionPanel = __webpack_require__(33).SharedFilesAccordionPanel;
-	var IncomingSharesAccordionPanel = __webpack_require__(34).IncomingSharesAccordionPanel;
+	var AlterParticipantsConversationMessage = __webpack_require__(32).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(33).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(34).PrivilegeChange;
+	var TopicChange = __webpack_require__(35).TopicChange;
+	var SharedFilesAccordionPanel = __webpack_require__(36).SharedFilesAccordionPanel;
+	var IncomingSharesAccordionPanel = __webpack_require__(37).IncomingSharesAccordionPanel;
 
-	var CloseOpenModeMessage = __webpack_require__(35).CloseOpenModeMessage;
-	var ChatHandleMessage = __webpack_require__(36).ChatHandleMessage;
-	var ChatlinkDialog = __webpack_require__(37).ChatlinkDialog;
+	var CloseOpenModeMessage = __webpack_require__(38).CloseOpenModeMessage;
+	var ChatHandleMessage = __webpack_require__(39).ChatHandleMessage;
+	var ChatlinkDialog = __webpack_require__(40).ChatlinkDialog;
 
 	var ENABLE_GROUP_CALLING_FLAG = true;
 
-	var ConversationAudioVideoPanel = __webpack_require__(38).ConversationAudioVideoPanel;
+	var ConversationAudioVideoPanel = __webpack_require__(41).ConversationAudioVideoPanel;
 
 	var JoinCallNotification = React.createClass({
 	    displayName: "JoinCallNotification",
@@ -7938,6 +7960,16 @@ React.makeElement = React['createElement'];
 	                        }
 	                        var chatdint = room.megaChat.plugins.chatdIntegration;
 	                        if (msg.getState() === Message.STATE.SENT || msg.getState() === Message.STATE.DELIVERED || msg.getState() === Message.STATE.NOT_SENT) {
+	                            var textContents = msg.textContents || '';
+
+	                            if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+	                                var attachmentMetadata = msg.getAttachmentMeta() || [];
+
+	                                attachmentMetadata.forEach(function (v) {
+	                                    M.moveToRubbish(v.h);
+	                                });
+	                            }
+
 	                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
 	                            msg.deleted = true;
 	                            msg.textContents = "";
@@ -7969,10 +8001,11 @@ React.makeElement = React['createElement'];
 	                        __(l[8879])
 	                    ),
 	                    React.makeElement(GenericConversationMessage, {
-	                        className: "dialog-wrapper",
+	                        className: " dialog-wrapper",
 	                        message: self.state.messageToBeDeleted,
 	                        hideActionButtons: true,
-	                        initTextScrolling: true
+	                        initTextScrolling: true,
+	                        dialog: true
 	                    })
 	                )
 	            );
@@ -12779,15 +12812,26 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	var _AudioContainer = __webpack_require__(24);
+
+	var _AudioContainer2 = _interopRequireDefault(_AudioContainer);
+
+	var _geoLocation = __webpack_require__(26);
+
+	var _geoLocation2 = _interopRequireDefault(_geoLocation);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
-	var MetaRichpreview = __webpack_require__(25).MetaRichpreview;
-	var MetaRichpreviewConfirmation = __webpack_require__(27).MetaRichpreviewConfirmation;
-	var MetaRichpreviewMegaLinks = __webpack_require__(28).MetaRichpreviewMegaLinks;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var MetaRichpreview = __webpack_require__(28).MetaRichpreview;
+	var MetaRichpreviewConfirmation = __webpack_require__(30).MetaRichpreviewConfirmation;
+	var MetaRichpreviewMegaLinks = __webpack_require__(31).MetaRichpreviewMegaLinks;
 	var ContactsUI = __webpack_require__(11);
 	var TypingAreaUI = __webpack_require__(17);
+
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
@@ -12998,8 +13042,8 @@ React.makeElement = React['createElement'];
 	        $.selected = [v.h];
 	        openSaveToDialog(v, function (node, target) {
 	            if (Array.isArray(target)) {
-	                megaChat.getMyChatFilesFolder().then(function (myChatFolderId) {
-	                    M.injectNodes(node, myChatFolderId, function (res) {
+	                M.myChatFilesFolder.get(true).then(function (myChatFolder) {
+	                    M.injectNodes(node, myChatFolder.h, function (res) {
 	                        if (Array.isArray(res) && res.length) {
 	                            megaChat.openChatAndAttachNodes(target, res).dump();
 	                        } else if (d) {
@@ -13672,11 +13716,99 @@ React.makeElement = React['createElement'];
 	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
 
 	                    return null;
+	                } else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+	                    var _avatar = null;
+	                    var _messageActionButtons = null;
+
+	                    if (this.props.grouped) {
+	                        additionalClasses += " grouped";
+	                    } else {
+	                        _avatar = React.makeElement(ContactsUI.Avatar, {
+	                            contact: contact,
+	                            className: 'message avatar-wrapper small-rounded-avatar'
+	                        });
+	                        datetime = React.makeElement(
+	                            'div',
+	                            { className: 'message date-time simpletip',
+	                                'data-simpletip': time2date(timestampInt) },
+	                            timestamp
+	                        );
+	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                    }
+
+	                    var attachmentMetadata = message.getAttachmentMeta() || [];
+	                    var audioContainer = null;
+
+	                    attachmentMetadata.forEach(function (v) {
+	                        audioContainer = React.makeElement(_AudioContainer2.default, {
+	                            h: v.h,
+	                            mime: v.mime,
+	                            playtime: v.playtime,
+	                            audioId: 'vm' + message.messageId
+	                        });
+	                    });
+
+	                    var iAmSender = contact && contact.u === u_handle;
+	                    var stillEditable = unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT;
+	                    var isBeingEdited = self.isBeingEdited() === true;
+	                    var chatIsReadOnly = chatRoom.isReadOnly() === true;
+
+	                    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !self.props.dialog) {
+	                        var deleteButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                            icon: 'red-cross',
+	                            label: __(l[1730]),
+	                            className: 'red',
+	                            onClick: function onClick(e) {
+	                                self.doDelete(e, message);
+	                            }
+	                        });
+
+	                        _messageActionButtons = React.makeElement(
+	                            ButtonsUI.Button,
+	                            {
+	                                className: 'default-white-button tiny-button',
+	                                icon: 'tiny-icon icons-sprite grey-dots' },
+	                            React.makeElement(
+	                                DropdownsUI.Dropdown,
+	                                {
+	                                    className: 'white-context-menu attachments-dropdown',
+	                                    noArrow: true,
+	                                    positionMy: 'left bottom',
+	                                    positionAt: 'right bottom',
+	                                    horizOffset: 4
+	                                },
+	                                deleteButton
+	                            )
+	                        );
+	                    }
+
+	                    return React.makeElement(
+	                        'div',
+	                        { className: message.messageId + " message body" + additionalClasses },
+	                        _avatar,
+	                        React.makeElement(
+	                            'div',
+	                            { className: 'message content-area' },
+	                            name,
+	                            datetime,
+	                            _messageActionButtons,
+	                            React.makeElement(
+	                                'div',
+	                                { className: 'message shared-block' },
+	                                files
+	                            ),
+	                            buttonsBlock,
+	                            spinnerElement,
+	                            audioContainer
+	                        )
+	                    );
 	                } else {
 	                    chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
 	                    return null;
 	                }
 	            } else {
+
+	                var geoLocation = null;
 
 	                if (message.textContents === "" && !message.dialogType) {
 	                    message.deleted = true;
@@ -13743,6 +13875,12 @@ React.makeElement = React['createElement'];
 	                                }));
 	                            }
 	                        }
+	                    } else if (message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+	                        var _message$meta$extra$ = message.meta.extra[0],
+	                            lng = _message$meta$extra$.lng,
+	                            latitude = _message$meta$extra$.la;
+
+	                        geoLocation = React.makeElement(_geoLocation2.default, { latitude: latitude, lng: lng });
 	                    }
 	                    if (message.megaLinks) {
 	                        subMessageComponent.push(React.makeElement(MetaRichpreviewMegaLinks, {
@@ -13865,7 +14003,7 @@ React.makeElement = React['createElement'];
 	                }
 	                if (!message.deleted) {
 	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
-	                        var editButton = message.metaType !== -1 ? React.makeElement(DropdownsUI.DropdownItem, {
+	                        var editButton = message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION ? React.makeElement(DropdownsUI.DropdownItem, {
 	                            icon: 'icons-sprite writing-pencil',
 	                            label: __(l[1342]),
 	                            className: '',
@@ -13905,6 +14043,11 @@ React.makeElement = React['createElement'];
 	                        );
 	                    }
 	                }
+	                var isGeoLocation = message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+
+	                if (isGeoLocation) {
+	                    messageDisplayBlock = null;
+	                }
 
 	                return React.makeElement(
 	                    'div',
@@ -13920,7 +14063,8 @@ React.makeElement = React['createElement'];
 	                        messageDisplayBlock,
 	                        subMessageComponent,
 	                        buttonsBlock,
-	                        spinnerElement
+	                        spinnerElement,
+	                        geoLocation
 	                    )
 	                );
 	            }
@@ -14106,6 +14250,502 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _AudioPlayer = __webpack_require__(25);
+
+	var _AudioPlayer2 = _interopRequireDefault(_AudioPlayer);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var AudioContainer = function (_React$Component) {
+	    _inherits(AudioContainer, _React$Component);
+
+	    function AudioContainer(props) {
+	        _classCallCheck(this, AudioContainer);
+
+	        var _this = _possibleConstructorReturn(this, (AudioContainer.__proto__ || Object.getPrototypeOf(AudioContainer)).call(this, props));
+
+	        _this.state = {
+	            audioBlobUrl: null,
+	            loading: false
+	        };
+
+	        _this.getAudioFile = _this.getAudioFile.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(AudioContainer, [{
+	        key: 'getAudioFile',
+	        value: function getAudioFile() {
+	            var self = this;
+	            var _props = this.props,
+	                mime = _props.mime,
+	                h = _props.h;
+
+	            var blobUrl = null;
+
+	            self.setState({
+	                loading: true
+	            });
+
+	            if (mime === 'audio/mp4') {
+	                blobUrl = new Promise(function (resolve, reject) {
+
+	                    M.gfsfetch(h, 0, -1, null).done(function (data) {
+	                        resolve({
+	                            buffer: data.buffer
+	                        });
+	                    }).fail(function (e) {
+	                        reject(e);
+	                    });
+	                }).then(function (_ref) {
+	                    var buffer = _ref.buffer;
+
+	                    var uint8Array = new Uint8Array(buffer);
+	                    var arrayBuffer = uint8Array.buffer;
+
+	                    self.setState(function (prevState) {
+	                        return {
+	                            audioBlobUrl: mObjectURL([arrayBuffer], 'audio/mp4'),
+	                            loading: false
+	                        };
+	                    });
+	                }).catch(function (e) {
+	                    console.error(e);
+	                });
+	            }
+
+	            return blobUrl;
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var self = this;
+	            var _self$state = self.state,
+	                audioBlobUrl = _self$state.audioBlobUrl,
+	                loading = _self$state.loading;
+	            var _self$props = self.props,
+	                playtime = _self$props.playtime,
+	                mime = _self$props.mime;
+
+
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'audio-container' },
+	                _react2.default.createElement(_AudioPlayer2.default, {
+	                    source: audioBlobUrl ? audioBlobUrl : null,
+	                    audioId: self.props.audioId,
+	                    loading: loading,
+	                    mime: mime,
+	                    getAudioFile: self.getAudioFile,
+	                    playtime: playtime
+	                })
+	            );
+	        }
+	    }]);
+
+	    return AudioContainer;
+	}(_react2.default.Component);
+
+	AudioContainer.propTypes = {
+	    h: _react2.default.PropTypes.string.isRequired,
+	    mime: _react2.default.PropTypes.string.isRequired
+	};
+
+	AudioContainer.defaultProps = {
+	    h: null,
+	    mime: null
+	};
+
+	exports.default = AudioContainer;
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var AudioPlayer = function (_React$Component) {
+	    _inherits(AudioPlayer, _React$Component);
+
+	    function AudioPlayer(props) {
+	        _classCallCheck(this, AudioPlayer);
+
+	        var _this = _possibleConstructorReturn(this, (AudioPlayer.__proto__ || Object.getPrototypeOf(AudioPlayer)).call(this, props));
+
+	        _this.state = {
+	            currentTime: null,
+	            progressWidth: 0,
+	            isBeingPlayed: false,
+	            isPaused: false
+	        };
+
+	        _this.handleOnPlaying = _this.handleOnPlaying.bind(_this);
+	        _this.handleOnTimeUpdate = _this.handleOnTimeUpdate.bind(_this);
+	        _this.handleOnEnded = _this.handleOnEnded.bind(_this);
+	        _this.handleOnPause = _this.handleOnPause.bind(_this);
+	        _this.handleOnMouseDown = _this.handleOnMouseDown.bind(_this);
+	        return _this;
+	    }
+
+	    _createClass(AudioPlayer, [{
+	        key: 'play',
+	        value: function play(e) {
+	            var self = this;
+	            var audio = self.audioEl;
+
+	            if (audio.paused) {
+	                var result = audio.play();
+	                if (result instanceof Promise) {
+	                    result.catch(function (e) {
+	                        console.error(e);
+	                    });
+	                }
+
+	                var audios = document.getElementsByClassName('audio-player__player');
+
+	                Array.prototype.filter.call(audios, function (audioElement) {
+	                    return audioElement.id !== self.props.audioId;
+	                }).forEach(function (audioElement) {
+	                    if (!audioElement.paused) {
+	                        audioElement.pause();
+	                    }
+	                });
+
+	                self.setState({
+	                    isPaused: false
+	                });
+	            } else {
+	                audio.pause();
+	                self.setState({
+	                    isPaused: true
+	                });
+	            }
+	        }
+	    }, {
+	        key: 'handleOnPause',
+	        value: function handleOnPause(e) {
+	            this.setState({
+	                isPaused: true
+	            });
+	        }
+	    }, {
+	        key: 'handleOnPlaying',
+	        value: function handleOnPlaying(e) {
+	            this.setState(function (prevState) {
+	                return {
+	                    isBeingPlayed: true
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnTimeUpdate',
+	        value: function handleOnTimeUpdate(e) {
+	            var _audioEl = this.audioEl,
+	                currentTime = _audioEl.currentTime,
+	                duration = _audioEl.duration;
+
+	            var percent = currentTime / duration * 100;
+
+	            this.setState(function (prevState) {
+	                return {
+	                    currentTime: secondsToTimeShort(currentTime),
+	                    progressWidth: percent
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnEnded',
+	        value: function handleOnEnded(e) {
+	            this.setState(function (prevState) {
+	                return {
+	                    progressWidth: 0,
+	                    isBeingPlayed: false,
+	                    currentTime: 0
+	                };
+	            });
+	        }
+	    }, {
+	        key: 'handleOnMouseDown',
+	        value: function handleOnMouseDown(event) {
+	            event.preventDefault();
+	            var self = this;
+	            var sliderPin = self.sliderPin;
+	            var slider = self.slider;
+	            var shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
+
+	            document.addEventListener('mousemove', onMouseMove);
+	            document.addEventListener('mouseup', onMouseUp);
+
+	            function onMouseMove(event) {
+	                var newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+
+	                if (newLeft < 0) {
+	                    newLeft = 0;
+	                }
+	                var rightEdge = slider.offsetWidth - sliderPin.offsetWidth;
+	                if (newLeft > rightEdge) {
+	                    newLeft = rightEdge;
+	                }
+
+	                sliderPin.style.left = newLeft + 'px';
+
+	                var pinPosition = newLeft / slider.getBoundingClientRect().width;
+
+	                var newTime = Math.ceil(self.props.playtime * pinPosition);
+	                var newCurrentTime = secondsToTimeShort(newTime);
+	                self.audioEl.currentTime = newTime;
+
+	                self.setState(function (prevState) {
+	                    return {
+	                        currentTime: newCurrentTime,
+	                        progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
+	                    };
+	                });
+	            }
+
+	            function onMouseUp() {
+	                document.removeEventListener('mouseup', onMouseUp);
+	                document.removeEventListener('mousemove', onMouseMove);
+	            }
+
+	            sliderPin.ondragstart = function () {
+	                return false;
+	            };
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this,
+	                _React$createElement;
+
+	            var self = this;
+	            var _self$props = self.props,
+	                source = _self$props.source,
+	                audioId = _self$props.audioId,
+	                loading = _self$props.loading,
+	                playtime = _self$props.playtime;
+	            var _self$state = self.state,
+	                progressWidth = _self$state.progressWidth,
+	                isBeingPlayed = _self$state.isBeingPlayed,
+	                isPaused = _self$state.isPaused,
+	                currentTime = _self$state.currentTime;
+
+
+	            var progressStyles = {
+	                width: progressWidth + '%'
+	            };
+
+	            var playtimeStyles = null;
+
+	            if (isBeingPlayed) {
+	                playtimeStyles = {
+	                    color: '#EB4444'
+	                };
+	            }
+
+	            var btnClass = 'audio-player__pause-btn';
+	            if (!isBeingPlayed || isPaused) {
+	                btnClass = 'audio-player__play-btn';
+	            }
+
+	            var controls = _react2.default.createElement('span', {
+	                className: btnClass,
+	                onClick: function onClick() {
+	                    if (self.props.source === null) {
+	                        self.props.getAudioFile().then(function () {
+	                            self.play();
+	                        });
+	                    } else {
+	                        self.play();
+	                    }
+	                } });
+
+	            if (loading) {
+	                controls = _react2.default.createElement('div', { className: 'small-blue-spinner audio-player__spinner' });
+	            }
+
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'audio-player' },
+	                controls,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'slider', ref: function ref(slider) {
+	                            _this2.slider = slider;
+	                        } },
+	                    _react2.default.createElement('div', { className: 'slider__progress', style: progressStyles }),
+	                    _react2.default.createElement('div', {
+	                        className: 'slider__progress__pin',
+	                        style: { left: progressWidth + '%' },
+	                        ref: function ref(sliderPin) {
+	                            _this2.sliderPin = sliderPin;
+	                        },
+	                        onMouseDown: this.handleOnMouseDown
+	                    })
+	                ),
+	                _react2.default.createElement(
+	                    'span',
+	                    { className: 'audio-player__time', style: playtimeStyles },
+	                    currentTime ? currentTime : secondsToTimeShort(playtime)
+	                ),
+	                _react2.default.createElement('audio', (_React$createElement = {
+	                    src: source,
+	                    className: 'audio-player__player',
+	                    onPause: self.handleOnPause,
+	                    id: audioId,
+	                    ref: function ref(audio) {
+	                        _this2.audioEl = audio;
+	                    },
+	                    onPlaying: self.handleOnPlaying
+	                }, _defineProperty(_React$createElement, 'onPause', self.handleOnPause), _defineProperty(_React$createElement, 'onEnded', self.handleOnEnded), _defineProperty(_React$createElement, 'onTimeUpdate', self.handleOnTimeUpdate), _React$createElement))
+	            );
+	        }
+	    }]);
+
+	    return AudioPlayer;
+	}(_react2.default.Component);
+
+	AudioPlayer.propTypes = {
+	    source: _react2.default.PropTypes.string,
+	    audioId: _react2.default.PropTypes.string.isRequired,
+	    loading: _react2.default.PropTypes.bool.isRequired,
+	    getAudioFile: _react2.default.PropTypes.func.isRequired,
+	    playtime: _react2.default.PropTypes.number.isRequired
+	};
+
+	exports.default = AudioPlayer;
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function GeoLocation(props) {
+	    var latitude = props.latitude,
+	        lng = props.lng;
+
+
+	    var handleOnclick = function handleOnclick(lat, lng) {
+	        var openGmaps = function openGmaps() {
+	            var gmapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+	            window.open(gmapsUrl, '_blank', 'noopener');
+	        };
+
+	        if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
+	            msgDialog('confirmation', 'geolocation-link', l[20788], 'Would you like to proceed?', function (answer) {
+	                if (answer) {
+	                    GeoLocationLinks.confirmationDoConfirm();
+	                    closeDialog();
+	                    openGmaps();
+	                } else {
+	                    GeoLocationLinks.confirmationDoNever();
+	                }
+	            });
+	        } else if (GeoLocationLinks.gmapsConfirmation) {
+	            openGmaps();
+	        }
+	    };
+
+	    return _react2.default.createElement(
+	        'div',
+	        { className: 'geolocation', onClick: function onClick() {
+	                return handleOnclick(latitude, lng);
+	            } },
+	        _react2.default.createElement(
+	            'div',
+	            { className: 'geolocation__details' },
+	            _react2.default.createElement('figure', { className: 'geolocation__img' }),
+	            _react2.default.createElement(
+	                'ul',
+	                { className: 'geolocation__data-list' },
+	                _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'geolocation__title' },
+	                        l[20789]
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                        'p',
+	                        null,
+	                        _react2.default.createElement('span', { className: 'geolocation__coordinates-icon' }),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'geolocation__coordinates' },
+	                            'https://maps.google.com'
+	                        )
+	                    )
+	                )
+	            )
+	        )
+	    );
+	}
+
+	GeoLocation.PropTypes = {
+	    latitude: _react2.default.PropTypes.string.isRequired,
+	    lng: _react2.default.PropTypes.string.isRequired
+	};
+
+	exports.default = GeoLocation;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	var React = __webpack_require__(2);
 
 	var utils = __webpack_require__(5);
@@ -14217,7 +14857,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14227,9 +14867,9 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(26).MetaRichpreviewLoading;
+	var MetaRichPreviewLoading = __webpack_require__(29).MetaRichpreviewLoading;
 
 	var MetaRichpreview = React.createClass({
 	    displayName: "MetaRichpreview",
@@ -14354,7 +14994,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14363,7 +15003,7 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 
 	var MetaRichpreviewLoading = React.createClass({
 	    displayName: "MetaRichpreviewLoading",
@@ -14383,7 +15023,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14393,7 +15033,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var MetaRichpreviewConfirmation = React.createClass({
@@ -14527,24 +15167,29 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(26).MetaRichpreviewLoading;
+	var _react = __webpack_require__(2);
 
-	var MetaRichpreviewMegaLinks = React.createClass({
-	    displayName: "MetaRichpreviewMegaLinks",
+	var _react2 = _interopRequireDefault(_react);
 
-	    mixins: [ConversationMessageMixin],
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _mixin = __webpack_require__(27);
+
+	var _metaRichPreviewLoading = __webpack_require__(29);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var MetaRichpreviewMegaLinks = _react2.default.createClass({
+	    displayName: 'MetaRichpreviewMegaLinks',
+
+	    mixins: [_mixin.ConversationMessageMixin],
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -14573,7 +15218,7 @@ React.makeElement = React['createElement'];
 	                    });
 	                }
 
-	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
 	            } else {
 	                var desc;
 
@@ -14584,65 +15229,65 @@ React.makeElement = React['createElement'];
 	                } else if (!megaLinkInfo.is_dir) {
 	                    desc = bytesToSize(megaLinkInfo.info.size);
 	                } else {
-	                    desc = React.makeElement(
-	                        "span",
+	                    desc = _react2.default.createElement(
+	                        'span',
 	                        null,
 	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
-	                        React.makeElement("br", null),
+	                        _react2.default.createElement('br', null),
 	                        bytesToSize(megaLinkInfo.info.size)
 	                    );
 	                }
 
-	                previewContainer = React.makeElement(
-	                    "div",
+	                previewContainer = _react2.default.createElement(
+	                    'div',
 	                    { className: "message richpreview body " + ((is_icon ? "have-icon" : "no-icon") + " " + (megaLinkInfo.is_chatlink ? "is-chat" : "")) },
-	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        React.makeElement("div", { className: "message richpreview preview",
+	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        _react2.default.createElement('div', { className: 'message richpreview preview',
 	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
-	                    ) : React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        megaLinkInfo.is_chatlink ? React.makeElement("i", { className: "huge-icon conversations" }) : React.createElement("div", { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
+	                    ) : _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        megaLinkInfo.is_chatlink ? _react2.default.createElement('i', { className: 'huge-icon conversations' }) : _react2.default.createElement('div', { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
 	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview inner-wrapper" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview data-title" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview title" },
-	                                React.makeElement(
-	                                    utils.EmojiFormattedContent,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview inner-wrapper' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview data-title' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview title' },
+	                                _react2.default.createElement(
+	                                    _utils2.default.EmojiFormattedContent,
 	                                    null,
 	                                    megaLinkInfo.info.name || megaLinkInfo.info.topic || ""
 	                                )
 	                            )
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview desc" },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview desc' },
 	                            desc
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview url-container" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url-favicon" },
-	                                React.makeElement("img", { src: "https://mega.nz/favicon.ico?v=3&c=1", width: 16, height: 16,
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview url-container' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url-favicon' },
+	                                _react2.default.createElement('img', { src: 'https://mega.nz/favicon.ico?v=3&c=1', width: 16, height: 16,
 	                                    onError: function onError(e) {
 	                                        e.target.parentNode.removeChild(e.target);
 	                                    },
-	                                    alt: ""
+	                                    alt: ''
 	                                })
 	                            ),
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url" },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url' },
 	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
 	                            )
 	                        )
@@ -14650,21 +15295,21 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 
-	            output.push(React.makeElement(
-	                "div",
+	            output.push(_react2.default.createElement(
+	                'div',
 	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
 	                    onClick: function (url) {
 	                        if (megaLinkInfo.hadLoaded()) {
-	                            window.open(url, "_blank");
+	                            window.open(url, '_blank', 'noopener');
 	                        }
 	                    }.bind(this, megaLinkInfo.getLink()) },
 	                previewContainer,
-	                React.makeElement("div", { className: "clear" })
+	                _react2.default.createElement('div', { className: 'clear' })
 	            ));
 	        }
-	        return React.makeElement(
-	            "div",
-	            { className: "message richpreview previews-container" },
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'message richpreview previews-container' },
 	            output
 	        );
 	    }
@@ -14675,7 +15320,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14685,7 +15330,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
@@ -14832,7 +15477,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14842,7 +15487,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TruncatedMessage = React.createClass({
@@ -14913,7 +15558,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14923,7 +15568,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var PrivilegeChange = React.createClass({
@@ -15016,7 +15661,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15026,7 +15671,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TopicChange = React.createClass({
@@ -15094,7 +15739,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 33 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15397,7 +16042,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 34 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15584,7 +16229,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 35 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15594,7 +16239,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var CloseOpenModeMessage = React.createClass({
@@ -15668,7 +16313,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 36 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15678,7 +16323,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var ChatHandleMessage = React.createClass({
@@ -15752,7 +16397,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 37 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15979,7 +16624,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 38 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -16983,7 +17628,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 39 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16994,7 +17639,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var Tooltips = __webpack_require__(14);
 	var Forms = __webpack_require__(15);
-	var MiniUI = __webpack_require__(40);
+	var MiniUI = __webpack_require__(43);
 	var ContactsUI = __webpack_require__(11);
 	var ModalDialogsUI = __webpack_require__(13);
 
@@ -17263,7 +17908,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 40 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17402,12 +18047,12 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 41 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var utils = __webpack_require__(42);
+	var utils = __webpack_require__(45);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(12);
 
@@ -18371,8 +19016,8 @@ React.makeElement = React['createElement'];
 
 	        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
 
-	            self.megaChat.getMyChatFilesFolder().then(function (myChatFilesFolderHandle) {
-	                M.copyNodes([nodeId], myChatFilesFolderHandle, false, new MegaPromise()).then(function (copyNodesResponse) {
+	            M.myChatFilesFolder.get(true).then(function (myChatFilesFolder) {
+	                M.copyNodes([nodeId], myChatFilesFolder.h, false, new MegaPromise()).then(function (copyNodesResponse) {
 	                    if (copyNodesResponse && copyNodesResponse[0]) {
 	                        proxyPromise.linkDoneAndFailTo(self.attachNodes([copyNodesResponse[0]]));
 	                    } else {
@@ -18727,7 +19372,7 @@ React.makeElement = React['createElement'];
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 42 */
+/* 45 */
 /***/ (function(module, exports) {
 
 	'use strict';

@@ -44,7 +44,7 @@
             // 1- must be 1 item
             // 2- must be to 1 target.
             // --> no need to consider in all logical space of file/folder conflicts
-            if (M.d[target] && M.d[target].name === 'My chat files') {
+            if (M.d[target] && M.d[target].name === M.myChatFilesFolder.name) {
                 defaultAction = ns.KEEPBOTH;
             }
 
@@ -410,7 +410,14 @@
 
             var done = function(file, name, action) {
                 closeDialog();
-                promise.resolve(file, name, action, $('#duplicates-checkbox').prop('checked'));
+                var checked = $('#duplicates-checkbox').prop('checked');
+                if (checked) {
+                    loadingDialog.show();
+                }
+                // Make sure browser is not freeze and show loading dialog
+                onIdle(function() {
+                    promise.resolve(file, name, action, checked);
+                })
             };
 
             $a1.rebind('click', function() {

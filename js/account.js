@@ -119,7 +119,7 @@ function u_checklogin3a(res, ctx) {
         ];
 
         for (var n in u_attr) {
-            if (exclude.indexOf(n) === -1) {
+            if (exclude.indexOf(n) === -1 && n[0] !== '*') {
                 try {
                     u_attr[n] = from8(base64urldecode(u_attr[n]));
                 } catch (e) {

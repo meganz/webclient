@@ -271,7 +271,8 @@ var Chat = function() {
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter,
-            'richpreviewsFilter': RichpreviewsFilter
+            'richpreviewsFilter': RichpreviewsFilter,
+            'geoLocationLinks': GeoLocationLinks
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -1642,6 +1643,7 @@ Chat.prototype.refreshConversations = function() {
         $('.fm-chat-block').hide();
         return false;
     }
+    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
     // move to the proper place if loaded before the FM
     if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
@@ -2330,33 +2332,6 @@ Chat.prototype.getChatById = function(chatdId) {
     return found ? found : false;
 };
 
-Chat.prototype.getMyChatFilesFolder = function() {
-    var promise = new MegaPromise();
-    // Translation ?
-    var folderName = "My chat files";
-    var paths = [folderName];
-    var safePath = M.getSafePath(paths);
-
-    if (safePath.length === 1) {
-        safePath = safePath[0];
-    }
-
-    var target = M.RootID;
-
-    M.createFolder(target, safePath, new MegaPromise())
-        .always(function(_target) {
-            if (typeof _target === 'number') {
-                ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
-                    path, target, api_strerror(_target));
-                promise.reject();
-            }
-            else {
-                promise.resolve(_target);
-            }
-        });
-
-    return promise;
-};
 
 /**
  * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin

@@ -10,12 +10,12 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
-    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: true };
+    this.columnsWidth.cloud.label = { min: 70, curr: 70, viewed: false };
     this.columnsWidth.cloud.size = { min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: true };
-    this.columnsWidth.cloud.versions = { min: 120, curr: 120, viewed: true };
+    this.columnsWidth.cloud.timeMd = { min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.versions = { min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { min: 93, curr: 93, viewed: true };
 
 }
@@ -1660,16 +1660,16 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
         var $trs = $('.transfer-table tr.ui-selected');
 
-        if ($trs.filter('.transfer-upload').length) {
-            if (ulmanager.ulOverStorageQuota) {
+        if ($(this).hasClass('transfer-play')) {
+            if ($trs.filter('.transfer-upload').length && ulmanager.ulOverStorageQuota) {
                 ulmanager.ulShowOverStorageQuotaDialog();
                 return;
             }
-        }
 
-        if (dlmanager.isOverQuota) {
-            dlmanager.showOverQuotaDialog();
-            return;
+            if (dlmanager.isOverQuota) {
+                dlmanager.showOverQuotaDialog();
+                return;
+            }
         }
 
         var ids = $trs.attrs('id');
@@ -2512,13 +2512,15 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $('.transfer-pause-icon').rebind('click', function() {
 
-        if (dlmanager.isOverQuota) {
-            return dlmanager.showOverQuotaDialog();
-        }
+        if ($(this).hasClass('active')) { 
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
+            }
 
-        if (ulmanager.ulOverStorageQuota) {
-            ulmanager.ulShowOverStorageQuotaDialog();
-            return false;
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return false;
+            }
         }
 
         if (!$(this).hasClass('disabled')) {
@@ -2981,6 +2983,15 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.label.viewed = false;
             M.columnsWidth.cloud.label.disabled = true;
         }
+        else {
+            if (M.columnsWidth.cloud.fav.disabled) {
+                // came from folder-link
+                M.columnsWidth.cloud.fav.viewed = true;
+            }
+            M.columnsWidth.cloud.versions.disabled = false;
+            M.columnsWidth.cloud.fav.disabled = false;
+            M.columnsWidth.cloud.label.disabled = false;
+        }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
             for (var col in M.columnsWidth.cloud) {
@@ -3008,6 +3019,11 @@ FileManager.prototype.addGridUI = function(refresh) {
                         $header.hide();
                         $('.grid-table.fm td[megatype="' + col + '"]').hide();
                     }
+                    else if (M.columnsWidth.cloud[col].viewed && !$header.is(':visible')) {
+                        $header.show();
+                        $('.grid-table.fm td[megatype="' + col + '"]').show();
+                    }
+
                 }
             }
         }
@@ -3171,23 +3187,9 @@ FileManager.prototype.addGridUI = function(refresh) {
             for (var sortBy in M.sortRules) {
                 if (cls.indexOf(sortBy) !== -1) {
 
-                    var $sortMenu = $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item')
-                        .removeClass('selected');
-                    var sortitem = sortBy;
+                    var dateColumns = ['ts', 'mtime', 'date'];
 
-                    if (sortitem === 'ts') {
-                        sortitem = 'timeAd';
-                    }
-                    else if (sortitem === 'mtime') {
-                        sortitem = 'timeMd';
-                    }
-                    else if (sortitem === 'date') {
-                        sortitem = 'sharecreated, .sort-timeAd';
-                    }
-
-                    $sortMenu.filter('.sort-' + sortitem).addClass('selected');
-
-                    if (dir !== -1 && sortitem !== sortBy) {
+                    if (dir !== -1 && dateColumns.indexOf(sortBy) !== -1) {
                         if (cls.indexOf('asc') === -1) {
                             dir = -1;
                         }

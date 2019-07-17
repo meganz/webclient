@@ -7,6 +7,8 @@ var MetaRichpreviewConfirmation = require('./metaRichpreviewConfirmation.jsx').M
 var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRichpreviewMegaLinks;
 var ContactsUI = require('./../contacts.jsx');
 var TypingAreaUI = require('./../typingArea.jsx');
+import AudioContainer from './AudioContainer.jsx';
+import GeoLocation from './geoLocation.jsx';
 
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
@@ -19,7 +21,7 @@ var GenericConversationMessage = React.createClass({
     mixins: [ConversationMessageMixin],
     getInitialState: function() {
         return {
-            'editing': this.props.editing
+            'editing': this.props.editing,
         };
     },
     isBeingEdited: function() {
@@ -245,9 +247,9 @@ var GenericConversationMessage = React.createClass({
         $.selected = [v.h];
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
-                megaChat.getMyChatFilesFolder()
-                    .then(function(myChatFolderId) {
-                        M.injectNodes(node, myChatFolderId, function(res) {
+                M.myChatFilesFolder.get(true)
+                    .then(function(myChatFolder) {
+                        M.injectNodes(node, myChatFolder.h, function(res) {
                             if (Array.isArray(res) && res.length) {
                                 megaChat.openChatAndAttachNodes(target, res).dump();
                             }
@@ -927,6 +929,90 @@ var GenericConversationMessage = React.createClass({
                     // don't show anything if this is a 'revoke' message
                     return null;
                 }
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+                    let avatar = null;
+                    let messageActionButtons = null;
+
+                    if (this.props.grouped) {
+                        additionalClasses += " grouped";
+                    }
+                    else {
+                        avatar = (
+                            <ContactsUI.Avatar
+                                contact={contact}
+                                className="message avatar-wrapper small-rounded-avatar"
+                            />
+                        );
+                        datetime = <div className="message date-time simpletip"
+                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                    }
+
+                    const attachmentMetadata = message.getAttachmentMeta() || [];
+                    let audioContainer = null;
+
+                    attachmentMetadata.forEach((v) => {
+                        audioContainer = (
+                            <AudioContainer 
+                                h={v.h}
+                                mime={v.mime}
+                                playtime={v.playtime}
+                                audioId={`vm${message.messageId}`}
+                            />
+                        );
+                    });
+                
+                    const iAmSender = (contact && contact.u === u_handle);
+                    const stillEditable = (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
+                    const isBeingEdited = (self.isBeingEdited() === true);
+                    const chatIsReadOnly = (chatRoom.isReadOnly() === true);
+
+                    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !self.props.dialog) {
+                        const deleteButton = (
+                            <DropdownsUI.DropdownItem
+                                icon="red-cross"
+                                label={__(l[1730])}
+                                className="red"
+                                onClick={(e) => {
+                                    self.doDelete(e, message);
+                                }}
+                            />
+                        );
+
+                        messageActionButtons = (
+                            <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left bottom"
+                                    positionAt="right bottom"
+                                    horizOffset={4}
+                                >
+                                {deleteButton}
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>
+                        );
+                    }
+
+                    return (
+                        <div className={message.messageId + " message body" + additionalClasses}>
+                            {avatar}
+                            <div className="message content-area">
+                                {name}
+                                {datetime}
+                                {messageActionButtons}
+                                <div className="message shared-block">
+                                    {files}
+                                </div>
+                                {buttonsBlock}
+                                {spinnerElement}
+                                {audioContainer}
+                            </div>
+                        </div>
+                    );
+                }
                 else {
                     chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
                     return null;
@@ -934,6 +1020,8 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
+                let geoLocation = null;
+
                 if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
@@ -1021,6 +1109,12 @@ var GenericConversationMessage = React.createClass({
                         }
 
 
+                    }
+                    else if (message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                        const { lng, la: latitude } = message.meta.extra[0];
+                        geoLocation = (
+                            <GeoLocation latitude={latitude} lng={lng}/>
+                        );
                     }
                     if (message.megaLinks) {
                         subMessageComponent.push(<MetaRichpreviewMegaLinks
@@ -1145,7 +1239,7 @@ var GenericConversationMessage = React.createClass({
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
-                        var editButton = message.metaType !== -1 ?
+                        var editButton = (message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION) ?
                             <DropdownsUI.DropdownItem
                                 icon="icons-sprite writing-pencil"
                                 label={__(l[1342])}
@@ -1184,6 +1278,11 @@ var GenericConversationMessage = React.createClass({
 
                     }
                 }
+                const isGeoLocation = message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+
+                if (isGeoLocation) {
+                    messageDisplayBlock = null;
+                }
 
                 return (
                     <div className={message.messageId + " message body " + additionalClasses}>
@@ -1198,6 +1297,7 @@ var GenericConversationMessage = React.createClass({
                             {subMessageComponent}
                             {buttonsBlock}
                             {spinnerElement}
+                            {geoLocation}
                         </div>
                     </div>
                 );

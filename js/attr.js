@@ -875,8 +875,9 @@ var attribCache = false;
     /**
      * Handles legacy cache & decryption of attributes that use tlvstore
      *
-     * @param res
-     * @param thePromise
+     * @param {String|Object} res The payload to decrypt.
+     * @param {MegaPromise} [thePromise] Promise to signal rejections.
+     * @param {String} [attribute] Attribute name we're decrypting.
      * @returns {*} the actual res (if altered)
      */
     ns.handleLegacyCacheAndDecryption = function(res, thePromise, attribute) {
@@ -889,27 +890,18 @@ var attribCache = false;
                 res = tlvstore.tlvRecordsToContainer(clearContainer, true);
 
                 if (res === false) {
-                    res = EINTERNAL;
+                    throw new Error('TLV Record decoding failed.');
                 }
             }
             catch (e) {
-                if (e.name === 'SecurityError') {
-                    logger.error(
-                        'Could not decrypt private user attribute ' +
-                        attribute +
-                        ': ' +
-                        e.message
-                    );
-                    thePromise.reject(EINTERNAL);
-                }
-                else {
-                    logger.error('Unexpected exception!', e);
-                    setTimeout(function () {
-                        throw e;
-                    }, 4);
-                    thePromise.reject(EINTERNAL);
+                if (d) {
+                    logger.error('Could not decrypt private user attribute %s: %s', attribute, e.message, e);
                 }
                 res = EINTERNAL;
+
+                if (thePromise) {
+                    thePromise.reject(res);
+                }
             }
         }
 
@@ -1073,6 +1065,242 @@ var attribCache = false;
         }
     });
 
+    /**
+     * Create helper factory.
+     * @param {String} attribute Name of the attribute.
+     * @param {Boolean|Number} pub
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
+     * @param {Boolean} nonHistoric
+     *     True for non-historic attributes (default: false).  Non-historic
+     *     attributes will overwrite the value, and not retain previous
+     *     values on the API server.
+     * @param {String} storeKey An object key to store the data under
+     * @param {Function} [decode] Function to post-process the value before returning it
+     * @param {Function} [encode] Function to pre-process the value before storing it
+     * @return {Object}
+     */
+    ns.factory = function(attribute, pub, nonHistoric, storeKey, decode, encode) {
+        var key = buildAttribute(attribute, pub, nonHistoric);
+        if (this.factory[key]) {
+            return this.factory[key];
+        }
+
+        if (typeof encode !== 'function') {
+            encode = function(value) {
+                return JSON.stringify(value);
+            };
+        }
+        if (typeof decode !== 'function') {
+            decode = function(value) {
+                return JSON.parse(value);
+            };
+        }
+        var log = new MegaLogger('factory[' + key + ']', false, logger);
+
+        var cacheValue = function(value) {
+            cacheValue.last = decode(value[storeKey]);
+
+            if (key[0] === '*') {
+                value = base64urlencode(
+                    tlvstore.blockEncrypt(
+                        tlvstore.containerToTlvRecords(value), u_k, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
+                    )
+                );
+            }
+            else if (key[0] === '^') {
+                value = base64urlencode(value);
+            }
+
+            if (typeof u_attr === 'object') {
+                u_attr[key] = value;
+            }
+
+            return cacheValue.last;
+        };
+        cacheValue.last = false;
+
+        var notify = function() {
+            for (var i = notify.queue.length; i--;) {
+                notify.queue[i](cacheValue.last);
+            }
+        };
+        notify.queue = [];
+
+        var factory = {
+            change: function(callback) {
+                notify.queue.push(tryCatch(callback));
+                return this;
+            },
+            remove: function() {
+                return mega.attr.remove(attribute, pub, nonHistoric);
+            },
+
+            set: promisify(function(resolve, reject, value) {
+                var store = {};
+                store[storeKey] = encode(value);
+
+                cacheValue(store);
+                log.debug('storing value', store);
+
+                mega.attr.set(attribute, store, pub, nonHistoric).then(resolve).catch(reject);
+            }),
+
+            get: promisify(function(resolve, reject, force) {
+                if (!force && Object(u_attr).hasOwnProperty(key)) {
+                    var value = u_attr[key] || false;
+
+                    if (value) {
+                        if (key[0] === '*') {
+                            value = mega.attr.handleLegacyCacheAndDecryption(value);
+                        }
+                        else if (key[0] === '^') {
+                            value = base64urldecode(value);
+                        }
+                    }
+
+                    log.debug('cached value', value);
+                    value = value[storeKey];
+
+                    if (value) {
+                        cacheValue.last = decode(value);
+                        return resolve(cacheValue.last);
+                    }
+                }
+
+                mega.attr.get(u_handle, attribute, pub, nonHistoric)
+                    .then(function(value) {
+                        log.debug('got value', value);
+                        resolve(cacheValue(value));
+                    })
+                    .catch(reject);
+            })
+        };
+
+        if (uaPacketParserHandler[key]) {
+            return log.warn('exists');
+        }
+
+        uaPacketParserHandler[key] = function() {
+            if (fminitialized && u_type) {
+                cacheValue.last = false;
+                if (typeof u_attr === 'object') {
+                    delete u_attr[key];
+                }
+                factory.get(true).always(notify);
+            }
+        };
+
+        this.factory[key] = factory;
+        return Object.freeze(factory);
+    };
+
+    /**
+     * An attribute factory that eases handling folder creation/management, e.g. My chat files
+     * @param {String} attribute Name of the attribute.
+     * @param {Boolean|Number} pub
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
+     * @param {Boolean} nonHistoric
+     *     True for non-historic attributes (default: false).  Non-historic
+     *     attributes will overwrite the value, and not retain previous
+     *     values on the API server.
+     * @param {String} storeKey An object key to store the data under
+     * @param {String|Array} name The folder name, if an array it's [localized, english]
+     * @param {Function} [decode] Function to post-process the value before returning it
+     * @param {Function} [encode] Function to pre-process the value before storing it
+     * @return {Object}
+     */
+    ns.getFolderFactory = function(attribute, pub, nonHistoric, storeKey, name, decode, encode) {
+        if (!Array.isArray(name)) {
+            name = [name];
+        }
+        var localeName = name[0] || name[1];
+        var englishName = name[1] || localeName;
+        var log = new MegaLogger('fldFactory[' + englishName + ']', false, logger);
+
+        // listen for attribute changes.
+        var onchange = function(handle) {
+            // XXX: caching the value under the global `M` is meant for compatibility
+            // with legacy synchronous code, any new logic should stick to promises.
+            M[attribute] = handle;
+            dbfetch.node([handle]).always(function(res) {
+                M[attribute] = res[0] || M[attribute];
+                if (M[attribute].p === M.RubbishID) {
+                    M[attribute] = false;
+                }
+                if (d) {
+                    log.info("Updating folder...", M[attribute]);
+                }
+            });
+        };
+        var ns = Object.create(null);
+        var factory = this.factory(attribute, pub, nonHistoric, storeKey, decode, encode).change(onchange);
+
+        // Initialization logic, invoke just once when needed.
+        ns.init = function() {
+            factory.get().then(onchange).catch(function() {
+                // attribute not set, lookup for a legacy folder node
+                var keys = Object.keys(M.c[M.RootID] || {});
+
+                for (var i = keys.length; i--;) {
+                    var n = M.getNodeByHandle(keys[i]);
+
+                    if (n.name === englishName || n.name === localeName) {
+                        if (d) {
+                            log.info('Found existing folder, migrating to attribute...', n.h, n);
+                        }
+                        factory.set(n.h).dump(attribute);
+                        if (n.name !== localeName) {
+                            M.rename(n.h, localeName);
+                        }
+                        break;
+                    }
+                }
+            });
+        };
+
+        // Retrieve folder node, optionally specifying whether if should be created if it does not exists.
+        ns.get = promisify(function(resolve, reject, create) {
+            factory.get().then(function(h) { return dbfetch.node([h]); }).always(function(res) {
+                var node = res[0];
+                if (node && node.p !== M.RubbishID) {
+                    return resolve(node);
+                }
+
+                if (!create) {
+                    return reject(node || ENOENT);
+                }
+
+                var target = typeof create === 'string' && create || M.RootID;
+                M.createFolder(target, this.name, new MegaPromise()).always(function(target) {
+                    if (!M.d[target]) {
+                        if (d) {
+                            log.warn("Failed to create folder...", target, api_strerror(target));
+                        }
+                        return reject(target);
+                    }
+
+                    ns.set(target).always(resolve.bind(null, M.d[target]));
+                });
+            });
+        });
+
+        // Store folder handle.
+        ns.set = function(handle) {
+            return handle === Object(M[attribute]).h ? Promise.resolve(EEXIST) : factory.set(handle);
+        };
+
+        Object.defineProperty(ns, 'name', {
+            get: function() {
+                return Object(M[attribute]).name || localeName || englishName;
+            }
+        });
+
+        return Object.freeze(ns);
+    };
 
     ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
         var remoteValues = valObj.remoteValue;

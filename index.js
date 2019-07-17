@@ -1,3 +1,8 @@
+/**
+ * global MegaData instance
+ * @name M
+ */
+var M = null;
 var dlid = false;
 var dlkey = false;
 var cn_url = false;
@@ -509,9 +514,19 @@ function init_page() {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
+
     if (page.substr(0, 7) == 'pwreset') {
         resetpwcode = page.replace("pwreset", "");
         page = 'resetpassword';
+    }
+
+    // If password revert link, use generic background page, show the dialog and pass in the code
+    if (page.substr(0, 8) === 'pwrevert') {
+        parsepage(pages[is_mobile ? 'mobile' : 'placeholder']);
+        passwordRevert.init(page);
+
+        // Make sure placeholder background is shown
+        return false;
     }
 
     // is chat link?
@@ -2354,6 +2369,10 @@ function topmenuUI() {
             $topHeader.find('.top-clear-button').addClass('hidden');
         }
     });
+
+    $topHeader.find('#search-fake-form').rebind('submit', function () {
+        return false;
+    })
 
     $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
         var val = $.trim($('.top-search-input').val());

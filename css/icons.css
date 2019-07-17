@@ -1181,7 +1181,11 @@
     margin-left: -1px;
 }
 .small-icon.context.sortgrid {
-    background-position: -1px -111px;
+    background-position: -89px -1992px;
+    opacity: 1;
+}
+.opened .small-icon.context.sortgrid {
+    background-position: -117px -1992px;
 }
 .small-icon.context.handset {
     background-position: -1px -333px;

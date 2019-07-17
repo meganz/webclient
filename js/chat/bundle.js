@@ -60,7 +60,7 @@ React.makeElement = React['createElement'];
 	var React = __webpack_require__(2);
 	var ReactDOM = __webpack_require__(3);
 	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(43);
+	var ChatRoom = __webpack_require__(44);
 
 	var EMOJI_DATASET_VERSION = 3;
 
@@ -272,7 +272,8 @@ React.makeElement = React['createElement'];
 	            'persistedTypeArea': PersistedTypeArea,
 	            'btRtfFilter': BacktickRtfFilter,
 	            'rtfFilter': RtfFilter,
-	            'richpreviewsFilter': RichpreviewsFilter
+	            'richpreviewsFilter': RichpreviewsFilter,
+	            'geoLocationLinks': GeoLocationLinks
 	        },
 	        'chatNotificationOptions': {
 	            'textMessages': {
@@ -2189,7 +2190,7 @@ React.makeElement = React['createElement'];
 	var ContactsUI = __webpack_require__(11);
 	var ConversationPanelUI = __webpack_require__(12);
 	var ModalDialogsUI = __webpack_require__(13);
-	var StartGroupChatWizard = __webpack_require__(41).StartGroupChatWizard;
+	var StartGroupChatWizard = __webpack_require__(42).StartGroupChatWizard;
 
 	var renderMessageSummary = function renderMessageSummary(lastMessage) {
 	    var renderableSummary;
@@ -2398,6 +2399,15 @@ React.makeElement = React['createElement'];
 	                    "div",
 	                    { className: lastMsgDivClasses },
 	                    'Voice Message'
+	                );
+	            }
+
+	            if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+	                lastMessageDiv = React.makeElement(
+	                    "div",
+	                    { className: lastMsgDivClasses },
+	                    React.makeElement("span", { className: "geolocation-icon" }),
+	                    l[20789]
 	                );
 	            }
 
@@ -6569,20 +6579,20 @@ React.makeElement = React['createElement'];
 	var ParticipantsList = __webpack_require__(22).ParticipantsList;
 
 	var GenericConversationMessage = __webpack_require__(23).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(31).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(32).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(33).PrivilegeChange;
-	var TopicChange = __webpack_require__(34).TopicChange;
-	var SharedFilesAccordionPanel = __webpack_require__(35).SharedFilesAccordionPanel;
-	var IncomingSharesAccordionPanel = __webpack_require__(36).IncomingSharesAccordionPanel;
+	var AlterParticipantsConversationMessage = __webpack_require__(32).AlterParticipantsConversationMessage;
+	var TruncatedMessage = __webpack_require__(33).TruncatedMessage;
+	var PrivilegeChange = __webpack_require__(34).PrivilegeChange;
+	var TopicChange = __webpack_require__(35).TopicChange;
+	var SharedFilesAccordionPanel = __webpack_require__(36).SharedFilesAccordionPanel;
+	var IncomingSharesAccordionPanel = __webpack_require__(37).IncomingSharesAccordionPanel;
 
-	var CloseOpenModeMessage = __webpack_require__(37).CloseOpenModeMessage;
-	var ChatHandleMessage = __webpack_require__(38).ChatHandleMessage;
-	var ChatlinkDialog = __webpack_require__(39).ChatlinkDialog;
+	var CloseOpenModeMessage = __webpack_require__(38).CloseOpenModeMessage;
+	var ChatHandleMessage = __webpack_require__(39).ChatHandleMessage;
+	var ChatlinkDialog = __webpack_require__(40).ChatlinkDialog;
 
 	var ENABLE_GROUP_CALLING_FLAG = true;
 
-	var ConversationAudioVideoPanel = __webpack_require__(40).ConversationAudioVideoPanel;
+	var ConversationAudioVideoPanel = __webpack_require__(41).ConversationAudioVideoPanel;
 
 	var JoinCallNotification = React.createClass({
 	    displayName: "JoinCallNotification",
@@ -12806,15 +12816,19 @@ React.makeElement = React['createElement'];
 
 	var _AudioContainer2 = _interopRequireDefault(_AudioContainer);
 
+	var _geoLocation = __webpack_require__(26);
+
+	var _geoLocation2 = _interopRequireDefault(_geoLocation);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var React = __webpack_require__(2);
 	var utils = __webpack_require__(5);
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
-	var MetaRichpreview = __webpack_require__(27).MetaRichpreview;
-	var MetaRichpreviewConfirmation = __webpack_require__(29).MetaRichpreviewConfirmation;
-	var MetaRichpreviewMegaLinks = __webpack_require__(30).MetaRichpreviewMegaLinks;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var MetaRichpreview = __webpack_require__(28).MetaRichpreview;
+	var MetaRichpreviewConfirmation = __webpack_require__(30).MetaRichpreviewConfirmation;
+	var MetaRichpreviewMegaLinks = __webpack_require__(31).MetaRichpreviewMegaLinks;
 	var ContactsUI = __webpack_require__(11);
 	var TypingAreaUI = __webpack_require__(17);
 
@@ -13794,6 +13808,8 @@ React.makeElement = React['createElement'];
 	                }
 	            } else {
 
+	                var geoLocation = null;
+
 	                if (message.textContents === "" && !message.dialogType) {
 	                    message.deleted = true;
 	                }
@@ -13859,6 +13875,12 @@ React.makeElement = React['createElement'];
 	                                }));
 	                            }
 	                        }
+	                    } else if (message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+	                        var _message$meta$extra$ = message.meta.extra[0],
+	                            lng = _message$meta$extra$.lng,
+	                            latitude = _message$meta$extra$.la;
+
+	                        geoLocation = React.makeElement(_geoLocation2.default, { latitude: latitude, lng: lng });
 	                    }
 	                    if (message.megaLinks) {
 	                        subMessageComponent.push(React.makeElement(MetaRichpreviewMegaLinks, {
@@ -13981,7 +14003,7 @@ React.makeElement = React['createElement'];
 	                }
 	                if (!message.deleted) {
 	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
-	                        var editButton = message.metaType !== -1 ? React.makeElement(DropdownsUI.DropdownItem, {
+	                        var editButton = message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION ? React.makeElement(DropdownsUI.DropdownItem, {
 	                            icon: 'icons-sprite writing-pencil',
 	                            label: __(l[1342]),
 	                            className: '',
@@ -14021,6 +14043,11 @@ React.makeElement = React['createElement'];
 	                        );
 	                    }
 	                }
+	                var isGeoLocation = message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+
+	                if (isGeoLocation) {
+	                    messageDisplayBlock = null;
+	                }
 
 	                return React.makeElement(
 	                    'div',
@@ -14036,7 +14063,8 @@ React.makeElement = React['createElement'];
 	                        messageDisplayBlock,
 	                        subMessageComponent,
 	                        buttonsBlock,
-	                        spinnerElement
+	                        spinnerElement,
+	                        geoLocation
 	                    )
 	                );
 	            }
@@ -14629,6 +14657,95 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function GeoLocation(props) {
+	    var latitude = props.latitude,
+	        lng = props.lng;
+
+
+	    var handleOnclick = function handleOnclick(lat, lng) {
+	        var openGmaps = function openGmaps() {
+	            var gmapsUrl = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+	            window.open(gmapsUrl, '_blank', 'noopener');
+	        };
+
+	        if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
+	            msgDialog('confirmation', 'geolocation-link', l[20788], 'Would you like to proceed?', function (answer) {
+	                if (answer) {
+	                    GeoLocationLinks.confirmationDoConfirm();
+	                    closeDialog();
+	                    openGmaps();
+	                } else {
+	                    GeoLocationLinks.confirmationDoNever();
+	                }
+	            });
+	        } else if (GeoLocationLinks.gmapsConfirmation) {
+	            openGmaps();
+	        }
+	    };
+
+	    return _react2.default.createElement(
+	        'div',
+	        { className: 'geolocation', onClick: function onClick() {
+	                return handleOnclick(latitude, lng);
+	            } },
+	        _react2.default.createElement(
+	            'div',
+	            { className: 'geolocation__details' },
+	            _react2.default.createElement('figure', { className: 'geolocation__img' }),
+	            _react2.default.createElement(
+	                'ul',
+	                { className: 'geolocation__data-list' },
+	                _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'geolocation__title' },
+	                        l[20789]
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'li',
+	                    null,
+	                    _react2.default.createElement(
+	                        'p',
+	                        null,
+	                        _react2.default.createElement('span', { className: 'geolocation__coordinates-icon' }),
+	                        _react2.default.createElement(
+	                            'span',
+	                            { className: 'geolocation__coordinates' },
+	                            'https://maps.google.com'
+	                        )
+	                    )
+	                )
+	            )
+	        )
+	    );
+	}
+
+	GeoLocation.PropTypes = {
+	    latitude: _react2.default.PropTypes.string.isRequired,
+	    lng: _react2.default.PropTypes.string.isRequired
+	};
+
+	exports.default = GeoLocation;
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	var React = __webpack_require__(2);
 
 	var utils = __webpack_require__(5);
@@ -14740,7 +14857,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14750,9 +14867,9 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(28).MetaRichpreviewLoading;
+	var MetaRichPreviewLoading = __webpack_require__(29).MetaRichpreviewLoading;
 
 	var MetaRichpreview = React.createClass({
 	    displayName: "MetaRichpreview",
@@ -14877,7 +14994,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14886,7 +15003,7 @@ React.makeElement = React['createElement'];
 	var ReactDOM = __webpack_require__(3);
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 
 	var MetaRichpreviewLoading = React.createClass({
 	    displayName: "MetaRichpreviewLoading",
@@ -14906,7 +15023,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -14916,7 +15033,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var MetaRichpreviewConfirmation = React.createClass({
@@ -15050,24 +15167,29 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(28).MetaRichpreviewLoading;
+	var _react = __webpack_require__(2);
 
-	var MetaRichpreviewMegaLinks = React.createClass({
-	    displayName: "MetaRichpreviewMegaLinks",
+	var _react2 = _interopRequireDefault(_react);
 
-	    mixins: [ConversationMessageMixin],
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _mixin = __webpack_require__(27);
+
+	var _metaRichPreviewLoading = __webpack_require__(29);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var MetaRichpreviewMegaLinks = _react2.default.createClass({
+	    displayName: 'MetaRichpreviewMegaLinks',
+
+	    mixins: [_mixin.ConversationMessageMixin],
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -15096,7 +15218,7 @@ React.makeElement = React['createElement'];
 	                    });
 	                }
 
-	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
 	            } else {
 	                var desc;
 
@@ -15107,65 +15229,65 @@ React.makeElement = React['createElement'];
 	                } else if (!megaLinkInfo.is_dir) {
 	                    desc = bytesToSize(megaLinkInfo.info.size);
 	                } else {
-	                    desc = React.makeElement(
-	                        "span",
+	                    desc = _react2.default.createElement(
+	                        'span',
 	                        null,
 	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
-	                        React.makeElement("br", null),
+	                        _react2.default.createElement('br', null),
 	                        bytesToSize(megaLinkInfo.info.size)
 	                    );
 	                }
 
-	                previewContainer = React.makeElement(
-	                    "div",
+	                previewContainer = _react2.default.createElement(
+	                    'div',
 	                    { className: "message richpreview body " + ((is_icon ? "have-icon" : "no-icon") + " " + (megaLinkInfo.is_chatlink ? "is-chat" : "")) },
-	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        React.makeElement("div", { className: "message richpreview preview",
+	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        _react2.default.createElement('div', { className: 'message richpreview preview',
 	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
-	                    ) : React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        megaLinkInfo.is_chatlink ? React.makeElement("i", { className: "huge-icon conversations" }) : React.createElement("div", { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
+	                    ) : _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        megaLinkInfo.is_chatlink ? _react2.default.createElement('i', { className: 'huge-icon conversations' }) : _react2.default.createElement('div', { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
 	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview inner-wrapper" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview data-title" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview title" },
-	                                React.makeElement(
-	                                    utils.EmojiFormattedContent,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview inner-wrapper' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview data-title' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview title' },
+	                                _react2.default.createElement(
+	                                    _utils2.default.EmojiFormattedContent,
 	                                    null,
 	                                    megaLinkInfo.info.name || megaLinkInfo.info.topic || ""
 	                                )
 	                            )
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview desc" },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview desc' },
 	                            desc
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview url-container" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url-favicon" },
-	                                React.makeElement("img", { src: "https://mega.nz/favicon.ico?v=3&c=1", width: 16, height: 16,
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview url-container' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url-favicon' },
+	                                _react2.default.createElement('img', { src: 'https://mega.nz/favicon.ico?v=3&c=1', width: 16, height: 16,
 	                                    onError: function onError(e) {
 	                                        e.target.parentNode.removeChild(e.target);
 	                                    },
-	                                    alt: ""
+	                                    alt: ''
 	                                })
 	                            ),
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url" },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url' },
 	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
 	                            )
 	                        )
@@ -15173,21 +15295,21 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 
-	            output.push(React.makeElement(
-	                "div",
+	            output.push(_react2.default.createElement(
+	                'div',
 	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
 	                    onClick: function (url) {
 	                        if (megaLinkInfo.hadLoaded()) {
-	                            window.open(url, "_blank");
+	                            window.open(url, '_blank', 'noopener');
 	                        }
 	                    }.bind(this, megaLinkInfo.getLink()) },
 	                previewContainer,
-	                React.makeElement("div", { className: "clear" })
+	                _react2.default.createElement('div', { className: 'clear' })
 	            ));
 	        }
-	        return React.makeElement(
-	            "div",
-	            { className: "message richpreview previews-container" },
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'message richpreview previews-container' },
 	            output
 	        );
 	    }
@@ -15198,7 +15320,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15208,7 +15330,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
@@ -15355,7 +15477,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15365,7 +15487,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TruncatedMessage = React.createClass({
@@ -15436,7 +15558,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15446,7 +15568,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var PrivilegeChange = React.createClass({
@@ -15539,7 +15661,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15549,7 +15671,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TopicChange = React.createClass({
@@ -15617,7 +15739,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15920,7 +16042,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16107,7 +16229,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16117,7 +16239,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var CloseOpenModeMessage = React.createClass({
@@ -16191,7 +16313,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16201,7 +16323,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(26).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var ChatHandleMessage = React.createClass({
@@ -16275,7 +16397,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -16502,7 +16624,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17506,7 +17628,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17517,7 +17639,7 @@ React.makeElement = React['createElement'];
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var Tooltips = __webpack_require__(14);
 	var Forms = __webpack_require__(15);
-	var MiniUI = __webpack_require__(42);
+	var MiniUI = __webpack_require__(43);
 	var ContactsUI = __webpack_require__(11);
 	var ModalDialogsUI = __webpack_require__(13);
 
@@ -17786,7 +17908,7 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -17925,12 +18047,12 @@ React.makeElement = React['createElement'];
 	};
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var utils = __webpack_require__(44);
+	var utils = __webpack_require__(45);
 	var React = __webpack_require__(2);
 	var ConversationPanelUI = __webpack_require__(12);
 
@@ -19250,7 +19372,7 @@ React.makeElement = React['createElement'];
 	module.exports = ChatRoom;
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 	'use strict';

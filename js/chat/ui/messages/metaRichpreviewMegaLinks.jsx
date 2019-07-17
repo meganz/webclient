@@ -1,11 +1,7 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
-var ContactsUI = require('./../contacts.jsx');
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
-var MetaRichPreviewLoading = require('./metaRichPreviewLoading.jsx').MetaRichpreviewLoading;
+import React from 'react';
+import utils from './../../../ui/utils.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
+import { MetaRichPreviewLoading } from './metaRichPreviewLoading.jsx';
 
 var MetaRichpreviewMegaLinks = React.createClass({
     mixins: [ConversationMessageMixin],
@@ -113,7 +109,7 @@ var MetaRichpreviewMegaLinks = React.createClass({
                     }
                             onClick={function (url) {
                                 if (megaLinkInfo.hadLoaded()) {
-                                    window.open(url, "_blank");
+                                    window.open(url, '_blank', 'noopener');
                                 }
                             }.bind(this, megaLinkInfo.getLink())}>
                     {previewContainer}

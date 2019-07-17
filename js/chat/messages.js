@@ -573,6 +573,7 @@ Message.MANAGEMENT_MESSAGE_TYPES = {
 
 Message.MESSAGE_META_TYPE = {
     "RICH_PREVIEW": "\0",
+    "GEOLOCATION": "\1"
 };
 
 Message._stateToText = Object.create(null);

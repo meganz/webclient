@@ -32,17 +32,37 @@ MegaLogger.rootLogger = new MegaLogger(
 
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
-    loadingDialog.show = function() {
+
+    // New subject value to specify loading dialog subject.
+    // Loading dialog with subject will not disappear until it hided with the subject
+    $.loadingSubject = Object.create(null);
+    loadingDialog.show = function(subject) {
+
+        'use strict';
+
+        subject = subject || 'common';
+
         if (!this.quiet) {
             $('.dark-overlay').removeClass('hidden');
             $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
             this.active = true;
         }
+
+        $.loadingSubject[subject] = 1;
     };
-    loadingDialog.hide = function() {
-        $('.dark-overlay').addClass('hidden');
-        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
-        this.active = false;
+    loadingDialog.hide = function(subject) {
+
+        'use strict';
+
+        subject = subject || 'common';
+
+        delete $.loadingSubject[subject];
+
+        if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
+            $('.dark-overlay').addClass('hidden');
+            $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
+            this.active = false;
+        }
     };
     loadingDialog.nest = 0;
     loadingDialog.pshow = function() {
@@ -143,7 +163,9 @@ if (typeof loadingInitDialog === 'undefined') {
         this.progress = false;
         $('.light-overlay').addClass('hidden');
         $('body').removeClass('loading');
-        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
+        if ($.loadingSubject && Object.keys($.loadingSubject).length === 0) {
+            $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
+        }
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%').removeAttr('style');

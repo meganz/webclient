@@ -8,3 +8,13 @@ RewriteRule ^[\w/-]*$ /
 #Header set Access-Control-Allow-Headers "uloffset, ulkey"
 #Header set Content-Security-Policy "default-src 'self' *.mega.co.nz https://*.mega.co.nz; script-src 'self' mega.co.nz data: blob: 'unsafe-eval'; style-src 'self' 'unsafe-inline' *.mega.co.nz data: blob:; frame-src 'self' mega:; img-src 'self' *.mega.co.nz data: blob:"
 </IfModule>
+
+<filesMatch "\.(html|js|css|png|jpg|svg)$">
+  FileETag None
+  <ifModule mod_headers.c>
+     Header unset ETag
+     Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+     Header set Pragma "no-cache"
+     Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+  </ifModule>
+</filesMatch>

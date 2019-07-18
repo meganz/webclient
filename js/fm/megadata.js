@@ -9,7 +9,7 @@
  * @property {String} u
  *     Mega user handle as base64 URL encoded 88-bit value.
  * @property {Number} c
- *     Contact access right/status: 2: owner, 1: active contact, 0: otherwise.
+ *     Contact access right/status: 2: owner, 1: active contact, 0: inactive/deleted.
  * @property {String} m
  *     Email address of the contact.
  * @property {Array} m2
@@ -19,6 +19,10 @@
  *     If First and Last name in user profile are undefined holds users email.
  *     It's used at least like index field for search contacts in share dialog.
  *     It combines `firstname` and `lastname` of user attributes.
+ * @property {String} nickname
+ *     A custom nickname for a contact, it won't be set for the current user.
+ *     This information comes from a private encrypted attribute !*>alias which
+ *     stores all contact nicknames for the user.
  * @property {String} h
  *     Holds user handle, value equal to 'u' param. Used only when synching with
  *     M.d, deeply rooted in code. should not be removed.
@@ -64,6 +68,7 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "shortName": "",
         "firstName": "",
         "lastName": "",
+        "nickname": "",
         "ts": undefined,
         "ats": undefined,
         "rTimeStamp": undefined,

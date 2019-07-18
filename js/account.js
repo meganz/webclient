@@ -114,7 +114,7 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
+            'aav', 'aas', '*!>alias', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
             'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
         ];
 
@@ -144,6 +144,11 @@ function u_checklogin3a(res, ctx) {
 
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
+
+            // If nicknames private encrypted attribute is set
+            if (typeof u_attr['*!>alias'] !== 'undefined') {
+                nicknames.decryptAndCacheNicknames(u_attr['*!>alias']);
+            }
         }
 
         try {
@@ -1419,6 +1424,7 @@ function processEmailChangeActionPacket(ap) {
      * @param {String} value Configuration value
      */
     ns.set = function _setConfigValue(key, value) {
+
         fmconfig[key] = value;
 
         if (d) {

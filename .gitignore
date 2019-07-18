@@ -219,6 +219,7 @@ js/tests/node_modules/
 coverage/
 doc/
 test-results.xml
+.jscpd/
 jscpd-report.xml
 .coverage
 .tox

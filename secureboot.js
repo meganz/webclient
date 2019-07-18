@@ -2195,7 +2195,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
@@ -2230,6 +2229,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     
     if (!is_mobile) {
+        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});

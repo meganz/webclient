@@ -463,7 +463,7 @@ var mobile = {
         var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
 
         $(window).rebind('popstate.mega-mobile', function() {
-            
+
             $closeBtn.trigger('tap');
             $(this).off('popstate.mega-mobile');
         });
@@ -556,6 +556,13 @@ mega.megadrop = {
         return p;
     },
     isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
+};
+
+var nicknames = {
+    initialNicknames: {},
+    getNicknameAndName: function() {},
+    decryptAndCacheNicknames: function() {},
+    updateNicknamesFromActionPacket: function() {}
 };
 
 var notify = {

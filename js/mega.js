@@ -3057,8 +3057,12 @@ function processUPCO(ap) {
  * @param {Object} users Information about users (properties defined in js/fm/megadata.js)
  */
 function process_u(users, ignoreDB) {
-
     "use strict";
+
+    // If nicknames private encrypted attribute is set.
+    if (nicknames.cache === false && Object(u_attr).hasOwnProperty('*!>alias')) {
+        nicknames.decryptAndCacheNicknames(u_attr['*!>alias']);
+    }
 
     for (var i = 0; i < users.length; i++) {
 
@@ -3078,8 +3082,8 @@ function process_u(users, ignoreDB) {
             }
 
             // Or if the nickname is set in the initial 'ug' API request, then set it
-            else if (typeof nicknames.initialNicknames[userHandle] !== 'undefined') {
-                users[i].nickname = nicknames.initialNicknames[userHandle];
+            else if (nicknames.cache[userHandle]) {
+                users[i].nickname = nicknames.cache[userHandle];
             }
 
             M.addNode(users[i], ignoreDB);

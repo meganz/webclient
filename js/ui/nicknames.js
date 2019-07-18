@@ -6,7 +6,7 @@ var nicknames = {
     /**
      * Initial load of nicknames { userhandle : nickname, ... } from 'ug' request
      */
-    initialNicknames: {},
+    cache: false,
 
     /**
      * Gets the user's nickname if it's available
@@ -52,9 +52,10 @@ var nicknames = {
             var decodedContactNicknames = mega.attr.decodeObjectValues(contactNicknames);
 
             // Set
-            this.initialNicknames = decodedContactNicknames;
+            this.cache = decodedContactNicknames;
         }
         catch (ex) {
+            this.cache = Object.create(null);
             console.error('Failed to decrypt contact nicknames', ex);
         }
     },

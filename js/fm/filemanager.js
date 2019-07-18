@@ -3002,7 +3002,8 @@ FileManager.prototype.addGridUI = function(refresh) {
             var $fnameCol = $('.files-grid-view.fm .grid-table.fm td[megatype="fname"]').first();
 
             // check if it's still dynamic
-            if ($fnameCol.attr('style').indexOf('calc(100% -') !== -1) {
+            var colStyle = $fnameCol.attr('style');
+            if (colStyle && colStyle.indexOf('calc(100% -') !== -1) {
                 M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 400);
             }
 

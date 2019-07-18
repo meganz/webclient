@@ -145,8 +145,8 @@ function u_checklogin3a(res, ctx) {
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
 
-            // If nicknames private encrypted attribute is set
-            if (typeof u_attr['*!>alias'] !== 'undefined') {
+            // If nicknames private encrypted attribute is set and we are not in an embedded player
+            if (typeof u_attr['*!>alias'] !== 'undefined' && typeof nicknames === 'object') {
                 nicknames.decryptAndCacheNicknames(u_attr['*!>alias']);
             }
         }

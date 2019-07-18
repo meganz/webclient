@@ -15170,21 +15170,26 @@ React.makeElement = React['createElement'];
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(29).MetaRichpreviewLoading;
+	var _react = __webpack_require__(2);
 
-	var MetaRichpreviewMegaLinks = React.createClass({
-	    displayName: "MetaRichpreviewMegaLinks",
+	var _react2 = _interopRequireDefault(_react);
 
-	    mixins: [ConversationMessageMixin],
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _mixin = __webpack_require__(27);
+
+	var _metaRichPreviewLoading = __webpack_require__(29);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var MetaRichpreviewMegaLinks = _react2.default.createClass({
+	    displayName: 'MetaRichpreviewMegaLinks',
+
+	    mixins: [_mixin.ConversationMessageMixin],
 	    render: function render() {
 	        var self = this;
 	        var cssClasses = "message body";
@@ -15213,7 +15218,7 @@ React.makeElement = React['createElement'];
 	                    });
 	                }
 
-	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichpreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
 	            } else {
 	                var desc;
 
@@ -15224,65 +15229,65 @@ React.makeElement = React['createElement'];
 	                } else if (!megaLinkInfo.is_dir) {
 	                    desc = bytesToSize(megaLinkInfo.info.size);
 	                } else {
-	                    desc = React.makeElement(
-	                        "span",
+	                    desc = _react2.default.createElement(
+	                        'span',
 	                        null,
 	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
-	                        React.makeElement("br", null),
+	                        _react2.default.createElement('br', null),
 	                        bytesToSize(megaLinkInfo.info.size)
 	                    );
 	                }
 
-	                previewContainer = React.makeElement(
-	                    "div",
+	                previewContainer = _react2.default.createElement(
+	                    'div',
 	                    { className: "message richpreview body " + ((is_icon ? "have-icon" : "no-icon") + " " + (megaLinkInfo.is_chatlink ? "is-chat" : "")) },
-	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        React.makeElement("div", { className: "message richpreview preview",
+	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        _react2.default.createElement('div', { className: 'message richpreview preview',
 	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
-	                    ) : React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        megaLinkInfo.is_chatlink ? React.makeElement("i", { className: "huge-icon conversations" }) : React.createElement("div", { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
+	                    ) : _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        megaLinkInfo.is_chatlink ? _react2.default.createElement('i', { className: 'huge-icon conversations' }) : _react2.default.createElement('div', { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
 	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview inner-wrapper" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview data-title" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview title" },
-	                                React.makeElement(
-	                                    utils.EmojiFormattedContent,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview inner-wrapper' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview data-title' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview title' },
+	                                _react2.default.createElement(
+	                                    _utils2.default.EmojiFormattedContent,
 	                                    null,
 	                                    megaLinkInfo.info.name || megaLinkInfo.info.topic || ""
 	                                )
 	                            )
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview desc" },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview desc' },
 	                            desc
 	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview url-container" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url-favicon" },
-	                                React.makeElement("img", { src: "https://mega.nz/favicon.ico?v=3&c=1", width: 16, height: 16,
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview url-container' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url-favicon' },
+	                                _react2.default.createElement('img', { src: 'https://mega.nz/favicon.ico?v=3&c=1', width: 16, height: 16,
 	                                    onError: function onError(e) {
 	                                        e.target.parentNode.removeChild(e.target);
 	                                    },
-	                                    alt: ""
+	                                    alt: ''
 	                                })
 	                            ),
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url" },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url' },
 	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
 	                            )
 	                        )
@@ -15290,8 +15295,8 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 
-	            output.push(React.makeElement(
-	                "div",
+	            output.push(_react2.default.createElement(
+	                'div',
 	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
 	                    onClick: function (url) {
 	                        if (megaLinkInfo.hadLoaded()) {
@@ -15299,12 +15304,12 @@ React.makeElement = React['createElement'];
 	                        }
 	                    }.bind(this, megaLinkInfo.getLink()) },
 	                previewContainer,
-	                React.makeElement("div", { className: "clear" })
+	                _react2.default.createElement('div', { className: 'clear' })
 	            ));
 	        }
-	        return React.makeElement(
-	            "div",
-	            { className: "message richpreview previews-container" },
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'message richpreview previews-container' },
 	            output
 	        );
 	    }

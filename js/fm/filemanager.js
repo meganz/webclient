@@ -9,7 +9,7 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 823px)', viewed: true };
+    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
     this.columnsWidth.cloud.label = { max: 130, min: 70, curr: 70, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
@@ -17,6 +17,21 @@ function FileManager() {
     this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false }
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
+
+    this.columnsWidth.makeNameColumnStatic = function() {
+        var $header = $('.files-grid-view.fm .grid-table-header th[megatype="fname"]');
+        // check if it's still dynamic
+        var colStyle = $header.attr('style');
+
+        if (colStyle && colStyle.indexOf('calc(100% -') !== -1) {
+            var currWidth = $header.outerWidth();
+            M.columnsWidth.cloud['fname'].curr = currWidth;
+            $(".grid-table td[megatype='fname']").
+                outerWidth(currWidth);
+            $('.files-grid-view.fm .grid-table-header th[megatype="fname"]').
+                outerWidth(currWidth);
+        }
+    };
 
 }
 FileManager.prototype.constructor = FileManager;
@@ -530,6 +545,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 M.columnsWidth.cloud[colType].curr = thElm.outerWidth();
                 $(".grid-table td[megatype='" + colType + "']").
                     outerWidth(M.columnsWidth.cloud[colType].curr);
+
                 if (M.megaRender && M.megaRender.megaList) {
                     if (!M.megaRender.megaList._scrollIsInitialized) {
                         M.megaRender.megaList.resized();
@@ -548,7 +564,11 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
-        thElm && initGridScrolling();
+        if (thElm) {
+            M.columnsWidth.makeNameColumnStatic();
+
+            initGridScrolling();
+        }
         thElm = undefined;
         $('#fmholder').css('cursor', '');
     });
@@ -3304,6 +3324,8 @@ FileManager.prototype.addGridUI = function(refresh) {
             $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
             $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
         }
+
+        M.columnsWidth.makeNameColumnStatic();
 
         if (M.megaRender && M.megaRender.megaList) {
             if (!M.megaRender.megaList._scrollIsInitialized) {

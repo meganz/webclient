@@ -1381,11 +1381,21 @@ var notify = {
         if (M && M.u) {
             M.u.forEach(function(contact) {
 
-                // If the email is found
-                if (contact.m === email && contact.firstName && contact.lastName) {
+                var contactEmail = contact.m;
+                var contactHandle = contact.u;
 
-                    // Set the name and email
-                    displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';
+                // If the email is found
+                if (contactEmail === email) {
+
+                    // If the nickname is available use: Nickname (FirstName LastName
+                    if (M.u[contactHandle].nickname !== '') {
+                        displayName = nicknames.getNicknameAndName(contactHandle);
+                    }
+                    else {
+                        // Otherwise use: FirstName LastName (Email)
+                        displayName = (M.u[contactHandle].firstName + ' ' + M.u[contactHandle].lastName).trim()
+                                    + ' (' + email + ')';
+                    }
 
                     // Exit foreach loop
                     return true;

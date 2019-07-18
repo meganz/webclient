@@ -3050,52 +3050,62 @@ function processUPCO(ap) {
     }
 }
 
-/*
- * process_u
+/**
+ * Updates contact/user data in global variable M.u, local dB and taking care of items in share and add contacts
+ * dialogs dropdown
  *
- * Updates contact/s data in global variable M.u, local dB and
- * taking care of items in share and add contacts dialogs dropdown
- *
- * .c param is contact level i.e. [0-(inactive/deleted), 1-(active), 2-(owner)]
- *
- * @param {Object} u Users informations
+ * @param {Object} users Information about users (properties defined in js/fm/megadata.js)
  */
-function process_u(u, ignoreDB) {
+function process_u(users, ignoreDB) {
+
     "use strict";
 
-    for (var i = 0; i < u.length; i++) {
-        if (u[i].c === 1) {
-            u[i].h = u[i].u;
-            u[i].t = 1;
-            u[i].p = 'contacts';
-            M.addNode(u[i], ignoreDB);
+    for (var i = 0; i < users.length; i++) {
 
-            var contactName = M.getNameByHandle(u[i].h);
+        var userEmail = users[i].m;
+        var userHandle = users[i].u;
+        var userStatus = users[i].c;
+
+        if (userStatus === 1) {
+            users[i].h = userHandle;
+            users[i].t = 1;
+            users[i].p = 'contacts';
+            users[i].nickname = '';
+
+            // If this user had a nickname in the past, don't delete it if they are now added as a contact
+            if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
+                users[i].nickname = M.u[userHandle].nickname;
+            }
+
+            // Or if the nickname is set in the initial 'ug' API request, then set it
+            else if (typeof nicknames.initialNicknames[userHandle] !== 'undefined') {
+                users[i].nickname = nicknames.initialNicknames[userHandle];
+            }
+
+            M.addNode(users[i], ignoreDB);
+
+            var contactName = M.getNameByHandle(userHandle);
 
             // Update token.input plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: contactName}]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: contactName}]);
+            addToMultiInputDropDownList('.share-multiple-input', [{id: userEmail, name: contactName}]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: userEmail, name: contactName}]);
         }
-        else if (M.d[u[i].u]) {
-            M.delNode(u[i].u, ignoreDB);
+        else if (M.d[userHandle]) {
+            M.delNode(userHandle, ignoreDB);
 
             // Update token.input plugin
-            removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
-            removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
+            removeFromMultiInputDDL('.share-multiple-input', {id: userEmail, name: userEmail});
+            removeFromMultiInputDDL('.add-contact-multiple-input', {id: userEmail, name: userEmail});
         }
 
         // Update user attributes M.u
-        M.addUser(u[i], ignoreDB);
+        M.addUser(users[i], ignoreDB);
 
-        if (u[i].c === 1) {
-            // sync data objs M.u <-> M.d
-            M.d[u[i].u] = M.u[u[i].u];
+        // If a contact, sync data objs M.d and M.u
+        if (userStatus === 1) {
+            M.d[userHandle] = M.u[userHandle];
         }
     }
-
-    /*if (M.currentdirid === 'dashboard') {
-        delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
-     }*/
 }
 
 /**

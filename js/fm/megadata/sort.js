@@ -60,6 +60,7 @@ MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
 };
 
 MegaData.prototype.getSortByNameFn = function() {
+
     var self = this;
 
     return function(a, b, d) {
@@ -82,8 +83,12 @@ MegaData.prototype.getSortByNameFn2 = function(d) {
         var intl = this.collator || new Intl.Collator('co', {numeric: true});
 
         return function(a, b) {
-            if (a.name !== b.name) {
-                return intl.compare(a.name, b.name) * d;
+
+            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
+            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
+
+            if (nameA !== nameB) {
+                return intl.compare(nameA, nameB) * d;
             }
 
             return M.doFallbackSort(a, b, d);
@@ -92,7 +97,11 @@ MegaData.prototype.getSortByNameFn2 = function(d) {
 
     return function(a, b) {
         if (typeof a.name === 'string' && typeof b.name === 'string') {
-            return a.name.localeCompare(b.name) * d;
+
+            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
+            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
+
+            return nameA.localeCompare(nameB) * d;
         }
         return M.doFallbackSort(a, b, d);
     };

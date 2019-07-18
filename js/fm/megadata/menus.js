@@ -553,7 +553,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             var $contactBlock = $('#' + id).length ? $('#' + id) : $('#contact_' + id);
             var username = M.getNameByHandle(id) || '';
 
-            flt = '.remove-contact, .share-folder-item';
+            flt = '.remove-contact, .share-folder-item, .set-nickname';
+
             // Add .send-files-item to show Send files item
             if (!window.megaChatIsDisabled) {
                 flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';

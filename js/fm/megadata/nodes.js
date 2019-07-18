@@ -3546,9 +3546,9 @@ MegaData.prototype.getNameByHandle = function(handle) {
     if (handle.length === 11) {
         var user = this.getUserByHandle(handle);
 
+        // If user exists locally, use Nickname (FirstName LastName) or FirstName LastName or fallback to email
         if (user) {
-            // XXX: fallback to email
-            result = user.name && $.trim(user.name) || user.m;
+            result = nicknames.getNicknameAndName(handle) || user.m;
         }
         else if (window.megaChatIsReady && megaChat.chats[handle]) {
             var chat = megaChat.chats[handle];

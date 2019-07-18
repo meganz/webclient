@@ -1428,6 +1428,16 @@ FileManager.prototype.initContextUI = function() {
         fmremove();
     });
 
+    // Bind Set Nickname context menu button
+    $(c + '.set-nickname').rebind('click', function() {
+
+        var userHandle = $.selected && $.selected[0];
+        userHandle = userHandle.replace('contact_', '');
+
+        $.hideContextMenu();
+        nicknames.setNicknameDialog.init(userHandle);
+    });
+
     $(c + '.remove-contact').rebind('click', function() {
         if (u_attr && u_attr.b && u_attr.b.s === -1) {
             $.hideContextMenu();
@@ -2710,8 +2720,7 @@ FileManager.prototype.addContactUI = function() {
 
             var handle = user.u || user;
             var verificationState = u_authring.Ed25519[handle] || {};
-            var isVerified = (verificationState.method
-            >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+            var isVerified = (verificationState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
 
             // Show the user is verified
             if (isVerified) {
@@ -2748,6 +2757,12 @@ FileManager.prototype.addContactUI = function() {
                 return;
             }
             openCopyShareDialog(M.currentdirid);
+        });
+
+        // Initialise the Set nickname button on the contact details page
+        $('.fm-set-nickname').rebind('click', function() {
+
+            nicknames.setNicknameDialog.init(u_h);
         });
 
         // Remove contact button on contacts page
@@ -4459,8 +4474,8 @@ FileManager.prototype.openSharingDialog = function() {
         // Clear text area message
         $('.share-message textarea', $dialog).val(l[6853]);
 
-        // Maintain drop down list updated
-        updateDialogDropDownList('.share-multiple-input');
+        // Update drop down list / token input details
+        initShareDialogMultiInputPlugin();
 
         $('.share-dialog-icon.permissions-icon')
             .removeClass('active full-access read-and-write')

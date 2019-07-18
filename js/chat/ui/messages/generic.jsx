@@ -8,6 +8,7 @@ var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRic
 var ContactsUI = require('./../contacts.jsx');
 var TypingAreaUI = require('./../typingArea.jsx');
 import AudioContainer from './AudioContainer.jsx';
+import GeoLocation from './geoLocation.jsx';
 
 /* 1h as confirmed by Mathias */
 var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
@@ -1019,6 +1020,8 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
+                let geoLocation = null;
+
                 if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
@@ -1106,6 +1109,12 @@ var GenericConversationMessage = React.createClass({
                         }
 
 
+                    }
+                    else if (message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                        const { lng, la: latitude } = message.meta.extra[0];
+                        geoLocation = (
+                            <GeoLocation latitude={latitude} lng={lng}/>
+                        );
                     }
                     if (message.megaLinks) {
                         subMessageComponent.push(<MetaRichpreviewMegaLinks
@@ -1230,7 +1239,7 @@ var GenericConversationMessage = React.createClass({
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
-                        var editButton = message.metaType !== -1 ?
+                        var editButton = (message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION) ?
                             <DropdownsUI.DropdownItem
                                 icon="icons-sprite writing-pencil"
                                 label={__(l[1342])}
@@ -1269,6 +1278,11 @@ var GenericConversationMessage = React.createClass({
 
                     }
                 }
+                const isGeoLocation = message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+
+                if (isGeoLocation) {
+                    messageDisplayBlock = null;
+                }
 
                 return (
                     <div className={message.messageId + " message body " + additionalClasses}>
@@ -1283,6 +1297,7 @@ var GenericConversationMessage = React.createClass({
                             {subMessageComponent}
                             {buttonsBlock}
                             {spinnerElement}
+                            {geoLocation}
                         </div>
                     </div>
                 );

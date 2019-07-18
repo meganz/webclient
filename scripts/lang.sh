@@ -1,53 +1,27 @@
 #!/bin/bash
 #
-# This script checks out the 'translations' branch, then fetches the latest translation strings from Babel and updates
-# the .json files in the /lang directory. Then it merges the 'translations' branch into your current branch.
+# This script is just pulling latest language strings from babel
 #
 # How to use:
 #
 # From inside your local webclient directory, run:
 # ./scripts/lang.sh
-#
-# After that you are free to push the changes to the remote.
-
-
-# Get the current branch
-currentBranch=$(git rev-parse --abbrev-ref HEAD)
-
-# Checkout the local translations branch
-checkoutResult=$(git checkout translations)
-
-# Check if the checkout succeeded
-if [ $? -eq 0 ]; then
-
-    # Clear any local changes and make sure it's up to date with the remote
-    git reset --hard remotes/origin/translations
-    git pull
-
-    echo "Updated translations branch with latest changes from remotes/origin/translations."
-else
-    # If the checkout failed, fetch the branch from the remote server and check it out locally
-    git fetch
-    git checkout -b translations remotes/origin/translations
-
-    echo "Created a new local translations branch based on the latest remotes/origin/translations."
-fi
 
 # Change to the lang directory
 cd $(dirname $BASH_SOURCE)/../lang
 
+if [ $? -ne 0 ]; then
+
+    echo "ERROR: Cannot able to get into language folder. The update was aborted."
+    exit 1
+fi
+
 # Fetch the latest translations from Babel
 wget 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -O lang.tar.gz || curl -# 'https://babel.mega.co.nz/?u=Jq1EXnelOeQpj7UCaBa1&id=fetch&' -o lang.tar.gz
 
-# Check if the fetch failed
 if [ $? -ne 0 ]; then
 
-    # Check out the previous branch again
-    git checkout $currentBranch
-    git status
-
-    echo "There was a problem fetching strings from Babel."
-    echo "The language strings update was aborted and terminal is now returned to the $currentBranch branch."
+    echo "ERROR: There was a problem fetching beta language strings from Babel. The update was aborted."
     exit 1
 fi
 
@@ -55,57 +29,28 @@ fi
 find . -type f -not -name '*_prod.json' -not -name 'lang.tar.gz' -delete
 
 # Extract the tar.gz file
-tar xfvz lang.tar.gz
+tar xfvzm lang.tar.gz
 
-# Remove unnecessary files
-rm strings.json
-rm error.json
-rm .ignore
+# Display any errors from Babel e.g. missing strings to the console
+cat error.json
 
-# Add the .json files
-git add *.json
+# If the error.json file does not exist, then this command will fail which is fine, so continue as normal
+if [ $? -ne 0 ]; then
 
-# Commit it
-git commit -m 'Updated strings from Babel'
-
-# Push it to the translations branch
-git push -u origin translations
-
-# Check out the previous branch again
-git checkout $currentBranch
-
-# Merge translations branch into the current branch
-git pull origin translations
-
-# Check result of merge to see if it merged cleanly without conflicts
-mergeResult=$(git ls-files -u)
-
-# If there was a merge conflict
-if [ -n "$mergeResult" ]; then
-    echo "Problem merging, re-extracting strings from Babel again to resolve conflict..."
-    git status
-
-    # Extract the tar.gz file again
-    tar xfvz lang.tar.gz
-
-    # Remove unnecessary files
-    rm strings.json
-    rm error.json
-    rm .ignore
-
-    # Mark conflict resolved and commit changes
-    git add *.json
-    git commit --no-edit
-
-    echo
-    echo "Conflicts resolved, you can now push the changes."
+    echo "No errors from Babel, continuing as normal..."
 else
     echo
-    echo "All merged, you can now push the changes."
+    echo "ERROR: There are errors above with the language strings from Babel."
+    exit 1
 fi
 
-# Final cleanup
-rm lang.tar.gz
+# Remove unnecessary files
+rm -f strings.json
+rm -f error.json
+rm -f .ignore
 
-# Show all clear
-git status
+# Final cleanup
+rm -f lang.tar.gz
+
+echo
+echo "Language files successfully downloaded and extracted."

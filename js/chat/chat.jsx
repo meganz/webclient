@@ -271,7 +271,8 @@ var Chat = function() {
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter,
-            'richpreviewsFilter': RichpreviewsFilter
+            'richpreviewsFilter': RichpreviewsFilter,
+            'geoLocationLinks': GeoLocationLinks
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -1041,8 +1042,6 @@ Chat.prototype.getContacts = function() {
     });
     return results;
 };
-
-
 
 /**
  * Helper to convert XMPP presence from string (e.g. 'chat'), to a CSS class (e.g. will return 'online')

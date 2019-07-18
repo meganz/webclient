@@ -2063,6 +2063,9 @@ function initShareDialogMultiInputPlugin() {
     var $scope = $('.share-dialog');
     var $input = $('.share-multiple-input', $scope);
 
+    // Clear old values in case the name/nickname updated since last opening
+    $input.tokenInput('destroy');
+
     $input.tokenInput(contacts, {
         theme: "mega",
         placeholder: l[19108],// Enter one or more email address

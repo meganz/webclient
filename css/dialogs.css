@@ -3057,7 +3057,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -4745,6 +4745,59 @@ li.token-input-token-invite .input-close {
     width: 450px;
 }
 /* end of Make chat private */
+
+/* Contact Nickname dialog */
+.contact-nickname-dialog {
+    left: 50%;
+    margin-left: -228px;
+    margin-top: -124px;
+    padding: 0;
+    top: 50%;
+}
+.contact-nickname-dialog .fm-dialog-body {
+    padding: 49px 40px 0 40px;
+}
+.contact-nickname-dialog .input-block {
+    position: relative;
+}
+.contact-nickname-dialog .small-icon.gentleman {
+    left: 7px;
+    position: absolute;
+    top: 20px;
+}
+.contact-nickname-dialog .nickname-input-title {
+    color: #999;
+    font-family: 'LatoWebSemibold';
+    font-size: 12px;
+    letter-spacing: 0.86px;
+    line-height: 15px;
+    margin-left: 34px;
+    visibility: hidden;
+}
+.contact-nickname-dialog .nickname-input-title.visible {
+    visibility: visible;
+}
+.contact-nickname-dialog .nickname-input {
+    border: 0;
+    color: #333;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    letter-spacing: 1px;
+    line-height: 17px;
+    margin-left: 34px;
+    padding: 8px 0 14px 0;
+    width: 343px;
+}
+.contact-nickname-dialog .horizontal-bar {
+    background-color: #00bfa5;
+    height: 1px;
+}
+.contact-nickname-dialog .button-block {
+    padding: 32px 40px 36px 40px;
+}
+.contact-nickname-dialog .cancel-button {
+    margin-right: 11px;
+}
 
 /* Register side pane */
 .register-side-pane.container {

@@ -867,3 +867,78 @@
     top: 70%;
     left: 20px;
 }
+
+.message .geolocation {
+    height: 122px;
+    width: 402px;
+    background-color: #FFF;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px 0 rgba(0, 0 , 0, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.message .geolocation .geolocation__coordinates {
+    color: #333;
+    font-size: 14px;
+    opacity: 0.84;
+    margin-left: 20px;
+}
+
+.message .geolocation .geolocation__img {
+    background-image: url(../images/mega/link_location@2x.png);
+    background-size: contain;
+    width: 112px;
+    height: 112px;
+    position: relative;
+    left: -35px;
+    top: 5px;
+    display: inline-block;
+}
+
+.message .geolocation .geolocation__data-list {
+    position: absolute;
+    left: 95px;
+    top: 40px;
+}
+
+.message .geolocation ul li:nth-child(3) {
+   padding-left: 20px;
+}
+
+.message .geolocation ul li {
+    margin-bottom: 30px;
+}
+
+.message .geolocation .geolocation__title {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+.message .geolocation .geolocation__text-md {
+    font-size: 15px;
+}
+
+.message .geolocation .geolocation__coordinates-icon {
+    height: 15px;
+    width: 15px;
+    background-image: url(../images/mega/google-icon.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    display: inline-block;
+    left: 40px;
+    bottom: 26px;
+}
+
+.geolocation-icon {
+    background: url('../images/mega/icons-sprite_v29.png') no-repeat -121px -1960px;
+    width: 10px;
+    height: 15px;
+    display: inline-block;
+    margin-right: 5px;
+}

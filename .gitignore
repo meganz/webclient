@@ -219,6 +219,7 @@ js/tests/node_modules/
 coverage/
 doc/
 test-results.xml
+.jscpd/
 jscpd-report.xml
 .coverage
 .tox
@@ -244,9 +245,8 @@ dont-deploy/ui/out/
 contrib/local_config.py
 
 # Temp language files from Babel
-lang/error.json
-lang/lang.tar.gz
-lang/strings.json
+lang/*
+!lang/*_prod.json
 lang/strings_prod.json
 
 #############

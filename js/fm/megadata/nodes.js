@@ -758,7 +758,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
             nodesCount = importNodes - Object.keys(res).length;
-            if (t.length === 11) {
+            if (ctx.t && ctx.t.length === 11) {
                 getsc(true);
             }
         }
@@ -3546,9 +3546,9 @@ MegaData.prototype.getNameByHandle = function(handle) {
     if (handle.length === 11) {
         var user = this.getUserByHandle(handle);
 
+        // If user exists locally, use Nickname (FirstName LastName) or FirstName LastName or fallback to email
         if (user) {
-            // XXX: fallback to email
-            result = user.name && $.trim(user.name) || user.m;
+            result = nicknames.getNicknameAndName(handle) || user.m;
         }
         else if (window.megaChatIsReady && megaChat.chats[handle]) {
             var chat = megaChat.chats[handle];
@@ -3883,6 +3883,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
     var _import = function(data) {
         M.onFileManagerReady(function() {
+            loadingDialog.hide('import');
             openCopyDialog(function() {
                 $.mcImport = true;
                 $.selected = data[0];
@@ -3897,7 +3898,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     };
 
     if (localStorage.folderLinkImport && !folderlink) {
-
+        loadingDialog.show('import');
         if ($.onImportCopyNodes) {
             _import($.onImportCopyNodes);
         }

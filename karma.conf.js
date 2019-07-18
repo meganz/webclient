@@ -152,6 +152,7 @@ module.exports = function(config) {
         'js/chat/plugins/callFeedback.js',
         'js/chat/webrtc.js',
         'js/chat/plugins/callManager.js',
+        'js/chat/plugins/geoLocationLinks.js',
         'js/chat/messages.js',
         'js/chat/ui/incomingCallDialog.js',
         'js/chat/callNotificationsEngine.js',

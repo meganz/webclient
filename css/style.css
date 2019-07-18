@@ -4880,7 +4880,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5580,7 +5580,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6309,7 +6309,7 @@ th.grid-first-th {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7243,11 +7243,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -10442,7 +10442,7 @@ span.orange {
     background-repeat: no-repeat;
 }
 .dropdown-item.sort-grid-item.selected i {
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v29.png);
     background-position: -1px -1546px;
     background-size: 262px auto;
     background-repeat: no-repeat;
@@ -29675,7 +29675,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v27.png");
+    background-image: url("../images/mega/icons-sprite_v29.png");
     width: 24px;
     height: 24px;
     left: -1px;
@@ -29801,7 +29801,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     top: 0;
 }
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v27.png");
+    background-image: url("../images/mega/icons-sprite_v29.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29860,7 +29860,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v27.png");
+    background-image: url("../images/mega/icons-sprite_v29.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -29927,7 +29927,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v27.png");
+    background-image: url("../images/mega/icons-sprite_v29.png");
 }
 .transfer-task-actions {
     display: none;

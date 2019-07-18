@@ -373,14 +373,20 @@ RtcModule.prototype.getActiveCall = function() {
 
 RtcModule.prototype._updatePeerAvState = function(parsedCallData, peerIsUs) {
     var chatid = parsedCallData.chatid;
-    var userid = parsedCallData.fromUser;
-    var clientid = parsedCallData.fromClient;
-    var av = parsedCallData.av;
-    var peerid = userid + clientid;
     var roomCallState = this.offCallStates[chatid];
     if (!roomCallState) {
+        if (parsedCallData.av === 0) {
+            return;
+        }
         roomCallState = this.offCallStates[chatid] = { callId: parsedCallData.callid, peerAv: {} };
     }
+
+    var userid = parsedCallData.fromUser;
+    var clientid = parsedCallData.fromClient;
+    // clientid can be undefined only if we were disconnected from the shard, but that case is handled above
+    assert(clientid);
+    var av = parsedCallData.av;
+    var peerid = userid + clientid;
     var peerAvs = roomCallState.peerAv;
     var oldAv = peerAvs[peerid];
     if (av !== oldAv) {
@@ -1497,6 +1503,16 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         }
         self.logger.log(logMsg);
 
+        if (self.gLocalStream) {
+            RTC.stopMediaStream(self.gLocalStream);
+            delete self.gLocalStream;
+            delete self.localMediaPromise;
+        }
+        if (self._audioMutedChecker) {
+            self._audioMutedChecker.stop();
+            delete self._audioMutedChecker;
+        }
+
         // reasonNoPeer can be kBusy even in a group call if we are the callee, and another client of ours
         // is already in a call. In that case, our other client will broadcast a decline with kBusy,
         // and we will see it and abort the incoming call request
@@ -1516,15 +1532,6 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             delete self._peerCallRecoveryWaitTimer;
         }
         self._setState(CallState.kDestroyed);
-        if (self.gLocalStream) {
-            RTC.stopMediaStream(self.gLocalStream);
-            delete self.gLocalStream;
-            delete self.localMediaPromise;
-        }
-        if (self._audioMutedChecker) {
-            self._audioMutedChecker.stop();
-            delete self._audioMutedChecker;
-        }
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, willRecover);
         self.manager._removeCall(self);
     };
@@ -1532,7 +1539,8 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         self.logger.warn("Destroying call immediately due to kAppTerminating");
         destroyCall();
         self._destroyPromise = Promise.resolve();
-    } else if (code === Term.kErrNetSignalling && self.predestroyState !== CallState.kRingIn) {
+    } else if (code === Term.kErrNetSignalling && ((self.predestroyState === CallState.kCallInProgress)
+            || (self.predestroyState === CallState.kJoining))) {
         self.logger.warn("Destroying call immediately due to kErrNetSignalling and setting up a recovery attempt");
         // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
         self.manager._setupCallRecovery(self);
@@ -1565,7 +1573,7 @@ RtcModule.prototype._setupCallRecovery = function(call) {
         callid: callid,
         av: call.localAv(),
         callHandler: call.handler,
-        timer: setTimeout(function() {
+        timeoutTimer: setTimeout(function() {
             var recovery = self.callRecoveries[chatid];
             if (!recovery) {
                 return;
@@ -1592,7 +1600,7 @@ RtcModule.prototype.clearCallRecovery = function(chatid) {
     if (!recovery) {
         return;
     }
-    clearTimeout(recovery.timer);
+    clearTimeout(recovery.timeoutTimer);
     delete this.callRecoveries[chatid];
 };
 

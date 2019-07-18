@@ -514,9 +514,19 @@ function init_page() {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
+
     if (page.substr(0, 7) == 'pwreset') {
         resetpwcode = page.replace("pwreset", "");
         page = 'resetpassword';
+    }
+
+    // If password revert link, use generic background page, show the dialog and pass in the code
+    if (page.substr(0, 8) === 'pwrevert') {
+        parsepage(pages[is_mobile ? 'mobile' : 'placeholder']);
+        passwordRevert.init(page);
+
+        // Make sure placeholder background is shown
+        return false;
     }
 
     // is chat link?

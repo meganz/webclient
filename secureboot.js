@@ -2195,7 +2195,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
@@ -2225,10 +2224,12 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
-    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});    
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-
+    
     if (!is_mobile) {
+        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
@@ -2654,6 +2655,7 @@ else if (!browserUpdate) {
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
             'cne_js': {f:'js/chat/callNotificationsEngine.js', n: 'cne_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},

@@ -3230,8 +3230,19 @@ FileManager.prototype.addGridUI = function(refresh) {
                         }
                     }
 
+                    var scrollVal = 0;
+                    if (M.megaRender && M.megaRender.megaList) {
+                        scrollVal = M.megaRender.megaList.getScrollLeft();
+                    }
+
                     M.doSort(sortBy, dir);
                     M.renderMain();
+
+                    if (scrollVal && M.megaRender && M.megaRender.megaList) {
+                        M.megaRender.megaList.scrollTo(0, scrollVal);
+                        var tableHeader = $('.files-grid-view.fm .grid-table-header');
+                        tableHeader.css('left', -1 * scrollVal);
+                    }
 
                     break;
                 }

@@ -15229,7 +15229,7 @@ React.makeElement = React['createElement'];
 	                    });
 	                }
 
-	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichpreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
 	            } else {
 	                var desc;
 

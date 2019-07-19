@@ -1683,7 +1683,7 @@ var ConversationPanel = React.createClass({
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
-                title={__("Confirm paste")}
+                title={__(l[20905])}
                 name="paste-image-chat"
                 onClose={() => {
                     self.setState({'pasteImageConfirmDialog': false});
@@ -1717,7 +1717,7 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__("Please confirm that you want to upload this image and share it in this chat room.")}
+                        {__(l[20906])}
                     </div>
 
                     <img

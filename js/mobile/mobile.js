@@ -559,7 +559,7 @@ mega.megadrop = {
 };
 
 var nicknames = {
-    initialNicknames: {},
+    cache: {},
     getNicknameAndName: function() {},
     decryptAndCacheNicknames: function() {},
     updateNicknamesFromActionPacket: function() {}

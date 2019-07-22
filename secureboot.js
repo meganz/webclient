@@ -82,11 +82,6 @@ var load_error_types = {
  */
 function isMobile() {
 
-    // If extension, not applicable
-    if (is_extension) {
-        return false;
-    }
-
     var mobileStrings = [
         'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'

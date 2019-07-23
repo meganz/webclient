@@ -126,7 +126,7 @@ function removeUInode(h, parent) {
     if (M.megaRender && M.megaRender.megaList) {
         if (parent) {
             // this was a move node op
-            if (parent === M.currentdirid) {
+            if (parent === M.currentdirid || parent === M.currentCustomView.nodeID) {
                 // the node was moved out of the current viewport, so lets remove it from the MegaList
                 M.megaRender.megaList.remove(h);
             }

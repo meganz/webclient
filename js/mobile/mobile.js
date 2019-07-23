@@ -451,14 +451,9 @@ var mobile = {
      * @param {Object} $overlay target overlay
      */
     initOverlayPopstateHandler: function($overlay) {
-
         'use strict';
 
-        if (pfid) {
-            history.pushState({ subpage: page }, "", "#" + page);
-        } else {
-            history.pushState({ subpage: page }, "", "/" + page);
-        }
+        pushHistoryState(page);
 
         var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
 

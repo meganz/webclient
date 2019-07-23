@@ -200,6 +200,26 @@ mega.tpw = new function TransferProgressWidget() {
         });
     };
 
+    /**
+     * Clear the warnings shown on TPW header
+     * @param {Number} type     flag to distinguish upload/download
+     */
+    this.resetErrorsAndQuotasUI = function(type) {
+        if (!type) {
+            return;
+        }
+
+        $overQuotaBanner.addClass('hidden');
+
+        var $sectionType = 'download';
+
+        if (type === this.UPLOAD) {
+            $sectionType = 'upload';
+        }
+
+        $rowsHeader.find('.transfer-progress-type.' + $sectionType).removeClass('error overquota');
+    };
+
 
     var actionsOnRowEventHandler = function() {
         var $me = $(this);

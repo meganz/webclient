@@ -1894,6 +1894,16 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
 }
 
 
+function resetOverQuotaTransfers(ids) {
+    $('#' + ids.join(',#'))
+        .addClass('transfer-queued')
+        .find('.transfer-status')
+        .removeClass('overquota')
+        .text(l[7227]);
+
+    mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
+}
+
 function fm_chromebar(height) {
     if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {
         return false;

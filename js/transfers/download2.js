@@ -1198,11 +1198,7 @@ var dlmanager = {
             $(window).trigger('resize');
         }
         else if (ids.length) {
-            $('#' + ids.join(',#'))
-                .addClass('transfer-queued')
-                .find('.transfer-status')
-                .removeClass('overquota')
-                .text(l[7227]);
+            resetOverQuotaTransfers(ids);
         }
 
         for (var i = 0; i < this._dlQuotaListener.length; ++i) {

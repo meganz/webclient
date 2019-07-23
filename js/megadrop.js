@@ -1270,7 +1270,12 @@ mega.megadrop = (function() {
                 console.log('settings.drawPups');
             }
             var list = Object.values(pup.items);
+            var handleList = list.map(function(pup) {
+                return pup.h;
+            });
             var item = {};
+
+            $(settingsOpts.card.wrapperClass).empty();
 
             if (!$(settingsOpts.card.wrapperClass).find('.megadrop-header').length) {
                 var $headElem = $('#megadrop-header-template').clone().removeAttr('id');
@@ -1281,22 +1286,25 @@ mega.megadrop = (function() {
                 }
             }
 
-            // Sort the MEGADrop folders by name alphabetically before rendering
-            list.sort(function (a, b) {
-                return a.fn.localeCompare(b.fn);
-            });
+            dbfetch.geta(handleList).always(function() {
 
-            for (var g = 0; g < list.length; g++) {
-                item = list[g];
-                if (item.p && item.s === 2) {
-                    drawPupCard(item.p);
-                }
-                else {
-                    if (d) {
-                        console.warn('settings.drawPups: non-active PUP: ', item.fn);
+                // Sort the MEGADrop folders by name alphabetically before rendering
+                list.sort(function (a, b) {
+                    return a.fn.localeCompare(b.fn);
+                });
+
+                for (var g = 0; g < list.length; g++) {
+                    item = list[g];
+                    if (item.p && item.s === 2) {
+                        drawPupCard(item.p);
+                    }
+                    else {
+                        if (d) {
+                            console.warn('settings.drawPups: non-active PUP: ', item.fn);
+                        }
                     }
                 }
-            }
+            });
         };
 
         /**

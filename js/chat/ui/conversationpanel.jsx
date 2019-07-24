@@ -1,40 +1,31 @@
-// libs
-var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var CloudBrowserModalDialog = require('./../../ui/cloudBrowserModalDialog.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationsUI = require('./../ui/conversations.jsx');
-var TypingAreaUI = require('./../ui/typingArea.jsx');
-var WhosTyping = require('./whosTyping.jsx').WhosTyping;
-var getMessageString = require('./messages/utils.jsx').getMessageString;
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-var Accordion = require('./../../ui/accordion.jsx').Accordion;
-var AccordionPanel = require('./../../ui/accordion.jsx').AccordionPanel;
-var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
-
-var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage =
-    require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
-var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
-var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
-var TopicChange = require('./messages/topicChange.jsx').TopicChange;
-var SharedFilesAccordionPanel = require('./sharedFilesAccordionPanel.jsx').SharedFilesAccordionPanel;
-var IncomingSharesAccordionPanel = require('./incomingSharesAccordionPanel.jsx').IncomingSharesAccordionPanel;
-
-var CloseOpenModeMessage = require('./messages/closeOpenMode.jsx').CloseOpenModeMessage;
-var ChatHandleMessage = require('./messages/chatHandle.jsx').ChatHandleMessage;
-var ChatlinkDialog = require('./../ui/chatlinkDialog.jsx').ChatlinkDialog;
-
+import React from 'react';
+import ReactDOM from 'react-dom';
+import utils from './../../ui/utils.jsx';
+import { RenderDebugger, MegaRenderMixin } from './../../stores/mixins.js';
+import ButtonsUI from './../../ui/buttons.jsx';
+import ModalDialogsUI from './../../ui/modalDialogs.jsx';
+import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
+import DropdownsUI from './../../ui/dropdowns.jsx';
+import ContactsUI from './../ui/contacts.jsx';
+import TypingAreaUI from './../ui/typingArea.jsx';
+import { WhosTyping } from './whosTyping.jsx';
+import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
+import { Accordion } from './../../ui/accordion.jsx';
+import { AccordionPanel } from './../../ui/accordion.jsx';
+import { ParticipantsList } from './participantsList.jsx';
+import { GenericConversationMessage } from './messages/generic.jsx';
+import { AlterParticipantsConversationMessage }  from './messages/alterParticipants.jsx';
+import { TruncatedMessage } from './messages/truncated.jsx';
+import { PrivilegeChange } from './messages/privilegeChange.jsx';
+import { TopicChange } from './messages/topicChange.jsx';
+import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
+import { IncomingSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
+import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
+import { ChatHandleMessage } from './messages/chatHandle.jsx';
+import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
+import { ConversationAudioVideoPanel } from './conversationaudiovideopanel.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
-
-var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
 
 var JoinCallNotification = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],

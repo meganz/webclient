@@ -57,10 +57,23 @@ React.makeElement = React['createElement'];
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var ConversationsUI = __webpack_require__(4);
-	var ChatRoom = __webpack_require__(44);
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(3);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _conversations = __webpack_require__(4);
+
+	var _conversations2 = _interopRequireDefault(_conversations);
+
+	var _chatRoom = __webpack_require__(44);
+
+	var _chatRoom2 = _interopRequireDefault(_chatRoom);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var EMOJI_DATASET_VERSION = 3;
 
@@ -344,8 +357,8 @@ React.makeElement = React['createElement'];
 	        self.updateSectionUnreadCount();
 	    });
 
-	    $.each(self.options.plugins, function (k, v) {
-	        self.plugins[k] = new v(self);
+	    Object.keys(self.options.plugins).forEach(function (plugin) {
+	        self.plugins[plugin] = new self.options.plugins[plugin](self);
 	    });
 
 	    $(document.body).rebind('mousedown.megachat', '.top-user-status-popup .tick-item', function () {
@@ -410,9 +423,9 @@ React.makeElement = React['createElement'];
 	            console.time('chatReactUiInit');
 	        }
 
-	        self.$conversationsApp = React.makeElement(ConversationsUI.ConversationsApp, { megaChat: self, contacts: M.u });
+	        self.$conversationsApp = _react2.default.createElement(_conversations2.default.ConversationsApp, { megaChat: self, contacts: M.u });
 
-	        self.$conversationsAppInstance = ReactDOM.render(self.$conversationsApp, document.querySelector('.section.conversations'));
+	        self.$conversationsAppInstance = _reactDom2.default.render(self.$conversationsApp, document.querySelector('.section.conversations'));
 
 	        if (d) {
 	            console.timeEnd('chatReactUiInit');
@@ -832,7 +845,7 @@ React.makeElement = React['createElement'];
 	    var havePendingCall = false;
 	    var haveCall = false;
 	    self.haveAnyActiveCall() === false && self.chats.forEach(function (megaRoom, k) {
-	        if (megaRoom.state == ChatRoom.STATE.LEFT) {
+	        if (megaRoom.state == _chatRoom2.default.STATE.LEFT) {
 
 	            return;
 	        }
@@ -908,8 +921,8 @@ React.makeElement = React['createElement'];
 	    self.unregisterUploadListeners(true);
 	    self.trigger('onDestroy', [isLogout]);
 
-	    if (self.$conversationsAppInstance && ReactDOM.findDOMNode(self.$conversationsAppInstance) && ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode) {
-	        ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+	    if (self.$conversationsAppInstance && _reactDom2.default.findDOMNode(self.$conversationsAppInstance) && _reactDom2.default.findDOMNode(self.$conversationsAppInstance).parentNode) {
+	        _reactDom2.default.unmountComponentAtNode(_reactDom2.default.findDOMNode(self.$conversationsAppInstance).parentNode);
 	    }
 
 	    self.chats.forEach(function (room, roomJid) {
@@ -1154,7 +1167,7 @@ React.makeElement = React['createElement'];
 	        return [roomId, undefined, $promise];
 	    }
 
-	    var room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck);
+	    var room = new _chatRoom2.default(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck);
 
 	    self.chats.set(room.roomId, room);
 
@@ -1182,7 +1195,7 @@ React.makeElement = React['createElement'];
 	    }
 
 	    this.trigger('onRoomInitialized', [room]);
-	    room.setState(ChatRoom.STATE.JOINING);
+	    room.setState(_chatRoom2.default.STATE.JOINING);
 	    return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
 	};
 
@@ -1204,7 +1217,7 @@ React.makeElement = React['createElement'];
 
 	        var waitForReadyState = function waitForReadyState(aRoom, aShow) {
 	            var verify = function verify() {
-	                return aRoom.state === ChatRoom.STATE.READY;
+	                return aRoom.state === _chatRoom2.default.STATE.READY;
 	            };
 
 	            var ready = function ready() {
@@ -1250,7 +1263,7 @@ React.makeElement = React['createElement'];
 	            self.logger.debug('Waiting for chat "%s" to be ready...', roomId, [room]);
 
 	            promise.then(function (aRoomId, aRoom) {
-	                if (aRoomId !== roomId || room && room !== aRoom || !(aRoom instanceof ChatRoom)) {
+	                if (aRoomId !== roomId || room && room !== aRoom || !(aRoom instanceof _chatRoom2.default)) {
 	                    self.logger.error('Unexpected openChat() procedure...', aRoomId, [aRoom]);
 	                    return reject(EINTERNAL);
 	                }
@@ -1958,7 +1971,7 @@ React.makeElement = React['createElement'];
 	            var room;
 
 	            for (var i = result.length; i--;) {
-	                if (result[i] instanceof ChatRoom) {
+	                if (result[i] instanceof _chatRoom2.default) {
 	                    room = result[i];
 	                    break;
 	                }
@@ -5345,20 +5358,28 @@ React.makeElement = React['createElement'];
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var React = __webpack_require__(2);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var RenderDebugger = __webpack_require__(6).RenderDebugger;
-	var utils = __webpack_require__(5);
-	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
+	var _react = __webpack_require__(2);
 
-	var ContactsListItem = React.createClass({
-	    displayName: "ContactsListItem",
+	var _react2 = _interopRequireDefault(_react);
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	var _mixins = __webpack_require__(6);
+
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _perfectScrollbar = __webpack_require__(8);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ContactsListItem = _react2.default.createClass({
+	    displayName: 'ContactsListItem',
+
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var classString = "nw-conversations-item";
 
@@ -5370,22 +5391,22 @@ React.makeElement = React['createElement'];
 
 	        classString += " " + this.props.megaChat.userPresenceToCssClass(contact.presence);
 
-	        return React.makeElement(
-	            "div",
+	        return _react2.default.createElement(
+	            'div',
 	            null,
-	            React.makeElement(
-	                "div",
+	            _react2.default.createElement(
+	                'div',
 	                { className: classString,
 	                    onClick: this.props.onContactClicked },
-	                React.makeElement("div", { className: "nw-contact-status" }),
-	                React.makeElement(
-	                    "div",
-	                    { className: "nw-conversations-unread" },
-	                    "0"
+	                _react2.default.createElement('div', { className: 'nw-contact-status' }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'nw-conversations-unread' },
+	                    '0'
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "nw-conversations-name" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'nw-conversations-name' },
 	                    M.getNameByHandle(contact.u)
 	                )
 	            )
@@ -5393,10 +5414,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ContactButton = React.createClass({
-	    displayName: "ContactButton",
+	var ContactButton = _react2.default.createClass({
+	    displayName: 'ContactButton',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var self = this;
 
@@ -5431,11 +5452,11 @@ React.makeElement = React['createElement'];
 
 	            var moreDropdowns = [];
 
-	            moreDropdowns.push(React.makeElement(
-	                "div",
-	                { className: "dropdown-avatar rounded", key: "mainContactInfo" },
-	                React.makeElement(Avatar, { className: "avatar-wrapper context-avatar",
-	                    contact: contact, hideVerifiedBadge: "true", onClick: function onClick() {
+	            moreDropdowns.push(_react2.default.createElement(
+	                'div',
+	                { className: 'dropdown-avatar rounded', key: 'mainContactInfo' },
+	                _react2.default.createElement(Avatar, { className: 'avatar-wrapper context-avatar',
+	                    contact: contact, hideVerifiedBadge: 'true', onClick: function onClick() {
 	                        if (contact.c === 2) {
 	                            loadSubPage('fm/account');
 	                        }
@@ -5443,9 +5464,9 @@ React.makeElement = React['createElement'];
 	                            loadSubPage('fm/' + contact.u);
 	                        }
 	                    } }),
-	                React.makeElement(
-	                    "div",
-	                    { className: "dropdown-user-name", onClick: function onClick() {
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'dropdown-user-name', onClick: function onClick() {
 	                            if (contact.c === 2) {
 	                                loadSubPage('fm/account');
 	                            }
@@ -5454,54 +5475,54 @@ React.makeElement = React['createElement'];
 	                            }
 	                        } },
 	                    username,
-	                    React.makeElement(ContactPresence, { className: "small", contact: contact })
+	                    _react2.default.createElement(ContactPresence, { className: 'small', contact: contact })
 	                )
 	            ));
 
-	            moreDropdowns.push(React.makeElement(ContactFingerprint, { key: "fingerprint", contact: contact }));
+	            moreDropdowns.push(_react2.default.createElement(ContactFingerprint, { key: 'fingerprint', contact: contact }));
 
 	            if (dropdowns.length && contact.c !== 2) {
 	                moreDropdowns.push(dropdowns);
 
-	                moreDropdowns.push(React.makeElement("hr", { key: "top-separator" }));
+	                moreDropdowns.push(_react2.default.createElement('hr', { key: 'top-separator' }));
 	            }
 
 	            if (contact.c === 2) {
-	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "view0", icon: "human-profile", label: __(l[187]), onClick: function onClick() {
+	                moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                    key: 'view0', icon: 'human-profile', label: __(l[187]), onClick: function onClick() {
 	                        loadSubPage('fm/account');
 	                    } }));
 	            }
 	            if (contact.c === 1) {
 
 	                if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-	                    moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "startCall", className: "contains-submenu", icon: "context handset", label: __(l[19125]),
+	                    moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                        key: 'startCall', className: 'contains-submenu', icon: 'context handset', label: __(l[19125]),
 	                        onClick: function onClick() {
 	                            megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
 	                                room.setActive();
 	                                room.startAudioCall();
 	                            });
 	                        } }));
-	                    moreDropdowns.push(React.makeElement(
-	                        "div",
-	                        { className: "dropdown body submenu", key: "dropdownGroup" },
-	                        React.makeElement(
-	                            "div",
+	                    moreDropdowns.push(_react2.default.createElement(
+	                        'div',
+	                        { className: 'dropdown body submenu', key: 'dropdownGroup' },
+	                        _react2.default.createElement(
+	                            'div',
 	                            null,
-	                            React.makeElement(DropdownsUI.DropdownItem, {
-	                                key: "startAudio", icon: "context handset", label: __(l[1565]), onClick: function onClick() {
+	                            _react2.default.createElement(DropdownsUI.DropdownItem, {
+	                                key: 'startAudio', icon: 'context handset', label: __(l[1565]), onClick: function onClick() {
 	                                    megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
 	                                        room.setActive();
 	                                        room.startAudioCall();
 	                                    });
 	                                } })
 	                        ),
-	                        React.makeElement(
-	                            "div",
+	                        _react2.default.createElement(
+	                            'div',
 	                            null,
-	                            React.makeElement(DropdownsUI.DropdownItem, {
-	                                key: "startVideo", icon: "context videocam", label: __(l[1566]), onClick: function onClick() {
+	                            _react2.default.createElement(DropdownsUI.DropdownItem, {
+	                                key: 'startVideo', icon: 'context videocam', label: __(l[1566]), onClick: function onClick() {
 	                                    megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
 	                                        room.setActive();
 	                                        room.startVideoCall();
@@ -5510,74 +5531,82 @@ React.makeElement = React['createElement'];
 	                        )
 	                    ));
 	                } else {
-	                    moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                        key: "startChat", icon: "context conversation", label: __(l[5885]), onClick: function onClick() {
+	                    moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                        key: 'startChat', icon: 'context conversation', label: __(l[5885]), onClick: function onClick() {
 	                            loadSubPage('fm/chat/p/' + contact.u);
 	                        } }));
 	                }
 
-	                moreDropdowns.push(React.makeElement("hr", { key: "files-separator" }));
+	                moreDropdowns.push(_react2.default.createElement('hr', { key: 'files-separator' }));
 
-	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "send-files-item", icon: "context arrow-in-circle", label: __(l[6834]), onClick: function onClick() {
+	                moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                    key: 'send-files-item', icon: 'context arrow-in-circle', label: __(l[6834]), onClick: function onClick() {
 	                        megaChat.openChatAndSendFilesDialog(contact.u);
 	                    } }));
-	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "share-item", icon: "context share-folder", label: __(l[6775]), onClick: function onClick() {
+	                moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                    key: 'share-item', icon: 'context share-folder', label: __(l[6775]), onClick: function onClick() {
 	                        openCopyShareDialog(contact.u);
 	                    } }));
 	            } else if (!contact.c) {
-	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "view2", icon: "small-icon icons-sprite grey-plus", label: __(l[101]), onClick: function onClick() {
+	                moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                    key: 'view2',
+	                    icon: 'small-icon icons-sprite grey-plus',
+	                    label: __(l[101]),
+	                    onClick: function onClick() {
 	                        loadingDialog.show();
-
-	                        if (anonymouschat && (!u_handle || u_type !== 3)) {
+	                        var isAnonymousUser = !u_handle || u_type !== 3;
+	                        var ADD_CONTACT = 'addContact';
+	                        if (anonymouschat && isAnonymousUser) {
 	                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-	                            return;
-	                        }
-	                        M.syncContactEmail(contact.u).done(function (email) {
-	                            var exists = false;
-	                            Object.keys(M.opc).forEach(function (k) {
-	                                if (!exists && M.opc[k].m === email) {
-	                                    exists = true;
-	                                    return false;
-	                                }
-	                            });
-
-	                            if (exists) {
-	                                closeDialog();
-	                                msgDialog('warningb', '', l[17545]);
-	                            } else {
-	                                M.inviteContact(M.u[u_handle].m, email);
-	                                var title = l[150];
-
-	                                var msg = l[5898].replace('[X]', email);
-
-	                                closeDialog();
-	                                msgDialog('info', title, msg);
+	                            if (localStorage.getItem(ADD_CONTACT) === null) {
+	                                localStorage.setItem(ADD_CONTACT, JSON.stringify({ u: contact.u, unixTime: unixtime() }));
 	                            }
-	                        }).always(function () {
-	                            loadingDialog.hide();
-	                        });
+	                        } else {
+	                            M.syncContactEmail(contact.u).done(function (email) {
+	                                var exists = false;
+	                                Object.keys(M.opc).forEach(function (k) {
+	                                    if (!exists && M.opc[k].m === email) {
+	                                        exists = true;
+	                                        return false;
+	                                    }
+	                                });
+
+	                                if (exists) {
+	                                    closeDialog();
+	                                    msgDialog('warningb', '', l[17545]);
+	                                } else {
+	                                    M.inviteContact(M.u[u_handle].m, email);
+	                                    var title = l[150];
+
+	                                    var msg = l[5898].replace('[X]', email);
+
+	                                    closeDialog();
+	                                    msgDialog('info', title, msg);
+	                                }
+	                            }).always(function () {
+	                                loadingDialog.hide();
+	                            });
+	                        }
+	                        return;
 	                    } }));
 	            }
 
 	            if (u_attr && contact.u !== u_handle) {
 
-	                moreDropdowns.push(React.makeElement("hr", { key: "nicknames-separator" }));
-	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
-	                    key: "set-nickname", icon: "small-icon context writing-pen", label: __(l[20828]), onClick: function onClick() {
+	                moreDropdowns.push(_react2.default.createElement('hr', { key: 'nicknames-separator' }));
+	                moreDropdowns.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                    key: 'set-nickname', icon: 'small-icon context writing-pen', label: __(l[20828]), onClick: function onClick() {
 	                        nicknames.setNicknameDialog.init(contact.u);
 	                    } }));
 	            }
 
 	            if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
-	                moreDropdowns.push(React.makeElement("hr", { key: "remove-separator" }));
+	                moreDropdowns.push(_react2.default.createElement('hr', { key: 'remove-separator' }));
 	                moreDropdowns.push(self.props.dropdownRemoveButton);
 	            }
 
 	            if (moreDropdowns.length > 0) {
-	                buttonComponent = React.makeElement(
+	                buttonComponent = _react2.default.createElement(
 	                    ButtonsUI.Button,
 	                    {
 	                        className: classes,
@@ -5585,9 +5614,9 @@ React.makeElement = React['createElement'];
 	                        disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled,
 	                        label: label
 	                    },
-	                    React.makeElement(
+	                    _react2.default.createElement(
 	                        DropdownsUI.Dropdown,
-	                        { className: "contact-card-dropdown",
+	                        { className: 'contact-card-dropdown',
 	                            positionMy: dropdownPosition,
 	                            positionAt: dropdownPosition,
 	                            vertOffset: vertOffset,
@@ -5604,10 +5633,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ContactVerified = React.createClass({
-	    displayName: "ContactVerified",
+	var ContactVerified = _react2.default.createClass({
+	    displayName: 'ContactVerified',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    componentWillMount: function componentWillMount() {
 	        var self = this;
 
@@ -5639,7 +5668,7 @@ React.makeElement = React['createElement'];
 
 	        if (u_authring && u_authring.Ed25519) {
 	            var verifyState = u_authring.Ed25519[contact.u] || {};
-	            verifiedElement = verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ? React.makeElement("div", { className: "user-card-verified " + this.props.className }) : null;
+	            verifiedElement = verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ? _react2.default.createElement('div', { className: "user-card-verified " + this.props.className }) : null;
 	        } else {
 	            var self = this;
 
@@ -5653,10 +5682,10 @@ React.makeElement = React['createElement'];
 	        return verifiedElement;
 	    }
 	});
-	var ContactPresence = React.createClass({
-	    displayName: "ContactPresence",
+	var ContactPresence = _react2.default.createClass({
+	    displayName: 'ContactPresence',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
@@ -5666,14 +5695,14 @@ React.makeElement = React['createElement'];
 
 	        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).userPresenceToCssClass(contact.presence);
 
-	        return React.makeElement("div", { className: "user-card-presence " + pres + " " + this.props.className });
+	        return _react2.default.createElement('div', { className: "user-card-presence " + pres + " " + this.props.className });
 	    }
 	});
 
-	var ContactFingerprint = React.createClass({
-	    displayName: "ContactFingerprint",
+	var ContactFingerprint = _react2.default.createClass({
+	    displayName: 'ContactFingerprint',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
@@ -5685,8 +5714,8 @@ React.makeElement = React['createElement'];
 
 	        userFingerprint(contact.u, function (fingerprints) {
 	            fingerprints.forEach(function (v, k) {
-	                infoBlocks.push(React.makeElement(
-	                    "span",
+	                infoBlocks.push(_react2.default.createElement(
+	                    'span',
 	                    { key: "fingerprint-" + k },
 	                    v
 	                ));
@@ -5698,10 +5727,10 @@ React.makeElement = React['createElement'];
 	        if (contact.c === 1 && u_authring && u_authring.Ed25519) {
 	            var verifyState = u_authring.Ed25519[contact.u] || {};
 	            if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-	                verifyButton = React.makeElement(ButtonsUI.Button, {
-	                    className: "dropdown-verify active",
+	                verifyButton = _react2.default.createElement(ButtonsUI.Button, {
+	                    className: 'dropdown-verify active',
 	                    label: __(l[7692]),
-	                    icon: "grey-key",
+	                    icon: 'grey-key',
 	                    onClick: function onClick() {
 	                        $(document).trigger('closeDropdowns');
 	                        fingerprintDialog(contact.u);
@@ -5711,22 +5740,22 @@ React.makeElement = React['createElement'];
 
 	        var fingerprintCode = null;
 	        if (infoBlocks.length > 0) {
-	            fingerprintCode = React.makeElement(
-	                "div",
-	                { className: "dropdown-fingerprint" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "contact-fingerprint-title" },
-	                    React.makeElement(
-	                        "span",
+	            fingerprintCode = _react2.default.createElement(
+	                'div',
+	                { className: 'dropdown-fingerprint' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'contact-fingerprint-title' },
+	                    _react2.default.createElement(
+	                        'span',
 	                        null,
 	                        __(l[6872])
 	                    ),
-	                    React.makeElement(ContactVerified, { contact: contact })
+	                    _react2.default.createElement(ContactVerified, { contact: contact })
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "contact-fingerprint-txt" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'contact-fingerprint-txt' },
 	                    infoBlocks
 	                ),
 	                verifyButton
@@ -5739,10 +5768,10 @@ React.makeElement = React['createElement'];
 
 	var _noAvatars = {};
 
-	var Avatar = React.createClass({
-	    displayName: "Avatar",
+	var Avatar = _react2.default.createClass({
+	    displayName: 'Avatar',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var self = this;
 	        var contact = this.props.contact;
@@ -5766,7 +5795,7 @@ React.makeElement = React['createElement'];
 	        var verifiedElement = null;
 
 	        if (!this.props.hideVerifiedBadge && !anonymouschat) {
-	            verifiedElement = React.makeElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
+	            verifiedElement = _react2.default.createElement(ContactVerified, { contact: this.props.contact, className: this.props.verifiedClassName });
 	        }
 
 	        if (!avatars[contact.u] && !_noAvatars[contact.u]) {
@@ -5792,8 +5821,8 @@ React.makeElement = React['createElement'];
 	            }
 	        }
 	        if (avatarMeta.type === "image") {
-	            displayedAvatar = React.makeElement(
-	                "div",
+	            displayedAvatar = _react2.default.createElement(
+	                'div',
 	                _extends({ className: classes, style: this.props.style
 	                }, extraProps, {
 	                    onClick: self.props.onClick ? function (e) {
@@ -5801,13 +5830,13 @@ React.makeElement = React['createElement'];
 	                        self.props.onClick(e);
 	                    } : self.onClick }),
 	                verifiedElement,
-	                React.makeElement("img", { src: avatarMeta.avatar, style: this.props.imgStyles })
+	                _react2.default.createElement('img', { src: avatarMeta.avatar, style: this.props.imgStyles })
 	            );
 	        } else {
 	            classes += " color" + avatarMeta.avatar.colorIndex;
 
-	            displayedAvatar = React.makeElement(
-	                "div",
+	            displayedAvatar = _react2.default.createElement(
+	                'div',
 	                _extends({ className: classes, style: this.props.style
 	                }, extraProps, {
 	                    onClick: self.props.onClick ? function (e) {
@@ -5815,8 +5844,8 @@ React.makeElement = React['createElement'];
 	                        self.props.onClick(e);
 	                    } : self.onClick }),
 	                verifiedElement,
-	                React.makeElement(
-	                    "span",
+	                _react2.default.createElement(
+	                    'span',
 	                    null,
 	                    avatarMeta.avatar.letters
 	                )
@@ -5827,10 +5856,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ContactCard = React.createClass({
-	    displayName: "ContactCard",
+	var ContactCard = _react2.default.createClass({
+	    displayName: 'ContactCard',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'dropdownButtonClasses': "default-white-button tiny-button",
@@ -5903,17 +5932,17 @@ React.makeElement = React['createElement'];
 
 	        var usernameBlock;
 	        if (!noContextMenu) {
-	            usernameBlock = React.makeElement(ContactButton, { key: "lnk", dropdowns: dropdowns,
+	            usernameBlock = _react2.default.createElement(ContactButton, { key: 'lnk', dropdowns: dropdowns,
 	                noContextMenu: noContextMenu,
 	                contact: contact,
-	                className: "light",
+	                className: 'light',
 	                label: username,
 	                dropdownRemoveButton: dropdownRemoveButton
 	            });
 	        } else {
-	            usernameBlock = React.makeElement(
-	                "div",
-	                { className: "user-card-name light" },
+	            usernameBlock = _react2.default.createElement(
+	                'div',
+	                { className: 'user-card-name light' },
 	                username
 	            );
 	        }
@@ -5929,28 +5958,28 @@ React.makeElement = React['createElement'];
 	                presenceRow = M.onlineStatusClass(contact.presence)[0];
 	            }
 
-	            userCard = React.makeElement(
-	                "div",
-	                { className: "user-card-data" },
+	            userCard = _react2.default.createElement(
+	                'div',
+	                { className: 'user-card-data' },
 	                usernameBlock,
-	                React.makeElement(
-	                    "div",
-	                    { className: "user-card-status" },
-	                    React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
-	                    this.props.isInCall ? React.makeElement("i", { className: "small-icon audio-call" }) : null,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'user-card-status' },
+	                    _react2.default.createElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
+	                    this.props.isInCall ? _react2.default.createElement('i', { className: 'small-icon audio-call' }) : null,
 	                    presenceRow
 	                )
 	            );
 	        } else {
-	            userCard = React.makeElement(
-	                "div",
-	                { className: "user-card-data" },
+	            userCard = _react2.default.createElement(
+	                'div',
+	                { className: 'user-card-data' },
 	                usernameBlock,
-	                React.makeElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
-	                this.props.isInCall ? React.makeElement("i", { className: "small-icon audio-call" }) : null,
-	                React.makeElement(
-	                    "div",
-	                    { className: "user-card-email" },
+	                _react2.default.createElement(ContactPresence, { contact: contact, className: this.props.presenceClassName }),
+	                this.props.isInCall ? _react2.default.createElement('i', { className: 'small-icon audio-call' }) : null,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'user-card-email' },
 	                    contact.m
 	                )
 	            );
@@ -5958,15 +5987,15 @@ React.makeElement = React['createElement'];
 
 	        var selectionTick = null;
 	        if (this.props.selectable) {
-	            selectionTick = React.makeElement(
-	                "div",
-	                { className: "user-card-tick-wrap" },
-	                React.makeElement("i", { className: "small-icon mid-green-tick" })
+	            selectionTick = _react2.default.createElement(
+	                'div',
+	                { className: 'user-card-tick-wrap' },
+	                _react2.default.createElement('i', { className: 'small-icon mid-green-tick' })
 	            );
 	        }
 
-	        return React.makeElement(
-	            "div",
+	        return _react2.default.createElement(
+	            'div',
 	            {
 	                className: "contacts-info body " + (pres === "offline" ? "offline" : "") + (className ? " " + className : ""),
 	                onClick: function onClick(e) {
@@ -5982,8 +6011,8 @@ React.makeElement = React['createElement'];
 	                },
 	                style: self.props.style
 	            },
-	            React.makeElement(Avatar, { contact: contact, className: "avatar-wrapper small-rounded-avatar" }),
-	            anonymouschat || noContextButton ? null : React.makeElement(ContactButton, { key: "button",
+	            _react2.default.createElement(Avatar, { contact: contact, className: 'avatar-wrapper small-rounded-avatar' }),
+	            anonymouschat || noContextButton ? null : _react2.default.createElement(ContactButton, { key: 'button',
 	                dropdowns: dropdowns,
 	                dropdownIconClasses: self.props.dropdownIconClasses ? self.props.dropdownIconClasses : "",
 	                disabled: self.props.dropdownDisabled,
@@ -5999,10 +6028,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ContactItem = React.createClass({
-	    displayName: "ContactItem",
+	var ContactItem = _react2.default.createClass({
+	    displayName: 'ContactItem',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var classString = "nw-conversations-item";
 	        var self = this;
@@ -6014,32 +6043,32 @@ React.makeElement = React['createElement'];
 
 	        var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
 
-	        return React.makeElement(
-	            "div",
-	            { className: "selected-contact-card short" },
-	            React.makeElement(
-	                "div",
-	                { className: "remove-contact-bttn", onClick: function onClick(e) {
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'selected-contact-card short' },
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'remove-contact-bttn', onClick: function onClick(e) {
 	                        if (self.props.onClick) {
 	                            self.props.onClick(contact, e);
 	                        }
 	                    } },
-	                React.makeElement("i", { className: "tiny-icon small-cross" })
+	                _react2.default.createElement('i', { className: 'tiny-icon small-cross' })
 	            ),
-	            React.makeElement(Avatar, { contact: contact, className: "avatar-wrapper small-rounded-avatar", hideVerifiedBadge: true }),
-	            React.makeElement(
-	                "div",
-	                { className: "user-card-data" },
-	                React.makeElement(ContactButton, { contact: contact, className: "light", label: username })
+	            _react2.default.createElement(Avatar, { contact: contact, className: 'avatar-wrapper small-rounded-avatar', hideVerifiedBadge: true }),
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'user-card-data' },
+	                _react2.default.createElement(ContactButton, { contact: contact, className: 'light', label: username })
 	            )
 	        );
 	    }
 	});
 
-	var ContactPickerWidget = React.createClass({
-	    displayName: "ContactPickerWidget",
+	var ContactPickerWidget = _react2.default.createClass({
+	    displayName: 'ContactPickerWidget',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'searchValue': '',
@@ -6146,10 +6175,10 @@ React.makeElement = React['createElement'];
 	            selectedClass = "selected";
 	        }
 
-	        contacts.push(React.makeElement(ContactCard, {
+	        contacts.push(_react2.default.createElement(ContactCard, {
 	            contact: v,
 	            className: "contacts-search short " + selectedClass,
-	            noContextButton: "true",
+	            noContextButton: 'true',
 	            selectable: selectableContacts,
 	            onClick: self.props.readOnly ? function () {} : function (contact, e) {
 	                var contactHash = contact.u;
@@ -6217,7 +6246,7 @@ React.makeElement = React['createElement'];
 
 	        if (self.props.readOnly) {
 	            (self.state.selected || []).forEach(function (v, k) {
-	                contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], key: v }));
+	                contactsSelected.push(_react2.default.createElement(ContactItem, { contact: self.props.contacts[v], key: v }));
 	            });
 	        } else if (self.props.multiple) {
 	            selectableContacts = true;
@@ -6275,12 +6304,12 @@ React.makeElement = React['createElement'];
 	            if (!self.state.selected || self.state.selected.length === 0) {
 	                selectedContacts = false;
 
-	                multipleContacts = React.makeElement(
-	                    "div",
-	                    { className: "horizontal-contacts-list" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "contacts-list-empty-txt" },
+	                multipleContacts = _react2.default.createElement(
+	                    'div',
+	                    { className: 'horizontal-contacts-list' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'contacts-list-empty-txt' },
 	                        self.props.nothingSelectedButtonLabel ? self.props.nothingSelectedButtonLabel : l[8889]
 	                    )
 	                );
@@ -6288,24 +6317,24 @@ React.makeElement = React['createElement'];
 	                selectedContacts = true;
 
 	                (self.state.selected || []).forEach(function (v, k) {
-	                    contactsSelected.push(React.makeElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
+	                    contactsSelected.push(_react2.default.createElement(ContactItem, { contact: self.props.contacts[v], onClick: onContactSelectDoneCb,
 	                        key: v
 	                    }));
 	                });
 
-	                multipleContacts = React.makeElement(
-	                    "div",
-	                    { className: "horizontal-contacts-list" },
-	                    React.makeElement(
-	                        PerfectScrollbar,
-	                        { className: "perfectScrollbarContainer selected-contact-block horizontal-only",
+	                multipleContacts = _react2.default.createElement(
+	                    'div',
+	                    { className: 'horizontal-contacts-list' },
+	                    _react2.default.createElement(
+	                        _perfectScrollbar.PerfectScrollbar,
+	                        { className: 'perfectScrollbarContainer selected-contact-block horizontal-only',
 	                            selected: this.state.selected,
 	                            ref: function ref(psSelected) {
 	                                self.psSelected = psSelected;
 	                            } },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "select-contact-centre", style: { width: selectedWidth } },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'select-contact-centre', style: { width: selectedWidth } },
 	                            contactsSelected
 	                        )
 	                    )
@@ -6314,16 +6343,16 @@ React.makeElement = React['createElement'];
 
 	            if (self.props.selectFooter) {
 
-	                selectFooter = React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-footer" },
-	                    React.makeElement(
-	                        "a",
-	                        { className: "default-white-button left", onClick: onAddContact },
+	                selectFooter = _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-footer' },
+	                    _react2.default.createElement(
+	                        'a',
+	                        { className: 'default-white-button left', onClick: onAddContact },
 	                        l[71]
 	                    ),
-	                    React.makeElement(
-	                        "a",
+	                    _react2.default.createElement(
+	                        'a',
 	                        { className: "default-grey-button right " + (!selectedContacts ? "disabled" : ""),
 	                            onClick: function onClick(e) {
 	                                if (self.state.selected.length > 0) {
@@ -6340,8 +6369,8 @@ React.makeElement = React['createElement'];
 	            var _topButtons = [];
 
 	            self.props.showTopButtons.forEach(function (button) {
-	                _topButtons.push(React.makeElement(
-	                    "div",
+	                _topButtons.push(_react2.default.createElement(
+	                    'div',
 	                    { className: "link-button light", key: button.key, onClick: function onClick(e) {
 	                            e.preventDefault();
 	                            e.stopPropagation();
@@ -6350,13 +6379,13 @@ React.makeElement = React['createElement'];
 
 	                            button.onClick(e);
 	                        } },
-	                    React.makeElement("i", { className: "small-icon " + button.icon }),
+	                    _react2.default.createElement('i', { className: "small-icon " + button.icon }),
 	                    button.title
 	                ));
 	            });
-	            topButtons = React.makeElement(
-	                "div",
-	                { className: "contacts-search-buttons" },
+	            topButtons = _react2.default.createElement(
+	                'div',
+	                { className: 'contacts-search-buttons' },
 	                _topButtons
 	            );
 	        }
@@ -6404,8 +6433,8 @@ React.makeElement = React['createElement'];
 	            }
 
 	            if (hideFrequents) {
-	                contacts = React.makeElement(
-	                    "em",
+	                contacts = _react2.default.createElement(
+	                    'em',
 	                    null,
 	                    noContactsMsg
 	                );
@@ -6417,66 +6446,66 @@ React.makeElement = React['createElement'];
 	        var contactsList;
 	        if (haveContacts) {
 	            if (frequentContacts.length === 0 && noOtherContacts) {
-	                contactsList = React.makeElement(
-	                    "div",
-	                    { className: "chat-contactspicker-no-contacts" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "contacts-list-header" },
+	                contactsList = _react2.default.createElement(
+	                    'div',
+	                    { className: 'chat-contactspicker-no-contacts' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'contacts-list-header' },
 	                        l[165]
 	                    ),
-	                    React.makeElement("div", { className: "fm-empty-contacts-bg" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "fm-empty-cloud-txt small" },
+	                    _react2.default.createElement('div', { className: 'fm-empty-contacts-bg' }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'fm-empty-cloud-txt small' },
 	                        l[784]
 	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "fm-empty-description small" },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'fm-empty-description small' },
 	                        l[19115]
 	                    )
 	                );
 	            } else {
-	                contactsList = React.makeElement(
-	                    utils.JScrollPane,
-	                    { className: "contacts-search-scroll",
+	                contactsList = _react2.default.createElement(
+	                    _utils2.default.JScrollPane,
+	                    { className: 'contacts-search-scroll',
 	                        selected: this.state.selected,
 	                        changedHashProp: this.props.changedHashProp,
 	                        searchValue: this.state.searchValue },
-	                    React.makeElement(
-	                        "div",
+	                    _react2.default.createElement(
+	                        'div',
 	                        null,
-	                        React.makeElement(
-	                            "div",
-	                            { className: "contacts-search-subsection",
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'contacts-search-subsection',
 	                                style: { 'display': !hideFrequents ? "" : "none" } },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "contacts-list-header" },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'contacts-list-header' },
 	                                l[20141]
 	                            ),
-	                            frequentsLoading ? React.makeElement(
-	                                "div",
-	                                { className: "loading-spinner" },
-	                                "..."
-	                            ) : React.makeElement(
-	                                "div",
-	                                { className: "contacts-search-list", style: innerDivStyles },
+	                            frequentsLoading ? _react2.default.createElement(
+	                                'div',
+	                                { className: 'loading-spinner' },
+	                                '...'
+	                            ) : _react2.default.createElement(
+	                                'div',
+	                                { className: 'contacts-search-list', style: innerDivStyles },
 	                                frequentContacts
 	                            )
 	                        ),
-	                        contacts.length > 0 ? React.makeElement(
-	                            "div",
-	                            { className: "contacts-search-subsection" },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "contacts-list-header" },
+	                        contacts.length > 0 ? _react2.default.createElement(
+	                            'div',
+	                            { className: 'contacts-search-subsection' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'contacts-list-header' },
 	                                !frequentsLoading && frequentContacts.length === 0 ? !self.props.readOnly ? l[165] : l[16217] : l[165]
 	                            ),
-	                            React.makeElement(
-	                                "div",
-	                                { className: "contacts-search-list", style: innerDivStyles },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'contacts-search-list', style: innerDivStyles },
 	                                contacts
 	                            )
 	                        ) : undefined
@@ -6484,37 +6513,37 @@ React.makeElement = React['createElement'];
 	                );
 	            }
 	        } else {
-	            contactsList = React.makeElement(
-	                "div",
-	                { className: "chat-contactspicker-no-contacts" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "contacts-list-header" },
+	            contactsList = _react2.default.createElement(
+	                'div',
+	                { className: 'chat-contactspicker-no-contacts' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'contacts-list-header' },
 	                    l[165]
 	                ),
-	                React.makeElement("div", { className: "fm-empty-contacts-bg" }),
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-empty-cloud-txt small" },
+	                _react2.default.createElement('div', { className: 'fm-empty-contacts-bg' }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-empty-cloud-txt small' },
 	                    l[784]
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-empty-description small" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-empty-description small' },
 	                    l[19115]
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: " big-red-button fm-empty-button", onClick: function onClick(e) {
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: ' big-red-button fm-empty-button', onClick: function onClick(e) {
 	                            contactAddDialog();
 	                        } },
 	                    l[101]
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "empty-share-public" },
-	                    React.makeElement("i", { className: "small-icon icons-sprite grey-chain" }),
-	                    React.makeElement("span", { dangerouslySetInnerHTML: { __html: l[19111] } })
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'empty-share-public' },
+	                    _react2.default.createElement('i', { className: 'small-icon icons-sprite grey-chain' }),
+	                    _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: l[19111] } })
 	                )
 	            );
 
@@ -6522,28 +6551,28 @@ React.makeElement = React['createElement'];
 	        }
 
 	        var displayStyle = self.state.searchValue && self.state.searchValue.length > 0 ? "" : "none";
-	        return React.makeElement(
-	            "div",
+	        return _react2.default.createElement(
+	            'div',
 	            { className: this.props.className + " " + extraClasses },
 	            multipleContacts,
-	            !self.props.readOnly && haveContacts ? React.makeElement(
-	                "div",
+	            !self.props.readOnly && haveContacts ? _react2.default.createElement(
+	                'div',
 	                { className: "contacts-search-header " + this.props.headerClasses },
-	                React.makeElement("i", { className: "small-icon thin-search-icon" }),
-	                React.makeElement("input", {
+	                _react2.default.createElement('i', { className: 'small-icon thin-search-icon' }),
+	                _react2.default.createElement('input', {
 	                    autoFocus: true,
-	                    type: "search",
+	                    type: 'search',
 	                    placeholder: __(l[8010]),
-	                    ref: "contactSearchField",
+	                    ref: 'contactSearchField',
 	                    onChange: this.onSearchChange,
 	                    value: this.state.searchValue
 	                }),
-	                React.makeElement("div", {
+	                _react2.default.createElement('div', {
 	                    onClick: function onClick(e) {
 	                        self.setState({ searchValue: '' });
 	                        self.refs.contactSearchField.focus();
 	                    },
-	                    className: "search-result-clear",
+	                    className: 'search-result-clear',
 	                    style: { display: displayStyle }
 	                })
 	            ) : null,
@@ -6569,47 +6598,84 @@ React.makeElement = React['createElement'];
 /* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var RenderDebugger = __webpack_require__(6).RenderDebugger;
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ButtonsUI = __webpack_require__(9);
-	var ModalDialogsUI = __webpack_require__(13);
-	var CloudBrowserModalDialog = __webpack_require__(16);
-	var DropdownsUI = __webpack_require__(10);
-	var ContactsUI = __webpack_require__(11);
-	var ConversationsUI = __webpack_require__(4);
-	var TypingAreaUI = __webpack_require__(17);
-	var WhosTyping = __webpack_require__(20).WhosTyping;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var PerfectScrollbar = __webpack_require__(8).PerfectScrollbar;
-	var Accordion = __webpack_require__(21).Accordion;
-	var AccordionPanel = __webpack_require__(21).AccordionPanel;
-	var ParticipantsList = __webpack_require__(22).ParticipantsList;
+	var _react = __webpack_require__(2);
 
-	var GenericConversationMessage = __webpack_require__(23).GenericConversationMessage;
-	var AlterParticipantsConversationMessage = __webpack_require__(32).AlterParticipantsConversationMessage;
-	var TruncatedMessage = __webpack_require__(33).TruncatedMessage;
-	var PrivilegeChange = __webpack_require__(34).PrivilegeChange;
-	var TopicChange = __webpack_require__(35).TopicChange;
-	var SharedFilesAccordionPanel = __webpack_require__(36).SharedFilesAccordionPanel;
-	var IncomingSharesAccordionPanel = __webpack_require__(37).IncomingSharesAccordionPanel;
+	var _react2 = _interopRequireDefault(_react);
 
-	var CloseOpenModeMessage = __webpack_require__(38).CloseOpenModeMessage;
-	var ChatHandleMessage = __webpack_require__(39).ChatHandleMessage;
-	var ChatlinkDialog = __webpack_require__(40).ChatlinkDialog;
+	var _reactDom = __webpack_require__(3);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _mixins = __webpack_require__(6);
+
+	var _buttons = __webpack_require__(9);
+
+	var _buttons2 = _interopRequireDefault(_buttons);
+
+	var _modalDialogs = __webpack_require__(13);
+
+	var _modalDialogs2 = _interopRequireDefault(_modalDialogs);
+
+	var _cloudBrowserModalDialog = __webpack_require__(16);
+
+	var _cloudBrowserModalDialog2 = _interopRequireDefault(_cloudBrowserModalDialog);
+
+	var _dropdowns = __webpack_require__(10);
+
+	var _dropdowns2 = _interopRequireDefault(_dropdowns);
+
+	var _contacts = __webpack_require__(11);
+
+	var _contacts2 = _interopRequireDefault(_contacts);
+
+	var _typingArea = __webpack_require__(17);
+
+	var _typingArea2 = _interopRequireDefault(_typingArea);
+
+	var _whosTyping = __webpack_require__(20);
+
+	var _perfectScrollbar = __webpack_require__(8);
+
+	var _accordion = __webpack_require__(21);
+
+	var _participantsList = __webpack_require__(22);
+
+	var _generic = __webpack_require__(23);
+
+	var _alterParticipants = __webpack_require__(32);
+
+	var _truncated = __webpack_require__(33);
+
+	var _privilegeChange = __webpack_require__(34);
+
+	var _topicChange = __webpack_require__(35);
+
+	var _sharedFilesAccordionPanel = __webpack_require__(36);
+
+	var _incomingSharesAccordionPanel = __webpack_require__(37);
+
+	var _closeOpenMode = __webpack_require__(38);
+
+	var _chatHandle = __webpack_require__(39);
+
+	var _chatlinkDialog = __webpack_require__(40);
+
+	var _conversationaudiovideopanel = __webpack_require__(41);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var ENABLE_GROUP_CALLING_FLAG = true;
 
-	var ConversationAudioVideoPanel = __webpack_require__(41).ConversationAudioVideoPanel;
+	var JoinCallNotification = _react2.default.createClass({
+	    displayName: 'JoinCallNotification',
 
-	var JoinCallNotification = React.createClass({
-	    displayName: "JoinCallNotification",
-
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    componentDidUpdate: function componentDidUpdate() {
 	        var $node = $(this.findDOMNode());
 	        var room = this.props.chatRoom;
@@ -6622,30 +6688,30 @@ React.makeElement = React['createElement'];
 	    render: function render() {
 	        var room = this.props.chatRoom;
 	        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
-	            return React.makeElement(
-	                "div",
-	                { className: "in-call-notif yellow join" },
-	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'in-call-notif yellow join' },
+	                _react2.default.createElement('i', { className: 'small-icon audio-call colorized' }),
 	                l[20200]
 	            );
 	        } else {
 	            var translatedCode = escapeHTML(l[20460] || "There is an active group call. [A]Join[/A]");
 	            translatedCode = translatedCode.replace("[A]", '<a class="joinActiveCall">').replace('[/A]', '</a>');
 
-	            return React.makeElement(
-	                "div",
-	                { className: "in-call-notif neutral join" },
-	                React.makeElement("i", { className: "small-icon audio-call colorized" }),
-	                React.makeElement("span", { dangerouslySetInnerHTML: { __html: translatedCode } })
+	            return _react2.default.createElement(
+	                'div',
+	                { className: 'in-call-notif neutral join' },
+	                _react2.default.createElement('i', { className: 'small-icon audio-call colorized' }),
+	                _react2.default.createElement('span', { dangerouslySetInnerHTML: { __html: translatedCode } })
 	            );
 	        }
 	    }
 	});
 
-	var ConversationRightArea = React.createClass({
-	    displayName: "ConversationRightArea",
+	var ConversationRightArea = _react2.default.createClass({
+	    displayName: 'ConversationRightArea',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    getDefaultProps: function getDefaultProps() {
 	        return {
 	            'requiresUpdateOnResize': true
@@ -6710,36 +6776,36 @@ React.makeElement = React['createElement'];
 	            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
 	        }
 
-	        var startAudioCallButton = React.makeElement(
-	            "div",
+	        var startAudioCallButton = _react2.default.createElement(
+	            'div',
 	            { className: "link-button light" + " " + startVideoCallButtonClass, onClick: function onClick() {
 	                    if (!disableStartCalls) {
 	                        room.startAudioCall();
 	                    }
 	                } },
-	            React.makeElement("i", { className: "small-icon colorized audio-call" }),
+	            _react2.default.createElement('i', { className: 'small-icon colorized audio-call' }),
 	            __(l[5896])
 	        );
 
-	        var startVideoCallButton = React.makeElement(
-	            "div",
+	        var startVideoCallButton = _react2.default.createElement(
+	            'div',
 	            { className: "link-button light" + " " + startVideoCallButtonClass, onClick: function onClick() {
 	                    if (!disableStartCalls) {
 	                        room.startVideoCall();
 	                    }
 	                } },
-	            React.makeElement("i", { className: "small-icon colorized video-call" }),
+	            _react2.default.createElement('i', { className: 'small-icon colorized video-call' }),
 	            __(l[5897])
 	        );
-	        var AVseperator = React.makeElement("div", { className: "chat-button-seperator" });
-	        var endCallButton = React.makeElement(
-	            "div",
+	        var AVseperator = _react2.default.createElement('div', { className: 'chat-button-seperator' });
+	        var endCallButton = _react2.default.createElement(
+	            'div',
 	            { className: "link-button light red", onClick: function onClick() {
 	                    if (room.callManagerCall) {
 	                        room.callManagerCall.endCall();
 	                    }
 	                } },
-	            React.makeElement("i", { className: "small-icon colorized horizontal-red-handset" }),
+	            _react2.default.createElement('i', { className: 'small-icon colorized horizontal-red-handset' }),
 	            room.type === "group" || room.type === "public" ? "Leave call" : l[5884]
 	        );
 
@@ -6763,10 +6829,10 @@ React.makeElement = React['createElement'];
 	        var isReadOnlyElement = null;
 
 	        if (room.isReadOnly()) {
-	            isReadOnlyElement = React.makeElement(
-	                "center",
-	                { className: "center", style: { margin: "6px" } },
-	                "(read only chat)"
+	            isReadOnlyElement = _react2.default.createElement(
+	                'center',
+	                { className: 'center', style: { margin: "6px" } },
+	                '(read only chat)'
 	            );
 	        }
 	        var excludedParticipants = room.type === "group" || room.type === "public" ? room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) : room.getParticipants() : room.getParticipants();
@@ -6783,11 +6849,11 @@ React.makeElement = React['createElement'];
 
 	        var participantsList = null;
 	        if (room.type === "group" || room.type === "public") {
-	            participantsList = React.makeElement(
-	                "div",
+	            participantsList = _react2.default.createElement(
+	                'div',
 	                null,
 	                isReadOnlyElement,
-	                React.makeElement(ParticipantsList, {
+	                _react2.default.createElement(_participantsList.ParticipantsList, {
 	                    chatRoom: room,
 	                    members: room.members,
 	                    isCurrentlyActive: room.isCurrentlyActive
@@ -6795,28 +6861,28 @@ React.makeElement = React['createElement'];
 	            );
 	        }
 
-	        var addParticipantBtn = React.makeElement(
-	            ButtonsUI.Button,
+	        var addParticipantBtn = _react2.default.createElement(
+	            _buttons2.default.Button,
 	            {
-	                className: "link-button green light",
-	                icon: "rounded-plus colorized",
+	                className: 'link-button green light',
+	                icon: 'rounded-plus colorized',
 	                label: __(l[8007]),
 	                contacts: this.props.contacts,
 	                disabled: !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
 	            },
-	            React.makeElement(DropdownsUI.DropdownContactsSelector, {
+	            _react2.default.createElement(_dropdowns2.default.DropdownContactsSelector, {
 	                contacts: this.props.contacts,
 	                megaChat: this.props.megaChat,
 	                chatRoom: room,
 	                exclude: excludedParticipants,
 	                multiple: true,
-	                className: "popup add-participant-selector",
+	                className: 'popup add-participant-selector',
 	                singleSelectedButtonLabel: __(l[8869]),
 	                multipleSelectedButtonLabel: __(l[8869]),
 	                nothingSelectedButtonLabel: __(l[8870]),
 	                onSelectDone: this.props.onAddParticipantSelected,
-	                positionMy: "center top",
-	                positionAt: "left bottom",
+	                positionMy: 'center top',
+	                positionAt: 'left bottom',
 	                arrowHeight: -32,
 	                selectFooter: true
 	            })
@@ -6829,13 +6895,13 @@ React.makeElement = React['createElement'];
 	            expandedPanel['options'] = true;
 	        }
 
-	        return React.makeElement(
-	            "div",
-	            { className: "chat-right-area" },
-	            React.makeElement(
-	                PerfectScrollbar,
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'chat-right-area' },
+	            _react2.default.createElement(
+	                _perfectScrollbar.PerfectScrollbar,
 	                {
-	                    className: "chat-right-area conversation-details-scroll",
+	                    className: 'chat-right-area conversation-details-scroll',
 	                    options: {
 	                        'suppressScrollX': true
 	                    },
@@ -6844,11 +6910,11 @@ React.makeElement = React['createElement'];
 	                    },
 	                    triggerGlobalResize: true,
 	                    chatRoom: self.props.chatRoom },
-	                React.makeElement(
-	                    "div",
-	                    { className: "chat-right-pad" },
-	                    React.makeElement(
-	                        Accordion,
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'chat-right-pad' },
+	                    _react2.default.createElement(
+	                        _accordion.Accordion,
 	                        {
 	                            onToggle: function onToggle() {
 
@@ -6860,34 +6926,34 @@ React.makeElement = React['createElement'];
 	                            },
 	                            expandedPanel: expandedPanel
 	                        },
-	                        participantsList ? React.makeElement(
-	                            AccordionPanel,
-	                            { className: "small-pad", title: l[8876], key: "participants" },
+	                        participantsList ? _react2.default.createElement(
+	                            _accordion.AccordionPanel,
+	                            { className: 'small-pad', title: l[8876], key: 'participants' },
 	                            participantsList
 	                        ) : null,
-	                        room.type === "public" ? React.makeElement(
-	                            "div",
-	                            { className: "accordion-text observers" },
+	                        room.type === "public" ? _react2.default.createElement(
+	                            'div',
+	                            { className: 'accordion-text observers' },
 	                            l[20466],
-	                            React.makeElement(
-	                                "span",
-	                                { className: "observers-count" },
-	                                React.makeElement("i", { className: "tiny-icon eye" }),
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'observers-count' },
+	                                _react2.default.createElement('i', { className: 'tiny-icon eye' }),
 	                                self.props.chatRoom.observers
 	                            )
-	                        ) : React.makeElement("div", null),
-	                        React.makeElement(
-	                            AccordionPanel,
-	                            { className: "have-animation buttons", title: l[7537], key: "options" },
-	                            React.makeElement(
-	                                "div",
+	                        ) : _react2.default.createElement('div', null),
+	                        _react2.default.createElement(
+	                            _accordion.AccordionPanel,
+	                            { className: 'have-animation buttons', title: l[7537], key: 'options' },
+	                            _react2.default.createElement(
+	                                'div',
 	                                null,
 	                                addParticipantBtn,
 	                                startAudioCallButton,
 	                                startVideoCallButton,
 	                                AVseperator,
-	                                room.type == "group" || room.type == "public" ? React.makeElement(
-	                                    "div",
+	                                room.type == "group" || room.type == "public" ? _react2.default.createElement(
+	                                    'div',
 	                                    { className: renameButtonClass,
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
@@ -6897,12 +6963,12 @@ React.makeElement = React['createElement'];
 	                                                self.props.onRenameClicked();
 	                                            }
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon colorized writing-pen" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon colorized writing-pen' }),
 	                                    l[9080]
 	                                ) : null,
-	                                !room.isReadOnly() && room.type === "public" ? React.makeElement(
-	                                    "div",
-	                                    { className: "link-button light",
+	                                !room.isReadOnly() && room.type === "public" ? _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'link-button light',
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
 	                                                return false;
@@ -6910,12 +6976,12 @@ React.makeElement = React['createElement'];
 
 	                                            self.props.onGetManageChatLinkClicked();
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon blue-chain colorized" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon blue-chain colorized' }),
 	                                    l[20481]
 	                                ) : null,
-	                                !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey ? React.makeElement(
-	                                    "div",
-	                                    { className: "link-button light",
+	                                !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey ? _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'link-button light',
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
 	                                                return false;
@@ -6923,42 +6989,42 @@ React.makeElement = React['createElement'];
 
 	                                            self.props.onJoinViaPublicLinkClicked();
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon writing-pen" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon writing-pen' }),
 	                                    l[20597]
 	                                ) : null,
-	                                React.makeElement(
-	                                    ButtonsUI.Button,
+	                                _react2.default.createElement(
+	                                    _buttons2.default.Button,
 	                                    {
-	                                        className: "link-button light dropdown-element",
-	                                        icon: "rounded-grey-up-arrow colorized",
+	                                        className: 'link-button light dropdown-element',
+	                                        icon: 'rounded-grey-up-arrow colorized',
 	                                        label: __(l[6834] + "..."),
 	                                        disabled: room.isReadOnly()
 	                                    },
-	                                    React.makeElement(
-	                                        DropdownsUI.Dropdown,
+	                                    _react2.default.createElement(
+	                                        _dropdowns2.default.Dropdown,
 	                                        {
 	                                            contacts: this.props.contacts,
 	                                            megaChat: this.props.megaChat,
-	                                            className: "wide-dropdown send-files-selector light",
-	                                            noArrow: "true",
+	                                            className: 'wide-dropdown send-files-selector light',
+	                                            noArrow: 'true',
 	                                            vertOffset: 4,
 	                                            onClick: function onClick() {}
 	                                        },
-	                                        React.makeElement(
-	                                            "div",
-	                                            { className: "dropdown info-txt" },
+	                                        _react2.default.createElement(
+	                                            'div',
+	                                            { className: 'dropdown info-txt' },
 	                                            __(l[19793]) ? __(l[19793]) : "Send files from..."
 	                                        ),
-	                                        React.makeElement(DropdownsUI.DropdownItem, {
-	                                            className: "link-button light",
-	                                            icon: "grey-cloud colorized",
+	                                        _react2.default.createElement(_dropdowns2.default.DropdownItem, {
+	                                            className: 'link-button light',
+	                                            icon: 'grey-cloud colorized',
 	                                            label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
 	                                            onClick: function onClick() {
 	                                                self.props.onAttachFromCloudClicked();
 	                                            } }),
-	                                        React.makeElement(DropdownsUI.DropdownItem, {
-	                                            className: "link-button light",
-	                                            icon: "grey-computer colorized",
+	                                        _react2.default.createElement(_dropdowns2.default.DropdownItem, {
+	                                            className: 'link-button light',
+	                                            icon: 'grey-computer colorized',
 	                                            label: __(l[19795]) ? __(l[19795]) : "My computer",
 	                                            onClick: function onClick() {
 	                                                self.props.onAttachFromComputerClicked();
@@ -6966,8 +7032,8 @@ React.makeElement = React['createElement'];
 	                                    )
 	                                ),
 	                                endCallButton,
-	                                React.makeElement(
-	                                    "div",
+	                                _react2.default.createElement(
+	                                    'div',
 	                                    { className: "link-button light " + (dontShowTruncateButton || !room.members.hasOwnProperty(u_handle) ? "disabled" : ""),
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
@@ -6977,34 +7043,34 @@ React.makeElement = React['createElement'];
 	                                                self.props.onTruncateClicked();
 	                                            }
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon colorized clear-arrow" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon colorized clear-arrow' }),
 	                                    __(l[8871])
 	                                ),
-	                                room.iAmOperator() && room.type === "public" ? React.makeElement(
-	                                    "div",
-	                                    { className: "chat-enable-key-rotation-paragraph" },
-	                                    React.makeElement("div", { className: "chat-button-seperator" }),
-	                                    React.makeElement(
-	                                        "div",
-	                                        { className: "link-button light",
+	                                room.iAmOperator() && room.type === "public" ? _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'chat-enable-key-rotation-paragraph' },
+	                                    _react2.default.createElement('div', { className: 'chat-button-seperator' }),
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'link-button light',
 	                                            onClick: function onClick(e) {
 	                                                if ($(e.target).closest('.disabled').length > 0) {
 	                                                    return false;
 	                                                }
 	                                                self.props.onMakePrivateClicked();
 	                                            } },
-	                                        React.makeElement("i", { className: "small-icon yellow-key colorized" }),
+	                                        _react2.default.createElement('i', { className: 'small-icon yellow-key colorized' }),
 	                                        l[20623]
 	                                    ),
-	                                    React.makeElement(
-	                                        "p",
+	                                    _react2.default.createElement(
+	                                        'p',
 	                                        null,
 	                                        l[20454]
 	                                    )
 	                                ) : null,
-	                                React.makeElement("div", { className: "chat-button-seperator" }),
-	                                React.makeElement(
-	                                    "div",
+	                                _react2.default.createElement('div', { className: 'chat-button-seperator' }),
+	                                _react2.default.createElement(
+	                                    'div',
 	                                    { className: "link-button light" + (!(room.members.hasOwnProperty(u_handle) && !anonymouschat) ? " disabled" : ""),
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
@@ -7020,11 +7086,11 @@ React.makeElement = React['createElement'];
 	                                                }
 	                                            }
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon colorized " + (room.isArchived() ? "unarchive" : "archive") }),
+	                                    _react2.default.createElement('i', { className: "small-icon colorized " + (room.isArchived() ? "unarchive" : "archive") }),
 	                                    room.isArchived() ? __(l[19065]) : __(l[16689])
 	                                ),
-	                                room.type !== "private" ? React.makeElement(
-	                                    "div",
+	                                room.type !== "private" ? _react2.default.createElement(
+	                                    'div',
 	                                    { className: "link-button light red " + (room.stateIsLeftOrLeaving() || !(room.type !== "private" && room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat) ? "disabled" : ""),
 	                                        onClick: function onClick(e) {
 	                                            if ($(e.target).closest('.disabled').length > 0) {
@@ -7034,24 +7100,24 @@ React.makeElement = React['createElement'];
 	                                                self.props.onLeaveClicked();
 	                                            }
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon rounded-stop colorized" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon rounded-stop colorized' }),
 	                                    l[8633]
 	                                ) : null,
-	                                room._closing !== true && (room.type === "group" || room.type === "public") && room.stateIsLeftOrLeaving() && !anonymouschat ? React.makeElement(
-	                                    "div",
-	                                    { className: "link-button light red", onClick: function onClick() {
+	                                room._closing !== true && (room.type === "group" || room.type === "public") && room.stateIsLeftOrLeaving() && !anonymouschat ? _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'link-button light red', onClick: function onClick() {
 	                                            if (self.props.onCloseClicked) {
 	                                                self.props.onCloseClicked();
 	                                            }
 	                                        } },
-	                                    React.makeElement("i", { className: "small-icon rounded-stop colorized" }),
+	                                    _react2.default.createElement('i', { className: 'small-icon rounded-stop colorized' }),
 	                                    l[148]
 	                                ) : null
 	                            )
 	                        ),
-	                        React.makeElement(SharedFilesAccordionPanel, { key: "sharedFiles", title: l[19796] ? l[19796] : "Shared Files", chatRoom: room,
+	                        _react2.default.createElement(_sharedFilesAccordionPanel.SharedFilesAccordionPanel, { key: 'sharedFiles', title: l[19796] ? l[19796] : "Shared Files", chatRoom: room,
 	                            sharedFiles: room.messagesBuff.sharedFiles }),
-	                        room.type === "private" ? React.makeElement(IncomingSharesAccordionPanel, { key: "incomingShares", title: l[5542], chatRoom: room }) : null
+	                        room.type === "private" ? _react2.default.createElement(_incomingSharesAccordionPanel.IncomingSharesAccordionPanel, { key: 'incomingShares', title: l[5542], chatRoom: room }) : null
 	                    )
 	                )
 	            )
@@ -7059,10 +7125,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ConversationPanel = React.createClass({
-	    displayName: "ConversationPanel",
+	var ConversationPanel = _react2.default.createClass({
+	    displayName: 'ConversationPanel',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    lastScrollPositionPerc: 1,
 	    componentSpecificIsComponentEventuallyVisible: function componentSpecificIsComponentEventuallyVisible() {
 	        return this.props.chatRoom.isCurrentlyActive;
@@ -7313,7 +7379,7 @@ React.makeElement = React['createElement'];
 	        if (!M.chat) {
 	            return;
 	        }
-	        var $container = $(ReactDOM.findDOMNode(this));
+	        var $container = $(_reactDom2.default.findDOMNode(this));
 	        var self = this;
 
 	        self.eventuallyInit(false);
@@ -7506,27 +7572,27 @@ React.makeElement = React['createElement'];
 	                    headerText = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.getRoomTitle()));
 	                }
 
-	                messagesList.push(React.makeElement(
-	                    "div",
-	                    { className: "messages notification", key: "initialMsg" },
-	                    React.makeElement("div", { className: "header", dangerouslySetInnerHTML: { __html: headerText } }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "info" },
+	                messagesList.push(_react2.default.createElement(
+	                    'div',
+	                    { className: 'messages notification', key: 'initialMsg' },
+	                    _react2.default.createElement('div', { className: 'header', dangerouslySetInnerHTML: { __html: headerText } }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'info' },
 	                        __(l[8080]),
-	                        React.makeElement(
-	                            "p",
+	                        _react2.default.createElement(
+	                            'p',
 	                            null,
-	                            React.makeElement("i", { className: "semi-big-icon grey-lock" }),
-	                            React.makeElement("span", { dangerouslySetInnerHTML: {
+	                            _react2.default.createElement('i', { className: 'semi-big-icon grey-lock' }),
+	                            _react2.default.createElement('span', { dangerouslySetInnerHTML: {
 	                                    __html: __(l[8540]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
 	                                } })
 	                        ),
-	                        React.makeElement(
-	                            "p",
+	                        _react2.default.createElement(
+	                            'p',
 	                            null,
-	                            React.makeElement("i", { className: "semi-big-icon grey-tick" }),
-	                            React.makeElement("span", { dangerouslySetInnerHTML: {
+	                            _react2.default.createElement('i', { className: 'semi-big-icon grey-tick' }),
+	                            _react2.default.createElement('span', { dangerouslySetInnerHTML: {
 	                                    __html: __(l[8539]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
 	                                } })
 	                        )
@@ -7566,9 +7632,9 @@ React.makeElement = React['createElement'];
 
 	                if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
 	                    lastTimeMarker = curTimeMarker;
-	                    messagesList.push(React.makeElement(
-	                        "div",
-	                        { className: "message date-divider", key: v.messageId + "_marker",
+	                    messagesList.push(_react2.default.createElement(
+	                        'div',
+	                        { className: 'message date-divider', key: v.messageId + "_marker",
 	                            title: time2date(timestamp) },
 	                        curTimeMarker
 	                    ));
@@ -7622,42 +7688,42 @@ React.makeElement = React['createElement'];
 	                if (v.dialogType) {
 	                    var messageInstance = null;
 	                    if (v.dialogType === 'alterParticipants') {
-	                        messageInstance = React.makeElement(AlterParticipantsConversationMessage, {
+	                        messageInstance = _react2.default.createElement(_alterParticipants.AlterParticipantsConversationMessage, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'truncated') {
-	                        messageInstance = React.makeElement(TruncatedMessage, {
+	                        messageInstance = _react2.default.createElement(_truncated.TruncatedMessage, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'privilegeChange') {
-	                        messageInstance = React.makeElement(PrivilegeChange, {
+	                        messageInstance = _react2.default.createElement(_privilegeChange.PrivilegeChange, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'topicChange') {
-	                        messageInstance = React.makeElement(TopicChange, {
+	                        messageInstance = _react2.default.createElement(_topicChange.TopicChange, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'openModeClosed') {
-	                        messageInstance = React.makeElement(CloseOpenModeMessage, {
+	                        messageInstance = _react2.default.createElement(_closeOpenMode.CloseOpenModeMessage, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
 	                            grouped: grouped
 	                        });
 	                    } else if (v.dialogType === 'chatHandleUpdate') {
-	                        messageInstance = React.makeElement(ChatHandleMessage, {
+	                        messageInstance = _react2.default.createElement(_chatHandle.ChatHandleMessage, {
 	                            message: v,
 	                            key: v.messageId,
 	                            contact: Message.getContactForMessage(v),
@@ -7671,7 +7737,7 @@ React.makeElement = React['createElement'];
 	                        v.chatRoom = room;
 	                    }
 
-	                    messagesList.push(React.makeElement(GenericConversationMessage, {
+	                    messagesList.push(_react2.default.createElement(_generic.GenericConversationMessage, {
 	                        message: v,
 	                        state: v.state,
 	                        key: v.messageId,
@@ -7752,7 +7818,7 @@ React.makeElement = React['createElement'];
 	        var attachCloudDialog = null;
 	        if (self.state.attachCloudDialog === true) {
 	            var selected = [];
-	            attachCloudDialog = React.makeElement(CloudBrowserModalDialog.CloudBrowserDialog, {
+	            attachCloudDialog = _react2.default.createElement(_cloudBrowserModalDialog2.default.CloudBrowserDialog, {
 	                folderSelectNotAllowed: true,
 	                onClose: function onClose() {
 	                    self.setState({ 'attachCloudDialog': false });
@@ -7774,8 +7840,8 @@ React.makeElement = React['createElement'];
 	        var nonLoggedInJoinChatDialog = null;
 	        if (self.state.nonLoggedInJoinChatDialog === true) {
 	            var usersCount = Object.keys(room.members).length;
-	            nonLoggedInJoinChatDialog = React.makeElement(
-	                ModalDialogsUI.ModalDialog,
+	            nonLoggedInJoinChatDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ModalDialog,
 	                {
 	                    title: l[20596],
 	                    className: "fm-dialog chat-links-preview-desktop",
@@ -7785,44 +7851,44 @@ React.makeElement = React['createElement'];
 	                        self.setState({ 'nonLoggedInJoinChatDialog': false });
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-body" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "chatlink-contents" },
-	                        React.makeElement("div", { className: "huge-icon group-chat" }),
-	                        React.makeElement(
-	                            "h3",
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-body' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'chatlink-contents' },
+	                        _react2.default.createElement('div', { className: 'huge-icon group-chat' }),
+	                        _react2.default.createElement(
+	                            'h3',
 	                            null,
-	                            React.makeElement(
-	                                utils.EmojiFormattedContent,
+	                            _react2.default.createElement(
+	                                _utils2.default.EmojiFormattedContent,
 	                                null,
 	                                room.topic ? room.getRoomTitle() : " "
 	                            )
 	                        ),
-	                        React.makeElement(
-	                            "h5",
+	                        _react2.default.createElement(
+	                            'h5',
 	                            null,
 	                            usersCount ? l[20233].replace("%s", usersCount) : " "
 	                        ),
-	                        React.makeElement(
-	                            "p",
+	                        _react2.default.createElement(
+	                            'p',
 	                            null,
 	                            l[20595]
 	                        ),
-	                        React.makeElement(
-	                            "a",
-	                            { className: "join-chat", onClick: function onClick(e) {
+	                        _react2.default.createElement(
+	                            'a',
+	                            { className: 'join-chat', onClick: function onClick(e) {
 	                                    self.setState({ 'nonLoggedInJoinChatDialog': false });
 
 	                                    megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
 	                                } },
 	                            l[20597]
 	                        ),
-	                        React.makeElement(
-	                            "a",
-	                            { className: "not-now", onClick: function onClick(e) {
+	                        _react2.default.createElement(
+	                            'a',
+	                            { className: 'not-now', onClick: function onClick(e) {
 	                                    self.setState({ 'nonLoggedInJoinChatDialog': false });
 	                                } },
 	                            l[18682]
@@ -7834,7 +7900,7 @@ React.makeElement = React['createElement'];
 
 	        var chatLinkDialog;
 	        if (self.state.chatLinkDialog === true) {
-	            chatLinkDialog = React.makeElement(ChatlinkDialog, {
+	            chatLinkDialog = _react2.default.createElement(_chatlinkDialog.ChatlinkDialog, {
 	                chatRoom: self.props.chatRoom,
 	                onClose: function onClose() {
 	                    self.setState({ 'chatLinkDialog': false });
@@ -7848,8 +7914,8 @@ React.makeElement = React['createElement'];
 	            if (!$.dialog || $.dialog === "create-private-chat") {
 	                $.dialog = "create-private-chat";
 
-	                privateChatDialog = React.makeElement(
-	                    ModalDialogsUI.ModalDialog,
+	                privateChatDialog = _react2.default.createElement(
+	                    _modalDialogs2.default.ModalDialog,
 	                    {
 	                        title: l[20594],
 	                        className: "fm-dialog create-private-chat",
@@ -7862,38 +7928,38 @@ React.makeElement = React['createElement'];
 	                            }
 	                        }
 	                    },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "create-private-chat-content-block fm-dialog-body" },
-	                        React.makeElement("i", { className: "huge-icon lock" }),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "dialog-body-text" },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "" },
-	                                React.makeElement(
-	                                    "b",
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'create-private-chat-content-block fm-dialog-body' },
+	                        _react2.default.createElement('i', { className: 'huge-icon lock' }),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'dialog-body-text' },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: '' },
+	                                _react2.default.createElement(
+	                                    'b',
 	                                    null,
 	                                    l[20590]
 	                                ),
-	                                React.makeElement("br", null),
+	                                _react2.default.createElement('br', null),
 	                                l[20591]
 	                            )
 	                        ),
-	                        React.makeElement("div", { className: "clear" }),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "big-red-button", id: "make-chat-private", onClick: function onClick() {
+	                        _react2.default.createElement('div', { className: 'clear' }),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'big-red-button', id: 'make-chat-private', onClick: function onClick() {
 	                                    self.props.chatRoom.switchOffPublicMode();
 	                                    self.setState({ 'privateChatDialog': false });
 	                                    if ($.dialog === "create-private-chat") {
 	                                        closeDialog();
 	                                    }
 	                                } },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "big-btn-txt" },
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'big-btn-txt' },
 	                                l[20593]
 	                            )
 	                        )
@@ -7936,7 +8002,7 @@ React.makeElement = React['createElement'];
 	                });
 	            }
 
-	            sendContactDialog = React.makeElement(ModalDialogsUI.SelectContactDialog, {
+	            sendContactDialog = _react2.default.createElement(_modalDialogs2.default.SelectContactDialog, {
 	                megaChat: room.megaChat,
 	                chatRoom: room,
 	                exclude: excludedContacts,
@@ -7955,13 +8021,13 @@ React.makeElement = React['createElement'];
 
 	        var confirmDeleteDialog = null;
 	        if (self.state.confirmDeleteDialog === true) {
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ConfirmDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ConfirmDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[8004]),
-	                    name: "delete-message",
+	                    name: 'delete-message',
 	                    onClose: function onClose() {
 	                        self.setState({ 'confirmDeleteDialog': false });
 	                    },
@@ -8004,16 +8070,16 @@ React.makeElement = React['createElement'];
 	                        }
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
 	                        __(l[8879])
 	                    ),
-	                    React.makeElement(GenericConversationMessage, {
-	                        className: " dialog-wrapper",
+	                    _react2.default.createElement(_generic.GenericConversationMessage, {
+	                        className: ' dialog-wrapper',
 	                        message: self.state.messageToBeDeleted,
 	                        hideActionButtons: true,
 	                        initTextScrolling: true,
@@ -8025,13 +8091,13 @@ React.makeElement = React['createElement'];
 
 	        var pasteImageConfirmDialog = null;
 	        if (self.state.pasteImageConfirmDialog) {
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ConfirmDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ConfirmDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[20905]),
-	                    name: "paste-image-chat",
+	                    name: 'paste-image-chat',
 	                    onClose: function onClose() {
 	                        self.setState({ 'pasteImageConfirmDialog': false });
 	                    },
@@ -8060,15 +8126,15 @@ React.makeElement = React['createElement'];
 	                        URL.revokeObjectURL(meta[2]);
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
 	                        __(l[20906])
 	                    ),
-	                    React.makeElement("img", {
+	                    _react2.default.createElement('img', {
 	                        src: self.state.pasteImageConfirmDialog[2],
 	                        style: {
 	                            maxWidth: "90%",
@@ -8091,13 +8157,13 @@ React.makeElement = React['createElement'];
 
 	        var confirmTruncateDialog = null;
 	        if (self.state.truncateDialog === true) {
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ConfirmDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ConfirmDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[8871]),
-	                    name: "truncate-conversation",
+	                    name: 'truncate-conversation',
 	                    dontShowAgainCheckbox: false,
 	                    onClose: function onClose() {
 	                        self.setState({ 'truncateDialog': false });
@@ -8112,12 +8178,12 @@ React.makeElement = React['createElement'];
 	                        });
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
 	                        __(l[8881])
 	                    )
 	                )
@@ -8125,13 +8191,13 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (self.state.archiveDialog === true) {
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ConfirmDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ConfirmDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[19068]),
-	                    name: "archive-conversation",
+	                    name: 'archive-conversation',
 	                    onClose: function onClose() {
 	                        self.setState({ 'archiveDialog': false });
 	                    },
@@ -8145,25 +8211,25 @@ React.makeElement = React['createElement'];
 	                        });
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
 	                        __(l[19069])
 	                    )
 	                )
 	            );
 	        }
 	        if (self.state.unarchiveDialog === true) {
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ConfirmDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ConfirmDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[19063]),
-	                    name: "unarchive-conversation",
+	                    name: 'unarchive-conversation',
 	                    onClose: function onClose() {
 	                        self.setState({ 'unarchiveDialog': false });
 	                    },
@@ -8177,12 +8243,12 @@ React.makeElement = React['createElement'];
 	                        });
 	                    }
 	                },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
 	                        __(l[19064])
 	                    )
 	                )
@@ -8197,14 +8263,14 @@ React.makeElement = React['createElement'];
 	                e.stopPropagation();
 	            };
 
-	            confirmDeleteDialog = React.makeElement(
-	                ModalDialogsUI.ModalDialog,
+	            confirmDeleteDialog = _react2.default.createElement(
+	                _modalDialogs2.default.ModalDialog,
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
 	                    title: __(l[9080]),
-	                    name: "rename-group",
-	                    className: "chat-rename-dialog",
+	                    name: 'rename-group',
+	                    className: 'chat-rename-dialog',
 	                    onClose: function onClose() {
 	                        self.setState({ 'renameDialog': false, 'renameDialogValue': undefined });
 	                    },
@@ -8224,22 +8290,22 @@ React.makeElement = React['createElement'];
 	                            e.stopPropagation();
 	                        }
 	                    }] },
-	                React.makeElement(
-	                    "div",
-	                    { className: "fm-dialog-content" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dialog secondary-header" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "rename-input-bl" },
-	                            React.makeElement("input", {
-	                                type: "text",
-	                                className: "chat-rename-group-dialog",
-	                                name: "newTopic",
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'fm-dialog-content' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dialog secondary-header' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'rename-input-bl' },
+	                            _react2.default.createElement('input', {
+	                                type: 'text',
+	                                className: 'chat-rename-group-dialog',
+	                                name: 'newTopic',
 	                                defaultValue: self.props.chatRoom.getRoomTitle(),
 	                                value: self.state.renameDialogValue,
-	                                maxLength: "30",
+	                                maxLength: '30',
 	                                onChange: function onChange(e) {
 	                                    self.setState({
 	                                        'renameDialogValue': e.target.value.substr(0, 30)
@@ -8264,25 +8330,25 @@ React.makeElement = React['createElement'];
 
 	        var topicInfo = null;
 	        if (self.props.chatRoom.type === "group" || self.props.chatRoom.type === "public") {
-	            topicInfo = React.makeElement(
-	                "div",
-	                { className: "chat-topic-info" },
-	                React.makeElement("div", { className: "chat-topic-icon" }),
-	                React.makeElement(
-	                    "div",
-	                    { className: "chat-topic-text" },
-	                    React.makeElement(
-	                        "span",
-	                        { className: "txt" },
-	                        React.makeElement(
-	                            utils.EmojiFormattedContent,
+	            topicInfo = _react2.default.createElement(
+	                'div',
+	                { className: 'chat-topic-info' },
+	                _react2.default.createElement('div', { className: 'chat-topic-icon' }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'chat-topic-text' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'txt' },
+	                        _react2.default.createElement(
+	                            _utils2.default.EmojiFormattedContent,
 	                            null,
 	                            self.props.chatRoom.getRoomTitle()
 	                        )
 	                    ),
-	                    React.makeElement(
-	                        "span",
-	                        { className: "txt small" },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'txt small' },
 	                        (l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length)
 	                    )
 	                )
@@ -8292,9 +8358,9 @@ React.makeElement = React['createElement'];
 	            var contactHandle = contacts[0];
 	            var contact = M.u[contactHandle];
 
-	            topicInfo = React.makeElement(ContactsUI.ContactCard, {
-	                className: "short",
-	                noContextButton: "true",
+	            topicInfo = _react2.default.createElement(_contacts2.default.ContactCard, {
+	                className: 'short',
+	                noContextButton: 'true',
 	                contact: contact,
 	                megaChat: self.props.chatRoom.megaChat,
 	                showLastGreen: true,
@@ -8305,14 +8371,14 @@ React.makeElement = React['createElement'];
 
 	        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
 
-	        return React.makeElement(
-	            "div",
+	        return _react2.default.createElement(
+	            'div',
 	            { className: conversationPanelClasses, onMouseMove: self.onMouseMove,
-	                "data-room-id": self.props.chatRoom.chatId },
-	            React.makeElement(
-	                "div",
+	                'data-room-id': self.props.chatRoom.chatId },
+	            _react2.default.createElement(
+	                'div',
 	                { className: "chat-content-block " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ? "with-pane" : "no-pane") },
-	                !room.megaChat.chatUIFlags['convPanelCollapse'] ? React.makeElement(ConversationRightArea, {
+	                !room.megaChat.chatUIFlags['convPanelCollapse'] ? _react2.default.createElement(ConversationRightArea, {
 	                    isVisible: this.props.chatRoom.isCurrentlyActive,
 	                    chatRoom: this.props.chatRoom,
 	                    members: this.props.chatRoom.membersSetFromApi,
@@ -8378,7 +8444,7 @@ React.makeElement = React['createElement'];
 	                        }
 	                    }
 	                }) : null,
-	                room.callManagerCall && room.callManagerCall.isStarted() ? React.makeElement(ConversationAudioVideoPanel, {
+	                room.callManagerCall && room.callManagerCall.isStarted() ? _react2.default.createElement(_conversationaudiovideopanel.ConversationAudioVideoPanel, {
 	                    chatRoom: this.props.chatRoom,
 	                    contacts: self.props.contacts,
 	                    megaChat: this.props.chatRoom.megaChat,
@@ -8396,90 +8462,90 @@ React.makeElement = React['createElement'];
 	                sendContactDialog,
 	                confirmDeleteDialog,
 	                confirmTruncateDialog,
-	                React.makeElement(
-	                    "div",
-	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden" },
-	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dropdown notification-text" },
-	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden' },
+	                    _react2.default.createElement('i', { className: 'dropdown-white-arrow' }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dropdown notification-text' },
+	                        _react2.default.createElement('i', { className: 'small-icon conversations' }),
 	                        __(l[8882])
 	                    )
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden" },
-	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dropdown notification-text" },
-	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden' },
+	                    _react2.default.createElement('i', { className: 'dropdown-white-arrow' }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dropdown notification-text' },
+	                        _react2.default.createElement('i', { className: 'small-icon conversations' }),
 	                        __(l[8883])
 	                    )
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden" },
-	                    React.makeElement("i", { className: "dropdown-white-arrow" }),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "dropdown notification-text" },
-	                        React.makeElement("i", { className: "small-icon conversations" }),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden' },
+	                    _react2.default.createElement('i', { className: 'dropdown-white-arrow' }),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'dropdown notification-text' },
+	                        _react2.default.createElement('i', { className: 'small-icon conversations' }),
 	                        __(l[8884])
 	                    )
 	                ),
-	                React.makeElement(
-	                    "div",
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "chat-topic-block " + topicBlockClass + (self.props.chatRoom.havePendingGroupCall() || self.props.chatRoom.haveActiveCall() ? " have-pending-group-call" : "") },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "chat-topic-buttons" },
-	                        React.makeElement(ButtonsUI.Button, {
-	                            className: "right",
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'chat-topic-buttons' },
+	                        _react2.default.createElement(_buttons2.default.Button, {
+	                            className: 'right',
 	                            disableCheckingVisibility: true,
 	                            icon: "small-icon " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ? "arrow-in-square" : "arrow-in-square active"),
 	                            onClick: function onClick() {
 	                                room.megaChat.toggleUIFlag('convPanelCollapse');
 	                            }
 	                        }),
-	                        React.makeElement(
-	                            "span",
+	                        _react2.default.createElement(
+	                            'span',
 	                            null,
-	                            React.makeElement(
-	                                "div",
+	                            _react2.default.createElement(
+	                                'div',
 	                                {
-	                                    className: "button right",
+	                                    className: 'button right',
 	                                    onClick: function onClick() {
 	                                        if (!disabledCalls) {
 	                                            room.startVideoCall();
 	                                        }
 	                                    } },
-	                                React.makeElement("i", { className: "small-icon small-icon video-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "") })
+	                                _react2.default.createElement('i', { className: "small-icon small-icon video-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "") })
 	                            ),
-	                            React.makeElement(
-	                                "div",
+	                            _react2.default.createElement(
+	                                'div',
 	                                {
-	                                    className: "button right",
+	                                    className: 'button right',
 	                                    onClick: function onClick() {
 	                                        if (!disabledCalls) {
 	                                            room.startAudioCall();
 	                                        }
 	                                    } },
-	                                React.makeElement("i", { className: "small-icon small-icon audio-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "") })
+	                                _react2.default.createElement('i', { className: "small-icon small-icon audio-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "") })
 	                            )
 	                        )
 	                    ),
 	                    topicInfo
 	                ),
-	                React.makeElement(
-	                    "div",
+	                _react2.default.createElement(
+	                    'div',
 	                    { className: "messages-block " + additionalClass },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "messages scroll-area" },
-	                        React.makeElement(
-	                            PerfectScrollbar,
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'messages scroll-area' },
+	                        _react2.default.createElement(
+	                            _perfectScrollbar.PerfectScrollbar,
 	                            {
 	                                onFirstInit: function onFirstInit(ps, node) {
 	                                    ps.scrollToBottom(true);
@@ -8487,7 +8553,7 @@ React.makeElement = React['createElement'];
 	                                },
 	                                onReinitialise: self.onMessagesScrollReinitialise,
 	                                onUserScroll: self.onMessagesScrollUserScroll,
-	                                className: "js-messages-scroll-area perfectScrollbarContainer",
+	                                className: 'js-messages-scroll-area perfectScrollbarContainer',
 	                                messagesToggledInCall: self.state.messagesToggledInCall,
 	                                ref: function ref(_ref2) {
 	                                    return self.messagesListScrollable = _ref2;
@@ -8503,17 +8569,17 @@ React.makeElement = React['createElement'];
 	                                    'suppressScrollX': true
 	                                }
 	                            },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "messages main-pad" },
-	                                React.makeElement(
-	                                    "div",
-	                                    { className: "messages content-area" },
-	                                    React.makeElement(
-	                                        "div",
-	                                        { className: "loading-spinner js-messages-loading light manual-management",
-	                                            key: "loadingSpinner", style: { top: "50%" } },
-	                                        React.makeElement("div", { className: "main-loader", style: {
+	                            _react2.default.createElement(
+	                                'div',
+	                                { className: 'messages main-pad' },
+	                                _react2.default.createElement(
+	                                    'div',
+	                                    { className: 'messages content-area' },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'loading-spinner js-messages-loading light manual-management',
+	                                            key: 'loadingSpinner', style: { top: "50%" } },
+	                                        _react2.default.createElement('div', { className: 'main-loader', style: {
 	                                                'position': 'fixed',
 	                                                'top': '50%',
 	                                                'left': '50%'
@@ -8524,13 +8590,13 @@ React.makeElement = React['createElement'];
 	                            )
 	                        )
 	                    ),
-	                    !anonymouschat && room.state != ChatRoom.STATE.LEFT && room.havePendingGroupCall() && (!room.callManagerCall || room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) ? React.makeElement(JoinCallNotification, { chatRoom: room }) : null,
-	                    anonymouschat || !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey ? React.makeElement(
-	                        "div",
-	                        { className: "join-chat-block" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "join-chat-button",
+	                    !anonymouschat && room.state != ChatRoom.STATE.LEFT && room.havePendingGroupCall() && (!room.callManagerCall || room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) ? _react2.default.createElement(JoinCallNotification, { chatRoom: room }) : null,
+	                    anonymouschat || !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey ? _react2.default.createElement(
+	                        'div',
+	                        { className: 'join-chat-block' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'join-chat-button',
 	                                onClick: function onClick(e) {
 	                                    if (anonymouschat) {
 	                                        megaChat.loginOrRegisterBeforeJoining(room.publicChatHandle);
@@ -8540,15 +8606,15 @@ React.makeElement = React['createElement'];
 	                                } },
 	                            l[20597]
 	                        )
-	                    ) : React.makeElement(
-	                        "div",
-	                        { className: "chat-textarea-block" },
-	                        React.makeElement(WhosTyping, { chatRoom: room }),
-	                        React.makeElement(
-	                            TypingAreaUI.TypingArea,
+	                    ) : _react2.default.createElement(
+	                        'div',
+	                        { className: 'chat-textarea-block' },
+	                        _react2.default.createElement(_whosTyping.WhosTyping, { chatRoom: room }),
+	                        _react2.default.createElement(
+	                            _typingArea2.default.TypingArea,
 	                            {
 	                                chatRoom: self.props.chatRoom,
-	                                className: "main-typing-area",
+	                                className: 'main-typing-area',
 	                                disabled: room.isReadOnly(),
 	                                persist: true,
 	                                onUpEditPressed: function onUpEditPressed() {
@@ -8610,45 +8676,45 @@ React.makeElement = React['createElement'];
 	                                    }
 	                                }
 	                            },
-	                            React.makeElement(
-	                                ButtonsUI.Button,
+	                            _react2.default.createElement(
+	                                _buttons2.default.Button,
 	                                {
-	                                    className: "popup-button left",
-	                                    icon: "small-icon grey-small-plus",
+	                                    className: 'popup-button left',
+	                                    icon: 'small-icon grey-small-plus',
 	                                    disabled: room.isReadOnly()
 	                                },
-	                                React.makeElement(
-	                                    DropdownsUI.Dropdown,
+	                                _react2.default.createElement(
+	                                    _dropdowns2.default.Dropdown,
 	                                    {
-	                                        className: "wide-dropdown attach-to-chat-popup light",
-	                                        noArrow: "true",
-	                                        positionMy: "left top",
-	                                        positionAt: "left bottom",
+	                                        className: 'wide-dropdown attach-to-chat-popup light',
+	                                        noArrow: 'true',
+	                                        positionMy: 'left top',
+	                                        positionAt: 'left bottom',
 	                                        vertOffset: 4
 	                                    },
-	                                    React.makeElement(
-	                                        "div",
-	                                        { className: "dropdown info-txt" },
+	                                    _react2.default.createElement(
+	                                        'div',
+	                                        { className: 'dropdown info-txt' },
 	                                        __(l[19793]) ? __(l[19793]) : "Send files from..."
 	                                    ),
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        className: "link-button light",
-	                                        icon: "grey-cloud colorized",
+	                                    _react2.default.createElement(_dropdowns2.default.DropdownItem, {
+	                                        className: 'link-button light',
+	                                        icon: 'grey-cloud colorized',
 	                                        label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
 	                                        onClick: function onClick(e) {
 	                                            self.setState({ 'attachCloudDialog': true });
 	                                        } }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        className: "link-button light",
-	                                        icon: "grey-computer colorized",
+	                                    _react2.default.createElement(_dropdowns2.default.DropdownItem, {
+	                                        className: 'link-button light',
+	                                        icon: 'grey-computer colorized',
 	                                        label: __(l[19795]) ? __(l[19795]) : "My computer",
 	                                        onClick: function onClick(e) {
 	                                            self.uploadFromComputer();
 	                                        } }),
-	                                    React.makeElement("div", { className: "chat-button-seperator" }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
-	                                        className: "link-button light",
-	                                        icon: "square-profile colorized",
+	                                    _react2.default.createElement('div', { className: 'chat-button-seperator' }),
+	                                    _react2.default.createElement(_dropdowns2.default.DropdownItem, {
+	                                        className: 'link-button light',
+	                                        icon: 'square-profile colorized',
 	                                        label: __(l[8628]),
 	                                        onClick: function onClick(e) {
 	                                            self.setState({ 'sendContactDialog': true });
@@ -8663,10 +8729,10 @@ React.makeElement = React['createElement'];
 	    }
 	});
 
-	var ConversationPanels = React.createClass({
-	    displayName: "ConversationPanels",
+	var ConversationPanels = _react2.default.createClass({
+	    displayName: 'ConversationPanels',
 
-	    mixins: [MegaRenderMixin, RenderDebugger],
+	    mixins: [_mixins.MegaRenderMixin, _mixins.RenderDebugger],
 	    render: function render() {
 	        var self = this;
 
@@ -8695,7 +8761,7 @@ React.makeElement = React['createElement'];
 	                contact = M.u[otherParticipants[0]];
 	            }
 
-	            conversations.push(React.makeElement(ConversationPanel, {
+	            conversations.push(_react2.default.createElement(ConversationPanel, {
 	                chatUIFlags: self.props.chatUIFlags,
 	                isExpanded: chatRoom.megaChat.chatUIFlags['convPanelCollapse'],
 	                chatRoom: chatRoom,
@@ -8719,43 +8785,43 @@ React.makeElement = React['createElement'];
 	                    if (contact.c === 1) {
 	                        var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
 
-	                        (pres === "offline" ? contactsListOffline : contactsList).push(React.makeElement(ContactsUI.ContactCard, { contact: contact, megaChat: self.props.megaChat,
+	                        (pres === "offline" ? contactsListOffline : contactsList).push(_react2.default.createElement(_contacts2.default.ContactCard, { contact: contact, megaChat: self.props.megaChat,
 	                            key: contact.u }));
 	                    }
 	                });
 	            }
 	            var emptyMessage = hadLoaded ? l[8008] : l[7006];
 
-	            return React.makeElement(
-	                "div",
+	            return _react2.default.createElement(
+	                'div',
 	                null,
-	                React.makeElement(
-	                    "div",
-	                    { className: "chat-right-area" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "chat-right-area contacts-list-scroll" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "chat-right-pad" },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'chat-right-area' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'chat-right-area contacts-list-scroll' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'chat-right-pad' },
 	                            contactsList,
 	                            contactsListOffline
 	                        )
 	                    )
 	                ),
-	                React.makeElement(
-	                    "div",
-	                    { className: "empty-block" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "empty-pad conversations" },
-	                        React.makeElement("div", { className: "fm-empty-conversations-bg" }),
-	                        React.makeElement("div", { className: "fm-empty-cloud-txt small", dangerouslySetInnerHTML: {
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'empty-block' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'empty-pad conversations' },
+	                        _react2.default.createElement('div', { className: 'fm-empty-conversations-bg' }),
+	                        _react2.default.createElement('div', { className: 'fm-empty-cloud-txt small', dangerouslySetInnerHTML: {
 	                                __html: __(anonymouschat ? "" : emptyMessage).replace("[P]", "<span>").replace("[/P]", "</span>")
 	                            } }),
-	                        hadLoaded && !anonymouschat ? React.makeElement(
-	                            "div",
-	                            { className: "big-red-button new-chat-link",
+	                        hadLoaded && !anonymouschat ? _react2.default.createElement(
+	                            'div',
+	                            { className: 'big-red-button new-chat-link',
 	                                onClick: function onClick(e) {
 	                                    $(document.body).trigger('startNewChatLink');
 	                                } },
@@ -8765,8 +8831,8 @@ React.makeElement = React['createElement'];
 	                )
 	            );
 	        } else {
-	            return React.makeElement(
-	                "div",
+	            return _react2.default.createElement(
+	                'div',
 	                { className: "conversation-panels " + self.props.className },
 	                conversations
 	            );
@@ -12824,26 +12890,41 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
-	var _AudioContainer = __webpack_require__(24);
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _utils3 = __webpack_require__(7);
+
+	var _mixin = __webpack_require__(24);
+
+	var _metaRichpreview = __webpack_require__(25);
+
+	var _metaRichpreviewConfirmation = __webpack_require__(27);
+
+	var _metaRichpreviewMegaLinks = __webpack_require__(28);
+
+	var _contacts = __webpack_require__(11);
+
+	var _contacts2 = _interopRequireDefault(_contacts);
+
+	var _typingArea = __webpack_require__(17);
+
+	var _typingArea2 = _interopRequireDefault(_typingArea);
+
+	var _AudioContainer = __webpack_require__(29);
 
 	var _AudioContainer2 = _interopRequireDefault(_AudioContainer);
 
-	var _geoLocation = __webpack_require__(26);
+	var _geoLocation = __webpack_require__(31);
 
 	var _geoLocation2 = _interopRequireDefault(_geoLocation);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var React = __webpack_require__(2);
-	var utils = __webpack_require__(5);
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
-	var MetaRichpreview = __webpack_require__(28).MetaRichpreview;
-	var MetaRichpreviewConfirmation = __webpack_require__(30).MetaRichpreviewConfirmation;
-	var MetaRichpreviewMegaLinks = __webpack_require__(31).MetaRichpreviewMegaLinks;
-	var ContactsUI = __webpack_require__(11);
-	var TypingAreaUI = __webpack_require__(17);
-
 
 	var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
@@ -12851,10 +12932,10 @@ React.makeElement = React['createElement'];
 
 	var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-	var GenericConversationMessage = React.createClass({
+	var GenericConversationMessage = _react2.default.createClass({
 	    displayName: 'GenericConversationMessage',
 
-	    mixins: [ConversationMessageMixin],
+	    mixins: [_mixin.ConversationMessageMixin],
 	    getInitialState: function getInitialState() {
 	        return {
 	            'editing': this.props.editing
@@ -13005,7 +13086,8 @@ React.makeElement = React['createElement'];
 	        if (M.getNodeRights(h) > 1) {
 	            var isFav = M.isFavourite(h);
 
-	            arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: "context " + (isFav ? "broken-heart" : "heart"),
+	            arr.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                icon: "context " + (isFav ? "broken-heart" : "heart"),
 	                label: isFav ? l[5872] : l[5871],
 	                isFav: isFav,
 	                key: 'fav',
@@ -13014,7 +13096,8 @@ React.makeElement = React['createElement'];
 	                    e.stopPropagation();
 	                    e.preventDefault();
 	                    return false;
-	                } }));
+	                }
+	            }));
 	            return isFav;
 	        } else {
 	            return false;
@@ -13030,14 +13113,16 @@ React.makeElement = React['createElement'];
 
 	        var getManageLinkText = haveLink ? l[6909] : l[59];
 
-	        arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'icons-sprite chain',
+	        arr.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	            icon: 'icons-sprite chain',
 	            key: 'getLinkButton',
 	            label: getManageLinkText,
 	            onClick: self._getLink.bind(self, h)
 	        }));
 
 	        if (haveLink) {
-	            arr.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context remove-link',
+	            arr.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                icon: 'context remove-link',
 	                key: 'removeLinkButton',
 	                label: __(l[6821]),
 	                onClick: self._removeLink.bind(self, h)
@@ -13207,7 +13292,7 @@ React.makeElement = React['createElement'];
 	                    buttonsBlock = null;
 	                } else {
 	                    additionalClasses += " sending";
-	                    spinnerElement = React.makeElement('div', { className: 'small-blue-spinner' });
+	                    spinnerElement = _react2.default.createElement('div', { className: 'small-blue-spinner' });
 
 	                    if (!message.sending) {
 	                        message.sending = true;
@@ -13257,21 +13342,21 @@ React.makeElement = React['createElement'];
 	                                noThumbPrev = 'no-thumb-prev';
 	                            }
 	                            var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-	                            previewButton = React.makeElement(
+	                            previewButton = _react2.default.createElement(
 	                                'span',
 	                                { key: 'previewButton' },
-	                                React.makeElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
+	                                _react2.default.createElement(DropdownsUI.DropdownItem, { icon: 'search-icon', label: previewLabel,
 	                                    onClick: self._startPreview.bind(self, v) })
 	                            );
 	                        }
 
 	                        if (contact.u === u_handle) {
-	                            dropdown = React.makeElement(
+	                            dropdown = _react2.default.createElement(
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
 	                                    icon: 'tiny-icon icons-sprite grey-dots' },
-	                                React.makeElement(DropdownsUI.Dropdown, {
+	                                _react2.default.createElement(DropdownsUI.Dropdown, {
 	                                    ref: function ref(refObj) {
 	                                        self.dropdown = refObj;
 	                                    },
@@ -13293,12 +13378,14 @@ React.makeElement = React['createElement'];
 	                                        var downloadButton = null;
 
 	                                        if (message.isEditable && message.isEditable()) {
-	                                            revokeButton = React.makeElement(DropdownsUI.DropdownItem, { icon: 'red-cross',
+	                                            revokeButton = _react2.default.createElement(DropdownsUI.DropdownItem, {
+	                                                icon: 'red-cross',
 	                                                label: __(l[83]),
 	                                                className: 'red',
 	                                                onClick: function onClick() {
 	                                                    chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId || message.orderValue, "");
-	                                                } });
+	                                                }
+	                                            });
 	                                        }
 
 	                                        if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
@@ -13310,13 +13397,13 @@ React.makeElement = React['createElement'];
 	                                                    dd.doRerender();
 	                                                }
 	                                            });
-	                                            return React.makeElement(
+	                                            return _react2.default.createElement(
 	                                                'span',
 	                                                null,
 	                                                l[5533]
 	                                            );
 	                                        } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-	                                            downloadButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                                            downloadButton = _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                                icon: 'rounded-grey-down-arrow',
 	                                                label: __(l[1187]),
 	                                                onClick: self._startDownload.bind(self, v) });
@@ -13325,22 +13412,27 @@ React.makeElement = React['createElement'];
 	                                                self._addLinkButtons(v.h, linkButtons);
 	                                            }
 
-	                                            firstGroupOfButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'context info', label: __(l[6859]),
+	                                            firstGroupOfButtons.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                                                icon: 'context info',
+	                                                label: __(l[6859]),
 	                                                key: 'infoDialog',
 	                                                onClick: function onClick() {
 	                                                    $.selected = [v.h];
 	                                                    propertiesDialog();
-	                                                } }));
+	                                                }
+	                                            }));
 
 	                                            self._addFavouriteButtons(v.h, firstGroupOfButtons);
 
-	                                            linkButtons.push(React.makeElement(DropdownsUI.DropdownItem, { icon: 'small-icon conversations',
+	                                            linkButtons.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
+	                                                icon: 'small-icon conversations',
 	                                                label: __(l[17764]),
 	                                                key: 'sendToChat',
 	                                                onClick: function onClick() {
 	                                                    $.selected = [v.h];
 	                                                    openCopyDialog('conversations');
-	                                                } }));
+	                                                }
+	                                            }));
 	                                        }
 
 	                                        if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && linkButtons.length === 0 && !revokeButton) {
@@ -13348,30 +13440,30 @@ React.makeElement = React['createElement'];
 	                                        }
 
 	                                        if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || linkButtons.length > 0 || revokeButton)) {
-	                                            previewButton = [previewButton, React.makeElement('hr', { key: 'preview-sep' })];
+	                                            previewButton = [previewButton, _react2.default.createElement('hr', { key: 'preview-sep' })];
 	                                        }
 
-	                                        return React.makeElement(
+	                                        return _react2.default.createElement(
 	                                            'div',
 	                                            null,
 	                                            previewButton,
 	                                            firstGroupOfButtons,
-	                                            firstGroupOfButtons && firstGroupOfButtons.length > 0 ? React.makeElement('hr', null) : "",
+	                                            firstGroupOfButtons && firstGroupOfButtons.length > 0 ? _react2.default.createElement('hr', null) : "",
 	                                            downloadButton,
 	                                            linkButtons,
-	                                            revokeButton && downloadButton ? React.makeElement('hr', null) : "",
+	                                            revokeButton && downloadButton ? _react2.default.createElement('hr', null) : "",
 	                                            revokeButton
 	                                        );
 	                                    }
 	                                })
 	                            );
 	                        } else {
-	                            dropdown = React.makeElement(
+	                            dropdown = _react2.default.createElement(
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
 	                                    icon: 'tiny-icon icons-sprite grey-dots' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
 	                                        className: 'white-context-menu attachments-dropdown',
@@ -13382,27 +13474,27 @@ React.makeElement = React['createElement'];
 	                                        vertOffset: 3
 	                                    },
 	                                    previewButton,
-	                                    React.makeElement('hr', null),
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
+	                                    _react2.default.createElement('hr', null),
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, { icon: 'rounded-grey-down-arrow', label: __(l[1187]),
 	                                        onClick: self._startDownload.bind(self, v) }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, { icon: 'grey-cloud', label: __(l[1988]),
 	                                        onClick: self._addToCloudDrive.bind(self, v, false) }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, { icon: 'conversations', label: __(l[17764]),
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, { icon: 'conversations', label: __(l[17764]),
 	                                        onClick: self._addToCloudDrive.bind(self, v, true) })
 	                                )
 	                            );
 	                        }
 
 	                        var attachmentClasses = "message shared-data";
-	                        var preview = React.makeElement(
+	                        var preview = _react2.default.createElement(
 	                            'div',
 	                            { className: "data-block-view medium " + noThumbPrev,
 	                                onClick: isPreviewable && self._startPreview.bind(self, v) },
 	                            dropdown,
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'data-block-bg' },
-	                                React.makeElement('div', { className: "block-view-file-type " + icon })
+	                                _react2.default.createElement('div', { className: "block-view-file-type " + icon })
 	                            )
 	                        );
 
@@ -13413,20 +13505,20 @@ React.makeElement = React['createElement'];
 
 	                            if (isImage) {
 	                                thumbClass = thumbClass + " image";
-	                                thumbOverlay = React.makeElement('div', { className: 'thumb-overlay',
+	                                thumbOverlay = _react2.default.createElement('div', { className: 'thumb-overlay',
 	                                    onClick: self._startPreview.bind(self, v) });
 	                            } else {
 	                                thumbClass = thumbClass + " video " + (isPreviewable ? " previewable" : "non-previewable");
-	                                thumbOverlay = React.makeElement(
+	                                thumbOverlay = _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'thumb-overlay',
 	                                        onClick: isPreviewable && self._startPreview.bind(self, v) },
-	                                    isPreviewable && React.makeElement('div', { className: 'play-video-button' }),
-	                                    React.makeElement(
+	                                    isPreviewable && _react2.default.createElement('div', { className: 'play-video-button' }),
+	                                    _react2.default.createElement(
 	                                        'div',
 	                                        { className: 'video-thumb-details' },
-	                                        v.playtime && React.makeElement('i', { className: 'small-icon small-play-icon' }),
-	                                        React.makeElement(
+	                                        v.playtime && _react2.default.createElement('i', { className: 'small-icon small-play-icon' }),
+	                                        _react2.default.createElement(
 	                                            'span',
 	                                            null,
 	                                            secondsToTimeShort(v.playtime || -1)
@@ -13435,42 +13527,42 @@ React.makeElement = React['createElement'];
 	                                );
 	                            }
 
-	                            preview = src ? React.makeElement(
+	                            preview = src ? _react2.default.createElement(
 	                                'div',
 	                                { id: v.ch, className: "shared-link thumb " + thumbClass },
 	                                thumbOverlay,
 	                                dropdown,
-	                                React.makeElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
+	                                _react2.default.createElement('img', { alt: '', className: "thumbnail-placeholder " + v.h, src: src,
 	                                    key: 'thumb-' + v.ch,
 	                                    onClick: isPreviewable && self._startPreview.bind(self, v)
 	                                })
 	                            ) : preview;
 	                        }
 
-	                        files.push(React.makeElement(
+	                        files.push(_react2.default.createElement(
 	                            'div',
 	                            { className: attachmentClasses, key: 'atch-' + v.ch },
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-info' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'message data-title' },
 	                                    __(l[17669]),
-	                                    React.makeElement(
+	                                    _react2.default.createElement(
 	                                        'span',
 	                                        { className: 'file-name' },
 	                                        v.name
 	                                    )
 	                                ),
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'message file-size' },
 	                                    bytesToSize(v.s)
 	                                )
 	                            ),
 	                            preview,
-	                            React.makeElement('div', { className: 'clear' })
+	                            _react2.default.createElement('div', { className: 'clear' })
 	                        ));
 	                    });
 
@@ -13480,26 +13572,26 @@ React.makeElement = React['createElement'];
 	                    if (this.props.grouped) {
 	                        additionalClasses += " grouped";
 	                    } else {
-	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
-	                        datetime = React.makeElement(
+	                        avatar = _react2.default.createElement(_contacts2.default.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
+	                        datetime = _react2.default.createElement(
 	                            'div',
 	                            { className: 'message date-time simpletip',
 	                                'data-simpletip': time2date(timestampInt) },
 	                            timestamp
 	                        );
-	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                        name = _react2.default.createElement(_contacts2.default.ContactButton, { contact: contact, className: 'message', label: displayName });
 	                    }
 
-	                    return React.makeElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { className: message.messageId + " message body" + additionalClasses },
 	                        avatar,
-	                        React.makeElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'message content-area' },
 	                            name,
 	                            datetime,
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-block' },
 	                                files
@@ -13529,7 +13621,7 @@ React.makeElement = React['createElement'];
 	                        var deleteButtonOptional = null;
 
 	                        if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
-	                            deleteButtonOptional = React.makeElement(DropdownsUI.DropdownItem, {
+	                            deleteButtonOptional = _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                icon: 'red-cross',
 	                                label: l[83],
 	                                className: 'red',
@@ -13553,12 +13645,12 @@ React.makeElement = React['createElement'];
 
 	                        if (M.u[contact.u] && M.u[contact.u].c === 1) {
 
-	                            dropdown = React.makeElement(
+	                            dropdown = _react2.default.createElement(
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
 	                                    icon: 'tiny-icon icons-sprite grey-dots' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
 	                                        className: 'white-context-menu shared-contact-dropdown',
@@ -13567,45 +13659,45 @@ React.makeElement = React['createElement'];
 	                                        positionAt: 'right bottom',
 	                                        horizOffset: 4
 	                                    },
-	                                    React.makeElement(
+	                                    _react2.default.createElement(
 	                                        'div',
 	                                        { className: 'dropdown-avatar rounded' },
-	                                        React.makeElement(ContactsUI.ContactPresence, { className: 'small', contact: contact }),
-	                                        React.makeElement(ContactsUI.Avatar, { className: 'avatar-wrapper context-avatar', contact: contact }),
-	                                        React.makeElement(
+	                                        _react2.default.createElement(_contacts2.default.ContactPresence, { className: 'small', contact: contact }),
+	                                        _react2.default.createElement(_contacts2.default.Avatar, { className: 'avatar-wrapper context-avatar', contact: contact }),
+	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'dropdown-user-name' },
 	                                            M.getNameByHandle(contact.u)
 	                                        )
 	                                    ),
-	                                    React.makeElement(ContactsUI.ContactFingerprint, { contact: contact }),
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
+	                                    _react2.default.createElement(_contacts2.default.ContactFingerprint, { contact: contact }),
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'human-profile',
 	                                        label: __(l[5868]),
 	                                        onClick: function onClick() {
 	                                            loadSubPage("fm/" + contact.u);
 	                                        }
 	                                    }),
-	                                    React.makeElement('hr', null),
+	                                    _react2.default.createElement('hr', null),
 	                                    null,
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'conversations',
 	                                        label: __(l[8632]),
 	                                        onClick: function onClick() {
 	                                            loadSubPage("fm/chat/p/" + contact.u);
 	                                        }
 	                                    }),
-	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,
+	                                    deleteButtonOptional ? _react2.default.createElement('hr', null) : null,
 	                                    deleteButtonOptional
 	                                )
 	                            );
 	                        } else if (M.u[contact.u] && !M.u[contact.u].c) {
-	                            dropdown = React.makeElement(
+	                            dropdown = _react2.default.createElement(
 	                                ButtonsUI.Button,
 	                                {
 	                                    className: 'default-white-button tiny-button',
 	                                    icon: 'tiny-icon icons-sprite grey-dots' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    DropdownsUI.Dropdown,
 	                                    {
 	                                        className: 'white-context-menu shared-contact-dropdown',
@@ -13614,18 +13706,18 @@ React.makeElement = React['createElement'];
 	                                        positionAt: 'right bottom',
 	                                        horizOffset: 4
 	                                    },
-	                                    React.makeElement(
+	                                    _react2.default.createElement(
 	                                        'div',
 	                                        { className: 'dropdown-avatar rounded' },
-	                                        React.makeElement(ContactsUI.ContactPresence, { className: 'small', contact: contact }),
-	                                        React.makeElement(ContactsUI.Avatar, { className: 'avatar-wrapper context-avatar', contact: contact }),
-	                                        React.makeElement(
+	                                        _react2.default.createElement(_contacts2.default.ContactPresence, { className: 'small', contact: contact }),
+	                                        _react2.default.createElement(_contacts2.default.Avatar, { className: 'avatar-wrapper context-avatar', contact: contact }),
+	                                        _react2.default.createElement(
 	                                            'div',
 	                                            { className: 'dropdown-user-name' },
 	                                            M.getNameByHandle(contact.u)
 	                                        )
 	                                    ),
-	                                    React.makeElement(DropdownsUI.DropdownItem, {
+	                                    _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'rounded-grey-plus',
 	                                        label: __(l[71]),
 	                                        onClick: function onClick() {
@@ -13652,41 +13744,41 @@ React.makeElement = React['createElement'];
 	                                            }
 	                                        }
 	                                    }),
-	                                    deleteButtonOptional ? React.makeElement('hr', null) : null,
+	                                    deleteButtonOptional ? _react2.default.createElement('hr', null) : null,
 	                                    deleteButtonOptional
 	                                )
 	                            );
 	                        }
 
-	                        contacts.push(React.makeElement(
+	                        contacts.push(_react2.default.createElement(
 	                            'div',
 	                            { key: contact.u },
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-info' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'message data-title' },
 	                                    M.getNameByHandle(contact.u)
 	                                ),
-	                                M.u[contact.u] ? React.makeElement(ContactsUI.ContactVerified, { className: 'right-align', contact: contact }) : null,
-	                                React.makeElement(
+	                                M.u[contact.u] ? _react2.default.createElement(_contacts2.default.ContactVerified, { className: 'right-align', contact: contact }) : null,
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'user-card-email' },
 	                                    contactEmail
 	                                )
 	                            ),
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-data' },
-	                                React.makeElement(
+	                                _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'data-block-view semi-big' },
-	                                    M.u[contact.u] ? React.makeElement(ContactsUI.ContactPresence, { className: 'small', contact: contact }) : null,
+	                                    M.u[contact.u] ? _react2.default.createElement(_contacts2.default.ContactPresence, { className: 'small', contact: contact }) : null,
 	                                    dropdown,
-	                                    React.makeElement(ContactsUI.Avatar, { className: 'avatar-wrapper medium-avatar', contact: contact })
+	                                    _react2.default.createElement(_contacts2.default.Avatar, { className: 'avatar-wrapper medium-avatar', contact: contact })
 	                                ),
-	                                React.makeElement('div', { className: 'clear' })
+	                                _react2.default.createElement('div', { className: 'clear' })
 	                            )
 	                        ));
 	                    });
@@ -13697,26 +13789,26 @@ React.makeElement = React['createElement'];
 	                    if (this.props.grouped) {
 	                        additionalClasses += " grouped";
 	                    } else {
-	                        avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
-	                        datetime = React.makeElement(
+	                        avatar = _react2.default.createElement(_contacts2.default.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
+	                        datetime = _react2.default.createElement(
 	                            'div',
 	                            { className: 'message date-time simpletip',
 	                                'data-simpletip': time2date(timestampInt) },
 	                            timestamp
 	                        );
-	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                        name = _react2.default.createElement(_contacts2.default.ContactButton, { contact: contact, className: 'message', label: displayName });
 	                    }
 
-	                    return React.makeElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { className: message.messageId + " message body" + additionalClasses },
 	                        avatar,
-	                        React.makeElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'message content-area' },
 	                            name,
 	                            datetime,
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-block' },
 	                                contacts
@@ -13735,24 +13827,24 @@ React.makeElement = React['createElement'];
 	                    if (this.props.grouped) {
 	                        additionalClasses += " grouped";
 	                    } else {
-	                        _avatar = React.makeElement(ContactsUI.Avatar, {
+	                        _avatar = _react2.default.createElement(_contacts2.default.Avatar, {
 	                            contact: contact,
 	                            className: 'message avatar-wrapper small-rounded-avatar'
 	                        });
-	                        datetime = React.makeElement(
+	                        datetime = _react2.default.createElement(
 	                            'div',
 	                            { className: 'message date-time simpletip',
 	                                'data-simpletip': time2date(timestampInt) },
 	                            timestamp
 	                        );
-	                        name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                        name = _react2.default.createElement(_contacts2.default.ContactButton, { contact: contact, className: 'message', label: displayName });
 	                    }
 
 	                    var attachmentMetadata = message.getAttachmentMeta() || [];
 	                    var audioContainer = null;
 
 	                    attachmentMetadata.forEach(function (v) {
-	                        audioContainer = React.makeElement(_AudioContainer2.default, {
+	                        audioContainer = _react2.default.createElement(_AudioContainer2.default, {
 	                            h: v.h,
 	                            mime: v.mime,
 	                            playtime: v.playtime,
@@ -13766,7 +13858,7 @@ React.makeElement = React['createElement'];
 	                    var chatIsReadOnly = chatRoom.isReadOnly() === true;
 
 	                    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !self.props.dialog) {
-	                        var deleteButton = React.makeElement(DropdownsUI.DropdownItem, {
+	                        var deleteButton = _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                            icon: 'red-cross',
 	                            label: __(l[1730]),
 	                            className: 'red',
@@ -13775,12 +13867,12 @@ React.makeElement = React['createElement'];
 	                            }
 	                        });
 
-	                        _messageActionButtons = React.makeElement(
+	                        _messageActionButtons = _react2.default.createElement(
 	                            ButtonsUI.Button,
 	                            {
 	                                className: 'default-white-button tiny-button',
 	                                icon: 'tiny-icon icons-sprite grey-dots' },
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                DropdownsUI.Dropdown,
 	                                {
 	                                    className: 'white-context-menu attachments-dropdown',
@@ -13794,17 +13886,17 @@ React.makeElement = React['createElement'];
 	                        );
 	                    }
 
-	                    return React.makeElement(
+	                    return _react2.default.createElement(
 	                        'div',
 	                        { className: message.messageId + " message body" + additionalClasses },
 	                        _avatar,
-	                        React.makeElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'message content-area' },
 	                            name,
 	                            datetime,
 	                            _messageActionButtons,
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                'div',
 	                                { className: 'message shared-block' },
 	                                files
@@ -13829,14 +13921,14 @@ React.makeElement = React['createElement'];
 	                if (!message.deleted) {
 	                    if (message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
 	                        if (!message.meta.requiresConfirmation) {
-	                            subMessageComponent.push(React.makeElement(MetaRichpreview, {
+	                            subMessageComponent.push(_react2.default.createElement(_metaRichpreview.MetaRichpreview, {
 	                                key: "richprev",
 	                                message: message,
 	                                chatRoom: chatRoom
 	                            }));
 	                            if (message.isEditable()) {
 	                                if (!message.meta.isLoading) {
-	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                    extraPreButtons.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                        key: 'remove-link-preview',
 	                                        icon: 'icons-sprite bold-crossed-eye',
 	                                        label: l[18684],
@@ -13850,7 +13942,7 @@ React.makeElement = React['createElement'];
 	                                    }));
 	                                } else {
 
-	                                    extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                    extraPreButtons.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                        icon: 'icons-sprite bold-crossed-eye',
 	                                        key: 'stop-link-preview',
 	                                        label: l[18684],
@@ -13867,13 +13959,13 @@ React.makeElement = React['createElement'];
 	                        } else if (!self.isBeingEdited()) {
 	                            if (message.source === Message.SOURCE.SENT || message.confirmed === true) {
 	                                additionalClasses += " preview-requires-confirmation-container";
-	                                subMessageComponent.push(React.makeElement(MetaRichpreviewConfirmation, {
+	                                subMessageComponent.push(_react2.default.createElement(_metaRichpreviewConfirmation.MetaRichpreviewConfirmation, {
 	                                    key: "confirm",
 	                                    message: message,
 	                                    chatRoom: chatRoom
 	                                }));
 	                            } else {
-	                                extraPreButtons.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                                extraPreButtons.push(_react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                    key: 'insert-link-preview',
 	                                    icon: 'icons-sprite bold-eye',
 	                                    label: l[18683],
@@ -13892,10 +13984,10 @@ React.makeElement = React['createElement'];
 	                            lng = _message$meta$extra$.lng,
 	                            latitude = _message$meta$extra$.la;
 
-	                        geoLocation = React.makeElement(_geoLocation2.default, { latitude: latitude, lng: lng });
+	                        geoLocation = _react2.default.createElement(_geoLocation2.default, { latitude: latitude, lng: lng });
 	                    }
 	                    if (message.megaLinks) {
-	                        subMessageComponent.push(React.makeElement(MetaRichpreviewMegaLinks, {
+	                        subMessageComponent.push(_react2.default.createElement(_metaRichpreviewMegaLinks.MetaRichpreviewMegaLinks, {
 	                            key: "richprevml",
 	                            message: message,
 	                            chatRoom: chatRoom
@@ -13909,18 +14001,18 @@ React.makeElement = React['createElement'];
 
 	                    if (!spinnerElement) {
 	                        if (!message.requiresManualRetry) {
-	                            messageNotSendIndicator = React.makeElement(
+	                            messageNotSendIndicator = _react2.default.createElement(
 	                                'div',
 	                                { className: 'not-sent-indicator tooltip-trigger',
 	                                    'data-tooltip': 'not-sent-notification' },
-	                                React.makeElement('i', { className: 'small-icon yellow-triangle' })
+	                                _react2.default.createElement('i', { className: 'small-icon yellow-triangle' })
 	                            );
 	                        } else {
 	                            if (self.isBeingEdited() !== true) {
-	                                messageNotSendIndicator = React.makeElement(
+	                                messageNotSendIndicator = _react2.default.createElement(
 	                                    'div',
 	                                    { className: 'not-sent-indicator' },
-	                                    React.makeElement(
+	                                    _react2.default.createElement(
 	                                        'span',
 	                                        { className: 'tooltip-trigger',
 	                                            key: 'retry',
@@ -13928,9 +14020,9 @@ React.makeElement = React['createElement'];
 	                                            onClick: function onClick(e) {
 	                                                self.doRetry(e, message);
 	                                            } },
-	                                        React.makeElement('i', { className: 'small-icon refresh-circle' })
+	                                        _react2.default.createElement('i', { className: 'small-icon refresh-circle' })
 	                                    ),
-	                                    React.makeElement(
+	                                    _react2.default.createElement(
 	                                        'span',
 	                                        { className: 'tooltip-trigger',
 	                                            key: 'cancel',
@@ -13938,7 +14030,7 @@ React.makeElement = React['createElement'];
 	                                            onClick: function onClick(e) {
 	                                                self.doCancelRetry(e, message);
 	                                            } },
-	                                        React.makeElement('i', { className: 'small-icon red-cross' })
+	                                        _react2.default.createElement('i', { className: 'small-icon red-cross' })
 	                                    )
 	                                );
 	                            }
@@ -13952,14 +14044,14 @@ React.makeElement = React['createElement'];
 	                if (this.props.grouped) {
 	                    additionalClasses += " grouped";
 	                } else {
-	                    avatar = React.makeElement(ContactsUI.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
-	                    datetime = React.makeElement(
+	                    avatar = _react2.default.createElement(_contacts2.default.Avatar, { contact: contact, className: 'message avatar-wrapper small-rounded-avatar' });
+	                    datetime = _react2.default.createElement(
 	                        'div',
 	                        { className: 'message date-time simpletip',
 	                            'data-simpletip': time2date(timestampInt) },
 	                        timestamp
 	                    );
-	                    name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                    name = _react2.default.createElement(_contacts2.default.ContactButton, { contact: contact, className: 'message', label: displayName });
 	                }
 
 	                var messageDisplayBlock;
@@ -13967,7 +14059,7 @@ React.makeElement = React['createElement'];
 	                    var msgContents = message.textContents;
 	                    msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
-	                    messageDisplayBlock = React.makeElement(TypingAreaUI.TypingArea, {
+	                    messageDisplayBlock = _react2.default.createElement(_typingArea2.default.TypingArea, {
 	                        iconClass: 'small-icon writing-pen textarea-icon',
 	                        initialText: msgContents,
 	                        chatRoom: self.props.message.chatRoom,
@@ -14004,18 +14096,18 @@ React.makeElement = React['createElement'];
 	                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
 	                    }
 	                    if (self.props.initTextScrolling) {
-	                        messageDisplayBlock = React.makeElement(
-	                            utils.JScrollPane,
+	                        messageDisplayBlock = _react2.default.createElement(
+	                            _utils2.default.JScrollPane,
 	                            { className: 'message text-block scroll' },
-	                            React.makeElement('div', { className: 'message text-scroll', dangerouslySetInnerHTML: { __html: textMessage } })
+	                            _react2.default.createElement('div', { className: 'message text-scroll', dangerouslySetInnerHTML: { __html: textMessage } })
 	                        );
 	                    } else {
-	                        messageDisplayBlock = React.makeElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
+	                        messageDisplayBlock = _react2.default.createElement('div', { className: 'message text-block', dangerouslySetInnerHTML: { __html: textMessage } });
 	                    }
 	                }
 	                if (!message.deleted) {
 	                    if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && self.isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
-	                        var editButton = message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION ? React.makeElement(DropdownsUI.DropdownItem, {
+	                        var editButton = message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION ? _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                            icon: 'icons-sprite writing-pencil',
 	                            label: __(l[1342]),
 	                            className: '',
@@ -14026,12 +14118,12 @@ React.makeElement = React['createElement'];
 	                                self.setState({ 'editing': true });
 	                            } }) : null;
 
-	                        messageActionButtons = React.makeElement(
+	                        messageActionButtons = _react2.default.createElement(
 	                            ButtonsUI.Button,
 	                            {
 	                                className: 'default-white-button tiny-button',
 	                                icon: 'tiny-icon icons-sprite grey-dots' },
-	                            React.makeElement(
+	                            _react2.default.createElement(
 	                                DropdownsUI.Dropdown,
 	                                {
 	                                    className: 'white-context-menu attachments-dropdown',
@@ -14042,8 +14134,8 @@ React.makeElement = React['createElement'];
 	                                },
 	                                extraPreButtons,
 	                                editButton,
-	                                editButton ? React.makeElement('hr', null) : null,
-	                                React.makeElement(DropdownsUI.DropdownItem, {
+	                                editButton ? _react2.default.createElement('hr', null) : null,
+	                                _react2.default.createElement(DropdownsUI.DropdownItem, {
 	                                    icon: 'red-cross',
 	                                    label: __(l[1730]),
 	                                    className: 'red',
@@ -14061,11 +14153,11 @@ React.makeElement = React['createElement'];
 	                    messageDisplayBlock = null;
 	                }
 
-	                return React.makeElement(
+	                return _react2.default.createElement(
 	                    'div',
 	                    { className: message.messageId + " message body " + additionalClasses },
 	                    avatar,
-	                    React.makeElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'message content-area' },
 	                        name,
@@ -14082,7 +14174,7 @@ React.makeElement = React['createElement'];
 	            }
 	        } else if (message.type) {
 	            var avatarsListing = [];
-	            textMessage = getMessageString(message.type, message.chatRoom.type === "group" || message.chatRoom.type === "public");
+	            textMessage = (0, _utils3.getMessageString)(message.type, message.chatRoom.type === "group" || message.chatRoom.type === "public");
 
 	            if (!textMessage) {
 	                console.error("Message with type: ", message.type, " - no text string defined. Message: ", message);
@@ -14100,10 +14192,10 @@ React.makeElement = React['createElement'];
 	                if (this.props.grouped) {
 	                    additionalClasses += " grouped";
 	                } else {
-	                    avatar = React.makeElement(ContactsUI.Avatar, { contact: message.authorContact,
+	                    avatar = _react2.default.createElement(_contacts2.default.Avatar, { contact: message.authorContact,
 	                        className: 'message avatar-wrapper small-rounded-avatar' });
 	                    displayName = M.getNameByHandle(message.authorContact.u);
-	                    name = React.makeElement(ContactsUI.ContactButton, { contact: contact, className: 'message', label: displayName });
+	                    name = _react2.default.createElement(_contacts2.default.ContactButton, { contact: contact, className: 'message', label: displayName });
 	                }
 	            }
 
@@ -14146,9 +14238,9 @@ React.makeElement = React['createElement'];
 	                    var classes = button.classes;
 	                    var icon;
 	                    if (button.icon) {
-	                        icon = React.makeElement('i', { className: "small-icon " + button.icon });
+	                        icon = _react2.default.createElement('i', { className: "small-icon " + button.icon });
 	                    }
-	                    buttons.push(React.makeElement(
+	                    buttons.push(_react2.default.createElement(
 	                        'div',
 	                        { className: classes, key: k, onClick: function onClick(e) {
 	                                button.callback.call(e.target);
@@ -14161,11 +14253,11 @@ React.makeElement = React['createElement'];
 
 	            var buttonsCode;
 	            if (buttons.length > 0) {
-	                buttonsCode = React.makeElement(
+	                buttonsCode = _react2.default.createElement(
 	                    'div',
 	                    { className: 'buttons-block' },
 	                    buttons,
-	                    React.makeElement('div', { className: 'clear' })
+	                    _react2.default.createElement('div', { className: 'clear' })
 	                );
 	            }
 
@@ -14204,7 +14296,7 @@ React.makeElement = React['createElement'];
 	                    callParts.forEach(function (handleAndSid) {
 	                        var handle = base64urlencode(handleAndSid.substr(0, 8));
 	                        if (!unique[handle]) {
-	                            avatarsListing.push(React.makeElement(ContactsUI.Avatar, {
+	                            avatarsListing.push(_react2.default.createElement(_contacts2.default.Avatar, {
 	                                key: handle,
 	                                contact: M.u[handle],
 	                                simpletip: M.u[handle] && M.u[handle].name,
@@ -14217,32 +14309,32 @@ React.makeElement = React['createElement'];
 	                }
 	            }
 
-	            return React.makeElement(
+	            return _react2.default.createElement(
 	                'div',
 	                { className: message.messageId + " message body" + additionalClasses,
 	                    'data-id': "id" + message.messageId },
-	                !message.showInitiatorAvatar ? React.makeElement(
+	                !message.showInitiatorAvatar ? _react2.default.createElement(
 	                    'div',
 	                    { className: 'feedback call-status-block' },
-	                    React.makeElement('i', { className: "call-icon " + message.cssClass })
+	                    _react2.default.createElement('i', { className: "call-icon " + message.cssClass })
 	                ) : avatar,
-	                React.makeElement(
+	                _react2.default.createElement(
 	                    'div',
 	                    { className: 'message content-area' },
 	                    name,
-	                    React.makeElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'message date-time simpletip', 'data-simpletip': time2date(timestampInt) },
 	                        timestamp
 	                    ),
-	                    React.makeElement(
+	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'message text-block' },
-	                        React.makeElement(
+	                        _react2.default.createElement(
 	                            'div',
 	                            { className: 'message call-inner-block' },
 	                            avatarsListing,
-	                            React.makeElement('div', { dangerouslySetInnerHTML: { __html: textMessage } })
+	                            _react2.default.createElement('div', { dangerouslySetInnerHTML: { __html: textMessage } })
 	                        )
 	                    ),
 	                    buttonsCode
@@ -14262,6 +14354,585 @@ React.makeElement = React['createElement'];
 
 	'use strict';
 
+	var React = __webpack_require__(2);
+
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var RenderDebugger = __webpack_require__(6).RenderDebugger;
+
+	var ConversationMessageMixin = {
+	    mixins: [MegaRenderMixin, RenderDebugger],
+	    onAfterRenderWasTriggered: false,
+	    componentWillMount: function componentWillMount() {
+	        var self = this;
+	        var chatRoom = self.props.message.chatRoom;
+	        var megaChat = chatRoom.megaChat;
+	        var contact = self.getContact();
+	        var changedCb = function changedCb(contact, oldData, k, v) {
+	            if (k === "ts") {
+
+	                return;
+	            }
+	            self.debouncedForceUpdate();
+	        };
+
+	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
+	            self._contactChangeListener = contact.addChangeListener(changedCb);
+	        }
+	        if (self.haveMoreContactListeners) {
+	            if (!self._contactChangeListeners) {
+	                self._contactChangeListeners = [];
+	                var moreIds = self.haveMoreContactListeners();
+	                if (moreIds && moreIds.forEach) {
+	                    moreIds.forEach(function (handle) {
+	                        if (M.u[handle] && M.u[handle].addChangeListener) {
+	                            self._contactChangeListeners.push([M.u[handle], M.u[handle].addChangeListener(changedCb)]);
+	                        }
+	                    });
+	                }
+	            }
+	        }
+	    },
+	    componentWillUnmount: function componentWillUnmount() {
+	        var self = this;
+	        var contact = self.getContact();
+
+	        if (self._contactChangeListener && contact && contact.removeChangeListener) {
+	            contact.removeChangeListener(self._contactChangeListener);
+	        }
+	        if (this._contactChangeListeners) {
+	            this._contactChangeListeners.forEach(function (listener) {
+	                listener[0].removeChangeListener(listener[1]);
+	            });
+	            this._contactChangeListeners = [];
+	        }
+	    },
+	    getContact: function getContact() {
+	        if (this.props.contact) {
+
+	            return this.props.contact;
+	        }
+	        var message = this.props.message;
+
+	        return Message.getContactForMessage(message);
+	    },
+	    getTimestampAsString: function getTimestampAsString() {
+	        return unixtimeToTimeString(this.getTimestamp());
+	    },
+	    getTimestamp: function getTimestamp() {
+	        var message = this.props.message;
+	        var timestampInt;
+	        if (message.getDelay) {
+	            timestampInt = message.getDelay();
+	        } else if (message.delay) {
+	            timestampInt = message.delay;
+	        } else {
+	            timestampInt = unixtime();
+	        }
+
+	        if (timestampInt && message.updated && message.updated > 0) {
+	            timestampInt += message.updated;
+	        }
+	        return timestampInt;
+	    },
+	    getParentJsp: function getParentJsp() {
+	        var $node = $(this.findDOMNode());
+	        var $jsp = $node.closest('.jScrollPaneContainer').data('jsp');
+	        return $jsp;
+	    },
+	    componentDidUpdate: function componentDidUpdate() {
+	        var self = this;
+	        var chatRoom = self.props.message.chatRoom;
+	        var megaChat = chatRoom.megaChat;
+
+	        if (!self.onAfterRenderWasTriggered) {
+	            var msg = self.props.message;
+	            var shouldRender = true;
+	            if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
+	                shouldRender = false;
+	            }
+
+	            if (shouldRender) {
+	                chatRoom.trigger("onAfterRenderMessage", self.props.message);
+	                self.onAfterRenderWasTriggered = true;
+	            }
+	        }
+	    }
+	};
+
+	module.exports = {
+	    ConversationMessageMixin: ConversationMessageMixin
+	};
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ContactsUI = __webpack_require__(11);
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(7).getMessageString;
+	var MetaRichPreviewLoading = __webpack_require__(26).MetaRichpreviewLoading;
+
+	var MetaRichpreview = React.createClass({
+	    displayName: "MetaRichpreview",
+
+	    mixins: [ConversationMessageMixin],
+	    getBase64Url: function getBase64Url(b64incoming) {
+	        if (!b64incoming || !b64incoming.split) {
+	            return;
+	        }
+	        var exti = b64incoming.split(":");
+	        var b64i = exti[1];
+	        exti = exti[0];
+	        return "data:image/" + exti + ";base64," + b64i;
+	    },
+	    render: function render() {
+	        var self = this;
+	        var cssClasses = "message body";
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+
+	        var output = [];
+
+	        var metas = message.meta && message.meta.extra ? message.meta.extra : [];
+	        var failedToLoad = message.meta.isLoading && unixtime() - message.meta.isLoading > 60 * 5;
+	        var isLoading = !!message.meta.isLoading;
+	        if (failedToLoad) {
+	            return null;
+	        }
+
+	        for (var i = 0; i < metas.length; i++) {
+	            var meta = metas[i];
+
+	            if (!meta.d && !meta.t && !message.meta.isLoading) {
+	                continue;
+	            }
+	            var previewCss = {};
+	            if (meta.i) {
+	                previewCss['backgroundImage'] = "url(" + self.getBase64Url(meta.i) + ")";
+	                previewCss['backgroundRepeat'] = "no-repeat";
+	                previewCss['backgroundPosition'] = "center center";
+	            }
+
+	            var previewContainer = undefined;
+
+	            if (isLoading) {
+	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: message.meta.isLoading });
+	            } else {
+	                var domainName = meta.url;
+	                domainName = domainName.replace("https://", "").replace("http://", "").split("/")[0];
+	                previewContainer = React.makeElement(
+	                    "div",
+	                    { className: "message richpreview body" },
+	                    meta.i ? React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview preview", style: previewCss })
+	                    ) : undefined,
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview inner-wrapper" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview data-title" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview title" },
+	                                meta.t
+	                            )
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview desc" },
+	                            ellipsis(meta.d, 'end', 82)
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview url-container" },
+	                            meta.ic ? React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url-favicon" },
+	                                React.makeElement("img", { src: self.getBase64Url(meta.ic), width: 16, height: 16,
+	                                    onError: function onError(e) {
+	                                        e.target.parentNode.removeChild(e.target);
+	                                    },
+	                                    alt: ""
+	                                })
+	                            ) : "",
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview url" },
+	                                domainName
+	                            )
+	                        )
+	                    )
+	                );
+	            }
+
+	            output.push(React.makeElement(
+	                "div",
+	                { key: meta.url, className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
+	                    onClick: function (url) {
+	                        if (!message.meta.isLoading) {
+	                            window.open(url, "_blank");
+	                        }
+	                    }.bind(this, meta.url) },
+	                previewContainer,
+	                React.makeElement("div", { className: "clear" })
+	            ));
+	        }
+	        return React.makeElement(
+	            "div",
+	            { className: "message richpreview previews-container" },
+	            output
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreview: MetaRichpreview
+	};
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+
+	var MetaRichpreviewLoading = React.createClass({
+	    displayName: "MetaRichpreviewLoading",
+
+	    mixins: [ConversationMessageMixin],
+	    render: function render() {
+	        return React.makeElement(
+	            "div",
+	            { className: "loading-spinner light small" },
+	            React.makeElement("div", { className: "main-loader" })
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewLoading: MetaRichpreviewLoading
+	};
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var React = __webpack_require__(2);
+	var ReactDOM = __webpack_require__(3);
+	var utils = __webpack_require__(5);
+	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
+	var ContactsUI = __webpack_require__(11);
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
+	var getMessageString = __webpack_require__(7).getMessageString;
+
+	var MetaRichpreviewConfirmation = React.createClass({
+	    displayName: "MetaRichpreviewConfirmation",
+
+	    mixins: [ConversationMessageMixin],
+	    doAllow: function doAllow() {
+	        var self = this;
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+
+	        delete message.meta.requiresConfirmation;
+	        RichpreviewsFilter.confirmationDoConfirm();
+	        megaChat.plugins.richpreviewsFilter.processMessage({}, message);
+	        message.trackDataChange();
+	    },
+	    doNotNow: function doNotNow() {
+	        var self = this;
+	        var message = this.props.message;
+	        delete message.meta.requiresConfirmation;
+	        RichpreviewsFilter.confirmationDoNotNow();
+	        message.trackDataChange();
+	    },
+	    doNever: function doNever() {
+	        var self = this;
+	        var message = this.props.message;
+	        msgDialog('confirmation', l[870], l[18687], '', function (e) {
+	            if (e) {
+	                delete message.meta.requiresConfirmation;
+	                RichpreviewsFilter.confirmationDoNever();
+	                message.trackDataChange();
+	            } else {}
+	        });
+	    },
+	    render: function render() {
+	        var self = this;
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+
+	        var notNowButton = null;
+	        var neverButton = null;
+
+	        if (RichpreviewsFilter.confirmationCount >= 2) {
+	            neverButton = React.makeElement(
+	                "div",
+	                { className: "default-white-button small-text small right red",
+	                    onClick: function onClick(e) {
+	                        self.doNever();
+	                    } },
+	                React.makeElement(
+	                    "span",
+	                    null,
+	                    l[1051]
+	                )
+	            );
+	        }
+
+	        notNowButton = React.makeElement(
+	            "div",
+	            { className: "default-white-button small-text small grey-txt right",
+	                onClick: function onClick(e) {
+	                    self.doNotNow();
+	                } },
+	            React.makeElement(
+	                "span",
+	                null,
+	                l[18682]
+	            )
+	        );
+
+	        return React.makeElement(
+	            "div",
+	            { className: "message richpreview previews-container" },
+	            React.makeElement(
+	                "div",
+	                { className: "message richpreview container confirmation" },
+	                React.makeElement(
+	                    "div",
+	                    { className: "message richpreview body" },
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview img-wrapper" },
+	                        React.makeElement("div", { className: "message richpreview preview confirmation-icon" })
+	                    ),
+	                    React.makeElement(
+	                        "div",
+	                        { className: "message richpreview inner-wrapper" },
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview data-title" },
+	                            React.makeElement(
+	                                "span",
+	                                { className: "message richpreview title" },
+	                                l[18679]
+	                            )
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "message richpreview desc" },
+	                            l[18680]
+	                        ),
+	                        React.makeElement(
+	                            "div",
+	                            { className: "buttons-block" },
+	                            React.makeElement(
+	                                "div",
+	                                { className: "default-grey-button small-text small right", onClick: function onClick(e) {
+	                                        self.doAllow();
+	                                    } },
+	                                React.makeElement(
+	                                    "span",
+	                                    null,
+	                                    l[18681]
+	                                )
+	                            ),
+	                            notNowButton,
+	                            neverButton
+	                        )
+	                    )
+	                ),
+	                React.makeElement("div", { className: "clear" })
+	            )
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewConfirmation: MetaRichpreviewConfirmation
+	};
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _react = __webpack_require__(2);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _utils = __webpack_require__(5);
+
+	var _utils2 = _interopRequireDefault(_utils);
+
+	var _mixin = __webpack_require__(24);
+
+	var _metaRichPreviewLoading = __webpack_require__(26);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var MetaRichpreviewMegaLinks = _react2.default.createClass({
+	    displayName: 'MetaRichpreviewMegaLinks',
+
+	    mixins: [_mixin.ConversationMessageMixin],
+	    render: function render() {
+	        var self = this;
+	        var cssClasses = "message body";
+
+	        var message = this.props.message;
+	        var megaChat = this.props.message.chatRoom.megaChat;
+	        var chatRoom = this.props.message.chatRoom;
+	        var previewContainer;
+
+	        var output = [];
+
+	        var megaLinks = message.megaLinks && message.megaLinks ? message.megaLinks : [];
+	        for (var i = 0; i < megaLinks.length; i++) {
+	            var megaLinkInfo = megaLinks[i];
+	            if (megaLinkInfo.failed) {
+	                continue;
+	            }
+
+	            if (megaLinkInfo.hadLoaded() === false) {
+	                if (megaLinkInfo.startedLoading() === false) {
+	                    megaLinkInfo.getInfo().always(function () {
+	                        Soon(function () {
+	                            message.trackDataChange();
+	                            self.safeForceUpdate();
+	                        });
+	                    });
+	                }
+
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichpreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	            } else {
+	                var desc;
+
+	                var is_icon = megaLinkInfo.is_dir ? true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
+
+	                if (megaLinkInfo.is_chatlink) {
+	                    desc = l[8876] + ": " + megaLinkInfo.info['ncm'];
+	                } else if (!megaLinkInfo.is_dir) {
+	                    desc = bytesToSize(megaLinkInfo.info.size);
+	                } else {
+	                    desc = _react2.default.createElement(
+	                        'span',
+	                        null,
+	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
+	                        _react2.default.createElement('br', null),
+	                        bytesToSize(megaLinkInfo.info.size)
+	                    );
+	                }
+
+	                previewContainer = _react2.default.createElement(
+	                    'div',
+	                    { className: "message richpreview body " + ((is_icon ? "have-icon" : "no-icon") + " " + (megaLinkInfo.is_chatlink ? "is-chat" : "")) },
+	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        _react2.default.createElement('div', { className: 'message richpreview preview',
+	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
+	                    ) : _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview img-wrapper' },
+	                        megaLinkInfo.is_chatlink ? _react2.default.createElement('i', { className: 'huge-icon conversations' }) : _react2.default.createElement('div', { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'message richpreview inner-wrapper' },
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview data-title' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview title' },
+	                                _react2.default.createElement(
+	                                    _utils2.default.EmojiFormattedContent,
+	                                    null,
+	                                    megaLinkInfo.info.name || megaLinkInfo.info.topic || ""
+	                                )
+	                            )
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview desc' },
+	                            desc
+	                        ),
+	                        _react2.default.createElement(
+	                            'div',
+	                            { className: 'message richpreview url-container' },
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url-favicon' },
+	                                _react2.default.createElement('img', { src: 'https://mega.nz/favicon.ico?v=3&c=1', width: 16, height: 16,
+	                                    onError: function onError(e) {
+	                                        e.target.parentNode.removeChild(e.target);
+	                                    },
+	                                    alt: ''
+	                                })
+	                            ),
+	                            _react2.default.createElement(
+	                                'span',
+	                                { className: 'message richpreview url' },
+	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
+	                            )
+	                        )
+	                    )
+	                );
+	            }
+
+	            output.push(_react2.default.createElement(
+	                'div',
+	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
+	                    onClick: function (url) {
+	                        if (megaLinkInfo.hadLoaded()) {
+	                            window.open(url, '_blank', 'noopener');
+	                        }
+	                    }.bind(this, megaLinkInfo.getLink()) },
+	                previewContainer,
+	                _react2.default.createElement('div', { className: 'clear' })
+	            ));
+	        }
+	        return _react2.default.createElement(
+	            'div',
+	            { className: 'message richpreview previews-container' },
+	            output
+	        );
+	    }
+	});
+
+	module.exports = {
+	    MetaRichpreviewMegaLinks: MetaRichpreviewMegaLinks
+	};
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
@@ -14272,7 +14943,7 @@ React.makeElement = React['createElement'];
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _AudioPlayer = __webpack_require__(25);
+	var _AudioPlayer = __webpack_require__(30);
 
 	var _AudioPlayer2 = _interopRequireDefault(_AudioPlayer);
 
@@ -14387,7 +15058,7 @@ React.makeElement = React['createElement'];
 	exports.default = AudioContainer;
 
 /***/ }),
-/* 25 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14664,7 +15335,7 @@ React.makeElement = React['createElement'];
 	exports.default = AudioPlayer;
 
 /***/ }),
-/* 26 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -14753,585 +15424,6 @@ React.makeElement = React['createElement'];
 	exports.default = GeoLocation;
 
 /***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var React = __webpack_require__(2);
-
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var RenderDebugger = __webpack_require__(6).RenderDebugger;
-
-	var ConversationMessageMixin = {
-	    mixins: [MegaRenderMixin, RenderDebugger],
-	    onAfterRenderWasTriggered: false,
-	    componentWillMount: function componentWillMount() {
-	        var self = this;
-	        var chatRoom = self.props.message.chatRoom;
-	        var megaChat = chatRoom.megaChat;
-	        var contact = self.getContact();
-	        var changedCb = function changedCb(contact, oldData, k, v) {
-	            if (k === "ts") {
-
-	                return;
-	            }
-	            self.debouncedForceUpdate();
-	        };
-
-	        if (contact && contact.addChangeListener && !self._contactChangeListener) {
-	            self._contactChangeListener = contact.addChangeListener(changedCb);
-	        }
-	        if (self.haveMoreContactListeners) {
-	            if (!self._contactChangeListeners) {
-	                self._contactChangeListeners = [];
-	                var moreIds = self.haveMoreContactListeners();
-	                if (moreIds && moreIds.forEach) {
-	                    moreIds.forEach(function (handle) {
-	                        if (M.u[handle] && M.u[handle].addChangeListener) {
-	                            self._contactChangeListeners.push([M.u[handle], M.u[handle].addChangeListener(changedCb)]);
-	                        }
-	                    });
-	                }
-	            }
-	        }
-	    },
-	    componentWillUnmount: function componentWillUnmount() {
-	        var self = this;
-	        var contact = self.getContact();
-
-	        if (self._contactChangeListener && contact && contact.removeChangeListener) {
-	            contact.removeChangeListener(self._contactChangeListener);
-	        }
-	        if (this._contactChangeListeners) {
-	            this._contactChangeListeners.forEach(function (listener) {
-	                listener[0].removeChangeListener(listener[1]);
-	            });
-	            this._contactChangeListeners = [];
-	        }
-	    },
-	    getContact: function getContact() {
-	        if (this.props.contact) {
-
-	            return this.props.contact;
-	        }
-	        var message = this.props.message;
-
-	        return Message.getContactForMessage(message);
-	    },
-	    getTimestampAsString: function getTimestampAsString() {
-	        return unixtimeToTimeString(this.getTimestamp());
-	    },
-	    getTimestamp: function getTimestamp() {
-	        var message = this.props.message;
-	        var timestampInt;
-	        if (message.getDelay) {
-	            timestampInt = message.getDelay();
-	        } else if (message.delay) {
-	            timestampInt = message.delay;
-	        } else {
-	            timestampInt = unixtime();
-	        }
-
-	        if (timestampInt && message.updated && message.updated > 0) {
-	            timestampInt += message.updated;
-	        }
-	        return timestampInt;
-	    },
-	    getParentJsp: function getParentJsp() {
-	        var $node = $(this.findDOMNode());
-	        var $jsp = $node.closest('.jScrollPaneContainer').data('jsp');
-	        return $jsp;
-	    },
-	    componentDidUpdate: function componentDidUpdate() {
-	        var self = this;
-	        var chatRoom = self.props.message.chatRoom;
-	        var megaChat = chatRoom.megaChat;
-
-	        if (!self.onAfterRenderWasTriggered) {
-	            var msg = self.props.message;
-	            var shouldRender = true;
-	            if (msg.isManagement && msg.isManagement() === true && msg.isRenderableManagement() === false) {
-	                shouldRender = false;
-	            }
-
-	            if (shouldRender) {
-	                chatRoom.trigger("onAfterRenderMessage", self.props.message);
-	                self.onAfterRenderWasTriggered = true;
-	            }
-	        }
-	    }
-	};
-
-	module.exports = {
-	    ConversationMessageMixin: ConversationMessageMixin
-	};
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(7).getMessageString;
-	var MetaRichPreviewLoading = __webpack_require__(29).MetaRichpreviewLoading;
-
-	var MetaRichpreview = React.createClass({
-	    displayName: "MetaRichpreview",
-
-	    mixins: [ConversationMessageMixin],
-	    getBase64Url: function getBase64Url(b64incoming) {
-	        if (!b64incoming || !b64incoming.split) {
-	            return;
-	        }
-	        var exti = b64incoming.split(":");
-	        var b64i = exti[1];
-	        exti = exti[0];
-	        return "data:image/" + exti + ";base64," + b64i;
-	    },
-	    render: function render() {
-	        var self = this;
-	        var cssClasses = "message body";
-
-	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
-
-	        var output = [];
-
-	        var metas = message.meta && message.meta.extra ? message.meta.extra : [];
-	        var failedToLoad = message.meta.isLoading && unixtime() - message.meta.isLoading > 60 * 5;
-	        var isLoading = !!message.meta.isLoading;
-	        if (failedToLoad) {
-	            return null;
-	        }
-
-	        for (var i = 0; i < metas.length; i++) {
-	            var meta = metas[i];
-
-	            if (!meta.d && !meta.t && !message.meta.isLoading) {
-	                continue;
-	            }
-	            var previewCss = {};
-	            if (meta.i) {
-	                previewCss['backgroundImage'] = "url(" + self.getBase64Url(meta.i) + ")";
-	                previewCss['backgroundRepeat'] = "no-repeat";
-	                previewCss['backgroundPosition'] = "center center";
-	            }
-
-	            var previewContainer = undefined;
-
-	            if (isLoading) {
-	                previewContainer = React.makeElement(MetaRichPreviewLoading, { message: message, isLoading: message.meta.isLoading });
-	            } else {
-	                var domainName = meta.url;
-	                domainName = domainName.replace("https://", "").replace("http://", "").split("/")[0];
-	                previewContainer = React.makeElement(
-	                    "div",
-	                    { className: "message richpreview body" },
-	                    meta.i ? React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        React.makeElement("div", { className: "message richpreview preview", style: previewCss })
-	                    ) : undefined,
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview inner-wrapper" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview data-title" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview title" },
-	                                meta.t
-	                            )
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview desc" },
-	                            ellipsis(meta.d, 'end', 82)
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview url-container" },
-	                            meta.ic ? React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url-favicon" },
-	                                React.makeElement("img", { src: self.getBase64Url(meta.ic), width: 16, height: 16,
-	                                    onError: function onError(e) {
-	                                        e.target.parentNode.removeChild(e.target);
-	                                    },
-	                                    alt: ""
-	                                })
-	                            ) : "",
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview url" },
-	                                domainName
-	                            )
-	                        )
-	                    )
-	                );
-	            }
-
-	            output.push(React.makeElement(
-	                "div",
-	                { key: meta.url, className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
-	                    onClick: function (url) {
-	                        if (!message.meta.isLoading) {
-	                            window.open(url, "_blank");
-	                        }
-	                    }.bind(this, meta.url) },
-	                previewContainer,
-	                React.makeElement("div", { className: "clear" })
-	            ));
-	        }
-	        return React.makeElement(
-	            "div",
-	            { className: "message richpreview previews-container" },
-	            output
-	        );
-	    }
-	});
-
-	module.exports = {
-	    MetaRichpreview: MetaRichpreview
-	};
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
-
-	var MetaRichpreviewLoading = React.createClass({
-	    displayName: "MetaRichpreviewLoading",
-
-	    mixins: [ConversationMessageMixin],
-	    render: function render() {
-	        return React.makeElement(
-	            "div",
-	            { className: "loading-spinner light small" },
-	            React.makeElement("div", { className: "main-loader" })
-	        );
-	    }
-	});
-
-	module.exports = {
-	    MetaRichpreviewLoading: MetaRichpreviewLoading
-	};
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	var React = __webpack_require__(2);
-	var ReactDOM = __webpack_require__(3);
-	var utils = __webpack_require__(5);
-	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
-	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
-	var getMessageString = __webpack_require__(7).getMessageString;
-
-	var MetaRichpreviewConfirmation = React.createClass({
-	    displayName: "MetaRichpreviewConfirmation",
-
-	    mixins: [ConversationMessageMixin],
-	    doAllow: function doAllow() {
-	        var self = this;
-	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-
-	        delete message.meta.requiresConfirmation;
-	        RichpreviewsFilter.confirmationDoConfirm();
-	        megaChat.plugins.richpreviewsFilter.processMessage({}, message);
-	        message.trackDataChange();
-	    },
-	    doNotNow: function doNotNow() {
-	        var self = this;
-	        var message = this.props.message;
-	        delete message.meta.requiresConfirmation;
-	        RichpreviewsFilter.confirmationDoNotNow();
-	        message.trackDataChange();
-	    },
-	    doNever: function doNever() {
-	        var self = this;
-	        var message = this.props.message;
-	        msgDialog('confirmation', l[870], l[18687], '', function (e) {
-	            if (e) {
-	                delete message.meta.requiresConfirmation;
-	                RichpreviewsFilter.confirmationDoNever();
-	                message.trackDataChange();
-	            } else {}
-	        });
-	    },
-	    render: function render() {
-	        var self = this;
-
-	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
-
-	        var notNowButton = null;
-	        var neverButton = null;
-
-	        if (RichpreviewsFilter.confirmationCount >= 2) {
-	            neverButton = React.makeElement(
-	                "div",
-	                { className: "default-white-button small-text small right red",
-	                    onClick: function onClick(e) {
-	                        self.doNever();
-	                    } },
-	                React.makeElement(
-	                    "span",
-	                    null,
-	                    l[1051]
-	                )
-	            );
-	        }
-
-	        notNowButton = React.makeElement(
-	            "div",
-	            { className: "default-white-button small-text small grey-txt right",
-	                onClick: function onClick(e) {
-	                    self.doNotNow();
-	                } },
-	            React.makeElement(
-	                "span",
-	                null,
-	                l[18682]
-	            )
-	        );
-
-	        return React.makeElement(
-	            "div",
-	            { className: "message richpreview previews-container" },
-	            React.makeElement(
-	                "div",
-	                { className: "message richpreview container confirmation" },
-	                React.makeElement(
-	                    "div",
-	                    { className: "message richpreview body" },
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview img-wrapper" },
-	                        React.makeElement("div", { className: "message richpreview preview confirmation-icon" })
-	                    ),
-	                    React.makeElement(
-	                        "div",
-	                        { className: "message richpreview inner-wrapper" },
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview data-title" },
-	                            React.makeElement(
-	                                "span",
-	                                { className: "message richpreview title" },
-	                                l[18679]
-	                            )
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "message richpreview desc" },
-	                            l[18680]
-	                        ),
-	                        React.makeElement(
-	                            "div",
-	                            { className: "buttons-block" },
-	                            React.makeElement(
-	                                "div",
-	                                { className: "default-grey-button small-text small right", onClick: function onClick(e) {
-	                                        self.doAllow();
-	                                    } },
-	                                React.makeElement(
-	                                    "span",
-	                                    null,
-	                                    l[18681]
-	                                )
-	                            ),
-	                            notNowButton,
-	                            neverButton
-	                        )
-	                    )
-	                ),
-	                React.makeElement("div", { className: "clear" })
-	            )
-	        );
-	    }
-	});
-
-	module.exports = {
-	    MetaRichpreviewConfirmation: MetaRichpreviewConfirmation
-	};
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _react = __webpack_require__(2);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _utils = __webpack_require__(5);
-
-	var _utils2 = _interopRequireDefault(_utils);
-
-	var _mixin = __webpack_require__(27);
-
-	var _metaRichPreviewLoading = __webpack_require__(29);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var MetaRichpreviewMegaLinks = _react2.default.createClass({
-	    displayName: 'MetaRichpreviewMegaLinks',
-
-	    mixins: [_mixin.ConversationMessageMixin],
-	    render: function render() {
-	        var self = this;
-	        var cssClasses = "message body";
-
-	        var message = this.props.message;
-	        var megaChat = this.props.message.chatRoom.megaChat;
-	        var chatRoom = this.props.message.chatRoom;
-	        var previewContainer;
-
-	        var output = [];
-
-	        var megaLinks = message.megaLinks && message.megaLinks ? message.megaLinks : [];
-	        for (var i = 0; i < megaLinks.length; i++) {
-	            var megaLinkInfo = megaLinks[i];
-	            if (megaLinkInfo.failed) {
-	                continue;
-	            }
-
-	            if (megaLinkInfo.hadLoaded() === false) {
-	                if (megaLinkInfo.startedLoading() === false) {
-	                    megaLinkInfo.getInfo().always(function () {
-	                        Soon(function () {
-	                            message.trackDataChange();
-	                            self.safeForceUpdate();
-	                        });
-	                    });
-	                }
-
-	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichpreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
-	            } else {
-	                var desc;
-
-	                var is_icon = megaLinkInfo.is_dir ? true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
-
-	                if (megaLinkInfo.is_chatlink) {
-	                    desc = l[8876] + ": " + megaLinkInfo.info['ncm'];
-	                } else if (!megaLinkInfo.is_dir) {
-	                    desc = bytesToSize(megaLinkInfo.info.size);
-	                } else {
-	                    desc = _react2.default.createElement(
-	                        'span',
-	                        null,
-	                        fm_contains(megaLinkInfo.info.s[1], megaLinkInfo.info.s[2] - 1),
-	                        _react2.default.createElement('br', null),
-	                        bytesToSize(megaLinkInfo.info.size)
-	                    );
-	                }
-
-	                previewContainer = _react2.default.createElement(
-	                    'div',
-	                    { className: "message richpreview body " + ((is_icon ? "have-icon" : "no-icon") + " " + (megaLinkInfo.is_chatlink ? "is-chat" : "")) },
-	                    megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url ? _react2.default.createElement(
-	                        'div',
-	                        { className: 'message richpreview img-wrapper' },
-	                        _react2.default.createElement('div', { className: 'message richpreview preview',
-	                            style: { "backgroundImage": 'url(' + megaLinkInfo.info.preview_url + ')' } })
-	                    ) : _react2.default.createElement(
-	                        'div',
-	                        { className: 'message richpreview img-wrapper' },
-	                        megaLinkInfo.is_chatlink ? _react2.default.createElement('i', { className: 'huge-icon conversations' }) : _react2.default.createElement('div', { className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) })
-	                    ),
-	                    _react2.default.createElement(
-	                        'div',
-	                        { className: 'message richpreview inner-wrapper' },
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'message richpreview data-title' },
-	                            _react2.default.createElement(
-	                                'span',
-	                                { className: 'message richpreview title' },
-	                                _react2.default.createElement(
-	                                    _utils2.default.EmojiFormattedContent,
-	                                    null,
-	                                    megaLinkInfo.info.name || megaLinkInfo.info.topic || ""
-	                                )
-	                            )
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'message richpreview desc' },
-	                            desc
-	                        ),
-	                        _react2.default.createElement(
-	                            'div',
-	                            { className: 'message richpreview url-container' },
-	                            _react2.default.createElement(
-	                                'span',
-	                                { className: 'message richpreview url-favicon' },
-	                                _react2.default.createElement('img', { src: 'https://mega.nz/favicon.ico?v=3&c=1', width: 16, height: 16,
-	                                    onError: function onError(e) {
-	                                        e.target.parentNode.removeChild(e.target);
-	                                    },
-	                                    alt: ''
-	                                })
-	                            ),
-	                            _react2.default.createElement(
-	                                'span',
-	                                { className: 'message richpreview url' },
-	                                ellipsis(megaLinkInfo.getLink(), 'end', 40)
-	                            )
-	                        )
-	                    )
-	                );
-	            }
-
-	            output.push(_react2.default.createElement(
-	                'div',
-	                { key: megaLinkInfo.node_key + "_" + output.length, className: "message richpreview container " + (megaLinkInfo.havePreview() ? "have-preview" : "no-preview") + " " + (megaLinkInfo.d ? "have-description" : "no-description") + " " + (!megaLinkInfo.hadLoaded() ? "is-loading" : "done-loading"),
-	                    onClick: function (url) {
-	                        if (megaLinkInfo.hadLoaded()) {
-	                            window.open(url, '_blank', 'noopener');
-	                        }
-	                    }.bind(this, megaLinkInfo.getLink()) },
-	                previewContainer,
-	                _react2.default.createElement('div', { className: 'clear' })
-	            ));
-	        }
-	        return _react2.default.createElement(
-	            'div',
-	            { className: 'message richpreview previews-container' },
-	            output
-	        );
-	    }
-	});
-
-	module.exports = {
-	    MetaRichpreviewMegaLinks: MetaRichpreviewMegaLinks
-	};
-
-/***/ }),
 /* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -15342,7 +15434,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var AlterParticipantsConversationMessage = React.createClass({
@@ -15499,7 +15591,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TruncatedMessage = React.createClass({
@@ -15580,7 +15672,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var PrivilegeChange = React.createClass({
@@ -15683,7 +15775,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var TopicChange = React.createClass({
@@ -16251,7 +16343,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var CloseOpenModeMessage = React.createClass({
@@ -16335,7 +16427,7 @@ React.makeElement = React['createElement'];
 	var utils = __webpack_require__(5);
 	var MegaRenderMixin = __webpack_require__(6).MegaRenderMixin;
 	var ContactsUI = __webpack_require__(11);
-	var ConversationMessageMixin = __webpack_require__(27).ConversationMessageMixin;
+	var ConversationMessageMixin = __webpack_require__(24).ConversationMessageMixin;
 	var getMessageString = __webpack_require__(7).getMessageString;
 
 	var ChatHandleMessage = React.createClass({

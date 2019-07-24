@@ -1,17 +1,17 @@
-var React = require("react");
-var utils = require('./../../../ui/utils.jsx');
-var getMessageString = require('./utils.jsx').getMessageString;
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var MetaRichpreview = require('./metaRichpreview.jsx').MetaRichpreview;
-var MetaRichpreviewConfirmation = require('./metaRichpreviewConfirmation.jsx').MetaRichpreviewConfirmation;
-var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRichpreviewMegaLinks;
-var ContactsUI = require('./../contacts.jsx');
-var TypingAreaUI = require('./../typingArea.jsx');
+import React from 'react';
+import utils from './../../../ui/utils.jsx';
+import { getMessageString } from './utils.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
+import { MetaRichpreview } from './metaRichpreview.jsx';
+import { MetaRichpreviewConfirmation } from './metaRichpreviewConfirmation.jsx';
+import { MetaRichpreviewMegaLinks } from './metaRichpreviewMegaLinks.jsx';
+import ContactsUI from './../contacts.jsx';
+import TypingAreaUI from './../typingArea.jsx';
 import AudioContainer from './AudioContainer.jsx';
 import GeoLocation from './geoLocation.jsx';
 
 /* 1h as confirmed by Mathias */
-var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
+const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 
@@ -193,16 +193,18 @@ var GenericConversationMessage = React.createClass({
             var isFav = M.isFavourite(h);
 
             arr.push(
-                <DropdownsUI.DropdownItem icon={"context " + (isFav ? "broken-heart" : "heart")}
-                                          label={isFav ? l[5872] : l[5871]}
-                                          isFav={isFav}
-                                          key="fav"
-                                          onClick={(e) => {
-                                              self._favourite(h);
-                                              e.stopPropagation();
-                                              e.preventDefault();
-                                              return false;
-                                          }}/>
+                <DropdownsUI.DropdownItem
+                    icon={"context " + (isFav ? "broken-heart" : "heart")}
+                    label={isFav ? l[5872] : l[5871]}
+                    isFav={isFav}
+                    key="fav"
+                    onClick={(e) => {
+                        self._favourite(h);
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return false;
+                    }}
+                />
             );
             return isFav;
         }
@@ -221,19 +223,22 @@ var GenericConversationMessage = React.createClass({
         var getManageLinkText = haveLink ? l[6909] : l[59];
 
         arr.push(
-            <DropdownsUI.DropdownItem icon="icons-sprite chain"
-                                      key="getLinkButton"
-                                      label={getManageLinkText}
-                                      onClick={self._getLink.bind(self, h)}
+            <DropdownsUI.DropdownItem
+                icon="icons-sprite chain"
+                key="getLinkButton"
+                label={getManageLinkText}
+                onClick={self._getLink.bind(self, h)}
             />);
 
         if (haveLink) {
             arr.push(
-                <DropdownsUI.DropdownItem icon="context remove-link"
-                                          key="removeLinkButton"
-                                          label={__(l[6821])}
-                                          onClick={self._removeLink.bind(self, h)}
-                />);
+                <DropdownsUI.DropdownItem 
+                    icon="context remove-link"
+                    key="removeLinkButton"
+                    label={__(l[6821])}
+                    onClick={self._removeLink.bind(self, h)}
+                />
+            );
             return true;
         }
         else {
@@ -501,14 +506,18 @@ var GenericConversationMessage = React.createClass({
                                         var downloadButton = null;
 
                                         if (message.isEditable && message.isEditable()) {
-                                            revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                                                     label={__(l[83])}
-                                                                                     className="red"
-                                                                                     onClick={() => {
-                                                 chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                     chatRoom, message.internalId || message.orderValue, ""
-                                                 );
-                                            }}/>
+                                            revokeButton = (
+                                                <DropdownsUI.DropdownItem
+                                                    icon="red-cross"
+                                                    label={__(l[83])}
+                                                    className="red"
+                                                    onClick={() => {
+                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                            chatRoom, message.internalId || message.orderValue, ""
+                                                        );
+                                                    }}
+                                                />
+                                            );
                                         }
 
                                         if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
@@ -535,25 +544,30 @@ var GenericConversationMessage = React.createClass({
                                             }
 
                                             firstGroupOfButtons.push(
-                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                          key="infoDialog"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              propertiesDialog();
-                                                                          }}/>
+                                                <DropdownsUI.DropdownItem
+                                                    icon="context info" 
+                                                    label={__(l[6859])}
+                                                    key="infoDialog"
+                                                    onClick={() => {
+                                                        $.selected = [v.h];
+                                                        propertiesDialog();
+                                                    }}
+                                                />
                                             );
 
 
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
 
                                             linkButtons.push(
-                                                <DropdownsUI.DropdownItem icon="small-icon conversations"
-                                                                          label={__(l[17764])}
-                                                                          key="sendToChat"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              openCopyDialog('conversations');
-                                                                          }}/>
+                                                <DropdownsUI.DropdownItem
+                                                    icon="small-icon conversations"
+                                                    label={__(l[17764])}
+                                                    key="sendToChat"
+                                                    onClick={() => {
+                                                        $.selected = [v.h];
+                                                        openCopyDialog('conversations');
+                                                    }}
+                                                />
                                             );
 
                                         }

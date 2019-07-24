@@ -1,9 +1,9 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var ConversationsUI = require("./ui/conversations.jsx");
-var ChatRoom = require('./chatRoom.jsx');
+import React from "react";
+import ReactDOM from "react-dom";
+import ConversationsUI from "./ui/conversations.jsx";
+import ChatRoom from './chatRoom.jsx';
 
-var EMOJI_DATASET_VERSION = 3;
+const EMOJI_DATASET_VERSION = 3;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -358,8 +358,8 @@ Chat.prototype.init = function() {
         self.updateSectionUnreadCount();
     });
 
-    $.each(self.options.plugins, function(k, v) {
-        self.plugins[k] = new v(self);
+    Object.keys(self.options.plugins).forEach(plugin => {
+        self.plugins[plugin] = new self.options.plugins[plugin](self);
     });
 
     // UI events

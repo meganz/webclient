@@ -18,7 +18,7 @@ var PerfectScrollbar = React.createClass({
             requiresUpdateOnResize: true
         };
     },
-    doProgramaticScroll: SoonFc(function(newPos, forced, isX) {
+    doProgramaticScroll(newPos, forced, isX) {
         if (!this.isMounted()) {
             return;
         }
@@ -54,7 +54,7 @@ var PerfectScrollbar = React.createClass({
             self.isUserScroll = true;
             $elem.off('scroll.progscroll' + idx);
         }.bind(this, idx));
-    }, 10),
+    },
     componentDidMount: function() {
         var self = this;
         var $elem = $(ReactDOM.findDOMNode(self));

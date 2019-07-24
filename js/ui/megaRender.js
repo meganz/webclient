@@ -1294,7 +1294,7 @@
                         sharedUserWrapper.dataset.simpletip = aProperties.userNames.join(",[BR]");
                     }
                     aTemplate.querySelector('.fm-chat-users').textContent = userNames.join(', ');
-                    
+
                     if (otherCount === 1) {
                         aTemplate.querySelector('.fm-chat-users-other').textContent = l[20652];
                     }
@@ -1338,8 +1338,7 @@
                 }
 
                 if (this.viewmode) {
-
-                    aTemplate.querySelector('.shared-folder-name').textContent = aNode.name;
+                    aTemplate.querySelector('.shared-folder-name').textContent = nicknames.getNicknameAndName(aNode.u);
                     aTemplate.querySelector('.shared-folder-info').textContent = aNode.m;
                 }
                 else {

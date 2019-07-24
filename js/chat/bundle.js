@@ -5561,6 +5561,15 @@ React.makeElement = React['createElement'];
 	                    } }));
 	            }
 
+	            if (u_attr && contact.u !== u_handle) {
+
+	                moreDropdowns.push(React.makeElement("hr", { key: "nicknames-separator" }));
+	                moreDropdowns.push(React.makeElement(DropdownsUI.DropdownItem, {
+	                    key: "set-nickname", icon: "small-icon context writing-pen", label: __(l[20828]), onClick: function onClick() {
+	                        nicknames.setNicknameDialog.init(contact.u);
+	                    } }));
+	            }
+
 	            if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
 	                moreDropdowns.push(React.makeElement("hr", { key: "remove-separator" }));
 	                moreDropdowns.push(self.props.dropdownRemoveButton);
@@ -5871,9 +5880,10 @@ React.makeElement = React['createElement'];
 	        return shouldUpdate;
 	    },
 	    render: function render() {
-	        var self = this;
 
+	        var self = this;
 	        var contact = this.props.contact;
+
 	        if (!contact) {
 	            return null;
 	        }
@@ -5881,6 +5891,7 @@ React.makeElement = React['createElement'];
 	        var pres = (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
 	        var avatarMeta = generateAvatarMeta(contact.u);
 	        var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+
 	        if (contact.u == u_handle) {
 	            username += " (Me)";
 	        }
@@ -15218,7 +15229,7 @@ React.makeElement = React['createElement'];
 	                    });
 	                }
 
-	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichPreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
+	                previewContainer = _react2.default.createElement(_metaRichPreviewLoading.MetaRichpreviewLoading, { message: message, isLoading: megaLinkInfo.hadLoaded() });
 	            } else {
 	                var desc;
 

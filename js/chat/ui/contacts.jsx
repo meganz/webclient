@@ -219,6 +219,21 @@ var ContactButton = React.createClass({
                 );
             }
 
+            // Don't show Set Nickname button if not logged in or clicking your own name
+            if (u_attr && contact.u !== u_handle) {
+
+                // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
+                moreDropdowns.push(
+                    <hr key="nicknames-separator" />
+                );
+                moreDropdowns.push(
+                    <DropdownsUI.DropdownItem
+                        key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
+                            nicknames.setNicknameDialog.init(contact.u);
+                    }} />
+                );
+            }
+
             if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
                 moreDropdowns.push(
                     <hr key="remove-separator" />
@@ -516,9 +531,10 @@ var ContactCard = React.createClass({
         return shouldUpdate;
     },
     render: function() {
-        var self = this;
 
+        var self = this;
         var contact = this.props.contact;
+
         if (!contact) {
             return null;
         }
@@ -527,6 +543,7 @@ var ContactCard = React.createClass({
             (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+
         if (contact.u == u_handle) {
             username += " (Me)";
         }

@@ -411,7 +411,7 @@
             var done = function(file, name, action) {
                 closeDialog();
                 var checked = $('#duplicates-checkbox').prop('checked');
-                if (checked) {
+                if (checked && op === 'import') {
                     loadingDialog.show();
                 }
                 // Make sure browser is not freeze and show loading dialog

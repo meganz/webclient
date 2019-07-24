@@ -114,7 +114,7 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
+            'aav', 'aas', '*!>alias', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
             'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
         ];
 
@@ -1419,6 +1419,7 @@ function processEmailChangeActionPacket(ap) {
      * @param {String} value Configuration value
      */
     ns.set = function _setConfigValue(key, value) {
+
         fmconfig[key] = value;
 
         if (d) {

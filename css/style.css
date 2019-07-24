@@ -10467,9 +10467,21 @@ span.orange {
 }
 .dropdown-item.sort-grid-item.selected i {
     background-image: url(../images/mega/icons-sprite_v30.png);
-    background-position: -1px -1546px;
+    background-position: -7px -1991px;
     background-size: 262px auto;
     background-repeat: no-repeat;
+}
+.dropdown-item.sort-grid-item.selected.inverted i {
+    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-position: -45px -1991px;
+    background-size: 262px auto;
+    background-repeat: no-repeat;
+}
+.dropdown-item.sort-grid-item.selected:hover i {
+    background-position: -26px -1991px;
+}
+.dropdown-item.sort-grid-item.selected.inverted:hover i {
+    background-position: -62px -1991px;
 }
 .dropdown-item.do-sort.selected:hover i {
     background-position: -30px -1850px;

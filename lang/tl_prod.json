@@ -3258,5 +3258,7 @@
     "20857": "Your link is invalid.",
     "20858": "Please contact support@mega.nz for assistance.",
     "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
-    "20860": "Your password was successfully reverted to the previous one."
+    "20860": "Your password was successfully reverted to the previous one.",
+    "20905": "Confirm paste",
+    "20906": "Please confirm that you want to upload this image and share it in this chat."
 }

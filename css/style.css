@@ -112,7 +112,7 @@ body.mobile.bottom-pages {
     overflow: visible;
 }
 .lato {
-    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .lato-semibold {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold';

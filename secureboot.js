@@ -17,6 +17,7 @@ var staticpath = null;
 var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fail. EU is the mothership.
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
+var uven = window.navigator.vendor.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var l, d = false;
 

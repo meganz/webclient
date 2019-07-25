@@ -305,8 +305,8 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
 .bus-reg-checkbox.checkOn::before {
     background-image: url(../images/mega/top-login-sprite_v11@2x.png);
 }
-.bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before, .megaapp-linux-arrow, .megaapp-linux .default-select, .bottom-page-icon.white-info, .dark-notification-arrow  {
-    background-image: url(../images/mega/new-pages-sprite_v3@2x.png) !important;
+.bottom-page.large-icon, .cropped-page .bottom-page.big-icon, .cropped-page .bottom-page.top-title::before, .mobile-apps-button.uwp,.uwp .advertise-chat .mobile-apps-button.red span::before, .megaapp-linux-arrow, .megaapp-linux .default-select, .bottom-page-icon.white-info, .dark-notification-arrow, .bottom-page.icon.new-pages-sprite, .bottom-page.top-title::before {
+    background-image: url(../images/mega/new-pages-sprite_v4@2x.png) !important;
     background-size: 376px auto;
 }
 .auth-app-select-tooltip .app-link-icon, .auth-app-select-tooltip .app-link-arrow {

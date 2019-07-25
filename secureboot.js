@@ -82,11 +82,6 @@ var load_error_types = {
  */
 function isMobile() {
 
-    // If extension, not applicable
-    if (is_extension) {
-        return false;
-    }
-
     var mobileStrings = [
         'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
         'windows mobile', 'windows phone', 'iemobile', 'mobile safari', 'bb10; touch'
@@ -2225,9 +2220,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
-    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});    
+    jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    
+
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
@@ -3585,6 +3580,27 @@ function showAd() {
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
 
     return showAd;
+}
+
+/**
+ * History API's pushState helper that takes into account whether we're running through an extension or public-link
+ * @param {Object|String} page The page to change to, or an history's state object
+ * @param {Object} [state] An optional state object, if an String is provided for the 1st parameter.
+ */
+function pushHistoryState(page, state) {
+    'use strict';
+
+    try {
+        if (typeof page !== 'object') {
+            page = {subpage: page};
+        }
+        state = Object.assign(page, state);
+        page = state.subpage || state.fmpage || location.hash;
+        history.pushState(state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
 }
 
 /**

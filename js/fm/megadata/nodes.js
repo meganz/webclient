@@ -1822,6 +1822,9 @@ MegaData.prototype.rename = function(itemHandle, newItemName) {
 
     if (n && n.name !== newItemName) {
         n.name = newItemName;
+        if (n.t && M.tree[n.p]) {
+            Object(M.tree[n.p][n.h]).name = newItemName;
+        }
         api_setattr(n, mRandomToken('mv'));
         this.onRenameUIUpdate(itemHandle, newItemName);
     }

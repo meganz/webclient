@@ -1796,6 +1796,16 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
                 }
             }, 50);
         }
+
+        if ($('#treeli_' + n.h).length > 0) {
+            // Since n.h may not be a folder, we need to do some check to ensure we really need to do a tree redraw.
+            // In case its rendered in the dom as #treeli_hash, then this is 100% a folder that was rendered in its old
+            // order.
+            // Last but not least, we throttle this, so that big move/rename operations would only redraw the tree once
+            delay('onRenameUIUpdateTreePane', function () {
+                M.redrawTree();
+            }, 50);
+        }
     }
 
     if (M.recentsRender) {

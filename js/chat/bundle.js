@@ -2394,11 +2394,14 @@ React.makeElement = React['createElement'];
 	            }
 	            lastMessageDiv = React.makeElement("div", { className: lastMsgDivClasses, dangerouslySetInnerHTML: { __html: renderableSummary } });
 	            var voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+
 	            if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+	                var playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
 	                lastMessageDiv = React.makeElement(
 	                    "div",
 	                    { className: lastMsgDivClasses },
-	                    'Voice Message'
+	                    React.makeElement("span", { className: "voice-message-icon" }),
+	                    playTime
 	                );
 	            }
 

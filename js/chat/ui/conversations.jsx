@@ -272,14 +272,15 @@ var ConversationsListItem = React.createClass({
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
             const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+            
             if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+                const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
                 lastMessageDiv = (
                     <div className={lastMsgDivClasses}>
-                        {'Voice Message'}
+                        <span className="voice-message-icon"></span>{playTime}
                     </div>
                 );
             }
-            
 
             if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
                 lastMessageDiv = (

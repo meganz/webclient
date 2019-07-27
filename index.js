@@ -1961,7 +1961,24 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
-    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
+    var versionClickCounter = 0;
+    var versionClickTimeout = null;
+    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion()).off('click').on('click', function() {
+        clearTimeout(versionClickTimeout);
+        if (++versionClickCounter >= 5) {
+            if (apipath && apipath.indexOf("staging.api.mega.co.nz") >= 0) {
+                localStorage.removeItem('apipath');
+                alert("API path set to live");
+            } else {
+                M.staging(1);
+                alert("API path set to staging");
+            }
+            window.location.reload();
+        }
+        versionClickTimeout = setTimeout(function() {
+            versionClickCounter = 0;
+        }, 1000);
+    });
 
     if (u_type) {
         $('body').removeClass('not-logged').addClass('logged');

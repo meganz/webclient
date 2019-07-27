@@ -3219,7 +3219,7 @@
     "20694": "Erstellt",
     "20695": "Zielordner \u00f6ffnen",
     "20697": "Download MEGA Desktop App",
-    "20698": "Transfer with MEGA Desktop App",
+    "20698": "Mit der MEGA Desktop-App herunterladen",
     "20707": "[B]50 GB*[\/B] Free storage",
     "20708": "Create an account and get [S]50 GB*[\/S] of free storage on the MEGA cloud collaboration platform while you are waiting. It will not affect your download process.",
     "20709": "Create an account today and get [S]50 GB*[\/S] of free storage on MEGA\u2019s end-to-end encrypted cloud collaboration platform!",
@@ -3258,5 +3258,7 @@
     "20857": "Ihr Link ist ung\u00fcltig.",
     "20858": "Bitte setzen Sie sich mit support@mega.nz in Verbindung.",
     "20859": "M\u00f6chten Sie die Passwort\u00e4nderung des Accounts %1 wirklich r\u00fcckg\u00e4ngig machen?",
-    "20860": "Ihr Passwort wurde erfolgreich auf das vorherige zur\u00fcckgesetzt."
+    "20860": "Ihr Passwort wurde erfolgreich auf das vorherige zur\u00fcckgesetzt.",
+    "20905": "Bild eingef\u00fcgt",
+    "20906": "M\u00f6chten Sie das eingef\u00fcgte Bild an den Chat schicken?"
 }

@@ -249,7 +249,8 @@ html.gbot {
     height: 100%;
     background-color: white;
     background-image: none;
-    overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }
 .fmholder .bottom-page.scroll-block {
     height: 100%;
@@ -4875,9 +4876,6 @@ a.opensource-icon-txt.coming-soon {
 body:not(.en) .pages-nav.content-block .nav-button {
      width: 25%;
 }
-.top-links-block {
-    display: none;
-}
 .bottom-page.top-dark-info.medium {
     padding-bottom: 10px;
 }
@@ -5043,9 +5041,6 @@ body:not(.en) .pages-nav.content-block .nav-button {
     max-width: 100%;
     padding: 0 10px;
     margin: 0 0 0 0;
-}
-.bottom-page .top-links-block {
-    display: none;
 }
 .bottom-page.top-links.mb {
     margin: 0 -43px;
@@ -5306,7 +5301,7 @@ body:not(.en) .pages-nav.content-block .nav-button {
     position: relative;
 }
 .browsers .bottom-page.top-links {
-    float: left;
+    float: none;
     width: 50%;
 }
 .browsers .bottom-page.left-cell .img-description {
@@ -5373,7 +5368,7 @@ body:not(.en) .pages-nav.content-block .nav-button {
 @media only screen and (max-width: 783px) and (max-height: 761px) {
 .img.browsers-top {
     max-width: 60%;
-    margin-top: -30px;
+    margin-top: 22px;
     padding-bottom: 63px;
 }
 }

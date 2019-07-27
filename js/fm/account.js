@@ -271,6 +271,14 @@ accountUI.general = {
                 }
                 $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
             }
+
+            if (!account.maf) {
+                $('.fm-right-account-block').removeClass('active-achievements');
+            }
+            else {
+                $('.fm-right-account-block').addClass('active-achievements');
+            }
+
             /* End of New Used Bandwidth chart */
         },
 
@@ -1599,14 +1607,12 @@ accountUI.plan = {
 
             /* achievements */
             if (!account.maf) {
-                $('.fm-right-account-block').removeClass('active-achievements');
                 $('.account.plan-info.storage > span').text(bytesToSize(M.account.space, 0));
                 $('.account.plan-info.bandwidth > span').text(bytesToSize(M.account.tfsq.max, 0));
                 $('.account.plan-info .quota-note-container, .account.plan-info .settings-bar, .btn-achievements')
                     .addClass('hidden');
             }
             else {
-                $('.fm-right-account-block').addClass('active-achievements');
                 mega.achievem.parseAccountAchievements();
             }
         },

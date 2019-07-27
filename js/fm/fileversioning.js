@@ -641,8 +641,7 @@ var versiondialogid;
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
-            history.pushState({subpage: page}, '', '/' + page);
-
+            pushHistoryState(page);
         },
 
         /**

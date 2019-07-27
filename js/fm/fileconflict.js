@@ -411,8 +411,12 @@
             var done = function(file, name, action) {
                 closeDialog();
                 var checked = $('#duplicates-checkbox').prop('checked');
-                if (checked && op === 'import') {
+                if (checked) {
+                    // Show loading while process multiple files
                     loadingDialog.show();
+                    promise.always(function () {
+                        loadingDialog.hide();
+                    });
                 }
                 // Make sure browser is not freeze and show loading dialog
                 onIdle(function() {

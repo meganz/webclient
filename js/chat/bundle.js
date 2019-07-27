@@ -4441,7 +4441,7 @@ React.makeElement = React['createElement'];
 	            requiresUpdateOnResize: true
 	        };
 	    },
-	    doProgramaticScroll: SoonFc(function (newPos, forced, isX) {
+	    doProgramaticScroll: function doProgramaticScroll(newPos, forced, isX) {
 	        if (!this.isMounted()) {
 	            return;
 	        }
@@ -4475,7 +4475,8 @@ React.makeElement = React['createElement'];
 	            self.isUserScroll = true;
 	            $elem.off('scroll.progscroll' + idx);
 	        }.bind(this, idx));
-	    }, 10),
+	    },
+
 	    componentDidMount: function componentDidMount() {
 	        var self = this;
 	        var $elem = $(ReactDOM.findDOMNode(self));
@@ -8029,7 +8030,7 @@ React.makeElement = React['createElement'];
 	                {
 	                    megaChat: room.megaChat,
 	                    chatRoom: room,
-	                    title: __("Confirm paste"),
+	                    title: __(l[20905]),
 	                    name: "paste-image-chat",
 	                    onClose: function onClose() {
 	                        self.setState({ 'pasteImageConfirmDialog': false });
@@ -8065,7 +8066,7 @@ React.makeElement = React['createElement'];
 	                    React.makeElement(
 	                        "div",
 	                        { className: "dialog secondary-header" },
-	                        __("Please confirm that you want to upload this image and share it in this chat room.")
+	                        __(l[20906])
 	                    ),
 	                    React.makeElement("img", {
 	                        src: self.state.pasteImageConfirmDialog[2],

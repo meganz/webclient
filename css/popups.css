@@ -370,6 +370,14 @@ body.tl .dropdown.body.popup.contacts-search {
     z-index: 10;
     overflow: hidden;
 }
+
+.popup-scroll-area .emojis-not-found {
+    color: #999;
+    margin-left: 132px;
+    position: relative;
+    top: 10px;
+}
+
 .popup-scroll-content.emoji {
     padding: 12px;
     min-height: 312px;

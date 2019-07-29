@@ -354,7 +354,11 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if (!isHiddenByUser) {
-            mega.tpw.showWidget();
+
+            if (page.indexOf('chat') === -1) {
+                mega.tpw.showWidget();
+            }
+
             if ($widgetHeadAndBody.hasClass('expand')) {
                 if (page.indexOf('chat') !== -1) {
                     $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();

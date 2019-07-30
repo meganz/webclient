@@ -61,7 +61,7 @@ body.pro:after {
     background-size: 755px auto;
 }
 .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite@2x.png);
+    background-image: url(../images/mega/privacy-sprite_v2@2x.png);
     background-size: 130px auto;
 }
 .widget-circle, .widget-arrows, .widget-icon, .widget-arrow {
@@ -161,7 +161,7 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 853px auto;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v9@2x.png);
+    background-image: url(../images/mega/startpage-sprite_v10@2x.png);
     background-size: 267px auto;
 }
 .properties-file-icon div {

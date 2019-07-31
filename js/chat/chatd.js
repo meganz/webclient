@@ -538,9 +538,10 @@ Chatd.Shard.prototype.reconnect = function() {
         self.logger.debug('chatd connection established');
         self.connectionRetryManager.gotConnected();
 
+        self.cmdq = "";
         self.sendIdentity();
 
-        if (!self.triggerSendIfAble()) {
+        if (!self.triggerSendIfAble(true)) {
             // XXX: websocket.send() failed for whatever reason, onerror should
             //      have been called and the connection restablished afterwards.
             self.logger.warn('chatd connection closed unexpectedly...');
@@ -639,7 +640,7 @@ Chatd.clientIdToString = function(data, offset) {
     return '0x' + Chatd.dumpToHex(data, offset ? offset : 0, 4, true);
 };
 
-Chatd.logCmdsToString = function(logger, cmd, tx, prefix) {
+Chatd.logCmdsToString = function(logger, cmd, tx, prefix, isReconnect) {
     var result = Chatd.cmdsToArrayStrings(cmd, tx);
     if (!prefix) {
         prefix = tx ? "send:" : "recv:";
@@ -650,7 +651,7 @@ Chatd.logCmdsToString = function(logger, cmd, tx, prefix) {
     }
     for (var k = 0; k < len; k++) {
         var line = result[k];
-        logger.debug((len > 1) ? (prefix + k + ")") : prefix, line);
+        logger.debug(isReconnect ? "initial cmdq flush:" : "", (len > 1) ? (prefix + k + ")") : prefix, line);
     }
 };
 
@@ -900,7 +901,7 @@ Chatd.Shard.prototype.cmd = function(opCode, cmd, sendFirst) {
         this.cmdq = buf + this.cmdq;
     }
 
-    return this.triggerSendIfAble();
+    return this.triggerSendIfAble(sendFirst);
 };
 /*
  * Checks if the shard has a clientId assigned. It may be
@@ -948,7 +949,7 @@ Chatd.Shard.prototype.sendKeepAlive = function(forced) {
     }
 };
 
-Chatd.Shard.prototype.triggerSendIfAble = function() {
+Chatd.Shard.prototype.triggerSendIfAble = function(isReconnect) {
     if (!this.isOnline()) {
         return false;
     }
@@ -963,7 +964,7 @@ Chatd.Shard.prototype.triggerSendIfAble = function() {
             this.s.send(a);
 
             if (this.loggerIsEnabled) {
-                Chatd.logCmdsToString(this.logger, this.cmdq, true);
+                Chatd.logCmdsToString(this.logger, this.cmdq, true, undefined, isReconnect);
             }
         }
         catch (ex) {
@@ -1922,6 +1923,9 @@ Chatd.Messages.prototype.loginState = function() {
 Chatd.Messages.prototype.join = function() {
     var self = this;
     var shard = self.shard;
+    if (!shard.isOnline()) {
+        return;
+    }
     var chatId = self.chatId;
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(self.chatId));
 

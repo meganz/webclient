@@ -147,6 +147,8 @@ mega.tpw = new function TransferProgressWidget() {
         // upgrade account
         $('.up-action', $overQuotaBanner).off('click').on('click',
             function overquota_bannerUpgrade() {
+                $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                isHiddenByUser = true;
                 loadSubPage('pro');
             });
 

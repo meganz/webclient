@@ -1345,7 +1345,9 @@ CallManagerCall.prototype.muteVideo = function () {
     if (!self.rtcCall) {
         return;
     }
-    self.rtcCall.enableVideo(false);
+    self.rtcCall.enableVideo(false).catch(function() {
+        /* silence unhandled error console message */
+    });
 };
 
 CallManagerCall.prototype.unmuteVideo = function () {
@@ -1353,7 +1355,9 @@ CallManagerCall.prototype.unmuteVideo = function () {
     if (!self.rtcCall) {
         return;
     }
-    self.rtcCall.enableVideo(true);
+    self.rtcCall.enableVideo(true).catch(function() {
+        /* silence unhandled error console message */
+    });
 };
 
 CallManagerCall.prototype.setState = function (newState) {
@@ -1449,7 +1453,11 @@ CallManagerCall.prototype.getMediaOptions = function () {
         this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
         return {audio: false, video: false};
     }
-    return {audio: !!(localAv & Av.Audio), video: !!(localAv & Av.Video)};// jscs:ignore disallowImplicitTypeConversion
+    return {
+        audio: !!(localAv & Av.Audio), // jscs:ignore disallowImplicitTypeConversion
+        video: !!(localAv & Av.Video), // jscs:ignore disallowImplicitTypeConversion
+        screen: !!(localAv & Av.Screen) // jscs:ignore disallowImplicitTypeConversion
+    };
 };
 
 CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
@@ -1484,7 +1492,11 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
     }
 
     // jscs:disable disallowImplicitTypeConversion
-    return {audio: !!(firstSession.peerAv & Av.Audio), video: !!(firstSession.peerAv & Av.Video)};
+    return {
+        audio: !!(firstSession.peerAv & Av.Audio),
+        video: !!(firstSession.peerAv & Av.Video),
+        screen:  !!(firstSession.peerAv & Av.Screen)
+    };
     // jscs:enable disallowImplicitTypeConversion
 };
 

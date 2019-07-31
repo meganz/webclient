@@ -70,7 +70,7 @@ function WebrtcApi() {
     this.supportsReplaceTrack = !!(window.RTCRtpSender && RTCRtpSender.prototype.replaceTrack);
     this.supportsUnifiedPlan = !!(this.supportsReplaceTrack && window.RTCRtpTransceiver);
     this.supportsRxTxGetStats = !!(window.RTCRtpSender && RTCRtpSender.prototype.getStats);
-
+    this.supportsScreenCapture = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
     function processDevices(devices) {
         var hasAudio = false;
         var hasVideo = false;
@@ -112,13 +112,16 @@ function WebrtcApi() {
         }
     };
 
-
     this.getUserMedia = function (opts) {
         return new Promise(function (resolve, reject) {
             navigator.getUserMedia(opts, resolve, reject);
         });
     };
-
+    if (this.supportsScreenCapture) {
+        this.getDisplayMedia = function(opts) {
+            return navigator.mediaDevices.getDisplayMedia(opts);
+        };
+    }
     if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
         this.getMediaInputTypes = function () {
             return new Promise(function (resolve, reject) {

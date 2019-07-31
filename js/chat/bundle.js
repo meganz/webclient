@@ -16709,6 +16709,17 @@ React.makeElement = React['createElement'];
 	                return VIEW_MODES.CAROUSEL;
 	            }
 	        }
+	        if (chatRoom.type === "private") {
+	            return VIEW_MODES.GRID;
+	        }
+	        var streamKeys = Object.keys(callManagerCall._streams);
+	        for (var i = 0; i < streamKeys.length; i++) {
+	            var sid = streamKeys[i];
+	            if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
+	                return VIEW_MODES.CAROUSEL;
+	            }
+	        }
+
 	        return this.state.viewMode;
 	    },
 	    onPlayerClick: function onPlayerClick(sid) {
@@ -16771,7 +16782,17 @@ React.makeElement = React['createElement'];
 	            $('.participantsContainer', $container).height('auto');
 	            var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
 
+	            var callManagerCall = chatRoom.callManagerCall;
+	            var mediaOpts;
+	            if (this.state.selectedStreamSid === "local") {
+	                mediaOpts = callManagerCall.getMediaOptions();
+	            } else {
+	                mediaOpts = callManagerCall.getRemoteMediaOptions(self.getRemoteSid());
+	            }
+	            var audioIsMuted = mediaOpts.audio;
+
 	            $('.activeStream', $container).height(activeStreamHeight);
+
 	            $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
 
 	            $('.user-video, .user-audio, .user-video video', $container).width('').height('');
@@ -16780,14 +16801,6 @@ React.makeElement = React['createElement'];
 	            var $mutedIcon;
 	            $video = $('.activeStream video', $container);
 	            $mutedIcon = $('.activeStream .icon-audio-muted', $container);
-
-	            var callManagerCall = chatRoom.callManagerCall;
-	            var audioIsMuted = false;
-	            if (this.state.selectedStreamSid === "local") {
-	                audioIsMuted = callManagerCall.getMediaOptions().audio;
-	            } else {
-	                audioIsMuted = callManagerCall.getRemoteMediaOptions(self.getRemoteSid()).audio;
-	            }
 
 	            if ($video.length > 0 && $mutedIcon.length > 0) {
 	                if ($video.outerHeight() > 0 && $video[0].videoWidth > 0 && $video[0].videoHeight > 0) {
@@ -17206,8 +17219,9 @@ React.makeElement = React['createElement'];
 	            var clientId = streamId.split(":")[1];
 	            var sessionId = streamId.split(":")[2];
 	            var remotePlayerStream = stream;
+	            var mediaOpts = callManagerCall.getRemoteMediaOptions(sessionId);
 
-	            if (!remotePlayerStream || callManagerCall.getRemoteMediaOptions(sessionId).video === false) {
+	            if (!remotePlayerStream || mediaOpts.video === false && mediaOpts.screen === false) {
 
 	                var contact = M.u[userId];
 	                var player = _react2.default.createElement(
@@ -17239,7 +17253,7 @@ React.makeElement = React['createElement'];
 	                player = _react2.default.createElement(
 	                    'div',
 	                    {
-	                        className: "call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
+	                        className: "call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_") + (mediaOpts.screen ? " is-screen" : ""),
 	                        key: streamId + "_" + k,
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick(streamId);
@@ -17266,7 +17280,7 @@ React.makeElement = React['createElement'];
 	        });
 
 	        if (this.getViewMode() === VIEW_MODES.GRID) {
-	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false) {
 	                localPlayerElement = _react2.default.createElement(
 	                    'div',
 	                    { className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass },
@@ -17291,7 +17305,7 @@ React.makeElement = React['createElement'];
 	                localPlayerElement = _react2.default.createElement(
 	                    'div',
 	                    {
-	                        className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeStreamIdOrPlayer === "local" ? " active " : "") },
+	                        className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeStreamIdOrPlayer === "local" ? " active " : "") + (callManagerCall.getMediaOptions().screen ? " is-screen" : "") },
 	                    chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
 	                    _react2.default.createElement(
 	                        'div',
@@ -17314,7 +17328,7 @@ React.makeElement = React['createElement'];
 	        } else {
 
 	            var localPlayer;
-	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+	            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false) {
 	                localPlayer = _react2.default.createElement(
 	                    'div',
 	                    { className: "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : ""), key: 'local',
@@ -17342,7 +17356,7 @@ React.makeElement = React['createElement'];
 	                localPlayer = _react2.default.createElement(
 	                    'div',
 	                    {
-	                        className: "call user-video local-carousel is-video" + (activeStreamIdOrPlayer === "local" ? " active " : ""),
+	                        className: "call user-video local-carousel is-video" + (activeStreamIdOrPlayer === "local" ? " active " : "") + (callManagerCall.getMediaOptions().screen ? " is-screen" : ""),
 	                        key: 'local-video',
 	                        onClick: function onClick(e) {
 	                            self.onPlayerClick("local");
@@ -17365,7 +17379,7 @@ React.makeElement = React['createElement'];
 	                    activeStreamIdOrPlayer = _react2.default.createElement(
 	                        'div',
 	                        {
-	                            className: 'call user-video is-video local-carousel local-carousel-big',
+	                            className: "call user-video is-video local-carousel local-carousel-big " + (callManagerCall.getMediaOptions().screen ? " is-screen" : ""),
 	                            key: 'local-video2' },
 	                        chatRoom.megaChat.networkQuality === 0 ? _react2.default.createElement('div', { className: 'icon-connection-issues' }) : null,
 	                        callManagerCall.getMediaOptions().audio === false ? _react2.default.createElement('div', { className: 'small-icon icon-audio-muted' }) : _react2.default.createElement('div', { className: 'small-icon icon-audio-muted hidden' }),
@@ -17409,6 +17423,16 @@ React.makeElement = React['createElement'];
 	        }
 
 	        if (chatRoom.type === "group" || chatRoom.type === "public") {
+	            var haveScreenShare = false;
+	            var streamKeys = Object.keys(callManagerCall._streams);
+	            for (var x = 0; x < streamKeys.length; x++) {
+	                var sid = streamKeys[x];
+	                if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
+	                    haveScreenShare = true;
+	                    break;
+	                }
+	            }
+
 	            header = _react2.default.createElement(
 	                'div',
 	                { className: 'call-header' },
@@ -17426,7 +17450,7 @@ React.makeElement = React['createElement'];
 	                    { className: 'call-participants-count' },
 	                    Object.keys(chatRoom.callParticipants).length
 	                ),
-	                _react2.default.createElement('a', { className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : ""), onClick: function onClick(e) {
+	                _react2.default.createElement('a', { className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : ""), onClick: function onClick(e) {
 	                        if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
 	                            return;
 	                        }
@@ -17618,6 +17642,18 @@ React.makeElement = React['createElement'];
 	                            }
 	                        } },
 	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: "button call" + (RTC.supportsScreenCapture && chatRoom.callManagerCall && callManagerCall.rtcCall && !this.state.muteInProgress ? "" : " disabled"), onClick: function onClick(e) {
+	                            if (RTC.supportsScreenCapture && chatRoom.callManagerCall) {
+	                                var rtcCall = chatRoom.callManagerCall.rtcCall;
+	                                if (rtcCall) {
+	                                    rtcCall.enableScreenCapture(!rtcCall.isScreenCaptureEnabled());
+	                                }
+	                            }
+	                        } },
+	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.rtcCall && callManagerCall.rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare") })
 	                ),
 	                _react2.default.createElement(
 	                    'div',

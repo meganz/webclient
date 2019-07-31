@@ -49,7 +49,7 @@ function init_page() {
         elm.classList.add(theme);
         elm.addEventListener("click", function() {
             window.open(
-                getAppBaseUrl() + (is_extension ? '' : '/') + 'megadrop/' + id, "_blank",
+                getAppBaseUrl() + (is_extension ? '#' : '/') + 'megadrop/' + id, "_blank",
                 "width=750, height=738, resizable=no, status=no, location=no, titlebar=no, toolbar=no",
                 true
             );

@@ -32,7 +32,7 @@
     position:absolute;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: -70px -600px;
     background-position: -163px -849px;
@@ -687,7 +687,7 @@
 }
 
 .message.richpreview.confirmation-icon {
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-position: -119px -1551px;
     background-size: 237px auto;
     height: 118px;
@@ -768,7 +768,7 @@
 .chat-topic-block.privateChat .privateChatDiv {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-size: 237px auto;
     background-repeat: no-repeat;
     background-position: 0px -4137px;
@@ -941,4 +941,13 @@
     height: 15px;
     display: inline-block;
     margin-right: 5px;
+}
+
+.voice-message-icon {
+    background: url('../images/mega/new-chat-sprite_v16.png') no-repeat -19px -4581px;
+    display: inline-block;
+    height: 21px;
+    margin-right: 5px;
+    opacity: 0.5;
+    width: 16px;
 }

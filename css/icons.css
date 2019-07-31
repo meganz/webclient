@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -507,7 +507,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {

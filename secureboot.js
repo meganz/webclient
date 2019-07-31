@@ -599,6 +599,13 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
+if (String(location.pathname).indexOf('%') > 0) {
+    tmp = mURIDecode(location.pathname);
+    if (tmp.indexOf('%') < 0) {
+        location.assign(tmp);
+    }
+}
+
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {

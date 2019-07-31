@@ -646,6 +646,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
+        $('.grid-table-header-container-sc .column-settings.overlap').removeClass('c-opened');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');
@@ -3298,14 +3299,30 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
     });
 
-    $('.grid-table-header').rebind('contextmenu', function(e) {
+    var showColumnsContextMenu = function(e) {
         var notAllowedTabs = ['shares', 'out-shares', 'contacts', 'ipc', 'opc'];
         if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
             return false;
         }
         M.contextMenuUI(e, 7);
         return false;
+    };
+
+    $('.grid-table-header').rebind('contextmenu', function(e) {
+        return showColumnsContextMenu(e);
     });
+
+    $('.grid-table-header-container-sc .column-settings.overlap').rebind('click',
+        function(e) {
+            var $me = $(this);
+            if ($me.hasClass('c-opened')) {
+                $.hideContextMenu();
+                return false;
+            }
+            showColumnsContextMenu(e);
+            $me.addClass('c-opened');
+            return false;
+        });
 
     $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
         var $me = $(this);

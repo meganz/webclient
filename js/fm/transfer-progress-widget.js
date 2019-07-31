@@ -1096,7 +1096,7 @@ mega.tpw = new function TransferProgressWidget() {
     this.showWidget = function() {
         init();
         initUI();
-        if (!$rowsContainer.find('.transfer-task-row').length) {
+        if (!$rowsContainer || !$rowsContainer.find('.transfer-task-row').length) {
             return;
         }
         $widget.removeClass('hidden');

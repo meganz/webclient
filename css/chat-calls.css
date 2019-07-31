@@ -74,6 +74,12 @@ video.localViewport {
     -webkit-transform: rotateY(180deg); /* Safari and Chrome */
     -moz-transform: rotateY(180deg); /* Firefox */
 }
+
+.is-screen video.localViewport {
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+}
 .call.local-video {
     min-height: 184px;
     max-height: 184px;

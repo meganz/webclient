@@ -347,7 +347,9 @@ mega.tpw = new function TransferProgressWidget() {
     var viewPreparation = function() {
         'use strict';
         init();
-        initUI();
+        if (!initUI()) {
+            return;
+        }
 
         // pages to hide always
         if (page.indexOf('transfers') !== -1) {
@@ -578,7 +580,7 @@ mega.tpw = new function TransferProgressWidget() {
         var $currWidget = clearAndReturnWidget();
 
         if (!$currWidget) {
-            return;
+            return false;
         }
 
         var rows = $currWidget.find('.transfer-task-row');
@@ -597,6 +599,7 @@ mega.tpw = new function TransferProgressWidget() {
                     actionsOnRowEventHandler);
             }
         }
+        return true;
     };
 
     /**

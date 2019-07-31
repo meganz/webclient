@@ -1821,12 +1821,23 @@ MegaData.prototype.rename = function(itemHandle, newItemName) {
     }
 
     if (n && n.name !== newItemName) {
+        var oldItemName = n.name;
+
         n.name = newItemName;
         if (n.t && M.tree[n.p]) {
             Object(M.tree[n.p][n.h]).name = newItemName;
         }
-        api_setattr(n, mRandomToken('mv'));
+
         this.onRenameUIUpdate(itemHandle, newItemName);
+        api_setattr(n, mRandomToken('mv'))
+            .fail(function(error) {
+                n.name = oldItemName;
+                if (n.t && M.tree[n.p]) {
+                    Object(M.tree[n.p][n.h]).name = oldItemName;
+                }
+                msgDialog('warninga', l[135], l[47], api_strerror(error));
+                M.onRenameUIUpdate(itemHandle, oldItemName);
+            });
     }
 };
 

@@ -1647,8 +1647,44 @@ function init_page() {
             return init_page();
         }
 
-    }
-    else if (is_fm()) {
+    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+        var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
+        var contactHandle = contactRequestInfo.u;
+        var contactRequestTime = contactRequestInfo.unixTime;
+        var TWO_HOURS_IN_SECONDS = 7200;
+
+        var addContact = function (ownerEmail, targetEmail) {
+            M.inviteContact(ownerEmail, targetEmail);
+            localStorage.removeItem('addContact');
+            return init_page();
+        };
+
+        if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
+            attribCache.getItem(contactHandle + "_uge")
+            .done(function(email) {
+                addContact(u_attr.email, email);
+            })
+            .fail(function() {
+                asyncApiReq({
+                    'a': 'uge',
+                    'u': contactHandle
+                })
+                .done(function(email) {
+                    if (isValidEmail(email) && isString(email)) {
+                        attribCache.setItem(contactHandle + "_uge", email);
+                        addContact(u_attr.email, email);
+                    }
+                    else {
+                        localStorage.removeItem('addContact');
+                    }
+                })
+                .fail(function(e) {
+                    console.error(e);
+                    localStorage.removeItem('addContact');
+                });
+            });
+        }
+    } else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');

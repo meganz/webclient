@@ -4201,20 +4201,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     position: fixed;
     width: 24px;
-    height: 24px;
+    height: 23px;
     background-color: #ffffff;
     right: 0px;
-    top: 71px;
     z-index: 9;
-}
-.files-grid-view.fm.shared-folder-content .column-settings {
-    top: 226px;
-}
-.files-grid-view.fm.out-shares-view .column-settings {
-    top: 106px;
-}
-.files-grid-view.fm.public-links-view .column-settings {
-    top: 106px;
 }
 .files-grid-view.fm .column-settings::before {
     content: "";
@@ -4223,7 +4213,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     position: fixed;
     width: 24px;
-    height: 24px;
+    height: 23px;
     opacity: 0.6;
     cursor: pointer;
     transition: 0.2s;

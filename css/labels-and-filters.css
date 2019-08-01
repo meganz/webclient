@@ -29,6 +29,9 @@
 .colour-label-ind.purple, .colour-label.purple .file-block-title::after, .colour-label.purple .tranfer-filetype-txt::after, .colour-label.purple .shared-folder-info-block::after {
     background-color: #D088E1;
 }
+.active-folder-link .colour-label-ind, .active-folder-link .colour-label .file-block-title::after, .active-folder-link .colour-label .tranfer-filetype-txt::after, .active-folder-link .colour-label .shared-folder-info-block::after {
+    display: none;
+}
 .colour-label .shared-folder-info-block::after {
     right: 2px;
     top: 13px;

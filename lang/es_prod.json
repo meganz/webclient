@@ -556,7 +556,7 @@
     "1664": "Caducado",
     "1667": "Acceso denegado",
     "1668": "Ya existe",
-    "1673": "L\u00edmite de cuenta excedido",
+    "1673": "L\u00edmite excedido",
     "1676": "Error de escritura",
     "1677": "Error de lectura",
     "1679": "Error desconocido",
@@ -920,7 +920,7 @@
     "7147": "Has denegado una solicitud de contacto",
     "7148": "Has aceptado una solicitud de contacto",
     "7149": "Has ignorado una solicitud de contacto",
-    "7150": "Recordatorio: tienes una solicitud de contacto",
+    "7150": "Aviso: tienes una solicitud de contacto",
     "7151": "Ha cancelado su solicitud de contacto",
     "7152": "Pesado",
     "7153": "Ligero",
@@ -3260,5 +3260,10 @@
     "20859": "\u00bfEst\u00e1s seguro de que quieres revertir la contrase\u00f1a de la cuenta%1 a la anterior?",
     "20860": "Se ha revertido la contrase\u00f1a a la anterior.",
     "20905": "Confirmar la subida",
-    "20906": "Confirma que quieres subir esta imagen y compartirla en este chat."
+    "20906": "Confirma que quieres subir esta imagen y compartirla en este chat.",
+    "20917": "No se ha podido completar la subida - reiniciando...",
+    "20918": "No se ha podido completar la subida - reintentando...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only"
 }

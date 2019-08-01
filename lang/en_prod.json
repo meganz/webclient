@@ -1372,8 +1372,8 @@
     "9118": "Resume Transfer",
     "10628": "You are about to start a recurring subscription and your card will be re-billed monthly.",
     "10629": "You are about to start a recurring subscription and your card will be re-billed annually.",
-    "10630": "For more detail on recurring payments, our refund policy, or how to cancel your subscription, please visit our [A]general information page[\/A].",
-    "10631": "You are about to make a one-off payment. You will be reminded when your plan is due to expire and you will need to purchase this plan again manually. For more detail on our refund policy, please visit our [A]general information page[\/A].",
+    "10630": "For more detail on recurring payments, our refund policy, or how to cancel your subscription, please visit our [A]terms of service page[\/A].",
+    "10631": "You are about to make a one-off payment. You will be reminded when your plan is due to expire and you will need to purchase this plan again manually. For more detail on our refund policy, please visit our [A]terms of service page[\/A].",
     "10632": "Enter your billing address details",
     "10633": "Please fill in all required fields.",
     "10634": "If you are having trouble with your payment, please [A]contact our support team[\/A].",
@@ -1429,7 +1429,7 @@
     "16103": "Reinvite all pending",
     "16104": "Pending App Install",
     "16105": "Quota Granted",
-    "16106": "Your purchase of MEGA services will be processed for [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16106": "Your purchase of MEGA services will be processed by [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
     "16107": "Did you know that you can download the entire folder at once if you [S]install the free MEGA app[\/S]?",
     "16108": "Logout options",
     "16109": "Wipe all local metadata when logging out - Your next login will take longer to process.",
@@ -3260,5 +3260,10 @@
     "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
     "20860": "Your password was successfully reverted to the previous one.",
     "20905": "Confirm paste",
-    "20906": "Please confirm that you want to upload this image and share it in this chat."
+    "20906": "Please confirm that you want to upload this image and share it in this chat.",
+    "20917": "Upload failed - restarting...",
+    "20918": "Upload error - retrying...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only"
 }

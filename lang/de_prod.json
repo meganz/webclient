@@ -3260,5 +3260,10 @@
     "20859": "M\u00f6chten Sie die Passwort\u00e4nderung des Accounts %1 wirklich r\u00fcckg\u00e4ngig machen?",
     "20860": "Ihr Passwort wurde erfolgreich auf das vorherige zur\u00fcckgesetzt.",
     "20905": "Bild eingef\u00fcgt",
-    "20906": "M\u00f6chten Sie das eingef\u00fcgte Bild an den Chat schicken?"
+    "20906": "M\u00f6chten Sie das eingef\u00fcgte Bild an den Chat schicken?",
+    "20917": "Upload failed - restarting...",
+    "20918": "Upload error - retrying...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only"
 }

@@ -1372,8 +1372,8 @@
     "9118": "Riprendi trasferimento",
     "10628": "Stai per iniziare un nuovo abbonamento e la tua carta verr\u00e0 addebitata mensilmente.",
     "10629": "Stai per iniziare un nuovo abbonamento e la tua carta verr\u00e0 addebitata annualmente.",
-    "10630": "Per pi\u00f9 dettagli sui pagamenti ricorrenti, la nostra policy dei rimborsi, o come cancellare l'abbonamento, visita la nostra [A]pagina di informazioni generali[\/A].",
-    "10631": "Stai per completare un pagamento singolo. Ti verr\u00e0 ricordato quando il piano sta per scadere e avrai bisogno di comprare il piano nuovamente manualmente. Per pi\u00f9 dettagli riguardo la nostra policy di rimborsi, visita la nostra [A]pagina di informazioni generali[\/A].",
+    "10630": "Per maggiori dettagli sui pagamenti ricorrenti, la nostra policy dei rimborsi, o come cancellare l'abbonamento, visita la nostra [A]pagina dei termini di servizio[\/A].",
+    "10631": "Stai per completare un pagamento singolo. Ti verr\u00e0 ricordato quando il piano sta per scadere e avrai bisogno di comprare il piano nuovamente manualmente. Per pi\u00f9 dettagli riguardo la nostra policy di rimborsi, visita la nostra [A]pagina dei termini di servizio[\/A].",
     "10632": "Inserisci i dettagli del tuo indirizzo di fatturazione",
     "10633": "Per favore, riempi tutti i campi obbligatori",
     "10634": "Se stai riscontrando problemi con il pagamento, [A]contatta il nostro team di supporto[\/A].",
@@ -1429,7 +1429,7 @@
     "16103": "In attesa del re-invito di tutti",
     "16104": "In attesa dell'installazione dell'app",
     "16105": "Quota garantita",
-    "16106": "Il tuo acquisto di servizi MEGA sar\u00e0 processato per [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Lussemburgo[\/B].",
+    "16106": "Il tuo acquisto di servizi MEGA sar\u00e0 processato da [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Lussemburgo[\/B].",
     "16107": "Sapevi di poter scaricare un'intera cartella per volta se [S]installi l'app di MEGA[\/S]?",
     "16108": "Opzioni di logout:",
     "16109": "Cancella tutti i metadati locali quando effettui il logout - Il tuo prossimo login sar\u00e0 pi\u00f9 lungo.",
@@ -3260,5 +3260,10 @@
     "20859": "Sei sicuro di voler rimettere la precedente password per l'account %1?",
     "20860": "La tua password \u00e8 stata cambiata con la precedente con successo.",
     "20905": "Conferma per incollare",
-    "20906": "Per favore, conferma che vuoi caricare questa immagine e condividerla in questa chat."
+    "20906": "Per favore, conferma che vuoi caricare questa immagine e condividerla in questa chat.",
+    "20917": "Caricamento fallito - riavvio...",
+    "20918": "Errore nel caricamento - riavvio...",
+    "20935": "La Rotazione della Chiave \u00e8 attiva",
+    "20936": "Utilizza il tuo mouse per vedere le statistiche di un giorno preciso",
+    "20950": "European Customers Only"
 }

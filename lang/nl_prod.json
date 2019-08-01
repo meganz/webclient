@@ -1372,8 +1372,8 @@
     "9118": "Hervat overdracht",
     "10628": "U staat op het punt om een periodiek abonnement te starten en uw creditcard zal maandelijks worden gefactureerd.",
     "10629": "U staat op het punt om een periodiek abonnement te starten en uw creditcard zal jaarlijks worden gefactureerd.",
-    "10630": "Voor meer details over periodieke betalingen, ons restitutie beleid, of hoe u uw abonnement kunt annuleren, bezoek alstublieft onze [A]Algemene informatie pagina[\/A].",
-    "10631": "U staat op het punt om een eenmalige betaling te maken. U zal er aan herinnert worden wanneer uw abonnement zal verlopen en u opnieuw deze abonnement handmatig moet aanschaffen. Voor meer informatie over ons restitutie beleid, bezoek alstublieft onze [A]Algemene voorwaarden pagina[\/A].",
+    "10630": "Ga voor meer informatie over terugkerende betalingen, ons restitutiebeleid of hoe u uw abonnement kunt annuleren naar onze [A]servicevoorwaardenpagina[\/A].",
+    "10631": "U staat op het punt een eenmalige betaling te doen. U wordt eraan herinnerd wanneer uw abonnement vervalt en u moet dit abonnement handmatig opnieuw aanschaffen. Ga voor meer informatie over ons restitutiebeleid naar onze servicepagina [A] [\/A].",
     "10632": "Vul uw factuuradres gegevens in",
     "10633": "Vul alstublieft alle verplichte velden in.",
     "10634": "Als u problemen heeft met uw betaling, neem dan alstublieft [A]contact op met onze helpdesk[\/A]",
@@ -1429,7 +1429,7 @@
     "16103": "Nodig opnieuw alle wachtende uit",
     "16104": "In afwachting van Applicatie Installatie",
     "16105": "Tegoed Toegekend",
-    "16106": "Uw aankoop van MEGA diensten zal worden verwerkt voor [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16106": "Uw aankoop van MEGA-services wordt verwerkt door [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxemburg [\/B].",
     "16107": "Wist u dat u een volledige map in zijn geheel kan downloaden als u de gratis [S]MEGA app[\/S] installeerd?",
     "16108": "Uitlog opties",
     "16109": "Verwijder alle lokale metadata tijdens het uitloggen - Uw volgende sessie zal langer laden.",
@@ -3260,5 +3260,10 @@
     "20859": "Weet u zeker dat u het wachtwoord wilt terugbrengen van account %1 naar de vorige?",
     "20860": "Uw wachtwoord is succesvol teruggebracht naar de vorige.",
     "20905": "Plakken bevestigen",
-    "20906": "Bevestig dat u deze afbeelding wilt uploaden en delen in dit gesprek."
+    "20906": "Bevestig dat u deze afbeelding wilt uploaden en delen in dit gesprek.",
+    "20917": "Upload mislukt - herstarten...",
+    "20918": "Upload fout - herproberen...",
+    "20935": "Sleutelrotatie is ingeschakeld",
+    "20936": "Gebruik uw muis om statistieken van een bepaalde dag te bekijken",
+    "20950": "European Customers Only"
 }

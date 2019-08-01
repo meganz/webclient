@@ -1372,8 +1372,8 @@
     "9118": "Wzn\u00f3w",
     "10628": "Masz zamiar aktywowa\u0107 subskrypcj\u0119 i z Twojej karty b\u0119dzie pobierany abonament ka\u017cdego miesi\u0105ca.",
     "10629": "Masz zamiar aktywowa\u0107 subskrypcj\u0119 i z Twojej karty b\u0119dzie pobierany abonament ka\u017cdego roku.",
-    "10630": "Wi\u0119cej informacji o subskrypcjach, zwrotach i jak anulowa\u0107 subskrypcje, odwied\u017a nasz\u0105 stron\u0119 [A]informacje og\u00f3lne[\/A].",
-    "10631": "Planujesz dokona\u0107 jednorazowej op\u0142aty. Kiedy okres wa\u017cno\u015bci abonamentu b\u0119dzie si\u0119\u00a0ko\u0144czy\u0107 zostaniesz o tym powiadomiony i b\u0119dziesz mia\u0142 mo\u017cliwo\u015b\u0107 dokonania kolejnej p\u0142atno\u015bci. Wi\u0119cej informacji znajdziesz na [A]naszych stronach[\/A].",
+    "10630": "Aby uzyska\u0107 wi\u0119cej informacji na temat powtarzaj\u0105cych si\u0119 p\u0142atno\u015bci, naszej polityki zwrotu pieni\u0119dzy lub sposobu anulowania subskrypcji, odwied\u017a nasz\u0105 stron\u0119 [A]warunki us\u0142ugi[\/A].",
+    "10631": "Zamierzasz dokona\u0107 jednorazowej p\u0142atno\u015bci. Zostaniesz przypomniany, kiedy tw\u00f3j plan wyga\u015bnie, i b\u0119dziesz musia\u0142 ponownie zakupi\u0107 ten plan r\u0119cznie. Aby uzyska\u0107 wi\u0119cej informacji na temat naszej polityki refundacji, odwied\u017a nasz\u0105 stron\u0119 [A]warunki us\u0142ugi[\/A].",
     "10632": "Wprowad\u017a dane do faktury",
     "10633": "Wype\u0142nij wymagane pola.",
     "10634": "Je\u017celi masz problemy z p\u0142atno\u015bci\u0105, skontaktuj si\u0119 z [A]obs\u0142ug\u0105 klienta[\/A].",
@@ -1429,7 +1429,7 @@
     "16103": "Pon\u00f3w zaproszenia",
     "16104": "Oczekuj\u0105ca instalacja",
     "16105": "Przyznana pojemno\u015b\u0107",
-    "16106": "Twoje zam\u00f3wienie us\u0142ug MEGA zostanie zrealizowane przez [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
+    "16106": "Tw\u00f3j zakup us\u0142ug MEGA b\u0119dzie przetwarzany przez [B]Mega Europe sarl, 4 Rue Graham Bell, L-3235, Bettembourg, Luxembourg[\/B].",
     "16107": "Czy wiesz, \u017ce mo\u017cesz pobra\u0107 ca\u0142y folder na raz je\u017celi [S]zainstalujesz darmow\u0105 aplikacje MEGA[\/S]?",
     "16108": "Opcje wylogowania",
     "16109": "Wyczy\u015b\u0107 wszystkie meta dane kiedy si\u0119 wylogowujesz - Nast\u0119pne logowanie b\u0119dzie trwa\u0142o d\u0142u\u017cej.",
@@ -3260,5 +3260,10 @@
     "20859": "Czy na pewno chcesz przywr\u00f3ci\u0107 has\u0142o do konta %1 z powrotem do poprzedniego?",
     "20860": "Twoje has\u0142o zosta\u0142o pomy\u015blnie przywr\u00f3cone do poprzedniego.",
     "20905": "Potwierd\u017a wklej",
-    "20906": "Potwierd\u017a, \u017ce chcesz przes\u0142a\u0107 ten obraz i udost\u0119pni\u0107 go na tym czacie."
+    "20906": "Potwierd\u017a, \u017ce chcesz przes\u0142a\u0107 ten obraz i udost\u0119pni\u0107 go na tym czacie.",
+    "20917": "Przesy\u0142anie nie powiod\u0142o si\u0119 - ponowne uruchomienie...",
+    "20918": "B\u0142\u0105d przesy\u0142ania - ponawianie pr\u00f3by...",
+    "20935": "Zmiana klucza jest w\u0142\u0105czona",
+    "20936": "U\u017cyj myszki, aby zobaczy\u0107 statystyki z okre\u015blonego dnia",
+    "20950": "European Customers Only"
 }

@@ -2522,7 +2522,7 @@ React.makeElement = React['createElement'];
 	                ),
 	                chatRoom.type === "private" ? React.makeElement("span", { className: "user-card-presence " + presenceClass }) : undefined
 	            ),
-	            chatRoom.type === "group" || chatRoom.type === "private" ? React.makeElement("i", { className: "tiny-icon blue-key" }) : undefined,
+	            chatRoom.type === "group" || chatRoom.type === "private" ? React.makeElement("i", { className: "tiny-icon blue-key simpletip", "data-simpletip": l[20935] }) : undefined,
 	            archivedDiv,
 	            notificationItems.length > 0 ? React.makeElement(
 	                "div",

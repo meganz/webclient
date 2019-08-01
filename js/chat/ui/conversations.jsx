@@ -410,7 +410,7 @@ var ConversationsListItem = React.createClass({
                 </div>
                 {
                     (chatRoom.type === "group" || chatRoom.type === "private") ?
-                        <i className="tiny-icon blue-key"></i> : undefined
+                        <i className="tiny-icon blue-key simpletip" data-simpletip={l[20935]}></i> : undefined
                 }
                 {archivedDiv}
                 {notificationItems.length > 0 ? (

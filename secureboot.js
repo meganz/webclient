@@ -777,6 +777,7 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
     'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']

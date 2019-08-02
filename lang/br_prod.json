@@ -3260,5 +3260,11 @@
     "20859": "Voc\u00ea tem certeza de que quer reverter a senha atual da conta %1 \u00e0 senha anterior?",
     "20860": "A sua senha foi corretamente revertida \u00e0 senha anterior.",
     "20905": "Confirmar envio",
-    "20906": "Confirme que voc\u00ea quer fazer o upload desta imagem e compartilh\u00e1-la neste chat."
+    "20906": "Confirme que voc\u00ea quer fazer o upload desta imagem e compartilh\u00e1-la neste chat.",
+    "20917": "N\u00e3o foi poss\u00edvel fazer o upload - reiniciando...",
+    "20918": "N\u00e3o foi poss\u00edvel fazer o upload - tentando novamente...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only",
+    "20951": "Beneficiary address"
 }

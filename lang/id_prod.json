@@ -3260,5 +3260,11 @@
     "20859": "Anda yakin ingin mengembalikan kata sandi untuk akun %1 kembali ke yang sebelumnya?",
     "20860": "Kata sandi Anda berhasil dikembalikan ke yang sebelumnya.",
     "20905": "Confirm paste",
-    "20906": "Please confirm that you want to upload this image and share it in this chat."
+    "20906": "Please confirm that you want to upload this image and share it in this chat.",
+    "20917": "Upload failed - restarting...",
+    "20918": "Upload error - retrying...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only",
+    "20951": "Beneficiary address"
 }

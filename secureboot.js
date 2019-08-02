@@ -340,7 +340,9 @@ if (!browserUpdate) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
-        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+
+        // Enable logging on smoketest.static.mega.co.nz (old smoketest) and smoketest.mega.nz (new smoketest)
+        if (typeof localStorage.d === 'undefined' && location.host.indexOf('smoketest') > -1) {
             localStorage.d = 1;
         }
         d = localStorage.d | 0;
@@ -419,20 +421,21 @@ if (!browserUpdate) try
 
     if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
-        nocontentcheck = true;
-        var devhost = window.location.host;
+        if (location.host === 'smoketest.mega.nz') {
+            staticpath = 'https://smoketest.static.mega.nz/3/';
+            defaultStaticPath = staticpath;
+        }
+        else {
+            nocontentcheck = true;
+            var devhost = window.location.host;
 
-        // handle subdirs
-        // Disable pathSuffixes, because they are no longer supported: the webclient will now only work from root
-        var pathSuffix = '';
-        pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+            // Set the static path and default static path for debug mode to be the same
+            staticpath = window.location.protocol + "//" + devhost + "/";
+            defaultStaticPath = staticpath;
 
-        // Set the static path and default static path for debug mode to be the same
-        staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-        defaultStaticPath = staticpath;
-
-        if (window.d) {
-            console.debug('StaticPath set to "' + staticpath + '"');
+            if (window.d) {
+                console.debug('StaticPath set to "' + staticpath + '"');
+            }
         }
     }
 
@@ -774,6 +777,7 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
     'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']

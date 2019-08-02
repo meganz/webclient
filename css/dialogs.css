@@ -3487,11 +3487,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v7.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v7.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -4444,7 +4444,7 @@ li.token-input-token-invite .input-close {
     bottom: 0;
     left: 50%;
     margin: 0 0 0 -61px;
-    background-image: url(../images/mega/dialog-sprite_v7.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
 }
 .verify-ph-icon {
     background-position: -19px -6008px;

@@ -19,7 +19,7 @@ var blogposts = null;
 
 function unsigned_blogposts(ready) {
     var xhr = getxhr();
-    xhr.open("GET", "https://cms2.mega.nz/unsigned/blog");
+    xhr.open("GET", (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/blog");
     xhr.onreadystatechange = function() {
         if (this.readyState === 4) {
             blogposts = JSON.parse(xhr.responseText);

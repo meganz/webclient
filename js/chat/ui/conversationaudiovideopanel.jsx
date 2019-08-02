@@ -1124,17 +1124,16 @@ var ConversationAudioVideoPanel = React.createClass({
                     ) {
                         return;
                     }
-                    if (callManagerCall.getMediaOptions().video === true) {
+                    var videoMode = callManagerCall.videoMode();
+                    if (videoMode === Av.Video) {
                         callManagerCall.muteVideo();
-                    }
-                    else {
-                        if (!callManagerCall.hasVideoSlotLimitReached()) {
-                            callManagerCall.unmuteVideo();
-                        }
+                    } else {
+                        callManagerCall.unmuteVideo();
                     }
                 }}>
                     <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam")
+                        "big-icon " +
+                        ((callManagerCall.videoMode() === Av.Video) ? " videocam" : " crossed-videocam")
                     }></i>
                 </div>
 
@@ -1142,16 +1141,16 @@ var ConversationAudioVideoPanel = React.createClass({
                     "button call" + ((RTC.supportsScreenCapture && chatRoom.callManagerCall
                         && callManagerCall.rtcCall && !this.state.muteInProgress) ? "" : " disabled")
                 } onClick={function(e) {
-                    if (RTC.supportsScreenCapture && chatRoom.callManagerCall) {
-                        var rtcCall = chatRoom.callManagerCall.rtcCall;
-                        if (rtcCall) {
-                            rtcCall.enableScreenCapture(!rtcCall.isScreenCaptureEnabled());
+                    if (chatRoom.callManagerCall) {
+                        if (callManagerCall.isScreenCaptureEnabled()) {
+                            callManagerCall.stopScreenCapture();
+                        } else {
+                            callManagerCall.startScreenCapture();
                         }
                     }
                 }}>
                     <i className={"big-icon " + (
-                        callManagerCall.rtcCall &&
-                        callManagerCall.rtcCall.isScreenCaptureEnabled() ?
+                        callManagerCall.isScreenCaptureEnabled() ?
                             "screenshare" : "crossed-screenshare"
                     )}></i>
                 </div>

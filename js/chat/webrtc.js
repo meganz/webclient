@@ -2305,160 +2305,178 @@ Call.prototype.enableAudio = function(enable) {
         }
     }
 };
-Call.prototype.enableVideo = function(enable) {
+
+Call.prototype._canEnableDisableVideo = function(enable) {
     var self = this;
     if (self.state !== CallState.kCallInProgress) {
-        var msg = "enableVideo: Call state is not kInProgress, but " + constStateToText(CallState, self.state);
-        self.logger.warn(msg);
-        return Promise.reject(msg);
+        return "Call that is not in state kInProgress (but in " + constStateToText(CallState, self.state) + ")";
     }
     if (self._localMuteCompletePromise) {
-        var msg = "enableVideo: A mute/unmute operation is already in progress";
-        self.logger.warn(msg);
-        return Promise.reject(msg);
+        return "A mute/unmute operation is already in progress";
     }
     var oldAv = self.localAv();
     if ((!!(oldAv & Av.Video)) === enable) { // jshint -W018
-        self.logger.log("enableVideo: Nothing to change");
-        return Promise.resolve();
+        return "Nothing to change";
     }
-    var sndCounts = self.manager.getAudioVideoSenderCount(self.chatid);
-    assert(sndCounts);
-    if (enable && (sndCounts.video >= RtcModule.kMaxCallVideoSenders)) {
+    return null;
+};
+
+Call.prototype._enableVideo = function(screen) {
+    var self = this;
+    var err = self._canEnableDisableVideo(true);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
+    }
+    var senderCounts = self.manager.getAudioVideoSenderCount(self.chatid);
+    assert(senderCounts);
+    if (senderCounts.video >= RtcModule.kMaxCallVideoSenders) {
         var msg = "Can't enable video sending, too many video senders in call";
         self.logger.warn(msg);
         return Promise.reject(msg);
     }
+    self._isCapturingScreen = screen;
     self._notifyLocalMuteInProgress();
     var sessions = self.sessions;
-    if (enable) {
-        var pms = self._getLocalVideo(self._isCapturingScreen);
-        pms.catch(function(err) {
-            // can't enable camera
-            self.logger.warn("Error getting local video: " + err);
-            self._notifyLocalMuteComplete(err);
-        });
-        pms.then(function() {
-            if (self.state >= CallState.kTerminating) {
-                return;
-            }
-            var videoTrack = self.gLocalStream.getVideoTracks()[0];
-            assert(videoTrack);
-            if (self._isCapturingScreen) {
-                videoTrack.onended = function() {
-                    self._onScreenCaptureEndedByFloatButton();
-                };
-            }
-            if (Object.keys(sessions).length === 0) {
-                self._checkLocalMuteCompleted();
-            } else {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
-                        // we can just replace the track at the sender
-                        sess._setStreamRenegTimeout();
-                        RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
-                        .then((function() {
-                            this._notifyRenegotiationComplete();
-                        }).bind(sess));
-                    } else { // no videoSender or we don't have replaceTrack support
-                        if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
-                            RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
-                        } else {
-                            sess.terminateAndDestroy(Term.kStreamChange);
-                        }
-                    }
-                }
-            }
-            self._bcastLocalAvChange();
-        });
-    } else { // disable video
-        RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var pms = self._getLocalVideo(screen);
+    pms.catch(function(err) {
+        // can't enable camera/screen capture
+        self._isCapturingScreen = false;
+        self.logger.warn("Error getting local video: " + err);
+        self._notifyLocalMuteComplete(err);
+    });
+
+    pms.then(function() {
+        if (self.state >= CallState.kTerminating) {
+            return;
+        }
+        var videoTrack = self.gLocalStream.getVideoTracks()[0];
+        assert(videoTrack);
+        if (screen) {
+            videoTrack.onended = function() {
+                self._onScreenCaptureEndedByFloatButton();
+            };
+        }
         if (Object.keys(sessions).length === 0) {
             self._checkLocalMuteCompleted();
         } else {
-          if (RTC.supportsReplaceTrack) {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    var pc = sess.rtcConn;
-                    assert(pc);
-                    var pms = RTC.peerConnRemoveVideoTrack(pc);
-                    // pms is null if there was no video track
-                    assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
-                        "but gLocalStream has one");
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
+                    // we can just replace the track at the sender
                     sess._setStreamRenegTimeout();
-                    pms.then(function() {
+                    RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
+                    .then((function() {
                         this._notifyRenegotiationComplete();
-                    }.bind(sess));
-                    pms.catch(function(err) { // replaceTrack(null) is not supported
-                        self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
-                            " falling back to session reconnect");
-                        this.terminateAndDestroy(Term.kStreamChange);
-                    }.bind(sess));
-                }
-            } else {
-                for (var sid in sessions) {
-                    sessions[sid].terminateAndDestroy(Term.kStreamChange);
+                    }).bind(sess));
+                } else { // no videoSender or we don't have replaceTrack support
+                    if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
+                        RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
+                    } else {
+                        sess.terminateAndDestroy(Term.kStreamChange);
+                    }
                 }
             }
         }
         self._bcastLocalAvChange();
-    }
+    })
+    .catch(function(err) {
+        // silence logging an unhandled promise reject in the console,
+        // since the error is passed to the pms.then() branch as well
+    });
     return self._localMuteCompletePromise;
 };
 
-Call.prototype.enableScreenCapture = function(enable) {
+Call.prototype.disableVideo = function() {
     var self = this;
-    if (!RTC.supportsScreenCapture) {
-        this.logger.error("Screen capture is not supported by this browser");
-        return false;
+    var err = self._canEnableDisableVideo(false);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
     }
-    if (self._localMuteCompletePromise) {
-        self.logger.warn("enableScreenCapture: A mute/unmute operation is already in progress");
-        return false;
-    }
-    if (enable === self._isCapturingScreen) {
-        self.logger.warn("enableScreenCapture: Screen capture already " + (enable ? "enabled" : "disabled"));
-        return false;
-    }
-    if (!enable) {
-        // capture must have been enabled, so we have a video stream at the moment
-        delete self._isCapturingScreen;
-        self.enableVideo(false);
-        return true;
-    } else { // enable capture
-        self._isCapturingScreen = true;
-        if (!self.gLocalStream || (self.gLocalStream.getVideoTracks().length === 0)) {
-            self.enableVideo(true)
-            .catch(function(err) {
-                delete self._isCapturingScreen;
-            });
-            return true;
-        } else { // we have a video track, replace it
-            self._muteAndUnmuteVideo();
-            return true;
+    delete self._isCapturingScreen;
+    self._notifyLocalMuteInProgress();
+    RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var sessions = self.sessions;
+    if (Object.keys(sessions).length === 0) {
+        self._checkLocalMuteCompleted();
+    } else {
+        if (RTC.supportsReplaceTrack) {
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                var pc = sess.rtcConn;
+                assert(pc);
+                var pms = RTC.peerConnRemoveVideoTrack(pc);
+                // pms is null if there was no video track
+                assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
+                    "but gLocalStream has one");
+                sess._setStreamRenegTimeout();
+                pms.then(function() {
+                    this._notifyRenegotiationComplete();
+                }.bind(sess));
+                pms.catch(function(err) { // replaceTrack(null) is not supported
+                    self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
+                        " falling back to session reconnect");
+                    this.terminateAndDestroy(Term.kStreamChange);
+                }.bind(sess));
+            }
+        } else {
+            for (var sid in sessions) {
+                sessions[sid].terminateAndDestroy(Term.kStreamChange);
+            }
         }
     }
+    self._bcastLocalAvChange();
+    return self._localMuteCompletePromise;
+};
+
+Call.prototype.enableScreenCapture = function() {
+    var self = this;
+    if (!RTC.supportsScreenCapture) {
+        return Promise.reject("Screen capture is not supported by this browser");
+    }
+    if (self._isCapturingScreen) {
+        return Promise.reject("Screen capture already enabled");
+    }
+    var pms = (self.localAv() & Av.Video) ? self.disableVideo() : Promise.resolve();
+    return pms
+    .then(function() {
+        return self._enableVideo(true);
+    });
+};
+
+Call.prototype.enableCamera = function() {
+    var self = this;
+    var localAv = self.localAv();
+    var pms;
+    if (localAv & Av.Video) {
+        if ((localAv & Av.Screen) === 0) {
+            return Promise.reject("Camera already enabled");
+        } else {
+            pms = self.disableVideo();
+        }
+    } else {
+        pms = Promise.resolve();
+    }
+    return pms
+    .then(function() {
+        return self._enableVideo(false);
+    });
 };
 
 Call.prototype._onScreenCaptureEndedByFloatButton = function() {
     var self = this;
+    if (!self._isCapturingScreen) {
+        self.logger.warn("Received stop button click from screen capture, but we are not capturing screen, ignoring");
+        return;
+    }
     delete self._isCapturingScreen;
     self.logger.log("Screen capture ended by floating button, muting video");
-    self.enableVideo(false);
+    self.disableVideo().catch(function(err) {});
 };
 
 Call.prototype.isScreenCaptureEnabled = function() {
     return this._isCapturingScreen;
-};
-
-Call.prototype._muteAndUnmuteVideo = function() {
-    var self = this;
-    assert(!self._localMuteCompletePromise);
-    return self.enableVideo(false)
-    .then(function() {
-        return self.enableVideo(true);
-    });
 };
 
 Call.prototype._bcastLocalAvChange = function() {

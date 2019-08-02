@@ -17725,27 +17725,27 @@ React.makeElement = React['createElement'];
 	                            if (self.state.muteInProgress || $(this).is(".disabled")) {
 	                                return;
 	                            }
-	                            if (callManagerCall.getMediaOptions().video === true) {
+	                            var videoMode = callManagerCall.videoMode();
+	                            if (videoMode === Av.Video) {
 	                                callManagerCall.muteVideo();
 	                            } else {
-	                                if (!callManagerCall.hasVideoSlotLimitReached()) {
-	                                    callManagerCall.unmuteVideo();
-	                                }
+	                                callManagerCall.unmuteVideo();
 	                            }
 	                        } },
-	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam") })
+	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.videoMode() === Av.Video ? " videocam" : " crossed-videocam") })
 	                ),
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: "button call" + (RTC.supportsScreenCapture && chatRoom.callManagerCall && callManagerCall.rtcCall && !this.state.muteInProgress ? "" : " disabled"), onClick: function onClick(e) {
-	                            if (RTC.supportsScreenCapture && chatRoom.callManagerCall) {
-	                                var rtcCall = chatRoom.callManagerCall.rtcCall;
-	                                if (rtcCall) {
-	                                    rtcCall.enableScreenCapture(!rtcCall.isScreenCaptureEnabled());
+	                            if (chatRoom.callManagerCall) {
+	                                if (callManagerCall.isScreenCaptureEnabled()) {
+	                                    callManagerCall.stopScreenCapture();
+	                                } else {
+	                                    callManagerCall.startScreenCapture();
 	                                }
 	                            }
 	                        } },
-	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.rtcCall && callManagerCall.rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare") })
+	                    _react2.default.createElement('i', { className: "big-icon " + (callManagerCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare") })
 	                ),
 	                _react2.default.createElement(
 	                    'div',

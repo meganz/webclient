@@ -16,11 +16,19 @@ function dlinfo(ph,key,next)
     if (!is_mobile) {
         init_start();
     }
-    if (dlMethod == FlashIO)
-    {
+    if (dlMethod === FlashIO) {
         $('.fm-dialog.download-dialog').removeClass('hidden');
         $('.fm-dialog.download-dialog').css('left','-1000px');
-        $('.download-save-your-file').safeHTML('<object data="' + document.location.origin + '/downloader.swf" id="dlswf_'+ htmlentities(ph) + '" type="application/x-shockwave-flash" height="' + $('.download-save-your-file').height() + '"  width="' + $('.download-save-your-file').width() + '"><param name="wmode" value="transparent"><param value="always" name="allowscriptaccess"><param value="all" name="allowNetworking"><param name=FlashVars value="buttonclick=1" /></object>');
+        $('.download-save-your-file').safeHTML('<object data="'
+            + document.location.origin
+            + '/downloader.swf" id="dlswf_' + htmlentities(ph)
+            + '" typeex="application/x-shockwave-flash" height="'
+            + $('.download-save-your-file').height() + '"  width="'
+            + $('.download-save-your-file').width()
+            + '"><param name="wmode" value="transparent">'
+            + '<param value="always" name="allowscriptaccess">'
+            + '<param value="all" name="allowNetworking">'
+            + '<param name=FlashVars value="buttonclick=1" /></object>');
     }
     loadingDialog.show();
 
@@ -678,7 +686,9 @@ function dlPageStartDownload(isDlWithMegaSync) {
     var $downloadPage = $('.download.top-bar');
 
     // Collapse top bar
-    $downloadPage.removeClass('expanded').css('height', '');
+    if (!$downloadPage.hasClass('video-theatre-mode')) {
+        $downloadPage.removeClass('expanded').css('height', '');
+    }
     $('.download .pause-transfer').removeClass('hidden active').find('span').text(l[9112]);
     $(window).unbind('resize.download-bar');
 

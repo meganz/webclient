@@ -922,6 +922,8 @@ mega.tpw = new function TransferProgressWidget() {
         $errorCancelAction.find('.tooltips').text(cancelText);
         $targetedRow.find('.transfer-task-actions').empty().append($errorCancelAction);
 
+        $targetedRow.removeAttr('prepared');
+
         $rowsHeader.find('.transfer-progress-type.' + subHeaderClass).addClass('error');
 
         if (isOverQuota) {

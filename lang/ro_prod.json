@@ -768,7 +768,7 @@
     "6189": "Contul t\u0103u a fost anulat cu succes.",
     "6190": "ACHIZI\u021aIONEAZ\u0102",
     "6196": "Nicio solicitare \u00een a\u0219teptare \u00een acest moment",
-    "6197": "Numele contului",
+    "6197": "Numele beneficiarului",
     "6198": "Transfer bancar",
     "6200": "Num\u0103rul contului",
     "6203": "Codul SWIFT",
@@ -1174,7 +1174,7 @@
     "8668": "IBAN",
     "8669": "Neaplicabil pentru b\u0103ncile din Noua Zeeland\u0103",
     "8670": "Dac\u0103 adresa ta de e-mail este prea lung\u0103 pentru c\u00e2mpul 'Referin\u021b\u0103' ar trebui s\u0103 fie plasat\u0103 \u00een c\u00e2mpul 'Comentarii'.",
-    "8671": "\u021a\u0103rile europene au adoptat un standard cunoscut ca num\u0103rul de cont bancar interna\u021bional (IBAN). Noua Zeeland\u0103 nu a adoptat acest standard, astfel c\u0103 dac\u0103 ai nevoie s\u0103 introduci un cod IBAN te rug\u0103m s\u0103 trimi\u021bi fondurile \u00een contul nostru din Luxemburg.",
+    "8671": "\u021a\u0103rile europene au adoptat un standard cunoscut ca num\u0103rul de cont bancar interna\u021bional (IBAN). Noua Zeeland\u0103 nu a adoptat acest standard, astfel c\u0103 dac\u0103 ai nevoie s\u0103 introduci un cod IBAN te rug\u0103m s\u0103 trimi\u021bi fondurile \u00een contul nostru din Spania.",
     "8683": "Nu toate fi\u0219ierele au putut fi importate. Acest lucru se poate \u00eent\u00e2mpla dac\u0103 unele fi\u0219iere au fost eliminate. Opera\u021bia s-a \u00eencheiat cu %1 din %2 elemente importate cu succes.",
     "8684": "Trimite \u0219i \u00eenchide",
     "8685": "Te rug\u0103m s\u0103 explici de ce nu dore\u0219ti s\u0103 re\u00eennoie\u0219ti planul:",
@@ -3265,6 +3265,6 @@
     "20918": "Eroare la \u00eenc\u0103rcare - se re\u00eencearc\u0103...",
     "20935": "Rota\u021bia cheii este activat\u0103",
     "20936": "Folose\u0219te mouse-ul pentru a vedea statistici dintr-o anumit\u0103 zi",
-    "20950": "European Customers Only",
-    "20951": "Beneficiary address"
+    "20950": "Numai clien\u021bii europeni",
+    "20951": "Adresa beneficiarului"
 }

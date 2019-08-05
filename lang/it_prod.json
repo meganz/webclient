@@ -768,7 +768,7 @@
     "6189": "Il tuo account \u00e8 stato cancellato con successo.",
     "6190": "COMPRA",
     "6196": "Non ci sono richieste in sospeso in questo momento",
-    "6197": "Nome account",
+    "6197": "Nome del beneficiario",
     "6198": "Trasferimento bancario",
     "6200": "Account numero",
     "6203": "Codice SWIFT",
@@ -1174,7 +1174,7 @@
     "8668": "IBAN",
     "8669": "Non applicabile alle banche neozelandesi",
     "8670": "Se il tuo indirizzo email \u00e8 troppo lungo per il campo \"Riferimento\", inseriscilo nel campo \"Commenti\".",
-    "8671": "Le nazioni europee hanno adottato uno standard conosciuto come International Bank Account Number (IBAN): La Nuova Zelanda non ha ancora adottato questo standard, quindi se hai bisogno di inserire un IBAN per favore mandaci i soldi al nostro conto lussemburghese.",
+    "8671": "Le nazioni europee hanno adottato uno standard conosciuto come International Bank Account Number (IBAN): La Nuova Zelanda non ha ancora adottato questo standard, quindi se hai bisogno di inserire un IBAN per favore mandaci i soldi al nostro conto spagnolo.",
     "8683": "Non tutti i file potrebbero esser stati importati. Questo succede se qualche file \u00e8 stato reso indisponibile. L'operazione \u00e8 finita con %1 su %2 elementi importati con successo.",
     "8684": "Invia e chiudi",
     "8685": "Per favore, spiegaci perch\u00e9 non vuoi rinnovare il tuo piano:",
@@ -3266,5 +3266,5 @@
     "20935": "La Rotazione della Chiave \u00e8 attiva",
     "20936": "Utilizza il tuo mouse per vedere le statistiche di un giorno preciso",
     "20950": "Solo clienti europei",
-    "20951": "Beneficiary address"
+    "20951": "Indirizzo del beneficiario"
 }

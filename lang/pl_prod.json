@@ -768,7 +768,7 @@
     "6189": "Twoje konto zosta\u0142o anulowane.",
     "6190": "ZAMAWIAM",
     "6196": "Brak zg\u0142osze\u0144",
-    "6197": "Nazwa konta",
+    "6197": "Nazwa odbiorcy",
     "6198": "Przelew",
     "6200": "Numer konta",
     "6203": "Kod SWIFT",
@@ -1174,7 +1174,7 @@
     "8668": "IBAN",
     "8669": "Niedost\u0119pne dla bank\u00f3w w NZ",
     "8670": "Je\u017celi Tw\u00f3j adres email jest za d\u0142ugi dla pola 'Odniesienia', wpisz go w pole 'Komentarz'.",
-    "8671": "W krajach europejskich korzysta si\u0119 z mi\u0119dzyarodowego formatu zapisu numery konta bankowego (IBAN). Nowa Zelandia nie korzysta z tego standardu, wi\u0119c je\u017celi chcesz dokona\u0107 przelewu, skorzystaj z naszego konta w Luxemburgu.",
+    "8671": "Kraje europejskie przyj\u0119\u0142y standard znany jako mi\u0119dzynarodowy numer rachunku bankowego (IBAN). Nowa Zelandia nie przyj\u0119\u0142a tego standardu, wi\u0119c je\u015bli musisz wprowadzi\u0107 IBAN, wy\u015blij \u015brodki na nasze hiszpa\u0144skie konto.",
     "8683": "Nie wszystkie pliki mog\u0142y zosta\u0107 zaimportowane. Mo\u017ce to si\u0119 wydarzy\u0107, gdy pliki s\u0105 ju\u017c niedost\u0119pne. Operacja zako\u0144czy\u0142a si\u0119 zaimportwaniem %1 z %2 element\u00f3w.",
     "8684": "Wy\u015blij i zamknij",
     "8685": "Prosimy o podanie powod\u00f3w dla kt\u00f3rych nie planujesz odnowi\u0107 swojego planu:",
@@ -3265,6 +3265,6 @@
     "20918": "B\u0142\u0105d przesy\u0142ania - ponawianie pr\u00f3by...",
     "20935": "Zmiana klucza jest w\u0142\u0105czona",
     "20936": "U\u017cyj myszki, aby zobaczy\u0107 statystyki z okre\u015blonego dnia",
-    "20950": "European Customers Only",
-    "20951": "Beneficiary address"
+    "20950": "Tylko klienci europejscy",
+    "20951": "Adres beneficjenta"
 }

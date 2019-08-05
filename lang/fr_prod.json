@@ -768,7 +768,7 @@
     "6189": "Votre compte a \u00e9t\u00e9 annul\u00e9 avec succ\u00e8s.",
     "6190": "ACHETER",
     "6196": "Il n\u2019y a aucune requ\u00eate en attente pour l'instant",
-    "6197": "Nom du compte",
+    "6197": "Nom du b\u00e9n\u00e9ficiaire",
     "6198": "Transfert bancaire",
     "6200": "Num\u00e9ro de compte",
     "6203": "Code SWIFT",
@@ -1174,7 +1174,7 @@
     "8668": "IBAN",
     "8669": "Non applicable pour les banques n\u00e9o-z\u00e9landaises",
     "8670": "Si vous adresse courriel est trop longue pour le champ \u00ab R\u00e9f\u00e9rence \u00bb, elle devrait \u00eatre saisie dans le champ \u00ab Commentaires \u00bb",
-    "8671": "Les pays europ\u00e9ens ont adopt\u00e9 une norme connue sous le nom de num\u00e9ro de compte bancaire international (IBAN). La Nouvelle-Z\u00e9lande n\u2019a pas adopt\u00e9 cette norme, et si vous devez saisir un IBAN, veuillez transf\u00e9rer les fonds vers notre compte au Luxembourg.",
+    "8671": "Les pays europ\u00e9ens ont adopt\u00e9 une norme connue sous le nom de num\u00e9ro de compte bancaire international (IBAN). La Nouvelle-Z\u00e9lande n\u2019a pas adopt\u00e9 cette norme, et si vous devez saisir un IBAN, veuillez transf\u00e9rer les fonds vers notre compte en Espagne.",
     "8683": "Tous les fichiers n'ont pas pu \u00eatre import\u00e9s. Cela peut arriver si certains fichiers ont \u00e9t\u00e9 retir\u00e9s. %1 sur %2 \u00e9l\u00e9ments ont \u00e9t\u00e9 import\u00e9s avec succ\u00e8s.",
     "8684": "Envoyer et fermer",
     "8685": "Veuillez expliquer pourquoi vous ne souhaitez pas renouveler votre abonnement\u00a0:",
@@ -3266,5 +3266,5 @@
     "20935": "La rotation de la cl\u00e9 est activ\u00e9e",
     "20936": "Utilisez votre souris pour visualiser les statistiques elle d\u2019un jour particulier",
     "20950": "Clients europ\u00e9ens seulement",
-    "20951": "Beneficiary address"
+    "20951": "Adresse du b\u00e9n\u00e9ficiaire"
 }

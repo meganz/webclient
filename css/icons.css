@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -507,7 +507,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -625,6 +625,12 @@
 .semi-big-icon.nwse-inset-resize, .button.active .semi-big-icon.nwse-resize, .small-block .big-icon.nwse-inset-resize, .small-block .button.active .big-icon.nwse-resize {
     background-position: -160px -3549px;
 }
+.semi-big-icon.crossed-screenshare, .small-block .big-icon.crossed-screenshare {
+    background-position: -153px -3127px;
+}
+.semi-big-icon.screenshare, .small-block .big-icon.screenshare {
+    background-position: -198px -3127px;
+}
 .semi-big-icon.grey-lock {
     background-position: -3px -3710px;
 }
@@ -654,6 +660,12 @@
 }
 .big-icon.nwse-resize {
     background-position: -84px -3537px;
+}
+.big-icon.crossed-screenshare {
+    background-position: -35px -3118px;
+}
+.big-icon.screenshare {
+    background-position: -92px -3118px;
 }
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;

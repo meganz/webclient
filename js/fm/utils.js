@@ -1234,6 +1234,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                 loadingDialog.show();
                 dbfetch.geta(handles).always(function() {
                     loadSubPage('fm/search/' + searchTerm);
+                    loadingDialog.hide();
                     onIdle(resolve);
                 });
             }

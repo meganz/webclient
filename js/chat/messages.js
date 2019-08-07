@@ -863,6 +863,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         self.chatdIsProcessingHistory = false;
         self.sendingListFlushed = true;
         self.expectedMessagesCount = 0;
+        if (self.$msgsHistoryLoading && self.$msgsHistoryLoading.reject) {
+            self.$msgsHistoryLoading.reject();
+        }
+        if (self.$sharedFilesLoading && self.$sharedFilesLoading.reject) {
+            self.$sharedFilesLoading.reject();
+        }
     });
 
     chatRoom.rebind('onHistoryDecrypted.mb', function() {
@@ -1003,12 +1009,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             ) {
                 // this is an empty/new chat.
                 self.expectedMessagesCount = 0;
-                self.retrievedAllMessages = true;
-            }
-            else if (
-                self.expectedMessagesCount === requestedMessagesCount
-            ) {
-                self.haveMessages = true;
                 self.retrievedAllMessages = true;
             }
             else if (

@@ -147,6 +147,8 @@ mega.tpw = new function TransferProgressWidget() {
         // upgrade account
         $('.up-action', $overQuotaBanner).off('click').on('click',
             function overquota_bannerUpgrade() {
+                $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                isHiddenByUser = true;
                 loadSubPage('pro');
             });
 
@@ -354,7 +356,11 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if (!isHiddenByUser) {
-            mega.tpw.showWidget();
+
+            if (page.indexOf('chat') === -1) {
+                mega.tpw.showWidget();
+            }
+
             if ($widgetHeadAndBody.hasClass('expand')) {
                 if (page.indexOf('chat') !== -1) {
                     $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
@@ -1094,7 +1100,7 @@ mega.tpw = new function TransferProgressWidget() {
     this.showWidget = function() {
         init();
         initUI();
-        if (!$rowsContainer.find('.transfer-task-row').length) {
+        if (!$rowsContainer || !$rowsContainer.find('.transfer-task-row').length) {
             return;
         }
         $widget.removeClass('hidden');

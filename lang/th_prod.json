@@ -3260,5 +3260,11 @@
     "20859": "Are you sure you want to revert the password for account %1 back to the previous one?",
     "20860": "Your password was successfully reverted to the previous one.",
     "20905": "Confirm paste",
-    "20906": "Please confirm that you want to upload this image and share it in this chat."
+    "20906": "Please confirm that you want to upload this image and share it in this chat.",
+    "20917": "Upload failed - restarting...",
+    "20918": "Upload error - retrying...",
+    "20935": "Key Rotation is Enabled",
+    "20936": "Use your mouse to see statistics from a particular day",
+    "20950": "European Customers Only",
+    "20951": "Beneficiary address"
 }

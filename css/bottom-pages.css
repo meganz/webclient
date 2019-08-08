@@ -1799,7 +1799,7 @@ body:not(.en) .pages-nav.content-block  .pages-nav.content {
 }
 .bottom-page.container-title, .bottom-page.bold-title {
     color: #FFFFFF;
-    font-family: ''montserrat_lights', 'open_sans', sans-serif';
+    font-family: 'montserrat_light', 'open_sans', 'sans-serif';
     font-size: 24px;
     font-weight: 300;
     line-height: 32px;

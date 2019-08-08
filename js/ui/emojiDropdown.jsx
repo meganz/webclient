@@ -365,6 +365,7 @@ var DropdownEmojiSelector = React.createClass({
         var visibleCategories = [];
         self._emojiReactElements = [];
         self.data_categoryPositions = {};
+
         self.data_categoriesWithCustomOrder.forEach(function (k) {
             var categoryDivMeta = self.generateEmojiElementsByCategory(k, currentPos, stateObj);
             if (categoryDivMeta) {
@@ -383,11 +384,19 @@ var DropdownEmojiSelector = React.createClass({
                     )
                 ) {
                     visibleCategories.push(k);
-
                     self._emojiReactElements.push(categoryDivMeta[1]);
                 }
             }
         });
+
+        if (self._emojiReactElements.length === 0) {
+            const emojisNotFound = (
+                <span className="emojis-not-found" key={'emojis-not-found'}>
+                    {l[20920]}
+                </span>
+            );
+            self._emojiReactElements.push(emojisNotFound);
+        }
 
         visibleCategories = visibleCategories.join(',');
 

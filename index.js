@@ -570,6 +570,7 @@ function init_page() {
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
+        && (page !== 'unsub')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1530,6 +1531,15 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
+    }
+    else if (page.substr(0, 5) === 'unsub') {
+        // Non-registered user unsubsribe from emails.
+        if (is_mobile) {
+            mobile.initDOM();
+        }
+        M.require('unsub_js').done(function() {
+            EmailUnsubscribe.unsubscribe();
+        });
     }
     else if (dlid) {
         page = 'download';

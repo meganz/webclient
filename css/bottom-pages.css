@@ -5530,3 +5530,29 @@ body:not(.en) .pages-nav.content-block .nav-button {
     direction: rtl;
     
 }
+/*subscription page*/
+.bottom-page.unsub .main-mid-pad {
+    width: 100%;
+    padding: 116px 12px 0;
+    max-width: 688px;
+    box-sizing: border-box;
+    margin-bottom: 96px;
+}
+.bottom-page.unsub .tip-wrapper {
+    margin-top: 32px;
+}
+body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
+    margin-left: 12px;
+}
+.bottom-page.unsub .sent-email-logo {
+    display: inline-block;
+}
+.bottom-page.unsub .sent-email-logo.hidden {
+    display: none;
+}
+.bottom-page.unsub .button-container {
+    padding-top: 40px;
+}
+/*end of subscription page*/
+
+

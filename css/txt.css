@@ -1,0 +1,54 @@
+/*common value*/
+.txt-bold {
+     font-weight: 700;
+     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+}
+.txt-green {
+    color: #00BFA5;
+}
+/* body header */
+.semi-large-header {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 28px;
+    color: #333333;
+    line-height: 42px;
+    padding: 24px 32px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/*body text*/
+.content-txt {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 20px;
+    color: #999;
+    padding:0;
+    position: relative;
+    display: inline-block;
+}
+.content-txt.semi-larger-txt {
+    font-size: 16px;
+    line-height: 24px;
+}
+.content-txt.txt-dark {
+    color: #333;
+}
+.underline-btn-txt {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 20px;
+    text-decoration: underline;
+    position: relative;
+    display: inline-block;
+    outline-color: none;
+}
+.underline-btn-txt.semi-larger-txt {
+    font-size: 16px;
+    line-height: 24px;
+}
+/*data presentation text*/
+/*test*/
+/*input*/
+/*transfers related text*/

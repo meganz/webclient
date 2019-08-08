@@ -1182,3 +1182,246 @@ testMegaDataBitMap = function() {
     arr1.mergeFrom(arr2.toString());
     return arr1;
 };
+
+/**
+ * Bitmap based on an integer.
+ * @param attribute {String}
+ *     Name of the attribute.
+ * @param map An array of keys to use for identifying each bit.
+ * @param pub {Boolean|Number}
+ *     True for public attributes (default: true).
+ *     -1 for "system" attributes (e.g. without prefix)
+ *     -2 for "private non encrypted attributes"
+ *     False for private encrypted attributes
+ * @param nonHistoric {Boolean}
+ *     True for non-historic attributes (default: false).  Non-historic attributes will overwrite the value, and
+ *     not retain previous values on the API server.
+ * @param autoSaveTimeout {int} Autosave after x millisecond.
+ * @constructor
+ */
+function MegaIntBitMap(attribute, map, pub, nonHistoric, autoSaveTimeout) {
+    'use strict';
+    this.value = undefined;
+    this.attribute = attribute;
+    this.map = map;
+    this.pub = pub;
+    this.nonHistoric = nonHistoric;
+    this.isReadyPromise = null;
+    this.autoSaveTimeout = autoSaveTimeout;
+    this.autoSaveTimer = null;
+}
+
+/**
+ * Get a bit based on its key.
+ * @param key The bit key.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.get = function(key) {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        self.isReady().then(function() {
+            var mask;
+            if (Array.isArray(key)) {
+                var bitKey;
+                var result = {};
+                for (var i = 0; i < key.length; i++) {
+                    bitKey = key[i];
+                    mask = self.getMask(bitKey);
+                    if (!mask) {
+                        reject("Invalid Key");
+                        return false;
+                    }
+                    result[bitKey] = self.value & mask ? true : false;
+                }
+                resolve(result);
+            } else {
+                mask = self.getMask(key);
+                if (!mask) {
+                    reject("Invalid Key");
+                    return false;
+                }
+                resolve(self.value & mask ? true : false);
+            }
+
+        }, reject);
+    });
+};
+
+/**
+ * Set a bit/bits based on a key/keys.
+ * @param key object|string The bit key or map of bit keys -> newState
+ * @param newValue {bool|void} The new state if previous parameter is a bit key.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.set = function(key, newValue) {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        self.isReady().then(function() {
+            var mask;
+            // jscs:disable disallowImplicitTypeConversion
+            if (typeof key === 'object') {
+                var bitKey;
+                var updatedValue = self.value;
+                var keys = Object.keys(key);
+                for (var i = 0; i < keys.length; i++) {
+                    bitKey = keys[i];
+                    mask = self.getMask(bitKey);
+                    if (!mask) {
+                        reject("Invalid Key");
+                        return false;
+                    }
+                    updatedValue = key[bitKey] ? (updatedValue | mask) : (updatedValue & (~mask));
+                }
+                self.value = updatedValue;
+            } else {
+                mask = self.getMask(key);
+                if (!mask) {
+                    reject("Invalid Key");
+                    return false;
+                }
+                self.value = newValue ? (self.value | mask) : (self.value & (~mask));
+            }
+            // jscs:enable disallowImplicitTypeConversion
+            self.valueChanged();
+            resolve(self.value);
+        }, reject);
+    });
+};
+
+/**
+ * Get all bits.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.getAll = function() {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        self.isReady().then(function() {
+            var all = {};
+            for (var i = 0; i < self.map.length; i++) {
+                all[self.map[i]] = self.value & (1 << i) ? true : false;
+            }
+            resolve(all);
+        }, reject);
+    });
+};
+
+/**
+ * Set all bits that we know about.
+ * @param newValue The new state for all known bits.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.setAll = function(newValue) {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        self.isReady().then(function() {
+            // jscs:disable disallowImplicitTypeConversion
+            var mask = ~(0xFFFFFF << self.map.length);
+            self.value = newValue ? self.value | mask : self.value & (~mask);
+            // jscs:enable disallowImplicitTypeConversion
+            self.valueChanged();
+            resolve(self.value);
+        }, reject);
+    });
+};
+
+/**
+ * Get a mask from a key.
+ * @param key The bit key.
+ */
+MegaIntBitMap.prototype.getMask = function(key) {
+    'use strict';
+    var idx = this.map.indexOf(key);
+    if (idx >= 0) {
+        return 1 << idx;
+    }
+    return false;
+};
+
+/**
+ * Load attribute.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.load = function() {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        mega.attr.get(u_attr.u, self.attribute, self.pub, self.nonHistoric).then(function(value) {
+            self.value = parseInt(value);
+            resolve();
+        }, function(value) {
+            if (value === ENOENT) {
+                self.value = 0;
+                resolve();
+            } else {
+                reject.apply(null, arguments);
+            }
+        });
+    });
+};
+
+/**
+ * Save Attribute.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.save = function() {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        var actionResult = self.value === 0
+            ? mega.attr.remove(self.attribute, self.pub, self.nonHistoric)
+            : mega.attr.set(self.attribute, self.value, self.pub, self.nonHistoric);
+        actionResult.then(resolve, reject);
+    });
+};
+
+/**
+ * Wait till ready.
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.isReady = function() {
+    'use strict';
+    if (this.isReadyPromise === null) {
+        var self = this;
+        this.isReadyPromise = new MegaPromise(function(resolve, reject) {
+            self.load().then(resolve, reject);
+        });
+    }
+    return this.isReadyPromise;
+};
+
+/**
+ * Directly set all the bits by providing an int.
+ * @param newValue {int} The new value
+ * @returns {MegaPromise}
+ */
+MegaIntBitMap.prototype.setValue = function(newValue) {
+    'use strict';
+    var self = this;
+    return new MegaPromise(function(resolve, reject) {
+        self.isReady().then(function() {
+            self.value = newValue;
+            self.valueChanged();
+            resolve(self.value);
+        }, reject);
+    });
+};
+
+/**
+ * Track value changed.
+ * Note: Call this whenever the value is changed.
+ */
+MegaIntBitMap.prototype.valueChanged = function() {
+    'use strict';
+    if (this.autoSaveTimeout) {
+        var self = this;
+        clearTimeout(this.autoSaveTimer);
+        this.autoSaveTimer = setTimeout(function() {
+            clearTimeout(self.autoSaveTimer);
+            self.save();
+        }, self.autoSaveTimeout);
+    }
+};

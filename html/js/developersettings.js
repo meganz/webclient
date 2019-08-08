@@ -16,7 +16,7 @@
 
         /** Show Developer Setting Page. */
         show: function() {
-            parsepage(pages['developer_settings']);
+            parsepage(pages['developersettings']);
             topmenuUI();
             this.init();
         },

@@ -2874,6 +2874,16 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         console.time('iconUI');
     }
 
+    // Change title for Public link page
+    if (page === 'fm/public-links') {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[20694]);
+    }
+    else {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[17445]);
+    }
+
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
     $('.shared-grid-view').addClass('hidden');

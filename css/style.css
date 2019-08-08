@@ -5820,6 +5820,9 @@ th.grid-first-th {
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
+tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
+    cursor: pointer;
+}
 .arrow.grid-header-star {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;

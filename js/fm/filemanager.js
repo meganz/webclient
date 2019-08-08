@@ -3238,7 +3238,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
+        .add('.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 

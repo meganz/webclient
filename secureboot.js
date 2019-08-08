@@ -2238,8 +2238,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'html/developer-settings.html', n: 'developer_settings', j:0});
-    jsl.push({f:'html/js/developer-settings.js', n: 'developer_settings_js', j:1});
+    jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
+    jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2739,7 +2739,7 @@ else if (!browserUpdate) {
         'uwp': ['uwp'],
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
-        'developerSettings': ['developer_settings', 'developer_settings_js']
+        'developersettings': ['developersettings', 'developersettings_js']
     };
 
     if (is_mobile) {

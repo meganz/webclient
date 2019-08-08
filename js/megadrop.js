@@ -1110,7 +1110,8 @@ mega.megadrop = (function() {
                 var title = h === M.RootID ? l[1687] : M.d[h].name;
 
                 var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
-                    '" title="' +  escapeHTML(title) + '" data-node="' + h + '">' + '<span class="right-arrow-bg">' +
+                    '" data-node="' + h + '">' +
+                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" >' +
                     '<span>' + escapeHTML(title) + '</span></span></a>' : '';
 
                 return html;

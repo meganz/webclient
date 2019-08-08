@@ -7558,7 +7558,7 @@ table {
     display: block;
     height: 25px;
     overflow: hidden;
-    background-position: 5px -1000px;
+    background-position: 5px -1001px;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     display: inline-block;
@@ -22206,8 +22206,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     min-width: 100px;
 }
 .widget-card .fm-dialog-tab {
-    height: 36px;
-    margin-top: 20px;
+    padding: 10px 0 20px 0;
     border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
     background-image: linear-gradient(-180deg, rgba(249,249,249,0.05) 0%, rgba(238,238,238,0.10) 100%);
@@ -22230,9 +22229,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -ms-transition:  all 200ms ease-in-out;
     transition:  all 200ms ease-in-out;
     position: relative;
+    margin:11px 0 0 0;
 }
 .widget-card .fm-dialog-tab .fm-tab-wrapper {
-    margin:11px 0 0 0px;
     width: auto;
 }
 .widget-card .fm-dialog-tab .fm-tab.active {
@@ -28676,20 +28675,17 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
     padding-top: 0;
 }
-.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg,
-.fm-right-account-block .fm-breadcrumbs:first-child .right-arrow-bg{
+.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg{
     margin: 0 0 0 -3px;
     padding-left: 35px;
 }
 .fm-picker-dialog .fm-breadcrumbs:nth-child(2) {
     margin-left: 47px;
 }
-.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span,
-.fm-right-account-block .fm-breadcrumbs:first-child .right-arrow-bg span{
+.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span{
     display: block !important;
 }
-.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span:empty,
-.fm-right-account-block .fm-breadcrumbs:first-child .right-arrow-bg span:empty {
+.fm-picker-dialog .fm-breadcrumbs:first-child .right-arrow-bg span:empty {
     display: none !important;
 }
 .fm-picker-dialog .item-row .summary-status {
@@ -29356,8 +29352,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .fm-dialog-body .nw-contact-item.selected .nw-contact-checkbox::before {
     display: inline-block;
 }
-.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg,
-.fm-right-account-block .fm-breadcrumbs .right-arrow-bg{
+.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
     font-size: 14px;
     line-height: 22px;
     cursor: pointer;

@@ -2991,10 +2991,18 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             sortType = 'date';
         }
 
-        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
-        $me.addClass('selected');
+        var classToAdd = 'selected';
+        var sortDir = 1;
 
-        M.doSort(sortType, 1);
+        if ($me.hasClass('selected') && !$me.hasClass('inverted') ) {
+            classToAdd += ' inverted';
+            sortDir = -1;
+        }
+
+        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected inverted');
+        $me.addClass(classToAdd);
+
+        M.doSort(sortType, sortDir);
         M.renderMain();
     });
 

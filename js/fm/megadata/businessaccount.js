@@ -550,7 +550,7 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
         // M.isBusinessAccountMaster = 1; // init it, or re-set it
 
         if (!M.suba) {
-            M.suba = [];
+            M.suba = Object.create(null);
         }
         if (!suba) {
             return;

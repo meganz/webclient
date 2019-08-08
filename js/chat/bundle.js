@@ -11866,6 +11866,7 @@ React.makeElement = React['createElement'];
 	        var visibleCategories = [];
 	        self._emojiReactElements = [];
 	        self.data_categoryPositions = {};
+
 	        self.data_categoriesWithCustomOrder.forEach(function (k) {
 	            var categoryDivMeta = self.generateEmojiElementsByCategory(k, currentPos, stateObj);
 	            if (categoryDivMeta) {
@@ -11877,11 +11878,19 @@ React.makeElement = React['createElement'];
 
 	                if (self._isVisible(visibleStart, visibleEnd, startPos, endPos)) {
 	                    visibleCategories.push(k);
-
 	                    self._emojiReactElements.push(categoryDivMeta[1]);
 	                }
 	            }
 	        });
+
+	        if (self._emojiReactElements.length === 0) {
+	            var emojisNotFound = React.makeElement(
+	                "span",
+	                { className: "emojis-not-found", key: 'emojis-not-found' },
+	                l[20920]
+	            );
+	            self._emojiReactElements.push(emojisNotFound);
+	        }
 
 	        visibleCategories = visibleCategories.join(',');
 

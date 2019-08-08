@@ -2874,6 +2874,16 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         console.time('iconUI');
     }
 
+    // Change title for Public link page
+    if (page === 'fm/public-links') {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[20694]);
+    }
+    else {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[17445]);
+    }
+
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
     $('.shared-grid-view').addClass('hidden');
@@ -2981,10 +2991,18 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             sortType = 'date';
         }
 
-        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
-        $me.addClass('selected');
+        var classToAdd = 'selected';
+        var sortDir = 1;
 
-        M.doSort(sortType, 1);
+        if ($me.hasClass('selected') && !$me.hasClass('inverted') ) {
+            classToAdd += ' inverted';
+            sortDir = -1;
+        }
+
+        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected inverted');
+        $me.addClass(classToAdd);
+
+        M.doSort(sortType, sortDir);
         M.renderMain();
     });
 
@@ -3238,7 +3256,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
+        .add('.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 

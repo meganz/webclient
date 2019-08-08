@@ -675,10 +675,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
-    l[10631] = l[10631].replace('[A]', '<a href="https://mega.nz/general" target="_blank" rel="noopener noreferrer">')
-                       .replace('[/A]', '</a>');
-    l[10630] = l[10630].replace('[A]', '<a href="https://mega.nz/general" target="_blank" rel="noopener noreferrer">')
-                       .replace('[/A]', '</a>');
+    l[10631] = l[10631].replace('[A]',
+        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]',
+        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[10634] = l[10634].replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
                        .replace('[/A]', '</a>');
 

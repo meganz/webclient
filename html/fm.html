@@ -1533,9 +1533,9 @@
                                     <div class="used-storage-icon-cell">
                                         <i class="folder-small-icon tiny-clock"></i>
                                     </div>
-                                    <div class="ff-name">a
+                                    <div class="ff-name">
                                         [$17821]
-                                        <i class="tiny-icon cog versioning-settings hidden" title="View file versioning settings" alt="View file versioning settings"></i>
+                                        <i class="tiny-icon cog versioning-settings hidden" title="[$17580]" alt="[$17580]"></i>
                                     </div>
                                     <div class="ff-number">
                                         <div class="file-number"> </div>
@@ -2201,7 +2201,6 @@
         <!-- check if there is any other place using account qr-block -->
         <div class="fm-right-account-block">
             <div class="fm-account-main">
-
                 <div class="account add-phone-num-banner hidden">
                     <div class="account add-phone-wrapper">
                         <div class="first-block">
@@ -2224,7 +2223,6 @@
 
                     </div>
                 </div>
-
                 <div class="settings-banner hidden">
                     <div class="first-block">
                         <div class="title-txt">[$16118]:</div>
@@ -2620,11 +2618,17 @@
                     </div>
                 </div>
                 <div class="fm-account-notifications fm-account-sections">
-                    <div class="account data-block">
+                    <div class="account data-block account-notification">
                         <div class="settings-left-block">
-                            <div class="title-txt">[$16143]</div>
+                            <div class="title-txt">[$20900]</div>
                         </div>
                         <div class="settings-right-block">
+                            <div class="settings-sub-section border">
+                                <div class="subtitle-txt">[$20899]</div>
+                                <div class="dialog-feature-toggle toggle-all" id="notif-all" >
+                                    <div class="dialog-feature-switch"></div>
+                                </div>
+                            </div>
                             <div class="switch-container cloud-drive">
                                 <div class="subtitle-txt">[$1687]</div>
                                 <div class="settings-sub-section border">
@@ -2698,7 +2702,7 @@
                                 </div>
                                 <div class="settings-sub-section">
                                     <div for="delete-request" class="content-txt">
-                                    [$16150]
+                                    [$20957]
                                     </div>
                                     <div class="dialog-feature-toggle toggle-on" id="delete-request" name="fcrdel">
                                         <div class="dialog-feature-switch no-trans-init"></div>
@@ -2708,6 +2712,81 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="account data-block email-notification">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$20898]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section border">
+                                <div class="subtitle-txt">[$20897]</div>
+                                <div class="dialog-feature-toggle toggle-all" id="enotif-all" name="all">
+                                    <div class="dialog-feature-switch"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$165]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                    [$16148]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-contact-request" name="contact-request">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$7997]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$20890]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-chat-message" name="chat-message">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20891]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$20892]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-achievements" name="achievements">
+                                        <div class="dialog-feature-switch no-trans-init"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20893]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$20894]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-quota" name="quota">
+                                        <div class="dialog-feature-switch no-trans-init"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20895]</div>
+                                <div class="settings-sub-section">
+                                    <div class="content-txt">
+                                        [$20896]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-inactive" name="account-inactive">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="fm-account-security fm-account-sections">
                     <div class="account data-block change-password">
@@ -3341,9 +3420,6 @@
         <div class="fm-right-block dashboard hidden">
             <div class="widgets content-block">
 
-
-
-
                 <!-- for business dashboard -->
                 <div class="business-dashboard hidden">
                     <div class="business-dashboard-container">
@@ -3461,7 +3537,7 @@
                                             <i class="folder-small-icon tiny-clock"></i>
                                         </div>
                                         <div class="ff-name">[$17821]
-                                            <i class="tiny-icon cog versioning-settings" title="View file versioning settings" alt="View file versioning settings"></i>
+                                            <i class="tiny-icon cog versioning-settings" title="[$17580]" alt="[$17580]"></i>
                                         </div>
                                         <div class="ff-number">
                                             <div class="file-number"> </div>
@@ -3579,7 +3655,7 @@
                                     </div>
                                     <div class="clear"></div>
                                 </div>
-                                <div class="account pr-item incoming-shares">
+                                <!--<div class="account pr-item incoming-shares">
                                     <i class="semi-small-icon left-arrow-with-dot"></i>
                                     <div class="account progress-perc pr2"></div>
                                     <div class="account progress-title">
@@ -3589,7 +3665,7 @@
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
-                                </div>
+                                </div>-->
                                 <div class="account pr-item rubbish-bin">
                                     <i class="semi-small-icon rubbish-arrows"></i>
                                     <div class="account progress-perc pr1"></div>

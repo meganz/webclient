@@ -2052,6 +2052,9 @@ accountUI.notifications = {
 
         'use strict';
 
+        // Ensure the loading dialog stays open till enotif is finished.
+        loadingDialog.show('enotif');
+
         // New setting need to force cloud and contacts notification available.
         if (!mega.notif.has('enabled', 'cloud')) {
             mega.notif.set('enabled', 'cloud');
@@ -2061,8 +2064,12 @@ accountUI.notifications = {
             mega.notif.set('enabled', 'contacts');
         }
 
-        $('.fm-account-notifications .dialog-feature-toggle').each(function() {
+        // Handle account notification switches
+        var $NToggleAll = $('.fm-account-notifications .account-notification .dialog-feature-toggle.toggle-all');
+        var $NToggle = $('.fm-account-notifications .account-notification .switch-container .dialog-feature-toggle');
 
+        // Toggle Individual Notifications
+        $NToggle.each(function() {
             var $this = $(this);
             var $section = $this.parents('.switch-container');
             var sectionName = accountUI.notifications.getSectionName($section);
@@ -2075,7 +2082,75 @@ accountUI.notifications = {
 
                     var notifChange = val ? mega.notif.set : mega.notif.unset;
                     notifChange($this.attr('name'), sectionName);
+
+                    if (val) {
+                        $NToggleAll.addClass('toggle-on');
+                    } else {
+                        ($NToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
+                            .apply($NToggleAll, ['toggle-on']);
+                    }
                 });
+        });
+
+        // Toggle All Notifications
+        accountUI.inputs.switch.init(
+            '#' + $NToggleAll[0].id,
+            $NToggleAll.parent(),
+            $NToggle.hasClass('toggle-on'),
+            function(val) {
+                $NToggle.each(function() {
+                    var $this = $(this);
+                    var $section = $this.parents('.switch-container');
+                    var sectionName = accountUI.notifications.getSectionName($section);
+                    var notifChange = val ? mega.notif.set : mega.notif.unset;
+                    notifChange($this.attr('name'), sectionName);
+
+                    (val ? $.fn.addClass : $.fn.removeClass).apply($NToggle, ['toggle-on']);
+                });
+            }
+        );
+
+        // Hide achievements toggle if achievements not an option for this user.
+        if (!M.account.maf) {
+            $('#enotif-achievements').closest('.switch-container').remove();
+        }
+
+        // Handle email notification switches.
+        var $EToggleAll = $('.fm-account-notifications .email-notification .dialog-feature-toggle.toggle-all');
+        var $EToggle = $('.fm-account-notifications .email-notification .switch-container .dialog-feature-toggle');
+
+        mega.enotif.all().then(function(enotifStates) {
+            // Toggle Individual Emails
+            $EToggle.each(function() {
+                var $this = $(this);
+                var $section = $this.parents('.switch-container');
+                var emailId = $this.attr('name');
+
+                accountUI.inputs.switch.init(
+                    '#' + this.id,
+                    $section,
+                    !enotifStates[emailId],
+                    function(val) {
+                        mega.enotif.setState(emailId, !val);
+                        (val || $EToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
+                            .apply($EToggleAll, ['toggle-on']);
+                    }
+                );
+            });
+
+            // All Email Notifications Switch
+            accountUI.inputs.switch.init(
+                '#' + $EToggleAll[0].id,
+                $EToggleAll.parents('.settings-sub-section'),
+                $EToggle.hasClass('toggle-on'),
+                function(val) {
+                    mega.enotif.setAllState(!val);
+                    (val ? $.fn.addClass : $.fn.removeClass).apply($EToggle, ['toggle-on']);
+                }
+            );
+
+            // Hide the loading screen.
+            loadingDialog.hide('enotif');
         });
     },
 

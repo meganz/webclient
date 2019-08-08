@@ -1182,8 +1182,13 @@
             },
             'shares': function(aNode, aProperties, aTemplate) {
 
+                var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
+
+                if (!this.viewmode) {
+                    aTemplate.querySelector(selector).classList.add(aProperties.accessRightsClass);
+                }
+
                 if (aNode.fav && !folderlink) {
-                    var selector = this.viewmode ? '.file-status-icon' : '.grid-status-icon';
                     aTemplate.querySelector(selector).classList.add('star');
                 }
 

@@ -451,6 +451,11 @@ if (!browserUpdate) try
 
     staticpath = staticpath || geoStaticPath();
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
+
+    // If dark mode flag is enabled, change styling
+    if (localStorage.getItem('darkMode') === '1') {
+        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+    }
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -2233,6 +2238,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
+    jsl.push({f:'html/developer-settings.html', n: 'developer_settings', j:0});
+    jsl.push({f:'html/js/developer-settings.js', n: 'developer_settings_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2342,6 +2349,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2368,6 +2376,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/txt.css', n: 'txt_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2603,6 +2612,8 @@ else if (!browserUpdate) {
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
+        'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
@@ -2726,7 +2737,9 @@ else if (!browserUpdate) {
         'bird': ['megabird'],
         'wp': ['uwp'],
         'uwp': ['uwp'],
-        'security': ['securitypractice', 'securitypractice_js', 'filesaver']
+        'unsub': ['unsub', 'unsub_js'],
+        'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
+        'developerSettings': ['developer_settings', 'developer_settings_js']
     };
 
     if (is_mobile) {

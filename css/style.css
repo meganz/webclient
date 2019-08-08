@@ -42,6 +42,51 @@ body * {
     -ms-user-select: none;
     user-select: none;
 }
+
+/* Developer dark mode */
+html.dark-mode {
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-percentage {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-m-block {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .account.qr-icon {
+    background: #fff;
+    padding: 5px;
+    filter: invert(1);
+    position: absolute;
+}
+html.dark-mode .qr-settings .settings-left-block.slide-in-out .content-txt {
+    position: absolute;
+    top: 178px;
+    width: 235px;
+}
+html.dark-mode .fm-dialog.two-factor-dialog .two-factor-qr-code {
+    filter: invert(1);
+    padding: 5px;
+}
+/* Overrides to prevent inverting (inverts again back to normal) */
+html.dark-mode .nw-fm-left-icons-panel,
+html.dark-mode .logo,
+html.dark-mode .fm-left-menu.cloud-drive,
+html.dark-mode .browsers.icon.medium,
+html.dark-mode .business-icon.semi-medium,
+html.dark-mode .main-loader,
+html.dark-mode .provider-icon,
+html.dark-mode .reg-st3-membership-icon,
+html.dark-mode .viewer-overlay,
+html.dark-mode .video-theatre-mode .viewer-image-bl,
+html.dark-mode .achievements-icon,
+html.dark-mode video,
+html.dark-mode img {
+    filter: invert(1);
+}
+
 img:not([src]) {
     visibility: hidden;
 }
@@ -5816,6 +5861,9 @@ th.grid-first-th {
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
+tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
+    cursor: pointer;
+}
 .arrow.grid-header-star {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -10489,11 +10537,9 @@ span.orange {
 }
 .dropdown-item.sort-grid-item.selected i {
     background-position: -7px -1991px;
-    background-size: 262px auto;
 }
 .dropdown-item.sort-grid-item.selected.inverted i {
     background-position: -45px -1991px;
-    background-size: 262px auto;
 }
 .dropdown-item.sort-grid-item.selected:hover i {
     background-position: -26px -1991px;
@@ -21221,8 +21267,11 @@ body.kr .account.chart.data {
 .fontsize1 .nw-fm-tree-folder, .fontsize1 .nw-conversations-name, .fontsize1 .fm-tree-panel .nw-contact-name, .fontsize1 .nw-conversations-header, .fontsize1 .nw-tree-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .fm-picker-dialog-panel-header, .fontsize1 .share-dialog-panel-header, .fontsize1 .top-user-status-item, .fontsize1 .sorting-menu-item, .fontsize1 .permissions-menu-item, .fontsize1 .dropdown.body.submenu, .fontsize1 .tranfer-filetype-txt, .fontsize1 .fm-browsers-txt, .fontsize1 .fm-flags-txt, .fontsize1 .fm-member-icon-txt, .fontsize1 .transfer-table td, .fontsize1 .grid-table td, .fontsize1 .grid-share-table td, .fontsize1 .contacts-grid-table td, .fontsize1 .file-block-title, .fontsize1 .contact-block-view-name, .fontsize1 .shared-folder-info-block, .fontsize1 .fm-chat-user, .fontsize1 .fm-chat-user-status, .fontsize1 .fm-chat-user-email, .fontsize1 .shared-folder-access, .fontsize1 .contacts-interation, .fontsize1 .transfer-table th, .fontsize1 .transfer-table td, .fontsize1 .transfer-table-header th, .fontsize1 .grid-table th, .fontsize1 .grid-table td, .fontsize1 .grid-share-table th, .fontsize1 .grid-share-table td, .fontsize1 .grid-table-header th, .fontsize1 .contacts-grid-header th, .fontsize1 .contacts-grid-table th, .fontsize1 .contacts-grid-table td, .fontsize1 .membership-status, .fontsize1 .new-notification-txt, .fontsize1 .dark-tooltip, .fontsize1 .new-notification-info {
     font-size: 12px;
 }
-.fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p, .content-txt-container li a, .fontsize1 .dialog-input-title-ontop .dialog-input::placeholder, .fontsize1 .dialog-input-title-ontop .title, .fontsize1 .content-txt, .fontsize1 .settings-sub-section.phone-number-settings .add-phone-text, .fontsize1 .add-phone-text, .fontsize1 .settings-sub-section .radio-txt, .fontsize1 .fm-right-account-block .grid-table td, .fontsize1 .fm-right-account-block .grid-table th, .fontsize1 .fm-account-button .sub-title {
+.fontsize1 .nlanguage-bottom, .fontsize1 .nlanguage-lnk, .fontsize1 a.nlanguage-lnk, .fontsize1 a.nlanguage-lnk:link, .fontsize1 a.nlanguage-lnk:visited, .fontsize1 a.nlanguage-lnk:hover, .fontsize1 a.nlanguage-lnk:active, .fontsize1 .share-dialog-permissions, .fontsize1 .share-dialog-icon.permissions-icon, .fontsize1 .transfer-panel-title, .fontsize1 .fm-breadcrumbs .right-arrow-bg, .fontsize1 .toast-notification, .fontsize1 .fm-notification-info p, .content-txt-container li a, .fontsize1 .dialog-input-title-ontop .dialog-input::placeholder, .fontsize1 .dialog-input-title-ontop .title, .fontsize1 .fm-right-account-block .grid-table td, .fontsize1 .fm-right-account-block .grid-table th, .fontsize1 .fm-account-button .sub-title  {
     font-size: 13px;
+}
+.fontsize1 .fm-account-sections .content-txt, .fontsize1 .settings-sub-section.phone-number-settings .add-phone-text, .fontsize1 .add-phone-text, .fontsize1 .settings-sub-section .radio-txt {
+    font-size: 14px;
 }
 .fontsize1 .subtitle-txt, .fontsize1 .fm-account-button .head-title {
     font-size: 15px;
@@ -25520,7 +25569,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 
-.user-management-view .icon64, .user-management-dialog .icon64 {
+.user-management-view .icon64, .user-management-dialog .icon64, .bottom-page.unsub .icon64 {
     background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
     width:64px;
@@ -25557,9 +25606,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     background-position: -17px -1091px;
 }
-
-
-
 .user-management-view .default-button-no-border .icon, .fm-right-header-user-management .default-button-no-border .icon, .user-management-dialog .default-button-no-border .icon {
     cursor: pointer;
     position: relative;
@@ -25793,7 +25839,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
     vertical-align: top;
 }
-.user-management-able-user-dialog .re-enable-large-icon {
+.user-management-able-user-dialog .re-enable-large-icon, .re-enable-large-icon {
     background-position: -117px -1261px;
 }
 .user-management-able-user-dialog .disable-large-icon {
@@ -29694,7 +29740,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 /* Transfer tooltips */
 .float-widget.transfer-prorgess * {
-    font-family: 'latoWeb', 'source_sans_proregular', sans-serif; 
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
 }
 .float-widget.transfer-prorgess {
     position: fixed;
@@ -30177,7 +30223,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 18px;
     height: 18px;
     display: block;
-    position: absolute; 
+    position: absolute;
     left: 10px;
     top: 3px;
     background-image: url(../images/mega/dual-spinner-small.svg);
@@ -30252,7 +30298,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-icon.restart:hover{
     background-position: -159px -1884px;
     opacity: 0.8;
-}  
+}
 .transfer-progress-type.upload .status-indicator::before {
     background-position: -8px -1804px;
 }
@@ -30493,3 +30539,25 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .grid-table.fm td[megatype="fname"] {
     min-width: 180px;
 }
+
+/** Developer Settings Page **/
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: left;
+}
+.bottom-page.developer-settings .developer-settings-container {
+    margin-bottom: 100px;
+}
+.bottom-page.developer-settings h3 {
+    text-align: center;
+}
+.bottom-page.developer-settings .apply {
+    color: white;
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .developer-setting {
+    width: 100%;
+}
+/** End Developer Settings Page **/

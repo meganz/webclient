@@ -371,6 +371,16 @@ body:not(.rtl) .default-white-button::first-letter {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
+.default-white-button.huge, .default-red-button.huge, .default-green-button.huge {
+    line-height: 55px;
+    height: 56px;
+    font-size: 18px;
+    padding: 0 16px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    min-width: 218px;
+}
 .default-white-button.semi-small, .default-grey-button.semi-small {
     line-height: 27px;
     height: 28px;
@@ -1126,4 +1136,13 @@ body:not(.rtl) .default-white-button::first-letter {
 }
 .big-green-button:hover {
     background-color: #00AC94;
+}
+/*button containers*/
+.button-container.two-buttons .btn {
+    display: inline-block;
+    margin: 0 8px;
+}
+.button-container.large-button {
+    margin: 24px auto 48px;
+    display: inline-block;
 }

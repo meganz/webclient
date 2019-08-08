@@ -1720,7 +1720,7 @@ var exportExpiry = {
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
         if (folderlink) {
-            fileUrlWithoutKey = 'https://mega.nz/#F!' + pfid;
+            fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid;
             fileUrlKey = '!' + pfkey;
             fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
             fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
@@ -1745,7 +1745,7 @@ var exportExpiry = {
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
-        fileUrlWithoutKey = fileUrlWithoutKey || ('https://mega.nz/#' + type + '!' + htmlentities(item.ph));
+        fileUrlWithoutKey = fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph));
         fileUrlKey = fileUrlKey || (key ? '!' + a32_to_base64(key) : '');
 
         html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'

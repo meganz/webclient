@@ -230,9 +230,6 @@ function topPopupAlign(button, popup, topPos) {
     }
 }
 
-
-
-
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
     var mobilePageParsed = false;
@@ -570,6 +567,7 @@ function init_page() {
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
+        && (page !== 'unsub')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1375,13 +1373,21 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms') {
+    else if (page.substr(0, 5) === 'terms') {
         if (is_mobile) {
             mobile.initDOM();
             mobile.terms.show();
         }
         else {
             parsepage(pages['terms']);
+        }
+
+        if (page.substr(5, 1) === '/') {
+            delay('waitTermLoad', function() {
+                var anchor = page.split('/')[1];
+                page = 'terms';
+                $('a[data-scrollto="#' + anchor + '"]').click();
+            });
         }
     }
     else if (page === 'security') {
@@ -1530,6 +1536,15 @@ function init_page() {
     else if (page == 'done') {
         parsepage(pages['done']);
         init_done();
+    }
+    else if (page.substr(0, 5) === 'unsub') {
+        // Non-registered user unsubsribe from emails.
+        if (is_mobile) {
+            mobile.initDOM();
+        }
+        M.require('unsub_js').done(function() {
+            EmailUnsubscribe.unsubscribe();
+        });
     }
     else if (dlid) {
         page = 'download';
@@ -1997,19 +2012,13 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
+    var $versionButton = $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
     var versionClickCounter = 0;
     var versionClickTimeout = null;
-    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion()).off('click').on('click', function() {
+    $versionButton.rebind('click', function() {
         clearTimeout(versionClickTimeout);
-        if (++versionClickCounter >= 5) {
-            if (apipath && apipath.indexOf("staging.api.mega.co.nz") >= 0) {
-                localStorage.removeItem('apipath');
-                alert("API path set to live");
-            } else {
-                M.staging(1);
-                alert("API path set to staging");
-            }
-            window.location.reload();
+        if (++versionClickCounter >= 3) {
+            mega.developerSettings.show();
         }
         versionClickTimeout = setTimeout(function() {
             versionClickCounter = 0;

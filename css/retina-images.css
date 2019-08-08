@@ -222,93 +222,75 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-tree-panel-header .img{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-tree-panel-arrows {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .default-white-button-user-management .icon, .default-green-button-user-management .icon, .default-red-button-user-management .icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .fm-files-view-icon-user-management {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-overview-bar-data .info-block .icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-sorting-menu .sort-icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .up-arrow-icon {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-breadcrumb .user-management-icon {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-breadcrumb .user-management-next-arrow {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-view-status.enabled, .user-management-view-status.disabled, .user-management-view-status.pending{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .subaccount-view-used-data .used-storage-info .folder-small-icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-out-share,
 .subaccount-view-used-data .used-storage-info .folder-small-icon.ex-in-share{
     background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
 }
-
 .user-management-breadcrumbs-img {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-view .default-white-drop-box .list-arrow, .user-management-dialog .list-arrow {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-overview-container .daily-transfer-flow-bar .tooltip::after {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;
 }
-
 .user-management-view .admin-icon{
     background-image: url(../images/mega/fm-main-sprite_v12@2x.png);
     background-size: 48px auto;

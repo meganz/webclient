@@ -1376,13 +1376,21 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms') {
+    else if (page.substr(0, 5) === 'terms') {
         if (is_mobile) {
             mobile.initDOM();
             mobile.terms.show();
         }
         else {
             parsepage(pages['terms']);
+        }
+
+        if (page.substr(5, 1) === '/') {
+            delay('waitTermLoad', function() {
+                var anchor = page.split('/')[1];
+                page = 'terms';
+                $('a[data-scrollto="#' + anchor + '"]').click();
+            });
         }
     }
     else if (page === 'security') {

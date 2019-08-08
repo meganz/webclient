@@ -42,6 +42,51 @@ body * {
     -ms-user-select: none;
     user-select: none;
 }
+
+/* Developer dark mode */
+html.dark-mode {
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-percentage {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-m-block {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .account.qr-icon {
+    background: #fff;
+    padding: 5px;
+    filter: invert(1);
+    position: absolute;
+}
+html.dark-mode .qr-settings .settings-left-block.slide-in-out .content-txt {
+    position: absolute;
+    top: 178px;
+    width: 235px;
+}
+html.dark-mode .fm-dialog.two-factor-dialog .two-factor-qr-code {
+    filter: invert(1);
+    padding: 5px;
+}
+/* Overrides to prevent inverting (inverts again back to normal) */
+html.dark-mode .nw-fm-left-icons-panel,
+html.dark-mode .logo,
+html.dark-mode .fm-left-menu.cloud-drive,
+html.dark-mode .browsers.icon.medium,
+html.dark-mode .business-icon.semi-medium,
+html.dark-mode .main-loader,
+html.dark-mode .provider-icon,
+html.dark-mode .reg-st3-membership-icon,
+html.dark-mode .viewer-overlay,
+html.dark-mode .video-theatre-mode .viewer-image-bl,
+html.dark-mode .achievements-icon,
+html.dark-mode video,
+html.dark-mode img {
+    filter: invert(1);
+}
+
 img:not([src]) {
     visibility: hidden;
 }
@@ -29609,7 +29654,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 /* Transfer tooltips */
 .float-widget.transfer-prorgess * {
-    font-family: 'latoWeb', 'source_sans_proregular', sans-serif; 
+    font-family: 'latoWeb', 'source_sans_proregular', sans-serif;
 }
 .float-widget.transfer-prorgess {
     position: fixed;
@@ -30092,7 +30137,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 18px;
     height: 18px;
     display: block;
-    position: absolute; 
+    position: absolute;
     left: 10px;
     top: 3px;
     background-image: url(../images/mega/dual-spinner-small.svg);
@@ -30167,7 +30212,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-icon.restart:hover{
     background-position: -159px -1884px;
     opacity: 0.8;
-}  
+}
 .transfer-progress-type.upload .status-indicator::before {
     background-position: -8px -1804px;
 }
@@ -30408,3 +30453,25 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .grid-table.fm td[megatype="fname"] {
     min-width: 180px;
 }
+
+/** Developer Settings Page **/
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: left;
+}
+.bottom-page.developer-settings .developer-settings-container {
+    margin-bottom: 100px;
+}
+.bottom-page.developer-settings h3 {
+    text-align: center;
+}
+.bottom-page.developer-settings .apply {
+    color: white;
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .developer-setting {
+    width: 100%;
+}
+/** End Developer Settings Page **/

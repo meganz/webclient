@@ -451,6 +451,11 @@ if (!browserUpdate) try
 
     staticpath = staticpath || geoStaticPath();
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
+
+    // If dark mode flag is enabled, change styling
+    if (localStorage.getItem('darkMode') === '1') {
+        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+    }
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -2233,6 +2238,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
+    jsl.push({f:'html/developer-settings.html', n: 'developer_settings', j:0});
+    jsl.push({f:'html/js/developer-settings.js', n: 'developer_settings_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2731,7 +2738,8 @@ else if (!browserUpdate) {
         'wp': ['uwp'],
         'uwp': ['uwp'],
         'unsub': ['unsub', 'unsub_js'],
-        'security': ['securitypractice', 'securitypractice_js', 'filesaver']
+        'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
+        'developerSettings': ['developer_settings', 'developer_settings_js']
     };
 
     if (is_mobile) {

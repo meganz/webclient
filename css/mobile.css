@@ -45,6 +45,52 @@ body.pro:after {
     display: none;
     content: url(../images/mega/payment-animation.gif);
 }
+
+/* Developer dark mode */
+html.dark-mode {
+    filter: invert(1);
+    overflow-x: hidden;
+}
+html.dark-mode .loading-main-block .loading-percentage {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-m-block {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .mobile.two-factor-page .qr-code-img {
+    background-color: #fff;
+    filter: invert(1);
+    padding: 5px;
+}
+/* Overrides to prevent inverting (inverts again back to normal) */
+html.dark-mode .logo,
+html.dark-mode .browsers.icon.medium,
+html.dark-mode .business-icon.semi-medium,
+html.dark-mode .main-loader,
+html.dark-mode .reg-st3-membership-icon,
+html.dark-mode .provider-icon,
+html.dark-mode .membership-icon,
+html.dark-mode .dark-overlay,
+html.dark-mode .fm-icon.mega,
+html.dark-mode .loading .loading-image,
+html.dark-mode .mobile.slideshow-back-arrow,
+html.dark-mode .mobile.slideshow-forward-arrow,
+html.dark-mode video,
+html.dark-mode img {
+    filter: invert(1);
+}
+html.dark-mode .mobile.slides.mid {
+    filter: invert(1);
+}
+html.dark-mode .mobile.slides.mid img {
+    filter: none;
+}
+html.dark-mode .mobile.context-menu-container.hidden {
+    display: none !important;
+}
+
 /* Re-enable selection and highlighting for specific things */
 input, textarea {
     -webkit-touch-callout: text !important;
@@ -94,7 +140,7 @@ ul, li {
     color: #00BFA5;
 }
 .mobile .semi-large-header {
-    font-size: 18px;  
+    font-size: 18px;
     line-height: 28px;
     color: #333;
     font-family: 'LatoWebBold';
@@ -9820,7 +9866,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/mobile-sprite_v24.png);
+    background-image: url(../images/mobile/mobile-sprite_v24.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11494,5 +11540,32 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: 86px;
     height: 44px;
     position: relative;
-    background-position: -17px -1091px;  
+    background-position: -17px -1091px;
 }
+
+/** Developer Settings Page **/
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: left;
+}
+.bottom-page.developer-settings .developer-settings-container {
+    margin-bottom: 100px;
+}
+.bottom-page.developer-settings h3 {
+    text-align: center;
+}
+.bottom-page.developer-settings .apply {
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .apply {
+    color: white;
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .developer-setting {
+    width: 100%;
+}
+/** End Developer Settings Page **/

@@ -2233,10 +2233,6 @@ Call.prototype._notifySessionConnected = function(sess) {
     if (chat.tsCallStart == null) {
         chat.tsCallStart = Date.now();
     }
-    self._fire('onCallStarted', chat.tsCallStart);
-    if (!self.isGroup && Av.fromStream(sess.remoteStream) === 0 && self.localAv() === 0) {
-        self._fire('onNoMediaOnBothEnds');
-    }
     var recovery = this.manager.callRecoveries[this.chatid];
     if (recovery) {
         if (recovery.callid === this.id) {

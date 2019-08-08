@@ -1160,7 +1160,7 @@ mega.megadrop = (function() {
                 var $this = $(this);
 
                 $this.removeClass('closed');
-                $this.find('.close-icon > .tooltips').text('Fold');
+                $this.find('.close-icon > .tooltips').text(l[148]);
 
                 // Waiting for css animation to be finished
                 setTimeout(function() {

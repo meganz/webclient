@@ -299,6 +299,7 @@ var GenericConversationMessage = React.createClass({
             ephemeralDialog(l[1005]);
         }
         else {
+            $.selected = [h];
             mega.Share.initCopyrightsDialog([h]);
         }
         if (e) {

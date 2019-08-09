@@ -1460,7 +1460,7 @@
     "16137": "Has agotado la cuota de transferencia permitida. Puedes esperar hasta que tengas suficiente cuota de transferencia disponible o [A]ampl\u00eda tu cuenta[\/A] para seguir disfrutando de un almacenamiento seguro y cifrado punto a punto.",
     "16138": "Has agotado la cuota de almacenamiento y de transferencia. Puedes liberar espacio en tu Nube y esperar hasta que tengas suficiente cuota de transferencia disponible o [A]ampliar tu cuenta[\/A] para seguir disfrutando de un almacenamiento seguro y cifrado punto a punto.",
     "16141": "Activar",
-    "16144": "Notificaciones del Escritorio",
+    "16144": "Notificaciones de escritorio",
     "16145": "Nueva carpeta compartida por un contacto",
     "16146": "Se ha eliminado el acceso a una carpeta compartida",
     "16147": "Un contacto ha a\u00f1adido archivos a una carpeta compartida",
@@ -3262,7 +3262,7 @@
     "20891": "Aviso sobre los bonos",
     "20892": "Bonos activos y caducados de tus logros",
     "20893": "Avisos sobre el l\u00edmite de almacenamiento",
-    "20894": "Nota: Si superas el l\u00edmite de almacenamiento el aviso se te enviar\u00e1 de todos modos.",
+    "20894": "Nota: si superas el l\u00edmite de almacenamiento, el aviso se te enviar\u00e1 de todos modos.",
     "20895": "Inactividad de la cuenta",
     "20896": "Aviso de inactividad de la cuenta",
     "20897": "Activar todas las notificaciones por correo electr\u00f3nico",
@@ -3281,5 +3281,5 @@
     "20949": "No se ha podido cancelar la suscripci\u00f3n a los correos",
     "20950": "Solo para usuarios europeos",
     "20951": "Direcci\u00f3n del beneficiario",
-    "20957": "Someone has removed you as a contact"
+    "20957": "Alguien te ha eliminado como contacto"
 }

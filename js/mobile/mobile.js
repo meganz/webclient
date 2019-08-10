@@ -483,6 +483,45 @@ var mobile = {
     }
 };
 
+mBroadcaster.once('fm:initialized', function () {
+    'use strict';
+
+    if (!isMobile) {
+        // not neccessary check, but to make sure.
+        return;
+    }
+
+    if (u_attr && u_attr.b) {
+        if (u_attr.b.m) {
+            var msg = '';
+
+            if (u_attr.b.s === -1) { // expired
+                if (u_attr.b.m) {
+                    msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                        .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                }
+                else {
+                    msg = l[20462];
+                }
+
+                mobile.alertBanner.showError(msg);
+            }
+            else if (u_attr.b.s === 2) { // grace
+                if (u_attr.b.m) {
+                    msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                        .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                    mobile.alertBanner.showWarning(msg);
+                }
+            }
+        }
+        else { // not master user
+            if (u_attr.b.s === -1) { // expired
+                mobile.alertBanner.showError(l[20462]);
+            }
+        }
+
+    }
+});
 
 mBroadcaster.once('startMega:mobile', function() {
     'use strict';

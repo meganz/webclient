@@ -147,6 +147,8 @@ mega.tpw = new function TransferProgressWidget() {
         // upgrade account
         $('.up-action', $overQuotaBanner).off('click').on('click',
             function overquota_bannerUpgrade() {
+                $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                isHiddenByUser = true;
                 loadSubPage('pro');
             });
 
@@ -198,6 +200,26 @@ mega.tpw = new function TransferProgressWidget() {
             $overQuotaBanner.removeClass('hidden');
 
         });
+    };
+
+    /**
+     * Clear the warnings shown on TPW header
+     * @param {Number} type     flag to distinguish upload/download
+     */
+    this.resetErrorsAndQuotasUI = function(type) {
+        if (!type) {
+            return;
+        }
+
+        $overQuotaBanner.addClass('hidden');
+
+        var $sectionType = 'download';
+
+        if (type === this.UPLOAD) {
+            $sectionType = 'upload';
+        }
+
+        $rowsHeader.find('.transfer-progress-type.' + $sectionType).removeClass('error overquota');
     };
 
 
@@ -345,7 +367,9 @@ mega.tpw = new function TransferProgressWidget() {
     var viewPreparation = function() {
         'use strict';
         init();
-        initUI();
+        if (!initUI()) {
+            return;
+        }
 
         // pages to hide always
         if (page.indexOf('transfers') !== -1) {
@@ -354,7 +378,11 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if (!isHiddenByUser) {
-            mega.tpw.showWidget();
+
+            if (page.indexOf('chat') === -1) {
+                mega.tpw.showWidget();
+            }
+
             if ($widgetHeadAndBody.hasClass('expand')) {
                 if (page.indexOf('chat') !== -1) {
                     $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
@@ -572,7 +600,7 @@ mega.tpw = new function TransferProgressWidget() {
         var $currWidget = clearAndReturnWidget();
 
         if (!$currWidget) {
-            return;
+            return false;
         }
 
         var rows = $currWidget.find('.transfer-task-row');
@@ -591,6 +619,7 @@ mega.tpw = new function TransferProgressWidget() {
                     actionsOnRowEventHandler);
             }
         }
+        return true;
     };
 
     /**
@@ -916,6 +945,8 @@ mega.tpw = new function TransferProgressWidget() {
         $errorCancelAction.find('.tooltips').text(cancelText);
         $targetedRow.find('.transfer-task-actions').empty().append($errorCancelAction);
 
+        $targetedRow.removeAttr('prepared');
+
         $rowsHeader.find('.transfer-progress-type.' + subHeaderClass).addClass('error');
 
         if (isOverQuota) {
@@ -1094,7 +1125,7 @@ mega.tpw = new function TransferProgressWidget() {
     this.showWidget = function() {
         init();
         initUI();
-        if (!$rowsContainer.find('.transfer-task-row').length) {
+        if (!$rowsContainer || !$rowsContainer.find('.transfer-task-row').length) {
             return;
         }
         $widget.removeClass('hidden');

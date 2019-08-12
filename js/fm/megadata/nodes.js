@@ -1796,6 +1796,16 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
                 }
             }, 50);
         }
+
+        if ($('#treeli_' + n.h).length > 0) {
+            // Since n.h may not be a folder, we need to do some check to ensure we really need to do a tree redraw.
+            // In case its rendered in the dom as #treeli_hash, then this is 100% a folder that was rendered in its old
+            // order.
+            // Last but not least, we throttle this, so that big move/rename operations would only redraw the tree once
+            delay('onRenameUIUpdateTreePane', function () {
+                M.redrawTree();
+            }, 50);
+        }
     }
 
     if (M.recentsRender) {
@@ -1811,9 +1821,23 @@ MegaData.prototype.rename = function(itemHandle, newItemName) {
     }
 
     if (n && n.name !== newItemName) {
+        var oldItemName = n.name;
+
         n.name = newItemName;
-        api_setattr(n, mRandomToken('mv'));
+        if (n.t && M.tree[n.p]) {
+            Object(M.tree[n.p][n.h]).name = newItemName;
+        }
+
         this.onRenameUIUpdate(itemHandle, newItemName);
+        api_setattr(n, mRandomToken('mv'))
+            .fail(function(error) {
+                n.name = oldItemName;
+                if (n.t && M.tree[n.p]) {
+                    Object(M.tree[n.p][n.h]).name = oldItemName;
+                }
+                msgDialog('warninga', l[135], l[47], api_strerror(error));
+                M.onRenameUIUpdate(itemHandle, oldItemName);
+            });
     }
 };
 

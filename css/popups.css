@@ -370,6 +370,14 @@ body.tl .dropdown.body.popup.contacts-search {
     z-index: 10;
     overflow: hidden;
 }
+
+.popup-scroll-area .emojis-not-found {
+    color: #999;
+    margin-left: 132px;
+    position: relative;
+    top: 10px;
+}
+
 .popup-scroll-content.emoji {
     padding: 12px;
     min-height: 312px;
@@ -380,7 +388,18 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip {
     display: block;
     position: absolute;
-    z-index: 100;
+    z-index: 1200;
+    opacity: 0;
+    -webkit-transition: opacity 200ms ease-in-out 1s;
+    transition: opacity 200ms ease-in-out 1s;
+    transition-delay: 0ms;
+}
+.dark-direct-tooltip.simpletip-tooltip.delay {
+    -webkit-transition-delay: 1ms;
+    transition-delay: 1ms;
+}
+.dark-direct-tooltip.simpletip-tooltip.visible {
+    opacity: 1;
 }
 .dark-direct-tooltip.simpletip-tooltip.simpletip-v-b {
     margin-top: 5px;

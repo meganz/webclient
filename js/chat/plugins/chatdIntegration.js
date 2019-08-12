@@ -508,6 +508,43 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
     }
 };
 
+
+ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle, chatShard) {
+    var self = this;
+    if (!self._currentMcphurlRequests) {
+        self._currentMcphurlRequests = {};
+    }
+    if (typeof chatShard !== 'undefined' && self._currentMcphurlRequests[chatShard]) {
+        return self._currentMcphurlRequests[chatShard];
+    }
+    if (!isPublic && !chatShard) {
+        var chat = megaChat.getChatById(chatIdOrHandle);
+        if (chat && typeof chat.chatShard !== 'undefined') {
+            chatShard = chat.chatShard;
+        }
+    }
+    var apiReq = {
+        a: isPublic ? 'mcphurl' : 'mcurl',
+        v: Chatd.VERSION
+    };
+    if (isPublic) {
+        apiReq['ph'] = chatIdOrHandle;
+    }
+    else {
+        apiReq['id'] = chatIdOrHandle;
+    }
+    var req = asyncApiReq(apiReq);
+
+    if (typeof chatShard !== 'undefined') {
+        self._currentMcphurlRequests[chatShard] = req;
+        req.always(function() {
+            delete self._currentMcphurlRequests[chatShard];
+        });
+    }
+
+    return req;
+};
+
 /**
  * Core func for opening a chat.
  *
@@ -593,7 +630,11 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
                     apiReq['id'] = chatInfo.id;
                 }
 
-                asyncApiReq(apiReq)
+                self._retrieveShardUrl(
+                    !!publicChatHandle,
+                    publicChatHandle ? publicChatHandle : chatInfo.id,
+                    chatInfo.cs
+                    )
                     .done(function(ret) {
                         self._finalizeMcurlResponseHandling(ret, chatInfo, publicChatHandle, finishProcess);
                     })
@@ -808,19 +849,11 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
     };
 
     if (publicChatHandle || !chatInfo.url && (!chatRoom || !chatRoom.chatdUrl)) {
-
-        var apiReq = {
-            a: publicChatHandle ? 'mcphurl' : 'mcurl',
-            v: Chatd.VERSION
-        };
-        if (publicChatHandle) {
-            apiReq['ph'] = publicChatHandle;
-        }
-        else {
-            apiReq['id'] = chatInfo.id;
-        }
-
-        asyncApiReq(apiReq)
+        self._retrieveShardUrl(
+            !!publicChatHandle,
+            publicChatHandle ? publicChatHandle : chatInfo.id,
+            chatInfo.cs
+        )
             .done(function(ret) {
                 self._finalizeMcurlResponseHandling(ret, chatInfo, publicChatHandle, finishProcess);
             })

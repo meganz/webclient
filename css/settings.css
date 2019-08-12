@@ -53,7 +53,7 @@
     height: 16px;
     left: 16px;
     top: 10px;
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
     opacity: 0.3;
 }
@@ -65,7 +65,7 @@
     height: 24px;
     right: 16px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
     opacity: 0;
@@ -275,22 +275,31 @@
 .settings-sub-section .status-container .content-txt {
     padding: 0;
 }
-.fm-account-notifications .subtitle-txt {
+.fm-account-notifications .settings-sub-section, .fm-account-notifications .settings-sub-section.border {
+    padding: 16px 0;
+}
+.fm-account-notifications .settings-sub-section.border:first-child {
+    padding-top: 24px;
+}
+.fm-right-account-block .fm-account-notifications .content-txt + .dialog-feature-toggle {
+    top: 16px;
+}
+.fm-right-account-block .fm-account-notifications .dialog-feature-toggle {
+    top: 24px;
+}
+.fm-account-notifications .switch-container:not(:first-child) .subtitle-txt {
     display: block;
     line-height: 22px;
-    margin-bottom: 8px;
     margin-top: 24px;
 }
 .subtitle-txt.short-title {
     width: 140px;
 }
-.content-txt, .add-phone-text {
-    font-size: 14px;
-    line-height: 20px;
+.fm-account-sections .content-txt, .fm-account-sections .add-phone-text {
+    font-size: 15px;
+    display: block;
     padding-top: 18px;
-    color: #999;
     vertical-align:top;
-    transition: 0.3s;
 }
 .fm-account-notifications.fm-account-sections .content-txt {
     max-width: 400px;
@@ -299,8 +308,8 @@
     max-width: 340px;
 }
 .settings-sub-section .radio-txt {
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 15px;
+    line-height: 22px;
     color: #999;
     vertical-align:top;
     max-width: 340px;
@@ -311,7 +320,7 @@
     font-size: 18px;
 }
 .settings-sub-section .radio-txt.small {
-    font-size: 14px;
+    font-size: 15px;
 }
 .fm-account-notifications .content-txt {
     padding: 0px;
@@ -800,7 +809,7 @@
     color: #999;
     font-family: 'LatoWeb';
     font-size: 14px;
-    line-height: 18px;
+    line-height: 20px;
 }
 .settings-sub-section.phone-number-settings .phone-number {
     display: none;
@@ -954,14 +963,15 @@
 .fm-right-account-block .grid-table tr {
     font-family: 'LatoWeb','source_sans_proregular', Arial;
     position: relative;
-    transition: 0.3s;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .fm-right-account-block .grid-table tr:last-child {
     border: 0;
 }
-.fm-right-account-block .grid-table tr:not(:first-child):hover {
+.fm-right-account-block .grid-table tr:not(:first-child):hover, .fm-right-account-block .grid-table tr:hover .fm-breadcrumbs:first-child {
     background-color: #fafafa;
+    -webkit-transition: background-color 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out;
 }
 .fm-right-account-block .grid-table tr:first-child {
     background-color: rgba(245,245,245,1);
@@ -1000,8 +1010,11 @@
     box-sizing: border-box;
 }
 .fm-right-account-block .grid-table.megadrop td {
-    padding: 0;
+    padding: 0 12px;
     cursor: pointer;
+}
+.fm-right-account-block .grid-table.megadrop td  .icon {
+    margin-top: 8px;
 }
 .fm-right-account-block .grid-table td.ip-addr {
     max-width: 120px;
@@ -1036,7 +1049,7 @@
 }
 .fm-right-account-block .grid-table.megadrop tr th:nth-child(3),
 .fm-right-account-block .grid-table.megadrop tr td:nth-child(3) {
-    width: 80px;
+    width: 60px;
     overflow: visible;
     line-height: 0;
 }
@@ -1088,6 +1101,7 @@
     white-space: nowrap;
     max-width: 520px;
     overflow: hidden;
+    position: relative;
 }
 .fm-right-account-block .icon {
     width: 24px;
@@ -1101,6 +1115,9 @@
     display: inline-block;
     opacity: 0.3;
     overflow: visible;
+}
+.fm-right-account-block .icon:last-child {
+    margin-right: 0;
 }
 .dashboard .account.user-data-block {
     padding: 60px 20px 0 20px;
@@ -1135,6 +1152,7 @@
 }
 .fm-right-account-block .grid-table.megadrop {
     overflow: auto;
+    table-layout: fixed;
 }
 .fm-right-account-block .grid-table.megadrop .icon {
     position: relative;
@@ -1225,17 +1243,30 @@
     text-overflow: ellipsis;
 }
 .fm-right-account-block .fm-picker-breadcrumbs.link-row {
-    margin: 8px 0;
+    margin: 9px -12px 7px -12px;
     white-space: normal;
 }
 .fm-right-account-block .fm-breadcrumbs {
     cursor: pointer;
+    max-width: calc(100% - 20px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.fm-right-account-block .fm-breadcrumbs:nth-of-type(2) {
+    cursor: pointer;
+    max-width: calc(100% - 74px);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .fm-right-account-block .megadrop-row .fm-breadcrumbs:hover > span {
     text-decoration: underline;
 }
+.fm-right-account-block .closed .widget-card.expanded-widget {
+    overflow: hidden;
+}
 .fm-right-account-block .widget-card.expanded-widget {
-    max-height: 365px;
+    max-height: 865px;
+    overflow: visible;
 }
 .fm-right-account-block .widget-card:hover {
     box-shadow: none;
@@ -1245,13 +1276,14 @@
 }
 .fm-right-account-block .widget-card .widget-dialog-buttons {
     position: relative;
-    padding:16px 0 24px 0;
+    padding: 0 0 24px 0;
+    height: auto;
 }
 .fm-right-account-block .widget-card .widget-dialog-buttons .default-white-button,
 .fm-right-account-block .widget-card .widget-dialog-buttons .default-green-button {
     position: relative;
     float: right;
-    margin: 0 6px;
+    margin: 16px 0 0 12px;
 }
 .fm-right-account-block .widget-card .fm-dialog-tab {
     border-top:none;
@@ -1527,13 +1559,6 @@
 }
 .fm-account-main.low-width .fm-account-sections.fm-account-sections .settings-right-block, .fm-account-main.low-width .fm-account-transfers.fm-account-sections .account.data-block.table-block {
     overflow: visible;
-}
-.fm-account-main.low-width .grid-table.sessions, .fm-account-main.low-width .grid-table.megadrop {
-    margin: 0 -64px;
-    width: calc(100% + 128px);
-}
-.fm-account-main.low-width .fm-right-account-block .fm-picker-breadcrumbs {
-    max-width: 340px;
 }
 .fm-account-main.low-width .settings-right-block .dialog-input-title-ontop {
     width: 250px;

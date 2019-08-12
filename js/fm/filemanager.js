@@ -646,6 +646,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
+        $('.grid-table-header-container-sc .column-settings.overlap').removeClass('c-opened');
 
         // Set to default
         a = $('.dropdown.body.files-menu,.dropdown.body.download');
@@ -2873,6 +2874,16 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         console.time('iconUI');
     }
 
+    // Change title for Public link page
+    if (page === 'fm/public-links') {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[20694]);
+    }
+    else {
+        $('.files-menu.context .dropdown-item.sort-timeAd')
+            .safeHTML('<i class="small-icon context sort-timeAd"></i>' + l[17445]);
+    }
+
     $('.fm-files-view-icon.block-view').addClass('active');
     $('.fm-files-view-icon.listing-view').removeClass('active');
     $('.shared-grid-view').addClass('hidden');
@@ -2980,10 +2991,18 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             sortType = 'date';
         }
 
-        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
-        $me.addClass('selected');
+        var classToAdd = 'selected';
+        var sortDir = 1;
 
-        M.doSort(sortType, 1);
+        if ($me.hasClass('selected') && !$me.hasClass('inverted') ) {
+            classToAdd += ' inverted';
+            sortDir = -1;
+        }
+
+        $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected inverted');
+        $me.addClass(classToAdd);
+
+        M.doSort(sortType, sortDir);
         M.renderMain();
     });
 
@@ -3237,7 +3256,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     // enable add star on first column click (make favorite)
-    $('.grid-table.shared-with-me tr td:first-child,.grid-table.fm tr td:first-child').rebind('click', function() {
+    $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
+        .add('.grid-table.fm tr td:first-child').rebind('click', function() {
         var id = [$(this).parent().attr('id')];
         var newFavState = Number(!M.isFavourite(id));
 
@@ -3298,14 +3318,30 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
     });
 
-    $('.grid-table-header').rebind('contextmenu', function(e) {
+    var showColumnsContextMenu = function(e) {
         var notAllowedTabs = ['shares', 'out-shares', 'contacts', 'ipc', 'opc'];
         if (notAllowedTabs.indexOf(M.currentdirid) !== -1) {
             return false;
         }
         M.contextMenuUI(e, 7);
         return false;
+    };
+
+    $('.grid-table-header').rebind('contextmenu', function(e) {
+        return showColumnsContextMenu(e);
     });
+
+    $('.grid-table-header-container-sc .column-settings.overlap').rebind('click',
+        function(e) {
+            var $me = $(this);
+            if ($me.hasClass('c-opened')) {
+                $.hideContextMenu();
+                return false;
+            }
+            showColumnsContextMenu(e);
+            $me.addClass('c-opened');
+            return false;
+        });
 
     $('.files-menu.context .dropdown-item.visible-col-select').rebind('click', function(e) {
         var $me = $(this);

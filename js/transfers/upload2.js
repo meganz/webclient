@@ -334,7 +334,8 @@ var ulmanager = {
     },
 
     restart: function UM_restart(file, reason, xhr) {
-        onUploadError(file, "Upload failed - restarting...", reason, xhr);
+        // Upload failed - restarting...
+        onUploadError(file, l[20917], reason, xhr);
 
         // reschedule
         ulQueue.poke(file);
@@ -400,7 +401,8 @@ var ulmanager = {
             }
         }, 950 + Math.floor(Math.random() * 2e3));
 
-        onUploadError(file, "Upload failed - retrying",
+        // "Upload failed - retrying"
+        onUploadError(file, l[20918],
             reason.substr(0, 2) === 'IO' ? 'IO Failed' : reason,
             xhr);
 

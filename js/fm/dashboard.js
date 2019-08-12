@@ -298,6 +298,10 @@ function dashboardUI() {
                 100 * (account.space - account.space_used) / account.space,
             ];
             for (i = 0; i < 5; i++) {
+                if (i === 2) {
+                    // escaping showing incoming share percentage
+                    continue;
+                }
                 var $percBlock = $('.storage .account.progress-perc.pr' + i);
                 if (percents[i] > 0) {
                     $percBlock.text(Math.round(percents[i]) + ' %');
@@ -318,9 +322,9 @@ function dashboardUI() {
                 account.stats[M.RubbishID].bytes > 0 ? bytesToSize(account.stats[M.RubbishID].bytes) : '-'
             );
             // Incoming shares
-            $('.account.progress-size.incoming-shares').text(
-                account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
-            );
+            // $('.account.progress-size.incoming-shares').text(
+            //    account.stats.inshares.bytes ? bytesToSize(account.stats.inshares.bytes) : '-'
+            // );
             // Inbox
             $('.account.progress-size.inbox').text(
                 account.stats[M.InboxID].bytes > 0 ? bytesToSize(account.stats[M.InboxID].bytes) : '-'

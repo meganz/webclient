@@ -45,6 +45,52 @@ body.pro:after {
     display: none;
     content: url(../images/mega/payment-animation.gif);
 }
+
+/* Developer dark mode */
+html.dark-mode {
+    filter: invert(1);
+    overflow-x: hidden;
+}
+html.dark-mode .loading-main-block .loading-percentage {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .loading-main-block .loading-m-block {
+    background-color: #000;
+    filter: invert(1);
+}
+html.dark-mode .mobile.two-factor-page .qr-code-img {
+    background-color: #fff;
+    filter: invert(1);
+    padding: 5px;
+}
+/* Overrides to prevent inverting (inverts again back to normal) */
+html.dark-mode .logo,
+html.dark-mode .browsers.icon.medium,
+html.dark-mode .business-icon.semi-medium,
+html.dark-mode .main-loader,
+html.dark-mode .reg-st3-membership-icon,
+html.dark-mode .provider-icon,
+html.dark-mode .membership-icon,
+html.dark-mode .dark-overlay,
+html.dark-mode .fm-icon.mega,
+html.dark-mode .loading .loading-image,
+html.dark-mode .mobile.slideshow-back-arrow,
+html.dark-mode .mobile.slideshow-forward-arrow,
+html.dark-mode video,
+html.dark-mode img {
+    filter: invert(1);
+}
+html.dark-mode .mobile.slides.mid {
+    filter: invert(1);
+}
+html.dark-mode .mobile.slides.mid img {
+    filter: none;
+}
+html.dark-mode .mobile.context-menu-container.hidden {
+    display: none !important;
+}
+
 /* Re-enable selection and highlighting for specific things */
 input, textarea {
     -webkit-touch-callout: text !important;
@@ -85,6 +131,59 @@ ul, li {
 .left {
     float: left;
 }
+/* text for mobile*/
+.txt-bold {
+     font-weight: 700;
+     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+}
+.txt-green {
+    color: #00BFA5;
+}
+.mobile .semi-large-header {
+    font-size: 18px;
+    line-height: 28px;
+    color: #333;
+    font-family: 'LatoWebBold';
+    padding: 24px 0px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.mobile .content-txt {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 22px;
+    color: #666;
+    padding:0;
+    position: relative;
+    display: inline-block;
+}
+.mobile .content-txt.txt-bold {
+     font-weight: 700;
+     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+}
+.mobile .content-txt.txt-dark {
+    color: #333;
+}
+.mobile .content-txt.semi-larger-txt {
+    font-size: 15px;
+    line-height: 22px;
+}
+.mobile .underline-btn-txt {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 22px;
+    text-decoration: underline;
+    position: relative;
+    display: inline-block;
+    outline-color: none;
+}
+.mobile .underline-btn-txt.semi-larger-txt {
+    font-size: 16px;
+    line-height: 24px;
+}
+/*end of text for mobile*/
 .mobile.stop-inertia {
     overflow: hidden;
 }
@@ -426,7 +525,7 @@ ul, li {
     overflow: hidden;
     font-family: 'latoWeb';
 }
-.mobile.inline-buttons .mobile.red-button, .mobile.inline-buttons .mobile.green-button {
+.mobile.inline-buttons .mobile.red-button, .mobile.inline-buttons .mobile.green-button, .mobile .unsub .btn {
     width: 50%;
     width: -webkit-calc(50% - 4px);
     width: -moz-calc(50% - 4px);
@@ -444,7 +543,7 @@ ul, li {
 .mobile.inline-buttons .mobile.red-button.first, .mobile.inline-buttons .mobile.green-button.first   {
     float: right;
 }
-.mobile.inline-buttons .mobile.second {
+.mobile.inline-buttons .mobile.second, .mobile .unsub .default-white-button {
     float: left;
     background: #FFFFFF;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.75) 100%);
@@ -463,7 +562,7 @@ ul, li {
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.03);
     color:  #555;
 }
-.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar, .membership-bott-button, .payment-address-dialog .payment-buy-now, .mobile.green-button {
+.mobile.red-button, .mobile.download-progress .bar, .mobile.upload-progress .bar, .membership-bott-button, .payment-address-dialog .payment-buy-now, .mobile.green-button, .mobile.default-green-button, .mobile.default-white-button {
     color: white;
     font-size: 13px;
     display: block;
@@ -482,7 +581,7 @@ ul, li {
     overflow: hidden;
     box-sizing:border-box;
 }
-.mobile.green-button {
+.mobile.green-button, .mobile.default-green-button {
     background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
     border: 1px solid #00A58F;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
@@ -7174,7 +7273,7 @@ textarea.mobile.support-text-field {
     -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 }
-.mobile .mobile.red-button.dl-browser {
+.mobile .mobile.red-button.dl-browser, .mobile .unsub .default-white-button {
     background: #FFFFFF;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.75) 100%);
     border: 1px solid #DFDFDF;
@@ -8259,7 +8358,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -9767,7 +9866,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/mobile-sprite_v24.png);
+    background-image: url(../images/mobile/mobile-sprite_v24.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11419,3 +11518,54 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 /**
  * End of chatlink preview page styles
  */
+/*subscription page*/
+.mobile .underline-btn-txt {
+    display: block;
+    text-align: center;
+}
+.mobile .bottom-page.unsub .icon64 {
+    background-image: url(../images/mega/big-icons_v4.png);
+    background-repeat: no-repeat;
+    width:64px;
+    height: 64px;
+    position: relative;
+    background-position: -117px -1261px;
+}
+.bottom-page.unsub .tip-wrapper .underline-btn-txt {
+    margin-top: 8px;
+}
+.mobile .sent-email-logo {
+    background-image: url(../images/mega/big-icons_v4.png);
+    background-repeat: no-repeat;
+    width: 86px;
+    height: 44px;
+    position: relative;
+    background-position: -17px -1091px;
+}
+
+/** Developer Settings Page **/
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: left;
+}
+.bottom-page.developer-settings .developer-settings-container {
+    margin-bottom: 100px;
+}
+.bottom-page.developer-settings h3 {
+    text-align: center;
+}
+.bottom-page.developer-settings .apply {
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .apply {
+    color: white;
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+}
+.bottom-page.developer-settings .developer-setting {
+    width: 100%;
+}
+/** End Developer Settings Page **/

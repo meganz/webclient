@@ -230,9 +230,6 @@ function topPopupAlign(button, popup, topPos) {
     }
 }
 
-
-
-
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
     var mobilePageParsed = false;
@@ -570,6 +567,7 @@ function init_page() {
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
+        && (page !== 'unsub')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1375,13 +1373,21 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms') {
+    else if (page.substr(0, 5) === 'terms') {
         if (is_mobile) {
             mobile.initDOM();
             mobile.terms.show();
         }
         else {
             parsepage(pages['terms']);
+        }
+
+        if (page.substr(5, 1) === '/') {
+            delay('waitTermLoad', function() {
+                var anchor = page.split('/')[1];
+                page = 'terms';
+                $('a[data-scrollto="#' + anchor + '"]').click();
+            });
         }
     }
     else if (page === 'security') {
@@ -1531,6 +1537,15 @@ function init_page() {
         parsepage(pages['done']);
         init_done();
     }
+    else if (page.substr(0, 5) === 'unsub') {
+        // Non-registered user unsubsribe from emails.
+        if (is_mobile) {
+            mobile.initDOM();
+        }
+        M.require('unsub_js').done(function() {
+            EmailUnsubscribe.unsubscribe();
+        });
+    }
     else if (dlid) {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {
@@ -1647,8 +1662,44 @@ function init_page() {
             return init_page();
         }
 
-    }
-    else if (is_fm()) {
+    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+        var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
+        var contactHandle = contactRequestInfo.u;
+        var contactRequestTime = contactRequestInfo.unixTime;
+        var TWO_HOURS_IN_SECONDS = 7200;
+
+        var addContact = function (ownerEmail, targetEmail) {
+            M.inviteContact(ownerEmail, targetEmail);
+            localStorage.removeItem('addContact');
+            return init_page();
+        };
+
+        if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
+            attribCache.getItem(contactHandle + "_uge")
+            .done(function(email) {
+                addContact(u_attr.email, email);
+            })
+            .fail(function() {
+                asyncApiReq({
+                    'a': 'uge',
+                    'u': contactHandle
+                })
+                .done(function(email) {
+                    if (isValidEmail(email) && isString(email)) {
+                        attribCache.setItem(contactHandle + "_uge", email);
+                        addContact(u_attr.email, email);
+                    }
+                    else {
+                        localStorage.removeItem('addContact');
+                    }
+                })
+                .fail(function(e) {
+                    console.error(e);
+                    localStorage.removeItem('addContact');
+                });
+            });
+        }
+    } else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1961,19 +2012,13 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
+    var $versionButton = $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
     var versionClickCounter = 0;
     var versionClickTimeout = null;
-    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion()).off('click').on('click', function() {
+    $versionButton.rebind('click', function() {
         clearTimeout(versionClickTimeout);
-        if (++versionClickCounter >= 5) {
-            if (apipath && apipath.indexOf("staging.api.mega.co.nz") >= 0) {
-                localStorage.removeItem('apipath');
-                alert("API path set to live");
-            } else {
-                M.staging(1);
-                alert("API path set to staging");
-            }
-            window.location.reload();
+        if (++versionClickCounter >= 3) {
+            mega.developerSettings.show();
         }
         versionClickTimeout = setTimeout(function() {
             versionClickCounter = 0;

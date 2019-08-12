@@ -590,6 +590,7 @@ RtcModule.prototype._removeCall = function(call) {
         }
     }
 };
+
 Call.prototype.onNoInputAudioDetected = function() {
     this.manager._fire("onNoInputAudioDetected");
 };
@@ -617,16 +618,59 @@ Call.prototype._initialGetLocalStream = function(av) {
     var pms;
     // We always get audio, and then mute it if we don't need it
     if (needVideo) {
-        var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
-        pms = RTC.getUserMedia({audio: true, video: vidOpts})
-        .catch(function(error) {
-            self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
-            return RTC.getUserMedia({audio: true, video: false});
-        })
-        .catch(function(error) {
-            self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
-            return RTC.getUserMedia({audio: false, video: vidOpts});
-        });
+        if (av & Av.Screen) {
+            self._isCapturingScreen = true;
+            // for screen sharing, we can't obtain audio & video at the same time, they come
+            // from different APIs
+            var pmsAudio = RTC.getUserMedia({audio: true})
+            .catch(function(err) {
+                self.logger.warn("Error getting audio:", err);
+                return null;
+            });
+            var pmsScreen = RTC.getDisplayMedia({
+                video: {
+                    cursor: 'never',
+                    displaySurface: 'monitor'
+                }
+            })
+            .catch(function(err) {
+                self.logger.warn("Error getting screen:", err);
+                return null;
+            });
+            pms = Promise.all([pmsAudio, pmsScreen])
+            .then(function(streams) {
+                var audioStream = streams[0];
+                var screenStream = streams[1];
+                if (!audioStream) {
+                    return screenStream;
+                } else if (!screenStream) {
+                    return audioStream;
+                } else {
+                    var audioTrack = audioStream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        screenStream.addTrack(audioTrack);
+                    }
+                    var videoTrack = screenStream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        videoTrack.onended = function() {
+                            self._onScreenCaptureEndedByFloatButton();
+                        };
+                    }
+                    return Promise.resolve(screenStream);
+                }
+            });
+        } else {
+            var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            pms = RTC.getUserMedia({audio: true, video: vidOpts})
+            .catch(function(error) {
+                self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
+                return RTC.getUserMedia({audio: true, video: false});
+            })
+            .catch(function(error) {
+                self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
+                return RTC.getUserMedia({audio: false, video: vidOpts});
+            });
+        }
     } else { // need only audio
         pms = RTC.getUserMedia({audio: true, video: false});
     }
@@ -688,7 +732,7 @@ Call.prototype._initialGetLocalStream = function(av) {
     });
 };
 
-Call.prototype._getLocalVideo = function() {
+Call.prototype._getLocalVideo = function(screenCapture) {
     var self = this;
     assert(!self.gLocalStream || !Av.streamHasVideo(self.gLocalStream));
     var resolved = false; // track whether the promise was resolved for the timeout reject
@@ -700,11 +744,21 @@ Call.prototype._getLocalVideo = function() {
             notified = true;
         }
     }, 2000);
-    var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
 
     return new Promise(function(resolve, reject) {
-        RTC.getUserMedia({audio: false, video: vidOpts})
-        .then(function(stream) {
+        var pms;
+        if (screenCapture) {
+            pms = RTC.getDisplayMedia({
+                video: {
+                    cursor: 'never',
+                    displaySurface: 'monitor'
+                }
+            });
+        } else {
+            var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            pms = RTC.getUserMedia({audio: false, video: vidOpts});
+        }
+        pms.then(function(stream) {
             if (resolved) {
                 RTC.stopMediaStream(stream);
                 return;
@@ -737,7 +791,7 @@ Call.prototype._getLocalVideo = function() {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        self.manager._fire('onLocalMediaFail', err);
+        self._fire('onLocalMediaFail', err);
         return Promise.reject(err);
     });
 };
@@ -1882,7 +1936,7 @@ Call.prototype._join = function() {
     // JOIN:
     // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8 flags.1
     // flags is sentAv + whether we support stream renegotiation
-    var data = self.id + self.manager.ownAnonId + (String.fromCharCode(Av.fromStream(self.gLocalStream) |
+    var data = self.id + self.manager.ownAnonId + (String.fromCharCode(self.localAv() |
         (RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)));
     self._setState(CallState.kJoining);
     if (!self.cmdBroadcast(RTCMD.JOIN, data)) {
@@ -2094,7 +2148,7 @@ Call.prototype._checkLocalMuteCompleted = function() {
     var self = this;
     // We are called when a session renegotiation completes, but it may be the peer that does
     // the muting
-    if (!self._localMuteInProgress) {
+    if (!self._localMuteCompletePromise) {
         return;
     }
     var sessRetries = self.sessRetries;
@@ -2121,16 +2175,22 @@ Call.prototype._checkLocalMuteCompleted = function() {
 
 Call.prototype._notifyLocalMuteInProgress = function() {
     var self = this;
-    assert(!self._localMuteInProgress);
-    self._localMuteInProgress = true;
+    assert(!self._localMuteCompletePromise);
+    self._localMuteCompletePromise = createPromiseWithResolveMethods();
     self._fire("onLocalMuteInProgress");
 };
 
-Call.prototype._notifyLocalMuteComplete = function() {
+Call.prototype._notifyLocalMuteComplete = function(err) {
     var self = this;
-    assert(self._localMuteInProgress);
-    delete self._localMuteInProgress;
+    assert(self._localMuteCompletePromise);
+    var pms = self._localMuteCompletePromise;
+    delete self._localMuteCompletePromise;
     self._fire('onLocalMuteComplete');
+    if (err) {
+        pms.reject(err);
+    } else {
+        pms.resolve();
+    }
 };
 
 Call.prototype._removeRetry = function(reason, userid, clientid) {
@@ -2173,10 +2233,6 @@ Call.prototype._notifySessionConnected = function(sess) {
     if (chat.tsCallStart == null) {
         chat.tsCallStart = Date.now();
     }
-    self._fire('onCallStarted', chat.tsCallStart);
-    if (!self.isGroup && Av.fromStream(sess.remoteStream) === 0 && Av.fromStream(self.gLocalStream) === 0) {
-        self._fire('onNoMediaOnBothEnds');
-    }
     var recovery = this.manager.callRecoveries[this.chatid];
     if (recovery) {
         if (recovery.callid === this.id) {
@@ -2192,7 +2248,7 @@ Call.prototype._notifySessionConnected = function(sess) {
     } else {
         this._fire('onCallStarted', chat.tsCallStart);
     }
-    if (!this.isGroup && Av.fromStream(sess.remoteStream) === 0 && Av.fromStream(this.manager.gLocalAv) === 0) {
+    if (!this.isGroup && Av.fromStream(sess.remoteStream) === 0 && self.localAv() === 0) {
         this._fire('onNoMediaOnBothEnds');
     }
     if (self._renegotiateAfterInitialConnect) {
@@ -2208,7 +2264,7 @@ Call.prototype.enableAudio = function(enable) {
         self.logger.warn("enableAudio: Call is terminating");
         return;
     }
-    if (self._localMuteInProgress) {
+    if (self._localMuteCompletePromise) {
         self.logger.warn("enableAudio: Local mute/unmute already in progress");
         return;
     }
@@ -2216,7 +2272,7 @@ Call.prototype.enableAudio = function(enable) {
     if (!s) {
         return;
     }
-    var oldAv = Av.fromStream(s);
+    var oldAv = self.localAv();
     var hadAudio = !!(oldAv & Av.Audio);
     if (hadAudio === enable) {
         self.logger.log("enableAudio: Nothing to change");
@@ -2230,13 +2286,12 @@ Call.prototype.enableAudio = function(enable) {
     }
     self._notifyLocalMuteInProgress();
     Av.enableAudio(s, enable);
-    var newAv = Av.fromStream(s);
     self._notifyLocalMuteComplete();
     if (hadAudio === enable) {
         self.logger.warn("Failed to enable/disable audio");
         return;
     }
-    self._bcastLocalAvChange(newAv);
+    self._bcastLocalAvChange();
     var amChecker = self._audioMutedChecker;
     if (amChecker) {
         if (!enable) {
@@ -2246,103 +2301,185 @@ Call.prototype.enableAudio = function(enable) {
         }
     }
 };
-Call.prototype.enableVideo = function(enable) {
+
+Call.prototype._canEnableDisableVideo = function(enable) {
     var self = this;
     if (self.state !== CallState.kCallInProgress) {
-        self.logger.warn("enableVideo: Call state is not kInProgress, but " + constStateToText(CallState, self.state));
-        return;
+        return "Call that is not in state kInProgress (but in " + constStateToText(CallState, self.state) + ")";
     }
-    if (self._localMuteInProgress) {
-        self.logger.warn("enableVideo: A mute/unmute operation is already in progress");
-        return;
+    if (self._localMuteCompletePromise) {
+        return "A mute/unmute operation is already in progress";
     }
-    var oldAv = Av.fromStream(self.gLocalStream);
+    var oldAv = self.localAv();
     if ((!!(oldAv & Av.Video)) === enable) { // jshint -W018
-        self.logger.log("enableVideo: Nothing to change");
-        return;
+        return "Nothing to change";
     }
-    var sndCounts = self.manager.getAudioVideoSenderCount(self.chatid);
-    assert(sndCounts);
-    if (enable && (sndCounts.video >= RtcModule.kMaxCallVideoSenders)) {
-        self.logger.warn("Can't enable video sending, too many video senders in call");
-        return;
+    return null;
+};
+
+Call.prototype._enableVideo = function(screen) {
+    var self = this;
+    var err = self._canEnableDisableVideo(true);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
     }
+    var senderCounts = self.manager.getAudioVideoSenderCount(self.chatid);
+    assert(senderCounts);
+    if (senderCounts.video >= RtcModule.kMaxCallVideoSenders) {
+        var msg = "Can't enable video sending, too many video senders in call";
+        self.logger.warn(msg);
+        return Promise.reject(msg);
+    }
+    self._isCapturingScreen = screen;
     self._notifyLocalMuteInProgress();
     var sessions = self.sessions;
-    if (enable) {
-        var pms = self._getLocalVideo();
-        pms.catch(function(err) {
-            // can't enable camera
-            self.logger.warn("Error getting local video: " + err);
-            self._notifyLocalMuteComplete();
-        });
-        pms.then(function() {
-            if (self.state >= CallState.kTerminating) {
-                return;
-            }
-            var videoTrack = self.gLocalStream.getVideoTracks()[0];
-            assert(videoTrack);
-            if (Object.keys(sessions).length === 0) {
-                self._checkLocalMuteCompleted();
-            } else {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
-                        // we can just replace the track at the sender
-                        sess._setStreamRenegTimeout();
-                        RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
-                        .then((function() {
-                            this._notifyRenegotiationComplete();
-                        }).bind(sess));
-                    } else { // no videoSender or we don't have replaceTrack support
-                        if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
-                            RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
-                        } else {
-                            sess.terminateAndDestroy(Term.kStreamChange);
-                        }
-                    }
-                }
-            }
-            self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
-        });
-    } else { // disable video
-        RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var pms = self._getLocalVideo(screen);
+    pms.catch(function(err) {
+        // can't enable camera/screen capture
+        self._isCapturingScreen = false;
+        self.logger.warn("Error getting local video: " + err);
+        self._notifyLocalMuteComplete(err);
+    });
+
+    pms.then(function() {
+        if (self.state >= CallState.kTerminating) {
+            return;
+        }
+        var videoTrack = self.gLocalStream.getVideoTracks()[0];
+        assert(videoTrack);
+        if (screen) {
+            videoTrack.onended = function() {
+                self._onScreenCaptureEndedByFloatButton();
+            };
+        }
         if (Object.keys(sessions).length === 0) {
             self._checkLocalMuteCompleted();
         } else {
-          if (RTC.supportsReplaceTrack) {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    var pc = sess.rtcConn;
-                    assert(pc);
-                    var pms = RTC.peerConnRemoveVideoTrack(pc);
-                    // pms is null if there was no video track
-                    assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
-                        "but gLocalStream has one");
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
+                    // we can just replace the track at the sender
                     sess._setStreamRenegTimeout();
-                    pms.then(function() {
+                    RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
+                    .then((function() {
                         this._notifyRenegotiationComplete();
-                    }.bind(sess));
-                    pms.catch(function(err) { // replaceTrack(null) is not supported
-                        self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
-                            " falling back to session reconnect");
-                        this.terminateAndDestroy(Term.kStreamChange);
-                    }.bind(sess));
-                }
-            } else {
-                for (var sid in sessions) {
-                    sessions[sid].terminateAndDestroy(Term.kStreamChange);
+                    }).bind(sess));
+                } else { // no videoSender or we don't have replaceTrack support
+                    if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
+                        RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
+                    } else {
+                        sess.terminateAndDestroy(Term.kStreamChange);
+                    }
                 }
             }
         }
-        self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
-    }
+        self._bcastLocalAvChange();
+    })
+    .catch(function(err) {
+        // silence logging an unhandled promise reject in the console,
+        // since the error is passed to the pms.then() branch as well
+    });
+    return self._localMuteCompletePromise;
 };
 
-Call.prototype._bcastLocalAvChange = function(av) {
+Call.prototype.disableVideo = function() {
+    var self = this;
+    var err = self._canEnableDisableVideo(false);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
+    }
+    delete self._isCapturingScreen;
+    self._notifyLocalMuteInProgress();
+    RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var sessions = self.sessions;
+    if (Object.keys(sessions).length === 0) {
+        self._checkLocalMuteCompleted();
+    } else {
+        if (RTC.supportsReplaceTrack) {
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                var pc = sess.rtcConn;
+                assert(pc);
+                var pms = RTC.peerConnRemoveVideoTrack(pc);
+                // pms is null if there was no video track
+                assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
+                    "but gLocalStream has one");
+                sess._setStreamRenegTimeout();
+                pms.then(function() {
+                    this._notifyRenegotiationComplete();
+                }.bind(sess));
+                pms.catch(function(err) { // replaceTrack(null) is not supported
+                    self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
+                        " falling back to session reconnect");
+                    this.terminateAndDestroy(Term.kStreamChange);
+                }.bind(sess));
+            }
+        } else {
+            for (var sid in sessions) {
+                sessions[sid].terminateAndDestroy(Term.kStreamChange);
+            }
+        }
+    }
+    self._bcastLocalAvChange();
+    return self._localMuteCompletePromise;
+};
+
+Call.prototype.enableScreenCapture = function() {
+    var self = this;
+    if (!RTC.supportsScreenCapture) {
+        return Promise.reject("Screen capture is not supported by this browser");
+    }
+    if (self._isCapturingScreen) {
+        return Promise.reject("Screen capture already enabled");
+    }
+    var pms = (self.localAv() & Av.Video) ? self.disableVideo() : Promise.resolve();
+    return pms
+    .then(function() {
+        return self._enableVideo(true);
+    });
+};
+
+Call.prototype.enableCamera = function() {
+    var self = this;
+    var localAv = self.localAv();
+    var pms;
+    if (localAv & Av.Video) {
+        if ((localAv & Av.Screen) === 0) {
+            return Promise.reject("Camera already enabled");
+        } else {
+            pms = self.disableVideo();
+        }
+    } else {
+        pms = Promise.resolve();
+    }
+    return pms
+    .then(function() {
+        return self._enableVideo(false);
+    });
+};
+
+Call.prototype._onScreenCaptureEndedByFloatButton = function() {
+    var self = this;
+    if (!self._isCapturingScreen) {
+        self.logger.warn("Received stop button click from screen capture, but we are not capturing screen, ignoring");
+        return;
+    }
+    delete self._isCapturingScreen;
+    self.logger.log("Screen capture ended by floating button, muting video");
+    self.disableVideo().catch(function(err) {});
+};
+
+Call.prototype.isScreenCaptureEnabled = function() {
+    return this._isCapturingScreen;
+};
+
+Call.prototype._bcastLocalAvChange = function() {
     this._bcastCallData(null); // this also calls _updateOwnPeerAvState();
     // For compatibility with older native clients that support only 1on1 calls, send RTMSG_MUTE as well
     if (!this.isGroup) {
+        var av = this.localAv();
         var sessions = this.sessions;
         for (var sid in sessions) {
             sessions[sid]._sendAv(av);
@@ -2351,7 +2488,11 @@ Call.prototype._bcastLocalAvChange = function(av) {
 };
 
 Call.prototype.localAv = function() {
-    return Av.fromStream(this.gLocalStream);
+    var av = Av.fromStream(this.gLocalStream);
+    if ((av & Av.Video) && this._isCapturingScreen) {
+        av |= Av.Screen;
+    }
+    return av;
 };
 
 /** Protocol flow:
@@ -2391,7 +2532,7 @@ Call.prototype.localAv = function() {
         => send SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
         => call state: CallState.kCallInProgress (in case of group calls call state may already be kCallInProgress)
 
-    A: send SDP_OFFER sid.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
+    A: send SDP_OFFER sid.8 anonId.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
         => call state: CallState.kInProress
         => sess state: SessState.kWaitSdpAnswer
     C: send SDP_ANSWER sid.8 fprHash.32 av.1 sdpLen.2 sdpAnswer.sdpLen
@@ -2727,7 +2868,7 @@ Session.prototype._sendSdpAnswer = function() {
         var success = self.cmd(
             opcode,
             self.ownFprHash +
-            String.fromCharCode(Av.fromStream(self.call.gLocalStream)) +
+            String.fromCharCode(self.call.localAv()) +
             Chatd.pack16le(self.ownSdpAnswer.length) +
             self.ownSdpAnswer
         );
@@ -2831,14 +2972,23 @@ Session.prototype._createRtcConn = function() {
         self.cmd(RTCMD.ICE_CANDIDATE, data);
     };
     conn.onaddstream = function(event) {
+        self.logger.log("onaddstream");
         if (self.remoteStream) {
             self._fire("onRemoteStreamRemoved");
         }
         var stream = self.remoteStream = event.stream;
         self._fire("onRemoteStreamAdded", stream);
         if (stream.getAudioTracks().length) {
+            // Audio level notifications for all peers seems to require too much CPU
             // self.audioLevelMonitor = new AudioLevelMonitor(stream, self.handler);
         }
+        if (self.state !== SessState.kSessInProgress) {
+            return;
+        }
+        // Just in case, check if the actual stream a/v tracks match the ones negotiated
+        // over CALLDATA/SDP. If not, they will be updated
+        self._onRemoteMuteUnmute(Av.fromStream(stream) | (self.peerAv & Av.Screen));
+
         // FIXME: We never had audio work from the GUI player if video is disabled,
         // and the audio was coming from this 'internal' player. We need to fix that ASAP
         if (self.mediaWaitPlayer) {
@@ -2876,10 +3026,6 @@ Session.prototype._createRtcConn = function() {
     };
     conn.ontrack = function(event) {
         self.logger.debug("ontrack:", streamInfo(event.streams[0]));
-        if (self.state !== SessState.kSessInProgress) {
-            return;
-        }
-        self._onRemoteMuteUnmute(Av.fromStream(event.streams[0]));
     };
 
     conn.onsignalingstatechange = function(event) {
@@ -2998,7 +3144,7 @@ Session.prototype.sendOffer = function() {
                 ? self.crypto.encryptNonceTo(self.peer, self.ownHashKey)
                 : '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0') +
             self.crypto.mac(self.ownSdpOffer, self.peerHashKey) +
-            String.fromCharCode(Av.fromStream(self.call.gLocalStream)) +
+            String.fromCharCode(self.call.localAv()) +
             Chatd.pack16le(self.ownSdpOffer.length) +
             self.ownSdpOffer
         );
@@ -3566,7 +3712,9 @@ Session.prototype.calcNetworkQualityFirefox = function(sample) {
 };
 
 // jshint -W003
-var Av = { Audio: 1, Video: 2, Mask: 3 };
+// Only if the Video flag is set, the Screen flag may be also set to denote that the video is
+// a screen capture stream
+var Av = { Audio: 1, Video: 2, Screen: 8, Mask: 11 };
 Av.fromStream = function(stream) {
     if (!stream) {
         return 0;
@@ -3576,12 +3724,14 @@ Av.fromStream = function(stream) {
     for (var i = 0; i < at.length; i++) {
         if (at[i].enabled) {
             av |= Av.Audio;
+            break;
         }
     }
     var vt = stream.getVideoTracks();
     for (var i = 0; i < vt.length; i++) {
         if (vt[i].enabled) {
             av |= Av.Video;
+            break;
         }
     }
     return av;
@@ -3604,6 +3754,9 @@ Av.fromMediaOptions = function(opts) {
     var result = opts.audio ? Av.Audio : 0;
     if (opts.video) {
         result |= Av.Video;
+        if (opts.screen) {
+            result |= Av.Screen;
+        }
     }
     return result;
 };
@@ -3658,16 +3811,17 @@ Av.applyToStream = function(stream, av) {
 };
 
 Av.toString = function(av) {
-    if (av & Av.Audio) {
-        if (av & Av.Video) {
-            return 'a+v';
+    var vidPart = null;
+    if (av & Av.Video) {
+        if (av & Av.Screen) {
+            vidPart = 'v(screen)';
         } else {
-            return 'a';
+            vidPart = 'v';
         }
-    } else if (av & Av.Video) {
-        return 'v';
+        return (av & Av.Audio) ? ('a+' + vidPart) : vidPart;
     } else {
-        return '-';
+        // no video
+        return (av & Av.Audio) ? 'a' : '-';
     }
 };
 
@@ -3979,6 +4133,14 @@ RtcModule.rtcmdToString = function(cmd, tx, chatdOpcode) {
                 result += getSid() + ', mid: ' + cmd.substr(34, midLen) +
                     '\n' + cmd.substr(35 + midLen, candLen);
                 break;
+            case RTCMD.SDP_OFFER:
+            case RTCMD.SDP_OFFER_RENEGOTIATE:
+                result += getSid() + ', av: ' + Av.toString(cmd.charCodeAt(104));
+                break;
+            case RTCMD.SDP_ANSWER:
+            case RTCMD.SDP_ANSWER_RENEGOTIATE:
+                result += getSid() + ', av: ' + Av.toString(cmd.charCodeAt(64));
+                break;
             default:
                 result += '\ndata(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
                 if (dataLen > 64) {
@@ -4063,7 +4225,7 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         handler = { onAudioLevelChange: function(level) {  console.log("audio level change:", level);  } };
     }
     self.handler = handler;
-    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.01;
+    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.002;
     var ctx = self.audioCtx = new AudioContext();
     self.source = ctx.createMediaStreamSource(stream);
     var scriptNode = self.scriptNode = ctx.createScriptProcessor(8192, 1, 1);
@@ -4289,6 +4451,29 @@ function streamInfo(stream) {
         str += "\n\t" + trackInfo(tracks[i]);
     }
     return str;
+}
+function createPromiseWithResolveMethods() {
+    var cbResolve;
+    var cbReject;
+    var pms = new Promise(function(resolve, reject) {
+        cbResolve = resolve;
+        cbReject = reject;
+    });
+    pms.resolve = function(val) {
+        if (pms.done) {
+            return;
+        }
+        pms.done = true;
+        cbResolve(val);
+    };
+    pms.reject = function(err) {
+        if (pms.done) {
+            return;
+        }
+        pms.done = true;
+        cbReject(err);
+    };
+    return pms;
 }
 
 RtcModule.streamInfo = streamInfo;

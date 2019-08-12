@@ -161,7 +161,7 @@
     background-position: 0 -2249px;
 }
 .dropdown-dark-arrow {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -41px -1315px;
     display: none;
@@ -284,7 +284,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -358,7 +358,7 @@
     top: 7px;
     content: '';
     display: block;
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-repeat: no-repeat;
 }
 .colour-sorting-menu .dropdown-item.asc i::after {/* Dark arrow pointing up */
@@ -650,7 +650,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .labels:not(.disabled) .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-position: 2.2px -532.2px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -1021,7 +1021,7 @@ z-index: 1;
     -moz-box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
     margin: -8px -8px 9px -8px;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-position: 0 -3881px;
     background-repeat: repeat-x;
     height: 80px;

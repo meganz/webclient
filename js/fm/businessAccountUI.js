@@ -3172,7 +3172,7 @@ BusinessAccountUI.prototype.sortSubusers = function(subusers, field) {
                 }
             }
         });
-        var sortedSubList = [];
+        var sortedSubList = {};
         for (var k = 0; k < tempArray.length; k++) {
             sortedSubList[tempArray[k].key] = tempArray[k].val;
         }

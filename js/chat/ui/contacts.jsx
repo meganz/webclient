@@ -1,8 +1,7 @@
-var React = require("react");
-var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
-var utils = require("../../ui/utils.jsx");
-var PerfectScrollbar = require("../../ui/perfectScrollbar.jsx").PerfectScrollbar;
+import React from 'react';
+import { MegaRenderMixin, RenderDebugger } from '../../stores/mixins.js';
+import utils from '../../ui/utils.jsx';
+import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 
 var ContactsListItem = React.createClass({
     mixins: [MegaRenderMixin, RenderDebugger],
@@ -182,40 +181,52 @@ var ContactButton = React.createClass({
             else if (!contact.c) {
                 moreDropdowns.push(
                     <DropdownsUI.DropdownItem
-                        key="view2" icon="small-icon icons-sprite grey-plus" label={__(l[101])} onClick={() => {
-                        loadingDialog.show();
+                        key="view2"
+                        icon="small-icon icons-sprite grey-plus"
+                        label={__(l[101])}
+                        onClick={() => {
+                            loadingDialog.show();
+                            const isAnonymousUser = (!u_handle || u_type !== 3);
+                            const ADD_CONTACT = 'addContact';
+                            if (anonymouschat && isAnonymousUser) {
+                                megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                                if (localStorage.getItem(ADD_CONTACT) === null) {
+                                    localStorage.setItem(
+                                        ADD_CONTACT,
+                                        JSON.stringify({u: contact.u, unixTime: unixtime()})
+                                    );
+                                }
+                            } else {
+                                M.syncContactEmail(contact.u)
+                                .done(function(email) {
+                                    var exists = false;
+                                    Object.keys(M.opc).forEach(function (k) {
+                                        if (!exists && M.opc[k].m === email) {
+                                            exists = true;
+                                            return false;
+                                        }
+                                    });
 
-                        if (anonymouschat && (!u_handle || u_type !== 3)) {
-                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                                    if (exists) {
+                                        closeDialog();
+                                        msgDialog('warningb', '', l[17545]);
+                                    } else {
+                                        M.inviteContact(M.u[u_handle].m, email);
+                                        var title = l[150];
+
+                                        var msg = l[5898].replace('[X]', email);
+
+                                        closeDialog();
+                                        msgDialog('info', title, msg);
+                                    }
+                                })
+                                .always(function() {
+                                    loadingDialog.hide();
+                                });
+                            }
                             return;
                         }
-                        M.syncContactEmail(contact.u)
-                            .done(function(email) {
-                                var exists = false;
-                                Object.keys(M.opc).forEach(function (k) {
-                                    if (!exists && M.opc[k].m === email) {
-                                        exists = true;
-                                        return false;
-                                    }
-                                });
-
-                                if (exists) {
-                                    closeDialog();
-                                    msgDialog('warningb', '', l[17545]);
-                                } else {
-                                    M.inviteContact(M.u[u_handle].m, email);
-                                    var title = l[150];
-
-                                    var msg = l[5898].replace('[X]', email);
-
-                                    closeDialog();
-                                    msgDialog('info', title, msg);
-                                }
-                            })
-                            .always(function() {
-                                loadingDialog.hide();
-                            });
-                    }} />
+                    }/>
                 );
             }
 

@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -380,6 +380,12 @@
 
 /*  end of Icons for chat archived */
 
+.dropdown-item .small-icon.icons-sprite.reverted-clock {
+    background-position: -200px -1200px;
+}
+.dropdown-item:hover .small-icon.icons-sprite.reverted-clock {
+    background-position: -40px -1200px;
+}
 .dropdown-item .small-icon.rounded-grey-plus {
     background-position: -3px -3131px;
 }
@@ -497,6 +503,9 @@
 .dropdown-item:hover .small-icon.rounded-stop {
     background-position: -54px -218px;
 }
+.dropdown-item.opened .small-icon.context.sortgrid, .dropdown-item:hover .small-icon.context.sortgrid {
+    background-position: -117px -1992px;
+}
 .dropdown.body:not(.context) .dropdown-item .small-icon.remove-link {
     margin: 6px 8px 1px -1px;
 }
@@ -507,7 +516,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v15.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -625,6 +634,12 @@
 .semi-big-icon.nwse-inset-resize, .button.active .semi-big-icon.nwse-resize, .small-block .big-icon.nwse-inset-resize, .small-block .button.active .big-icon.nwse-resize {
     background-position: -160px -3549px;
 }
+.semi-big-icon.crossed-screenshare, .small-block .big-icon.crossed-screenshare {
+    background-position: -153px -3127px;
+}
+.semi-big-icon.screenshare, .small-block .big-icon.screenshare {
+    background-position: -198px -3127px;
+}
 .semi-big-icon.grey-lock {
     background-position: -3px -3710px;
 }
@@ -654,6 +669,12 @@
 }
 .big-icon.nwse-resize {
     background-position: -84px -3537px;
+}
+.big-icon.crossed-screenshare {
+    background-position: -35px -3118px;
+}
+.big-icon.screenshare {
+    background-position: -92px -3118px;
 }
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;
@@ -707,7 +728,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -1116,15 +1137,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -1132,7 +1153,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1181,7 +1202,11 @@
     margin-left: -1px;
 }
 .small-icon.context.sortgrid {
-    background-position: -1px -111px;
+    background-position: -89px -1992px;
+    opacity: 1;
+}
+.opened .small-icon.context.sortgrid {
+    background-position: -117px -1992px;
 }
 .small-icon.context.handset {
     background-position: -1px -333px;
@@ -1673,7 +1698,7 @@
     background-position: -205px -1731px;
 }
 i.icons-sprite, i.small-icon.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v29.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;

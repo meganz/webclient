@@ -770,7 +770,25 @@ var ContactPickerWidget = React.createClass({
             // continue;
             return false;
         }
-        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+        var isDisabled = false;
+        if (!self.wasMissingKeysForContacts) {
+            self.wasMissingKeysForContacts = {};
+        }
+        if (!self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
+            // we don't want to preload keys each time...e.g. we want to only load them when needed, so ensure they
+            // are loaded here
+            self.wasMissingKeysForContacts[v.u] = true;
+
+            ChatdIntegration._ensureKeysAreLoaded(undefined, [v.u])
+                .always(function() {
+                    if (self.isMounted()) {
+                        self.safeForceUpdate();
+                    }
+                });
+            isDisabled = true;
+            return true;
+        }
+        else if (self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
             // keys not loaded, don't allow starting of new chats/any interaction with that user yet
             return false;
         }
@@ -807,11 +825,15 @@ var ContactPickerWidget = React.createClass({
 
         contacts.push(
             <ContactCard
+                disabled={isDisabled}
                 contact={v}
-                className={"contacts-search short " + selectedClass}
+                className={"contacts-search short " + selectedClass + (isDisabled ? " disabled" : "")}
                 noContextButton="true"
                 selectable={selectableContacts}
                 onClick={self.props.readOnly ? () => {} : (contact, e) => {
+                    if (isDisabled) {
+                        return false;
+                    }
                     var contactHash = contact.u;
 
                     // differentiate between a click and a double click.

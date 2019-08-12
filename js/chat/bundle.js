@@ -6149,7 +6149,22 @@ React.makeElement = React['createElement'];
 
 	            return false;
 	        }
-	        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+	        var isDisabled = false;
+	        if (!self.wasMissingKeysForContacts) {
+	            self.wasMissingKeysForContacts = {};
+	        }
+	        if (!self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
+
+	            self.wasMissingKeysForContacts[v.u] = true;
+
+	            ChatdIntegration._ensureKeysAreLoaded(undefined, [v.u]).always(function () {
+	                if (self.isMounted()) {
+	                    self.safeForceUpdate();
+	                }
+	            });
+	            isDisabled = true;
+	            return true;
+	        } else if (self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
 
 	            return false;
 	        }
@@ -6179,11 +6194,15 @@ React.makeElement = React['createElement'];
 	        }
 
 	        contacts.push(_react2.default.createElement(ContactCard, {
+	            disabled: isDisabled,
 	            contact: v,
-	            className: "contacts-search short " + selectedClass,
+	            className: "contacts-search short " + selectedClass + (isDisabled ? " disabled" : ""),
 	            noContextButton: 'true',
 	            selectable: selectableContacts,
 	            onClick: self.props.readOnly ? function () {} : function (contact, e) {
+	                if (isDisabled) {
+	                    return false;
+	                }
 	                var contactHash = contact.u;
 
 	                if (contactHash === self.lastClicked && new Date() - self.clickTime < 500 || !self.props.multiple) {

@@ -393,6 +393,7 @@ body.tl .dropdown.body.popup.contacts-search {
     -webkit-transition: opacity 200ms ease-in-out 1s;
     transition: opacity 200ms ease-in-out 1s;
     transition-delay: 0ms;
+    white-space: normal;
 }
 .dark-direct-tooltip.simpletip-tooltip.delay {
     -webkit-transition-delay: 1ms;

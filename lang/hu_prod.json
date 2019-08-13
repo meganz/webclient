@@ -103,7 +103,7 @@
     "378": "K\u00e9rem \u00edrja be jelszav\u00e1t fi\u00f3kja visszaigazol\u00e1s\u00e1hoz.",
     "381": "Minden jog fenntartva",
     "383": "T\u00e1mogat\u00e1s",
-    "384": "Help centre",
+    "384": "S\u00fag\u00f3k\u00f6zpont",
     "385": "\u00e1ltal\u00e1nos szolg\u00e1ltat\u00e1si felt\u00e9telekkel",
     "386": "Adatv\u00e9delmi nyilatkozat",
     "387": "Szerz\u0151i jog",
@@ -327,7 +327,7 @@
     "950": "Kapcsolatok",
     "954": "\u00c9rdemlista",
     "955": "Mobil alkalmaz\u00e1sok",
-    "956": "Sync Client",
+    "956": "Szinkron kliens",
     "957": "Chrome alkalmaz\u00e1s",
     "959": "Firefox alkalmaz\u00e1s",
     "961": "Alkalmaz\u00e1sok",
@@ -2554,7 +2554,7 @@
     "19631": "M\u00f3dos\u00edt\u00e1s ment\u00e9se",
     "19632": "Adja meg a v\u00e1llalkoz\u00e1sa ad\u00f3sz\u00e1m\u00e1t",
     "19633": "Be\u00e1ll\u00edt\u00e1sok mentve",
-    "19634": "Sync Client",
+    "19634": "Szinkron kliens",
     "19635": "Elem v\u00e9gleg t\u00f6r\u00f6lve",
     "19636": "Elem vissza\u00e1ll\u00edtva a Felh\u0151be",
     "19638": "Unleash MEGA\u2019s full potential with a rich set of commands",
@@ -3281,5 +3281,6 @@
     "20949": "Email subscription cancellation failed",
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
+    "20956": "Embed button options",
     "20957": "Someone has removed you as a contact"
 }

@@ -103,7 +103,7 @@
     "378": "Please enter your password to confirm your account.",
     "381": "All rights reserved",
     "383": "Support",
-    "384": "Help centre",
+    "384": "Help Centre",
     "385": "Terms of Service",
     "386": "Privacy Policy",
     "387": "Copyright",
@@ -327,7 +327,7 @@
     "950": "Contacts",
     "954": "Credits",
     "955": "Mobile Apps",
-    "956": "Sync Client",
+    "956": "Desktop App",
     "957": "Chrome Extension",
     "959": "Firefox Extension",
     "961": "Apps",
@@ -2554,7 +2554,7 @@
     "19631": "Save changes",
     "19632": "Please enter the tax number for your business",
     "19633": "Settings saved",
-    "19634": "Sync Client",
+    "19634": "Desktop App",
     "19635": "Item permanently deleted",
     "19636": "Item restored to Cloud Drive",
     "19638": "Unleash MEGA\u2019s full potential with a rich set of commands",
@@ -3281,5 +3281,6 @@
     "20949": "Email subscription cancellation failed",
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
+    "20956": "Embed button options",
     "20957": "Someone has removed you as a contact"
 }

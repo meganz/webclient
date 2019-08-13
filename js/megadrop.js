@@ -1111,8 +1111,8 @@ mega.megadrop = (function() {
 
                 var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
                     '" data-node="' + escapeHTML(h) + '">' +
-                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" >' +
-                    escapeHTML(title) + '</span></a>' : '';
+                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" ><span>' +
+                    escapeHTML(title) + '</span></span></a>' : '';
 
                 return html;
 

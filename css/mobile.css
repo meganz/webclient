@@ -398,6 +398,18 @@ ul, li {
     text-overflow: ellipsis;
     font-family: 'LatoWebBold';
 }
+.mobile.upload-overlay .mobile.filename, .mobile.overlay .download .mobile.filename {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 16px; /* max-height / line-height should be equal to -webkit-line-clamp to limit lines */
+    max-height: 48px;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+
+}
 .mobile.rb-empty-overlay-title {
     font-size: 15px;
     line-height: 1.5;

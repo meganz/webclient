@@ -2967,13 +2967,14 @@ else if (!browserUpdate) {
         }
     }
 
-    // Set a 10 second timeout for receiving an initial response from the static server. If the static server is
-    // completely dead, the longest wait a user will have is 10 seconds before they are switched to the EU servers. If
+    // Set a 15 second timeout for receiving an initial response from the normal static server. If the static server is
+    // completely dead, the longest wait a user will have is 15 seconds before they are switched to the EU servers. If
     // the server is ok, but their connection is slow, then it's likely they will still receive an initial response
-    // within 10 seconds. Once that first byte is received then the XHR onprogress handler will set the timeout to
+    // within 15 seconds. Once that first byte is received then the XHR onprogress handler will set the timeout to
     // unlimited (0 ms) and let the lower layers handle it (e.g. use the browser default timeout) which can let the
-    // site load slowly over 5 minutes if they are on a really bad connection.
-    var xhr_timeout = 10000;
+    // site load slowly over 5 minutes if they are on a really bad connection. For the EU static server (which we
+    // assume never fails) we set the timeout to unlimited.
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 0 : 15000;
 
     /**
      * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
@@ -3022,6 +3023,9 @@ else if (!browserUpdate) {
 
                 // Set flag to show the static server was flipped to the default EU server
                 staticServerLoading.flippedToDefault = true;
+
+                // Set the timeout to unlimited now it's on EU static
+                xhr_timeout = 0;
 
                 // Log that the loading was flipped to load from the default static servers
                 if (d) {

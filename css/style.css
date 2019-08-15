@@ -1702,7 +1702,7 @@ a.blog-button:hover {
     height: 298px;
     text-align: center;
 }
-.loading .notification-header, .loading .notification-popup-empty, .loading .fm-notifications-bottom {
+.loading .notification-header, .loading .notification-popup-empty, .notification-popup.loading .fm-notifications-bottom {
     display: none;
 }
 .notification-loading-icon {

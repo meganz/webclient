@@ -519,6 +519,16 @@ copyright.init_cndispute = function() {
         $('input.email').val(u_attr.email);
     }
 
+    // prefill the URL with public node handle.
+    if (u_attr) {
+        var localStorageKey = 'takedownDisputeNodeURL';
+        var disputeNodeURL = localStorage.getItem(localStorageKey);
+        if (disputeNodeURL) {
+            $('.bottom-page .copyrightdisputeform .contenturl').val(disputeNodeURL);
+            localStorage.removeItem(localStorageKey);
+        }
+    }
+
     // The sign button needs to validate the form
     $('.signbtn').rebind('click.copydispute', function() {
 

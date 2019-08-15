@@ -12,8 +12,6 @@ RepayPage.prototype.initPage = function() {
     var mySelf = this;
     loadingDialog.show();
 
-    parsepage(pages['repay']);
-
     var $repaySection = $('.main-mid-pad.bus-repay');
     var $leftSection = $('.main-left-block', $repaySection);
     var $paymentBlock = $('.bus-reg-radio-block', $leftSection);
@@ -132,7 +130,7 @@ RepayPage.prototype.initPage = function() {
                 var futurePaymentRow = rowTemplate.clone();
                 nbOfUsers = res.nb;
 
-                futurePaymentRow.find('.content-desc').text(res.nb + ' ' + l[5569]);
+                futurePaymentRow.find('.content-desc').text('Mega Business ' + res.nb + ' users');
                 futurePaymentRow.find('.content-date').text(time2date(new Date().getTime() / 1000, 1));
                 futurePaymentRow.find('.content-amou').text(res.et.toFixed(2) + ' \u20ac');
 

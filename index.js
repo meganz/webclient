@@ -1456,6 +1456,7 @@ function init_page() {
     }
     else if (page === 'repay') {
         if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            parsepage(pages['repay']);
             var repayPage = new RepayPage();
             repayPage.initPage();
         }

@@ -71,7 +71,7 @@ var ChatdIntegration = function(megaChat) {
 
                     var chatId = false;
 
-                    if (ap.g === 0) {
+                    if (ap.g === 0 && (ap.n || ap.u)) {
                         // extract the chatId, if the type of the chat is private (e.g. == other user's id)
                         (ap.n || ap.u).forEach(function(member) {
                             if (!chatId && member.u !== u_handle) {

@@ -30,6 +30,7 @@ var SelectionManager = function($selectable, resume) {
      */
     this.selected_list = [];
 
+    this.selected_totalSize = 0;
 
     this.last_selected = null;
 
@@ -133,6 +134,7 @@ var SelectionManager = function($selectable, resume) {
         });
 
         this.selected_list = $.selected = [];
+        this.selected_totalSize = 0;
 
         this.clear_last_selected();
     };
@@ -230,6 +232,8 @@ var SelectionManager = function($selectable, resume) {
                     return 0;
                 });
             }
+
+            this.selectionNotification(nodeId, true);
         }
         $.selected = this.selected_list;
         if (debugMode) {
@@ -253,6 +257,8 @@ var SelectionManager = function($selectable, resume) {
             if (debugMode) {
                 console.error("commit: ", JSON.stringify(this.selected_list));
             }
+
+            this.selectionNotification(nodeId, false);
         }
         else {
             if (debugMode) {
@@ -491,6 +497,52 @@ var SelectionManager = function($selectable, resume) {
         $('.fm-right-files-block').off('selectablecreate.sm');
     };
 
+    this.selectionNotification = function (nodeId, isAddToSelection) {
+        if (this.selected_list.length === 0) {
+            this.selected_totalSize = 0;
+            this.hideSelectionBar();
+        }
+        else {
+            var totalNodes = M.v.length;
+            var itemsNum = this.selected_list.length;
+            var itemsTotalSize = "";
+            var notificationText = "";
+
+            if (isAddToSelection) {
+                this.selected_totalSize += M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            } else {
+                this.selected_totalSize -= M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+            }
+            itemsTotalSize = bytesToSize(this.selected_totalSize);
+
+            if (totalNodes === 1) { // Only one item exists
+                notificationText = l[20966].replace('%1', itemsNum).replace('%2', itemsTotalSize);
+            }
+            else { // Multiple items here
+                notificationText = l[20967]
+                    .replace('%1', itemsNum + " / " + totalNodes)
+                    .replace('%2', itemsTotalSize);
+            }
+
+            this.showSelectionBar(notificationText);
+        }
+    };
+
+    this.showSelectionBar = function (notificationText) {
+        var $selectionBar = $('.selection-status-bar');
+        $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
+        $selectionBar.addClass('visible');
+        $selectionBar.parent('div').addClass('select');
+
+        if (this.selected_list.length === 1 && M.currentdirid.startsWith("search/")){
+            $selectionBar.css("opacity", 0);
+        }
+    };
+
+    this.hideSelectionBar = function () {
+        $('.selection-status-bar').removeClass('visible');
+        $('.selection-status-bar').parent('div').removeClass('select');
+    };
 
     if (!resume) {
         this.clear_selection(); // remove ANY old .currently-selected values.
@@ -500,6 +552,7 @@ var SelectionManager = function($selectable, resume) {
             console.error('resuming:', JSON.stringify($.selected));
         }
         this.selected_list = [];
+        this.selected_totalSize = 0;
 
         $.selected.forEach(function(entry) {
             self.selected_list.push(entry);

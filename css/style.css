@@ -4952,7 +4952,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5646,7 +5646,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6378,7 +6378,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7312,11 +7312,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -15211,6 +15211,43 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     font-size: 0;
     white-space: nowrap;
 }
+.selection-status-bar {
+    background-color: #EEEEEE;
+    height: 36px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 6px 12px;
+    margin-bottom: -72px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
+    cursor: default;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    visibility: hidden;
+}
+.selection-status-bar.visible {
+    margin-bottom: 0;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-toast-notification: 1;
+    opacity: 1;
+    visibility: visible;
+}
+.selection-status-bar span {
+    font-size: 14px;
+    color: #666;
+    line-height: 22px;
+    vertical-align: top;
+}
 .search .search-bottom-wrapper {
     display: block;
 }
@@ -15350,13 +15387,13 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
-.search .grid-scrolling-table, .search .contacts-grid-scrolling-table {
+.search .grid-scrolling-table, .search .contacts-grid-scrolling-table, .select .grid-scrolling-table, .select .contacts-grid-scrolling-table {
     height: 100%;
     height: -webkit-calc(100% - 60px);
     height: -moz-calc(100% - 60px);
     height: calc(100% - 60px);
 }
-.search .file-block-scrolling, .search .fm-contacts-blocks-view {
+.search .file-block-scrolling, .search .fm-contacts-blocks-view, .select .file-block-scrolling, .select .fm-contacts-blocks-view {
     height: 100%;
     height: -webkit-calc(100% - 35px);
     height: -moz-calc(100% - 35px);
@@ -29787,7 +29824,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v30.png");
+    background-image: url("../images/mega/icons-sprite_v31.png");
     width: 24px;
     height: 24px;
     left: -1px;
@@ -29913,7 +29950,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     top: 0;
 }
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v30.png");
+    background-image: url("../images/mega/icons-sprite_v31.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29972,7 +30009,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v30.png");
+    background-image: url("../images/mega/icons-sprite_v31.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -30039,7 +30076,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v30.png");
+    background-image: url("../images/mega/icons-sprite_v31.png");
 }
 .transfer-task-actions {
     display: none;

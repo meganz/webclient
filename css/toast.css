@@ -15,10 +15,11 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 12px 4px 12px 62px;
+    padding: 12px 4px 12px 52px;
     z-index: 2000;
     color: #666666;
     font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular';
     line-height: 18px;
     -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
@@ -75,7 +76,7 @@
 }
 .clipboard .toast-icon {
     background-position: -196px -128px;
-    background-image: url(../images/mega/icons-sprite_v30@2x.png);
+    background-image: url(../images/mega/icons-sprite_v31@2x.png);
     background-size: 262px auto;
     opacity: 0.74;
 }
@@ -225,7 +226,7 @@
     float: left;
 }
 .toast-close-button.qr-toast-close {
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: -136px -206px;
     margin-top: -4px;
     margin-left: 226px;
@@ -262,7 +263,7 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     vertical-align: top;
     margin: 2px 9px 0 1px;
     background-position: -198px -1240px;
@@ -367,14 +368,3 @@
     text-align: center;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }*/
-
-
-
-
-
-
-
-
-
-
-

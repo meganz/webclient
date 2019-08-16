@@ -203,7 +203,11 @@
         }
 
         if (!err) {
-            if ($('.register-check', $dialog).hasClass('checkboxOff')) {
+            if ($('.understand-check', $dialog).hasClass('checkboxOff')) {
+                hideOverlay();
+                msgDialog('warninga', l[1117], l[21957]);
+            }
+            else if ($('.register-check', $dialog).hasClass('checkboxOff')) {
                 hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
             }
@@ -364,8 +368,6 @@
                 return false;
             }
         });
-
-        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208g']);
 
         $('.checkbox-block.register a', $dialog).rebind('click', function(e) {
             e.preventDefault();

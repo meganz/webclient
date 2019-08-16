@@ -2,11 +2,21 @@
 .txt-bold {
      font-weight: 700;
      font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+     -webkit-font-smoothing: antialiased;
 }
 .txt-green {
     color: #00BFA5;
 }
+.txt-dark {
+    color: #333;
+}
 /* body header */
+h2 {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 32px;
+    line-height: 48px;
+    color: #262F3B;
+}
 .semi-large-header {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 28px;
@@ -31,9 +41,6 @@
 .content-txt.semi-larger-txt {
     font-size: 16px;
     line-height: 24px;
-}
-.content-txt.txt-dark {
-    color: #333;
 }
 .underline-btn-txt {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;

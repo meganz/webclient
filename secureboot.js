@@ -1725,7 +1725,7 @@ if (showLegacyMobilePage) {
     if (mobileblog) {
         document.body.innerHTML = '';
         mCreateElement('script', {type: 'text/javascript'}, 'head')
-            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
+            .src = ((location.host === 'mega.nz' || location.host === 'smoketest.mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
     else {
         var prechar = '#';

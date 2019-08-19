@@ -1695,7 +1695,7 @@ FileManager.prototype.initContextUI = function() {
             showExpiredBusiness();
             return;
         }
-        doClearbin(false);
+        doClearbin(true);
     });
 
     $(c + '.move-up').rebind('click', function() {

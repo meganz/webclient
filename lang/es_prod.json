@@ -1755,7 +1755,7 @@
     "17404": "Subir un archivo directamente a mi Nube MEGA sin registrarme.",
     "17405": "Velocidad actual",
     "17406": "Completado",
-    "17407": "C\u00f3digo de inserci\u00f3n",
+    "17407": "C\u00f3digo embebido",
     "17408": "Copiar c\u00f3digo",
     "17409": "Vista previa de la carpeta MEGAdrop",
     "17410": "Copia y pega el siguiente enlace para facilitar el acceso a la p\u00e1gina de MEGAdrop.",
@@ -2544,7 +2544,7 @@
     "19609": "Pago requerido",
     "19610": "Administrador",
     "19615": "La reproducci\u00f3n de este video se ha interrumpido porque sobrepasar\u00edas la cuota de transferencia gratuita asignada a tu direcci\u00f3n IP. Ampl\u00eda tu cuenta para obtener m\u00e1s cuota de transferencia, y el video se reanudar\u00e1 autom\u00e1ticamente.",
-    "19616": "Amplia cuenta",
+    "19616": "Ampliar cuenta",
     "19617": "El video ha dejado de reproducirse porque sobrepasar\u00edas la cuota de transferencia gratuita asignada a tu direcci\u00f3n IP. Amplia tu plan PRO para obtener m\u00e1s cuota de transferencia, y el video se reanudar\u00e1 autom\u00e1ticamente.",
     "19621": "Migraci\u00f3n de datos en curso. La operaci\u00f3n puede tardar unos minutos dependiendo del tama\u00f1o de la cuenta.",
     "19622": "Tu nube",
@@ -3142,7 +3142,7 @@
     "20584": "\u00bfPor qu\u00e9 usar MEGA?",
     "20585": "Al aplicar correctamente el cifrado punto a punto, MEGA logra una privacidad real desde el dise\u00f1o.",
     "20586": "Potente",
-    "20587": "MEGA es un servicio basado en la nube que se puede utilizar desde desde cualquier lugar con Internet en todos los dispositivos y plataformas principales.",
+    "20587": "MEGA es un servicio basado en la nube que se puede utilizar desde cualquier lugar con Internet, en todos los dispositivos y plataformas principales.",
     "20588": "MEGA est\u00e1 cuidadosamente dise\u00f1ado para lograr el nivel m\u00e1s alto de [A]seguridad[\/A] para sus usuarios.",
     "20589": "Transparente",
     "20590": "\u00bfQuieres activar la rotaci\u00f3n de la clave?",
@@ -3281,5 +3281,6 @@
     "20949": "No se ha podido cancelar la suscripci\u00f3n a los correos",
     "20950": "Solo para usuarios europeos",
     "20951": "Direcci\u00f3n del beneficiario",
+    "20956": "Opciones del bot\u00f3n de embebido",
     "20957": "Alguien te ha eliminado como contacto"
 }

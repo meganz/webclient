@@ -2982,12 +2982,9 @@ Session.prototype._createRtcConn = function() {
             // Audio level notifications for all peers seems to require too much CPU
             // self.audioLevelMonitor = new AudioLevelMonitor(stream, self.handler);
         }
-        if (self.state !== SessState.kSessInProgress) {
+        if (self.state > SessState.kSessInProgress) {
             return;
         }
-        // Just in case, check if the actual stream a/v tracks match the ones negotiated
-        // over CALLDATA/SDP. If not, they will be updated
-        self._onRemoteMuteUnmute(Av.fromStream(stream) | (self.peerAv & Av.Screen));
 
         // FIXME: We never had audio work from the GUI player if video is disabled,
         // and the audio was coming from this 'internal' player. We need to fix that ASAP

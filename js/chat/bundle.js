@@ -19504,7 +19504,8 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
 
       if (room) {
         showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-        M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+        var roomUrl = room.getRoomUrl().replace("fm/", "");
+        M.openFolder(roomUrl).always(resolve);
       } else {
         if (d) {
           self.logger.warn('openChatAndAttachNodes failed in whole...', result);

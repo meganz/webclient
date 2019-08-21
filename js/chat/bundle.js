@@ -14166,6 +14166,11 @@ function (_MegaRenderMixin) {
         totalWidth = $('.participantsContainer', $container).parent().outerWidth();
       }
 
+      if (ua.details.browser === "Safari") {
+        // for some reason, Safari adds 1px to the totalWidth
+        totalWidth -= 1;
+      }
+
       var $streams = $('.user-video, .user-audio', $container);
       var totalStreams = $streams.length;
 
@@ -19504,7 +19509,8 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
 
       if (room) {
         showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-        M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+        var roomUrl = room.getRoomUrl().replace("fm/", "");
+        M.openFolder(roomUrl).always(resolve);
       } else {
         if (d) {
           self.logger.warn('openChatAndAttachNodes failed in whole...', result);

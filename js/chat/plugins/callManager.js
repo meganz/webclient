@@ -1057,6 +1057,11 @@ CallManagerCall.prototype.onCallRecovered = function(newCall, tsCallStart) {
     self.room.trigger('onCallSessReconnected', [self]);
 };
 
+CallManagerCall.prototype.onCallRequestSent = function(localAv) {
+    var self = this;
+    self.room.trigger('onCallRequestSent', [self, Av.toMediaOptions(localAv)]);
+};
+
 CallManagerCall.prototype.onCallAborted = function (e, reason) {
 };
 
@@ -1469,11 +1474,7 @@ CallManagerCall.prototype.getMediaOptions = function () {
         this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
         return {audio: false, video: false};
     }
-    return {
-        audio: !!(localAv & Av.Audio), // jscs:ignore disallowImplicitTypeConversion
-        video: !!(localAv & Av.Video), // jscs:ignore disallowImplicitTypeConversion
-        screen: !!(localAv & Av.Screen) // jscs:ignore disallowImplicitTypeConversion
-    };
+    return Av.toMediaOptions(localAv);
 };
 
 CallManagerCall.prototype.videoMode = function() {
@@ -1524,13 +1525,7 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
         return {audio: false, video: false};
     }
 
-    // jscs:disable disallowImplicitTypeConversion
-    return {
-        audio: !!(firstSession.peerAv & Av.Audio),
-        video: !!(firstSession.peerAv & Av.Video),
-        screen:  !!(firstSession.peerAv & Av.Screen)
-    };
-    // jscs:enable disallowImplicitTypeConversion
+    return Av.toMediaOptions(firstSession.peerAv);
 };
 
 CallManagerCall.prototype.isScreenCaptureEnabled = function() {

@@ -688,14 +688,11 @@ Call.prototype._initialGetLocalStream = function(av) {
             resolved = true;
             if (self.state >= CallState.kTerminating) {
                 RTC.stopMediaStream(stream);
+                self.logger.log("_initialGetLocalStream: Call killed while getting local video");
                 return;
             }
             if (!needAudio) {
                 Av.enableAudio(stream, false);
-            }
-
-            if (self.state >= CallState.kTerminating) {
-                return Promise.reject("_initialGetLocalStream: Call killed while getting local video");
             }
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
@@ -711,6 +708,7 @@ Call.prototype._initialGetLocalStream = function(av) {
             }
             delete self._obtainingLocalStream;
             resolve(stream);
+        }).catch(function(err) { // silence DOMException logging
         });
         pms.catch(function(err) {
             resolved = true;
@@ -728,6 +726,7 @@ Call.prototype._initialGetLocalStream = function(av) {
             self._fire('onLocalMediaFail', err);
         }
         delete self._obtainingLocalStream;
+        return Promise.reject(err);
     });
 };
 
@@ -867,7 +866,15 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
         call._setIsRecover();
     }
     self.calls[chatid] = call;
-    call._startOrJoin(av);
+    call._startOrJoin(av)
+    .then(function() {
+        call._fire("onCallRequestSent", {
+            av: call.localAv()
+        });
+    })
+    .catch(function(err) {
+        self.logger.log("Error starting/joining call:", err);
+    });
     return call;
 };
 
@@ -1576,6 +1583,8 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             self.logger.log("Not sending CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
         } else if (self.predestroyState === CallState.kRingIn) {
             self.logger.log("Not sending CALLDATA because we were passively ringing");
+        } else if (self.predestroyState === CallState.kCallingOut) {
+            self.logger.log("Not sending CALLDATA because we haven't yet sent the call request");
         } else {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
@@ -3781,6 +3790,14 @@ Av.fromMediaOptions = function(opts) {
         }
     }
     return result;
+};
+
+Av.toMediaOptions = function(av) {
+    return {
+        audio: !!(av & Av.Audio), // jscs:ignore disallowImplicitTypeConversion
+        video: !!(av & Av.Video), // jscs:ignore disallowImplicitTypeConversion
+        screen: !!(av & Av.Screen) // jscs:ignore disallowImplicitTypeConversion
+    };
 };
 
 Av.enableTracks = function(tracks, enable) {

@@ -2650,7 +2650,7 @@
     "19731": "Open Source",
     "19732": "All our client source code is Public Source.",
     "19733": "It can be reviewed by you & security researchers at:",
-    "19734": "Our security white paper is available at",
+    "19734": "Our security whitepaper is available at",
     "19735": "File versioning means you can stop worrying.",
     "19736": "With our file versioning you can relax and not have to worry about overwriting that important document. We make it easy for you to revert or download older copies of your files, so you never lose anything.",
     "19737": "File backup",
@@ -2818,8 +2818,8 @@
     "20020": "MEGA\u2019s end-to-end encryption (E2EE) paradigm enhances the overall security by providing privacy by design, unlike many of its competitors who only provide privacy by policy, but it is not a silver bullet solution to all potential security threats. It is critical that the endpoint devices are secure as any breach on an endpoint device can break the E2EE chain.",
     "20022": "For example, a backdoor or virus on the user\u2019s endpoint device\u2019s operating system could allow a rogue attacker to intercept unencrypted data, log keystrokes or directly capture audio\/video from the device\u2019s microphone\/camera.[Br]It is therefore important that the user does not solely rely on MEGA, but also ensures that their endpoint devices (on which the user runs the MEGA client software) are secure.",
     "20023": "Transparency & Public Source code",
-    "20024": "To enable independent verification of our crypto model and service reliability, we publish MEGA\u2019s design and security processes in a white paper.",
-    "20025": "View White Paper",
+    "20024": "To enable independent verification of our crypto model and service reliability, we publish MEGA\u2019s design and security processes in a whitepaper.",
+    "20025": "View Whitepaper",
     "20026": "We also allow independent verification of the correctness and integrity of the actual implementation by publishing the full source code of our client apps.",
     "20027": "\u041f\u0435\u0440\u0435\u0433\u043b\u044f\u043d\u0443\u0442\u0438 \u041f\u043e\u0447\u0430\u0442\u043a\u043e\u0432\u0438\u0439 \u041a\u043e\u0434",
     "20028": "\u0414\u043e\u0434\u0430\u0442\u043e\u043a Windows 10",
@@ -3098,6 +3098,7 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact business@mega.nz to help you with Business account registration.",
     "20432": "Never enter your password on a device you do not fully trust.",
     "20433": "There is no recovery procedure for lost passwords, make sure you can remember your password at all times",
+    "20434": "Bytes",
     "20435": "%1 shared the following folders with you:",
     "20454": "Key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.",
     "20460": "There is an active call. [A]Join[\/A]",
@@ -3282,5 +3283,6 @@
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
     "20956": "Embed button options",
-    "20957": "Someone has deleted you as a contact"
+    "20957": "Someone has deleted you as a contact",
+    "20960": "Entered birthdate is invalid"
 }

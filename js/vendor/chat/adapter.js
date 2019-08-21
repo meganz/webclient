@@ -2919,7 +2919,7 @@ function isActionAllowedInSignalingState(action, type, signalingState) {
 
 function maybeAddCandidate(iceTransport, candidate) {
   // Edge's internal representation adds some fields therefore
-  // not all fieldѕ are taken into account.
+  // not all fields are taken into account.
   var alreadyAdded = iceTransport.getRemoteCandidates()
       .find(function(remoteCandidate) {
         return candidate.foundation === remoteCandidate.foundation &&
@@ -3321,7 +3321,7 @@ module.exports = function(window, edgeVersion) {
     iceGatherer.onlocalcandidate = function(evt) {
       if (pc.usingBundle && sdpMLineIndex > 0) {
         // if we know that we use bundle we can drop candidates with
-        // ѕdpMLineIndex > 0. If we don't do this then our state gets
+        // sdpMLineIndex > 0. If we don't do this then our state gets
         // confused since we dispose the extra ice gatherer.
         return;
       }
@@ -3329,7 +3329,7 @@ module.exports = function(window, edgeVersion) {
       event.candidate = {sdpMid: mid, sdpMLineIndex: sdpMLineIndex};
 
       var cand = evt.candidate;
-      // Edge emits an empty object for RTCIceCandidateComplete‥
+      // Edge emits an empty object for RTCIceCandidateComplete
       var end = !cand || Object.keys(cand).length === 0;
       if (end) {
         // polyfill since RTCIceGatherer.state is not implemented in
@@ -5090,7 +5090,7 @@ SDPUtils.parseRtcpParameters = function(mediaSection) {
   rtcpParameters.reducedSize = rsize.length > 0;
   rtcpParameters.compound = rsize.length === 0;
 
-  // parses the rtcp-mux attrіbute.
+  // parses the rtcp-mux attribute.
   // Note that Edge does not support unmuxed RTCP.
   var mux = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-mux');
   rtcpParameters.mux = mux.length > 0;

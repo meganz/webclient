@@ -1,11 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../../stores/mixins.js";
 
-var SharedFolderItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function () {
+class SharedFolderItem extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var node = this.props.node;
 
@@ -24,14 +22,13 @@ var SharedFolderItem = React.createClass({
                     </div>
                 </div>);
     }
-});
+};
 
-var IncomingSharesAccordionPanel = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    componentWillMount: function() {
+class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
+    componentWillMount() {
         this.hadLoaded = false;
-    },
-    getContactHandle: function() {
+    }
+    getContactHandle() {
         var self = this;
         var room = self.props.chatRoom;
         var contactHandle = room.getParticipantsExceptMe()[0];
@@ -39,8 +36,8 @@ var IncomingSharesAccordionPanel = React.createClass({
             return {};
         }
         return contactHandle;
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
         var room = self.props.chatRoom;
         var contactHandle = self.getContactHandle();
@@ -134,10 +131,10 @@ var IncomingSharesAccordionPanel = React.createClass({
             </div>
         </div>;
     }
-});
+};
 
 
-module.exports = {
+export {
     SharedFolderItem,
     IncomingSharesAccordionPanel
 };

@@ -1,34 +1,37 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var utils = require('./../../ui/utils.jsx');
+import MegaRenderMixin from './../../stores/mixins.js';
+import ModalDialogsUI  from './../../ui/modalDialogs.jsx';
+import utils  from './../../ui/utils.jsx';
 
-var ChatlinkDialog = React.createClass({
-    mixins: [MegaRenderMixin],
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-            'disableCheckingVisibility': true,
-        };
-    },
-    getInitialState: function() {
-        return {
+
+class ChatlinkDialog extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'requiresUpdateOnResize': true,
+        'disableCheckingVisibility': true,
+    }
+    constructor(props) {
+        super(props);
+        this.state = {
             'link': l[5533]
         };
-    },
-    onPopupDidMount: function($node) {
+        this.onPopupDidMount = this.onPopupDidMount.bind(this);
+        this.onClose = this.onClose.bind(this);
+        this.onTopicFieldChanged = this.onTopicFieldChanged.bind(this);
+        this.onTopicFieldKeyPress = this.onTopicFieldKeyPress.bind(this);
+    }
+    onPopupDidMount($node) {
         this.$popupNode = $node;
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
         $.dialog = "group-chat-link";
 
         self.retrieveChatLink();
-    },
-    retrieveChatLink: function() {
+    }
+    retrieveChatLink() {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (!chatRoom.topic) {
@@ -45,8 +48,9 @@ var ChatlinkDialog = React.createClass({
                     self.setState({'link': l[20660]});
                 }
             });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -54,8 +58,8 @@ var ChatlinkDialog = React.createClass({
         if ($.dialog === "group-chat-link") {
             closeDialog();
         }
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
         var chatRoom = this.props.chatRoom;
         if (!this.loading && chatRoom.topic) {
@@ -79,22 +83,22 @@ var ChatlinkDialog = React.createClass({
 
         // Setup the copy to clipboard buttons
         $('span', $copyButton).text(l[1990]);
-    },
-    onClose: function() {
+    }
+    onClose() {
         if (this.props.onClose) {
             this.props.onClose();
         }
-    },
-    onTopicFieldChanged: function(e) {
+    }
+    onTopicFieldChanged(e) {
         this.setState({'newTopic': e.target.value});
-    },
-    onTopicFieldKeyPress: function(e) {
+    }
+    onTopicFieldKeyPress(e) {
         var self = this;
        if (e.which === 13) {
            self.props.chatRoom.setRoomTitle(self.state.newTopic);
        }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var closeButton = <div key="close" className={"default-red-button right links-button"}
@@ -136,8 +140,8 @@ var ChatlinkDialog = React.createClass({
                                        style={{
                                         'paddingLeft': 8,
                                        }}
-                                       onChange={self.onTopicFieldChanged}
-                                       onKeyPress={self.onTopicFieldKeyPress}
+                                       onChange={self.onTopicFieldChanged.bind(self)}
+                                       onKeyPress={self.onTopicFieldKeyPress.bind(self)}
                                        placeholder={l[20616]} maxLength="30"/>
                             </div>
                         </div>
@@ -211,9 +215,8 @@ var ChatlinkDialog = React.createClass({
             </div>
         </ModalDialogsUI.ModalDialog>;
     }
+};
 
-});
-
-module.exports = {
+export {
     ChatlinkDialog
 };

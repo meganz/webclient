@@ -1,22 +1,19 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../stores/mixins.js";
 
 /**
  * jScrollPane helper
  * @type {*|Function}
  */
-var JScrollPane = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            className: "jScrollPaneContainer",
-            requiresUpdateOnResize: true
-        };
-    },
-    componentDidMount: function() {
+class JScrollPane extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        className: "jScrollPaneContainer",
+        requiresUpdateOnResize: true
+    };
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $elem = $(ReactDOM.findDOMNode(self));
 
@@ -110,16 +107,17 @@ var JScrollPane = React.createClass({
         $elem.rebind('forceResize.jsp'+self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
-        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize);
+        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
         self.onResize();
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
         $(window).off('resize.jsp' + this.getUniqueId());
-    },
-    eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
+    }
+    eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -139,8 +137,8 @@ var JScrollPane = React.createClass({
 
             self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
         }
-    },
-    _doReinit: function(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
+    }
+    _doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -181,8 +179,8 @@ var JScrollPane = React.createClass({
                 }
             }
         }
-    },
-    onResize: function(forced, scrollPositionYPerc, scrollToElement) {
+    }
+    onResize(forced, scrollPositionYPerc, scrollToElement) {
         if (forced && forced.originalEvent) {
             forced = true;
             scrollPositionYPerc = undefined;
@@ -190,13 +188,13 @@ var JScrollPane = React.createClass({
 
 
         this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         this.onResize();
-    },
-    render: function () {
+    }
+    render() {
         return (
-            <div {...this.props} onResize={this.onResize}>
+            <div className={this.props.className}>
                 <div className="jspContainer">
                     <div className="jspPane">
                         {this.props.children}
@@ -205,48 +203,56 @@ var JScrollPane = React.createClass({
             </div>
         );
     }
-});
+};
 
 /**
  * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
  * so that we can render Dialogs into the body or other child element, different then the current component's child.
  */
-var RenderTo = React.createClass({
-    componentDidMount: function() {
+class RenderTo extends React.Component {
+    componentDidMount() {
+        if (super.componentDidMount) {
+            super.componentDidMount();
+        }
         this.popup = document.createElement("div");
         this.popup.className = this.props.className ? this.props.className : "";
         if (this.props.style) {
             $(this.popup).css(this.props.style);
         }
         this.props.element.appendChild(this.popup);
+        var self = this;
+        this._renderLayer(function() {
+            if (self.props.popupDidMount) {
+                self.props.popupDidMount(self.popup);
+            }
+        });
+
+    }
+    componentDidUpdate() {
         this._renderLayer();
-        if (this.props.popupDidMount) {
-            this.props.popupDidMount(this.popup);
+    }
+    componentWillUnmount() {
+        if (super.componentWillUnmount) {
+            super.componentWillUnmount();
         }
-    },
-    componentDidUpdate: function() {
-        this._renderLayer();
-    },
-    componentWillUnmount: function() {
         ReactDOM.unmountComponentAtNode(this.popup);
         if (this.props.popupWillUnmount) {
             this.props.popupWillUnmount(this.popup);
         }
         this.props.element.removeChild(this.popup);
-    },
-    _renderLayer: function() {
-        ReactDOM.render(this.props.children, this.popup);
-    },
-    render: function() {
+    }
+    _renderLayer(cb) {
+        ReactDOM.render(this.props.children, this.popup, cb);
+    }
+    render() {
         // Render a placeholder
         return null;
     }
+};
 
-});
 
-
-var EmojiFormattedContent = React.createClass({
-    _eventuallyUpdateInternalState: function(props) {
+class EmojiFormattedContent extends React.Component {
+    _eventuallyUpdateInternalState(props) {
         if (!props) {
             props = this.props;
         }
@@ -261,8 +267,8 @@ var EmojiFormattedContent = React.createClass({
             this._content = str;
             this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
         }
-    },
-    shouldComponentUpdate: function(nextProps, nextState) {
+    }
+    shouldComponentUpdate(nextProps, nextState) {
         if (!this._isMounted) {
             this._eventuallyUpdateInternalState();
             return true;
@@ -275,18 +281,36 @@ var EmojiFormattedContent = React.createClass({
         else {
             return false;
         }
-    },
-    render: function() {
+    }
+    render() {
         this._eventuallyUpdateInternalState();
 
         return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
     }
-});
+};
 
+function SoonFcWrap( milliseconds ) {
+    return function( target, propertyKey, descriptor) {
+        const originalMethod = descriptor.value;
+        var _timerId = 0;
+        descriptor.value = function () {
+            if (_timerId) {
+                clearTimeout(_timerId);
+            }
+            var self = this;
+            var args = arguments;
+            // Like SoonFc, but with context fix.
+            _timerId = setTimeout(function() {
+                originalMethod.apply(self, args);
+            }, milliseconds);
+        };
+        return descriptor;
+    }
+};
 
-
-module.exports = {
+export default {
     JScrollPane,
     RenderTo,
-    EmojiFormattedContent
+    EmojiFormattedContent,
+    SoonFcWrap
 };

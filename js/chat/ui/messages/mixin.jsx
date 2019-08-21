@@ -1,13 +1,14 @@
 var React = require("react");
 
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
-var RenderDebugger = require('./../../../stores/mixins.js').RenderDebugger;
+import MegaRenderMixin from '../../../stores/mixins.js';
 
-var ConversationMessageMixin = {
-    mixins: [MegaRenderMixin, RenderDebugger],
-    onAfterRenderWasTriggered: false,
-    componentWillMount: function() {
+class ConversationMessageMixin extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+        this.onAfterRenderWasTriggered = false;
+    }
+    componentWillMount() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -39,8 +40,9 @@ var ConversationMessageMixin = {
                 }
             }
         }
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var contact = self.getContact();
 
@@ -53,8 +55,8 @@ var ConversationMessageMixin = {
             });
             this._contactChangeListeners = [];
         }
-    },
-    getContact: function() {
+    }
+    getContact() {
         if (this.props.contact) {
             // optimization
             return this.props.contact;
@@ -62,11 +64,11 @@ var ConversationMessageMixin = {
         var message = this.props.message;
 
         return Message.getContactForMessage(message);
-    },
-    getTimestampAsString: function() {
+    }
+    getTimestampAsString() {
         return unixtimeToTimeString(this.getTimestamp());
-    },
-    getTimestamp: function() {
+    }
+    getTimestamp() {
         var message = this.props.message;
         var timestampInt;
         if (message.getDelay) {
@@ -83,13 +85,13 @@ var ConversationMessageMixin = {
             timestampInt += message.updated;
         }
         return timestampInt;
-    },
-    getParentJsp: function() {
+    }
+    getParentJsp() {
         var $node = $(this.findDOMNode());
         var $jsp = $node.closest('.jScrollPaneContainer').data('jsp');
         return $jsp;
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -109,6 +111,6 @@ var ConversationMessageMixin = {
     }
 };
 
-module.exports = {
+export {
     ConversationMessageMixin
 };

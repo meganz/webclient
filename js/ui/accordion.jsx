@@ -1,10 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
+import MegaRenderMixin from "../stores/mixins.js";
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 
-var AccordionPanel = React.createClass({
-    render: function () {
+class AccordionPanel extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var contentClass = self.props.className ? self.props.className : '';
 
@@ -19,26 +19,29 @@ var AccordionPanel = React.createClass({
                 className={"chat-dropdown content have-animation " + contentClass}>{this.props.children}</div> : null}
         </div>;
     }
-});
+};
 
-var Accordion = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {
+class Accordion extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+
+        this.state = {
             'expandedPanel': this.props.expandedPanel
         }
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         $(window).rebind('resize.modalDialog' + self.getUniqueId(), function() {
             self.onResize();
         });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         $(window).off('resize.modalDialog' + this.getUniqueId());
 
-    },
-    onResize: function() {
+    }
+    onResize() {
         // if (!this.domNode) {
         //     return;
         // }
@@ -51,8 +54,8 @@ var Accordion = React.createClass({
         //     .position({
         //         of: $(document.body)
         //     });
-    },
-    onToggle: function(e, key) {
+    }
+    onToggle(e, key) {
         var obj = clone(this.state.expandedPanel);
         if (obj[key]) {
             delete obj[key];
@@ -62,8 +65,8 @@ var Accordion = React.createClass({
         }
         this.setState({'expandedPanel': obj});
         this.props.onToggle && this.props.onToggle(key);
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
@@ -79,8 +82,8 @@ var Accordion = React.createClass({
             }
 
             if (
-                child.type.displayName === 'AccordionPanel' || (
-                    child.type.displayName && child.type.displayName.indexOf('AccordionPanel') > -1
+                child.type.name === 'AccordionPanel' || (
+                    child.type.name && child.type.name.indexOf('AccordionPanel') > -1
                 )
             ) {
                 accordionPanels.push(React.cloneElement(child, {
@@ -104,10 +107,7 @@ var Accordion = React.createClass({
 
         return <div className={classes}>{accordionPanels}{otherElements}</div>;
     }
-});
-
-
-module.exports = {
-    Accordion,
-    AccordionPanel
 };
+
+
+export { Accordion, AccordionPanel};

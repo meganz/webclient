@@ -600,7 +600,7 @@ function alignSampleArrays(samples, len) {
     }
 }
 
-compressArrayIfSameValue = function(obj, name) {
+function compressArrayIfSameValue(obj, name) {
     var arr = obj[name];
     if (!arr || !(arr instanceof Array)) {
         return;

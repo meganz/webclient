@@ -1,23 +1,22 @@
-module.exports = {
-    'altersData': function(fn) {
-        fn.altersData = true;
-        return fn;
-    },
-    'prefixedKeyMirror': function(prefix, vals) {
-        var result = {};
+export function altersData(fn) {
+    fn.altersData = true;
+    return fn;
+};
+export function prefixedKeyMirror(prefix, vals) {
+    var result = {};
 
-        Object.keys(vals).forEach(function(k) {
-            result[k] = prefix + ":" + k;
-        });
-        return result;
-    },
-    'extendActions': function(prefix, src, toBeAppended) {
-        var actions = Object.keys(src).concat(Object.keys(toBeAppended));
-        var result = {};
+    Object.keys(vals).forEach(function(k) {
+        result[k] = prefix + ":" + k;
+    });
+    return result;
+};
 
-        actions.forEach(function(k) {
-            result[k] = prefix + ":" + k;
-        });
-        return result;
-    }
+export function extendActions(prefix, src, toBeAppended) {
+    var actions = Object.keys(src).concat(Object.keys(toBeAppended));
+    var result = {};
+
+    actions.forEach(function(k) {
+        result[k] = prefix + ":" + k;
+    });
+    return result;
 };

@@ -1,16 +1,16 @@
 // libs
+import { hot } from 'react-hot-loader/root';
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
+import utils from './../../ui/utils.jsx';
 var getMessageString = require('./messages/utils.jsx').getMessageString;
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationPanelUI = require("./../ui/conversationpanel.jsx");
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
+import MegaRenderMixin from './../../stores/mixins.js';
+import {Button} from './../../ui/buttons.jsx';
+import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
+import ContactsUI  from './../ui/contacts.jsx';
+import {ConversationPanels} from "./../ui/conversationpanel.jsx";
+import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 
 var renderMessageSummary = function(lastMessage) {
@@ -95,17 +95,6 @@ var renderMessageSummary = function(lastMessage) {
                 }
                 else {
                     var name = M.getNameByHandle(author.u);
-                    if (String(name).length > 10) {
-                        if (author.firstName) {
-                            name = author.firstName;
-                            if (author.lastName && String(author.lastName).length > 0) {
-                                var letter = String(author.lastName)[0];
-                                if (letter && letter.toUpperCase()) {
-                                    name += " " + letter.toUpperCase();
-                                }
-                            }
-                        }
-                    }
                     name = ellipsis(name, undefined, 11);
                     if (name) {
                         renderableSummary = escapeHTML(name) + ": " + renderableSummary;
@@ -120,9 +109,8 @@ var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
 
-var ConversationsListItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    specificShouldComponentUpdate: function() {
+class ConversationsListItem extends MegaRenderMixin(React.Component) {
+    specificShouldComponentUpdate() {
         if (
             this.loadingShown ||
             (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
@@ -142,19 +130,20 @@ var ConversationsListItem = React.createClass({
         else {
             return undefined;
         }
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         var self = this;
         self.chatRoomChangeListener = function() {
             self.debouncedForceUpdate(750);
         };
         self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
-    },
-    render: function() {
+    }
+    render() {
         var classString = "";
 
         var megaChat = this.props.chatRoom.megaChat;
@@ -272,7 +261,7 @@ var ConversationsListItem = React.createClass({
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
                     </div>;
             const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
-            
+
             if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
                 const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
                 lastMessageDiv = (
@@ -396,9 +385,12 @@ var ConversationsListItem = React.createClass({
             classString += " have-incoming-ringing-call";
         }
 
+        var self = this;
         return (
             <li className={classString} id={id} data-room-id={roomId} data-jid={contactId}
-                onClick={this.props.onConversationClicked}>
+                onClick={(e) => {
+                    self.props.onConversationClicked(e);
+                }}>
                 <div className={nameClassString}>
                     <utils.EmojiFormattedContent>{chatRoom.getRoomTitle()}</utils.EmojiFormattedContent>
                     {
@@ -422,11 +414,10 @@ var ConversationsListItem = React.createClass({
             </li>
         );
     }
-});
+};
 
-var ArchivedConversationsListItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
+    render() {
         var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
 
         var megaChat = this.props.chatRoom.megaChat;
@@ -540,7 +531,8 @@ var ArchivedConversationsListItem = React.createClass({
 
         return (
             <tr className={classString} id={id} data-room-id={roomId} data-jid={contactId}
-                onClick={this.props.onConversationSelected} onDoubleClick={this.props.onConversationClicked}>
+                onClick={this.props.onConversationSelected.bind(this)}
+                onDoubleClick={this.props.onConversationClicked.bind(this)}>
                 <td className="">
                 <div className="fm-chat-user-info todo-star">
                     <div className={nameClassString}>
@@ -558,37 +550,43 @@ var ArchivedConversationsListItem = React.createClass({
                         <div className="clear"></div>
                     </div>
                     <div className="button default-white-button semi-big unarchive-chat right"
-                        onClick={this.props.onUnarchiveConversationClicked}><span>{__(l[19065])}</span></div>
+                        onClick={this.props.onUnarchiveConversationClicked.bind(this)}
+                        ><span>{__(l[19065])}</span></div>
                 </td>
             </tr>
         );
     }
-});
+};
 
-var ConversationsList = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    conversationClicked: function(room, e) {
+class ConversationsList extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.currentCallClicked = this.currentCallClicked.bind(this);
+        this.endCurrentCall = this.endCurrentCall.bind(this);
+    }
+
+    conversationClicked(room, e) {
         loadSubPage(room.getRoomUrl());
         e.stopPropagation();
-    },
-    currentCallClicked: function(e) {
+    }
+    currentCallClicked(e) {
         var activeCallSession = this.props.megaChat.activeCallSession;
         if (activeCallSession) {
             this.conversationClicked(activeCallSession.room, e);
         }
-    },
-    contactClicked: function(contact, e) {
+    }
+    contactClicked(contact, e) {
         loadSubPage("fm/chat/p/" + contact.u);
         e.stopPropagation();
-    },
-    endCurrentCall: function(e) {
+    }
+    endCurrentCall(e) {
         var activeCallSession = this.props.megaChat.activeCallSession;
         if (activeCallSession) {
             activeCallSession.endCall('hangup');
             this.conversationClicked(activeCallSession.room, e);
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var currentCallingContactStatusProps = {
@@ -695,11 +693,18 @@ var ConversationsList = React.createClass({
             </div>
         );
     }
-});
+};
 
-var ArchivedConversationsList = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
+class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.state = this.getInitialState();
+
+        this.onSortNameClicked = this.onSortNameClicked.bind(this);
+        this.onSortTimeClicked = this.onSortTimeClicked.bind(this);
+    }
+
+    getInitialState() {
         return {
             'items':this.props.chats,
             'orderby':'lastActivity',
@@ -708,13 +713,13 @@ var ArchivedConversationsList = React.createClass({
             'confirmUnarchiveChat':null,
             'confirmUnarchiveDialogShown': false,
         };
-    },
-    conversationClicked: function(room, e) {
+    }
+    conversationClicked(room, e) {
         room.showArchived = true;
         loadSubPage(room.getRoomUrl());
         e.stopPropagation();
-    },
-    conversationSelected: function(room, e) {
+    }
+    conversationSelected(room, e) {
         var self = this;
         var previousState = room.archivedSelected ? room.archivedSelected : false;
         var sortedConversations = obj_values(this.props.chats.toJS());
@@ -737,37 +742,28 @@ var ArchivedConversationsList = React.createClass({
             'items': sortedConversations
         });
         e.stopPropagation();
-    },
-    unarchiveConversationClicked: function(room, e) {
+    }
+    unarchiveConversationClicked(room, e) {
         var self = this;
         self.setState({
             'confirmUnarchiveDialogShown': true,
             'confirmUnarchiveChat': room.roomId
         });
-    },
-    onSortNameClicked: function(e) {
+    }
+    onSortNameClicked(e) {
         this.setState({
-            'orderby': 'name'
+            'orderby': 'name',
+            'nameorder': this.state.nameorder * -1
         });
+    }
+    onSortTimeClicked(e) {
         this.setState({
-            'nameorder': this.state.nameorder*-1
+            'orderby': 'lastActivity',
+            'timeorder': this.state.timeorder * -1
         });
-    },
-    onSortTimeClicked: function(e) {
-        this.setState({
-            'orderby': 'lastActivity'
-        });
-        this.setState({
-            'timeorder': this.state.timeorder*-1
-        });
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
-
-        var currentCallingContactStatusProps = {
-            'className': "nw-conversations-item current-calling",
-            'data-jid': ''
-        };
 
         var megaChat = this.props.megaChat;
 
@@ -894,18 +890,18 @@ var ArchivedConversationsList = React.createClass({
         </div>
         );
     }
-});
+};
 
-var ConversationsApp = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {
+class ConversationsApp extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+        this.state = {
             'leftPaneWidth': mega.config.get('leftPaneWidth'),
             'startGroupChatDialogShown': false,
             'quickSearchText': ''
         };
-    },
-    startChatClicked: function(selected) {
+    }
+    startChatClicked(selected) {
         if (selected.length === 1) {
             megaChat.createAndShowPrivateRoomFor(selected[0])
                 .then(function(room) {
@@ -915,8 +911,9 @@ var ConversationsApp = React.createClass({
         else {
             this.props.megaChat.createAndShowGroupRoomFor(selected);
         }
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
 
         $(document.body).rebind('startNewChatLink.conversations', function(e) {
@@ -1070,19 +1067,20 @@ var ConversationsApp = React.createClass({
         });
 
         M.treeSearchUI();
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         window.removeEventListener('resize', this.handleWindowResize);
         $(document).off('keydown.megaChatTextAreaFocus');
         mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         this.handleWindowResize();
         if (this.props.megaChat.displayArchivedChats === true) {
             this.initArchivedChatsScrolling();
         }
-    },
-    handleWindowResize: function() {
+    }
+    handleWindowResize() {
         if (!M.chat) {
             return;
         }
@@ -1101,17 +1099,17 @@ var ConversationsApp = React.createClass({
                     'margin-left': ($('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width()) + "px"
                 });
         }
-    },
-    initArchivedChatsScrolling: function () {
+    }
+    initArchivedChatsScrolling() {
         var scroll = '.archive-chat-list';
         deleteScrollPanel(scroll, 'jsp');
         $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
         jScrollFade(scroll);
-    },
-    archiveChatsClicked : function() {
+    }
+    archiveChatsClicked() {
         loadSubPage('fm/chat/archived');
-    },
-    calcArchiveChats : function() {
+    }
+    calcArchiveChats() {
         var count = 0;
         this.props.megaChat.chats.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
@@ -1122,8 +1120,8 @@ var ConversationsApp = React.createClass({
             }
         });
         return count;
-    },
-    getTopButtonsForContactsPicker: function() {
+    }
+    getTopButtonsForContactsPicker() {
         var self = this;
         if (!self._topButtonsContactsPicker) {
             self._topButtonsContactsPicker = [
@@ -1157,8 +1155,8 @@ var ConversationsApp = React.createClass({
             ]
         }
         return self._topButtonsContactsPicker;
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var startGroupChatDialog = null;
@@ -1226,7 +1224,7 @@ var ConversationsApp = React.createClass({
 
         var rightPane = null;
 
-        rightPane = <div className="fm-right-files-block">
+        rightPane = <div className="fm-right-files-block in-chat">
                 {loadingOrEmpty}
 
                 {
@@ -1236,7 +1234,7 @@ var ConversationsApp = React.createClass({
                         :
                         null
                 }
-                <ConversationPanelUI.ConversationPanels
+                <ConversationPanels
                     {...this.props}
                     chatUIFlags={megaChat.chatUIFlags}
                     className={megaChat.displayArchivedChats === true ? "hidden" : ""}
@@ -1273,20 +1271,20 @@ var ConversationsApp = React.createClass({
                                    placeholder={l[7997]} />
                             <div className="small-icon thin-search-icon"></div>
 
-                            <ButtonsUI.Button
+                            <Button
                                 group="conversationsListing"
                                 icon="chat-with-plus"
                                 contacts={this.props.contacts}
                                 >
-                                <DropdownsUI.DropdownContactsSelector
+                                <DropdownContactsSelector
                                     className="main-start-chat-dropdown"
                                     contacts={this.props.contacts}
                                     megaChat={this.props.megaChat}
-                                    onSelectDone={this.startChatClicked}
+                                    onSelectDone={this.startChatClicked.bind(this)}
                                     multiple={false}
                                     showTopButtons={self.getTopButtonsForContactsPicker()}
                                     />
-                            </ButtonsUI.Button>
+                            </Button>
                         </div>
                     </div>
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
@@ -1307,13 +1305,13 @@ var ConversationsApp = React.createClass({
                             self.startGroupChatFlow = 2;
                             self.setState({'startGroupChatDialogShown': true});
                             return false;
-                        }}>
+                        }.bind(this)}>
                             <i className="small-icon blue-chain colorized"></i>
                             <div className="heading">
                                 {__(l[20638])}
                             </div>
                         </div>
-                        <div className={arcBtnClass}  onClick={this.archiveChatsClicked}>
+                        <div className={arcBtnClass}  onClick={this.archiveChatsClicked.bind(this)}>
                             <i className={arcIconClass}></i>
                             <div className="heading">
                                 {__(l[19066])}
@@ -1328,11 +1326,16 @@ var ConversationsApp = React.createClass({
             </div>
         );
     }
-});
+};
 
 
-module.exports = {
+if (module.hot) {
+    module.hot.accept();
+    ConversationsApp = hot(ConversationsApp);
+}
+
+export default {
     ConversationsList,
     ArchivedConversationsList,
-    ConversationsApp
+    ConversationsApp: ConversationsApp
 };

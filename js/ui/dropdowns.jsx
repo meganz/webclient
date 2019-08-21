@@ -1,53 +1,51 @@
 var React = require("react");
-var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
-var ContactsUI = require('./../chat/ui/contacts.jsx');
-var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
+import utils from './utils.jsx';
+import MegaRenderMixin from "../stores/mixins.js";
+import {ContactPickerWidget} from './../chat/ui/contacts.jsx';
 
-var Dropdown = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {}
-    },
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-        };
-    },
-    componentWillUpdate: function(nextProps, nextState) {
+export class Dropdown extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'requiresUpdateOnResize': true,
+    };
+
+    constructor (props) {
+        super(props);
+        this.onActiveChange = this.onActiveChange.bind(this);
+        this.onResized = this.onResized.bind(this);
+    }
+
+    componentWillUpdate (nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             this.onActiveChange(nextProps.active)
         }
-    },
-    specificShouldComponentUpdate: function(nextProps, nextState) {
+    }
+
+    specificShouldComponentUpdate (nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             if (this.props.onBeforeActiveChange) {
                 this.props.onBeforeActiveChange(nextProps.active);
             }
             return true;
-        }
-        else if (this.props.focused != nextProps.focused) {
+        } else if (this.props.focused != nextProps.focused) {
             return true;
-        }
-        else if (this.state && this.state.active != nextState.active) {
+        } else if (this.state && this.state.active != nextState.active) {
             return true;
-        }
-        else {
+        } else {
             // not sure, leave to the render mixing to decide.
             return undefined;
         }
-    },
-    onActiveChange: function(newVal) {
+    }
+
+    onActiveChange (newVal) {
         if (this.props.onActiveChange) {
             this.props.onActiveChange(newVal);
         }
-    },
-    onResized: function() {
-        var self = this;
+    }
 
+    onResized () {
+        var self = this;
         if (this.props.active === true) {
-            if (this.getOwnerElement()) {
+            if (this.popupElement) {
                 var $element = $(this.popupElement);
                 var positionToElement = $('.button.active:visible');
                 var offsetLeft = 0;
@@ -57,7 +55,7 @@ var Dropdown = React.createClass({
                     $container = $(document.body);
                 }
 
-                $element.css('margin-left','');
+                $element.css('margin-left', '');
 
                 $element.position({
                     of: positionToElement,
@@ -76,20 +74,17 @@ var Dropdown = React.createClass({
                                 arrowHeight = self.props.arrowHeight;
                                 if (info.vertical !== "top") {
                                     arrowHeight = arrowHeight * -1;
-                                }
-                                else {
+                                } else {
                                     arrowHeight = 0;
                                 }
-                            }
-                            else {
+                            } else {
                                 arrowHeight = $arrow.outerHeight();
                             }
                             if (info.vertical != "top") {
                                 $(this)
                                     .removeClass("up-arrow")
                                     .addClass("down-arrow");
-                            }
-                            else {
+                            } else {
                                 $(this)
                                     .removeClass("down-arrow")
                                     .addClass("up-arrow");
@@ -111,68 +106,79 @@ var Dropdown = React.createClass({
 
 
                         $(this).css({
-                            left: (obj.left + (offsetLeft ? offsetLeft/2 : 0) + horizOffset) + 'px',
+                            left: (obj.left + (offsetLeft ? offsetLeft / 2 : 0) + horizOffset) + 'px',
                             top: (obj.top + vertOffset + 'px')
                         });
                     }
                 });
             }
         }
-    },
-    componentDidMount: function() {
+    }
+
+    componentDidMount () {
+        super.componentDidMount();
+        $(window).rebind('resize.drpdwn' + this.getUniqueId(), this.onResized);
         this.onResized();
         var self = this;
-        $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function(e, target) {
+        $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
             if (self.props.active && target !== self) {
                 if (self.props && self.props.closeDropdown) {
                     self.props.closeDropdown();
                 }
             }
         });
-    },
-    componentDidUpdate: function() {
+    }
+
+    componentDidUpdate () {
         this.onResized();
-    },
-    componentWillUnmount: function() {
+    }
+
+    componentWillUnmount () {
+        super.componentWillUnmount();
         $(document.body).unbind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId());
         if (this.props.active) {
             // fake an active=false so that any onActiveChange handlers would simply trigger back UI to the state
             // in which this element is not active any more (since it would be removed from the DOM...)
             this.onActiveChange(false);
         }
-    },
-    doRerender: function() {
+        $(window).unbind('resize.drpdwn' + this.getUniqueId());
+    }
+
+    doRerender () {
         var self = this;
 
-        setTimeout(function() {
+        setTimeout(function () {
             self.safeForceUpdate();
         }, 100);
 
         // idb + DOM updates = delayed update so .onResized won't properly reposition the DOM node using $.position,
         // so we need to manually call this
-        setTimeout(function() {
+        setTimeout(function () {
             self.onResized();
         }, 200);
-    },
-    renderChildren: function () {
+    }
+
+    renderChildren () {
         var self = this;
 
         return React.Children.map(this.props.children, function (child) {
             if (child) {
+                var activeVal = self.props.active || self.state.active;
+                activeVal = String(activeVal);
+
                 return React.cloneElement(child, {
-                    active: self.props.active || self.state.active
+                    active: activeVal
                 });
-            }
-            else {
+            } else {
                 return null;
             }
         }.bind(this))
-    },
-    render: function() {
+    }
+
+    render () {
         if (this.props.active !== true) {
             return null;
-        }
-        else {
+        } else {
             var classes = (
                 "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className
             );
@@ -180,7 +186,7 @@ var Dropdown = React.createClass({
             var styles;
 
             // calculate and move the popup arrow to the correct position.
-            if (this.getOwnerElement()) {
+            if (this.popupElement) {
                 styles = {
                     'zIndex': 123,
                     'position': 'absolute',
@@ -194,8 +200,7 @@ var Dropdown = React.createClass({
 
             if (this.props.children) {
                 child = <div>{self.renderChildren()}</div>;
-            }
-            else if (this.props.dropdownItemGenerator) {
+            } else if (this.props.dropdownItemGenerator) {
                 child = this.props.dropdownItemGenerator(this);
             }
 
@@ -210,37 +215,38 @@ var Dropdown = React.createClass({
 
 
             return <utils.RenderTo element={document.body} className={classes} style={styles}
-                    popupDidMount={(popupElement) => {
-                        self.popupElement = popupElement;
-                    }}
-                    popupWillUnmount={(popupElement) => {
-                        delete self.popupElement;
-                    }}>
-                    <div onClick={function(e) {
-                        $(document.body).trigger('closeAllDropdownsExcept', self);
-                    }}>
-                        {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                        {child}
-                    </div>
-                </utils.RenderTo>;
+                                   popupDidMount={(popupElement) => {
+                                       self.popupElement = popupElement;
+                                       self.onResized();
+                                   }}
+                                   popupWillUnmount={(popupElement) => {
+                                       delete self.popupElement;
+                                   }}>
+                <div onClick={function (e) {
+                    $(document.body).trigger('closeAllDropdownsExcept', self);
+                }}>
+                    {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
+                    {child}
+                </div>
+            </utils.RenderTo>;
         }
     }
-});
+};
 
+export class DropdownContactsSelector extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        requiresUpdateOnResize: true
+    };
 
-var DropdownContactsSelector = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            requiresUpdateOnResize: true
-        };
-    },
-    getInitialState: function() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             'selected': this.props.selected ? this.props.selected : []
         }
-    },
-    specificShouldComponentUpdate: function(nextProps, nextState) {
+        this.onSelectClicked = this.onSelectClicked.bind(this);
+        this.onSelected = this.onSelected.bind(this);
+    }
+    specificShouldComponentUpdate(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             return true;
         }
@@ -257,18 +263,18 @@ var DropdownContactsSelector = React.createClass({
             // not sure, leave to the render mixing to decide.
             return undefined;
         }
-    },
-    onSelected: function(nodes) {
+    }
+    onSelected(nodes) {
         this.setState({'selected': nodes});
         if (this.props.onSelected) {
             this.props.onSelected(nodes);
         }
         this.forceUpdate();
-    },
-    onSelectClicked: function() {
+    }
+    onSelectClicked() {
         this.props.onSelectClicked();
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         return <Dropdown className={"popup contacts-search " + this.props.className + " tooltip-blur"}
@@ -280,7 +286,7 @@ var DropdownContactsSelector = React.createClass({
                          arrowHeight={this.props.arrowHeight}
                          vertOffset={this.props.vertOffset}
                 >
-                <ContactsUI.ContactPickerWidget
+                <ContactPickerWidget
                     active={this.props.active}
                     className="popup contacts-search tooltip-blur small-footer"
                     contacts={this.props.contacts}
@@ -297,30 +303,31 @@ var DropdownContactsSelector = React.createClass({
                     />
         </Dropdown>;
     }
-});
+};
 
-var DropdownItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            requiresUpdateOnResize: true
-        };
-    },
-    getInitialState: function() {
-        return {'isClicked': false}
-    },
-    renderChildren: function () {
+export class DropdownItem extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        requiresUpdateOnResize: true
+    };
+    constructor(props) {
+        super(props);
+        this.state = {'isClicked': false};
+        this.onClick = this.onClick.bind(this);
+        this.onMouseOver = this.onMouseOver.bind(this);
+    }
+    renderChildren() {
         var self = this;
         return React.Children.map(this.props.children, function (child) {
-            return React.cloneElement(child, {
+            var props = {
                 active: self.state.isClicked,
                 closeDropdown: function() {
                     self.setState({'isClicked': false});
                 }
-            });
+            };
+            return React.cloneElement(child, props);
         }.bind(this))
-    },
-    onClick: function(e) {
+    }
+    onClick(e) {
         var self = this;
 
         if (this.props.children) {
@@ -329,8 +336,8 @@ var DropdownItem = React.createClass({
             e.stopPropagation();
             e.preventDefault();
         }
-    },
-    onMouseOver: function(e) {
+    }
+    onMouseOver(e) {
         var self = this;
 
         if (this.props.className === "contains-submenu") {
@@ -358,8 +365,8 @@ var DropdownItem = React.createClass({
             $dropdown.find(".contains-submenu").removeClass("opened");
             $dropdown.find(".submenu").removeClass("active");
         }
-    },
-    render: function() {
+    }
+    render() {
         const self = this;
 
         let icon;
@@ -386,14 +393,8 @@ var DropdownItem = React.createClass({
                     onMouseOver={self.onMouseOver}
                 >
                     {icon}
-                    {label}
+                    <span>{label}</span>
                     {child}
                 </div>;
     }
-});
-
-module.exports = window.DropdownsUI = {
-    Dropdown,
-    DropdownItem,
-    DropdownContactsSelector
 };

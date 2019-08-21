@@ -563,7 +563,7 @@ Message.SOURCE = {
 };
 
 Message.MANAGEMENT_MESSAGE_TYPES = {
-    "MANAGEMENT": "\0",
+    "MANAGEMENT": "\x00",
     "ATTACHMENT": "\x10",
     "REVOKE_ATTACHMENT": "\x11",
     "CONTACT": "\x12",
@@ -572,8 +572,8 @@ Message.MANAGEMENT_MESSAGE_TYPES = {
 };
 
 Message.MESSAGE_META_TYPE = {
-    "RICH_PREVIEW": "\0",
-    "GEOLOCATION": "\1"
+    "RICH_PREVIEW": "\x00",
+    "GEOLOCATION": "\x01"
 };
 
 Message._stateToText = Object.create(null);

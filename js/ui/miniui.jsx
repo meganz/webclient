@@ -1,22 +1,22 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require("./../stores/mixins.js").MegaRenderMixin;
+import MegaRenderMixin from "./../stores/mixins.js";
 
-var ToggleCheckbox = React.createClass({
-    mixins: [MegaRenderMixin],
-    getInitialState: function() {
-        return {
+class ToggleCheckbox extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.state = {
             value: this.props.value
-        }
-    },
-    onToggle: function() {
+        };
+    }
+    onToggle() {
         var newState = !this.state.value;
         this.setState({'value': newState});
         if (this.props.onToggle) {
             this.props.onToggle(newState);
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         return  <div className={"toggle-checkbox " + (self.state.value ? " checked " : "") + self.props.className}
@@ -28,24 +28,25 @@ var ToggleCheckbox = React.createClass({
             </div>
         </div>;
     }
-});
+};
 
-var Checkbox = React.createClass({
-    mixins: [MegaRenderMixin],
-    getInitialState: function() {
-        return {
+class Checkbox extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.state = {
             value: this.props.value
-        }
-    },
+        };
+    }
     componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $node = self.findDOMNode();
         uiCheckboxes($node, false, function(newState) {
             self.setState({'value': newState});
             self.props.onToggle && self.props.onToggle(newState);
         }, !!self.props.value);
-    },
-    render: function() {
+    }
+    render() {
         var extraClasses = "";
         if (this.props.disabled) {
             extraClasses += " disabled";
@@ -60,24 +61,25 @@ var Checkbox = React.createClass({
             <div className="clear"></div>
         </div>;
     }
-});
+};
 
-var IntermediateCheckbox = React.createClass({
-    mixins: [MegaRenderMixin],
-    getInitialState: function() {
-        return {
+class IntermediateCheckbox extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.state = {
             value: this.props.value
-        }
-    },
+        };
+    }
     componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $node = self.findDOMNode();
         uiCheckboxes($node, false, function(newState) {
             self.setState({'value': newState});
             self.props.onToggle && self.props.onToggle(newState);
         }, !!self.props.value);
-    },
-    render: function() {
+    }
+    render() {
         var extraClasses = "";
         if (this.props.disabled) {
             extraClasses += " disabled";
@@ -98,8 +100,10 @@ var IntermediateCheckbox = React.createClass({
             <div className="clear"></div>
         </div>;
     }
-});
-module.exports = {
+};
+
+
+export default {
     ToggleCheckbox,
     Checkbox,
     IntermediateCheckbox

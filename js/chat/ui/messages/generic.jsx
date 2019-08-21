@@ -5,10 +5,12 @@ import { ConversationMessageMixin } from './mixin.jsx';
 import { MetaRichpreview } from './metaRichpreview.jsx';
 import { MetaRichpreviewConfirmation } from './metaRichpreviewConfirmation.jsx';
 import { MetaRichpreviewMegaLinks } from './metaRichpreviewMegaLinks.jsx';
-import ContactsUI from './../contacts.jsx';
-import TypingAreaUI from './../typingArea.jsx';
+import { Avatar, ContactButton, ContactPresence, ContactFingerprint, ContactVerified } from './../contacts.jsx';
+import {TypingArea} from './../typingArea.jsx';
 import AudioContainer from './AudioContainer.jsx';
 import GeoLocation from './geoLocation.jsx';
+var DropdownsUI = require('./../../../ui/dropdowns.jsx');
+var ButtonsUI = require('./../../../ui/buttons.jsx');
 
 /* 1h as confirmed by Mathias */
 const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
@@ -17,17 +19,17 @@ var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .da
 
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-var GenericConversationMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-    getInitialState: function() {
-        return {
+class GenericConversationMessage extends ConversationMessageMixin {
+    constructor(props) {
+        super(props);
+        this.state = {
             'editing': this.props.editing,
         };
-    },
-    isBeingEdited: function() {
+    }
+    isBeingEdited() {
         return this.state.editing === true || this.props.editing === true;
-    },
-    componentDidUpdate: function(oldProps, oldState) {
+    }
+    componentDidUpdate(oldProps, oldState) {
         var self = this;
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
@@ -55,10 +57,9 @@ var GenericConversationMessage = React.createClass({
                 }
             });
         });
-
-
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $node = $(self.findDOMNode());
 
@@ -103,15 +104,16 @@ var GenericConversationMessage = React.createClass({
                     $('.button.default-white-button.tiny-button', $block).trigger('click');
                 });
             });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var $node = $(self.findDOMNode());
 
         $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
-    },
-    haveMoreContactListeners: function() {
+    }
+    haveMoreContactListeners() {
         if (!this.props.message || !this.props.message.meta) {
             return false;
         }
@@ -128,8 +130,8 @@ var GenericConversationMessage = React.createClass({
         else {
             return false;
         }
-    },
-    _nodeUpdated: function(h) {
+    }
+    _nodeUpdated(h) {
         var self = this;
         // because it seems the webclient can trigger stuff before the actual
         // change is done on the node, this function would need to be queued
@@ -142,8 +144,8 @@ var GenericConversationMessage = React.createClass({
                 }
             }
         });
-    },
-    doDelete: function(e, msg) {
+    }
+    doDelete(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
 
@@ -153,8 +155,8 @@ var GenericConversationMessage = React.createClass({
         else {
             this.props.onDeleteClicked(e, this.props.message);
         }
-    },
-    doCancelRetry: function(e, msg) {
+    }
+    doCancelRetry(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.message.chatRoom;
@@ -165,8 +167,8 @@ var GenericConversationMessage = React.createClass({
             chatRoom,
             msg.messageId
         );
-    },
-    doRetry: function(e, msg) {
+    }
+    doRetry(e, msg) {
         var self = this;
         e.preventDefault(e);
         e.stopPropagation(e);
@@ -181,12 +183,12 @@ var GenericConversationMessage = React.createClass({
             });
 
 
-    },
-    _favourite: function(h) {
+    }
+    _favourite(h) {
         var newFavState = Number(!M.isFavourite(h));
         M.favourite([h], newFavState);
-    },
-    _addFavouriteButtons: function(h, arr) {
+    }
+    _addFavouriteButtons(h, arr) {
         var self = this;
 
         if (M.getNodeRights(h) > 1) {
@@ -211,11 +213,11 @@ var GenericConversationMessage = React.createClass({
         else {
             return false;
         }
-    },
-    _isNodeHavingALink: function(h) {
+    }
+    _isNodeHavingALink(h) {
         return M.getNodeShare(h) !== false;
-    },
-    _addLinkButtons: function(h, arr) {
+    }
+    _addLinkButtons(h, arr) {
         var self = this;
 
         var haveLink = self._isNodeHavingALink(h) === true;
@@ -232,7 +234,7 @@ var GenericConversationMessage = React.createClass({
 
         if (haveLink) {
             arr.push(
-                <DropdownsUI.DropdownItem 
+                <DropdownsUI.DropdownItem
                     icon="context remove-link"
                     key="removeLinkButton"
                     label={__(l[6821])}
@@ -244,11 +246,11 @@ var GenericConversationMessage = React.createClass({
         else {
             return false;
         }
-    },
-    _startDownload: function(v) {
+    }
+    _startDownload (v) {
         M.addDownload([v]);
-    },
-    _addToCloudDrive: function(v, openSendToChat) {
+    }
+    _addToCloudDrive(v, openSendToChat) {
         $.selected = [v.h];
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
@@ -292,9 +294,8 @@ var GenericConversationMessage = React.createClass({
                 });
             }
         }, openSendToChat ? "conversations" : false);
-    },
-
-    _getLink: function(h, e) {
+    }
+    _getLink(h, e) {
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -305,8 +306,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-    _removeLink: function(h, e) {
+    }
+    _removeLink(h, e) {
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -319,9 +320,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-
-    _startPreview: function(v, e) {
+    }
+    _startPreview(v, e) {
         if ($(e && e.target).is('.tiny-button')) {
             // prevent launching the previewer clicking the dropdown on an previewable item without thumbnail
             return;
@@ -336,9 +336,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-
-    render: function () {
+    }
+    render() {
         var self = this;
 
         var message = this.props.message;
@@ -545,7 +544,7 @@ var GenericConversationMessage = React.createClass({
 
                                             firstGroupOfButtons.push(
                                                 <DropdownsUI.DropdownItem
-                                                    icon="context info" 
+                                                    icon="context info"
                                                     label={__(l[6859])}
                                                     key="infoDialog"
                                                     onClick={() => {
@@ -634,7 +633,7 @@ var GenericConversationMessage = React.createClass({
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className={"data-block-view medium " + noThumbPrev}
-                                           onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                           onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}>
                             {dropdown}
 
                             <div className="data-block-bg">
@@ -657,7 +656,9 @@ var GenericConversationMessage = React.createClass({
                                     isPreviewable ? " previewable" : "non-previewable"
                                 );
                                 thumbOverlay = <div className="thumb-overlay"
-                                                    onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                                    onClick={
+                                                        isPreviewable ? self._startPreview.bind(self, v) : undefined
+                                                    }>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
                                         {v.playtime && <i className="small-icon small-play-icon"></i>}
@@ -672,7 +673,7 @@ var GenericConversationMessage = React.createClass({
 
                                 <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
                                      key={'thumb-' + v.ch}
-                                     onClick={isPreviewable && self._startPreview.bind(self, v)}
+                                     onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}
                                 />
                             </div>) : preview);
                         }
@@ -704,10 +705,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -788,13 +789,13 @@ var GenericConversationMessage = React.createClass({
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactsUI.ContactPresence className="small" contact={contact} />
-                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <ContactPresence className="small" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
                                         </div>
                                     </div>
-                                    <ContactsUI.ContactFingerprint contact={contact} />
+                                    <ContactFingerprint contact={contact} />
 
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
@@ -836,8 +837,8 @@ var GenericConversationMessage = React.createClass({
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactsUI.ContactPresence className="small" contact={contact} />
-                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <ContactPresence className="small" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
                                         </div>
@@ -889,7 +890,7 @@ var GenericConversationMessage = React.createClass({
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactsUI.ContactVerified className="right-align" contact={contact} /> :
+                                            <ContactVerified className="right-align" contact={contact} /> :
                                             null
                                     }
 
@@ -899,11 +900,11 @@ var GenericConversationMessage = React.createClass({
                                     <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactsUI.ContactPresence className="small" contact={contact} /> :
+                                                <ContactPresence className="small" contact={contact} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <ContactsUI.Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -919,10 +920,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -952,14 +953,14 @@ var GenericConversationMessage = React.createClass({
                     }
                     else {
                         avatar = (
-                            <ContactsUI.Avatar
+                            <Avatar
                                 contact={contact}
                                 className="message avatar-wrapper small-rounded-avatar"
                             />
                         );
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     const attachmentMetadata = message.getAttachmentMeta() || [];
@@ -967,7 +968,7 @@ var GenericConversationMessage = React.createClass({
 
                     attachmentMetadata.forEach((v) => {
                         audioContainer = (
-                            <AudioContainer 
+                            <AudioContainer
                                 h={v.h}
                                 mime={v.mime}
                                 playtime={v.playtime}
@@ -975,7 +976,7 @@ var GenericConversationMessage = React.createClass({
                             />
                         );
                     });
-                
+
                     const iAmSender = (contact && contact.u === u_handle);
                     const stillEditable = (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
                     const isBeingEdited = (self.isBeingEdited() === true);
@@ -1185,10 +1186,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                     datetime = <div className="message date-time simpletip"
                                     data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton contact={contact} className="message" label={displayName} />;
                 }
 
                 var messageDisplayBlock;
@@ -1196,7 +1197,7 @@ var GenericConversationMessage = React.createClass({
                     var msgContents = message.textContents;
                     msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
-                    messageDisplayBlock = <TypingAreaUI.TypingArea
+                    messageDisplayBlock = <TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
                         initialText={msgContents}
                         chatRoom={self.props.message.chatRoom}
@@ -1350,10 +1351,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={message.authorContact}
+                    avatar = <Avatar contact={message.authorContact}
                                                 className="message avatar-wrapper small-rounded-avatar"/>;
                     displayName = M.getNameByHandle(message.authorContact.u);
-                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton contact={contact} className="message" label={displayName} />;
                 }
             }
 
@@ -1485,7 +1486,7 @@ var GenericConversationMessage = React.createClass({
                         var handle = base64urlencode(handleAndSid.substr(0, 8));
                         if (!unique[handle]) {
                             avatarsListing.push(
-                                <ContactsUI.Avatar
+                                <Avatar
                                     key={handle}
                                     contact={M.u[handle]}
                                     simpletip={M.u[handle] && M.u[handle].name}
@@ -1532,8 +1533,8 @@ var GenericConversationMessage = React.createClass({
             )
         }
     }
-});
+};
 
-module.exports = {
+export {
     GenericConversationMessage
 };

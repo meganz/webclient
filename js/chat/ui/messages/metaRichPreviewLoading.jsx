@@ -1,16 +1,15 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 
-var MetaRichpreviewLoading = React.createClass({
-    mixins: [ConversationMessageMixin],
-    render: function () {
+class MetaRichpreviewLoading extends ConversationMessageMixin {
+    render() {
         return <div className="loading-spinner light small"><div className="main-loader"></div></div>;
     }
-});
+};
 
-module.exports = {
+export {
     MetaRichpreviewLoading
 };

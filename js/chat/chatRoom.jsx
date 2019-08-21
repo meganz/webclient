@@ -568,7 +568,7 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
         }
 
         if (megaChat.$conversationsAppInstance) {
-            megaChat.$conversationsAppInstance.safeForceUpdate();
+            megaChat.safeForceUpdate();
         }
     }
 };
@@ -992,8 +992,8 @@ ChatRoom.prototype.show = function() {
     $('.contacts-grid-view').addClass('hidden');
     $('.fm-contacts-blocks-view').addClass('hidden');
 
-    $('.fm-right-files-block[data-reactid]').removeClass('hidden');
-    $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+    $('.fm-right-files-block.in-chat').removeClass('hidden');
+    $('.fm-right-files-block:not(.in-chat)').addClass('hidden');
 
     //$('.nw-conversations-item').removeClass('selected');
 
@@ -1021,7 +1021,7 @@ ChatRoom.prototype.show = function() {
     }
     Soon(function() {
         if (megaChat.$conversationsAppInstance) {
-            megaChat.$conversationsAppInstance.safeForceUpdate();
+            megaChat.safeForceUpdate();
         }
     });
 };
@@ -1781,4 +1781,7 @@ ChatRoom.prototype.onPublicChatRoomInitialized = function() {
 };
 
 window.ChatRoom = ChatRoom;
-module.exports = ChatRoom;
+
+export default {
+    'ChatRoom': ChatRoom
+};

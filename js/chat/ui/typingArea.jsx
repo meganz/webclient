@@ -1,35 +1,28 @@
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationsUI = require('./../ui/conversations.jsx');
-var DropdownEmojiSelector = require('./../../ui/emojiDropdown.jsx').DropdownEmojiSelector;
-var EmojiAutocomplete = require('./emojiAutocomplete.jsx').EmojiAutocomplete;
+import MegaRenderMixin from './../../stores/mixins.js';
+import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
+import { Button } from './../../ui/buttons.jsx';
+import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
 
-var TypingArea = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    validEmojiCharacters: new RegExp("[\w\:\-\_0-9]", "gi"),
-    getDefaultProps: function() {
-        return {
-            'textareaMaxHeight': "40%"
-        };
-    },
-    getInitialState: function () {
+export class TypingArea extends MegaRenderMixin(React.Component) {
+    static validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
+    static defaultProps = {
+        'textareaMaxHeight': "40%"
+    };
+    constructor(props) {
+        super(props);
+
         var initialText = this.props.initialText;
 
-        return {
+        this.state ={
             emojiSearchQuery: false,
             typedMessage: initialText ? initialText : "",
             textareaHeight: 20
         };
-    },
-    onEmojiClicked: function (e, slug, meta) {
+    }
+    onEmojiClicked(e, slug, meta) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -54,9 +47,9 @@ var TypingArea = React.createClass({
             $textarea.click();
             moveCursortoToEnd($textarea[0]);
         }, 100);
-    },
+    }
 
-    stoppedTyping: function () {
+    stoppedTyping() {
         if (this.props.disabled) {
             return;
         }
@@ -68,8 +61,8 @@ var TypingArea = React.createClass({
         delete self.lastTypingStamp;
 
         room.trigger('stoppedTyping');
-    },
-    typing: function () {
+    }
+    typing() {
         if (this.props.disabled) {
             return;
         }
@@ -95,8 +88,8 @@ var TypingArea = React.createClass({
             self.lastTypingStamp = unixtime();
             room.trigger('typing');
         }
-    },
-    triggerOnUpdate: function(forced) {
+    }
+    triggerOnUpdate(forced) {
         var self = this;
         if (!self.props.onUpdate || !self.isMounted()) {
             return;
@@ -132,8 +125,8 @@ var TypingArea = React.createClass({
                 self.props.onUpdate();
             }, 70);
         }
-    },
-    onCancelClicked: function(e) {
+    }
+    onCancelClicked(e) {
         var self = this;
         self.setState({typedMessage: ""});
         if (self.props.chatRoom && self.iAmTyping) {
@@ -141,8 +134,8 @@ var TypingArea = React.createClass({
         }
         self.onConfirmTrigger(false);
         self.triggerOnUpdate();
-    },
-    onSaveClicked: function(e) {
+    }
+    onSaveClicked(e) {
         var self = this;
 
         if (self.props.disabled || !self.isMounted()) {
@@ -159,8 +152,8 @@ var TypingArea = React.createClass({
             self.stoppedTyping();
         }
         self.triggerOnUpdate();
-    },
-    onConfirmTrigger: function(val) {
+    }
+    onConfirmTrigger(val) {
         var result = this.props.onConfirm(val);
 
         if (val !== false && result !== false) {
@@ -181,8 +174,8 @@ var TypingArea = React.createClass({
             }
         }
         return result;
-    },
-    onTypeAreaKeyDown: function(e) {
+    }
+    onTypeAreaKeyDown(e) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -212,8 +205,8 @@ var TypingArea = React.createClass({
             }
             return;
         }
-    },
-    onTypeAreaKeyUp: function (e) {
+    }
+    onTypeAreaKeyUp(e) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -344,8 +337,8 @@ var TypingArea = React.createClass({
         }
 
         self.updateScroll(true);
-    },
-    onTypeAreaBlur: function (e) {
+    }
+    onTypeAreaBlur(e) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -367,8 +360,8 @@ var TypingArea = React.createClass({
                 }
             }, 300);
         }
-    },
-    onTypeAreaChange: function (e) {
+    }
+    onTypeAreaChange(e) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
@@ -411,8 +404,8 @@ var TypingArea = React.createClass({
         // if (self.props.onUpdate) {
         //     self.props.onUpdate();
         // }
-    },
-    focusTypeArea: function () {
+    }
+    focusTypeArea() {
         if (this.props.disabled) {
             return;
         }
@@ -423,10 +416,11 @@ var TypingArea = React.createClass({
                 moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
             }
         }
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
-        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize);
+        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this));
 
         var $container = $(ReactDOM.findDOMNode(this));
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
@@ -440,8 +434,8 @@ var TypingArea = React.createClass({
         });
         self.triggerOnUpdate(true);
 
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -481,15 +475,16 @@ var TypingArea = React.createClass({
                 }
             );
         }
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
         // window.removeEventListener('resize', self.handleWindowResize);
         $(window).unbind('resize.typingArea' + self.getUniqueId());
-    },
-    componentDidUpdate: function () {
+    }
+    componentDidUpdate() {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -514,8 +509,8 @@ var TypingArea = React.createClass({
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
             self.onUpdateCursorPosition = false;
         }
-    },
-    initScrolling: function() {
+    }
+    initScrolling() {
         var self = this;
         self.scrollingInitialised = true;
         var $node = $(self.findDOMNode());
@@ -530,8 +525,8 @@ var TypingArea = React.createClass({
             animateScroll: false,
             maintainPosition: false
         });
-    },
-    getTextareaMaxHeight: function() {
+    }
+    getTextareaMaxHeight() {
         var self = this;
         var textareaMaxHeight = self.props.textareaMaxHeight;
 
@@ -546,8 +541,8 @@ var TypingArea = React.createClass({
             }
         }
         return textareaMaxHeight;
-    },
-    updateScroll: function(keyEvents) {
+    }
+    updateScroll(keyEvents) {
         var self = this;
 
         // DONT update if not visible...
@@ -690,8 +685,8 @@ var TypingArea = React.createClass({
         else {
             self.handleWindowResize();
         }
-    },
-    getCursorPosition: function(el) {
+    }
+    getCursorPosition(el) {
         var pos = 0;
         if ('selectionStart' in el) {
             pos=el.selectionStart;
@@ -704,11 +699,11 @@ var TypingArea = React.createClass({
             pos = sel.text.length - selLength;
         }
         return pos;
-    },
-    onTypeAreaSelect: function(e) {
+    }
+    onTypeAreaSelect(e) {
         this.updateScroll(true);
-    },
-    handleWindowResize: function (e, scrollToBottom) {
+    }
+    handleWindowResize(e, scrollToBottom) {
         var self = this;
 
         if(!self.isMounted()) {
@@ -723,23 +718,23 @@ var TypingArea = React.createClass({
         }
         self.triggerOnUpdate();
 
-    },
-    isActive: function () {
+    }
+    isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
-    },
-    resetPrefillMode: function() {
+    }
+    resetPrefillMode() {
         this.prefillMode = false;
-    },
-    onCopyCapture: function(e) {
+    }
+    onCopyCapture(e) {
         this.resetPrefillMode();
-    },
-    onCutCapture: function(e) {
+    }
+    onCutCapture(e) {
         this.resetPrefillMode();
-    },
-    onPasteCapture: function(e) {
+    }
+    onPasteCapture(e) {
         this.resetPrefillMode();
-    },
-    render: function () {
+    }
+    render() {
         var self = this;
 
         var room = this.props.chatRoom;
@@ -751,18 +746,18 @@ var TypingArea = React.createClass({
 
         if (self.props.showButtons === true) {
             buttons = [
-                <ButtonsUI.Button
+                <Button
                     key="save"
                     className="default-white-button right"
                     icon=""
-                    onClick={self.onSaveClicked}
+                    onClick={self.onSaveClicked.bind(self)}
                     label={__(l[776])} />,
 
-                <ButtonsUI.Button
+                <Button
                     key="cancel"
                     className="default-white-button right"
                     icon=""
-                    onClick={self.onCancelClicked}
+                    onClick={self.onCancelClicked.bind(self)}
                     label={__(l[1718])} />
             ];
         }
@@ -881,7 +876,7 @@ var TypingArea = React.createClass({
             <div className={"chat-textarea " + self.props.className}>
                 {emojiAutocomplete}
                 {self.props.children}
-                <ButtonsUI.Button
+                <Button
                     className="popup-button"
                     icon="smiling-face"
                     disabled={this.props.disabled}
@@ -889,29 +884,28 @@ var TypingArea = React.createClass({
                     <DropdownEmojiSelector
                         className="popup emoji"
                         vertOffset={17}
-                        onClick={self.onEmojiClicked}
+                        onClick={self.onEmojiClicked.bind(self)}
                     />
-                </ButtonsUI.Button>
+                </Button>
                 <hr />
                 <div className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                      style={textareaScrollBlockStyles}>
                     <textarea
                         className={messageTextAreaClasses}
                         placeholder={placeholder}
-                        roomTitle={room.getRoomTitle()}
-                        onKeyUp={self.onTypeAreaKeyUp}
-                        onKeyDown={self.onTypeAreaKeyDown}
-                        onBlur={self.onTypeAreaBlur}
-                        onChange={self.onTypeAreaChange}
-                        onSelect={self.onTypeAreaSelect}
+                        onKeyUp={self.onTypeAreaKeyUp.bind(self)}
+                        onKeyDown={self.onTypeAreaKeyDown.bind(self)}
+                        onBlur={self.onTypeAreaBlur.bind(self)}
+                        onChange={self.onTypeAreaChange.bind(self)}
+                        onSelect={self.onTypeAreaSelect.bind(self)}
                         value={self.state.typedMessage}
                         ref="typearea"
                         style={textareaStyles}
                         disabled={disabledTextarea ? true : false}
                         readOnly={disabledTextarea ? true : false}
-                        onCopyCapture={self.onCopyCapture}
-                        onPasteCapture={self.onPasteCapture}
-                        onCutCapture={self.onCutCapture}
+                        onCopyCapture={self.onCopyCapture.bind(self)}
+                        onPasteCapture={self.onPasteCapture.bind(self)}
+                        onCutCapture={self.onCutCapture.bind(self)}
                     ></textarea>
                     <div className="message-preview"></div>
                 </div>
@@ -919,10 +913,4 @@ var TypingArea = React.createClass({
             {buttons}
         </div>
     }
-});
-
-
-module.exports = {
-    TypingArea
 };
-

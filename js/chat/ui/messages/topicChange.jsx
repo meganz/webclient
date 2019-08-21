@@ -1,15 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var TopicChange = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    render: function () {
+class TopicChange extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -66,8 +64,8 @@ var TopicChange = React.createClass({
 
         return <div>{messages}</div>;
     }
-});
+};
 
-module.exports = {
+export {
     TopicChange
 };

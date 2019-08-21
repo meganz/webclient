@@ -1,18 +1,19 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../stores/mixins.js";
 
 
 var _buttonGroups = {};
 
-var Button = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {'focused': false};
-    },
-    componentWillUpdate: function(nextProps, nextState) {
+export class Button extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+        this.state = {'focused': false};
+        this.onClick = this.onClick.bind(this);
+        this.onBlur = this.onBlur.bind(this);
+    }
+    componentWillUpdate(nextProps, nextState) {
         var self = this;
 
         if (nextProps.disabled === true && nextState.focused === true) {
@@ -57,11 +58,12 @@ var Button = React.createClass({
         if (this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] == this) {
             _buttonGroups[this.props.group] = null;
         }
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         this.unbindEvents();
-    },
-    renderChildren: function () {
+    }
+    renderChildren() {
         var self = this;
 
         return React.Children.map(this.props.children, function (child) {
@@ -96,8 +98,8 @@ var Button = React.createClass({
                 }
             });
         }.bind(this));
-    },
-    onBlur: function(e) {
+    }
+    onBlur(e) {
         if (!this.isMounted()) {
             return;
         }
@@ -113,10 +115,8 @@ var Button = React.createClass({
             this.unbindEvents();
             this.forceUpdate();
         }
-
-
-    },
-    unbindEvents: function() {
+    }
+    unbindEvents() {
         var self = this;
         $(document).off('keyup.button' + self.getUniqueId());
         $(document).off('closeDropdowns.' + self.getUniqueId());
@@ -125,8 +125,8 @@ var Button = React.createClass({
         if (self._pageChangeListener) {
             mBroadcaster.removeListener(self._pageChangeListener);
         }
-    },
-    onClick: function(e) {
+    }
+    onClick(e) {
         var $element = $(ReactDOM.findDOMNode(this));
 
         if (this.props.disabled === true) {
@@ -160,8 +160,8 @@ var Button = React.createClass({
             this.setState({focused: false});
             this.unbindEvents();
         }
-    },
-    render: function () {
+    }
+    render() {
         var classes = this.props.className ? `button ${this.props.className}` : "button";
 
         if (this.props.disabled == true || this.props.disabled == "true") {
@@ -182,21 +182,15 @@ var Button = React.createClass({
         }
 
         return (
-            <div 
+            <div
                 className={classes}
                 onClick={this.onClick}
                 style={this.props.style ? this.props.style : null}
             >
                 {icon}
-                {label}
+                <span>{label}</span>
                 {this.renderChildren()}
             </div>
         );
     }
-});
-
-
-
-module.exports = window.ButtonsUI = {
-    Button
 };

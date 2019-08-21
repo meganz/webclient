@@ -86,7 +86,7 @@ function WebrtcApi() {
                     elem.setAttribute('playsinline', "");
                     elem.setAttribute('autoplay', "");
                     elem.setAttribute("controls", true);
-                    setTimeout(() => {
+                    setTimeout(function() {
                         elem.removeAttribute("controls");
                     });
                 }

@@ -14166,6 +14166,11 @@ function (_MegaRenderMixin) {
         totalWidth = $('.participantsContainer', $container).parent().outerWidth();
       }
 
+      if (ua.details.browser === "Safari") {
+        // for some reason, Safari adds 1px to the totalWidth
+        totalWidth -= 1;
+      }
+
       var $streams = $('.user-video, .user-audio', $container);
       var totalStreams = $streams.length;
 

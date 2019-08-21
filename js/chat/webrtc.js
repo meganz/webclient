@@ -37,7 +37,7 @@ var CallDataFlag = Object.freeze({
 function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
     if (!RTC) {
         throw new RtcModule.NotSupportedError(
-            "Attempting to create RtcModule, but there is no webRTC support in this browser"
+            "Attempted to create RtcModule, but there is no webRTC support in this browser"
         );
     }
     var self = this;
@@ -50,7 +50,6 @@ function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
     self._rejectedCallIds = {};
     self.allIceServers = allIceServers;
     self.iceServers = iceServers ? iceServers : allIceServers;
-    self.pc_constraints = {};
     self.pcConstraints = {
         'offerToReceiveAudio': true,
         'offerToReceiveVideo': true
@@ -1564,6 +1563,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         }
         if (self._audioMutedChecker) {
             self._audioMutedChecker.stop();
+            self._audioMutedChecker.destroy();
             delete self._audioMutedChecker;
         }
 
@@ -2909,6 +2909,9 @@ Session.prototype.handleMsg = function(packet) {
         case RTCMD.ICE_CANDIDATE:
             this.msgIceCandidate(packet);
             return;
+        case RTCMD.END_ICE_CANDIDATES:
+            this.msgEndIceCandidates(packet);
+            return;
         case RTCMD.SESS_TERMINATE:
             this.msgSessTerminate(packet);
             return;
@@ -2951,6 +2954,10 @@ Session.prototype._createRtcConn = function() {
         // mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
         var cand = event.candidate;
         if (!cand) {
+            // Edge needs a null candidate to signal end of received candidates, but current clients
+            // don't tolerate ICE_CANDATE packets without payload, so we introduce a new packet type
+            // that will be simply ignored by older clients
+            self.cmd(RTCMD.END_ICE_CANDIDATES);
             return;
         }
         var ctype = cand.candidate.match(/typ\s([^\s]+)/)[1];
@@ -3017,6 +3024,7 @@ Session.prototype._createRtcConn = function() {
             return;
         }
         self._onNegotiationNeededCalled = true;
+        assert(self._streamRenegTimer == null);
         self._setStreamRenegTimeout();
         self.logger.log("onNegotiationNeeded while in progress, sending sdp offer");
         self.sendOffer();
@@ -3476,6 +3484,10 @@ Session.prototype.verifySdpFingerprints = function(sdp) {
 Session.prototype.msgIceCandidate = function(packet) {
     // sid.8 mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
     var self = this;
+    if (RTC.isEdge && (self.rtcConn.iceConnectionState === "completed")) {
+        self.logger.warn("Edge: Ignoring received ICE candidate - we are already in 'completed' ICE conn state");
+        return;
+    }
     var data = packet.data;
     var mLineIdx = data.charCodeAt(8);
     var midLen = data.charCodeAt(9);
@@ -3486,15 +3498,28 @@ Session.prototype.msgIceCandidate = function(packet) {
     var candLen = Chatd.unpack16le(data.substr(10 + midLen, 2));
     assert(data.length >= 12 + midLen + candLen);
     var cand = new RTCIceCandidate({
-        sdpMLineIndex: mLineIdx,
-        sdpMid: mid,
-        candidate: data.substr(midLen + 12, candLen)
+            sdpMLineIndex: mLineIdx,
+            sdpMid: mid,
+            candidate: data.substr(midLen + 12, candLen)
     });
-    return self.rtcConn.addIceCandidate(cand)
-        .catch(function(err) {
-            self.terminateAndDestroy(Term.kErrProtocol, err);
-            return Promise.reject(err);
-        });
+
+    self.rtcConn.addIceCandidate(cand)
+    .catch(function(err) {
+        self.terminateAndDestroy(Term.kErrProtocol, err);
+    });
+};
+
+Session.prototype.msgEndIceCandidates = function(packet) {
+    var self = this;
+    if (RTC.isEdge && (self.rtcConn.iceConnectionState === "completed")) {
+        self.logger.warn("Edge: Ignoring received END_ICE_CANDIDATES marker - " +
+            "we are already in 'completed' ICE conn state");
+        return;
+    }
+    self.rtcConn.addIceCandidate(null)
+    .catch(function(err) {
+        self.terminateAndDestroy(Term.kErrProtocol, err);
+    });
 };
 
 Session.prototype.msgMute = function(packet) {
@@ -3840,7 +3865,8 @@ var RTCMD = Object.freeze({
                             // it will not be detected as an error by the receiver
     MUTE: 12, // Notify peer that we muted/unmuted
     SDP_OFFER_RENEGOTIATE: 13, // SDP offer, generated after changing the local stream. Used to renegotiate the stream
-    SDP_ANSWER_RENEGOTIATE: 14 // SDP answer, resulting from SDP_OFFER_RENEGOTIATE
+    SDP_ANSWER_RENEGOTIATE: 14, // SDP answer, resulting from SDP_OFFER_RENEGOTIATE
+    END_ICE_CANDIDATES: 15 // Marks the end of the sequence of sent ICE_CANDIDATE-s. Required for Edge support
 });
 
 var Term = Object.freeze({
@@ -4125,10 +4151,15 @@ RtcModule.rtcmdToString = function(cmd, tx, chatdOpcode) {
                 break;
             case RTCMD.ICE_CANDIDATE:
                 // sid.8 mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
-                var midLen = cmd.charCodeAt(33);
-                var candLen = Chatd.unpack16le(cmd.substr(33 + midLen, 2));
-                result += getSid() + ', mid: ' + cmd.substr(34, midLen) +
-                    '\n' + cmd.substr(35 + midLen, candLen);
+                result += getSid();
+                if (cmd.length === 32) {
+                    result += "\n(null candidate)";
+                } else {
+                    var midLen = cmd.charCodeAt(33);
+                    var candLen = Chatd.unpack16le(cmd.substr(33 + midLen, 2));
+                    result += ', mid: ' + cmd.substr(34, midLen) +
+                        '\n' + cmd.substr(35 + midLen, candLen);
+                }
                 break;
             case RTCMD.SDP_OFFER:
             case RTCMD.SDP_OFFER_RENEGOTIATE:
@@ -4224,9 +4255,15 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
     self.handler = handler;
     self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.002;
     var ctx = self.audioCtx = new AudioContext();
+    if (!ctx) {
+        throw new Error("Can't create audio context, maybe maximum number of instances was reached");
+    }
     self.source = ctx.createMediaStreamSource(stream);
     var scriptNode = self.scriptNode = ctx.createScriptProcessor(8192, 1, 1);
     scriptNode.onaudioprocess = function(event) {
+        if (!self._connected) {
+            return;
+        }
         var inData = event.inputBuffer.getChannelData(0);
         var max = Math.abs(inData[0]);
         // Samples are in float format. Process each second sample to save some cpu cycles
@@ -4237,10 +4274,11 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
             }
         }
         var lastLevel = self._lastLevel;
+        // console.warn('max=', max);
         if (Math.abs(max - lastLevel) >= self._changeThreshold ||
-           (max < 0.001 && lastLevel >= 0.005)) { // return to zero
+           (max <= 0.001 && lastLevel >= 0.005)) { // return to zero
             self._lastLevel = max;
-            handler.onAudioLevelChange(Math.round(max * 100));
+            handler.onAudioLevelChange(max);
         }
     };
     self.connect();
@@ -4252,7 +4290,7 @@ AudioLevelMonitor.prototype.connect = function() {
         return;
     }
     self.source.connect(self.scriptNode);
-    if (RTC.isChrome) {
+    if (!RTC.isFirefox) {
         self.scriptNode.connect(self.audioCtx.destination);
     }
     self._connected = true;
@@ -4264,13 +4302,13 @@ AudioLevelMonitor.prototype.disconnect = function() {
         return;
     }
     self.source.disconnect(self.scriptNode);
-    if (RTC.isChrome) {
+    if (!RTC.isFirefox) {
         self.scriptNode.disconnect(self.audioCtx.destination);
     }
     delete self._connected;
     if (self._lastLevel >= 0.005) {
         self._lastLevel = 0.0;
-        self.handler.onAudioLevelChange(0);
+        self.handler.onAudioLevelChange(0.0);
     }
 };
 
@@ -4284,6 +4322,13 @@ AudioLevelMonitor.prototype.setChangeThreshold = function(val) {
 
 AudioLevelMonitor.prototype.lastLevel = function() {
     return Math.round(this._lastLevel * 100);
+};
+
+AudioLevelMonitor.prototype.destroy = function() {
+    if (this.audioCtx) {
+        this.audioCtx.close();
+        delete this.audioCtx;
+    }
 };
 
 function AudioMutedChecker(handler, timeout) {
@@ -4304,8 +4349,13 @@ AudioMutedChecker.prototype.start = function(stream) {
         delete self._levelMonitor;
     }
     self._stream = stream;
+    try {
+        self._levelMonitor = new AudioLevelMonitor(stream, self, 1); // also connects it to the stream
+    } catch(e) {
+        console.warn("Error creating audio level monitor:", e);
+        return false;
+    }
     self.arm();
-    self._levelMonitor = new AudioLevelMonitor(stream, self, 1); // also connects it to the stream
     return true;
 };
 
@@ -4322,9 +4372,15 @@ AudioMutedChecker.prototype.stop = function() {
     delete this._stream;
 };
 
+AudioMutedChecker.prototype.destroy = function() {
+    if (this._levelMonitor) {
+        this._levelMonitor.destroy();
+    }
+};
+
 AudioMutedChecker.prototype.onAudioLevelChange = function(level) {
     var self = this;
-    if (level < 1) {
+    if (level <= 0.001) {
         // if we disconnect, there will be an artificial change to 0
         // console.warn("AudioMutedChecker: Received level change to", level, "- should be > 0");
         return;
@@ -4441,6 +4497,9 @@ function trackInfo(track) {
 }
 
 function streamInfo(stream) {
+    if (!stream) {
+        return "(null stream)"
+    }
     var str = "stream id: " + stream.id;
     var tracks = stream.getTracks();
     var len = tracks.length;

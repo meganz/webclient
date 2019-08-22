@@ -458,8 +458,8 @@ def analyse_files_for_special_chars(filename, result):
                 for column, character in enumerate(line):
                     code = ord(character)
                     if code >= 128:
-                        result.append('Found non-ASCII character {} at file {}, line {}, column {}'
-                                     .format(code, filename, linenumber, column))
+                        result.append('Found non-ASCII character {} ({}) at file {}, line {}, column {}'
+                                     .format(code, character.encode("utf-8"), filename, linenumber + 1, column))
                         test_fail = True
 
     return test_fail

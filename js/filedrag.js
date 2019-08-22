@@ -257,7 +257,7 @@
             return true;
         }
     }
-    function FileSelectHandlerMegaSyncMouse(e) {
+    scope.FileSelectHandlerMegaSyncMouse = function(e) {
         e.preventDefault();
         e.stopPropagation();
         if (useMegaSync === -1) {
@@ -307,7 +307,7 @@
         }
     }
 
-    // on Drop event
+    // on Drop event or Click to file select event
     function FileSelectHandler(e) {
 
         if (e.preventDefault) {
@@ -326,7 +326,8 @@
         if (e.stopPropagation) {
             e.stopPropagation();
         }
-        if (!isFileDragAllowed()) {
+
+        if (e.type === 'drop' && !isFileDragAllowed()) {
             return;
         }
 

@@ -2857,6 +2857,10 @@ function processPH(publicHandles) {
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 
+            if (M.currentdirid === 'public-links') {
+                removeUInode(nodeId, value.p);
+            }
+
             if (UiExportLink) {
                 UiExportLink.removeExportLinkIcon(nodeId);
             }

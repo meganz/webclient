@@ -740,13 +740,16 @@
     background-position: -197px -129px;
 }
 .medium-icon.icons-img.share {
-        background-position: -230px -1005px;
+    background-position: -230px -1005px;
 }
 .medium-icon.icons-img.arrow-in-circle {
     background-position: -47px -631px;
 }
 .medium-icon.icons-img.i-in-circle {
     background-position: -69px -1392px;
+}
+.medium-icon.icons-img.remove-to-bin {
+    background-position: -237px -317px;
 }
 .medium-icon.icons-img.heart {
     background-position: -237px -495px;

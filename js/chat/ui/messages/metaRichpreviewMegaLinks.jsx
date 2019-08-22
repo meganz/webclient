@@ -3,9 +3,8 @@ import utils from './../../../ui/utils.jsx';
 import { ConversationMessageMixin } from './mixin.jsx';
 import { MetaRichpreviewLoading } from './metaRichPreviewLoading.jsx';
 
-var MetaRichpreviewMegaLinks = React.createClass({
-    mixins: [ConversationMessageMixin],
-    render: function () {
+class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -119,8 +118,8 @@ var MetaRichpreviewMegaLinks = React.createClass({
         }
         return <div className="message richpreview previews-container">{output}</div>;
     }
-});
+};
 
-module.exports = {
+export {
     MetaRichpreviewMegaLinks
 };

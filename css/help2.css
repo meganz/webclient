@@ -4634,10 +4634,12 @@
 #help2-main .ui-autocomplete .ui-menu-item .megachat.ui-state-active {
     background-position: -230px -333px;
 }
-#help2-main .ui-autocomplete .ui-menu-item .cmd {
+#help2-main .ui-autocomplete .ui-menu-item .cmd,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd {
     background-position: -178px -367px;
 }
-#help2-main .ui-autocomplete .ui-menu-item .cmd.ui-state-active {
+#help2-main .ui-autocomplete .ui-menu-item .cmd.ui-state-active,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd.ui-state-active {
     background-position: -230px -367px;
 }
 #help2-main .ui-autocomplete .label-text {

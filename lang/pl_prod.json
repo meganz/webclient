@@ -2650,7 +2650,7 @@
     "19731": "Open Source",
     "19732": "Ca\u0142y nasz kod \u017ar\u00f3d\u0142owy klienta jest Public Source.",
     "19733": "Mo\u017ce on zosta\u0107 przejrzany przez Ciebie i badaczy bezpiecze\u0144stwa na:",
-    "19734": "Nasza bia\u0142a ksi\u0119ga zabezpiecze\u0144 jest dost\u0119pna pod adresem",
+    "19734": "Nasz oficjalny dokument bezpiecze\u0144stwa jest dost\u0119pny pod adresem",
     "19735": "Wersjonowanie plik\u00f3w oznacza, \u017ce mo\u017cesz przesta\u0107 si\u0119 martwi\u0107.",
     "19736": "Dzi\u0119ki naszej wersji plik\u00f3w mo\u017cesz si\u0119 zrelaksowa\u0107 i nie martwi\u0107 si\u0119 o nadpisanie tego wa\u017cnego dokumentu. U\u0142atwiamy cofanie lub pobieranie starszych kopii plik\u00f3w, dzi\u0119ki czemu nigdy nic nie stracisz.",
     "19737": "Kopia zapasowa plik\u00f3w",
@@ -2818,8 +2818,8 @@
     "20020": "Paradygmat MEGA (end-to-end encryption) (E2EE) zwi\u0119ksza og\u00f3lne bezpiecze\u0144stwo, zapewniaj\u0105c prywatno\u015b\u0107 z za\u0142o\u017cenia, w przeciwie\u0144stwie do wielu konkurent\u00f3w, kt\u00f3rzy zapewniaj\u0105 prywatno\u015b\u0107 tylko dzi\u0119ki polityce, ale nie jest to rozwi\u0105zanie typu \"silver bullet\" dla wszystkich potencjalnych zagro\u017ce\u0144 bezpiecze\u0144stwa. Bardzo wa\u017cne jest, aby urz\u0105dzenia ko\u0144cowe by\u0142y bezpieczne, poniewa\u017c ka\u017cde naruszenie urz\u0105dzenia ko\u0144cowego mo\u017ce przerwa\u0107 \u0142a\u0144cuch E2EE.",
     "20022": "Na przyk\u0142ad, backdoor lub wirus w systemie operacyjnym urz\u0105dzenia ko\u0144cowego u\u017cytkownika mo\u017ce umo\u017cliwi\u0107 nieuczciwemu napastnikowi przechwycenie niezaszyfrowanych danych, zarejestrowanie naci\u015bni\u0119\u0107 klawiszy lub bezpo\u015brednie przechwytywanie audio \/ wideo z mikrofonu \/ kamery urz\u0105dzenia. [Br] Dlatego wa\u017cne jest, aby u\u017cytkownik nie polega\u0107 wy\u0142\u0105cznie na MEGA, ale zapewnia r\u00f3wnie\u017c bezpiecze\u0144stwo swoich urz\u0105dze\u0144 ko\u0144cowych (na kt\u00f3rych u\u017cytkownik uruchamia oprogramowanie klienta MEGA).",
     "20023": "Przejrzysto\u015b\u0107 i kod \u017ar\u00f3d\u0142owy",
-    "20024": "Aby umo\u017cliwi\u0107 niezale\u017cn\u0105 weryfikacj\u0119 naszego modelu kryptograficznego i niezawodno\u015b\u0107 us\u0142ug, publikujemy dokumentacj\u0119 MEGA dotycz\u0105c\u0105 bezpiecze\u0144stwa i proces\u00f3w w bia\u0142ej ksi\u0119dze.",
-    "20025": "Zobacz bia\u0142\u0105 ksi\u0119g\u0119",
+    "20024": "Aby umo\u017cliwi\u0107 niezale\u017cn\u0105 weryfikacj\u0119 naszego modelu kryptograficznego i niezawodno\u015bci us\u0142ug, publikujemy procesy projektowania i bezpiecze\u0144stwa MEGA w bia\u0142ej ksi\u0119dze.",
+    "20025": "Zobacz oficjalny dokument",
     "20026": "Umo\u017cliwiamy r\u00f3wnie\u017c niezale\u017cn\u0105 weryfikacj\u0119 poprawno\u015bci i integralno\u015bci rzeczywistej implementacji, publikuj\u0105c pe\u0142ny kod \u017ar\u00f3d\u0142owy naszych aplikacji klienckich.",
     "20027": "Wy\u015bwietl kod \u017ar\u00f3d\u0142owy",
     "20028": "Windows 10 App",
@@ -3098,6 +3098,7 @@
     "20431": "Niestety, w przypadku kont firmowych w Twoim kraju nie jest obs\u0142ugiwana \u017cadna metoda p\u0142atno\u015bci. Skontaktuj si\u0119 z business@mega.nz, aby uzyska\u0107 pomoc w rejestracji konta biznesowego.",
     "20432": "Nigdy nie wpisuj swojego has\u0142a na urz\u0105dzeniu, kt\u00f3remu nie ufasz w pe\u0142ni.",
     "20433": "Nie ma procedury odzyskiwania utraconych hase\u0142, pami\u0119taj, aby zawsze pami\u0119ta\u0107 has\u0142o",
+    "20434": "Bajty",
     "20435": "%1 udost\u0119pni\u0142 Ci nast\u0119puj\u0105ce foldery:",
     "20454": "Rotacja klucza jest nieco bezpieczniejsza, ale nie pozwala utworzy\u0107 \u0142\u0105cza do czatu, a nowi uczestnicy nie b\u0119d\u0105 widzie\u0107 poprzednich wiadomo\u015bci.",
     "20460": "Jest aktywne po\u0142\u0105czenie. [A]Do\u0142\u0105cz[\/A]",
@@ -3282,5 +3283,6 @@
     "20950": "Tylko klienci europejscy",
     "20951": "Adres beneficjenta",
     "20956": "Ustawienia udost\u0119pnie\u0144",
-    "20957": "Kto\u015b usun\u0105\u0142 Ci\u0119 z listy kontakt\u00f3w"
+    "20957": "Kto\u015b usun\u0105\u0142 Ci\u0119 jako kontakt",
+    "20960": "Podana data urodzenia jest nieprawid\u0142owa"
 }

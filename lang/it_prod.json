@@ -3098,6 +3098,7 @@
     "20431": "Spiacenti, nessun metodo di pagamento \u00e8 supportato per gli account Business nella tua nazione. Per favore, contatta business@mega.nz per farti aiutare nella registrazione di un account Business.",
     "20432": "Non inserire mai la tua password su un dispositivo di cui non ti fidi appieno.",
     "20433": "Non c'\u00e8 nessuna procedura di recupero per le password perse o dimenticate, sii sicuro di poter ricordare la tua password ogni volta",
+    "20434": "Bytes",
     "20435": "%1 ha condiviso la seguente cartella condivisa te:",
     "20454": "La rotazione della chiave \u00e8 leggermente pi\u00f9 sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.",
     "20460": "C'\u00e8 una chiamata attiva in corso. [A]Unisciti[\/A]",
@@ -3282,5 +3283,6 @@
     "20950": "Solo clienti europei",
     "20951": "Indirizzo del beneficiario",
     "20956": "Opzioni pulsanti embeddati",
-    "20957": "Qualcuno ti ha rimosso dai contatti"
+    "20957": "Qualcuno ti ha eliminato dai contatti",
+    "20960": "La data di nascita inserita non \u00e8 valida"
 }

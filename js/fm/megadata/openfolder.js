@@ -433,7 +433,7 @@
                     newHashLocation = room.getRoomUrl();
                 } else {
                     if (megaChat.$conversationsAppInstance) {
-                        megaChat.$conversationsAppInstance.safeForceUpdate();
+                        megaChat.safeForceUpdate();
                     }
                 }
             }

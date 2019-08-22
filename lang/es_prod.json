@@ -3098,6 +3098,7 @@
     "20431": "Lo sentimos, no hay ning\u00fan m\u00e9todo de pago disponible para cuentas Business en tu pa\u00eds. Ponte en contacto con business@mega.nz para ayudarte con el registro de la cuenta Business.",
     "20432": "Nunca introduzcas tu contrase\u00f1a en un dispositivo en el que no conf\u00edas plenamente.",
     "20433": "No existe ning\u00fan procedimiento de recuperaci\u00f3n si pierdes la contrase\u00f1a, aseg\u00farate de recordarla en todo momento",
+    "20434": "Bytes",
     "20435": "%1 ha compartido las siguientes carpetas contigo:",
     "20454": "La rotaci\u00f3n de la clave es ligeramente m\u00e1s segura, pero no podr\u00e1s crear un enlace del chat y los nuevos participantes no ver\u00e1n los mensajes anteriores.",
     "20460": "Hay una llamada en curso. [A]\u00danete[\/A]",
@@ -3282,5 +3283,6 @@
     "20950": "Solo para usuarios europeos",
     "20951": "Direcci\u00f3n del beneficiario",
     "20956": "Opciones del bot\u00f3n de embebido",
-    "20957": "Alguien te ha eliminado como contacto"
+    "20957": "Alguien te ha eliminado como contacto",
+    "20960": "Entered birthdate is invalid"
 }

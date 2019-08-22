@@ -1,15 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var CloseOpenModeMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    render: function () {
+class CloseOpenModeMessage extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -59,8 +57,8 @@ var CloseOpenModeMessage = React.createClass({
             </div>
         );
     }
-});
+};
 
-module.exports = {
+export {
     CloseOpenModeMessage
 };

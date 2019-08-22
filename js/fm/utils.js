@@ -1277,6 +1277,8 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
         if (urlParts) {
 
+            api_req({a: 'log', e: 99804, m: 'User tries to transfer a session from mega.co.nz.'});
+
             var toPage = String(urlParts[2] || 'fm').replace('#', '');
             // If the user is already logged in here with the same account
             // we can avoid a lot and just take them to the correct page

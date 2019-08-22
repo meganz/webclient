@@ -6,8 +6,10 @@
 // jscs:disable disallowImplicitTypeConversion
 
 mBroadcaster.once('startMega', function() {
-if (!window.RTC || !window.RTCPeerConnection || !RTCPeerConnection.prototype.getStats
-    || (RTC.browser !== 'chrome' && RTC.browser !== 'opera' && RTC.browser !== 'firefox')) {
+if (!window.RTC || (!RTC.isChrome || !RTC.supportsRxTxGetStats)) {
+    if (window.RTC) {
+        console.warn("No webrtc stats support for this browser");
+    }
     return;
 }
 
@@ -71,6 +73,10 @@ function addSampleToArrays(sample, arrs, len) {
                 arr = arrs[k] = createArrayWithValue(len);
             } else if (len > arr.length) {
                 appendEmptyValuesToArray(arr, len);
+            }
+            if (!arr.push) {
+                console.error("arr.push is not a function. arr is", JSON.stringify(arr));
+                return;
             }
             arr.push(Math.round(val * 10) / 10);
         }
@@ -151,7 +157,7 @@ function Recorder(rtcConn, maxSamplePeriod, handler) {
     self._maxSamplePeriod = maxSamplePeriod * 1000;
     self._handler = handler;
 
-    if (RTC.isFirefox) {
+    if (RTC.supportsRxTxGetStats) {
         var recvs = rtcConn.getReceivers();
         for (var i = 0; i < recvs.length; i++) {
             var rx = recvs[i];
@@ -182,36 +188,37 @@ Recorder.prototype.pollStats = function() {
         if (streams && streams.length) {
             pc.getStats(self.onStats.bind(self), streams);
         }
-    } else if (RTC.isFirefox) {
+    }
+    else if (RTC.supportsRxTxGetStats) {
         // jshint -W083
-        if (RTC.supportsRxTxGetStats) {
-            var statsMap = {};
-            var promises = [];
-            var senders = pc.getSenders();
-            var len = senders.length;
-            for (var i = 0; i < len; i++) {
-                promises.push(senders[i].getStats().then(function(stats) {
-                    for (var k in stats) {
-                        statsMap[k] = stats.get(k);
-                    }
-                }));
-            }
-            var receivers = pc.getReceivers();
-            len = receivers.length;
-            for (var i = 0; i < len; i++) {
-                promises.push(receivers[i].getStats().then(function(stats) {
-                    for (var k in stats) {
-                        statsMap[k] = stats.get(k);
-                    }
-                }));
-            }
-            Promise.all(promises).then(function() {
-                self.onStats(statsMap);
-            });
-        } else {
-            pc.getStats(null, self.onStats.bind(self));
+        var statsMap = {};
+        var promises = [];
+        var senders = pc.getSenders();
+        var len = senders.length;
+        for (var i = 0; i < len; i++) {
+            promises.push(senders[i].getStats().then(function(stats) {
+                for (var k in stats) {
+                    statsMap[k] = stats.get(k);
+                }
+            }));
         }
-    } else {
+        var receivers = pc.getReceivers();
+        len = receivers.length;
+        for (var i = 0; i < len; i++) {
+            promises.push(receivers[i].getStats().then(function(stats) {
+                for (var k in stats) {
+                    statsMap[k] = stats.get(k);
+                }
+            }));
+        }
+        Promise.all(promises).then(function() {
+            self.onStats(statsMap);
+        });
+    }
+    else if (RTC.isFirefox) { // old versions
+        pc.getStats(null, self.onStats.bind(self));
+    }
+    else {
         assert(false, "Unsupported browser for webrtc stats");
     }
 }
@@ -600,7 +607,7 @@ function alignSampleArrays(samples, len) {
     }
 }
 
-compressArrayIfSameValue = function(obj, name) {
+function compressArrayIfSameValue(obj, name) {
     var arr = obj[name];
     if (!arr || !(arr instanceof Array)) {
         return;

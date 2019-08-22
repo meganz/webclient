@@ -260,7 +260,7 @@
     "735": "Te rug\u0103m s\u0103 \u00ee\u021bi verifici e-mailul.",
     "741": "Te rug\u0103m s\u0103 alegi o nou\u0103 parol\u0103 sigur\u0103.",
     "742": "Reseteaz\u0103",
-    "754": "Extensia Firefox MEGA este securizat\u0103 \u0219i invizibil\u0103. Dac\u0103 preferi s\u0103 utilizezi MEGA f\u0103r\u0103 extensie, \u00ee\u021bi recomand\u0103m insistent s\u0103 folose\u0219ti [A]Chrome[\/A].",
+    "754": "Extensia Firefox MEGA este securizat\u0103 \u0219i invizibil\u0103. Dac\u0103 preferi s\u0103 folose\u0219ti MEGA f\u0103r\u0103 extensie, \u00ee\u021bi recomand\u0103m insistent s\u0103 folose\u0219ti [A]Chrome[\/A].",
     "761": "Te rug\u0103m s\u0103 confirmi",
     "776": "Salveaz\u0103",
     "779": "\u00cenregistreaz\u0103-te acum",
@@ -1845,7 +1845,7 @@
     "17687": "Nesuportat",
     "17688": "\u00ce\u021bi po\u021bi aminti parola?",
     "17689": "Atinge \u0219i \u021bine pentru a copia cheia de recuperare \u00een clipboard.",
-    "17690": "Pentru a-\u021bi restaura contul cu cheia de recuperare, viziteaz\u0103 [A]https:\/\/mega.nz\/recovery[\/A] \u0219i urm\u0103re\u0219te instruc\u021biunile.",
+    "17690": "Pentru a-\u021bi restaura contul cu cheia de recuperare, viziteaz\u0103 [A]https:\/\/mega.nz\/recovery[\/A] \u0219i urmeaz\u0103 instruc\u021biunile.",
     "17694": "Descarc\u0103 cheia",
     "17695": "zile",
     "17696": "GB",
@@ -1957,7 +1957,7 @@
     "18270": "Nu, nu am cheia mea de recuperare",
     "18278": "Verific\u0103 din nou pentru a vedea dac\u0103 am o sesiune activ\u0103\/autentificat\u0103",
     "18280": "Succes",
-    "18281": "Po\u021bi modifica cu u\u0219urin\u021b\u0103 parola. Urm\u0103re\u0219te pa\u0219ii de mai jos pentru a vedea cum:",
+    "18281": "Po\u021bi modifica cu u\u0219urin\u021b\u0103 parola. Urmeaz\u0103 pa\u0219ii de mai jos pentru a vedea cum:",
     "18282": "Deschide [B]meniul[\/B] din browserul \u00een care e\u0219ti \u00een continuare autentificat(\u0103).",
     "18283": "Selecteaz\u0103 [B]Contul meu[\/B].",
     "18284": "Selecteaz\u0103 fila [B]Securitate[\/B].",
@@ -3098,6 +3098,7 @@
     "20431": "Ne pare r\u0103u, nu este acceptat\u0103 nicio metod\u0103 de plat\u0103 pentru conturile business din \u021bara ta. Te rug\u0103m s\u0103 contactezi business@mega.nz pentru a te ajuta s\u0103 \u00eenregistrezi contul business.",
     "20432": "Nu introdu niciodat\u0103 parola pe un dispozitiv \u00een care nu ai \u00eencredere deplin\u0103.",
     "20433": "Nu exist\u0103 nicio procedur\u0103 de recuperare a parolelor pierdute, asigur\u0103-te c\u0103 \u00ee\u021bi po\u021bi aduce aminte parola \u00een orice moment",
+    "20434": "By\u021bi",
     "20435": "%1 a partajat urm\u0103toarele foldere cu tine:",
     "20454": "Rota\u021bia cheii este pu\u021bin mai sigur\u0103, dar nu \u00ee\u021bi permite s\u0103 creezi un link al chatului, iar noii participan\u021bi nu vor vedea mesajele din trecut.",
     "20460": "Exist\u0103 un apel activ. [A]Al\u0103tur\u0103-te[\/A]",
@@ -3282,5 +3283,6 @@
     "20950": "Numai clien\u021bii europeni",
     "20951": "Adresa beneficiarului",
     "20956": "Op\u021biuni pentru butonul de \u00eencorporare",
-    "20957": "Cineva te-a eliminat ca contact"
+    "20957": "Cineva te-a \u0219ters ca contact",
+    "20960": "Data na\u0219terii introdus\u0103 este nevalid\u0103"
 }

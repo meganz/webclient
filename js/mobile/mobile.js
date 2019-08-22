@@ -494,6 +494,7 @@ mBroadcaster.once('fm:initialized', function () {
     if (u_attr && u_attr.b) {
         if (u_attr.b.m) {
             var msg = '';
+            var $banner;
 
             if (u_attr.b.s === -1) { // expired
                 if (u_attr.b.m) {
@@ -504,19 +505,25 @@ mBroadcaster.once('fm:initialized', function () {
                     msg = l[20462];
                 }
 
-                mobile.alertBanner.showError(msg);
+                $banner = mobile.alertBanner.showError(msg);
+                $banner.$alertBanner.addClass('business');
+                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb') });
             }
             else if (u_attr.b.s === 2) { // grace
                 if (u_attr.b.m) {
                     msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
                         .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
-                    mobile.alertBanner.showWarning(msg);
+                    $banner = mobile.alertBanner.showWarning(msg);
+                    $banner.$alertBanner.addClass('business');
+                    $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb') });
                 }
             }
         }
         else { // not master user
             if (u_attr.b.s === -1) { // expired
-                mobile.alertBanner.showError(l[20462]);
+                $banner = mobile.alertBanner.showError(l[20462]);
+                $banner.$alertBanner.addClass('business');
+                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb') });
             }
         }
 

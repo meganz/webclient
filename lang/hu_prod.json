@@ -3098,6 +3098,7 @@
     "20431": "Sajnos, az \u00d6n orsz\u00e1g\u00e1ban nincs lehet\u0151s\u00e9g \u00dczleti fi\u00f3kra val\u00f3 el\u0151fizet\u00e9sre. \u00dczleti fi\u00f3k regisztr\u00e1l\u00e1s\u00e1hoz, seg\u00edts\u00e9g\u00e9rt, l\u00e9pjen kapcsolatba vel\u00fcnk itt: business@mega.nz",
     "20432": "Sose adja meg jelszav\u00e1t olyan eszk\u00f6z\u00f6n, ami nem t\u00f6k\u00e9letesen megb\u00edzhat\u00f3.",
     "20433": "T\u00e1rolja jelszav\u00e1t \u00fagy, hogy mindig el\u00e9rhet\u0151 legyen, mert elfelejt\u00e9se eset\u00e9n, nincs m\u00f3d a visszaszerz\u00e9s\u00e9re.",
+    "20434": "Bytes",
     "20435": "%1 ezen mapp\u00e1kat osztotta meg \u00d6nnel:",
     "20454": "A kulcsv\u00e1ltogat\u00e1s n\u00e9mileg biztons\u00e1gosabb, \u00e1m vele nem hozhat l\u00e9tre cseveg\u0151hivatkoz\u00e1st \u00e9s az \u00faj r\u00e9sztvev\u0151k nem l\u00e1tj\u00e1k a kor\u00e1bbi \u00fczeneteket.",
     "20460": "H\u00edv\u00e1s van folyamatban. [A]Csatlakoz\u00e1s[\/A]",
@@ -3281,5 +3282,7 @@
     "20949": "Email subscription cancellation failed",
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
-    "20957": "Someone has removed you as a contact"
+    "20956": "Embed button options",
+    "20957": "Someone has deleted you as a contact",
+    "20960": "Entered birthdate is invalid"
 }

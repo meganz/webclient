@@ -2650,7 +2650,7 @@
     "19731": "Code source ouvert",
     "19732": "Tout notre code source c\u00f4t\u00e9 client est public.",
     "19733": "Il peut \u00eatre examin\u00e9 par vos soins ou par des chercheurs en mati\u00e8re de s\u00e9curit\u00e9 \u00e0 l\u2019adresse\u00a0:",
-    "19734": "Notre document de pr\u00e9sentation technique sur la s\u00e9curit\u00e9 peut \u00eatre consult\u00e9 sur\u00a0",
+    "19734": "Notre document de pr\u00e9sentation technique sur la s\u00e9curit\u00e9 peut \u00eatre consult\u00e9 sur",
     "19735": "Avec le versionnage des fichiers, vous n\u2019avez plus \u00e0 vous inqui\u00e9ter.",
     "19736": "Gr\u00e2ce \u00e0 notre versionnage des fichiers, vous pouvez vous d\u00e9tendre sans crainte d\u2019\u00e9craser ce document important. Nous facilitons le retour \u00e0 d\u2019anciennes versions de vos fichiers et nous vous permettons aussi de les t\u00e9l\u00e9charger afin de ne jamais rien perdre.",
     "19737": "Sauvegarde des fichiers",
@@ -3098,6 +3098,7 @@
     "20431": "D\u00e9sol\u00e9, aucun mode de paiement n\u2019est pris en charge pour les comptes d\u2019entreprise dans votre pays. Veuillez contacter business@mega.nz pour obtenir de l\u2019aide au sujet de l\u2019inscription de votre compte d\u2019entreprise.",
     "20432": "Ne saisissez jamais votre mot de passe sur un appareil en lequel vous n\u2019avez pas pleinement confiance.",
     "20433": "Il n\u2019y a aucune proc\u00e9dure de r\u00e9cup\u00e9ration de mot de passe perdu, assurez-vous de vous souvenir de votre mot de passe en tout temps.",
+    "20434": "octets",
     "20435": "%1 a partag\u00e9 les dossiers suivants avec vous\u00a0:",
     "20454": "La rotation de la cl\u00e9 est un peu plus s\u00e9curis\u00e9e, mais elle ne vous permet pas de cr\u00e9er un lien de conversation, et les nouveaux participants ne verront pas les anciens messages.",
     "20460": "Un appel est en cours. [A]Vous y joindre[\/A]",
@@ -3281,5 +3282,7 @@
     "20949": "\u00c9chec de d\u00e9sabonnement aux courriels",
     "20950": "Clients europ\u00e9ens seulement",
     "20951": "Adresse du b\u00e9n\u00e9ficiaire",
-    "20957": "Someone has removed you as a contact"
+    "20956": "Options du bouton d\u2019int\u00e9gration",
+    "20957": "Quelqu\u2019un vous a supprim\u00e9 en tant que contact",
+    "20960": "La date de naissance saisie est invalide"
 }

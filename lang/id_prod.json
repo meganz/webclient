@@ -768,7 +768,7 @@
     "6189": "Akun anda telah berhasil dihapus.",
     "6190": "PEMBELIAN",
     "6196": "Tidak ada pending request pada saat ini",
-    "6197": "Nama akun",
+    "6197": "Nama penerima",
     "6198": "Transfer bank",
     "6200": "Nomor akun",
     "6203": "Kode SWIFT",
@@ -1465,7 +1465,7 @@
     "16146": "Akses ke folder berbagi telah dihapus",
     "16147": "Kontak menambahkan file ke folder berbagi",
     "16148": "Seseorang mengirim anda request kontak",
-    "16149": "Saat seseorang menerima request kontak anda",
+    "16149": "Seseorang telah menerima request kontak anda",
     "16151": "Tips dan Petunjuk:",
     "16154": "Hapus file lebih lama dari",
     "16155": "Batasi Sampah di bawah",
@@ -3098,6 +3098,7 @@
     "20431": "Maaf, tidak ada metode pembayaran yang didukung untuk akun Bisnis di negara Anda. Silakan hubungi business@mega.nz untuk membantu Anda dengan pendaftaran akun Bisnis.",
     "20432": "Jangan pernah memasukkan kata sandi Anda pada perangkat yang tidak sepenuhnya Anda percayai.",
     "20433": "Tidak ada prosedur pemulihan untuk kata sandi yang hilang, pastikan Anda dapat mengingat kata sandi Anda setiap saat",
+    "20434": "Bytes",
     "20435": "%1 berbagi folder berikut dengan Anda:",
     "20454": "Rotasi tombol sedikit lebih aman, tetapi tidak memungkinkan Anda membuat tautan obrolan dan peserta baru tidak akan melihat pesan sebelumnya.",
     "20460": "Ada panggilan aktif. [A]Bergabunglah[\/A]",
@@ -3281,5 +3282,7 @@
     "20949": "Email subscription cancellation failed",
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
-    "20957": "Someone has removed you as a contact"
+    "20956": "Embed button options",
+    "20957": "Someone has deleted you as a contact",
+    "20960": "Entered birthdate is invalid"
 }

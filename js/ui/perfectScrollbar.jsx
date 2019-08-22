@@ -1,23 +1,20 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../stores/mixins.js";
 var x = 0;
 /**
  * perfect-scrollbar React helper
  * @type {*|Function}
  */
-var PerfectScrollbar = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    isUserScroll: true,
-    scrollEventIncId: 0,
-    getDefaultProps: function() {
-        return {
-            className: "perfectScrollbarContainer",
-            requiresUpdateOnResize: true
-        };
-    },
+export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
+    static isUserScroll = true;
+    static scrollEventIncId = 0;
+    static defaultProps = {
+        className: "perfectScrollbarContainer",
+        requiresUpdateOnResize: true
+    };
+
     doProgramaticScroll(newPos, forced, isX) {
         if (!this.isMounted()) {
             return;
@@ -54,8 +51,9 @@ var PerfectScrollbar = React.createClass({
             self.isUserScroll = true;
             $elem.off('scroll.progscroll' + idx);
         }.bind(this, idx));
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $elem = $(ReactDOM.findDOMNode(self));
 
@@ -102,8 +100,9 @@ var PerfectScrollbar = React.createClass({
         });
         self.onResize();
         this.attachAnimationEvents();
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('ps-scroll-y.ps' + this.getUniqueId());
 
@@ -111,8 +110,8 @@ var PerfectScrollbar = React.createClass({
         $elem.parents('.have-animation')
             .unbind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
 
-    },
-    attachAnimationEvents: function() {
+    }
+    attachAnimationEvents() {
         var self = this;
         if (!self.isMounted()) {
             return;
@@ -133,8 +132,8 @@ var PerfectScrollbar = React.createClass({
                     self.props.onAnimationEnd();
                 }
             });
-    },
-    eventuallyReinitialise: function(forced, scrollPositionYPerc, scrollToElement) {
+    }
+    eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -150,8 +149,8 @@ var PerfectScrollbar = React.createClass({
             self._currHeight = self.getContentHeight();
             self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
         }
-    },
-    _doReinit: function(scrollPositionYPerc, scrollToElement, forced, $elem) {
+    }
+    _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
         var self = this;
 
         if (!self.isMounted()) {
@@ -188,15 +187,15 @@ var PerfectScrollbar = React.createClass({
                 self.scrollToElement(scrollToElement, true);
             }
         }
-    },
-    scrollToBottom: function(skipReinitialised) {
+    }
+    scrollToBottom(skipReinitialised) {
         this.doProgramaticScroll(9999999);
 
         if (!skipReinitialised) {
             this.reinitialised(true);
         }
-    },
-    reinitialise: function(skipReinitialised) {
+    }
+    reinitialise(skipReinitialised) {
         var $elem = $(this.findDOMNode());
         this.isUserScroll = false;
         Ps.update($elem[0]);
@@ -205,8 +204,8 @@ var PerfectScrollbar = React.createClass({
         if (!skipReinitialised) {
             this.reinitialised(true);
         }
-    },
-    getScrollHeight: function() {
+    }
+    getScrollHeight() {
         var $elem = $(this.findDOMNode());
         var outerHeightContainer = $elem.children(":first").outerHeight();
         var outerHeightScrollable = $elem.outerHeight();
@@ -219,8 +218,8 @@ var PerfectScrollbar = React.createClass({
         }
         this._lastKnownScrollHeight = res;
         return res;
-    },
-    getScrollWidth: function() {
+    }
+    getScrollWidth() {
         var $elem = $(this.findDOMNode());
         var outerWidthContainer = $elem.children(":first").outerWidth();
         var outerWidthScrollable = $elem.outerWidth();
@@ -233,27 +232,31 @@ var PerfectScrollbar = React.createClass({
         }
         this._lastKnownScrollWidth = res;
         return res;
-    },
-    getContentHeight: function() {
+    }
+    getContentHeight() {
         var $elem = $(this.findDOMNode());
         return $elem.children(":first").outerHeight();
-    },
-    isAtTop: function() {
+    }
+    setCssContentHeight(h) {
+        var $elem = $(this.findDOMNode());
+        return $elem.css('height', h);
+    }
+    isAtTop() {
         return this.findDOMNode().scrollTop === 0;
-    },
-    isAtBottom: function() {
+    }
+    isAtBottom() {
         return this.findDOMNode().scrollTop === this.getScrollHeight();
-    },
-    isCloseToBottom: function(minPixelsOff) {
+    }
+    isCloseToBottom(minPixelsOff) {
         return (this.getScrollHeight() - this.getScrollPositionY()) <= minPixelsOff;
-    },
-    getScrolledPercentY: function() {
+    }
+    getScrolledPercentY() {
         return 100/this.getScrollHeight() * this.findDOMNode().scrollTop;
-    },
-    getScrollPositionY: function() {
+    }
+    getScrollPositionY() {
         return this.findDOMNode().scrollTop;
-    },
-    scrollToPercentY: function(posPerc, skipReinitialised) {
+    }
+    scrollToPercentY(posPerc, skipReinitialised) {
         var $elem = $(this.findDOMNode());
         var targetPx = this.getScrollHeight()/100 * posPerc;
         if ($elem[0].scrollTop !== targetPx) {
@@ -263,8 +266,8 @@ var PerfectScrollbar = React.createClass({
                 this.reinitialised(true);
             }
         }
-    },
-    scrollToPercentX: function(posPerc, skipReinitialised) {
+    }
+    scrollToPercentX(posPerc, skipReinitialised) {
         var $elem = $(this.findDOMNode());
         var targetPx = this.getScrollWidth()/100 * posPerc;
         if ($elem[0].scrollLeft !== targetPx) {
@@ -273,8 +276,8 @@ var PerfectScrollbar = React.createClass({
                 this.reinitialised(true);
             }
         }
-    },
-    scrollToY: function(posY, skipReinitialised) {
+    }
+    scrollToY(posY, skipReinitialised) {
         var $elem = $(this.findDOMNode());
         if ($elem[0].scrollTop !== posY) {
             this.doProgramaticScroll(posY);
@@ -283,8 +286,8 @@ var PerfectScrollbar = React.createClass({
                 this.reinitialised(true);
             }
         }
-    },
-    scrollToElement: function(element, skipReinitialised) {
+    }
+    scrollToElement(element, skipReinitialised) {
         var $elem = $(this.findDOMNode());
         if (!element || !element.offsetTop) {
             return;
@@ -295,24 +298,24 @@ var PerfectScrollbar = React.createClass({
         if (!skipReinitialised) {
             this.reinitialised(true);
         }
-    },
-    disable: function() {
+    }
+    disable() {
         if (this.isMounted()) {
             var $elem = $(this.findDOMNode());
             $elem.attr('data-scroll-disabled', true);
             $elem.addClass('ps-disabled');
             Ps.disable($elem[0]);
         }
-    },
-    enable: function() {
+    }
+    enable() {
         if (this.isMounted()) {
             var $elem = $(this.findDOMNode());
             $elem.removeAttr('data-scroll-disabled');
             $elem.removeClass('ps-disabled');
             Ps.enable($elem[0]);
         }
-    },
-    reinitialised: function(forced) {
+    }
+    reinitialised(forced) {
         if (this.props.onReinitialise) {
             this.props.onReinitialise(
                 this,
@@ -320,8 +323,8 @@ var PerfectScrollbar = React.createClass({
                 forced ? forced : false
             )
         }
-    },
-    onResize: function(forced, scrollPositionYPerc, scrollToElement) {
+    }
+    onResize(forced, scrollPositionYPerc, scrollToElement) {
         if (forced && forced.originalEvent) {
             forced = true;
             scrollPositionYPerc = undefined;
@@ -329,28 +332,24 @@ var PerfectScrollbar = React.createClass({
 
 
         this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         if (this.props.requiresUpdateOnResize) {
             this.onResize(true);
         }
         this.attachAnimationEvents();
-    },
-    render: function () {
+    }
+    render() {
         var self = this;
         return (
-            <div {...this.props} onResize={this.onResize} onAnimationEnd={function() {
+            <div style={this.props.style} className={this.props.className} onAnimationEnd={function() {
                 self.onResize();
-                if (this.props.triggerGlobalResize) {
+                if (self.props.triggerGlobalResize) {
                     $.tresizer();
                 }
             }}>
-                {this.props.children}
+                {self.props.children}
             </div>
         );
     }
-});
-
-module.exports = {
-    PerfectScrollbar
 };

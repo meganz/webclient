@@ -3135,7 +3135,9 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
             ctx = new AudioContext();
             stream = new MediaStream();
             stream = ctx.createMediaStreamDestination();
-            stream.connect(ctx.destination);
+            if (stream.stream.getTracks()[0].readyState !== 'live') {
+                throw new Error('audio track is not live');
+            }
         }
         catch (ex) {
             console.debug('This browser does not support advanced audio streaming...', ex);
@@ -3145,7 +3147,7 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
                 var p = ctx.close();
                 if (p instanceof Promise) {
                     p.then(function() {
-                        mega.fullAudioContextSupport = stream && stream.numberOfOutputs > 0;
+                        mega.fullAudioContextSupport = stream && stream.numberOfInputs === 1;
                     });
                 }
             }

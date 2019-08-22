@@ -53,7 +53,7 @@
 // peerpresencecb(userhandle, presencelevel, can_webrtc) will be called with any change of peer presence
 
 // DEBUG flag
-PRESENCE2_DEBUG = localStorage.presencedDebug;
+window.PRESENCE2_DEBUG = localStorage.presencedDebug;
 
 var UserPresence = function userpresence(
     userhandle,
@@ -271,7 +271,10 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
                 // reinitialise remote state
                 // HELLO version 1 with fixed client capability flags
-                self.sendstring("\1\1" + String.fromCharCode(self.capabilities));
+                self.sendstring(
+                    String.fromCharCode(1) + String.fromCharCode(1) +
+                    String.fromCharCode(self.capabilities)
+                );
 
                 self.connectedcb(true);
 
@@ -593,13 +596,15 @@ UserPresence.prototype.sendprefs = function presence_sendprefs() {
 
     if (this.open) {
         var prefs = this.prefs();
-        this.sendstring("\7" + String.fromCharCode(prefs & 0xff) + String.fromCharCode(prefs >> 8));
+        this.sendstring(String.fromCharCode(7)
+            + String.fromCharCode(prefs & 0xff) + String.fromCharCode(prefs >> 8)
+        );
     }
 };
 
 UserPresence.prototype.sendflags = function presence_sendflags(active) {
     if (this.open) {
-        this.lastflagscmd = "\3" + String.fromCharCode(active ? 1 : 0);
+        this.lastflagscmd = String.fromCharCode(3) + String.fromCharCode(active ? 1 : 0);
         this.sendstring(this.lastflagscmd);
     }
 };
@@ -613,7 +618,7 @@ UserPresence.prototype.sendkeepalive = function presence_sendkeepalive(self) {
         clearTimeout(self.keepalivesendtimer);
     }
 
-    self.sendstring("\0");
+    self.sendstring("\x00");
     self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT - 5000, self);
 
     if (!self.keepalivechecktimer) {

@@ -1110,8 +1110,9 @@ mega.megadrop = (function() {
                 var title = h === M.RootID ? l[1687] : M.d[h].name;
 
                 var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
-                    '" title="' +  escapeHTML(title) + '" data-node="' + h + '">' + '<span class="right-arrow-bg">' +
-                    '<span>' + escapeHTML(title) + '</span></span></a>' : '';
+                    '" data-node="' + escapeHTML(h) + '">' +
+                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" ><span>' +
+                    escapeHTML(title) + '</span></span></a>' : '';
 
                 return html;
 
@@ -1286,6 +1287,8 @@ mega.megadrop = (function() {
                 }
             }
 
+            var promise = new MegaPromise();
+
             dbfetch.geta(handleList).always(function() {
 
                 // Sort the MEGADrop folders by name alphabetically before rendering
@@ -1304,7 +1307,10 @@ mega.megadrop = (function() {
                         }
                     }
                 }
+                promise.resolve();
             });
+
+            return promise;
         };
 
         /**
@@ -1313,9 +1319,8 @@ mega.megadrop = (function() {
         var widget = function settingsWidget() {
             loadingDialog.show();
 
-            drawPups();
+            drawPups().always(_eventListeners.bind(null));
             initAccountScroll();
-            _eventListeners();
             setInitialized(true);
 
             loadingDialog.hide();

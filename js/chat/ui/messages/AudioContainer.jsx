@@ -1,5 +1,6 @@
 import React from 'react';
 import AudioPlayer from './AudioPlayer.jsx';
+import PropTypes from 'prop-types';
 
 class AudioContainer extends React.Component {
     constructor(props) {
@@ -23,7 +24,7 @@ class AudioContainer extends React.Component {
 
         if (mime === 'audio/mp4') {
             blobUrl =  new Promise((resolve, reject) => {
-          
+
                 M.gfsfetch(h, 0, -1, null).done(function(data) {
                     resolve({
                         buffer: data.buffer,
@@ -69,8 +70,8 @@ class AudioContainer extends React.Component {
 }
 
 AudioContainer.propTypes = {
-    h: React.PropTypes.string.isRequired,
-    mime: React.PropTypes.string.isRequired,
+    h: PropTypes.string.isRequired,
+    mime: PropTypes.string.isRequired,
 }
 
 AudioContainer.defaultProps = {

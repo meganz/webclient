@@ -1,15 +1,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var ChatHandleMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    render: function () {
+class ChatHandleMessage extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -58,8 +55,8 @@ var ChatHandleMessage = React.createClass({
             </div>
         );
     }
-});
+};
 
-module.exports = {
+export {
     ChatHandleMessage
 };

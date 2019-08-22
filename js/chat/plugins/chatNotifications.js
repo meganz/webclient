@@ -176,7 +176,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                 .rebind('onChatIsFocused.chatNotifications', function(e) {
                     resetChatNotificationCounters();
                 })
-                .rebind('onOutgoingCall.chatNotifications', function(e, callManagerCall, mediaOptions) {
+                .rebind('onCallRequestSent.chatNotifications', function(e, callManagerCall, mediaOptions) {
                     var sid = callManagerCall.id;
                     var n = self.notifications.notify(
                         'outgoing-call',
@@ -198,8 +198,8 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     );
                     n.on('onClick', function() {
                         window.focus();
-                        room.activateWindow();
-                        room.show();
+                        megaRoom.activateWindow();
+                        megaRoom.show();
                     });
 
                     var evtId = generateEventSuffixFromArguments("", "chatNotifStopSoundOut", rand(10000));

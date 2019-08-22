@@ -1,11 +1,12 @@
 import React from 'react';
-import { MegaRenderMixin, RenderDebugger } from '../../stores/mixins.js';
+import MegaRenderMixin from '../../stores/mixins.js';
 import utils from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
+import { Button } from '../../ui/buttons.jsx';
+import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
-var ContactsListItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class ContactsListItem extends MegaRenderMixin(React.Component) {
+    render() {
         var classString = "nw-conversations-item";
 
         var contact = this.props.contact;
@@ -21,7 +22,7 @@ var ContactsListItem = React.createClass({
         return (
             <div>
                 <div className={classString}
-                     onClick={this.props.onContactClicked}>
+                     onClick={this.props.onContactClicked.bind(this)}>
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
@@ -31,11 +32,10 @@ var ContactsListItem = React.createClass({
             </div>
         );
     }
-});
+};
 
-var ContactButton = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class ContactButton extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
 
         var label = self.props.label ? self.props.label : "";
@@ -64,9 +64,6 @@ var ContactButton = React.createClass({
 
         var buttonComponent = null;
         if (!self.props.noContextMenu) {
-            var ButtonsUI = require('./../../ui/buttons.jsx');
-            var DropdownsUI = require('./../../ui/dropdowns.jsx');
-
             var moreDropdowns = [];
 
             moreDropdowns.push(
@@ -107,7 +104,7 @@ var ContactButton = React.createClass({
 
             if (contact.c === 2) {
                 moreDropdowns.push(
-                    <DropdownsUI.DropdownItem
+                    <DropdownItem
                         key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
                             loadSubPage('fm/account');
                         }} />
@@ -117,7 +114,7 @@ var ContactButton = React.createClass({
 
                 if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                     moreDropdowns.push(
-                        <DropdownsUI.DropdownItem
+                        <DropdownItem
                             key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
                             onClick={() => {
                                 megaChat.createAndShowPrivateRoomFor(contact.u)
@@ -130,7 +127,7 @@ var ContactButton = React.createClass({
                     moreDropdowns.push(
                         <div className="dropdown body submenu" key="dropdownGroup">
                             <div>
-                                <DropdownsUI.DropdownItem
+                                <DropdownItem
                                         key="startAudio" icon="context handset" label={__(l[1565])} onClick={() => {
                                             megaChat.createAndShowPrivateRoomFor(contact.u)
                                                 .then(function(room) {
@@ -140,7 +137,7 @@ var ContactButton = React.createClass({
                                         }} />
                             </div>
                             <div>
-                                <DropdownsUI.DropdownItem
+                                <DropdownItem
                                     key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
                                         megaChat.createAndShowPrivateRoomFor(contact.u)
                                             .then(function(room) {
@@ -154,7 +151,7 @@ var ContactButton = React.createClass({
                 }
                 else {
                     moreDropdowns.push(
-                            <DropdownsUI.DropdownItem
+                            <DropdownItem
                                 key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
                                     loadSubPage('fm/chat/p/' + contact.u);
                                 }} />
@@ -166,13 +163,13 @@ var ContactButton = React.createClass({
                 );
 
                 moreDropdowns.push(
-                    <DropdownsUI.DropdownItem
+                    <DropdownItem
                         key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
                         megaChat.openChatAndSendFilesDialog(contact.u);
                     }} />
                 );
                 moreDropdowns.push(
-                    <DropdownsUI.DropdownItem
+                    <DropdownItem
                         key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
                             openCopyShareDialog(contact.u);
                     }} />
@@ -180,7 +177,7 @@ var ContactButton = React.createClass({
             }
             else if (!contact.c) {
                 moreDropdowns.push(
-                    <DropdownsUI.DropdownItem
+                    <DropdownItem
                         key="view2"
                         icon="small-icon icons-sprite grey-plus"
                         label={__(l[101])}
@@ -238,7 +235,7 @@ var ContactButton = React.createClass({
                     <hr key="nicknames-separator" />
                 );
                 moreDropdowns.push(
-                    <DropdownsUI.DropdownItem
+                    <DropdownItem
                         key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
                             nicknames.setNicknameDialog.init(contact.u);
                     }} />
@@ -255,13 +252,13 @@ var ContactButton = React.createClass({
             }
 
             if (moreDropdowns.length > 0) {
-                buttonComponent = <ButtonsUI.Button
+                buttonComponent = <Button
                     className={classes}
                     icon={icon}
                     disabled={moreDropdowns.length === 0 || self.props.dropdownDisabled}
                     label={label}
                     >
-                    <DropdownsUI.Dropdown className="contact-card-dropdown"
+                    <Dropdown className="contact-card-dropdown"
                                           positionMy={dropdownPosition}
                                           positionAt={dropdownPosition}
                                           vertOffset={vertOffset}
@@ -269,18 +266,17 @@ var ContactButton = React.createClass({
                                           noArrow={true}
                     >
                         {moreDropdowns}
-                    </DropdownsUI.Dropdown>
-                </ButtonsUI.Button>;
+                    </Dropdown>
+                </Button>;
             }
         }
 
         return buttonComponent
     }
-});
+};
 
-var ContactVerified = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    componentWillMount:function() {
+export class ContactVerified extends MegaRenderMixin(React.Component) {
+    componentWillMount() {
         var self = this;
 
         var contact = this.props.contact;
@@ -289,16 +285,17 @@ var ContactVerified = React.createClass({
                 self.safeForceUpdate();
             });
         }
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
 
         var contact = this.props.contact;
         if (contact && self._contactListener) {
             contact.removeChangeListener(self._contactListener);
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var contact = this.props.contact;
@@ -330,10 +327,10 @@ var ContactVerified = React.createClass({
 
         return verifiedElement;
     }
-});
-var ContactPresence = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+};
+
+export class ContactPresence extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var contact = this.props.contact;
         if (!contact || !contact.c) {
@@ -344,11 +341,10 @@ var ContactPresence = React.createClass({
 
         return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
     }
-});
+};
 
-var ContactFingerprint = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class ContactFingerprint extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var contact = this.props.contact;
         if (!contact || !contact.u || anonymouschat) {
@@ -375,7 +371,7 @@ var ContactFingerprint = React.createClass({
                 typeof verifyState.method === "undefined" ||
                 verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON
             ) {
-                verifyButton = <ButtonsUI.Button
+                verifyButton = <Button
                     className="dropdown-verify active"
                     label={__(l[7692])}
                     icon="grey-key"
@@ -402,13 +398,12 @@ var ContactFingerprint = React.createClass({
 
         return fingerprintCode;
     }
-});
+};
 
 var _noAvatars = {};
 
-var Avatar = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class Avatar extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var contact = this.props.contact;
 
@@ -490,17 +485,14 @@ var Avatar = React.createClass({
 
         return displayedAvatar;
     }
-});
+};
 
-var ContactCard = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'dropdownButtonClasses': "default-white-button tiny-button",
-            'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
-        }
-    },
-    specificShouldComponentUpdate: function(nextProps, nextState) {
+export class ContactCard extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'dropdownButtonClasses': "default-white-button tiny-button",
+        'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
+    }
+    specificShouldComponentUpdate(nextProps, nextState) {
         var self = this;
 
         var foundKeys = Object.keys(self.props);
@@ -540,8 +532,8 @@ var ContactCard = React.createClass({
         }
 
         return shouldUpdate;
-    },
-    render: function() {
+    }
+    render() {
 
         var self = this;
         var contact = this.props.contact;
@@ -598,7 +590,7 @@ var ContactCard = React.createClass({
                             <i className="small-icon audio-call"></i> :
                             null
                     }
-                    {presenceRow}
+                    <span>{presenceRow}</span>
                 </div>
             </div>
         }
@@ -660,11 +652,10 @@ var ContactCard = React.createClass({
                 {userCard}
             </div>;
     }
-});
+};
 
-var ContactItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class ContactItem extends MegaRenderMixin(React.Component) {
+    render() {
         var classString = "nw-conversations-item";
         var self = this;
         var contact = this.props.contact;
@@ -689,32 +680,31 @@ var ContactItem = React.createClass({
             </div>
         </div>;
     }
-});
+};
 
-var ContactPickerWidget = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {
+export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        multipleSelectedButtonLabel: false,
+        singleSelectedButtonLabel: false,
+        nothingSelectedButtonLabel: false,
+        allowEmpty: false
+    }
+    constructor(props) {
+        super(props);
+        this.state = {
             'searchValue': '',
             'selected': this.props.selected || false,
         }
-    },
-    getDefaultProps: function() {
-        return {
-            multipleSelectedButtonLabel: false,
-            singleSelectedButtonLabel: false,
-            nothingSelectedButtonLabel: false,
-            allowEmpty: false
-        }
-    },
-    onSearchChange: function(e) {
+    }
+    onSearchChange(e) {
         var self = this;
         self.setState({searchValue: e.target.value});
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         setContactLink();
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
 
         var self = this;
         if (self.scrollToLastSelected && self.psSelected) {
@@ -724,8 +714,8 @@ var ContactPickerWidget = React.createClass({
         }
 
         setContactLink();
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         var self = this;
 
         if (self.props.multiple) {
@@ -753,8 +743,9 @@ var ContactPickerWidget = React.createClass({
             self._foundFrequents = r.reverse().splice(0, 30);
             self.safeForceUpdate();
         });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
 
         delete self._foundFrequents;
@@ -763,14 +754,32 @@ var ContactPickerWidget = React.createClass({
         if (self.props.multiple) {
             $(document.body).off('keypress.contactPicker' + self.getUniqueId());
         }
-    },
-    _eventuallyAddContact: function (v, contacts, selectableContacts, forced) {
+    }
+    _eventuallyAddContact(v, contacts, selectableContacts, forced) {
         var self = this;
         if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
             // continue;
             return false;
         }
-        if (!pubCu25519[v.u] || !pubEd25519[v.u]) {
+        var isDisabled = false;
+        if (!self.wasMissingKeysForContacts) {
+            self.wasMissingKeysForContacts = {};
+        }
+        if (!self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
+            // we don't want to preload keys each time...e.g. we want to only load them when needed, so ensure they
+            // are loaded here
+            self.wasMissingKeysForContacts[v.u] = true;
+
+            ChatdIntegration._ensureKeysAreLoaded(undefined, [v.u])
+                .always(function() {
+                    if (self.isMounted()) {
+                        self.safeForceUpdate();
+                    }
+                });
+            isDisabled = true;
+            return true;
+        }
+        else if (self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
             // keys not loaded, don't allow starting of new chats/any interaction with that user yet
             return false;
         }
@@ -807,11 +816,15 @@ var ContactPickerWidget = React.createClass({
 
         contacts.push(
             <ContactCard
+                disabled={isDisabled}
                 contact={v}
-                className={"contacts-search short " + selectedClass}
+                className={"contacts-search short " + selectedClass + (isDisabled ? " disabled" : "")}
                 noContextButton="true"
                 selectable={selectableContacts}
                 onClick={self.props.readOnly ? () => {} : (contact, e) => {
+                    if (isDisabled) {
+                        return false;
+                    }
                     var contactHash = contact.u;
 
                     // differentiate between a click and a double click.
@@ -860,8 +873,8 @@ var ContactPickerWidget = React.createClass({
             />
         );
         return true;
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var contacts = [];
@@ -963,8 +976,10 @@ var ContactPickerWidget = React.createClass({
             else {
                 selectedContacts = true;
 
+                onContactSelectDoneCb = onContactSelectDoneCb.bind(self);
                 (self.state.selected || []).forEach(function (v, k) {
-                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]} onClick={onContactSelectDoneCb}
+                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]}
+                                                       onClick={onContactSelectDoneCb}
                                                        key={v}
                     />);
                 });
@@ -986,7 +1001,7 @@ var ContactPickerWidget = React.createClass({
             if (self.props.selectFooter) {
 
                 selectFooter = <div className="fm-dialog-footer">
-                    <a className="default-white-button left" onClick={onAddContact}>
+                    <a className="default-white-button left" onClick={onAddContact.bind(self)}>
                         {l[71]}
                     </a>
 
@@ -1021,7 +1036,7 @@ var ContactPickerWidget = React.createClass({
                         button.onClick(e);
                     }}>
                         <i className={"small-icon " + button.icon}></i>
-                        {button.title}
+                        <span>{button.title}</span>
                     </div>
                 )
             });
@@ -1166,7 +1181,7 @@ var ContactPickerWidget = React.createClass({
                         type="search"
                         placeholder={__(l[8010])}
                         ref="contactSearchField"
-                        onChange={this.onSearchChange}
+                        onChange={this.onSearchChange.bind(this)}
                         value={this.state.searchValue}
                     />
                     <div
@@ -1184,15 +1199,4 @@ var ContactPickerWidget = React.createClass({
             {selectFooter}
         </div>;
     }
-});
-
-module.exports = {
-    ContactsListItem,
-    ContactButton,
-    ContactCard,
-    Avatar,
-    ContactPickerWidget,
-    ContactVerified,
-    ContactPresence,
-    ContactFingerprint
 };

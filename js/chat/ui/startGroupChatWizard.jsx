@@ -1,26 +1,26 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require("./../../ui/utils.jsx");
-var MegaRenderMixin = require("./../../stores/mixins.js").MegaRenderMixin;
-var Tooltips = require("./../../ui/tooltips.jsx");
-var Forms = require("./../../ui/forms.jsx");
-var MiniUI = require("./../../ui/miniui.jsx");
-var ContactsUI = require('./contacts.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
+import utils from "./../../ui/utils.jsx";
+import MegaRenderMixin from "./../../stores/mixins.js";
+import Tooltips from "./../../ui/tooltips.jsx";
+import Forms from "./../../ui/forms.jsx";
+import MiniUI from "./../../ui/miniui.jsx";
+import {ContactPickerWidget} from './contacts.jsx';
+import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
-var StartGroupChatWizard = React.createClass({
-    mixins: [MegaRenderMixin],
-    clickTime: 0,
-    getDefaultProps: function() {
-        return {
-            'selectLabel': __(l[1940]),
-            'cancelLabel': __(l[82]),
-            'hideable': true,
-            'flowType': 1
-        }
-    },
-    getInitialState: function() {
+export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
+    static clickTime = 0;
+    static defaultProps = {
+        'selectLabel': __(l[1940]),
+        'cancelLabel': __(l[82]),
+        'hideable': true,
+        'flowType': 1
+    };
+
+    constructor(props) {
+        super(props);
+
         var haveContacts = false;
         var keys = this.props.contacts.keys();
         for (var i = 0; i < keys.length; i++) {
@@ -30,7 +30,7 @@ var StartGroupChatWizard = React.createClass({
             }
         }
 
-        return {
+        this.state = {
             'selected': this.props.selected ? this.props.selected : [],
             'haveContacts': haveContacts,
             'step': this.props.flowType === 2 || !haveContacts ? 1 : 0,
@@ -38,17 +38,22 @@ var StartGroupChatWizard = React.createClass({
             'createChatLink': this.props.flowType === 2 ? true : false,
             'groupName': ''
         }
-    },
-    onSelected: function(nodes) {
+        this.onFinalizeClick = this.onFinalizeClick.bind(this);
+        this.onSelectClicked = this.onSelectClicked.bind(this);
+        this.onSelected = this.onSelected.bind(this);
+    }
+    onSelected(nodes) {
         this.setState({'selected': nodes});
         if (this.props.onSelected) {
             this.props.onSelected(nodes);
         }
-    },
-    onSelectClicked: function() {
-        this.props.onSelectClicked();
-    },
-    onFinalizeClick: function(e) {
+    }
+    onSelectClicked() {
+        if (this.props.onSelectClicked) {
+            this.props.onSelectClicked();
+        }
+    }
+    onFinalizeClick(e) {
         var self = this;
         if (e) {
             e.preventDefault();
@@ -61,8 +66,8 @@ var StartGroupChatWizard = React.createClass({
         var createChatLink = keyRotation ? false : self.state.createChatLink;
         megaChat.createAndShowGroupRoomFor(handles, groupName, keyRotation, createChatLink);
         self.props.onClose(self);
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var classes = "new-group-chat contrast small-footer " + self.props.className;
@@ -237,13 +242,13 @@ var StartGroupChatWizard = React.createClass({
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
                 {chatInfoElements}
-                <ContactsUI.ContactPickerWidget
+                <ContactPickerWidget
                     changedHashProp={self.state.step}
                     megaChat={self.props.megaChat}
                     contacts={contacts}
                     exclude={self.props.exclude}
                     selectableContacts="true"
-                    onSelectDone={self.props.onSelectClicked}
+                    onSelectDone={self.onSelectClicked}
                     onSelected={self.onSelected}
                     selected={self.state.selected}
                     headerClasses="left-aligned"
@@ -255,8 +260,4 @@ var StartGroupChatWizard = React.createClass({
             </ModalDialogsUI.ModalDialog>
         );
     }
-});
-
-module.exports = {
-    StartGroupChatWizard,
 };

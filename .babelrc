@@ -1,16 +1,39 @@
 {
-  "presets": ["es2015", "react"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "ie": "11"
+        }
+      }
+    ],
+    "@babel/preset-react"
+  ],
   "env": {
     "development": {
       "plugins": [
-        ["transform-react-display-name"],
-        ["react-transform", {
-          "transforms": [{
-            "transform": "react-transform-hmr",
-            "imports": ["react"],
-            "locals": ["module"]
-          }]
-        }]
+        "react-hot-loader/babel",
+        "@babel/transform-react-display-name",
+        [
+          "@babel/plugin-proposal-decorators",
+          {
+            "legacy": true
+          }
+        ],
+        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
+      ]
+    },
+    "production": {
+      "plugins": [
+        "@babel/transform-react-display-name",
+        [
+          "@babel/plugin-proposal-decorators",
+          {
+            "legacy": true
+          }
+        ],
+        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
       ]
     }
   }

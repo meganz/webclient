@@ -3098,6 +3098,7 @@
     "20431": "Sorry, no payment method is supported for Business accounts in your country. Please contact business@mega.nz to help you with Business account registration.",
     "20432": "Geben Sie niemals Ihr Passwort auf nicht absolut vertrauensw\u00fcrdigen Ger\u00e4ten ein.",
     "20433": "Verlorene Passw\u00f6rter k\u00f6nnen nicht zur\u00fcckgesetzt werden, bitte verlieren Sie niemals Ihr Passwort!",
+    "20434": "Bytes",
     "20435": "%1 hat die folgenden Ordner an Sie freigegeben:",
     "20454": "Schl\u00fcsselrotation ist etwas sicherer, jedoch k\u00f6nnen Sie keine Chatlinks exportieren, und alte Nachrichten bleiben neuen Teilnehmern unzug\u00e4nglich.",
     "20460": "Audio\/Video-Konferenz aktiv [A]Teilnehmen[\/A]",
@@ -3281,5 +3282,7 @@
     "20949": "Email subscription cancellation failed",
     "20950": "European Customers Only",
     "20951": "Beneficiary address",
-    "20957": "Someone has removed you as a contact"
+    "20956": "Embed button options",
+    "20957": "Someone has deleted you as a contact",
+    "20960": "Entered birthdate is invalid"
 }

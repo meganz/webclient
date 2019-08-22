@@ -1,7 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ConversationsUI from "./ui/conversations.jsx";
-import ChatRoom from './chatRoom.jsx';
+
+// load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
+require("./chatRoom.jsx");
 
 const EMOJI_DATASET_VERSION = 3;
 
@@ -122,8 +124,8 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
         if (roomType !== "archived") {
-            $('.fm-right-files-block[data-reactid]').removeClass('hidden');
-            $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+            $('.fm-right-files-block.in-chat').removeClass('hidden');
+            $('.fm-right-files-block:not(.in-chat)').addClass('hidden');
         }
 
         megaChat.refreshConversations();
@@ -167,7 +169,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             M.onSectionUIOpen('conversations');
             $('.archived-chat-view').removeClass('hidden');
             if (megaChat.$conversationsAppInstance) {
-                megaChat.$conversationsAppInstance.safeForceUpdate();
+                megaChat.safeForceUpdate();
             }
         }
         else {
@@ -994,12 +996,17 @@ Chat.prototype.destroy = function(isLogout) {
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
-    if (
-        self.$conversationsAppInstance &&
-        ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
-        ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
-    ) {
-        ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+    try {
+        if (
+            self.$conversationsAppInstance &&
+            ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
+            ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
+        ) {
+            ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+        }
+    }
+    catch (e) {
+        console.error("Failed do destroy chat dom:", e);
     }
 
 
@@ -1358,7 +1365,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
 
     // chat room not found, create a new one
-
     var room = new ChatRoom(
         self,
         roomId,
@@ -2446,7 +2452,8 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
 
             if (room) {
                 showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-                M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+                var roomUrl = room.getRoomUrl().replace("fm/", "");
+                M.openFolder(roomUrl).always(resolve);
             }
             else {
                 if (d) {
@@ -2604,6 +2611,16 @@ Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
     }
 };
 
+Chat.prototype.safeForceUpdate = function() {
+    if (this.$conversationsAppInstance) {
+        var $cai = this.$conversationsAppInstance;
+        try {
+            $cai.forceUpdate();
+        } catch (e) {
+            console.error("safeForceUpdate: ", $cai, e);
+        }
+    }
+};
 
 Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
     if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
@@ -2689,7 +2706,8 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
 window.Chat = Chat;
 window.chatui = chatui;
 
-module.exports = {
-    Chat,
-    chatui
-};
+if (module.hot) {
+    module.hot.accept();
+}
+
+export default {Chat, chatui};

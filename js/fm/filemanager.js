@@ -682,7 +682,7 @@ FileManager.prototype.initFileManagerUI = function() {
         if (!$target.is('.account-history-dropdown-button')) {
             $('.account-history-dropdown').addClass('hidden');
         }
-        if ($target.attr('data-reactid') || $target.is('.chatlink')) {
+        if ($target.parents('.conversationsApp').length || $target.is('.chatlink')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             return;
         }
@@ -947,7 +947,6 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
     if (!window.fmShortcuts) {
         window.fmShortcuts = new FMShortcuts();
     }
-
 
     if (!aUpdate) {
         if (window.selectionManager) {
@@ -2574,7 +2573,7 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $('.transfer-pause-icon').rebind('click', function() {
 
-        if ($(this).hasClass('active')) { 
+        if ($(this).hasClass('active')) {
             if (dlmanager.isOverQuota) {
                 return dlmanager.showOverQuotaDialog();
             }

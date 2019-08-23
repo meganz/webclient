@@ -2132,7 +2132,7 @@ function topmenuUI() {
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
 
-        if (u_type === 0) {
+        if (u_type === 0 && is_fm()) {
             $topHeader.find('.left.individual').addClass('hidden');
         }
 

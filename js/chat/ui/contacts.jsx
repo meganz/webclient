@@ -77,15 +77,18 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
                                     loadSubPage('fm/' + contact.u);
                                 }
                     }} />
-                        <div className="dropdown-user-name" onClick={() => {
-                            if (contact.c === 2) {
-                                loadSubPage('fm/account');
-                            }
-                            if (contact.c === 1) {
-                                loadSubPage('fm/' + contact.u);
-                            }}}>
+                    <div className="dropdown-user-name" onClick={() => {
+                        if (contact.c === 2) {
+                            loadSubPage('fm/account');
+                        }
+                        if (contact.c === 1) {
+                            loadSubPage('fm/' + contact.u);
+                        }}}>
                         {username}
                         <ContactPresence className="small" contact={contact} />
+                        <span className="email">
+                            {contact.m}
+                        </span>
                     </div>
                 </div>
             );

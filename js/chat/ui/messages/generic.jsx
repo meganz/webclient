@@ -789,10 +789,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactPresence className="small" contact={contact} />
                                         <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
+                                            <ContactPresence className="small" contact={contact} />
+                                            <span className="email">
+                                                 {M.u[contact.u].m}
+                                            </span>
                                         </div>
                                     </div>
                                     <ContactFingerprint contact={contact} />
@@ -837,10 +840,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactPresence className="small" contact={contact} />
                                         <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
+                                            <ContactPresence className="small" contact={contact} />
+                                            <span className="email">
+                                                 {M.u[contact.u].m}
+                                            </span>
                                         </div>
                                     </div>
 

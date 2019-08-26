@@ -1336,7 +1336,9 @@ function (_MegaRenderMixin2) {
         }, username, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactPresence, {
           className: "small",
           contact: contact
-        }))));
+        }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "email"
+        }, contact.m))));
         moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactFingerprint, {
           key: "fingerprint",
           contact: contact
@@ -11850,15 +11852,17 @@ function (_ConversationMessageM) {
                   horizOffset: 4
                 }, external_React_default.a.createElement("div", {
                   className: "dropdown-avatar rounded"
-                }, external_React_default.a.createElement(ui_contacts["ContactPresence"], {
-                  className: "small",
-                  contact: contact
-                }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+                }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
                   contact: contact
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
-                }, M.getNameByHandle(contact.u))), external_React_default.a.createElement(ui_contacts["ContactFingerprint"], {
+                }, M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
+                  className: "small",
+                  contact: contact
+                }), external_React_default.a.createElement("span", {
+                  className: "email"
+                }, M.u[contact.u].m))), external_React_default.a.createElement(ui_contacts["ContactFingerprint"], {
                   contact: contact
                 }), external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "human-profile",
@@ -11893,15 +11897,17 @@ function (_ConversationMessageM) {
                   horizOffset: 4
                 }, external_React_default.a.createElement("div", {
                   className: "dropdown-avatar rounded"
-                }, external_React_default.a.createElement(ui_contacts["ContactPresence"], {
-                  className: "small",
-                  contact: contact
-                }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+                }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
                   contact: contact
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
-                }, M.getNameByHandle(contact.u))), external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
+                }, M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
+                  className: "small",
+                  contact: contact
+                }), external_React_default.a.createElement("span", {
+                  className: "email"
+                }, M.u[contact.u].m))), external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "rounded-grey-plus",
                   label: __(l[71]),
                   onClick: function onClick() {

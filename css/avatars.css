@@ -179,7 +179,8 @@
     border-radius: 9px;
 }
 .context-avatar {
-    width: 240px;
+    width: 100%;
+    min-width: 240px;
     height: 180px;
     overflow: hidden;
     font-size: 76px;

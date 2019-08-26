@@ -1122,7 +1122,7 @@ z-index: 1;
     text-overflow: ellipsis;
     overflow: hidden;
     left: 0;
-    top: 145px;
+    bottom: 8px;
     padding: 0 24px 0 18px;
     margin: 0;
     max-width: -webkit-calc(100% - 10px);
@@ -1131,9 +1131,9 @@ z-index: 1;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
-    -moz-text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
-    -webkit-text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
-    text-shadow: 0px 1px 2px rgba(0,0,0,0.15);
+    -moz-text-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    -webkit-text-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    text-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     z-index: 10;
     cursor: pointer;
     -webkit-transition: opacity 250ms ease-in-out;
@@ -1141,6 +1141,16 @@ z-index: 1;
     -o-transition: opacity 250ms ease-in-out;
     -ms-transition: opacity 250ms ease-in-out;
     transition: opacity 250ms ease-in-out;
+}
+.dropdown-user-name .email {
+    display: block;
+    font-size: 14px;
+    line-height: 17px;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-right: -24px;
 }
 .dropdown-contact-details:hover .dropdown-user-name {
     opacity: 0;

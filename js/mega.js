@@ -3075,21 +3075,22 @@ function process_u(users, ignoreDB) {
         var userHandle = users[i].u;
         var userStatus = users[i].c;
 
+        users[i].nickname = '';
+
+        // If this user had a nickname in the past, don't delete it if they are now added as a contact
+        if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
+            users[i].nickname = M.u[userHandle].nickname;
+        }
+
+        // Or if the nickname is set in the initial 'ug' API request, then set it
+        else if (nicknames.cache[userHandle]) {
+            users[i].nickname = nicknames.cache[userHandle];
+        }
+
         if (userStatus === 1) {
             users[i].h = userHandle;
             users[i].t = 1;
             users[i].p = 'contacts';
-            users[i].nickname = '';
-
-            // If this user had a nickname in the past, don't delete it if they are now added as a contact
-            if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
-                users[i].nickname = M.u[userHandle].nickname;
-            }
-
-            // Or if the nickname is set in the initial 'ug' API request, then set it
-            else if (nicknames.cache[userHandle]) {
-                users[i].nickname = nicknames.cache[userHandle];
-            }
 
             M.addNode(users[i], ignoreDB);
 

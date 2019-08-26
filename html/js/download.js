@@ -608,7 +608,7 @@ function dl_g(res) {
             // Collapse/Expand top bar events
             $('.top-expand-button, .top-expand-txt').rebind('click', function() {
                 if ($(this).hasClass('active')) {
-                    $topBar.removeClass('expanded').css('height', '');
+                    $topBar.removeClass('expanded initial').css('height', '');
                     return $(window).unbind('resize.download-bar');
                 }
                 _expand();
@@ -625,10 +625,10 @@ function dl_g(res) {
                     || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;
 
                 if ((delta > 120 || delta < -120) && $this.is('.activated')) {
-                    $this.removeClass('expanded').css('height', '');
+                    $this.removeClass('expanded initial').css('height', '');
                 }
             });
-        }, 1500);
+        }, 100);
     }
 
     var pf = navigator.platform.toUpperCase();
@@ -687,7 +687,7 @@ function dlPageStartDownload(isDlWithMegaSync) {
 
     // Collapse top bar
     if (!$downloadPage.hasClass('video-theatre-mode')) {
-        $downloadPage.removeClass('expanded').css('height', '');
+        $downloadPage.removeClass('expanded initial').css('height', '');
     }
     $('.download .pause-transfer').removeClass('hidden active').find('span').text(l[9112]);
     $(window).unbind('resize.download-bar');
@@ -1084,7 +1084,7 @@ function dlPageCleanup() {
 
     if (dl_node) {
         $(window).unbind('resize.download-bar');
-        $('.download.top-bar').removeClass('expanded');
+        $('.download.top-bar').removeClass('expanded initial');
         $(window).trigger('video-destroy');
         dl_node = false;
     }

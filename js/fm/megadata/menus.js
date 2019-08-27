@@ -437,6 +437,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 itemsViewed = true;
             }
         }
+
+        if (M.currentrootid === M.RubbishID && M.v.length) {
+            $('.files-menu.context .dropdown-item.clearbin-item').attr('style', '');
+            itemsViewed = true;
+        }
+
         if (!ignoreGrideExtras && M.viewmode) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
@@ -651,9 +657,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         else if (currNodeClass && currNodeClass.indexOf('rubbish-bin') > -1) {
             $.selected = [M.RubbishID];
             $(menuCMI).filter('.properties-item').show();
-        }
-        else if (currNodeClass && currNodeClass.indexOf('recycle-item') > -1) {
-            $(menuCMI).filter('.clearbin-item').show();
+            if (currNodeClass.indexOf('filled') > -1) {
+                $(menuCMI).filter('.clearbin-item').show();
+            }
         }
         else if (currNodeClass && currNodeClass.indexOf('contacts-item') > -1) {
             $(menuCMI).filter('.addcontact-item').show();

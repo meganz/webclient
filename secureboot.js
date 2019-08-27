@@ -734,6 +734,11 @@ var showUpdatePage = function() {
 
     'use strict';
 
+
+    // Temperary update for disable showing updatepage feature for IE11 as requested from Management team.
+    // Please remove this when we made decision to show it again.
+    return false;
+
     var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
 
     // If they've already seen the update page in the past

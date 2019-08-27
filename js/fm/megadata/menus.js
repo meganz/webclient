@@ -263,6 +263,25 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    if (selNode) {
+        items['.download-item'] = 1;
+        items['.zipdownload-item'] = 1;
+        items['.copy-item'] = 1;
+        items['.properties-item'] = 1;
+    }
+    items['.refresh-item'] = 1;
+
+    if (folderlink) {
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
+        delete items['.embedcode-item'];
+        delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+        items['.import-item'] = 1;
+        items['.getlink-item'] = 1;
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
@@ -285,6 +304,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
+            delete items['.download-item'];
             items['.dispute-item'] = 1;
         }
     }
@@ -302,25 +322,6 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 break;
             }
         }
-    }
-
-    if (selNode) {
-        items['.download-item'] = 1;
-        items['.zipdownload-item'] = 1;
-        items['.copy-item'] = 1;
-        items['.properties-item'] = 1;
-    }
-    items['.refresh-item'] = 1;
-
-    if (folderlink) {
-        delete items['.copy-item'];
-        delete items['.add-star-item'];
-        delete items['.embedcode-item'];
-        delete items['.colour-label-items'];
-        delete items['.properties-versions'];
-        delete items['.clearprevious-versions'];
-        items['.import-item'] = 1;
-        items['.getlink-item'] = 1;
     }
 
     // For multiple selections, should check all have the right permission.

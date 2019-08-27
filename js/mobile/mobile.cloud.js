@@ -392,6 +392,12 @@ mobile.cloud = {
             $nodeTemplate.attr('data-handle', nodeHandle);
             $nodeTemplate.attr('id', nodeHandle);
 
+            // Add `taken-down` class to nodes that are taken down.
+            var share = M.getNodeShare(node);
+            if (share && share.down) {
+                $nodeTemplate.addClass('taken-down');
+            }
+
             // Update the current output
             output += $nodeTemplate.prop('outerHTML');
         }

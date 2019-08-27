@@ -3267,7 +3267,7 @@
     "20894": "Uwaga: Ostrze\u017cenie o przekroczeniu przydzia\u0142u b\u0119dzie zawsze wysy\u0142ane.",
     "20895": "Nieaktywne konta",
     "20896": "Przypomnienie o braku aktywno\u015bci konta",
-    "20897": "W\u0142\u0105cz wszystkie powiadomienia e-mail",
+    "20897": "Allow accessory emails",
     "20898": "Powiadomienia e-mailowe",
     "20899": "W\u0142\u0105cz wszystkie powiadomienia o koncie",
     "20900": "Powiadomienia o koncie",
@@ -3285,5 +3285,8 @@
     "20951": "Adres beneficjenta",
     "20956": "Ustawienia udost\u0119pnie\u0144",
     "20957": "Kto\u015b usun\u0105\u0142 Ci\u0119 jako kontakt",
-    "20960": "Podana data urodzenia jest nieprawid\u0142owa"
+    "20960": "Podana data urodzenia jest nieprawid\u0142owa",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

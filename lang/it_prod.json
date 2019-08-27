@@ -3267,7 +3267,7 @@
     "20894": "Nota: l'avvertimento per aver superato la quota sar\u00e0 sempre inviato.",
     "20895": "Inattivit\u00e0 dell'account",
     "20896": "Promemoria riguardo l'inattivit\u00e0 dell'account",
-    "20897": "Attiva tutte le notifiche per email",
+    "20897": "Allow accessory emails",
     "20898": "Notifiche per email",
     "20899": "Attiva tutte le notifiche dell'account",
     "20900": "Notifiche dell'account",
@@ -3285,5 +3285,8 @@
     "20951": "Indirizzo del beneficiario",
     "20956": "Opzioni pulsanti embeddati",
     "20957": "Qualcuno ti ha eliminato dai contatti",
-    "20960": "La data di nascita inserita non \u00e8 valida"
+    "20960": "La data di nascita inserita non \u00e8 valida",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

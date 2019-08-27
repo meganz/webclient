@@ -3267,7 +3267,7 @@
     "20894": "\ucc38\uace0: \ud560\ub2f9\ub7c9 \ucd08\uacfc \uc54c\ub9bc\uc740 \ud56d\uc0c1 \ubc1c\uc1a1\ub429\ub2c8\ub2e4.",
     "20895": "\uacc4\uc815 \ubbf8\ud65c\ub3d9",
     "20896": "\uacc4\uc815 \ube44\ud65c\uc131\ud654\uc5d0 \ub300\ud55c \uc54c\ub9bc",
-    "20897": "\ubaa8\ub4e0 \uc774\uba54\uc77c \uc54c\ub9bc \ud65c\uc131\ud654",
+    "20897": "Allow accessory emails",
     "20898": "\uc774\uba54\uc77c \uc54c\ub9bc",
     "20899": "\ubaa8\ub4e0 \uacc4\uc815 \uc54c\ub9bc \ud65c\uc131\ud654",
     "20900": "\uacc4\uc815 \uc54c\ub9bc",
@@ -3285,5 +3285,8 @@
     "20951": "\uc218\uc775\uc790 \uc8fc\uc18c",
     "20956": "\uc784\ubca0\ub4dc \ubc84\ud2bc \uc635\uc158",
     "20957": "\ub204\uad70\uac00 \ub2f9\uc2e0\uc744 \uc5f0\ub77d\ucc98\uc5d0\uc11c \uc0ad\uc81c\ud558\uc600\uc2b5\ub2c8\ub2e4",
-    "20960": "\uc785\ub825\ud55c \uc0dd\uc77c\uc774 \uc720\ud6a8\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4"
+    "20960": "\uc785\ub825\ud55c \uc0dd\uc77c\uc774 \uc720\ud6a8\ud558\uc9c0 \uc54a\uc2b5\ub2c8\ub2e4",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

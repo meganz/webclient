@@ -3267,7 +3267,7 @@
     "20894": "Not: Kota a\u015f\u0131m\u0131 uyar\u0131s\u0131 her zaman g\u00f6nderilir.",
     "20895": "Hesap hareketsizli\u011fi",
     "20896": "Hesap hareketsizli\u011fi hakk\u0131nda hat\u0131rlatma",
-    "20897": "T\u00fcm e-posta bildirimlerini etkinle\u015ftir",
+    "20897": "Allow accessory emails",
     "20898": "Email bildirimleri",
     "20899": "T\u00fcm hesap bildirimlerini etkinle\u015ftir",
     "20900": "Hesap Bildirimleri",
@@ -3285,5 +3285,8 @@
     "20951": "Haksahibinin Adresi",
     "20956": "Buton se\u00e7eneklerini g\u00f6m",
     "20957": "Birisi seni ki\u015fi listesinden \u00e7\u0131kard\u0131\u011f\u0131nda",
-    "20960": "Girilen do\u011fum tarihi ge\u00e7ersiz"
+    "20960": "Girilen do\u011fum tarihi ge\u00e7ersiz",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

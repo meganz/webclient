@@ -2,6 +2,7 @@ import React from 'react';
 import utils from './../../../ui/utils.jsx';
 import { ConversationMessageMixin } from './mixin.jsx';
 import { MetaRichpreviewLoading } from './metaRichPreviewLoading.jsx';
+import {ContactVerified, ContactPresence, Avatar} from "./../contacts.jsx";
 
 class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
     render() {
@@ -34,7 +35,44 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                 }
 
                 previewContainer = <MetaRichpreviewLoading message={message} isLoading={megaLinkInfo.hadLoaded()} />;
-            } else {
+            }
+            else if (megaLinkInfo.is_contactlink) {
+                var fakeContact = M.u[megaLinkInfo.info['h']] ? M.u[megaLinkInfo.info['h']] : {
+                    'u': megaLinkInfo.info['h'],
+                    'm': megaLinkInfo.info['e'],
+                    'firstName': megaLinkInfo.info['fn'],
+                    'lastName': megaLinkInfo.info['ln'],
+                    'name': megaLinkInfo.info['fn'] + " " + megaLinkInfo.info['ln'],
+                };
+                if (!M.u[fakeContact.u]) {
+                    M.u.set(fakeContact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                        'u': fakeContact.u,
+                        'name': fakeContact.firstName + " " + fakeContact.lastName,
+                        'm': fakeContact.m ? fakeContact.m : "",
+                        'c': undefined
+                    }));
+                }
+                var contact = M.u[megaLinkInfo.info['h']];
+
+
+
+
+                previewContainer = (<div key={megaLinkInfo.info['h']} className={"message shared-block contact-link"}>
+                    <div className="message shared-info">
+                        <div className="message data-title">{contact.name}</div>
+                            <ContactVerified className="right-align" contact={contact} />
+                        <div className="user-card-email">{contact.m}</div>
+                    </div>
+                    <div className="message shared-data">
+                        <div className="data-block-view semi-big">
+                            <ContactPresence className="small" contact={contact} />
+                            <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                        </div>
+                        <div className="clear"></div>
+                    </div>
+                </div>);
+            }
+            else {
                 var desc;
 
                 var is_icon = megaLinkInfo.is_dir ?
@@ -53,7 +91,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     </span>;
                 }
 
-                previewContainer = <div className={"message richpreview body " + (
+                previewContainer = (<div className={"message richpreview body " + (
                     (is_icon ? "have-icon" : "no-icon") + " " +
                     (megaLinkInfo.is_chatlink ? "is-chat" : "")
                 )}>
@@ -97,7 +135,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                             </span>
                         </div>
                     </div>
-                </div>;
+                </div>);
             }
 
             output.push(

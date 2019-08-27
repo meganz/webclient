@@ -97,7 +97,7 @@ module.exports = React;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
@@ -766,416 +766,6 @@ var ID_CURRENT = 0;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
-
-module.exports = ReactDOM;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var React = __webpack_require__(0);
-
-var ReactDOM = __webpack_require__(2);
-
-
-/**
- * jScrollPane helper
- * @type {*|Function}
- */
-
-var JScrollPane =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
-  _inherits(JScrollPane, _MegaRenderMixin);
-
-  function JScrollPane() {
-    _classCallCheck(this, JScrollPane);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(JScrollPane).apply(this, arguments));
-  }
-
-  _createClass(JScrollPane, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      _get(_getPrototypeOf(JScrollPane.prototype), "componentDidMount", this).call(this);
-
-      var self = this;
-      var $elem = $(ReactDOM.findDOMNode(self));
-      $elem.height('100%');
-      $elem.find('.jspContainer').replaceWith(function () {
-        var $children = $elem.find('.jspPane').children();
-
-        if ($children.length === 0 || $children.length > 1) {
-          console.error("JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.", "Mean while, JScrollPane should always (!) have 1 children element.");
-        }
-
-        return $children;
-      });
-      var options = $.extend({}, {
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 8,
-        animateScroll: true,
-        container: $('.jspContainer', $elem),
-        pane: $('.jspPane', $elem)
-      }, self.props.options);
-      $elem.jScrollPane(options);
-
-      if (self.props.onFirstInit) {
-        self.props.onFirstInit($elem.data('jsp'), $elem);
-      }
-
-      $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function (e) {
-        if ($elem.attr('data-scroll-disabled') === "true") {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      });
-      $elem.rebind('jsp-user-scroll-y.jsp' + self.getUniqueId(), function (e, scrollPositionY, isAtTop, isAtBottom) {
-        if (self.props.onUserScroll) {
-          if ($(e.target).is($elem)) {
-            self.props.onUserScroll($elem.data('jsp'), $elem, e, scrollPositionY, isAtTop, isAtBottom);
-          }
-        } // if (e.target.className.indexOf("textarea-scroll") > -1) {
-        //     return;
-        // }
-        //
-        // if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
-        //     return;
-        // }
-        //
-        // if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
-        //     if (
-        //         self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
-        //         !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
-        //         self.props.chatRoom.messagesBuff.haveMoreHistory()
-        //     ) {
-        //         self.props.chatRoom.messagesBuff.retrieveChatHistory();
-        //         self.forceUpdate();
-        //         self.lastUpdatedScrollHeight = $jsp.getContentHeight();
-        //         self.shouldMaintainScroll = true;
-        //     }
-        // }
-        //
-        // if (isAtBottom) {
-        //     self.lastScrolledToBottom = true;
-        // }
-        // else {
-        //     self.lastScrolledToBottom = false;
-        // }
-        //
-        // self.lastScrollHeight = $jsp.getContentHeight();
-        // self.lastScrollPosition = scrollPositionY;
-        // self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
-
-      });
-      $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
-        self.onResize(forced, scrollPositionYPerc, scrollToElement);
-      });
-      $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
-      self.onResize();
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      _get(_getPrototypeOf(JScrollPane.prototype), "componentWillUnmount", this).call(this);
-
-      var $elem = $(ReactDOM.findDOMNode(this));
-      $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
-      $(window).off('resize.jsp' + this.getUniqueId());
-    }
-  }, {
-    key: "eventuallyReinitialise",
-    value: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
-      var self = this;
-
-      if (!self.isMounted()) {
-        return;
-      }
-
-      if (!self.isComponentVisible()) {
-        return;
-      }
-
-      var $elem = $(ReactDOM.findDOMNode(self));
-      var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
-
-      if (forced || self._lastHeights != currHeights) {
-        self._lastHeights = currHeights;
-
-        self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
-      }
-    }
-  }, {
-    key: "_doReinit",
-    value: function _doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
-      var self = this;
-
-      if (!self.isMounted()) {
-        return;
-      }
-
-      if (!self.isComponentVisible()) {
-        return;
-      }
-
-      self._lastHeights = currHeights;
-      var $jsp = $elem.data('jsp');
-
-      if ($jsp) {
-        $jsp.reinitialise();
-        var manualReinitialiseControl = false;
-
-        if (self.props.onReinitialise) {
-          manualReinitialiseControl = self.props.onReinitialise($jsp, $elem, forced, scrollPositionYPerc, scrollToElement);
-        }
-
-        if (manualReinitialiseControl === false) {
-          if (scrollPositionYPerc) {
-            if (scrollPositionYPerc === -1) {
-              $jsp.scrollToBottom();
-            } else {
-              $jsp.scrollToPercentY(scrollPositionYPerc, false);
-            }
-          } else if (scrollToElement) {
-            $jsp.scrollToElement(scrollToElement);
-          }
-        }
-      }
-    }
-  }, {
-    key: "onResize",
-    value: function onResize(forced, scrollPositionYPerc, scrollToElement) {
-      if (forced && forced.originalEvent) {
-        forced = true;
-        scrollPositionYPerc = undefined;
-      }
-
-      this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      this.onResize();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      return React.makeElement("div", {
-        className: this.props.className
-      }, React.makeElement("div", {
-        className: "jspContainer"
-      }, React.makeElement("div", {
-        className: "jspPane"
-      }, this.props.children)));
-    }
-  }]);
-
-  return JScrollPane;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
-
-JScrollPane.defaultProps = {
-  className: "jScrollPaneContainer",
-  requiresUpdateOnResize: true
-};
-;
-/**
- * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
- * so that we can render Dialogs into the body or other child element, different then the current component's child.
- */
-
-var RenderTo =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(RenderTo, _React$Component);
-
-  function RenderTo() {
-    _classCallCheck(this, RenderTo);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(RenderTo).apply(this, arguments));
-  }
-
-  _createClass(RenderTo, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      if (_get(_getPrototypeOf(RenderTo.prototype), "componentDidMount", this)) {
-        _get(_getPrototypeOf(RenderTo.prototype), "componentDidMount", this).call(this);
-      }
-
-      this.popup = document.createElement("div");
-      this.popup.className = this.props.className ? this.props.className : "";
-
-      if (this.props.style) {
-        $(this.popup).css(this.props.style);
-      }
-
-      this.props.element.appendChild(this.popup);
-      var self = this;
-
-      this._renderLayer(function () {
-        if (self.props.popupDidMount) {
-          self.props.popupDidMount(self.popup);
-        }
-      });
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      this._renderLayer();
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      if (_get(_getPrototypeOf(RenderTo.prototype), "componentWillUnmount", this)) {
-        _get(_getPrototypeOf(RenderTo.prototype), "componentWillUnmount", this).call(this);
-      }
-
-      ReactDOM.unmountComponentAtNode(this.popup);
-
-      if (this.props.popupWillUnmount) {
-        this.props.popupWillUnmount(this.popup);
-      }
-
-      this.props.element.removeChild(this.popup);
-    }
-  }, {
-    key: "_renderLayer",
-    value: function _renderLayer(cb) {
-      ReactDOM.render(this.props.children, this.popup, cb);
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      // Render a placeholder
-      return null;
-    }
-  }]);
-
-  return RenderTo;
-}(React.Component);
-
-;
-
-var EmojiFormattedContent =
-/*#__PURE__*/
-function (_React$Component2) {
-  _inherits(EmojiFormattedContent, _React$Component2);
-
-  function EmojiFormattedContent() {
-    _classCallCheck(this, EmojiFormattedContent);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(EmojiFormattedContent).apply(this, arguments));
-  }
-
-  _createClass(EmojiFormattedContent, [{
-    key: "_eventuallyUpdateInternalState",
-    value: function _eventuallyUpdateInternalState(props) {
-      if (!props) {
-        props = this.props;
-      }
-
-      assert(typeof props.children === "string", "EmojiFormattedContent received a non-string (got: " + _typeof(props.children) + ") as props.children");
-      var str = props.children;
-
-      if (this._content !== str) {
-        this._content = str;
-        this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
-      }
-    }
-  }, {
-    key: "shouldComponentUpdate",
-    value: function shouldComponentUpdate(nextProps, nextState) {
-      if (!this._isMounted) {
-        this._eventuallyUpdateInternalState();
-
-        return true;
-      }
-
-      if (nextProps && nextProps.children !== this.props.children) {
-        this._eventuallyUpdateInternalState(nextProps);
-
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      this._eventuallyUpdateInternalState();
-
-      return React.makeElement("span", {
-        dangerouslySetInnerHTML: {
-          __html: this._formattedContent
-        }
-      });
-    }
-  }]);
-
-  return EmojiFormattedContent;
-}(React.Component);
-
-;
-
-function SoonFcWrap(milliseconds) {
-  return function (target, propertyKey, descriptor) {
-    var originalMethod = descriptor.value;
-    var _timerId = 0;
-
-    descriptor.value = function () {
-      if (_timerId) {
-        clearTimeout(_timerId);
-      }
-
-      var self = this;
-      var args = arguments; // Like SoonFc, but with context fix.
-
-      _timerId = setTimeout(function () {
-        originalMethod.apply(self, args);
-      }, milliseconds);
-    };
-
-    return descriptor;
-  };
-}
-
-;
-/* harmony default export */ __webpack_exports__["default"] = ({
-  JScrollPane: JScrollPane,
-  RenderTo: RenderTo,
-  EmojiFormattedContent: EmojiFormattedContent,
-  SoonFcWrap: SoonFcWrap
-});
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1192,7 +782,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
 /* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
@@ -2561,6 +2151,416 @@ ContactPickerWidget.defaultProps = {
 ;
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var React = __webpack_require__(0);
+
+var ReactDOM = __webpack_require__(3);
+
+
+/**
+ * jScrollPane helper
+ * @type {*|Function}
+ */
+
+var JScrollPane =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
+  _inherits(JScrollPane, _MegaRenderMixin);
+
+  function JScrollPane() {
+    _classCallCheck(this, JScrollPane);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(JScrollPane).apply(this, arguments));
+  }
+
+  _createClass(JScrollPane, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      _get(_getPrototypeOf(JScrollPane.prototype), "componentDidMount", this).call(this);
+
+      var self = this;
+      var $elem = $(ReactDOM.findDOMNode(self));
+      $elem.height('100%');
+      $elem.find('.jspContainer').replaceWith(function () {
+        var $children = $elem.find('.jspPane').children();
+
+        if ($children.length === 0 || $children.length > 1) {
+          console.error("JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.", "Mean while, JScrollPane should always (!) have 1 children element.");
+        }
+
+        return $children;
+      });
+      var options = $.extend({}, {
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 8,
+        animateScroll: true,
+        container: $('.jspContainer', $elem),
+        pane: $('.jspPane', $elem)
+      }, self.props.options);
+      $elem.jScrollPane(options);
+
+      if (self.props.onFirstInit) {
+        self.props.onFirstInit($elem.data('jsp'), $elem);
+      }
+
+      $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function (e) {
+        if ($elem.attr('data-scroll-disabled') === "true") {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      });
+      $elem.rebind('jsp-user-scroll-y.jsp' + self.getUniqueId(), function (e, scrollPositionY, isAtTop, isAtBottom) {
+        if (self.props.onUserScroll) {
+          if ($(e.target).is($elem)) {
+            self.props.onUserScroll($elem.data('jsp'), $elem, e, scrollPositionY, isAtTop, isAtBottom);
+          }
+        } // if (e.target.className.indexOf("textarea-scroll") > -1) {
+        //     return;
+        // }
+        //
+        // if (self.lastScrollPosition === scrollPositionY || self.scrolledToBottom !== 1) {
+        //     return;
+        // }
+        //
+        // if (scrollPositionY < 350 && !isAtBottom && self.$messages.is(":visible")) {
+        //     if (
+        //         self.lastUpdatedScrollHeight !== $jsp.getContentHeight() &&
+        //         !self.props.chatRoom.messagesBuff.messagesHistoryIsLoading() &&
+        //         self.props.chatRoom.messagesBuff.haveMoreHistory()
+        //     ) {
+        //         self.props.chatRoom.messagesBuff.retrieveChatHistory();
+        //         self.forceUpdate();
+        //         self.lastUpdatedScrollHeight = $jsp.getContentHeight();
+        //         self.shouldMaintainScroll = true;
+        //     }
+        // }
+        //
+        // if (isAtBottom) {
+        //     self.lastScrolledToBottom = true;
+        // }
+        // else {
+        //     self.lastScrolledToBottom = false;
+        // }
+        //
+        // self.lastScrollHeight = $jsp.getContentHeight();
+        // self.lastScrollPosition = scrollPositionY;
+        // self.lastScrollPositionPerc = $jsp.getPercentScrolledY();
+
+      });
+      $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
+        self.onResize(forced, scrollPositionYPerc, scrollToElement);
+      });
+      $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+      self.onResize();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      _get(_getPrototypeOf(JScrollPane.prototype), "componentWillUnmount", this).call(this);
+
+      var $elem = $(ReactDOM.findDOMNode(this));
+      $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
+      $(window).off('resize.jsp' + this.getUniqueId());
+    }
+  }, {
+    key: "eventuallyReinitialise",
+    value: function eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
+      var self = this;
+
+      if (!self.isMounted()) {
+        return;
+      }
+
+      if (!self.isComponentVisible()) {
+        return;
+      }
+
+      var $elem = $(ReactDOM.findDOMNode(self));
+      var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
+
+      if (forced || self._lastHeights != currHeights) {
+        self._lastHeights = currHeights;
+
+        self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
+      }
+    }
+  }, {
+    key: "_doReinit",
+    value: function _doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
+      var self = this;
+
+      if (!self.isMounted()) {
+        return;
+      }
+
+      if (!self.isComponentVisible()) {
+        return;
+      }
+
+      self._lastHeights = currHeights;
+      var $jsp = $elem.data('jsp');
+
+      if ($jsp) {
+        $jsp.reinitialise();
+        var manualReinitialiseControl = false;
+
+        if (self.props.onReinitialise) {
+          manualReinitialiseControl = self.props.onReinitialise($jsp, $elem, forced, scrollPositionYPerc, scrollToElement);
+        }
+
+        if (manualReinitialiseControl === false) {
+          if (scrollPositionYPerc) {
+            if (scrollPositionYPerc === -1) {
+              $jsp.scrollToBottom();
+            } else {
+              $jsp.scrollToPercentY(scrollPositionYPerc, false);
+            }
+          } else if (scrollToElement) {
+            $jsp.scrollToElement(scrollToElement);
+          }
+        }
+      }
+    }
+  }, {
+    key: "onResize",
+    value: function onResize(forced, scrollPositionYPerc, scrollToElement) {
+      if (forced && forced.originalEvent) {
+        forced = true;
+        scrollPositionYPerc = undefined;
+      }
+
+      this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      this.onResize();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.makeElement("div", {
+        className: this.props.className
+      }, React.makeElement("div", {
+        className: "jspContainer"
+      }, React.makeElement("div", {
+        className: "jspPane"
+      }, this.props.children)));
+    }
+  }]);
+
+  return JScrollPane;
+}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+
+JScrollPane.defaultProps = {
+  className: "jScrollPaneContainer",
+  requiresUpdateOnResize: true
+};
+;
+/**
+ * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
+ * so that we can render Dialogs into the body or other child element, different then the current component's child.
+ */
+
+var RenderTo =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(RenderTo, _React$Component);
+
+  function RenderTo() {
+    _classCallCheck(this, RenderTo);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(RenderTo).apply(this, arguments));
+  }
+
+  _createClass(RenderTo, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (_get(_getPrototypeOf(RenderTo.prototype), "componentDidMount", this)) {
+        _get(_getPrototypeOf(RenderTo.prototype), "componentDidMount", this).call(this);
+      }
+
+      this.popup = document.createElement("div");
+      this.popup.className = this.props.className ? this.props.className : "";
+
+      if (this.props.style) {
+        $(this.popup).css(this.props.style);
+      }
+
+      this.props.element.appendChild(this.popup);
+      var self = this;
+
+      this._renderLayer(function () {
+        if (self.props.popupDidMount) {
+          self.props.popupDidMount(self.popup);
+        }
+      });
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      this._renderLayer();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      if (_get(_getPrototypeOf(RenderTo.prototype), "componentWillUnmount", this)) {
+        _get(_getPrototypeOf(RenderTo.prototype), "componentWillUnmount", this).call(this);
+      }
+
+      ReactDOM.unmountComponentAtNode(this.popup);
+
+      if (this.props.popupWillUnmount) {
+        this.props.popupWillUnmount(this.popup);
+      }
+
+      this.props.element.removeChild(this.popup);
+    }
+  }, {
+    key: "_renderLayer",
+    value: function _renderLayer(cb) {
+      ReactDOM.render(this.props.children, this.popup, cb);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      // Render a placeholder
+      return null;
+    }
+  }]);
+
+  return RenderTo;
+}(React.Component);
+
+;
+
+var EmojiFormattedContent =
+/*#__PURE__*/
+function (_React$Component2) {
+  _inherits(EmojiFormattedContent, _React$Component2);
+
+  function EmojiFormattedContent() {
+    _classCallCheck(this, EmojiFormattedContent);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(EmojiFormattedContent).apply(this, arguments));
+  }
+
+  _createClass(EmojiFormattedContent, [{
+    key: "_eventuallyUpdateInternalState",
+    value: function _eventuallyUpdateInternalState(props) {
+      if (!props) {
+        props = this.props;
+      }
+
+      assert(typeof props.children === "string", "EmojiFormattedContent received a non-string (got: " + _typeof(props.children) + ") as props.children");
+      var str = props.children;
+
+      if (this._content !== str) {
+        this._content = str;
+        this._formattedContent = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(str));
+      }
+    }
+  }, {
+    key: "shouldComponentUpdate",
+    value: function shouldComponentUpdate(nextProps, nextState) {
+      if (!this._isMounted) {
+        this._eventuallyUpdateInternalState();
+
+        return true;
+      }
+
+      if (nextProps && nextProps.children !== this.props.children) {
+        this._eventuallyUpdateInternalState(nextProps);
+
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      this._eventuallyUpdateInternalState();
+
+      return React.makeElement("span", {
+        dangerouslySetInnerHTML: {
+          __html: this._formattedContent
+        }
+      });
+    }
+  }]);
+
+  return EmojiFormattedContent;
+}(React.Component);
+
+;
+
+function SoonFcWrap(milliseconds) {
+  return function (target, propertyKey, descriptor) {
+    var originalMethod = descriptor.value;
+    var _timerId = 0;
+
+    descriptor.value = function () {
+      if (_timerId) {
+        clearTimeout(_timerId);
+      }
+
+      var self = this;
+      var args = arguments; // Like SoonFc, but with context fix.
+
+      _timerId = setTimeout(function () {
+        originalMethod.apply(self, args);
+      }, milliseconds);
+    };
+
+    return descriptor;
+  };
+}
+
+;
+/* harmony default export */ __webpack_exports__["default"] = ({
+  JScrollPane: JScrollPane,
+  RenderTo: RenderTo,
+  EmojiFormattedContent: EmojiFormattedContent,
+  SoonFcWrap: SoonFcWrap
+});
+
+/***/ }),
 /* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2569,9 +2569,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Dropdown", function() { return Dropdown; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownContactsSelector", function() { return DropdownContactsSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownItem", function() { return DropdownItem; });
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3054,7 +3054,7 @@ DropdownItem.defaultProps = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
 /* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
@@ -3082,14 +3082,14 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
 
 
 
 
 
-var ContactsUI = __webpack_require__(4);
+var ContactsUI = __webpack_require__(2);
 
 var ExtraFooterElement =
 /*#__PURE__*/
@@ -3543,9 +3543,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 
 var _buttonGroups = {};
@@ -3801,7 +3801,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 
 
@@ -4081,7 +4081,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
 
 var x = 0;
@@ -4515,9 +4515,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 
 
@@ -4752,11 +4752,11 @@ Tooltip.defaultProps = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
-/* harmony import */ var _ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(4);
+/* harmony import */ var _ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2);
 /* harmony import */ var _ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
 /* harmony import */ var _ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
@@ -4788,7 +4788,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
 
 
@@ -6170,9 +6170,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 
 
@@ -6275,9 +6275,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 
 
@@ -6323,11 +6323,11 @@ var external_React_ = __webpack_require__(0);
 var external_React_default = /*#__PURE__*/__webpack_require__.n(external_React_);
 
 // EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(2);
+var external_ReactDOM_ = __webpack_require__(3);
 var external_ReactDOM_default = /*#__PURE__*/__webpack_require__.n(external_ReactDOM_);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -6366,7 +6366,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
 
 
@@ -7672,7 +7672,7 @@ window.CloudBrowserModalDialogUI = {
 var dropdowns = __webpack_require__(5);
 
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(4);
+var ui_contacts = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./js/ui/emojiDropdown.jsx
 function emojiDropdown_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { emojiDropdown_typeof = function _typeof(obj) { return typeof obj; }; } else { emojiDropdown_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return emojiDropdown_typeof(obj); }
@@ -7697,7 +7697,7 @@ function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Obj
 
 var emojiDropdown_React = __webpack_require__(0);
 
-var emojiDropdown_utils = __webpack_require__(3);
+var emojiDropdown_utils = __webpack_require__(4);
 
 
 
@@ -8246,7 +8246,7 @@ function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototype
 
 var emojiAutocomplete_React = __webpack_require__(0);
 
-var emojiAutocomplete_ReactDOM = __webpack_require__(2);
+var emojiAutocomplete_ReactDOM = __webpack_require__(3);
 
 
 
@@ -8551,7 +8551,7 @@ function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.se
 // libs
 var typingArea_React = __webpack_require__(0);
 
-var typingArea_ReactDOM = __webpack_require__(2);
+var typingArea_ReactDOM = __webpack_require__(3);
 
 
 
@@ -9496,7 +9496,7 @@ function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.se
 
 var whosTyping_React = __webpack_require__(0);
 
-var whosTyping_ReactDOM = __webpack_require__(2);
+var whosTyping_ReactDOM = __webpack_require__(3);
 
 
 
@@ -9681,7 +9681,7 @@ function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setP
 
 var accordion_React = __webpack_require__(0);
 
-var accordion_ReactDOM = __webpack_require__(2);
+var accordion_ReactDOM = __webpack_require__(3);
 
 
 
@@ -9849,7 +9849,7 @@ function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf
 
 var participantsList_React = __webpack_require__(0);
 
-var participantsList_ReactDOM = __webpack_require__(2);
+var participantsList_ReactDOM = __webpack_require__(3);
 
 
 
@@ -9859,7 +9859,7 @@ var ModalDialogsUI = __webpack_require__(6);
 
 var participantsList_DropdownsUI = __webpack_require__(5);
 
-var ContactsUI = __webpack_require__(4);
+var ContactsUI = __webpack_require__(2);
 
 var participantsList_PerfectScrollbar = __webpack_require__(11).PerfectScrollbar;
 
@@ -10194,13 +10194,13 @@ function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf =
 
 var metaRichpreview_React = __webpack_require__(0);
 
-var metaRichpreview_ReactDOM = __webpack_require__(2);
+var metaRichpreview_ReactDOM = __webpack_require__(3);
 
-var metaRichpreview_utils = __webpack_require__(3);
+var metaRichpreview_utils = __webpack_require__(4);
 
 
 
-var metaRichpreview_ContactsUI = __webpack_require__(4);
+var metaRichpreview_ContactsUI = __webpack_require__(2);
 
 var ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -10350,13 +10350,13 @@ function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfi
 
 var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
-var metaRichpreviewConfirmation_ReactDOM = __webpack_require__(2);
+var metaRichpreviewConfirmation_ReactDOM = __webpack_require__(3);
 
-var metaRichpreviewConfirmation_utils = __webpack_require__(3);
+var metaRichpreviewConfirmation_utils = __webpack_require__(4);
 
 
 
-var metaRichpreviewConfirmation_ContactsUI = __webpack_require__(4);
+var metaRichpreviewConfirmation_ContactsUI = __webpack_require__(2);
 
 var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -10495,6 +10495,7 @@ function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLink
 
 
 
+
 var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks =
 /*#__PURE__*/
 function (_ConversationMessageM) {
@@ -10539,6 +10540,50 @@ function (_ConversationMessageM) {
             message: message,
             isLoading: megaLinkInfo.hadLoaded()
           });
+        } else if (megaLinkInfo.is_contactlink) {
+          var fakeContact = M.u[megaLinkInfo.info['h']] ? M.u[megaLinkInfo.info['h']] : {
+            'u': megaLinkInfo.info['h'],
+            'm': megaLinkInfo.info['e'],
+            'firstName': megaLinkInfo.info['fn'],
+            'lastName': megaLinkInfo.info['ln'],
+            'name': megaLinkInfo.info['fn'] + " " + megaLinkInfo.info['ln']
+          };
+
+          if (!M.u[fakeContact.u]) {
+            M.u.set(fakeContact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+              'u': fakeContact.u,
+              'name': fakeContact.firstName + " " + fakeContact.lastName,
+              'm': fakeContact.m ? fakeContact.m : "",
+              'c': undefined
+            }));
+          }
+
+          var contact = M.u[megaLinkInfo.info['h']];
+          previewContainer = external_React_default.a.createElement("div", {
+            key: megaLinkInfo.info['h'],
+            className: "message shared-block contact-link"
+          }, external_React_default.a.createElement("div", {
+            className: "message shared-info"
+          }, external_React_default.a.createElement("div", {
+            className: "message data-title"
+          }, contact.name), external_React_default.a.createElement(ui_contacts["ContactVerified"], {
+            className: "right-align",
+            contact: contact
+          }), external_React_default.a.createElement("div", {
+            className: "user-card-email"
+          }, contact.m)), external_React_default.a.createElement("div", {
+            className: "message shared-data"
+          }, external_React_default.a.createElement("div", {
+            className: "data-block-view semi-big"
+          }, external_React_default.a.createElement(ui_contacts["ContactPresence"], {
+            className: "small",
+            contact: contact
+          }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+            className: "avatar-wrapper medium-avatar",
+            contact: contact
+          })), external_React_default.a.createElement("div", {
+            className: "clear"
+          })));
         } else {
           var desc;
           var is_icon = megaLinkInfo.is_dir ? true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
@@ -12514,11 +12559,11 @@ function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototype
 
 var alterParticipants_React = __webpack_require__(0);
 
-var alterParticipants_ReactDOM = __webpack_require__(2);
+var alterParticipants_ReactDOM = __webpack_require__(3);
 
-var alterParticipants_utils = __webpack_require__(3);
+var alterParticipants_utils = __webpack_require__(4);
 
-var alterParticipants_ContactsUI = __webpack_require__(4);
+var alterParticipants_ContactsUI = __webpack_require__(2);
 
 var alterParticipants_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -12701,13 +12746,13 @@ function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setP
 
 var truncated_React = __webpack_require__(0);
 
-var truncated_ReactDOM = __webpack_require__(2);
+var truncated_ReactDOM = __webpack_require__(3);
 
-var truncated_utils = __webpack_require__(3);
+var truncated_utils = __webpack_require__(4);
 
 
 
-var truncated_ContactsUI = __webpack_require__(4);
+var truncated_ContactsUI = __webpack_require__(2);
 
 var truncated_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -12804,13 +12849,13 @@ function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf =
 
 var privilegeChange_React = __webpack_require__(0);
 
-var privilegeChange_ReactDOM = __webpack_require__(2);
+var privilegeChange_ReactDOM = __webpack_require__(3);
 
-var privilegeChange_utils = __webpack_require__(3);
+var privilegeChange_utils = __webpack_require__(4);
 
 
 
-var privilegeChange_ContactsUI = __webpack_require__(4);
+var privilegeChange_ContactsUI = __webpack_require__(2);
 
 var privilegeChange_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -12934,13 +12979,13 @@ function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.
 
 var topicChange_React = __webpack_require__(0);
 
-var topicChange_ReactDOM = __webpack_require__(2);
+var topicChange_ReactDOM = __webpack_require__(3);
 
-var topicChange_utils = __webpack_require__(3);
+var topicChange_utils = __webpack_require__(4);
 
 
 
-var topicChange_ContactsUI = __webpack_require__(4);
+var topicChange_ContactsUI = __webpack_require__(2);
 
 var topicChange_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -13043,7 +13088,7 @@ function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPa
 
 var sharedFilesAccordionPanel_React = __webpack_require__(0);
 
-var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(2);
+var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(3);
 
 
 
@@ -13371,7 +13416,7 @@ function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccor
 
 var incomingSharesAccordionPanel_React = __webpack_require__(0);
 
-var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(2);
+var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(3);
 
 
 
@@ -13573,13 +13618,13 @@ function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Obj
 
 var closeOpenMode_React = __webpack_require__(0);
 
-var closeOpenMode_ReactDOM = __webpack_require__(2);
+var closeOpenMode_ReactDOM = __webpack_require__(3);
 
-var closeOpenMode_utils = __webpack_require__(3);
+var closeOpenMode_utils = __webpack_require__(4);
 
 
 
-var closeOpenMode_ContactsUI = __webpack_require__(4);
+var closeOpenMode_ContactsUI = __webpack_require__(2);
 
 var closeOpenMode_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -13674,11 +13719,11 @@ function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.se
 
 var chatHandle_React = __webpack_require__(0);
 
-var chatHandle_ReactDOM = __webpack_require__(2);
+var chatHandle_ReactDOM = __webpack_require__(3);
 
-var chatHandle_utils = __webpack_require__(3);
+var chatHandle_utils = __webpack_require__(4);
 
-var chatHandle_ContactsUI = __webpack_require__(4);
+var chatHandle_ContactsUI = __webpack_require__(2);
 
 var chatHandle_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
 
@@ -13777,7 +13822,7 @@ function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = O
 
 var chatlinkDialog_React = __webpack_require__(0);
 
-var chatlinkDialog_ReactDOM = __webpack_require__(2);
+var chatlinkDialog_ReactDOM = __webpack_require__(3);
 
 
 
@@ -17260,7 +17305,7 @@ module.exports = __webpack_require__(13);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -21502,7 +21547,7 @@ function extendActions(prefix, src, toBeAppended) {
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(3);
+var utils = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -21538,7 +21583,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(2);
+var ReactDOM = __webpack_require__(3);
 
 
 
@@ -21730,7 +21775,7 @@ function (_MegaRenderMixin3) {
   IntermediateCheckbox: IntermediateCheckbox
 });
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(4);
+var ui_contacts = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
 var modalDialogs = __webpack_require__(6);
@@ -21757,7 +21802,7 @@ function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPro
 
 var startGroupChatWizard_React = __webpack_require__(0);
 
-var startGroupChatWizard_ReactDOM = __webpack_require__(2);
+var startGroupChatWizard_ReactDOM = __webpack_require__(3);
 
 
 

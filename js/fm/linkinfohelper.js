@@ -5,20 +5,24 @@
  * @param node_handle {String}
  * @param node_key {String}
  * @param is_dir {Boolean}
+ * @param [is_chatlink] {Boolean}
+ * @param [is_contactlink] {Boolean}
  * @constructor
  */
-var LinkInfoHelper = function(node_handle, node_key, is_dir, is_chatlink) {
+var LinkInfoHelper = function(node_handle, node_key, is_dir, is_chatlink, is_contactlink) {
     "use strict";
     this.node_handle = node_handle;
     this.node_key = node_key;
     this.is_dir = is_dir;
     this.is_chatlink = is_chatlink;
+    this.is_contactlink = is_contactlink;
     this.info = {};
 };
 
 LinkInfoHelper.MEGA_LINKS_REGEXP = [
     "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/#(!|F!)([a-zA-Z\!0-9\-_]+)",
     "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(chat\\/)([a-zA-Z\#0-9\-_]+)",
+    "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(C!)([a-zA-Z\#0-9\-_]+)",
 ];
 LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED = false;
 LinkInfoHelper._CACHE = {};
@@ -113,6 +117,25 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                         LinkInfoHelper._CACHE[chatCacheKey]
                     );
                 }
+                else if (m[4] === "C!") {
+                    // is chat
+                    var contactHash = m[5];
+                    var contactHashKey = "C!" + contactHash;
+
+                    if (!LinkInfoHelper._CACHE[contactHashKey]) {
+                        LinkInfoHelper._CACHE[contactHashKey] = new LinkInfoHelper(
+                            contactHash,
+                            undefined,
+                            false,
+                            false,
+                            true
+                        );
+                    }
+
+                    found.push(
+                        LinkInfoHelper._CACHE[contactHashKey]
+                    );
+                }
             }
         }
     }
@@ -149,6 +172,21 @@ LinkInfoHelper.prototype.retrieve = function() {
             .done(function (r) {
                 self.info['ncm'] = r.ncm;
                 self.info['ct'] = r.ct;
+            })
+            .fail(function (e) {
+                self.failed = true;
+                if (d) {
+                    console.error("Failed to retrieve link info: ", e);
+                }
+            });
+    }
+    else if (self.is_contactlink) {
+        self._promise = asyncApiReq({a: 'clg', 'cl': self.node_handle})
+            .done(function (r) {
+                self.info['e'] = r.e;
+                self.info['fn'] = r.fn;
+                self.info['ln'] = r.ln;
+                self.info['h'] = r.h;
             })
             .fail(function (e) {
                 self.failed = true;
@@ -230,10 +268,13 @@ LinkInfoHelper.prototype.getInfo = function() {
 
     var promise = new MegaPromise();
 
+    // TODO: refactor this to use some ENUM-like type var
     if (
-        (!self.is_chatlink && !self.is_dir && !self.info['size'] && !self.info['at'] && !self.info['fa']) ||
-        (!self.is_chatlink && self.is_dir && !self.info['at']) ||
-        (self.is_chatlink && !self.info['ct'])
+        (!self.is_contactlink && !self.is_chatlink && !self.is_dir && !self.info['size'] && !self.info['at'] &&
+            !self.info['fa']) ||
+        (!self.is_contactlink && !self.is_chatlink && self.is_dir && !self.info['at']) ||
+        (!self.is_contactlink && self.is_chatlink && !self.info['ct']) ||
+        (self.is_contactlink && !self.info['e'])
     ) {
         promise.linkFailTo(
             self.retrieve().done(function() {
@@ -418,7 +459,10 @@ LinkInfoHelper.prototype.havePreview = function() {
 LinkInfoHelper.prototype.getLink = function() {
     "use strict";
     if (!this._url) {
-        if (this.is_chatlink) {
+        if (this.is_contactlink) {
+            this._url = "https://mega.nz/C!" + this.node_handle;
+        }
+        else if (this.is_chatlink) {
             this._url = "https://mega.nz/chat/" + this.node_handle + "#" + this.node_key;
         }
         else {

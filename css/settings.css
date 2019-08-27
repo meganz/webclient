@@ -326,6 +326,9 @@
     padding: 0px;
     display: inline-block;
 }
+.fm-account-notifications .email-notification .data-block-info-text {
+    margin-top: 20px;
+}
 .slider-percentage-bl .content-txt {
     font-size: 12px;
     line-height: 17px;
@@ -1405,7 +1408,7 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    padding: 0 16px 0 12px;
+    padding: 0 8px;
 }
 .settings-sub-section.rub-grn-noti {
     margin-bottom: 24px;

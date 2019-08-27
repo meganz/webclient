@@ -1290,6 +1290,9 @@
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
                 var p = $.cftarget;
+
+                // Make sure parent has selected class to make it expand
+                $('#mctreea_' + p, $dialog).addClass('selected');
                 selectTreeItem(p);
                 selectTreeItem(h);
             });

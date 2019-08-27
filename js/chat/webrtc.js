@@ -867,11 +867,6 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
     }
     self.calls[chatid] = call;
     call._startOrJoin(av)
-    .then(function() {
-        call._fire("onCallRequestSent", {
-            av: call.localAv()
-        });
-    })
     .catch(function(err) {
         self.logger.log("Error starting/joining call:", err);
     });
@@ -1689,7 +1684,8 @@ Call.prototype._broadcastCallReq = function() {
         return false;
     }
     assert(!self._obtainingLocalStream);
-    assert(self.localAv() != null);
+    var localAv = self.localAv();
+    assert(localAv != null);
     assert(self.isCallerOrJoiner);
     self.isRingingOut = true;
     if (!self._bcastCallData(CallDataType.kRinging)) {
@@ -1722,6 +1718,7 @@ Call.prototype._broadcastCallReq = function() {
             return;
         }
     }, RtcModule.kCallAnswerTimeout);
+    self._fire("onCallRequestSent", { av: localAv});
     return true;
 };
 

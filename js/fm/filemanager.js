@@ -3871,7 +3871,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     var promise = new MegaPromise();
     var prevState = $('.fm-main').is('.almost-full, .full');
-    $('.fm-main').removeClass('almost-full full');
+    $('.fm-main').removeClass('fm-notification almost-full full');
 
     if (this.showOverStorageQuotaPromise) {
         promise = this.showOverStorageQuotaPromise;
@@ -3977,6 +3977,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         $('.fm-notification-block .fm-notification-close')
             .rebind('click', function() {
                 $('.fm-main').removeClass('fm-notification almost-full full');
+                $.tresizer();
             });
 
         mega.achievem.enabled()
@@ -4010,6 +4011,9 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
             promise.reject();
         }
     }
+
+    // On the banner appearance or disappearance, lets resize height of fm.
+    $.tresizer();
 
     return promise;
 };

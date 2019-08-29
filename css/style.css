@@ -6066,11 +6066,16 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .fm-notification.full .visible-notification .fm-notification-block.full, .fm-notification.almost-full .visible-notification .fm-notification-block.almost-full {
     display: block;
 }
-.fm-notification .fm-blocks-view.fm, .fm-notification .files-grid-view.fm, .fm-notification .shared-grid-view, .fm-notification .shared-grid-view, .fm-notification .shared-blocks-view {
+.fm-notification .fm-blocks-view.fm, .fm-notification .files-grid-view.fm, .fm-notification .shared-grid-view, .fm-notification .shared-blocks-view {
     height: 100%;
     height: -webkit-calc(100% - 60px);
     height: -moz-calc(100% - 60px);
     height: calc(100% - 60px);
+}
+.fm-notification .fm-blocks-view.fm.out-shares-view, .fm-notification .files-grid-view.fm.out-shares-view, .fm-notification .fm-blocks-view.fm.public-links-view, .fm-notification .files-grid-view.fm.public-links-view {
+    height: -webkit-calc(100% - 97px);
+    height: -moz-calc(100% - 97px);
+    height: calc(100% - 97px);
 }
 .fm-notification .fm-empty-incoming, .fm-notification .fm-empty-trashbin, .fm-notification .fm-empty-cloud {
     height: 100%;

@@ -3254,6 +3254,7 @@
     "20831": "Has cancelado la suscripci\u00f3n",
     "20832": "No recibir\u00e1s correos electr\u00f3nicos de MEGA. Ten en cuenta que si registras una cuenta MEGA en el futuro, te volveremos a enviar correos electr\u00f3nicos.",
     "20840": "Copiar todo",
+    "20846": "\u00bfNo encuentras lo que buscas? [A]Todas las descargas[\/A]",
     "20856": "Tu enlace ha caducado.",
     "20857": "Tu enlace no es v\u00e1lido.",
     "20858": "Ponte en contacto con support@mega.nz para obtener ayuda.",
@@ -3266,7 +3267,7 @@
     "20894": "Nota: si superas el l\u00edmite de almacenamiento, el aviso se te enviar\u00e1 de todos modos.",
     "20895": "Inactividad de la cuenta",
     "20896": "Aviso de inactividad de la cuenta",
-    "20897": "Activar todas las notificaciones por correo electr\u00f3nico",
+    "20897": "Allow accessory emails",
     "20898": "Notificaciones por correo electr\u00f3nico",
     "20899": "Activar todas las notificaciones de la cuenta",
     "20900": "Notificaciones de la cuenta",
@@ -3284,5 +3285,8 @@
     "20951": "Direcci\u00f3n del beneficiario",
     "20956": "Opciones del bot\u00f3n de embebido",
     "20957": "Alguien te ha eliminado como contacto",
-    "20960": "Entered birthdate is invalid"
+    "20960": "Entered birthdate is invalid",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

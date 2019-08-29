@@ -3254,6 +3254,7 @@
     "20831": "Abonelikten ba\u015far\u0131yla \u00e7\u0131kt\u0131n\u0131z",
     "20832": "MEGA'dan e-posta almayacaks\u0131n\u0131z. L\u00fctfen gelecekte bir MEGA hesab\u0131na kaydolursan\u0131z size e-posta g\u00f6ndermeye devam edece\u011fimizi unutmay\u0131n.",
     "20840": "T\u00fcm\u00fcn\u00fc kopyala",
+    "20846": "Arad\u0131\u011f\u0131n\u0131z\u0131 bulam\u0131yor musunuz? [A]T\u00fcm Y\u00fcklemeler[\/A]",
     "20856": "Ba\u011flant\u0131n\u0131z\u0131n s\u00fcresi doldu.",
     "20857": "Ba\u011flant\u0131n\u0131z ge\u00e7ersiz.",
     "20858": "L\u00fctfen yard\u0131m i\u00e7in support@mega.nz ile ileti\u015fime ge\u00e7in.",
@@ -3266,7 +3267,7 @@
     "20894": "Not: Kota a\u015f\u0131m\u0131 uyar\u0131s\u0131 her zaman g\u00f6nderilir.",
     "20895": "Hesap hareketsizli\u011fi",
     "20896": "Hesap hareketsizli\u011fi hakk\u0131nda hat\u0131rlatma",
-    "20897": "T\u00fcm e-posta bildirimlerini etkinle\u015ftir",
+    "20897": "Allow accessory emails",
     "20898": "Email bildirimleri",
     "20899": "T\u00fcm hesap bildirimlerini etkinle\u015ftir",
     "20900": "Hesap Bildirimleri",
@@ -3284,5 +3285,8 @@
     "20951": "Haksahibinin Adresi",
     "20956": "Buton se\u00e7eneklerini g\u00f6m",
     "20957": "Birisi seni ki\u015fi listesinden \u00e7\u0131kard\u0131\u011f\u0131nda",
-    "20960": "Girilen do\u011fum tarihi ge\u00e7ersiz"
+    "20960": "Girilen do\u011fum tarihi ge\u00e7ersiz",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

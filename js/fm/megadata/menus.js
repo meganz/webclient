@@ -263,6 +263,25 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    if (selNode) {
+        items['.download-item'] = 1;
+        items['.zipdownload-item'] = 1;
+        items['.copy-item'] = 1;
+        items['.properties-item'] = 1;
+    }
+    items['.refresh-item'] = 1;
+
+    if (folderlink) {
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
+        delete items['.embedcode-item'];
+        delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+        items['.import-item'] = 1;
+        items['.getlink-item'] = 1;
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
@@ -285,6 +304,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
+            delete items['.download-item'];
             items['.dispute-item'] = 1;
         }
     }
@@ -302,25 +322,6 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 break;
             }
         }
-    }
-
-    if (selNode) {
-        items['.download-item'] = 1;
-        items['.zipdownload-item'] = 1;
-        items['.copy-item'] = 1;
-        items['.properties-item'] = 1;
-    }
-    items['.refresh-item'] = 1;
-
-    if (folderlink) {
-        delete items['.copy-item'];
-        delete items['.add-star-item'];
-        delete items['.embedcode-item'];
-        delete items['.colour-label-items'];
-        delete items['.properties-versions'];
-        delete items['.clearprevious-versions'];
-        items['.import-item'] = 1;
-        items['.getlink-item'] = 1;
     }
 
     // For multiple selections, should check all have the right permission.
@@ -436,6 +437,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 itemsViewed = true;
             }
         }
+
+        if (M.currentrootid === M.RubbishID && M.v.length) {
+            $('.files-menu.context .dropdown-item.clearbin-item').attr('style', '');
+            itemsViewed = true;
+        }
+
         if (!ignoreGrideExtras && M.viewmode) {
             itemsViewed = true;
             $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
@@ -650,9 +657,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         else if (currNodeClass && currNodeClass.indexOf('rubbish-bin') > -1) {
             $.selected = [M.RubbishID];
             $(menuCMI).filter('.properties-item').show();
-        }
-        else if (currNodeClass && currNodeClass.indexOf('recycle-item') > -1) {
-            $(menuCMI).filter('.clearbin-item').show();
+            if (currNodeClass.indexOf('filled') > -1) {
+                $(menuCMI).filter('.clearbin-item').show();
+            }
         }
         else if (currNodeClass && currNodeClass.indexOf('contacts-item') > -1) {
             $(menuCMI).filter('.addcontact-item').show();

@@ -3254,6 +3254,7 @@
     "20831": "U heeft zich succesvol uitgeschreven",
     "20832": "U ontvangt geen e-mails van MEGA. Let op: als u zich in de toekomst voor een MEGA-account registreert, zullen we u e-mails blijven sturen.",
     "20840": "Alles kopi\u00ebren",
+    "20846": "Kunt u niet vinden waarnaar u op zoek bent? [A]Alle downloads[\/A]",
     "20856": "Uw link is verlopen.",
     "20857": "Uw koppeling is ongeldig.",
     "20858": "Neem contact op met support@mega.nz voor assistentie.",
@@ -3266,7 +3267,7 @@
     "20894": "Noteer:  De over tegoed waarschuwing wordt altijd verzonden.",
     "20895": "Account inactiviteit",
     "20896": "Herinnering over account inactiviteit",
-    "20897": "Alle email notificaties inschakelen",
+    "20897": "Allow accessory emails",
     "20898": "Email Notificaties",
     "20899": "Schakel alle account notificaties in",
     "20900": "Account Notificaties",
@@ -3284,5 +3285,8 @@
     "20951": "E-mailadres begunstigde",
     "20956": "Embed knop opties",
     "20957": "Iemand heeft u verwijderd als een contact",
-    "20960": "Ingevoerde geboortedatum is ongeldig"
+    "20960": "Ingevoerde geboortedatum is ongeldig",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

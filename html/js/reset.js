@@ -253,10 +253,15 @@ function init_reset_pw() {
         }
     };
 
-    $passwords.add($confirms).rebind('keyup.initresetpw', function(e) {
+    $passwords.add($confirms).rebind('keyup.initresetpw, input.initresetpw', function(e) {
         var valid = _checkInput($(this));
         if (e.keyCode === 13 && valid) {
-            recovery_reset_pw();
+            if ($('.restore-verify-button').hasClass('reset-account')) {
+                delete_reset_pw();
+            }
+            else {
+                recovery_reset_pw();
+            }
         }
     });
 

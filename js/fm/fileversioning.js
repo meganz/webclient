@@ -221,7 +221,7 @@ var versiondialogid;
                     .replace('[X2]',
                     '<span class="versioning-text total-versions-size">' + bytesToSize(data.versions.size) + '</span>');
 
-            $('.versioning-body-text').safeHTML(verionInfo);
+            $('.versioning-body-text.versioning-info-message').safeHTML(verionInfo);
         },
 
         /**
@@ -641,8 +641,7 @@ var versiondialogid;
                 pd.addClass('hidden');
                 loadSubPage('fm/account/file-management');
             });
-            history.pushState({subpage: page}, '', '/' + page);
-
+            pushHistoryState(page);
         },
 
         /**

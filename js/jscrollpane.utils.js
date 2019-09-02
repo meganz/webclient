@@ -74,15 +74,6 @@ function initGridScrolling() {
     jScrollFade('.grid-scrolling-table:not(.megaList,.megaListContainer)');
 }
 
-function initSelectScrolling(scrollBlock) {
-
-    "use strict";
-
-    deleteScrollPanel(scrollBlock, 'jsp');
-    $(scrollBlock).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scrollBlock);
-}
-
 function initFileblocksScrolling() {
     $('.file-block-scrolling:visible')
         .filter(":not(.megaList)")
@@ -100,59 +91,78 @@ function initFileblocksScrolling2() {
     jScrollFade('.contact-details-view .file-block-scrolling');
 }
 
-function initContactsGridScrolling() {
+function initSelectScrolling(scrollBlock) {
+
     "use strict";
+
+    var $scrollBlock = $(scrollBlock);
+
+    // Remember current position of scroll
+    var currentPos = $scrollBlock.data('jsp') ? $scrollBlock.data('jsp').getContentPositionY() : 0;
+    deleteScrollPanel(scrollBlock, 'jsp');
+
+    // Need to reselect scrollblock due to update.
+    $scrollBlock = $(scrollBlock);
+    $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    $scrollBlock.data('jsp').scrollToY(currentPos);
+    jScrollFade(scrollBlock);
+}
+
+function initContactsGridScrolling() {
+
+    "use strict";
+
     var scroll = '.grid-scrolling-table.contacts';
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initOpcGridScrolling() {
+
+    "use strict";
+
     var scroll = '.grid-scrolling-table.opc';
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initIpcGridScrolling() {
+
+    "use strict";
+
     var scroll = '.grid-scrolling-table.ipc';
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initContactsBlocksScrolling() {
+
+    "use strict";
+
     var scroll = '.contacts-blocks-scrolling';
     if ($('.contacts-blocks-scrolling:visible').length === 0) {
         return;
     }
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initShareBlocksScrolling() {
+
+    "use strict";
+
     var scroll = '.shared-blocks-scrolling';
     if ($('.shared-blocks-scrolling:visible').length === 0) {
         return;
     }
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initOutShareBlocksScrolling() {
 
     'use strict';
-    
+
     var scroll = '.out-shared-blocks-scrolling';
     if ($('.out-shared-blocks-scrolling:visible').length === 0) {
         return;
     }
-    deleteScrollPanel(scroll, 'jsp');
-    $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    jScrollFade(scroll);
+    initSelectScrolling(scroll);
 }
 
 function initTransferScroll() {

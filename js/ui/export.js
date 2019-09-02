@@ -1556,7 +1556,7 @@ var exportExpiry = {
         toastTxt = linksNum > 1 ? l[7655].replace('%d', linksNum) : l[7654];
 
         // Setup the copy to clipboard buttons
-        $span.text(l[1990]);
+        $span.text(Object($.itemExport).length > 1 ? l[20840] : l[1990]);
 
         // Click anywhere on export link dialog will hide export link dropdown
         $('.export-links-dialog').rebind('click', function(e) {
@@ -1623,7 +1623,7 @@ var exportExpiry = {
 
             // Show the relevant 'Link without key', 'Decryption key' or 'Link with key'
             $('.export-content-block').removeClass('public-handle decryption-key full-link').addClass(keyOption);
-            $span.text(l[1990]);
+            $span.text(Object($.itemExport).length > 1 ? l[20840] : l[1990]);
 
             // If decryption key, grey out options for expiry date and password protect because it doesn't make sense
             if (keyOption === 'decryption-key') {
@@ -1720,7 +1720,7 @@ var exportExpiry = {
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
         if (folderlink) {
-            fileUrlWithoutKey = 'https://mega.nz/#F!' + pfid;
+            fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid;
             fileUrlKey = '!' + pfkey;
             fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
             fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
@@ -1745,7 +1745,7 @@ var exportExpiry = {
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
-        fileUrlWithoutKey = fileUrlWithoutKey || ('https://mega.nz/#' + type + '!' + htmlentities(item.ph));
+        fileUrlWithoutKey = fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph));
         fileUrlKey = fileUrlKey || (key ? '!' + a32_to_base64(key) : '');
 
         html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
@@ -2409,3 +2409,26 @@ var exportExpiry = {
     scope.mega.UI.Share = scope.mega.UI.Share || {};
     scope.mega.UI.Share.ExportLink = UiExportLink;
 })(jQuery, window);
+
+/** Export Link as string **/
+(function($, scope) {
+    'use strict';
+
+    scope.getPublicNodeExportLink = function(node) {
+        var fileUrlWithoutKey;
+        var type;
+        if (folderlink) {
+            fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid + (node.t ? '!' : '?') + node.h;
+        }
+        else if (node.t) {
+            type = 'F';
+        }
+        else {
+            // Shared item type is file
+            type = '';
+        }
+
+        return fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(node.ph));
+    };
+
+})(jQuery, mega);

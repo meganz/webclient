@@ -725,7 +725,6 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
                     mobile.register.showConfirmAccountScreen(res, true);
                 }
                 else {
@@ -3174,7 +3173,7 @@ BusinessAccountUI.prototype.sortSubusers = function(subusers, field) {
                 }
             }
         });
-        var sortedSubList = [];
+        var sortedSubList = {};
         for (var k = 0; k < tempArray.length; k++) {
             sortedSubList[tempArray[k].key] = tempArray[k].val;
         }

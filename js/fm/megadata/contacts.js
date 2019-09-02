@@ -403,8 +403,13 @@ MegaData.prototype.getContactsEMails = function(excludeRequests) {
         }
     }
 
+    // Sort contacts by name in ascending order
+    contacts.sort(function(contactA, contactB) {
+        return contactA.name.localeCompare(contactB.name);
+    });
+
     return contacts;
-}
+};
 
 MegaData.prototype.getActiveContacts = function() {
     var res = [];
@@ -690,14 +695,22 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
                 self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
             }
 
+            // Get the nickname (if available) and name
+            var userName = nicknames.getNicknameAndName(userId);
+
             if (M.currentdirid === 'shares') {// Update right panel list and block view
-                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(user.name);
+                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(userName);
                 $('.inbound-share .' + userId).next().find('.shared-folder-info')
-                    .text(l[17590].replace('%1', user.name));
+                    .text(l[17590].replace('%1', userName));
             }
             else if (M.getNodeRoot(M.currentdirid) === 'shares') {
                 $('.shared-details-info-block .' + userId).next()
-                    .find('.fm-chat-user').text(user.name + ' <' + user.m + '>');
+                    .find('.fm-chat-user').text(userName + ' <' + user.m + '>');
+            }
+            else if (M.getNodeRoot(M.currentdirid) === 'contacts' && $.sortTreePanel) {
+
+                // Update left panel if it has been initialised
+                M.contacts();
             }
         }
         else {
@@ -740,7 +753,6 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
         }
     });
 };
-
 
 MegaData.prototype.syncContactEmail = function(userHash) {
     var promise = new MegaPromise();
@@ -1008,6 +1020,8 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
             }
             M.u[userHandle].firstName = '';
             M.u[userHandle].lastName = '';
+
+            M.syncUsersFullname(userHandle);
         }
     }
 

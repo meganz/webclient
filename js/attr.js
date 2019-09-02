@@ -23,13 +23,22 @@ var attribCache = false;
      *     True for public attributes (default: true).
      *     -1 for "system" attributes (e.g. without prefix)
      *     -2 for "private non encrypted attributes"
+     *     False for private encrypted attributes
      * @param nonHistoric {Boolean}
-     *     True for non-historic attributes (default: false).  Non-historic
-     *     attributes will overwrite the value, and not retain previous
-     *     values on the API server.
+     *     True for non-historic attributes (default: false).  Non-historic attributes will overwrite the value, and
+     *     not retain previous values on the API server.
+     * @param encodeValues {Boolean|undefined}
+     *     If true, the object's values will be encoded to a UTF-8 byte array (Uint8Array) then encoded as a
+     *     String containing 8 bit representations of the bytes before being passed to the TLV encoding/encrypting
+     *     library. This is useful if the values contain special characters. The SDK is compatible with reading these.
      * @return {String}
      */
-    var buildAttribute = ns._buildAttribute = function (attribute, pub, nonHistoric) {
+    var buildAttribute = ns._buildAttribute = function (attribute, pub, nonHistoric, encodeValues) {
+
+        if (encodeValues) {
+            attribute = '>' + attribute;
+        }
+
         if (nonHistoric === true || nonHistoric === 1) {
             attribute = '!' + attribute;
         }
@@ -87,6 +96,71 @@ var attribCache = false;
     };
 
     /**
+     * Converts an object with key/value pairs where the values may have special characters (Javascript stores strings
+     * as UTF-16) which may take up 2+ bytes. First it converts the values to UTF-8 encoding, then encodes those bytes
+     * to their 8 bit string representation. This object can then be sent directly to the TLV encoding library and
+     * encrypted as each string character is 8 bits.
+     * @param {Object} attribute An object with key/value pairs, the values being either ASCII strings or regular
+     *                           JavaScript Strings with UTF-16 characters
+     * @returns {Object} Returns the object with converted values
+     */
+    ns.encodeObjectValues = function(attribute) {
+
+        var encodedAttribute = {};
+        var encoder = new TextEncoder('utf-8');
+
+        Object.keys(attribute).forEach(function(key) {
+
+            // Encode to UTF-8 and store as Uint8Array bytes
+            var value = attribute[key];
+            var byteArray = encoder.encode(value);
+            var encodedString = '';
+
+            // Encode from bytes back to String in 8 bit characters
+            for (var i = 0; i < byteArray.length; i++) {
+                encodedString += String.fromCharCode(byteArray[i]);
+            }
+
+            // Store the encoded string
+            encodedAttribute[key] = encodedString;
+        });
+
+        return encodedAttribute;
+    };
+
+    /**
+     * Converts an object's values (with key/value pairs where the values have 8 bit characters) back to a byte array
+     * then converts that back to its normal JavaScript string representation
+     * @param {Object} attribute An object with key/value pairs
+     * @returns {Object} Returns the object with converted values
+     */
+    ns.decodeObjectValues = function(attribute) {
+
+        var decodedAttribute = {};
+        var decoder = new TextDecoder('utf-8');
+
+        Object.keys(attribute).forEach(function(key) {
+
+            var value = attribute[key];
+            var decodedBytes = [];
+
+            // Encode from 8 bit characters back to bytes
+            for (var i = 0; i < value.length; i++) {
+                decodedBytes.push(value.charCodeAt(i));
+            }
+
+            // Create Uint8Array for the TextDecoder then decode
+            var byteArray = new Uint8Array(decodedBytes);
+            var regularString = decoder.decode(byteArray);
+
+            // Store the decoded string
+            decodedAttribute[key] = regularString;
+        });
+
+        return decodedAttribute;
+    };
+
+    /**
      * Retrieves a user attribute.
      *
      * @param userhandle {String}
@@ -97,6 +171,7 @@ var attribCache = false;
      *     True for public attributes (default: true).
      *     -1 for "system" attributes (e.g. without prefix)
      *     -2 for "private non encrypted attributes"
+     *     False for private encrypted attributes
      * @param nonHistoric {Boolean}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
@@ -106,21 +181,27 @@ var attribCache = false;
      * @param ctx {Object}
      *     Context, in case higher hierarchies need to inject a context
      *     (default: none).
-     * @param [chathandle] {String} pass chathandle in case this is an anonymous user previewing a specific pub chat
+     * @param chathandle {String} pass chathandle in case this is an anonymous user previewing a specific pub chat
+     * @param decodeValues {Boolean|undefined}
+     *     If true, the object's values will be decoded from String containing 8 bit representations of bytes to a
+     *     UTF-8 byte array then decoded back to regular JavaScript Strings (UTF-16). This is useful if the values
+     *     contain special characters. The SDK is compatible with reading these.
      *
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      *     Can be used to use promises instead of callbacks for asynchronous
      *     dependencies.
      */
-    ns.get = function _getUserAttribute(userhandle, attribute, pub, nonHistoric, callback, ctx, chathandle) {
+    ns.get = function _getUserAttribute(
+            userhandle, attribute, pub, nonHistoric, callback, ctx, chathandle, decodeValues) {
+
         assertUserHandle(userhandle);
         var self = this;
         var myCtx = ctx || {};
         var args = toArray.apply(null, arguments);
 
         // Assemble property name on Mega API.
-        attribute = buildAttribute(attribute, pub, nonHistoric);
+        attribute = buildAttribute(attribute, pub, nonHistoric, decodeValues);
         var cacheKey = buildCacheKey(userhandle, attribute);
 
         if (_inflight[cacheKey]) {
@@ -167,10 +248,18 @@ var attribCache = false;
 
             // Another conditional, the result value may have been changed.
             if (typeof res !== 'number') {
-                // Decrypt if it's a private attribute container.
+
+                // If it's a private attribute container
                 if (attribute.charAt(0) === '*') {
-                    // legacy cache - already decrypted by tlv and stored decrypted?
-                    res = mega.attr.handleLegacyCacheAndDecryption(res, thePromise, attribute);
+
+                    // Base64 URL decode, decrypt and convert back to object key/value pairs
+                    res = self.handleLegacyCacheAndDecryption(res, thePromise, attribute);
+
+                    // If the decodeValues flag is on, decode the 8 bit chars in the string to a UTF-8 byte array then
+                    // convert back to a regular JavaScript String (UTF-16)
+                    if (attribute[1] === '>' || attribute[2] === '>') {
+                        res = self.decodeObjectValues(res);
+                    }
                 }
 
                 // Otherwise if a non-encrypted private attribute, base64 decode the data
@@ -330,15 +419,22 @@ var attribCache = false;
      *     True for public attributes (default: true).
      *     -1 for "system" attributes (e.g. without prefix)
      *     -2 for "private non encrypted attributes"
+     *     False for private encrypted attributes
      * @param nonHistoric {bool}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
      *     values on the API server.
+     * @param encodeValues {Boolean|undefined}
+     *     If true and used in combination with the private/encrypted flag (* attribute), the object's values will be
+     *     encoded to UTF-8 as a byte array (Uint8Array) then encoded as a String containing the 8 bit representations
+     *     of the bytes before being passed to the TLV encoding/encrypting functions. These functions will convert
+     *     these 8 bit strings back to bytes before encryption. This feature is useful if the object values contain
+     *     special characters. The SDK is compatible with reading these attributes.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      */
-    ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric) {
-        attribute = buildAttribute(attribute, pub, nonHistoric);
+    ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric, encodeValues) {
+        attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
         var cacheKey = buildCacheKey(u_handle, attribute);
         var promise = new MegaPromise();
 
@@ -368,8 +464,8 @@ var attribCache = false;
      * Stores a user attribute for oneself.
      *
      * @param attribute {string}
-     *     Name of the attribute. The max length is 16 characters. Note that the
-     *     * and ! characters may be added so usually you only have 14 to work with.
+     *     Name of the attribute. The max length is 16 characters. Note that the SDK only reads the first 8 chars. Also
+     *     note that the prefix characters such as *, +, ^, ! or > may be added so usually you have less to work with.
      * @param value {object}
      *     Value of the user attribute. Public properties are of type {string},
      *     private ones have to be an object with key/value pairs.
@@ -377,47 +473,64 @@ var attribCache = false;
      *     True for public attributes (default: true).
      *     -1 for "system" attributes (e.g. without prefix)
      *     -2 for "private non encrypted attributes"
-     * @param nonHistoric {bool}
+     *     False for private encrypted attributes
+     * @param nonHistoric {Boolean}
      *     True for non-historic attributes (default: false).  Non-historic
      *     attributes will overwrite the value, and not retain previous
      *     values on the API server.
-     * @param callback {function}
+     * @param callback {Function}
      *     Callback function to call upon completion (default: none). This callback
      *     function expects two parameters: the attribute `name`, and its `value`.
      *     In case of an error, the `value` will be undefined.
-     * @param ctx {object}
+     * @param ctx {Object}
      *     Context, in case higher hierarchies need to inject a context
      *     (default: none).
-     * @param mode {integer}
-     *     Encryption mode. One of BLOCK_ENCRYPTION_SCHEME (default: AES_GCM_12_16).
-     * @param useVersion {boolean|undefined}
+     * @param mode {Integer|undefined}
+     *     Encryption mode. One of tlvstore.BLOCK_ENCRYPTION_SCHEME (to use default AES_GCM_12_16 pass undefined).
+     * @param useVersion {Boolean|undefined}
      *     If true is passed, 'upv' would be used instead of 'up' (which means that conflict handlers and all
      *     versioning logic may be used for setting this attribute)
+     * @param encodeValues {Boolean|undefined}
+     *     If true and used in combination with the private/encrypted flag (* attribute), the object's values will be
+     *     encoded to UTF-8 as a byte array (Uint8Array) then encoded as a String containing the 8 bit representations
+     *     of the bytes before being passed to the TLV encoding/encrypting functions. These functions will convert
+     *     these 8 bit strings back to bytes before encryption. This feature is useful if the object values contain
+     *     special characters. The SDK is compatible with reading these attributes.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.
      *     Can be used to use promises instead of callbacks for asynchronous
      *     dependencies.
      */
-    ns.set = function _setUserAttribute(attribute, value, pub, nonHistoric, callback, ctx, mode, useVersion) {
+    ns.set = function _setUserAttribute(
+            attribute, value, pub, nonHistoric, callback, ctx, mode, useVersion, encodeValues) {
+
         var self = this;
-
         var myCtx = ctx || {};
-
         var savedValue = value;
+        var attrName = attribute;
 
         // Prepare all data needed for the call on the Mega API.
         if (mode === undefined) {
             mode = tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
         }
 
-        var attrName = attribute;
+        // Format to get the right prefixes
+        attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
 
-        attribute = buildAttribute(attribute, pub, nonHistoric);
+        // If encrypted/private attribute, the value should be a key/value property container
         if (attribute[0] === '*') {
-            // The value should be a key/value property container.
-            // Let's encode and encrypt it.
-            savedValue = base64urlencode(tlvstore.blockEncrypt(
-                tlvstore.containerToTlvRecords(value), u_k, mode));
+
+            // If encode flag is on, encode the object values to UTF-8 then 8 bit strings so TLV blockEncrypt can parse
+            if (attribute[1] === '>' || attribute[2] === '>') {
+                value = self.encodeObjectValues(value);
+            }
+
+            // Encode to TLV, encrypt it then Base64 URL encode it so it can be stored API side
+            savedValue = base64urlencode(
+                tlvstore.blockEncrypt(
+                    tlvstore.containerToTlvRecords(value), u_k, mode, false
+                )
+            );
         }
 
         // Otherwise if a non-encrypted private attribute, base64 encode the data
@@ -875,8 +988,9 @@ var attribCache = false;
     /**
      * Handles legacy cache & decryption of attributes that use tlvstore
      *
-     * @param res
-     * @param thePromise
+     * @param {String|Object} res The payload to decrypt.
+     * @param {MegaPromise} [thePromise] Promise to signal rejections.
+     * @param {String} [attribute] Attribute name we're decrypting.
      * @returns {*} the actual res (if altered)
      */
     ns.handleLegacyCacheAndDecryption = function(res, thePromise, attribute) {
@@ -889,27 +1003,18 @@ var attribCache = false;
                 res = tlvstore.tlvRecordsToContainer(clearContainer, true);
 
                 if (res === false) {
-                    res = EINTERNAL;
+                    throw new Error('TLV Record decoding failed.');
                 }
             }
             catch (e) {
-                if (e.name === 'SecurityError') {
-                    logger.error(
-                        'Could not decrypt private user attribute ' +
-                        attribute +
-                        ': ' +
-                        e.message
-                    );
-                    thePromise.reject(EINTERNAL);
-                }
-                else {
-                    logger.error('Unexpected exception!', e);
-                    setTimeout(function () {
-                        throw e;
-                    }, 4);
-                    thePromise.reject(EINTERNAL);
+                if (d) {
+                    logger.error('Could not decrypt private user attribute %s: %s', attribute, e.message, e);
                 }
                 res = EINTERNAL;
+
+                if (thePromise) {
+                    thePromise.reject(res);
+                }
             }
         }
 
@@ -988,6 +1093,9 @@ var attribCache = false;
             if (fminitialized && page === 'fm/account/transfers') {
                 accountUI.transfers.transferTools.megasync.render();
             }
+        };
+        uaPacketParserHandler['*!>alias'] = function() {
+            nicknames.updateNicknamesFromActionPacket();
         };
         uaPacketParserHandler['birthday'] = function(userHandle) {
             mega.attr.get(userHandle, 'birthday', -1, false, function(res) {
@@ -1073,6 +1181,242 @@ var attribCache = false;
         }
     });
 
+    /**
+     * Create helper factory.
+     * @param {String} attribute Name of the attribute.
+     * @param {Boolean|Number} pub
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
+     * @param {Boolean} nonHistoric
+     *     True for non-historic attributes (default: false).  Non-historic
+     *     attributes will overwrite the value, and not retain previous
+     *     values on the API server.
+     * @param {String} storeKey An object key to store the data under
+     * @param {Function} [decode] Function to post-process the value before returning it
+     * @param {Function} [encode] Function to pre-process the value before storing it
+     * @return {Object}
+     */
+    ns.factory = function(attribute, pub, nonHistoric, storeKey, decode, encode) {
+        var key = buildAttribute(attribute, pub, nonHistoric);
+        if (this.factory[key]) {
+            return this.factory[key];
+        }
+
+        if (typeof encode !== 'function') {
+            encode = function(value) {
+                return JSON.stringify(value);
+            };
+        }
+        if (typeof decode !== 'function') {
+            decode = function(value) {
+                return JSON.parse(value);
+            };
+        }
+        var log = new MegaLogger('factory[' + key + ']', false, logger);
+
+        var cacheValue = function(value) {
+            cacheValue.last = decode(value[storeKey]);
+
+            if (key[0] === '*') {
+                value = base64urlencode(
+                    tlvstore.blockEncrypt(
+                        tlvstore.containerToTlvRecords(value), u_k, tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16
+                    )
+                );
+            }
+            else if (key[0] === '^') {
+                value = base64urlencode(value);
+            }
+
+            if (typeof u_attr === 'object') {
+                u_attr[key] = value;
+            }
+
+            return cacheValue.last;
+        };
+        cacheValue.last = false;
+
+        var notify = function() {
+            for (var i = notify.queue.length; i--;) {
+                notify.queue[i](cacheValue.last);
+            }
+        };
+        notify.queue = [];
+
+        var factory = {
+            change: function(callback) {
+                notify.queue.push(tryCatch(callback));
+                return this;
+            },
+            remove: function() {
+                return mega.attr.remove(attribute, pub, nonHistoric);
+            },
+
+            set: promisify(function(resolve, reject, value) {
+                var store = {};
+                store[storeKey] = encode(value);
+
+                cacheValue(store);
+                log.debug('storing value', store);
+
+                mega.attr.set(attribute, store, pub, nonHistoric).then(resolve).catch(reject);
+            }),
+
+            get: promisify(function(resolve, reject, force) {
+                if (!force && Object(u_attr).hasOwnProperty(key)) {
+                    var value = u_attr[key] || false;
+
+                    if (value) {
+                        if (key[0] === '*') {
+                            value = mega.attr.handleLegacyCacheAndDecryption(value);
+                        }
+                        else if (key[0] === '^') {
+                            value = base64urldecode(value);
+                        }
+                    }
+
+                    log.debug('cached value', value);
+                    value = value[storeKey];
+
+                    if (value) {
+                        cacheValue.last = decode(value);
+                        return resolve(cacheValue.last);
+                    }
+                }
+
+                mega.attr.get(u_handle, attribute, pub, nonHistoric)
+                    .then(function(value) {
+                        log.debug('got value', value);
+                        resolve(cacheValue(value));
+                    })
+                    .catch(reject);
+            })
+        };
+
+        if (uaPacketParserHandler[key]) {
+            return log.warn('exists');
+        }
+
+        uaPacketParserHandler[key] = function() {
+            if (fminitialized && u_type) {
+                cacheValue.last = false;
+                if (typeof u_attr === 'object') {
+                    delete u_attr[key];
+                }
+                factory.get(true).always(notify);
+            }
+        };
+
+        this.factory[key] = factory;
+        return Object.freeze(factory);
+    };
+
+    /**
+     * An attribute factory that eases handling folder creation/management, e.g. My chat files
+     * @param {String} attribute Name of the attribute.
+     * @param {Boolean|Number} pub
+     *     True for public attributes (default: true).
+     *     -1 for "system" attributes (e.g. without prefix)
+     *     -2 for "private non encrypted attributes"
+     * @param {Boolean} nonHistoric
+     *     True for non-historic attributes (default: false).  Non-historic
+     *     attributes will overwrite the value, and not retain previous
+     *     values on the API server.
+     * @param {String} storeKey An object key to store the data under
+     * @param {String|Array} name The folder name, if an array it's [localized, english]
+     * @param {Function} [decode] Function to post-process the value before returning it
+     * @param {Function} [encode] Function to pre-process the value before storing it
+     * @return {Object}
+     */
+    ns.getFolderFactory = function(attribute, pub, nonHistoric, storeKey, name, decode, encode) {
+        if (!Array.isArray(name)) {
+            name = [name];
+        }
+        var localeName = name[0] || name[1];
+        var englishName = name[1] || localeName;
+        var log = new MegaLogger('fldFactory[' + englishName + ']', false, logger);
+
+        // listen for attribute changes.
+        var onchange = function(handle) {
+            // XXX: caching the value under the global `M` is meant for compatibility
+            // with legacy synchronous code, any new logic should stick to promises.
+            M[attribute] = handle;
+            dbfetch.node([handle]).always(function(res) {
+                M[attribute] = res[0] || M[attribute];
+                if (M[attribute].p === M.RubbishID) {
+                    M[attribute] = false;
+                }
+                if (d) {
+                    log.info("Updating folder...", M[attribute]);
+                }
+            });
+        };
+        var ns = Object.create(null);
+        var factory = this.factory(attribute, pub, nonHistoric, storeKey, decode, encode).change(onchange);
+
+        // Initialization logic, invoke just once when needed.
+        ns.init = function() {
+            factory.get().then(onchange).catch(function() {
+                // attribute not set, lookup for a legacy folder node
+                var keys = Object.keys(M.c[M.RootID] || {});
+
+                for (var i = keys.length; i--;) {
+                    var n = M.getNodeByHandle(keys[i]);
+
+                    if (n.name === englishName || n.name === localeName) {
+                        if (d) {
+                            log.info('Found existing folder, migrating to attribute...', n.h, n);
+                        }
+                        factory.set(n.h).dump(attribute);
+                        if (n.name !== localeName) {
+                            M.rename(n.h, localeName);
+                        }
+                        break;
+                    }
+                }
+            });
+        };
+
+        // Retrieve folder node, optionally specifying whether if should be created if it does not exists.
+        ns.get = promisify(function(resolve, reject, create) {
+            factory.get().then(function(h) { return dbfetch.node([h]); }).always(function(res) {
+                var node = res[0];
+                if (node && node.p !== M.RubbishID) {
+                    return resolve(node);
+                }
+
+                if (!create) {
+                    return reject(node || ENOENT);
+                }
+
+                var target = typeof create === 'string' && create || M.RootID;
+                M.createFolder(target, ns.name, new MegaPromise()).always(function(target) {
+                    if (!M.d[target]) {
+                        if (d) {
+                            log.warn("Failed to create folder...", target, api_strerror(target));
+                        }
+                        return reject(target);
+                    }
+
+                    ns.set(target).always(resolve.bind(null, M.d[target]));
+                });
+            });
+        });
+
+        // Store folder handle.
+        ns.set = function(handle) {
+            return handle === Object(M[attribute]).h ? Promise.resolve(EEXIST) : factory.set(handle);
+        };
+
+        Object.defineProperty(ns, 'name', {
+            get: function() {
+                return Object(M[attribute]).name || localeName || englishName;
+            }
+        });
+
+        return Object.freeze(ns);
+    };
 
     ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
         var remoteValues = valObj.remoteValue;

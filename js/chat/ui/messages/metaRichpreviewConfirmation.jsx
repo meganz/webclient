@@ -1,14 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var MetaRichpreviewConfirmation = React.createClass({
-    mixins: [ConversationMessageMixin],
-    doAllow: function() {
+class MetaRichpreviewConfirmation extends ConversationMessageMixin {
+    doAllow() {
         var self = this;
         var message = this.props.message;
         var megaChat = this.props.message.chatRoom.megaChat;
@@ -17,15 +16,15 @@ var MetaRichpreviewConfirmation = React.createClass({
         RichpreviewsFilter.confirmationDoConfirm();
         megaChat.plugins.richpreviewsFilter.processMessage({}, message);
         message.trackDataChange();
-    },
-    doNotNow: function() {
+    }
+    doNotNow() {
         var self = this;
         var message = this.props.message;
         delete message.meta.requiresConfirmation;
         RichpreviewsFilter.confirmationDoNotNow();
         message.trackDataChange();
-    },
-    doNever: function() {
+    }
+    doNever() {
         var self = this;
         var message = this.props.message;
         msgDialog(
@@ -44,8 +43,8 @@ var MetaRichpreviewConfirmation = React.createClass({
                 }
          });
 
-    },
-    render: function () {
+    }
+    render() {
         var self = this;
 
         var message = this.props.message;
@@ -104,8 +103,8 @@ var MetaRichpreviewConfirmation = React.createClass({
             </div>
         </div>;
     }
-});
+};
 
-module.exports = {
+export {
     MetaRichpreviewConfirmation
 };

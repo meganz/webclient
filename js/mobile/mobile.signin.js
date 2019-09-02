@@ -25,6 +25,7 @@ mobile.signin = {
         // Show the login tab and hide the register tab until they manually open it
         this.$screen.find('.tab-block.sign-in').removeClass('hidden');
         this.$screen.find('.tab-block.register').addClass('hidden');
+        this.$screen.find('.mobile.forgot-password-button, .mobile.top-links').removeClass('hidden');
 
         // Init functionality
         this.prefillLoginMessage();

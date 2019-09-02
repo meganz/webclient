@@ -1057,6 +1057,11 @@ CallManagerCall.prototype.onCallRecovered = function(newCall, tsCallStart) {
     self.room.trigger('onCallSessReconnected', [self]);
 };
 
+CallManagerCall.prototype.onCallRequestSent = function(localAv) {
+    var self = this;
+    self.room.trigger('onCallRequestSent', [self, Av.toMediaOptions(localAv)]);
+};
+
 CallManagerCall.prototype.onCallAborted = function (e, reason) {
 };
 
@@ -1167,6 +1172,12 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
         var state = self.rtcCall.termCodeToUIState(terminationCode);
         self.setState(state);
         var callMgr = self.getCallManager();
+        if (terminationCode === Term.kCancelOutAnswerIn) {
+            // @lp Simultaneous 1on1 call to each other
+            // Terminate the call but don't display anything in the history
+            self.onCallTerminated();
+            return;
+        }
         switch (state) {
             case CallManagerCall.STATE.REJECTED:
                 callMgr.trigger('CallRejected', [self, terminationCode]);
@@ -1339,7 +1350,9 @@ CallManagerCall.prototype.muteVideo = function () {
     if (!self.rtcCall) {
         return;
     }
-    self.rtcCall.enableVideo(false);
+    self.rtcCall.disableVideo().catch(function() {
+        /* silence unhandled error console message */
+    });
 };
 
 CallManagerCall.prototype.unmuteVideo = function () {
@@ -1347,7 +1360,25 @@ CallManagerCall.prototype.unmuteVideo = function () {
     if (!self.rtcCall) {
         return;
     }
-    self.rtcCall.enableVideo(true);
+    self.rtcCall.enableCamera().catch(function() {
+        /* silence unhandled error console message */
+    });
+};
+CallManagerCall.prototype.startScreenCapture = function () {
+    var self = this;
+    if (!self.rtcCall) {
+        return;
+    }
+    self.rtcCall.enableScreenCapture()
+    .catch(function(err) {});
+};
+
+CallManagerCall.prototype.stopScreenCapture = function() {
+    var self = this;
+    if (!self.rtcCall) {
+        return;
+    }
+    self.rtcCall.disableVideo().catch(function(err) {});
 };
 
 CallManagerCall.prototype.setState = function (newState) {
@@ -1443,7 +1474,24 @@ CallManagerCall.prototype.getMediaOptions = function () {
         this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
         return {audio: false, video: false};
     }
-    return {audio: !!(localAv & Av.Audio), video: !!(localAv & Av.Video)};// jscs:ignore disallowImplicitTypeConversion
+    return Av.toMediaOptions(localAv);
+};
+
+CallManagerCall.prototype.videoMode = function() {
+    var rtcCall = this.rtcCall;
+    if (!rtcCall) {
+        return 0;
+    }
+    var localAv = rtcCall.localAv();
+    if (localAv & Av.Screen) {
+        return Av.Screen;
+    }
+    else if (localAv & Av.Video) {
+        return Av.Video;
+    }
+    else {
+        return 0;
+    }
 };
 
 CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
@@ -1477,11 +1525,12 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
         return {audio: false, video: false};
     }
 
-    // jscs:disable disallowImplicitTypeConversion
-    return {audio: !!(firstSession.peerAv & Av.Audio), video: !!(firstSession.peerAv & Av.Video)};
-    // jscs:enable disallowImplicitTypeConversion
+    return Av.toMediaOptions(firstSession.peerAv);
 };
 
+CallManagerCall.prototype.isScreenCaptureEnabled = function() {
+    return this.rtcCall ? this.rtcCall.isScreenCaptureEnabled() : false;
+};
 
 CallManagerCall.prototype.renderCallStartedState = function () {
     var self = this;

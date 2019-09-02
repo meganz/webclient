@@ -263,6 +263,25 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    if (selNode) {
+        items['.download-item'] = 1;
+        items['.zipdownload-item'] = 1;
+        items['.copy-item'] = 1;
+        items['.properties-item'] = 1;
+    }
+    items['.refresh-item'] = 1;
+
+    if (folderlink) {
+        delete items['.copy-item'];
+        delete items['.add-star-item'];
+        delete items['.embedcode-item'];
+        delete items['.colour-label-items'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+        items['.import-item'] = 1;
+        items['.getlink-item'] = 1;
+    }
+
     if ((sourceRoot === M.RootID) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
@@ -285,6 +304,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.sh4r1ng-item'];
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
+            delete items['.download-item'];
             items['.dispute-item'] = 1;
         }
     }
@@ -302,25 +322,6 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 break;
             }
         }
-    }
-
-    if (selNode) {
-        items['.download-item'] = 1;
-        items['.zipdownload-item'] = 1;
-        items['.copy-item'] = 1;
-        items['.properties-item'] = 1;
-    }
-    items['.refresh-item'] = 1;
-
-    if (folderlink) {
-        delete items['.copy-item'];
-        delete items['.add-star-item'];
-        delete items['.embedcode-item'];
-        delete items['.colour-label-items'];
-        delete items['.properties-versions'];
-        delete items['.clearprevious-versions'];
-        items['.import-item'] = 1;
-        items['.getlink-item'] = 1;
     }
 
     // For multiple selections, should check all have the right permission.
@@ -415,21 +416,56 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         });
         fupload.dispatchEvent(mEvent);
 
-        // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
-        if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
-            $(menuCMI).filter('.dropdown-item').hide();
-            if (M.currentrootid === 'contacts') {
-                $(menuCMI).filter('.addcontact-item').show();
+        $(menuCMI).filter('.dropdown-item').hide();
+        var itemsViewed = false;
+        var ignoreGrideExtras = false;
+
+        if (M.currentdirid !== 'shares' && M.currentdirid !== 'out-shares') {
+            // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
+            if (M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid) && (M.currentrootid !== M.RubbishID)) {
+                if (M.currentrootid === 'contacts') {
+                    $(menuCMI).filter('.addcontact-item').show();
+                    ignoreGrideExtras = true;
+                }
+                else {
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+
+                    if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
+                        $(menuCMI).filter('.folderupload-item').show();
+                    }
+                }
+                itemsViewed = true;
+            }
+        }
+
+        if (M.currentrootid === M.RubbishID && M.v.length) {
+            $('.files-menu.context .dropdown-item.clearbin-item').attr('style', '');
+            itemsViewed = true;
+        }
+
+        if (!ignoreGrideExtras && M.viewmode) {
+            itemsViewed = true;
+            $('.files-menu.context .dropdown-item.sort-grid-item-main').show();
+            if (M.currentdirid === 'shares') {
+                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-inshare').attr('style', '');
+            }
+            else if (M.currentdirid === 'out-shares') {
+                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-outshare').attr('style', '');
             }
             else {
-                $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
-
-                if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
-                    $(menuCMI).filter('.folderupload-item').show();
+                $('.files-menu.context .dropdown-item.sort-grid-item').attr('style', 'display:none !important');
+                $('.files-menu.context .dropdown-item.sort-grid-item.s-fm').attr('style', '');
+                if (folderlink) {
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-label')
+                        .attr('style', 'display:none !important');
+                    $('.files-menu.context .dropdown-item.sort-grid-item.s-fm.sort-fav')
+                        .attr('style', 'display:none !important');
                 }
             }
         }
-        else {
+        if (!itemsViewed) {
             return false;
         }
     }
@@ -471,6 +507,26 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         $('.files-menu.context .dropdown-item').hide();
         $('.files-menu.context .dropdown-item.do-sort').show();
     }
+    else if (ll === 7) { // Columns selection menu
+        if (M && M.columnsWidth && M.columnsWidth.cloud) {
+            var $currMenuItems = $('.files-menu.context .dropdown-item').hide().filter('.visible-col-select');
+            for (var col in M.columnsWidth.cloud) {
+                if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].disabled) {
+                    continue;
+                }
+                else {
+                    if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].viewed) {
+                        $currMenuItems.filter('[megatype="' + col + '"]').attr('isviewed', 'y')
+                            .show().find('i').addClass('icons-sprite tiny-grey-tick');
+                    }
+                    else {
+                        $currMenuItems.filter('[megatype="' + col + '"]').removeAttr('isviewed')
+                            .show().find('i').removeClass('icons-sprite tiny-grey-tick');
+                    }
+                }
+            }
+        }
+    }
     else if (ll) {// Click on item
 
         // Hide all menu-items
@@ -504,7 +560,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             var $contactBlock = $('#' + id).length ? $('#' + id) : $('#contact_' + id);
             var username = M.getNameByHandle(id) || '';
 
-            flt = '.remove-contact, .share-folder-item';
+            flt = '.remove-contact, .share-folder-item, .set-nickname';
+
             // Add .send-files-item to show Send files item
             if (!window.megaChatIsDisabled) {
                 flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
@@ -600,9 +657,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         else if (currNodeClass && currNodeClass.indexOf('rubbish-bin') > -1) {
             $.selected = [M.RubbishID];
             $(menuCMI).filter('.properties-item').show();
-        }
-        else if (currNodeClass && currNodeClass.indexOf('recycle-item') > -1) {
-            $(menuCMI).filter('.clearbin-item').show();
+            if (currNodeClass.indexOf('filled') > -1) {
+                $(menuCMI).filter('.clearbin-item').show();
+            }
         }
         else if (currNodeClass && currNodeClass.indexOf('contacts-item') > -1) {
             $(menuCMI).filter('.addcontact-item').show();
@@ -791,8 +848,6 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             n.addClass('overlap-left');
             n.css({'top': top, 'right': (wMax - nmW - minX) + 'px'});
         }
-
-
     };
 
     /**
@@ -817,12 +872,13 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
             pT = parseInt(mP.css('padding-top'));
             bT = parseInt(mP.css('border-top-width'));
         }
+
+        var difference = 0;
+
         if (b > maxY) {
-            top = (maxY - nmH + nTop - tB) - pE.top + 'px';
+            difference = b - maxY;
         }
-        else {
-            top = pPos.top - tB + 'px';
-        }
+        top = pPos.top - tB - difference + 'px';
 
         return top;
     };

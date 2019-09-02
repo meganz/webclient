@@ -281,7 +281,7 @@ MegaData.prototype.pathLength = function() {
     var $filter = $('.fm-right-header .filter-block.body:visible');
 
     if ($filter.length > 0) {
-        filterLength = $filter.outerWidth(true) + 20;
+        filterLength = $filter.outerWidth(true);
     }
 
     length = $('.fm-right-header .fm-breadcrumbs-block:visible').outerWidth(true)
@@ -313,6 +313,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
             }
             else {
                 typeclass = 'cloud-drive';
+                name = l[164];
             }
         }
         else if (a2[i] === 'contacts') {
@@ -329,7 +330,15 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
         else if (a2[i] === 'shares') {
             typeclass = 'shared-with-me';
-            name = '';
+            name = l[5542];
+        }
+        else if (a2[i] === 'out-shares') {
+            typeclass = 'out-shares';
+            name = l[5543];
+        }
+        else if (a2[i] === 'public-links') {
+            typeclass = 'pub-links';
+            name = l[16516];
         }
         else if (a2[i] === this.RubbishID) {
             typeclass = 'rubbish-bin';
@@ -353,7 +362,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
         }
         html = '<a class="fm-breadcrumbs ' + typeclass + ' ' + hasnext
             + ' ui-droppable" id="path_' + htmlentities(a2[i]) + '">'
-            + '<span class="right-arrow-bg ui-draggable">'
+            + '<span class="right-arrow-bg ui-draggable simpletip" data-simpletip="' + htmlentities(name) + '">'
             + '<span>' + htmlentities(name) + '</span>'
             + '</span>'
             + '</a>' + html;
@@ -404,17 +413,17 @@ MegaData.prototype.renderPath = function(fileHandle) {
     // Resizing breadcrumbs items
     function breadcrumbsResize() {
         var $fmHeader = $('.fm-right-header:visible');
-        var headerWidth = $fmHeader.width();
-
-        $fmHeader.removeClass('long-path short-foldernames');
-        if (M.pathLength() > headerWidth) {
-            $fmHeader.addClass('long-path');
-        }
+        var headerWidth = $fmHeader.outerWidth();
 
         var $el = $fmHeader.find('.fm-breadcrumbs-block:visible .right-arrow-bg');
         var i = 0;
         var j = 0;
         $el.removeClass('short-foldername ultra-short-foldername');
+
+        $fmHeader.removeClass('long-path overflowed-path');
+        if (M.pathLength() > headerWidth) {
+            $fmHeader.addClass('long-path');
+        }
 
         while (M.pathLength() > headerWidth) {
             if (i < $el.length - 1) {
@@ -430,6 +439,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
             }
             else {
                 $($el[j]).addClass('ultra-short-foldername');
+                $fmHeader.addClass('overflowed-path');
                 break;
             }
         }
@@ -445,21 +455,21 @@ MegaData.prototype.renderPath = function(fileHandle) {
 
     var $block = $('.fm-right-header .fm-breadcrumbs-block');
     if ($('.fm-breadcrumbs', $block).length > 1) {
-        $block.removeClass('deactivated');
+        $('.fm-breadcrumbs', $block).removeClass('deactivated');
     }
     else if (folderlink && $('.default-white-button.l-pane-visibility').hasClass('active')) {
         $('.folder-link .right-arrow-bg', $block)
             .safeHTML('<span>' + M.getNameByHandle(M.RootID) + '</span>');
     }
     else {
-        $block.addClass('deactivated');
+        $('.fm-breadcrumbs', $block).addClass('deactivated');
     }
 
     $('a', $block).rebind('click', function() {
         var crumbId = $(this).attr('id');
 
         // When NOT deactivated
-        if (!$block.hasClass('deactivated')) {
+        if (!$(this).hasClass('deactivated')) {
             if (crumbId === 'path_opc' || crumbId === 'path_ipc') {
                 return false;
             }
@@ -487,6 +497,50 @@ MegaData.prototype.renderPath = function(fileHandle) {
 
 MegaData.prototype.searchPath = function() {
     "use strict";
+
+    // Resizing breadcrumbs items
+    function pathResize() {
+        var $searchWrap = $('.search-bottom-wrapper:visible');
+        var $searchPath;
+        var wrapWidth;
+
+        if (!$searchWrap || !$searchWrap.length) {
+            $(window).unbind('resize.searchpath');
+            return false;
+        }
+
+        var $el = $searchWrap.find('.search-path-txt');
+        var i = 0;
+        var j = 0;
+        $el.removeClass('short-foldername ultra-short-foldername');
+
+        $searchPath = $searchWrap.find('.search-bottom-menu');
+        wrapWidth = $searchWrap.outerWidth();
+
+        $searchWrap.removeClass('long-path overflowed-path');
+        if ($searchPath.outerWidth() > wrapWidth) {
+            $searchWrap.addClass('long-path');
+        }
+        
+        while ($($searchPath).outerWidth() > wrapWidth) {
+            if (i < $el.length - 1) {
+                $($el[i]).addClass('short-foldername');
+                i++;
+            }
+            else if (j < $el.length - 1) {
+                $($el[j]).addClass('ultra-short-foldername');
+                j++;
+            }
+            else if (!$($el[j]).hasClass('short-foldername')) {
+                $($el[j]).addClass('short-foldername');
+            }
+            else {
+                $($el[j]).addClass('ultra-short-foldername');
+                $searchWrap.addClass('overflowed-path');
+                break;
+            }
+        }
+    }
 
     if (M.currentdirid && M.currentdirid.substr(0, 7) === 'search/') {
         var sel;
@@ -539,19 +593,23 @@ MegaData.prototype.searchPath = function() {
                     }
                 }
                 if (id) {
-                    html += '<div class="search-path-icon ' + c + '" id="spathicon_' + htmlentities(id) + '">'
-                        + iconimg + '</div><div class="search-path-txt" id="spathname_' + htmlentities(id) + '">'
-                        + htmlentities(name) + '</div>';
-
-                    if (i < path.length - 1) {
-                        html += '<div class="search-path-arrow"></div>';
-                    }
+                    html += '<div class="search-path-item ' + c + '" >'
+                        + '<div class="search-tip simpletip" data-simpletip="' + htmlentities(name) + '">'
+                        + '<div class="search-path-icon ' + c + '" id="spathicon_' + htmlentities(id)
+                        + '">' + iconimg + '</div>'
+                        + '<div class="search-path-txt" id="spathname_' + htmlentities(id) + '" '
+                        + '>' + htmlentities(name) + '</div>'
+                        + '</div>'
+                        + (i < path.length - 1 ? '<div class="search-path-arrow"></div>' : '')
+                        + '</div>';
                 }
             }
             html += '<div class="clear"></div>';
 
             $('.search-bottom-menu').safeHTML(html);
             $('.fm-blocks-view,.files-grid-view').addClass('search');
+            pathResize();
+            $(window).rebind('resize.searchpath', SoonFc(pathResize, 202));
 
             $('.search-path-icon,.search-path-txt').rebind('click', function() {
                 var id = $(this).attr('id');
@@ -639,3 +697,27 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
 
     return node;
 };
+
+/**
+ * Render a simplified "chat is loading" state UI for when the chat is still not ready but an /fm/chat(?/...) url was
+ * accessed.
+ */
+MegaData.prototype.renderChatIsLoading = function() {
+    M.onSectionUIOpen('conversations');
+
+    M.hideEmptyGrids();
+
+    $('.fm-files-view-icon').addClass('hidden');
+    $('.fm-blocks-view').addClass('hidden');
+    $('.files-grid-view').addClass('hidden');
+    $('.fm-right-account-block').addClass('hidden');
+    $('.contacts-details-block').addClass('hidden');
+
+    $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
+
+    $('.fm-right-files-block, .fm-left-panel, .fm-transfers-block').addClass('hidden');
+
+    $('.section.conversations').removeClass('hidden');
+    $('.section.conversations .fm-chat-is-loading').removeClass('hidden');
+};
+

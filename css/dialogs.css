@@ -337,29 +337,22 @@ body.de .fm-dialog.new-group-chat {
 .fm-dialog.add-from-cloud .tooltip-handler {
     z-index: 10;
 }
-
+.fm-dialog .fm-breadcrumbs-wrapper {
+    max-width: -webkit-calc(100% - 152px);
+    max-width: -moz-calc(100% - 152px);
+    max-width: calc(100% - 152px);
+    -webkit-transition: max-width 200ms ease-in-out;
+    transition: max-width 200ms ease-in-out;
+}
+.fm-dialog .active-search + .fm-breadcrumbs-wrapper {
+    max-width: -webkit-calc(100% - 302px);
+    max-width: -moz-calc(100% - 302px);
+    max-width: calc(100% - 302px);
+}
 .fm-dialog .fm-breadcrumbs-block {
-    float: none;
     height: 46px;
     margin: 0 0 0 0;
     padding: 12px 0 0 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    overflow: hidden;
-    position: relative;
-    width: 100%;
-    width: -webkit-calc(100% - 156x);
-    width: -moz-calc(100% - 156px);
-    width: calc(100% - 156px);
-}
-.fm-dialog .fm-header-buttons.active-search + .fm-breadcrumbs-block {
-    width: -webkit-calc(100% - 320x);
-    width: -moz-calc(100% - 320px);
-    width: calc(100% - 320px);
-}
-.fm-dialog .breadcrumbs-wrapper {
-    position: absolute;
 }
 .fm-dialog-table.grid-table tr:nth-child(odd) td {
     background-color: rgba(255,255,255,1);
@@ -1289,7 +1282,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     padding-left: 96px;
 }
 .achieved-block.invitees .new-dialog-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-repeat: no-repeat;
     background-position: -22px -12279px;
     background-size: 48px auto;
@@ -1406,7 +1399,7 @@ body.fr .achievement-dialog.expires-txt.red, body.jp .achievement-dialog.expires
     height: 112px;
 }
 .achievements-cell .medium-icon.remind-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-repeat: no-repeat;
     background-position: -22px -12374px;
     background-size: 48px auto;
@@ -1929,12 +1922,12 @@ li.token-input-token-invite .input-close {
     margin-right: 8px;
 }
 .invitation-dialog.table-cell span.desc {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: right -11445px;
     background-repeat: no-repeat;
 }
 .invitation-dialog.table-cell span.asc {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: right -11475px;
     background-repeat: no-repeat;
 }
@@ -2004,7 +1997,7 @@ li.token-input-token-invite .input-close {
     margin-top: 12px;
 }
 .create-folder-size-icon, .add-user-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -2060,7 +2053,7 @@ li.token-input-token-invite .input-close {
     position: absolute;
     width: 19px;
     height: 18px;
-    background-image: url(../images/mega/fm-main-sprite_v9.png);
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-repeat: no-repeat;
     background-position: -14px -10610px;
     right: 6px;
@@ -3057,7 +3050,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v27.png);
+    background-image: url(../images/mega/icons-sprite_v30.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -3487,11 +3480,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v6.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v6.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -4266,7 +4259,7 @@ li.token-input-token-invite .input-close {
     display: block;
 }
 .user-management-dialog .icon102 {
-    background-image: url(../images/mega/big-icons_v3.png);
+    background-image: url(../images/mega/big-icons_v4.png);
     background-size: 192px auto;
 }
 .user-management-dialog .bus-welcome-logo {
@@ -4445,7 +4438,7 @@ li.token-input-token-invite .input-close {
     bottom: 0;
     left: 50%;
     margin: 0 0 0 -61px;
-    background-image: url(../images/mega/dialog-sprite_v6.png);
+    background-image: url(../images/mega/dialog-sprite_v8.png);
 }
 .verify-ph-icon {
     background-position: -19px -6008px;
@@ -4746,6 +4739,59 @@ li.token-input-token-invite .input-close {
     width: 450px;
 }
 /* end of Make chat private */
+
+/* Contact Nickname dialog */
+.contact-nickname-dialog {
+    left: 50%;
+    margin-left: -228px;
+    margin-top: -124px;
+    padding: 0;
+    top: 50%;
+}
+.contact-nickname-dialog .fm-dialog-body {
+    padding: 49px 40px 0 40px;
+}
+.contact-nickname-dialog .input-block {
+    position: relative;
+}
+.contact-nickname-dialog .small-icon.gentleman {
+    left: 7px;
+    position: absolute;
+    top: 20px;
+}
+.contact-nickname-dialog .nickname-input-title {
+    color: #999;
+    font-family: 'LatoWebSemibold';
+    font-size: 12px;
+    letter-spacing: 0.86px;
+    line-height: 15px;
+    margin-left: 34px;
+    visibility: hidden;
+}
+.contact-nickname-dialog .nickname-input-title.visible {
+    visibility: visible;
+}
+.contact-nickname-dialog .nickname-input {
+    border: 0;
+    color: #333;
+    font-family: 'LatoWeb';
+    font-size: 14px;
+    letter-spacing: 1px;
+    line-height: 17px;
+    margin-left: 34px;
+    padding: 8px 0 14px 0;
+    width: 343px;
+}
+.contact-nickname-dialog .horizontal-bar {
+    background-color: #00bfa5;
+    height: 1px;
+}
+.contact-nickname-dialog .button-block {
+    padding: 32px 40px 36px 40px;
+}
+.contact-nickname-dialog .cancel-button {
+    margin-right: 11px;
+}
 
 /* Register side pane */
 .register-side-pane.container {

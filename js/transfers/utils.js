@@ -296,8 +296,7 @@ function setupTransferAnalysis() {
 
 
 (function __FileFingerprint(scope) {
-
-    var logger = MegaLogger.getLogger('ulFingerPrint');
+    'use strict';
     var CRC_SIZE = 16;
     var BLOCK_SIZE = CRC_SIZE * 4;
     var MAX_TSINT = Math.pow(2, 32) - 1;
@@ -348,127 +347,159 @@ function setupTransferAnalysis() {
         return (crc ^ (-1)) >>> 0;
     }
 
-    scope.fingerprint = function(uq_entry, callback) {
-        if (!(uq_entry && uq_entry.name)) {
-            logger.debug('CHECK THIS', 'Unable to generate fingerprint');
-            logger.debug('CHECK THIS', 'Invalid ul_queue entry', JSON.stringify(uq_entry));
+    /**
+     * Generate file fingerprint.
+     * @param {File} file The file entry.
+     * @returns {Promise}
+     * @global
+     */
+    scope.getFingerprint = function(file) {
+        return new Promise(function(resolve, reject) {
+            var logger = d && new MegaLogger('fingerprint:'
+                + file.size + ':..' + String(file.name).substr(-8), false, ulmanager.logger);
 
-            throw new Error('Invalid upload entry for fingerprint');
-        }
-        logger.info('Generating fingerprint for ' + uq_entry.name);
-
-        var size = uq_entry.size;
-        var fr = new FileReader();
-        if (!fr.readAsBinaryString) {
-            fr.ab = 1;
-        }
-
-        crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
-        if (crc32table[1] !== 0x77073096) {
-            throw new Error('Unexpected CRC32 Table...');
-        }
-
-        var timer;
-        var onTimeout = function(abort) {
-            if (timer) {
-                clearTimeout(timer);
-            }
-            if (!abort) {
-                timer = setTimeout(function() {
-                    ulmanager.logger.warn('Fingerprint timed out, the file is locked or unreadable.');
-                    callback(0xBADF, 0x8052000e);
-                }, 6000);
-            }
-        };
-
-        function Finish(crc) {
-            onTimeout(1);
-            var modtime = (uq_entry.lastModifiedDate || uq_entry.lastModified || 0) / 1000;
-            callback(base64urlencode(crc + serialize(modtime)), modtime);
-            callback = null;
-        }
-
-        var sfn = uq_entry.slice ? 'slice' : (uq_entry.mozSlice ? 'mozSlice' : 'webkitSlice');
-
-        if (size <= 8192) {
-            var blob = uq_entry[sfn](0, size);
-
-            onTimeout();
-            fr.onload = function(e) {
-                var crc;
-                var data = fr.ab ? ab_to_str(fr.result) : e.target.result;
-
-                if (size <= CRC_SIZE) {
-                    crc = data;
-                    var i = CRC_SIZE - crc.length;
-                    while (i--)
-                        crc += "\x00";
+            if (!(file instanceof Blob && file.name)) {
+                if (d) {
+                    logger.debug('CHECK THIS', 'Unable to generate fingerprint..', [file]);
+                    logger.debug('CHECK THIS', 'Invalid file entry', JSON.stringify(file));
                 }
-                else {
-                    var tmp = [];
+                return reject(new Error('Invalid file entry.'));
+            }
 
-                    for (var i = 0; i < 4; i++) {
-                        var begin = parseInt(i * size / 4);
-                        var len = parseInt(((i + 1) * size / 4) - begin);
-
-                        tmp.push(i2s(crc32(data.substr(begin, len), 0, len)));
-                    }
-
-                    crc = tmp.join("");
+            if (file.hash && file.ts) {
+                if (d) {
+                    logger.debug('Skipping file fingerprint, does already exists...');
                 }
+                return resolve({hash: file.hash, ts: file.ts});
+            }
 
-                Finish(crc);
+            if (d) {
+                logger.info('Generating fingerprint...', file.name, [file]);
+            }
+
+            var size = file.size;
+            var reader = new FileReader();
+            reader.ab = !reader.readAsBinaryString;
+            reader.errorCount = 0;
+
+            crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
+            if (crc32table[1] !== 0x77073096) {
+                throw new Error('Unexpected CRC32 Table...');
+            }
+
+            var timer;
+            var resetTimeout = function(abort) {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = false;
+                }
+                if (!abort) {
+                    timer = setTimeout(function() {
+                        if (d) {
+                            logger.warn('Fingerprint timed out, the file is locked or unreadable.');
+                        }
+                        reject(0x8052000e);
+                    }, 6e4);
+                }
             };
-            if (fr.ab) {
-                fr.readAsArrayBuffer(blob);
-            }
-            else {
-                fr.readAsBinaryString(blob);
-            }
-        }
-        else {
-            var tmp = [],
-                i = 0,
-                m = 4;
-            var blocks = parseInt(8192 / (BLOCK_SIZE * 4));
 
-            var step = function() {
-                if (m === i) {
-                    return Finish(tmp.join(""));
-                }
+            var finish = function(crc) {
+                resetTimeout(1);
+                var ts = (file.lastModifiedDate || file.lastModified || 0) / 1000;
+                resolve({hash: base64urlencode(crc + serialize(ts)), ts: ts});
+            };
 
-                var crc = 0,
-                    j = 0;
-                var next = function() {
-                    if (blocks === j) {
-                        tmp.push(i2s(crc));
-                        return step(++i);
-                    }
-                    if (typeof uq_entry[sfn] !== 'function') {
-                        ulmanager.logger.error('"' + sfn + '" is not callable...');
-                        return callback(0xBADF);
-                    }
-                    onTimeout();
+            var readBlock = function(blob, callback) {
+                resetTimeout();
+                reader.onloadend = tryCatch(function(ev) {
+                    var target = ev.target;
+                    var error = target.error;
 
-                    var offset = parseInt((size - BLOCK_SIZE) * (i * blocks + j) / (4 * blocks - 1));
-                    var blob = uq_entry[sfn](offset, offset + BLOCK_SIZE);
-                    fr.onload = function(e) {
-                        var block = fr.ab ? ab_to_str(fr.result) : e.target.result;
+                    resetTimeout(1);
+                    reader.onloadend = null;
 
-                        crc = crc32(block, crc, BLOCK_SIZE);
+                    if (error) {
+                        if (++reader.errorCount > 10) {
+                            return reject(error);
+                        }
 
-                        next(++j);
-                    };
-                    if (fr.ab) {
-                        fr.readAsArrayBuffer(blob);
+                        if (d) {
+                            logger.warn('Failed to read block (%s), retrying...', error.name, [error]);
+                        }
+                        setTimeout(readBlock.bind(null, blob, callback), 4e3);
                     }
                     else {
-                        fr.readAsBinaryString(blob);
+                        onIdle(callback.bind(null, reader.ab ? ab_to_str(target.result) : target.result));
                     }
-                };
-                next();
+                }, reject);
+
+                if (reader.ab) {
+                    reader.readAsArrayBuffer(blob);
+                }
+                else {
+                    reader.readAsBinaryString(blob);
+                }
             };
-            step();
-        }
+
+            if (size <= 8192) {
+                return readBlock(file, function(data) {
+                    var i;
+                    var crc;
+
+                    if (size <= CRC_SIZE) {
+                        crc = data;
+                        i = CRC_SIZE - crc.length;
+                        while (i--) {
+                            crc += "\x00";
+                        }
+                    }
+                    else {
+                        var tmp = [];
+
+                        for (i = 0; i < 4; i++) {
+                            var begin = parseInt(i * size / 4);
+                            var len = parseInt(((i + 1) * size / 4) - begin);
+
+                            tmp.push(i2s(crc32(data.substr(begin, len), 0, len)));
+                        }
+
+                        crc = tmp.join("");
+                    }
+
+                    finish(crc);
+                });
+            }
+
+            var idx = 0;
+            var max = 4;
+            var tmp = [];
+            var blocks = parseInt(8192 / (BLOCK_SIZE * 4));
+            var sliceFn = file.slice ? 'slice' : (file.mozSlice ? 'mozSlice' : 'webkitSlice');
+
+            (function step() {
+                if (max === idx) {
+                    return finish(tmp.join(""));
+                }
+
+                var blk = 0;
+                var crc = 0;
+                (function next() {
+                    if (blocks === blk) {
+                        tmp.push(i2s(crc));
+                        return step(++idx);
+                    }
+                    if (typeof file[sliceFn] !== 'function') {
+                        return reject(new Error(sliceFn + ' unavailable'));
+                    }
+
+                    var offset = parseInt((size - BLOCK_SIZE) * (idx * blocks + blk) / (4 * blocks - 1));
+
+                    readBlock(file[sliceFn](offset, offset + BLOCK_SIZE), function(block) {
+                        crc = crc32(block, crc, BLOCK_SIZE);
+                        next(++blk);
+                    });
+                })();
+            })();
+        });
     };
-})(this);
+})(self);

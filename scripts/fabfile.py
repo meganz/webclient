@@ -23,9 +23,6 @@ Fabfile for deploying the Mega Web Client.
 * To build a test Chrome extension:
   fab dev:build_chrome_ext=True or fab dev:build_chrome_ext=1
 
-* To pull latest language files from babel:
-  fab dev:fetch_lang=True or fab dev:fetch_lang=1 
-
 * To build both extensions:
   fab dev:build_firefox_ext=True,build_chrome_ext=True or fab dev:build_firefox_ext=1,build_chrome_ext=1
 
@@ -123,6 +120,11 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
     if branch_name == '':
         branch_name = local('git rev-parse --abbrev-ref HEAD', capture=True)
 
+    # If branch name is still empty, something is wrong.
+    if branch_name == '':
+        print('Something went wrong with get current branch name.\n');
+        exit();
+
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
 
@@ -157,10 +159,9 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
                 run('git pull --update-shallow')
                 run('git log -1')
 
-        if fetch_lang:
-            print('Pulling latest language file from babel.\n')
-            with cd(remote_branch_path):
-                run('./scripts/lang-beta.sh')
+        print('Pulling latest language file from babel.\n')
+        with cd(remote_branch_path):
+            run('./scripts/lang.sh')
 
         # Update version info.
         version = None

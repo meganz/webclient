@@ -1,4 +1,3 @@
-var M = null; // global MegaData instance
 var newnodes = [];
 var currsn;     // current *network* sn (not to be confused with the IndexedDB/memory state)
 var fminitialized = false;
@@ -33,17 +32,37 @@ MegaLogger.rootLogger = new MegaLogger(
 
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
-    loadingDialog.show = function() {
+
+    // New subject value to specify loading dialog subject.
+    // Loading dialog with subject will not disappear until it hided with the subject
+    $.loadingSubject = Object.create(null);
+    loadingDialog.show = function(subject) {
+
+        'use strict';
+
+        subject = subject || 'common';
+
         if (!this.quiet) {
             $('.dark-overlay').removeClass('hidden');
             $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
             this.active = true;
         }
+
+        $.loadingSubject[subject] = 1;
     };
-    loadingDialog.hide = function() {
-        $('.dark-overlay').addClass('hidden');
-        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
-        this.active = false;
+    loadingDialog.hide = function(subject) {
+
+        'use strict';
+
+        subject = subject || 'common';
+
+        delete $.loadingSubject[subject];
+
+        if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
+            $('.dark-overlay').addClass('hidden');
+            $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
+            this.active = false;
+        }
     };
     loadingDialog.nest = 0;
     loadingDialog.pshow = function() {
@@ -144,7 +163,9 @@ if (typeof loadingInitDialog === 'undefined') {
         this.progress = false;
         $('.light-overlay').addClass('hidden');
         $('body').removeClass('loading');
-        $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
+        if ($.loadingSubject && Object.keys($.loadingSubject).length === 0) {
+            $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('init active');
+        }
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%').removeAttr('style');
@@ -557,7 +578,10 @@ scparser.$helper.c = function(a) {
     if (megaChatIsReady) {
         $.each(a.u, function(k, v) {
             if (v.c !== 0) {
+                // load all keys.
                 crypt.getPubRSA(v.u);
+                crypt.getPubCu25519(v.u);
+                crypt.getPubEd25519(v.u);
             }
             megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
         });
@@ -617,9 +641,9 @@ scparser.$add('s', {
                         notify.notifyFromActionPacket({
                             a: 'dshare',
                             n: a.n,
-                            u: a.u,
+                            u: a.o,
                             orig: a.ou,
-                            rece: a.o
+                            rece: a.u
                         });
                     }
                 }
@@ -1324,7 +1348,7 @@ scparser.mcpc = scparser.mcc = function (a) {
 };
 
 // MEGAchat archive/unarchive
-scparser.mcfc = scparser.mcpfc = function(a) {
+scparser.mcfc = scparser.mcfpc = function(a) {
     'use strict';
 
     if (window.megaChatIsReady) {
@@ -1518,6 +1542,13 @@ function execsc() {
         delete scq[scqtail++];
         delete a.scqi;
 
+        var idtag = a.i;
+        if (a.i !== requesti && M.scAckQueue[a.i] === requesti) {
+            // An API request triggered locally wanting to get notified when the associated packet is processed.
+            delete M.scAckQueue[a.i];
+            a.i = requesti;
+        }
+
         if (d) {
             console.info('Received SC command "' + a.a + '"' + (a.i === requesti ? ' (triggered locally)' : ''), a);
         }
@@ -1537,8 +1568,7 @@ function execsc() {
         }
 
         if (a.a === 's' || a.a === 's2') {
-            // Make this onIdle to prevent infinite loading.
-            mBroadcaster.sendMessage('share-packet.' + a.n, a);
+            mBroadcaster.sendMessage('share-packet.' + idtag, a);
         }
 
         tickcount++;
@@ -1989,7 +2019,7 @@ function worker_procmsg(ev) {
                 }
             }
 
-            if (ufsc.cache) {
+            if (ufsc.cache && ev.data.p) {
                 ufsc.feednode(ev.data);
             }
             else if (fmdb) {
@@ -2827,6 +2857,10 @@ function processPH(publicHandles) {
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 
+            if (M.currentdirid === 'public-links') {
+                removeUInode(nodeId, value.p);
+            }
+
             if (UiExportLink) {
                 UiExportLink.removeExportLinkIcon(nodeId);
             }
@@ -3020,52 +3054,66 @@ function processUPCO(ap) {
     }
 }
 
-/*
- * process_u
+/**
+ * Updates contact/user data in global variable M.u, local dB and taking care of items in share and add contacts
+ * dialogs dropdown
  *
- * Updates contact/s data in global variable M.u, local dB and
- * taking care of items in share and add contacts dialogs dropdown
- *
- * .c param is contact level i.e. [0-(inactive/deleted), 1-(active), 2-(owner)]
- *
- * @param {Object} u Users informations
+ * @param {Object} users Information about users (properties defined in js/fm/megadata.js)
  */
-function process_u(u, ignoreDB) {
+function process_u(users, ignoreDB) {
     "use strict";
 
-    for (var i = 0; i < u.length; i++) {
-        if (u[i].c === 1) {
-            u[i].h = u[i].u;
-            u[i].t = 1;
-            u[i].p = 'contacts';
-            M.addNode(u[i], ignoreDB);
+    // If nicknames private encrypted attribute is set.
+    if (nicknames.cache === false && Object(u_attr).hasOwnProperty('*!>alias')) {
+        nicknames.decryptAndCacheNicknames(u_attr['*!>alias']);
+    }
 
-            var contactName = M.getNameByHandle(u[i].h);
+    for (var i = 0; i < users.length; i++) {
+
+        var userEmail = users[i].m;
+        var userHandle = users[i].u;
+        var userStatus = users[i].c;
+
+        if (userStatus === 1) {
+            users[i].h = userHandle;
+            users[i].t = 1;
+            users[i].p = 'contacts';
+            users[i].nickname = '';
+
+            // If this user had a nickname in the past, don't delete it if they are now added as a contact
+            if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
+                users[i].nickname = M.u[userHandle].nickname;
+            }
+
+            // Or if the nickname is set in the initial 'ug' API request, then set it
+            else if (nicknames.cache[userHandle]) {
+                users[i].nickname = nicknames.cache[userHandle];
+            }
+
+            M.addNode(users[i], ignoreDB);
+
+            var contactName = M.getNameByHandle(userHandle);
 
             // Update token.input plugin
-            addToMultiInputDropDownList('.share-multiple-input', [{id: u[i].m, name: contactName}]);
-            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: u[i].m, name: contactName}]);
+            addToMultiInputDropDownList('.share-multiple-input', [{id: userEmail, name: contactName}]);
+            addToMultiInputDropDownList('.add-contact-multiple-input', [{id: userEmail, name: contactName}]);
         }
-        else if (M.d[u[i].u]) {
-            M.delNode(u[i].u, ignoreDB);
+        else if (M.d[userHandle]) {
+            M.delNode(userHandle, ignoreDB);
 
             // Update token.input plugin
-            removeFromMultiInputDDL('.share-multiple-input', {id: u[i].m, name: u[i].m});
-            removeFromMultiInputDDL('.add-contact-multiple-input', {id: u[i].m, name: u[i].m});
+            removeFromMultiInputDDL('.share-multiple-input', {id: userEmail, name: userEmail});
+            removeFromMultiInputDDL('.add-contact-multiple-input', {id: userEmail, name: userEmail});
         }
 
         // Update user attributes M.u
-        M.addUser(u[i], ignoreDB);
+        M.addUser(users[i], ignoreDB);
 
-        if (u[i].c === 1) {
-            // sync data objs M.u <-> M.d
-            M.d[u[i].u] = M.u[u[i].u];
+        // If a contact, sync data objs M.d and M.u
+        if (userStatus === 1) {
+            M.d[userHandle] = M.u[userHandle];
         }
     }
-
-    /*if (M.currentdirid === 'dashboard') {
-        delay('dashboard:updcontacts', dashboardUI.updateContactsWidget);
-     }*/
 }
 
 /**
@@ -3286,6 +3334,7 @@ function init_chat() {
             loadingInitDialog.hide();
         }
     }
+
     if (anonymouschat) {
         __init_chat();
     }
@@ -3357,14 +3406,22 @@ function loadfm_callback(res) {
         }
         // cf will include the flags (like whether it is archived) and chatid,
         // so it needs to combine it before processing it.
+        var mergeCfToChatmcf = function(entry) {
+            for (var i = 0; i < loadfm.chatmcf.length; i++) {
+                if (loadfm.chatmcf[i].id === entry.id) {
+                    loadfm.chatmcf[i].f = entry.f;
+                }
+            }
+        };
+
         if (res.mcf.cf) {
             for (var i = 0; i < res.mcf.cf.length; i++) {
-                loadfm.chatmcf[i].f = res.mcf.cf[i].f;
+                mergeCfToChatmcf(res.mcf.cf[i]);
             }
         }
         if (res.mcf.pcf) {
             for (var i = 0; i < res.mcf.pcf.length; i++) {
-                loadfm.chatmcf[i].f = res.mcf.pcf[i].f;
+                mergeCfToChatmcf(res.mcf.pcf[i]);
             }
         }
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
@@ -3659,6 +3716,7 @@ function loadfm_done(mDBload) {
                         M.checkStorageQuota(50);
                     }
                 });
+                M.myChatFilesFolder.init();
             }
         }
         else {

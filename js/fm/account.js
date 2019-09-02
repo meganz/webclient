@@ -276,6 +276,14 @@ accountUI.general = {
                 }
                 $bandwidthChart.find('.chart.data .pecents-txt').text(usedW);
             }
+
+            if (!account.maf) {
+                $('.fm-right-account-block').removeClass('active-achievements');
+            }
+            else {
+                $('.fm-right-account-block').addClass('active-achievements');
+            }
+
             /* End of New Used Bandwidth chart */
         },
 
@@ -421,23 +429,23 @@ accountUI.inputs = {
             var $inputs = $('.fm-account-main input').add('.fm-voucher-popup input');
 
             $inputs.rebind('focus', function() {
-                $(this).parent().addClass('active');
+                $(this).parents('.dialog-input-title-ontop').addClass('active');
             });
 
             $inputs.rebind('blur', function() {
 
                 if ($(this).val()) {
-                    $(this).parent().addClass('valued');
+                    $(this).parents('.dialog-input-title-ontop').addClass('valued');
                 }
                 else {
-                    $(this).parent().removeClass('valued');
+                    $(this).parents('.dialog-input-title-ontop').removeClass('valued');
                 }
-                $(this).parent().removeClass('active');
+                $(this).parents('.dialog-input-title-ontop').removeClass('active');
             });
 
             $inputs.prev('.title').rebind('click', function() {
 
-                if (!$(this).parent().hasClass('active')) {
+                if (!$(this).parents('.dialog-input-title-ontop').hasClass('active')) {
                     $(this).next('input').trigger('focus');
                 }
             });
@@ -986,22 +994,18 @@ accountUI.account = {
 
                     var $this = $(this);
                     var $parent = $this.parent();
-                    var errorMsg;
+                    var errorMsg = l[20960];
                     var max = parseInt($this.attr('max'));
                     var min = parseInt($this.attr('min'));
 
                     if ($this.is('.byear, .bmonth, .bdate')) {
                         if (this.value > max) {
-                            errorMsg = '$1 should be smaller than $2'.replace('$1', $this.data('title'))
-                                .replace('$2', $this.attr('max'));
                             $this.addClass('errored');
                             $parent.addClass('error').find('.error-message').text(errorMsg);
                             $saveBlock.addClass('closed');
                             return false;
                         }
                         else if (this.value < min) {
-                            errorMsg = '$1 should be bigger than $2'.replace('$1', $this.data('title'))
-                                .replace('$2', $this.attr('min'));
                             $this.addClass('errored');
                             $parent.addClass('error').find('.error-message').text(errorMsg);
                             $saveBlock.addClass('closed');
@@ -1604,14 +1608,12 @@ accountUI.plan = {
 
             /* achievements */
             if (!account.maf) {
-                $('.fm-right-account-block').removeClass('active-achievements');
                 $('.account.plan-info.storage > span').text(bytesToSize(M.account.space, 0));
                 $('.account.plan-info.bandwidth > span').text(bytesToSize(M.account.tfsq.max, 0));
                 $('.account.plan-info .quota-note-container, .account.plan-info .settings-bar, .btn-achievements')
                     .addClass('hidden');
             }
             else {
-                $('.fm-right-account-block').addClass('active-achievements');
                 mega.achievem.parseAccountAchievements();
             }
         },
@@ -2051,6 +2053,9 @@ accountUI.notifications = {
 
         'use strict';
 
+        // Ensure the loading dialog stays open till enotif is finished.
+        loadingDialog.show('enotif');
+
         // New setting need to force cloud and contacts notification available.
         if (!mega.notif.has('enabled', 'cloud')) {
             mega.notif.set('enabled', 'cloud');
@@ -2060,8 +2065,12 @@ accountUI.notifications = {
             mega.notif.set('enabled', 'contacts');
         }
 
-        $('.fm-account-notifications .dialog-feature-toggle').each(function() {
+        // Handle account notification switches
+        var $NToggleAll = $('.fm-account-notifications .account-notification .dialog-feature-toggle.toggle-all');
+        var $NToggle = $('.fm-account-notifications .account-notification .switch-container .dialog-feature-toggle');
 
+        // Toggle Individual Notifications
+        $NToggle.each(function() {
             var $this = $(this);
             var $section = $this.parents('.switch-container');
             var sectionName = accountUI.notifications.getSectionName($section);
@@ -2074,7 +2083,75 @@ accountUI.notifications = {
 
                     var notifChange = val ? mega.notif.set : mega.notif.unset;
                     notifChange($this.attr('name'), sectionName);
+
+                    if (val) {
+                        $NToggleAll.addClass('toggle-on');
+                    } else {
+                        ($NToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
+                            .apply($NToggleAll, ['toggle-on']);
+                    }
                 });
+        });
+
+        // Toggle All Notifications
+        accountUI.inputs.switch.init(
+            '#' + $NToggleAll[0].id,
+            $NToggleAll.parent(),
+            $NToggle.hasClass('toggle-on'),
+            function(val) {
+                $NToggle.each(function() {
+                    var $this = $(this);
+                    var $section = $this.parents('.switch-container');
+                    var sectionName = accountUI.notifications.getSectionName($section);
+                    var notifChange = val ? mega.notif.set : mega.notif.unset;
+                    notifChange($this.attr('name'), sectionName);
+
+                    (val ? $.fn.addClass : $.fn.removeClass).apply($NToggle, ['toggle-on']);
+                });
+            }
+        );
+
+        // Hide achievements toggle if achievements not an option for this user.
+        if (!M.account.maf) {
+            $('#enotif-achievements').closest('.switch-container').remove();
+        }
+
+        // Handle email notification switches.
+        var $EToggleAll = $('.fm-account-notifications .email-notification .dialog-feature-toggle.toggle-all');
+        var $EToggle = $('.fm-account-notifications .email-notification .switch-container .dialog-feature-toggle');
+
+        mega.enotif.all().then(function(enotifStates) {
+            // Toggle Individual Emails
+            $EToggle.each(function() {
+                var $this = $(this);
+                var $section = $this.parents('.switch-container');
+                var emailId = $this.attr('name');
+
+                accountUI.inputs.switch.init(
+                    '#' + this.id,
+                    $section,
+                    !enotifStates[emailId],
+                    function(val) {
+                        mega.enotif.setState(emailId, !val);
+                        (val || $EToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
+                            .apply($EToggleAll, ['toggle-on']);
+                    }
+                );
+            });
+
+            // All Email Notifications Switch
+            accountUI.inputs.switch.init(
+                '#' + $EToggleAll[0].id,
+                $EToggleAll.parents('.settings-sub-section'),
+                $EToggle.hasClass('toggle-on'),
+                function(val) {
+                    mega.enotif.setAllState(!val);
+                    (val ? $.fn.addClass : $.fn.removeClass).apply($EToggle, ['toggle-on']);
+                }
+            );
+
+            // Hide the loading screen.
+            loadingDialog.hide('enotif');
         });
     },
 
@@ -2708,9 +2785,6 @@ accountUI.transfers = {
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
 
-        // Transfer Tools - Tooltip
-        this.transferTools.tooltip.render();
-
         // MEGAdrop folders table
         mega.megadrop.stngsDraw();
 
@@ -2900,22 +2974,6 @@ accountUI.transfers = {
                     fmconfig.dlThroughMEGAsync,
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
-                    });
-            }
-        },
-
-        tooltip: {
-
-            render: function() {
-
-                'use strict';
-
-                accountUI.inputs.switch.init(
-                    '#transfers-tooltip',
-                    $('#transfers-tooltip').parent(),
-                    fmconfig.tpp,
-                    function(val) {
-                        mega.config.setn('tpp', val);
                     });
             }
         }

@@ -469,7 +469,7 @@ mobile.slideshow = {
         'use strict';
 
         // On close button click/tap
-        mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function() {
+        mobile.slideshow.$overlay.find('.fm-dialog-close').off().on('tap', function(e) {
             mobile.slideshow.close();
             // Prevent double taps
             return false;

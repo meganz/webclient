@@ -1,3 +1,8 @@
+/**
+ * global MegaData instance
+ * @name M
+ */
+var M = null;
 var dlid = false;
 var dlkey = false;
 var cn_url = false;
@@ -224,9 +229,6 @@ function topPopupAlign(button, popup, topPos) {
         $.popupAlign();
     }
 }
-
-
-
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
@@ -460,7 +462,7 @@ function init_page() {
             else {
                 // If mobile, show the decryption key overlay
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
+                    mobile.initDOM();
                     mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
                 }
                 else {
@@ -509,9 +511,19 @@ function init_page() {
         confirmcode = page.replace("confirm", "");
         page = 'confirm';
     }
+
     if (page.substr(0, 7) == 'pwreset') {
         resetpwcode = page.replace("pwreset", "");
         page = 'resetpassword';
+    }
+
+    // If password revert link, use generic background page, show the dialog and pass in the code
+    if (page.substr(0, 8) === 'pwrevert') {
+        parsepage(pages[is_mobile ? 'mobile' : 'placeholder']);
+        passwordRevert.init(page);
+
+        // Make sure placeholder background is shown
+        return false;
     }
 
     // is chat link?
@@ -555,6 +567,7 @@ function init_page() {
         && (page !== 'resellers')
         && (page !== 'security')
         && (page !== 'downloadapp')
+        && (page !== 'unsub')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -566,9 +579,8 @@ function init_page() {
         else {
             // Show signup link dialog for mobile
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.register.showConfirmEmailScreen(acc);
-                topmenuUI();
                 return false;
             }
             else {
@@ -793,6 +805,9 @@ function init_page() {
 
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
+        if (is_mobile) {
+            mobile.initDOM();
+        }
         var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
             var business = new BusinessAccountUI();
@@ -811,7 +826,7 @@ function init_page() {
             page = 'login';
 
             if (is_mobile) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.register.showConfirmAccountScreen(email);
             }
             else {
@@ -926,7 +941,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.signin.show();
         }
         else {
@@ -1063,7 +1078,7 @@ function init_page() {
         }
 
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.register.show();
         }
         else {
@@ -1087,7 +1102,7 @@ function init_page() {
     }
     else if (page == 'key') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.register.showGeneratingKeysScreen();
         }
         else {
@@ -1097,7 +1112,7 @@ function init_page() {
     }
     else if (page === 'support') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.support.init();
         }
         else if (u_type === 0) {
@@ -1175,7 +1190,7 @@ function init_page() {
     }
     else if (page == 'backup') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.backup.init();
         }
         else {
@@ -1186,7 +1201,7 @@ function init_page() {
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
         if (is_mobile) {
             if (u_type) {
-                parsepage(pages['mobile']);
+                mobile.initDOM();
                 mobile.account.cancel.init();
             }
             else {
@@ -1273,20 +1288,20 @@ function init_page() {
 
     // Page for mobile to let them recover by Master/Recovery Key
     else if (is_mobile && page === 'recoverybykey') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
     }
 
     // Page for mobile to let them park their account (start a new account with the same email)
     else if (is_mobile && page === 'recoverybypark') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
     }
 
     // Code for handling the return from a #recover email link
     else if (page.substr(0, 7) === 'recover' && page.length > 25) {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.recovery.fromEmailLink.init();
         }
         else {
@@ -1297,19 +1312,19 @@ function init_page() {
 
     // Page for mobile to enter (or upload) their Master/Recovery Key
     else if (is_mobile && page === 'recoveryenterkey') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.enterKey.init();
     }
 
     // Page for mobile to let them change their password after they have entered their Master/Recovery key
     else if (is_mobile && page === 'recoverykeychangepass') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.changePassword.init('key');
     }
 
     // Page for mobile to let the user change their password and finish parking their account
     else if (is_mobile && page === 'recoveryparkchangepass') {
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.recovery.changePassword.init('park');
     }
     else if (page == 'sdkterms') {
@@ -1358,13 +1373,21 @@ function init_page() {
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
     }
-    else if (page === 'terms') {
+    else if (page.substr(0, 5) === 'terms') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
+            mobile.initDOM();
             mobile.terms.show();
         }
         else {
             parsepage(pages['terms']);
+        }
+
+        if (page.substr(5, 1) === '/') {
+            delay('waitTermLoad', function() {
+                var anchor = page.split('/')[1];
+                page = 'terms';
+                $('a[data-scrollto="#' + anchor + '"]').click();
+            });
         }
     }
     else if (page === 'security') {
@@ -1381,7 +1404,7 @@ function init_page() {
     else if (is_mobile && (page === 'copyright' || page === 'copyrightnotice')) {
 
         // Show message that the copyright takedown should be submitted in a desktop browser
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.messageOverlay.show(l[621], l[19628]).always(function() {
 
             // On clicking OK in the dialog, go to the file manager if logged in, or start page if not
@@ -1526,6 +1549,15 @@ function init_page() {
         parsepage(pages['done']);
         init_done();
     }
+    else if (page.substr(0, 5) === 'unsub') {
+        // Non-registered user unsubsribe from emails.
+        if (is_mobile) {
+            mobile.initDOM();
+        }
+        M.require('unsub_js').done(function() {
+            EmailUnsubscribe.unsubscribe();
+        });
+    }
     else if (dlid) {
         page = 'download';
         if (typeof fdl_queue_var !== 'undefined') {
@@ -1642,8 +1674,44 @@ function init_page() {
             return init_page();
         }
 
-    }
-    else if (is_fm()) {
+    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+        var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
+        var contactHandle = contactRequestInfo.u;
+        var contactRequestTime = contactRequestInfo.unixTime;
+        var TWO_HOURS_IN_SECONDS = 7200;
+
+        var addContact = function (ownerEmail, targetEmail) {
+            M.inviteContact(ownerEmail, targetEmail);
+            localStorage.removeItem('addContact');
+            return init_page();
+        };
+
+        if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
+            attribCache.getItem(contactHandle + "_uge")
+            .done(function(email) {
+                addContact(u_attr.email, email);
+            })
+            .fail(function() {
+                asyncApiReq({
+                    'a': 'uge',
+                    'u': contactHandle
+                })
+                .done(function(email) {
+                    if (isValidEmail(email) && isString(email)) {
+                        attribCache.setItem(contactHandle + "_uge", email);
+                        addContact(u_attr.email, email);
+                    }
+                    else {
+                        localStorage.removeItem('addContact');
+                    }
+                })
+                .fail(function(e) {
+                    console.error(e);
+                    localStorage.removeItem('addContact');
+                });
+            });
+        }
+    } else if (is_fm()) {
         var id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
@@ -1895,9 +1963,11 @@ function topmenuUI() {
 
     if (fminitialized) {
         $topHeader.find('.top-search-bl').removeClass('hidden');
+        $topHeader.find('.top-icon.notification').removeClass('hidden');
     }
     else {
         $topHeader.find('.top-search-bl').addClass('hidden');
+        $topHeader.find('.top-icon.notification').addClass('hidden');
     }
 
     if (page === 'download') {
@@ -1954,7 +2024,18 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.languages .right-el').text(lang);
 
     // Show version in top menu
-    $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
+    var $versionButton = $topMenu.find('.top-mega-version').text('v. ' + M.getSiteVersion());
+    var versionClickCounter = 0;
+    var versionClickTimeout = null;
+    $versionButton.rebind('click', function() {
+        clearTimeout(versionClickTimeout);
+        if (++versionClickCounter >= 3) {
+            mega.developerSettings.show();
+        }
+        versionClickTimeout = setTimeout(function() {
+            versionClickCounter = 0;
+        }, 1000);
+    });
 
     if (u_type) {
         $('body').removeClass('not-logged').addClass('logged');
@@ -1974,7 +2055,6 @@ function topmenuUI() {
         $topHeader.find('.top-change-language').addClass('hidden');
         $topHeader.find('.create-account-button').addClass('hidden');
         $topHeader.find('.membership-status-block').removeClass('hidden');
-        $topHeader.find('.top-icon.notification').removeClass('hidden');
         $topHeader.find('.left.individual').addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
@@ -2358,9 +2438,15 @@ function topmenuUI() {
     });
 
     $topHeader.find('.top-search-input').rebind('focus', function () {
-        $topHeader.find('.top-search-button').removeClass('hidden');
-        $topHeader.find('.top-clear-button').addClass('hidden');
+        if ($(this).closest('.top-search-bl').hasClass('active')) {
+            $topHeader.find('.top-search-button').removeClass('hidden');
+            $topHeader.find('.top-clear-button').addClass('hidden');
+        }
     });
+
+    $topHeader.find('#search-fake-form').rebind('submit', function () {
+        return false;
+    })
 
     $topHeader.find('.top-search-button').rebind('click mousedown', function _topSearchHandler() {
         var val = $.trim($('.top-search-input').val());

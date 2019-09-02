@@ -71,7 +71,7 @@ var ChatdIntegration = function(megaChat) {
 
                     var chatId = false;
 
-                    if (ap.g === 0) {
+                    if (ap.g === 0 && (ap.n || ap.u)) {
                         // extract the chatId, if the type of the chat is private (e.g. == other user's id)
                         (ap.n || ap.u).forEach(function(member) {
                             if (!chatId && member.u !== u_handle) {
@@ -508,6 +508,43 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
     }
 };
 
+
+ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle, chatShard) {
+    var self = this;
+    if (!self._currentMcphurlRequests) {
+        self._currentMcphurlRequests = {};
+    }
+    if (typeof chatShard !== 'undefined' && self._currentMcphurlRequests[chatShard]) {
+        return self._currentMcphurlRequests[chatShard];
+    }
+    if (!isPublic && !chatShard) {
+        var chat = megaChat.getChatById(chatIdOrHandle);
+        if (chat && typeof chat.chatShard !== 'undefined') {
+            chatShard = chat.chatShard;
+        }
+    }
+    var apiReq = {
+        a: isPublic ? 'mcphurl' : 'mcurl',
+        v: Chatd.VERSION
+    };
+    if (isPublic) {
+        apiReq['ph'] = chatIdOrHandle;
+    }
+    else {
+        apiReq['id'] = chatIdOrHandle;
+    }
+    var req = asyncApiReq(apiReq);
+
+    if (typeof chatShard !== 'undefined') {
+        self._currentMcphurlRequests[chatShard] = req;
+        req.always(function() {
+            delete self._currentMcphurlRequests[chatShard];
+        });
+    }
+
+    return req;
+};
+
 /**
  * Core func for opening a chat.
  *
@@ -593,7 +630,11 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
                     apiReq['id'] = chatInfo.id;
                 }
 
-                asyncApiReq(apiReq)
+                self._retrieveShardUrl(
+                    !!publicChatHandle,
+                    publicChatHandle ? publicChatHandle : chatInfo.id,
+                    chatInfo.cs
+                    )
                     .done(function(ret) {
                         self._finalizeMcurlResponseHandling(ret, chatInfo, publicChatHandle, finishProcess);
                     })
@@ -808,19 +849,11 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
     };
 
     if (publicChatHandle || !chatInfo.url && (!chatRoom || !chatRoom.chatdUrl)) {
-
-        var apiReq = {
-            a: publicChatHandle ? 'mcphurl' : 'mcurl',
-            v: Chatd.VERSION
-        };
-        if (publicChatHandle) {
-            apiReq['ph'] = publicChatHandle;
-        }
-        else {
-            apiReq['id'] = chatInfo.id;
-        }
-
-        asyncApiReq(apiReq)
+        self._retrieveShardUrl(
+            !!publicChatHandle,
+            publicChatHandle ? publicChatHandle : chatInfo.id,
+            chatInfo.cs
+        )
             .done(function(ret) {
                 self._finalizeMcurlResponseHandling(ret, chatInfo, publicChatHandle, finishProcess);
             })
@@ -1073,7 +1106,7 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
             }
         });
     }
-    if (Array.isArray(users)) {
+    if (Array.isArray(users) || users instanceof Set) {
         users.forEach(function (userId) {
             if (typeof(userId) === "undefined" || userId === null) {
                 return;
@@ -1119,7 +1152,7 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
 
 
 ChatdIntegration._ensureNamesAreLoaded = function(users, chathandle) {
-    if (Array.isArray(users)) {
+    if (Array.isArray(users) || users instanceof Set) {
         users.forEach(function (userId) {
             if (userId === strongvelope.COMMANDER) {
                 return;
@@ -1164,8 +1197,10 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
         message.trackDataChange();
     }
     else if (textContents[0] === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT) {
-        if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+        var messageHasAttachment = (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT);
+        var messageIsVoiceClip = (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP);
 
+        if (messageHasAttachment || messageIsVoiceClip) {
             message._onAttachmentReceived(textContents.substr(2));
         }
         else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.REVOKE_ATTACHMENT) {
@@ -1190,6 +1225,9 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
                 delete meta.textMessage;
                 if (origTextContents[2] === Message.MESSAGE_META_TYPE.RICH_PREVIEW) {
                     message.metaType = Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+                }
+                else if (origTextContents[2] === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                    message.metaType = Message.MESSAGE_META_TYPE.GEOLOCATION;
                 }
                 else {
                     message.metaType = -1;
@@ -1938,87 +1976,49 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
 
 ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
     var self = this;
-    var promise = new MegaPromise();
-
-    if (chatRoom && chatRoom.ct && chatRoom.protocolHandler) {
-        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-        if (parsedMessage) {
-            var promises = [];
-            promises.push(
-                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
-            );
-            var _runTopicDecryption = function() {
-                try {
-                    chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct))
-                        .done(function(decryptedCT) {
-                            if (decryptedCT) {
-                                chatRoom.topic = decryptedCT.payload;
-                                promise.resolve();
-                            }
-                            else {
-                                promise.reject();
-                            }
-                        })
-                        .fail(function(e) {
-                            if (localStorage.debugSignatureInvalid) {
-                                self.logger.error(
-                                    "Could not decrypt topic: ",
-                                    e,
-                                    "in room",
-                                    chatRoom.chatId, parsedMessage
-                                );
-                            }
-                            else {
-                                self.logger.error("Could not decrypt topic: ", e, "in room", chatRoom.chatId);
-                            }
-                            promise.reject();
-                        });
-                } catch (e) {
-                    self.logger.error("Could not decrypt topic: ", e, "in room", chatRoom.chatId);
-                    promise.reject();
-                }
-            };
-            MegaPromise.allDone(promises).done(
-                function () {
-                    _runTopicDecryption();
-                }
-            );
+    return new MegaPromise(function(resolve, reject) {
+        if (!chatRoom.protocolHandler) {
+            return reject(false);
         }
-    }
-    return promise;
+        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
+
+        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
+            .then(function() {
+                return chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
+            })
+            .then(function(decryptedCT) {
+                chatRoom.topic = decryptedCT.payload;
+                resolve();
+            })
+            .catch(function(ex) {
+                if (d) {
+                    self.logger.warn("Could not decrypt topic in root %s",
+                        chatRoom.chatId, ex, localStorage.debugSignatureInvalid && parsedMessage);
+                }
+                reject(ex);
+            });
+    });
 };
 
 ChatdIntegration.prototype.decryptUnifiedkey = function(chatRoom) {
     var self = this;
-    var pms = new MegaPromise();
-    if (chatRoom && chatRoom.ck && chatRoom.protocolHandler) {
-        var parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
-        if (parsedKey) {
-            var promises = [];
-            promises.push(
-                ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle)
-            );
-            var _runDecryption = function() {
-                try {
-                    var decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey,
-                                                                  parsedKey.sender);
-                    if (decryptedKeys) {
-                        chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
-                        pms.resolve();
-                    }
-                } catch (e) {
-                    self.logger.error("Could not get unified key: ", e);
-                    pms.reject();
-                }
-            };
-            MegaPromise.allDone(promises).done(
-                function () {
-                    _runDecryption();
-                }
-            );
+    return new MegaPromise(function(resolve, reject) {
+        if (!chatRoom.protocolHandler) {
+            return reject(false);
         }
-    }
-    return pms;
+        var parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
+
+        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle)
+            .then(function() {
+                var decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey, parsedKey.sender);
+                chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
+                resolve();
+            })
+            .catch(function(e) {
+                self.logger.error("Could not get unified key: ", e);
+                reject(e);
+            });
+    });
 };
 
 /** chatd related commands **/

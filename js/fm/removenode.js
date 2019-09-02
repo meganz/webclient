@@ -126,7 +126,7 @@ function removeUInode(h, parent) {
     if (M.megaRender && M.megaRender.megaList) {
         if (parent) {
             // this was a move node op
-            if (parent === M.currentdirid) {
+            if (parent === M.currentdirid || parent === M.currentCustomView.nodeID) {
                 // the node was moved out of the current viewport, so lets remove it from the MegaList
                 M.megaRender.megaList.remove(h);
             }
@@ -392,26 +392,54 @@ function fmremovesync(selectedNodes) {
     }
 }
 
+/**
+ * Generate file manager contains text message
+ *
+ * @param {Number} filecnt          The number of files
+ * @param {Number} foldercnt        The number of folders
+ * @param {Boolean} lineBreak       Indicate needs a line break or not
+ * @returns {String} containstext   Contains text message
+ */
+function fm_contains(filecnt, foldercnt, lineBreak) {
 
-function fm_contains(filecnt, foldercnt) {
+    "use strict";
+
     var containstxt = l[782];
-    if ((foldercnt > 1) && (filecnt > 1)) {
+
+    if ((foldercnt > 1) && (filecnt > 1) && lineBreak) {
+        containstxt = l[832].replace('[X]', foldercnt) + '<br>' + l[833].replace('[X]', filecnt);
+    }
+    else if ((foldercnt > 1) && (filecnt > 1)) {
         containstxt = l[828].replace('[X1]', foldercnt).replace('[X2]', filecnt);
-    } else if ((foldercnt > 1) && (filecnt === 1)) {
+    }
+    else if ((foldercnt > 1) && (filecnt === 1) && lineBreak) {
+        containstxt = l[832].replace('[X]', foldercnt) + '<br>' + l[835];
+    }
+    else if ((foldercnt > 1) && (filecnt === 1)) {
         containstxt = l[829].replace('[X]', foldercnt);
-    } else if ((foldercnt === 1) && (filecnt > 1)) {
+    }
+    else if ((foldercnt === 1) && (filecnt > 1) && lineBreak) {
+        containstxt = l[834] + '<br>' + l[833].replace('[X]', filecnt);
+    }
+    else if ((foldercnt === 1) && (filecnt > 1)) {
         containstxt = l[830].replace('[X]', filecnt);
-    } else if ((foldercnt === 1) && (filecnt === 1)) {
+    }
+    else if ((foldercnt === 1) && (filecnt === 1)) {
         containstxt = l[831];
-    } else if (foldercnt > 1) {
+    }
+    else if (foldercnt > 1) {
         containstxt = l[832].replace('[X]', foldercnt);
-    } else if (filecnt > 1) {
+    }
+    else if (filecnt > 1) {
         containstxt = l[833].replace('[X]', filecnt);
-    } else if (foldercnt === 1) {
+    }
+    else if (foldercnt === 1) {
         containstxt = l[834];
-    } else if (filecnt === 1) {
+    }
+    else if (filecnt === 1) {
         containstxt = l[835];
     }
+
     return containstxt;
 }
 

@@ -1881,18 +1881,27 @@ function rand_range(a, b) {
  *
  */
 function passwordManager(form) {
+
+    'use strict';
+
+    var $form = $(form);
+
+    if ($form.length === 0) {
+        return false;
+    }
+
     if (is_chrome_firefox) {
         var creds = passwordManager.pickFormFields(form);
         if (creds) {
             mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
         }
-        $(form).find('input').val('');
+        $form.find('input').val('');
         return;
     }
     if (typeof history !== "object") {
         return false;
     }
-    $(form).rebind('submit', function() {
+    $form.rebind('submit', function() {
         setTimeout(function() {
             var path = getSitePath();
             history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
@@ -1904,10 +1913,20 @@ function passwordManager(form) {
                 }
             }
             history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
-            $(form).find('input').val('');
+            $form.find('input').val('');
         }, 1000);
         return false;
-    }).submit();
+    });
+
+    // For trigger FF Password Manager, submit the form by making submit button and click it.
+    var submitButton = document.createElement("input");
+    submitButton.setAttribute("type", "submit");
+    submitButton.style.opacity = '0';
+
+    $form[0].appendChild(submitButton);
+
+    submitButton.click();
+
     return true;
 }
 passwordManager.knownForms = Object.freeze({
@@ -1924,33 +1943,6 @@ passwordManager.knownForms = Object.freeze({
         pwd: '#register-password'
     }
 });
-passwordManager.getStoredCredentials = function(password) {
-    // Retrieve `keypw` and `userhash` from pwd string
-    var result = null;
-
-    if (String(password).substr(0, 2) === '~:') {
-        var parts = password.substr(2).split(':');
-
-        if (parts.length === 2) {
-            try {
-                var hash = parts[1];
-                var keypw = base64_to_a32(parts[0]);
-
-                if (base64_to_a32(hash).length === 2
-                        && keypw.length === 4) {
-
-                    result = {
-                        hash: hash,
-                        keypw: keypw
-                    };
-                }
-            }
-            catch (e) {}
-        }
-    }
-
-    return result;
-};
 passwordManager.pickFormFields = function(form) {
     var result = null;
     var $form = $(form);
@@ -2231,8 +2223,29 @@ if (typeof sjcl !== 'undefined') {
                 var userEmail = elem.userEmail;
                 var selectedNodeHandle = elem.selectedNodeHandle;
                 var handleOrEmail = elem.handleOrEmail;
+                var step = 2;
+                var packet = null;
+                var idtag = mRandomToken('s2');
+                var promise = new MegaPromise();
+                var resolve = function() {
+                    if (!--step) {
+                        if (packet.okd && u_sharekeys[selectedNodeHandle]) {
+                            console.error('The sharekey should have been removed...');
+                        }
+                        promise.resolve(packet);
+                    }
+                };
 
-                promises.push(new MegaPromise());
+                promises.push(promise);
+                M.scAckQueue[idtag] = requesti;
+
+                // Wait for action-packet acknowledge, this is needed so that removing the last user
+                // from a share will issue an `okd` flag which removes the associated sharekey that we
+                // have to wait for *if* we're going to re-share to a different user next...
+                mBroadcaster.once('share-packet.' + idtag, function(a) {
+                    packet = a;
+                    resolve();
+                });
 
                 // The s2 api call can remove both shares and pending shares
                 api_req({
@@ -2240,15 +2253,13 @@ if (typeof sjcl !== 'undefined') {
                     n:  selectedNodeHandle,
                     s: [{ u: userEmail, r: ''}],
                     ha: '',
-                    i: requesti
+                    i: idtag
                 }, {
                     userEmail: userEmail,
                     selectedNodeHandle: selectedNodeHandle,
                     handleOrEmail: handleOrEmail,
-                    promise: promises[promises.length - 1],
 
                     callback : function(res, ctx) {
-                        var promise = ctx.promise;
 
                         if (typeof res === 'object') {
                             // FIXME: examine error codes in res.r, display error
@@ -2269,15 +2280,7 @@ if (typeof sjcl !== 'undefined') {
                                 self.removeFromPermissionQueue(ctx.userEmail);
                             }
 
-                            // Wait for action-packet acknowledge, this is needed so that removing the last user
-                            // from a share will issue an `okd` flag which removes the associated sharekey that we
-                            // have to wait for *if* we're going to re-share to a different user next...
-                            mBroadcaster.once('share-packet.' + ctx.selectedNodeHandle, function(packet) {
-                                if (packet.okd && u_sharekeys[ctx.selectedNodeHandle]) {
-                                    console.error('The sharekey should have been removed...');
-                                }
-                                promise.resolve(packet);
-                            });
+                            resolve();
                         }
                         else {
                             // FIXME: display error to user
@@ -2537,6 +2540,14 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
     pdfViewerSrcCode = pdfViewerSrcCode
         .replace('debuggerScriptPath: \'./debugger.js\',',
         ' ');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.cMapUrl = \'../web/cmaps/\';',
+        'PDFJS.cMapUrl = \'' + staticpath + 'cmaps/\';');
+
+    pdfViewerSrcCode = pdfViewerSrcCode
+        .replace('PDFJS.cMapPacked = true;',
+        'PDFJS.cMapPacked = false;');
 
     // algorithm to remove 'mozL10n.get'
     var st = 5000; // start from char 50000

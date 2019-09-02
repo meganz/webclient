@@ -1,9 +1,11 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var ConversationsUI = require("./ui/conversations.jsx");
-var ChatRoom = require('./chatRoom.jsx');
+import React from "react";
+import ReactDOM from "react-dom";
+import ConversationsUI from "./ui/conversations.jsx";
 
-var EMOJI_DATASET_VERSION = 3;
+// load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
+require("./chatRoom.jsx");
+
+const EMOJI_DATASET_VERSION = 3;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
@@ -122,8 +124,8 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
         if (roomType !== "archived") {
-            $('.fm-right-files-block[data-reactid]').removeClass('hidden');
-            $('.fm-right-files-block:not([data-reactid])').addClass('hidden');
+            $('.fm-right-files-block.in-chat').removeClass('hidden');
+            $('.fm-right-files-block:not(.in-chat)').addClass('hidden');
         }
 
         megaChat.refreshConversations();
@@ -167,7 +169,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             M.onSectionUIOpen('conversations');
             $('.archived-chat-view').removeClass('hidden');
             if (megaChat.$conversationsAppInstance) {
-                megaChat.$conversationsAppInstance.safeForceUpdate();
+                megaChat.safeForceUpdate();
             }
         }
         else {
@@ -271,7 +273,8 @@ var Chat = function() {
             'persistedTypeArea': PersistedTypeArea,
             'btRtfFilter': BacktickRtfFilter,
             'rtfFilter': RtfFilter,
-            'richpreviewsFilter': RichpreviewsFilter
+            'richpreviewsFilter': RichpreviewsFilter,
+            'geoLocationLinks': GeoLocationLinks
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -357,8 +360,8 @@ Chat.prototype.init = function() {
         self.updateSectionUnreadCount();
     });
 
-    $.each(self.options.plugins, function(k, v) {
-        self.plugins[k] = new v(self);
+    Object.keys(self.options.plugins).forEach(plugin => {
+        self.plugins[plugin] = new self.options.plugins[plugin](self);
     });
 
     // UI events
@@ -993,12 +996,17 @@ Chat.prototype.destroy = function(isLogout) {
     self.trigger('onDestroy', [isLogout]);
 
     // unmount the UI elements, to reduce any unneeded.
-    if (
-        self.$conversationsAppInstance &&
-        ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
-        ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
-    ) {
-        ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+    try {
+        if (
+            self.$conversationsAppInstance &&
+            ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
+            ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
+        ) {
+            ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
+        }
+    }
+    catch (e) {
+        console.error("Failed do destroy chat dom:", e);
     }
 
 
@@ -1041,8 +1049,6 @@ Chat.prototype.getContacts = function() {
     });
     return results;
 };
-
-
 
 /**
  * Helper to convert XMPP presence from string (e.g. 'chat'), to a CSS class (e.g. will return 'online')
@@ -1359,7 +1365,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
 
     // chat room not found, create a new one
-
     var room = new ChatRoom(
         self,
         roomId,
@@ -1642,6 +1647,7 @@ Chat.prototype.refreshConversations = function() {
         $('.fm-chat-block').hide();
         return false;
     }
+    $('.section.conversations .fm-chat-is-loading').addClass('hidden');
     // move to the proper place if loaded before the FM
     if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
@@ -2330,33 +2336,6 @@ Chat.prototype.getChatById = function(chatdId) {
     return found ? found : false;
 };
 
-Chat.prototype.getMyChatFilesFolder = function() {
-    var promise = new MegaPromise();
-    // Translation ?
-    var folderName = "My chat files";
-    var paths = [folderName];
-    var safePath = M.getSafePath(paths);
-
-    if (safePath.length === 1) {
-        safePath = safePath[0];
-    }
-
-    var target = M.RootID;
-
-    M.createFolder(target, safePath, new MegaPromise())
-        .always(function(_target) {
-            if (typeof _target === 'number') {
-                ulmanager.logger.warn('Unable to create folder "%s" on target "%s"',
-                    path, target, api_strerror(_target));
-                promise.reject();
-            }
-            else {
-                promise.resolve(_target);
-            }
-        });
-
-    return promise;
-};
 
 /**
  * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
@@ -2473,7 +2452,8 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes) {
 
             if (room) {
                 showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-                M.openFolder('chat/' + (room.type === 'group' ? 'g/' : '') + room.roomId).always(resolve);
+                var roomUrl = room.getRoomUrl().replace("fm/", "");
+                M.openFolder(roomUrl).always(resolve);
             }
             else {
                 if (d) {
@@ -2631,6 +2611,16 @@ Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
     }
 };
 
+Chat.prototype.safeForceUpdate = function() {
+    if (this.$conversationsAppInstance) {
+        var $cai = this.$conversationsAppInstance;
+        try {
+            $cai.forceUpdate();
+        } catch (e) {
+            console.error("safeForceUpdate: ", $cai, e);
+        }
+    }
+};
 
 Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister, forceLogin, notJoinReq) {
     if (!chatHandle && (page === 'chat' || page.indexOf('chat') > -1)) {
@@ -2716,7 +2706,8 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
 window.Chat = Chat;
 window.chatui = chatui;
 
-module.exports = {
-    Chat,
-    chatui
-};
+if (module.hot) {
+    module.hot.accept();
+}
+
+export default {Chat, chatui};

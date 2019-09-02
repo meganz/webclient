@@ -1,44 +1,34 @@
-// libs
-var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../ui/utils.jsx');
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var ButtonsUI = require('./../../ui/buttons.jsx');
-var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
-var CloudBrowserModalDialog = require('./../../ui/cloudBrowserModalDialog.jsx');
-var DropdownsUI = require('./../../ui/dropdowns.jsx');
-var ContactsUI = require('./../ui/contacts.jsx');
-var ConversationsUI = require('./../ui/conversations.jsx');
-var TypingAreaUI = require('./../ui/typingArea.jsx');
-var WhosTyping = require('./whosTyping.jsx').WhosTyping;
-var getMessageString = require('./messages/utils.jsx').getMessageString;
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-var Accordion = require('./../../ui/accordion.jsx').Accordion;
-var AccordionPanel = require('./../../ui/accordion.jsx').AccordionPanel;
-var ParticipantsList = require('./participantsList.jsx').ParticipantsList;
-
-var GenericConversationMessage = require('./messages/generic.jsx').GenericConversationMessage;
-var AlterParticipantsConversationMessage =
-    require('./messages/alterParticipants.jsx').AlterParticipantsConversationMessage;
-var TruncatedMessage = require('./messages/truncated.jsx').TruncatedMessage;
-var PrivilegeChange = require('./messages/privilegeChange.jsx').PrivilegeChange;
-var TopicChange = require('./messages/topicChange.jsx').TopicChange;
-var SharedFilesAccordionPanel = require('./sharedFilesAccordionPanel.jsx').SharedFilesAccordionPanel;
-var IncomingSharesAccordionPanel = require('./incomingSharesAccordionPanel.jsx').IncomingSharesAccordionPanel;
-
-var CloseOpenModeMessage = require('./messages/closeOpenMode.jsx').CloseOpenModeMessage;
-var ChatHandleMessage = require('./messages/chatHandle.jsx').ChatHandleMessage;
-var ChatlinkDialog = require('./../ui/chatlinkDialog.jsx').ChatlinkDialog;
-
+import React from 'react';
+import ReactDOM from 'react-dom';
+import utils from './../../ui/utils.jsx';
+import MegaRenderMixin from './../../stores/mixins.js';
+import {Button} from './../../ui/buttons.jsx';
+import ModalDialogsUI from './../../ui/modalDialogs.jsx';
+import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
+import { Dropdown, DropdownItem, DropdownContactsSelector } from './../../ui/dropdowns.jsx';
+import { ContactCard } from './../ui/contacts.jsx';
+import { TypingArea } from './../ui/typingArea.jsx';
+import { WhosTyping } from './whosTyping.jsx';
+import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
+import { Accordion } from './../../ui/accordion.jsx';
+import { AccordionPanel } from './../../ui/accordion.jsx';
+import { ParticipantsList } from './participantsList.jsx';
+import { GenericConversationMessage } from './messages/generic.jsx';
+import { AlterParticipantsConversationMessage }  from './messages/alterParticipants.jsx';
+import { TruncatedMessage } from './messages/truncated.jsx';
+import { PrivilegeChange } from './messages/privilegeChange.jsx';
+import { TopicChange } from './messages/topicChange.jsx';
+import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
+import { IncomingSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
+import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
+import { ChatHandleMessage } from './messages/chatHandle.jsx';
+import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
+import { ConversationAudioVideoPanel } from './conversationaudiovideopanel.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
 
-var ConversationAudioVideoPanel = require('./conversationaudiovideopanel.jsx').ConversationAudioVideoPanel;
-
-var JoinCallNotification = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    componentDidUpdate: function() {
+export class JoinCallNotification extends MegaRenderMixin(React.Component) {
+    componentDidUpdate() {
         var $node = $(this.findDOMNode());
         var room = this.props.chatRoom;
         $('a.joinActiveCall', $node)
@@ -47,8 +37,8 @@ var JoinCallNotification = React.createClass({
                 e.preventDefault();
                 return false;
             });
-    },
-    render: function() {
+    }
+    render() {
         var room = this.props.chatRoom;
         if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
@@ -68,19 +58,16 @@ var JoinCallNotification = React.createClass({
             </div>;
         }
     }
-});
+};
 
-var ConversationRightArea = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true
-        }
-    },
-    componentSpecificIsComponentEventuallyVisible: function() {
+export class ConversationRightArea extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'requiresUpdateOnResize': true
+    }
+    componentSpecificIsComponentEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
-    },
-    allContactsInChat: function(participants) {
+    }
+    allContactsInChat(participants) {
         var self = this;
         if (participants.length === 0) {
             return false;
@@ -102,8 +89,8 @@ var ConversationRightArea = React.createClass({
         else {
             return true;
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -156,7 +143,7 @@ var ConversationRightArea = React.createClass({
                 }
             }}>
                 <i className="small-icon colorized audio-call"></i>
-                {__(l[5896])}
+                <span>{__(l[5896])}</span>
             </div>;
 
         var startVideoCallButton =
@@ -166,7 +153,7 @@ var ConversationRightArea = React.createClass({
                 }
             }}>
                 <i className="small-icon colorized video-call"></i>
-                {__(l[5897])}
+                <span>{__(l[5897])}</span>
             </div>;
         var AVseperator = <div className="chat-button-seperator"></div>;
         var endCallButton =
@@ -176,7 +163,7 @@ var ConversationRightArea = React.createClass({
                         }
                     }}>
             <i className="small-icon colorized horizontal-red-handset"></i>
-                        {room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}
+                        <span>{room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}</span>
         </div>;
 
 
@@ -270,7 +257,7 @@ var ConversationRightArea = React.createClass({
         }
 
         const addParticipantBtn = (
-                <ButtonsUI.Button
+                <Button
                     className="link-button green light"
                     icon="rounded-plus colorized"
                     label={__(l[8007])}
@@ -284,7 +271,7 @@ var ConversationRightArea = React.createClass({
                         )
                     }
                 >
-                    <DropdownsUI.DropdownContactsSelector
+                    <DropdownContactsSelector
                         contacts={this.props.contacts}
                         megaChat={this.props.megaChat}
                         chatRoom={room}
@@ -296,13 +283,13 @@ var ConversationRightArea = React.createClass({
                         singleSelectedButtonLabel={__(l[8869])}
                         multipleSelectedButtonLabel={__(l[8869])}
                         nothingSelectedButtonLabel={__(l[8870])}
-                        onSelectDone={this.props.onAddParticipantSelected}
+                        onSelectDone={this.props.onAddParticipantSelected.bind(this)}
                         positionMy="center top"
                         positionAt="left bottom"
                         arrowHeight={-32}
                         selectFooter={true}
                     />
-                </ButtonsUI.Button>
+                </Button>
         );
 
         var expandedPanel = {};
@@ -366,7 +353,7 @@ var ConversationRightArea = React.createClass({
                                              }
                                     }}>
                                         <i className="small-icon colorized writing-pen"></i>
-                                        {l[9080]}
+                                        <span>{l[9080]}</span>
                                     </div>
                                 ) : null
                             }
@@ -382,7 +369,7 @@ var ConversationRightArea = React.createClass({
                                                  self.props.onGetManageChatLinkClicked();
                                              }}>
                                             <i className="small-icon blue-chain colorized"></i>
-                                            {l[20481]}
+                                            <span>{l[20481]}</span>
                                         </div>
                                     ) : null
                             }
@@ -400,18 +387,18 @@ var ConversationRightArea = React.createClass({
                                                  self.props.onJoinViaPublicLinkClicked();
                                              }}>
                                             <i className="small-icon writing-pen"></i>
-                                            {l[20597]}
+                                            <span>{l[20597]}</span>
                                         </div>
                                     ) : null
                             }
 
-                            <ButtonsUI.Button
+                            <Button
                                 className="link-button light dropdown-element"
                                 icon="rounded-grey-up-arrow colorized"
                                 label={__(l[6834] + "...")}
                                 disabled={room.isReadOnly()}
                                 >
-                                <DropdownsUI.Dropdown
+                                <Dropdown
                                     contacts={this.props.contacts}
                                     megaChat={this.props.megaChat}
                                     className="wide-dropdown send-files-selector light"
@@ -422,22 +409,22 @@ var ConversationRightArea = React.createClass({
                                     <div className="dropdown info-txt">
                                         {__(l[19793]) ? __(l[19793]) : "Send files from..."}
                                     </div>
-                                    <DropdownsUI.DropdownItem
+                                    <DropdownItem
                                         className="link-button light"
                                         icon="grey-cloud colorized"
                                         label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
                                         onClick={() => {
                                             self.props.onAttachFromCloudClicked();
                                         }} />
-                                    <DropdownsUI.DropdownItem
+                                    <DropdownItem
                                         className="link-button light"
                                         icon="grey-computer colorized"
                                         label={__(l[19795]) ? __(l[19795]) : "My computer"}
                                         onClick={() => {
                                             self.props.onAttachFromComputerClicked();
                                         }} />
-                                </DropdownsUI.Dropdown>
-                            </ButtonsUI.Button>
+                                </Dropdown>
+                            </Button>
 
                             {endCallButton}
 
@@ -453,7 +440,7 @@ var ConversationRightArea = React.createClass({
                                      }
                                  }}>
                                 <i className="small-icon colorized clear-arrow"></i>
-                                {__(l[8871])}
+                                <span>{__(l[8871])}</span>
                             </div>
 
                             {
@@ -469,10 +456,10 @@ var ConversationRightArea = React.createClass({
                                                      self.props.onMakePrivateClicked();
                                                  }}>
                                                 <i className="small-icon yellow-key colorized"></i>
-                                                {l[20623]}
+                                                <span>{l[20623]}</span>
                                             </div>
                                             <p>
-                                                {l[20454]}
+                                                <span>{l[20454]}</span>
                                             </p>
                                         </div>
                                     ) : null
@@ -499,7 +486,7 @@ var ConversationRightArea = React.createClass({
                                      }}>
                                     <i className={"small-icon colorized " +  ((room.isArchived()) ?
                                         "unarchive" : "archive")}></i>
-                                    {room.isArchived() ? __(l[19065]) : __(l[16689])}
+                                    <span>{room.isArchived() ? __(l[19065]) : __(l[16689])}</span>
                                 </div>
                             }
                             {
@@ -521,7 +508,7 @@ var ConversationRightArea = React.createClass({
                                          }
                                      }}>
                                     <i className="small-icon rounded-stop colorized"></i>
-                                    {l[8633]}
+                                    <span>{l[8633]}</span>
                                 </div>) : null
                             }
                             { room._closing !== true && (room.type === "group" || room.type === "public") &&
@@ -532,7 +519,7 @@ var ConversationRightArea = React.createClass({
                                     }
                                 }}>
                                     <i className="small-icon rounded-stop colorized"></i>
-                                    {l[148]}
+                                    <span>{l[148]}</span>
                                 </div>
                             ) : null
                         }
@@ -549,18 +536,15 @@ var ConversationRightArea = React.createClass({
             </PerfectScrollbar>
         </div>;
     }
-});
+};
 
 
 
-var ConversationPanel = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    lastScrollPositionPerc: 1,
-    componentSpecificIsComponentEventuallyVisible: function() {
-        return this.props.chatRoom.isCurrentlyActive;
-    },
-    getInitialState: function() {
-        return {
+export class ConversationPanel extends MegaRenderMixin(React.Component) {
+    static lastScrollPositionPerc = 1;
+    constructor(props) {
+        super(props);
+        this.state = {
             startCallPopupIsActive: false,
             localVideoIsMinimized: false,
             isFullscreenModeEnabled: false,
@@ -574,14 +558,19 @@ var ConversationPanel = React.createClass({
             messageToBeDeleted: null,
             editing: false
         };
-    },
 
-    uploadFromComputer: function() {
+        this.handleWindowResize = this.handleWindowResize.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+    }
+    componentSpecificIsComponentEventuallyVisible() {
+        return this.props.chatRoom.isCurrentlyActive;
+    }
+    uploadFromComputer() {
         this.props.chatRoom.scrolledToBottom = true;
 
         this.props.chatRoom.uploadFromComputer();
-    },
-    refreshUI: function() {
+    }
+    refreshUI() {
         var self = this;
         var room = self.props.chatRoom;
 
@@ -594,24 +583,28 @@ var ConversationPanel = React.createClass({
         room.megaChat.refreshConversations();
 
         room.trigger('RefreshUI');
-    },
+    }
 
-    onMouseMove: SoonFc(function(e) {
+    @utils.SoonFcWrap(150)
+    onMouseMove(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (self.isMounted()) {
             chatRoom.trigger("onChatIsFocused");
         }
-    }, 150),
+    };
 
-    handleKeyDown: SoonFc(function(e) {
+    @utils.SoonFcWrap(150)
+    handleKeyDown(e) {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
             chatRoom.trigger("onChatIsFocused");
         }
-    }, 150),
-    componentDidMount: function() {
+    };
+
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         window.addEventListener('resize', self.handleWindowResize);
         window.addEventListener('keydown', self.handleKeyDown);
@@ -661,8 +654,8 @@ var ConversationPanel = React.createClass({
                 self.setState({'nonLoggedInJoinChatDialog': true});
             }, rand_range(5, 10) * 1000);
         }
-    },
-    eventuallyInit: function(doResize) {
+    }
+    eventuallyInit(doResize) {
         var self = this;
 
         // because..JSP would hijack some DOM elements, we need to wait with this...
@@ -732,8 +725,8 @@ var ConversationPanel = React.createClass({
                 self.safeForceUpdate(true);
                 $.tresizer();
             });
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = self.props.chatRoom.megaChat;
@@ -741,8 +734,9 @@ var ConversationPanel = React.createClass({
         $(chatRoom).rebind('onHistoryDecrypted.cp', function() {
             self.eventuallyUpdate();
         });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -750,8 +744,8 @@ var ConversationPanel = React.createClass({
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
-    },
-    componentDidUpdate: function(prevProps, prevState) {
+    }
+    componentDidUpdate(prevProps, prevState) {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -791,9 +785,12 @@ var ConversationPanel = React.createClass({
         }
         if (!prevState.renameDialog && self.state.renameDialog === true) {
             var $input = $('.chat-rename-dialog input');
-            $input.trigger("focus");
-            $input[0].selectionStart = 0;
-            $input[0].selectionEnd = $input.val().length;
+            if ($input && $input[0] && !$($input[0]).is(":focus")) {
+                $input.trigger("focus");
+                $input[0].selectionStart = 0;
+                $input[0].selectionEnd = $input.val().length;
+            }
+
         }
 
         if (prevState.editing === false && self.state.editing !== false) {
@@ -816,8 +813,8 @@ var ConversationPanel = React.createClass({
                 }
             });
         }
-    },
-    handleWindowResize: function(e, scrollToBottom) {
+    }
+    handleWindowResize(e, scrollToBottom) {
         if (!M.chat) {
             return;
         }
@@ -858,11 +855,11 @@ var ConversationPanel = React.createClass({
         else {
             self.refreshUI(scrollToBottom);
         }
-    },
-    isActive: function() {
+    }
+    isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
-    },
-    onMessagesScrollReinitialise: function(
+    }
+    onMessagesScrollReinitialise(
                             ps,
                             $elem,
                             forced,
@@ -902,8 +899,8 @@ var ConversationPanel = React.createClass({
             }
 
         }
-    },
-    onMessagesScrollUserScroll: function(
+    }
+    onMessagesScrollUserScroll(
                         ps,
                         $elem,
                         e
@@ -1019,8 +1016,8 @@ var ConversationPanel = React.createClass({
         }
 
 
-    },
-    specificShouldComponentUpdate: function() {
+    }
+    specificShouldComponentUpdate() {
         if (
             this.isRetrievingHistoryViaScrollPull ||
             this.loadingShown ||
@@ -1042,8 +1039,8 @@ var ConversationPanel = React.createClass({
         else {
             return undefined;
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var room = this.props.chatRoom;
@@ -1263,7 +1260,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <AlterParticipantsConversationMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1271,7 +1268,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <TruncatedMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1279,7 +1276,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <PrivilegeChange
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1287,7 +1284,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <TopicChange
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1295,7 +1292,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <CloseOpenModeMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1303,7 +1300,7 @@ var ConversationPanel = React.createClass({
                         messageInstance = <ChatHandleMessage
                             message={v}
                             key={v.messageId}
-                            contact={M.u[v.userId]}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
                     }
@@ -1320,7 +1317,7 @@ var ConversationPanel = React.createClass({
                             message={v}
                             state={v.state}
                             key={v.messageId}
-                            contact={contact}
+                            contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                             onUpdate={() => {
                                 self.onResizeDoUpdate();
@@ -1612,9 +1609,19 @@ var ConversationPanel = React.createClass({
                     if (msg.getState() === Message.STATE.SENT ||
                         msg.getState() === Message.STATE.DELIVERED ||
                         msg.getState() === Message.STATE.NOT_SENT) {
-                        chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
-                        msg.deleted = true;
-                        msg.textContents = "";
+                            const textContents = msg.textContents || '';
+
+                            if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+                                const attachmentMetadata = msg.getAttachmentMeta() || [];
+
+                                attachmentMetadata.forEach((v) => {
+                                    M.moveToRubbish(v.h);
+                                });
+                            }
+
+                            chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
+                            msg.deleted = true;
+                            msg.textContents = "";
                     }
                     else if (
                         msg.getState() === Message.STATE.NOT_SENT_EXPIRED
@@ -1658,10 +1665,11 @@ var ConversationPanel = React.createClass({
                     </div>
 
                     <GenericConversationMessage
-                        className="dialog-wrapper"
+                        className=" dialog-wrapper"
                         message={self.state.messageToBeDeleted}
                         hideActionButtons={true}
                         initTextScrolling={true}
+                        dialog={true}
                     />
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1672,7 +1680,7 @@ var ConversationPanel = React.createClass({
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 megaChat={room.megaChat}
                 chatRoom={room}
-                title={__("Confirm paste")}
+                title={__(l[20905])}
                 name="paste-image-chat"
                 onClose={() => {
                     self.setState({'pasteImageConfirmDialog': false});
@@ -1706,7 +1714,7 @@ var ConversationPanel = React.createClass({
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__("Please confirm that you want to upload this image and share it in this chat room.")}
+                        {__(l[20906])}
                     </div>
 
                     <img
@@ -1823,6 +1831,9 @@ var ConversationPanel = React.createClass({
                 e.preventDefault();
                 e.stopPropagation();
             };
+            var renameDialogValue = typeof(self.state.renameDialogValue) !== 'undefined' ?
+                self.state.renameDialogValue :
+                self.props.chatRoom.getRoomTitle();
 
             confirmDeleteDialog = <ModalDialogsUI.ModalDialog
                 megaChat={room.megaChat}
@@ -1863,8 +1874,7 @@ var ConversationPanel = React.createClass({
                                 type="text"
                                 className="chat-rename-group-dialog"
                                 name="newTopic"
-                                defaultValue={self.props.chatRoom.getRoomTitle()}
-                                value={self.state.renameDialogValue}
+                                value={renameDialogValue}
                                 maxLength="30"
                                 onChange={(e) => {
                                     self.setState({
@@ -1914,7 +1924,7 @@ var ConversationPanel = React.createClass({
             var contactHandle = contacts[0];
             var contact = M.u[contactHandle];
 
-            topicInfo = <ContactsUI.ContactCard
+            topicInfo = <ContactCard
                 className="short"
                 noContextButton="true"
                 contact={contact}
@@ -1938,7 +1948,7 @@ var ConversationPanel = React.createClass({
         );
 
         return (
-            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove}
+            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove.bind(self)}
                  data-room-id={self.props.chatRoom.chatId}>
                 <div className={"chat-content-block " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ?
                     "with-pane" : "no-pane")}>
@@ -2072,7 +2082,7 @@ var ConversationPanel = React.createClass({
                             " have-pending-group-call" : ""
                     )}>
                         <div className="chat-topic-buttons">
-                            <ButtonsUI.Button
+                            <Button
                                 className="right"
                                 disableCheckingVisibility={true}
                                 icon={"small-icon " + (
@@ -2084,7 +2094,7 @@ var ConversationPanel = React.createClass({
                                     room.megaChat.toggleUIFlag('convPanelCollapse');
                                 }}
                             >
-                            </ButtonsUI.Button>
+                            </Button>
                             <span>
                                 <div
                                      className="button right"
@@ -2121,8 +2131,8 @@ var ConversationPanel = React.createClass({
                                         self.props.chatRoom.scrolledToBottom = 1;
 
                                     }}
-                                   onReinitialise={self.onMessagesScrollReinitialise}
-                                   onUserScroll={self.onMessagesScrollUserScroll}
+                                   onReinitialise={self.onMessagesScrollReinitialise.bind(this)}
+                                   onUserScroll={self.onMessagesScrollUserScroll.bind(this)}
                                    className="js-messages-scroll-area perfectScrollbarContainer"
                                    messagesToggledInCall={self.state.messagesToggledInCall}
                                    ref={(ref) => self.messagesListScrollable = ref}
@@ -2192,7 +2202,7 @@ var ConversationPanel = React.createClass({
                         <div className="chat-textarea-block">
                             <WhosTyping chatRoom={room} />
 
-                            <TypingAreaUI.TypingArea
+                            <TypingArea
                                 chatRoom={self.props.chatRoom}
                                 className="main-typing-area"
                                 disabled={room.isReadOnly()}
@@ -2271,12 +2281,12 @@ var ConversationPanel = React.createClass({
                                     }
                                 }}
                             >
-                                    <ButtonsUI.Button
+                                    <Button
                                         className="popup-button left"
                                         icon="small-icon grey-small-plus"
                                         disabled={room.isReadOnly()}
                                         >
-                                        <DropdownsUI.Dropdown
+                                        <Dropdown
                                             className="wide-dropdown attach-to-chat-popup light"
                                             noArrow="true"
                                             positionMy="left top"
@@ -2286,14 +2296,14 @@ var ConversationPanel = React.createClass({
                                             <div className="dropdown info-txt">
                                                 {__(l[19793]) ? __(l[19793]) : "Send files from..."}
                                             </div>
-                                            <DropdownsUI.DropdownItem
+                                            <DropdownItem
                                                 className="link-button light"
                                                 icon="grey-cloud colorized"
                                                 label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }} />
-                                            <DropdownsUI.DropdownItem
+                                            <DropdownItem
                                                 className="link-button light"
                                                 icon="grey-computer colorized"
                                                 label={__(l[19795]) ? __(l[19795]) : "My computer"}
@@ -2301,16 +2311,16 @@ var ConversationPanel = React.createClass({
                                                     self.uploadFromComputer();
                                             }} />
                                             <div className="chat-button-seperator"></div>
-                                            <DropdownsUI.DropdownItem
+                                            <DropdownItem
                                                 className="link-button light"
                                                 icon="square-profile colorized"
                                                 label={__(l[8628])}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />
-                                        </DropdownsUI.Dropdown>
-                                    </ButtonsUI.Button>
-                            </TypingAreaUI.TypingArea>
+                                        </Dropdown>
+                                    </Button>
+                            </TypingArea>
                         </div>
                         )
                         }
@@ -2319,11 +2329,10 @@ var ConversationPanel = React.createClass({
             </div>
         );
     }
-});
+};
 
-var ConversationPanels = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function() {
+export class ConversationPanels extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
 
         var conversations = [];
@@ -2382,7 +2391,7 @@ var ConversationPanels = React.createClass({
                         var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactsUI.ContactCard contact={contact} megaChat={self.props.megaChat}
+                            <ContactCard contact={contact} megaChat={self.props.megaChat}
                                                     key={contact.u}/>
                         );
                     }
@@ -2427,11 +2436,4 @@ var ConversationPanels = React.createClass({
             );
         }
     }
-});
-
-
-
-module.exports = {
-    ConversationPanel,
-    ConversationPanels
 };

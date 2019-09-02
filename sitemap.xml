@@ -290,25 +290,6 @@
 	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/sourcecode?zh"/>
   </url>
   <url> 
-    <loc>https://mega.nz/general</loc>
-	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/general"/>
-	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/general?es"/>
-	<xhtml:link rel="alternate" hreflang="pt" href="https://mega.nz/general?pt"/>
-	<xhtml:link rel="alternate" hreflang="de" href="https://mega.nz/general?de"/>
-	<xhtml:link rel="alternate" hreflang="nl" href="https://mega.nz/general?nl"/>
-	<xhtml:link rel="alternate" hreflang="ru" href="https://mega.nz/general?ru"/>
-	<xhtml:link rel="alternate" hreflang="fr" href="https://mega.nz/general?fr"/>
-	<xhtml:link rel="alternate" hreflang="vi" href="https://mega.nz/general?vi"/>
-	<xhtml:link rel="alternate" hreflang="ko" href="https://mega.nz/general?ko"/>
-	<xhtml:link rel="alternate" hreflang="it" href="https://mega.nz/general?it"/>
-	<xhtml:link rel="alternate" hreflang="tr" href="https://mega.nz/general?tr"/>
-	<xhtml:link rel="alternate" hreflang="ja" href="https://mega.nz/general?ja"/>
-	<xhtml:link rel="alternate" hreflang="zh-TW" href="https://mega.nz/general?zh-tw"/>
-	<xhtml:link rel="alternate" hreflang="zh-HK" href="https://mega.nz/general?zh-hk"/>
-	<xhtml:link rel="alternate" hreflang="zh-SG" href="https://mega.nz/general?zh-sg"/>
-	<xhtml:link rel="alternate" hreflang="zh-CN" href="https://mega.nz/general?zh"/>
-  </url>
-  <url> 
     <loc>https://mega.nz/terms</loc>
 	<xhtml:link rel="alternate" hreflang="en" href="https://mega.nz/terms"/>
 	<xhtml:link rel="alternate" hreflang="es" href="https://mega.nz/terms?es"/>

@@ -1,31 +1,35 @@
-var React = require("react");
-var utils = require('./../../../ui/utils.jsx');
-var getMessageString = require('./utils.jsx').getMessageString;
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var MetaRichpreview = require('./metaRichpreview.jsx').MetaRichpreview;
-var MetaRichpreviewConfirmation = require('./metaRichpreviewConfirmation.jsx').MetaRichpreviewConfirmation;
-var MetaRichpreviewMegaLinks = require('./metaRichpreviewMegaLinks.jsx').MetaRichpreviewMegaLinks;
-var ContactsUI = require('./../contacts.jsx');
-var TypingAreaUI = require('./../typingArea.jsx');
+import React from 'react';
+import utils from './../../../ui/utils.jsx';
+import { getMessageString } from './utils.jsx';
+import { ConversationMessageMixin } from './mixin.jsx';
+import { MetaRichpreview } from './metaRichpreview.jsx';
+import { MetaRichpreviewConfirmation } from './metaRichpreviewConfirmation.jsx';
+import { MetaRichpreviewMegaLinks } from './metaRichpreviewMegaLinks.jsx';
+import { Avatar, ContactButton, ContactPresence, ContactFingerprint, ContactVerified } from './../contacts.jsx';
+import {TypingArea} from './../typingArea.jsx';
+import AudioContainer from './AudioContainer.jsx';
+import GeoLocation from './geoLocation.jsx';
+var DropdownsUI = require('./../../../ui/dropdowns.jsx');
+var ButtonsUI = require('./../../../ui/buttons.jsx');
 
 /* 1h as confirmed by Mathias */
-var MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
+const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
 
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-var GenericConversationMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-    getInitialState: function() {
-        return {
-            'editing': this.props.editing
+class GenericConversationMessage extends ConversationMessageMixin {
+    constructor(props) {
+        super(props);
+        this.state = {
+            'editing': this.props.editing,
         };
-    },
-    isBeingEdited: function() {
+    }
+    isBeingEdited() {
         return this.state.editing === true || this.props.editing === true;
-    },
-    componentDidUpdate: function(oldProps, oldState) {
+    }
+    componentDidUpdate(oldProps, oldState) {
         var self = this;
         if (self.isBeingEdited() && self.isMounted()) {
             var $generic = $(self.findDOMNode());
@@ -53,10 +57,9 @@ var GenericConversationMessage = React.createClass({
                 }
             });
         });
-
-
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         var $node = $(self.findDOMNode());
 
@@ -101,15 +104,34 @@ var GenericConversationMessage = React.createClass({
                     $('.button.default-white-button.tiny-button', $block).trigger('click');
                 });
             });
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var $node = $(self.findDOMNode());
 
         $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
-    },
-    _nodeUpdated: function(h) {
+    }
+    haveMoreContactListeners() {
+        if (!this.props.message || !this.props.message.meta) {
+            return false;
+        }
+
+        if (this.props.message.meta) {
+            if (this.props.message.meta.participants) {
+                // call ended type of message
+                return this.props.message.meta.participants;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    _nodeUpdated(h) {
         var self = this;
         // because it seems the webclient can trigger stuff before the actual
         // change is done on the node, this function would need to be queued
@@ -122,8 +144,8 @@ var GenericConversationMessage = React.createClass({
                 }
             }
         });
-    },
-    doDelete: function(e, msg) {
+    }
+    doDelete(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
 
@@ -133,8 +155,8 @@ var GenericConversationMessage = React.createClass({
         else {
             this.props.onDeleteClicked(e, this.props.message);
         }
-    },
-    doCancelRetry: function(e, msg) {
+    }
+    doCancelRetry(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
         var chatRoom = this.props.message.chatRoom;
@@ -145,8 +167,8 @@ var GenericConversationMessage = React.createClass({
             chatRoom,
             msg.messageId
         );
-    },
-    doRetry: function(e, msg) {
+    }
+    doRetry(e, msg) {
         var self = this;
         e.preventDefault(e);
         e.stopPropagation(e);
@@ -161,39 +183,41 @@ var GenericConversationMessage = React.createClass({
             });
 
 
-    },
-    _favourite: function(h) {
+    }
+    _favourite(h) {
         var newFavState = Number(!M.isFavourite(h));
         M.favourite([h], newFavState);
-    },
-    _addFavouriteButtons: function(h, arr) {
+    }
+    _addFavouriteButtons(h, arr) {
         var self = this;
 
         if (M.getNodeRights(h) > 1) {
             var isFav = M.isFavourite(h);
 
             arr.push(
-                <DropdownsUI.DropdownItem icon={"context " + (isFav ? "broken-heart" : "heart")}
-                                          label={isFav ? l[5872] : l[5871]}
-                                          isFav={isFav}
-                                          key="fav"
-                                          onClick={(e) => {
-                                              self._favourite(h);
-                                              e.stopPropagation();
-                                              e.preventDefault();
-                                              return false;
-                                          }}/>
+                <DropdownsUI.DropdownItem
+                    icon={"context " + (isFav ? "broken-heart" : "heart")}
+                    label={isFav ? l[5872] : l[5871]}
+                    isFav={isFav}
+                    key="fav"
+                    onClick={(e) => {
+                        self._favourite(h);
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return false;
+                    }}
+                />
             );
             return isFav;
         }
         else {
             return false;
         }
-    },
-    _isNodeHavingALink: function(h) {
+    }
+    _isNodeHavingALink(h) {
         return M.getNodeShare(h) !== false;
-    },
-    _addLinkButtons: function(h, arr) {
+    }
+    _addLinkButtons(h, arr) {
         var self = this;
 
         var haveLink = self._isNodeHavingALink(h) === true;
@@ -201,35 +225,38 @@ var GenericConversationMessage = React.createClass({
         var getManageLinkText = haveLink ? l[6909] : l[59];
 
         arr.push(
-            <DropdownsUI.DropdownItem icon="icons-sprite chain"
-                                      key="getLinkButton"
-                                      label={getManageLinkText}
-                                      onClick={self._getLink.bind(self, h)}
+            <DropdownsUI.DropdownItem
+                icon="icons-sprite chain"
+                key="getLinkButton"
+                label={getManageLinkText}
+                onClick={self._getLink.bind(self, h)}
             />);
 
         if (haveLink) {
             arr.push(
-                <DropdownsUI.DropdownItem icon="context remove-link"
-                                          key="removeLinkButton"
-                                          label={__(l[6821])}
-                                          onClick={self._removeLink.bind(self, h)}
-                />);
+                <DropdownsUI.DropdownItem
+                    icon="context remove-link"
+                    key="removeLinkButton"
+                    label={__(l[6821])}
+                    onClick={self._removeLink.bind(self, h)}
+                />
+            );
             return true;
         }
         else {
             return false;
         }
-    },
-    _startDownload: function(v) {
+    }
+    _startDownload (v) {
         M.addDownload([v]);
-    },
-    _addToCloudDrive: function(v, openSendToChat) {
+    }
+    _addToCloudDrive(v, openSendToChat) {
         $.selected = [v.h];
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
-                megaChat.getMyChatFilesFolder()
-                    .then(function(myChatFolderId) {
-                        M.injectNodes(node, myChatFolderId, function(res) {
+                M.myChatFilesFolder.get(true)
+                    .then(function(myChatFolder) {
+                        M.injectNodes(node, myChatFolder.h, function(res) {
                             if (Array.isArray(res) && res.length) {
                                 megaChat.openChatAndAttachNodes(target, res).dump();
                             }
@@ -267,9 +294,8 @@ var GenericConversationMessage = React.createClass({
                 });
             }
         }, openSendToChat ? "conversations" : false);
-    },
-
-    _getLink: function(h, e) {
+    }
+    _getLink(h, e) {
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -280,8 +306,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-    _removeLink: function(h, e) {
+    }
+    _removeLink(h, e) {
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -294,9 +320,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-
-    _startPreview: function(v, e) {
+    }
+    _startPreview(v, e) {
         if ($(e && e.target).is('.tiny-button')) {
             // prevent launching the previewer clicking the dropdown on an previewable item without thumbnail
             return;
@@ -311,9 +336,8 @@ var GenericConversationMessage = React.createClass({
             e.preventDefault();
             e.stopPropagation();
         }
-    },
-
-    render: function () {
+    }
+    render() {
         var self = this;
 
         var message = this.props.message;
@@ -481,14 +505,18 @@ var GenericConversationMessage = React.createClass({
                                         var downloadButton = null;
 
                                         if (message.isEditable && message.isEditable()) {
-                                            revokeButton = <DropdownsUI.DropdownItem icon="red-cross"
-                                                                                     label={__(l[83])}
-                                                                                     className="red"
-                                                                                     onClick={() => {
-                                                 chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
-                                                     chatRoom, message.internalId || message.orderValue, ""
-                                                 );
-                                            }}/>
+                                            revokeButton = (
+                                                <DropdownsUI.DropdownItem
+                                                    icon="red-cross"
+                                                    label={__(l[83])}
+                                                    className="red"
+                                                    onClick={() => {
+                                                        chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
+                                                            chatRoom, message.internalId || message.orderValue, ""
+                                                        );
+                                                    }}
+                                                />
+                                            );
                                         }
 
                                         if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
@@ -510,28 +538,35 @@ var GenericConversationMessage = React.createClass({
                                                 label={__(l[1187])}
                                                 onClick={self._startDownload.bind(self, v)}/>;
 
-                                            self._addLinkButtons(v.h, linkButtons);
+                                            if (M.getNodeRoot(v.h) !== M.RubbishID) {
+                                                self._addLinkButtons(v.h, linkButtons);
+                                            }
 
                                             firstGroupOfButtons.push(
-                                                <DropdownsUI.DropdownItem icon="context info" label={__(l[6859])}
-                                                                          key="infoDialog"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              propertiesDialog();
-                                                                          }}/>
+                                                <DropdownsUI.DropdownItem
+                                                    icon="context info"
+                                                    label={__(l[6859])}
+                                                    key="infoDialog"
+                                                    onClick={() => {
+                                                        $.selected = [v.h];
+                                                        propertiesDialog();
+                                                    }}
+                                                />
                                             );
 
 
                                             self._addFavouriteButtons(v.h, firstGroupOfButtons);
 
                                             linkButtons.push(
-                                                <DropdownsUI.DropdownItem icon="small-icon conversations"
-                                                                          label={__(l[17764])}
-                                                                          key="sendToChat"
-                                                                          onClick={() => {
-                                                                              $.selected = [v.h];
-                                                                              openCopyDialog('conversations');
-                                                                          }}/>
+                                                <DropdownsUI.DropdownItem
+                                                    icon="small-icon conversations"
+                                                    label={__(l[17764])}
+                                                    key="sendToChat"
+                                                    onClick={() => {
+                                                        $.selected = [v.h];
+                                                        openCopyDialog('conversations');
+                                                    }}
+                                                />
                                             );
 
                                         }
@@ -598,7 +633,7 @@ var GenericConversationMessage = React.createClass({
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className={"data-block-view medium " + noThumbPrev}
-                                           onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                           onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}>
                             {dropdown}
 
                             <div className="data-block-bg">
@@ -621,7 +656,9 @@ var GenericConversationMessage = React.createClass({
                                     isPreviewable ? " previewable" : "non-previewable"
                                 );
                                 thumbOverlay = <div className="thumb-overlay"
-                                                    onClick={isPreviewable && self._startPreview.bind(self, v)}>
+                                                    onClick={
+                                                        isPreviewable ? self._startPreview.bind(self, v) : undefined
+                                                    }>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
                                         {v.playtime && <i className="small-icon small-play-icon"></i>}
@@ -636,7 +673,7 @@ var GenericConversationMessage = React.createClass({
 
                                 <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
                                      key={'thumb-' + v.ch}
-                                     onClick={isPreviewable && self._startPreview.bind(self, v)}
+                                     onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}
                                 />
                             </div>) : preview);
                         }
@@ -668,10 +705,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -752,13 +789,13 @@ var GenericConversationMessage = React.createClass({
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactsUI.ContactPresence className="small" contact={contact} />
-                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <ContactPresence className="small" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
                                         </div>
                                     </div>
-                                    <ContactsUI.ContactFingerprint contact={contact} />
+                                    <ContactFingerprint contact={contact} />
 
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
@@ -800,8 +837,8 @@ var GenericConversationMessage = React.createClass({
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactsUI.ContactPresence className="small" contact={contact} />
-                                        <ContactsUI.Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <ContactPresence className="small" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
                                             {M.getNameByHandle(contact.u)}
                                         </div>
@@ -853,7 +890,7 @@ var GenericConversationMessage = React.createClass({
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactsUI.ContactVerified className="right-align" contact={contact} /> :
+                                            <ContactVerified className="right-align" contact={contact} /> :
                                             null
                                     }
 
@@ -863,11 +900,11 @@ var GenericConversationMessage = React.createClass({
                                     <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactsUI.ContactPresence className="small" contact={contact} /> :
+                                                <ContactPresence className="small" contact={contact} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <ContactsUI.Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -883,10 +920,10 @@ var GenericConversationMessage = React.createClass({
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -907,6 +944,90 @@ var GenericConversationMessage = React.createClass({
                     // don't show anything if this is a 'revoke' message
                     return null;
                 }
+                else if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
+                    let avatar = null;
+                    let messageActionButtons = null;
+
+                    if (this.props.grouped) {
+                        additionalClasses += " grouped";
+                    }
+                    else {
+                        avatar = (
+                            <Avatar
+                                contact={contact}
+                                className="message avatar-wrapper small-rounded-avatar"
+                            />
+                        );
+                        datetime = <div className="message date-time simpletip"
+                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                    }
+
+                    const attachmentMetadata = message.getAttachmentMeta() || [];
+                    let audioContainer = null;
+
+                    attachmentMetadata.forEach((v) => {
+                        audioContainer = (
+                            <AudioContainer
+                                h={v.h}
+                                mime={v.mime}
+                                playtime={v.playtime}
+                                audioId={`vm${message.messageId}`}
+                            />
+                        );
+                    });
+
+                    const iAmSender = (contact && contact.u === u_handle);
+                    const stillEditable = (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT;
+                    const isBeingEdited = (self.isBeingEdited() === true);
+                    const chatIsReadOnly = (chatRoom.isReadOnly() === true);
+
+                    if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !self.props.dialog) {
+                        const deleteButton = (
+                            <DropdownsUI.DropdownItem
+                                icon="red-cross"
+                                label={__(l[1730])}
+                                className="red"
+                                onClick={(e) => {
+                                    self.doDelete(e, message);
+                                }}
+                            />
+                        );
+
+                        messageActionButtons = (
+                            <ButtonsUI.Button
+                                className="default-white-button tiny-button"
+                                icon="tiny-icon icons-sprite grey-dots">
+                                <DropdownsUI.Dropdown
+                                    className="white-context-menu attachments-dropdown"
+                                    noArrow={true}
+                                    positionMy="left bottom"
+                                    positionAt="right bottom"
+                                    horizOffset={4}
+                                >
+                                {deleteButton}
+                                </DropdownsUI.Dropdown>
+                            </ButtonsUI.Button>
+                        );
+                    }
+
+                    return (
+                        <div className={message.messageId + " message body" + additionalClasses}>
+                            {avatar}
+                            <div className="message content-area">
+                                {name}
+                                {datetime}
+                                {messageActionButtons}
+                                <div className="message shared-block">
+                                    {files}
+                                </div>
+                                {buttonsBlock}
+                                {spinnerElement}
+                                {audioContainer}
+                            </div>
+                        </div>
+                    );
+                }
                 else {
                     chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
                     return null;
@@ -914,6 +1035,8 @@ var GenericConversationMessage = React.createClass({
             }
             else {
                 // this is a text message.
+                let geoLocation = null;
+
                 if (message.textContents === "" && !message.dialogType) {
                     message.deleted = true;
                 }
@@ -1002,6 +1125,12 @@ var GenericConversationMessage = React.createClass({
 
 
                     }
+                    else if (message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+                        const { lng, la: latitude } = message.meta.extra[0];
+                        geoLocation = (
+                            <GeoLocation latitude={latitude} lng={lng}/>
+                        );
+                    }
                     if (message.megaLinks) {
                         subMessageComponent.push(<MetaRichpreviewMegaLinks
                             key={"richprevml"}
@@ -1057,10 +1186,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
                     datetime = <div className="message date-time simpletip"
                                     data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton contact={contact} className="message" label={displayName} />;
                 }
 
                 var messageDisplayBlock;
@@ -1068,7 +1197,7 @@ var GenericConversationMessage = React.createClass({
                     var msgContents = message.textContents;
                     msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
 
-                    messageDisplayBlock = <TypingAreaUI.TypingArea
+                    messageDisplayBlock = <TypingArea
                         iconClass="small-icon writing-pen textarea-icon"
                         initialText={msgContents}
                         chatRoom={self.props.message.chatRoom}
@@ -1125,7 +1254,7 @@ var GenericConversationMessage = React.createClass({
                         chatRoom.isReadOnly() === false &&
                         !message.requiresManualRetry
                     ) {
-                        var editButton = message.metaType !== -1 ?
+                        var editButton = (message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION) ?
                             <DropdownsUI.DropdownItem
                                 icon="icons-sprite writing-pencil"
                                 label={__(l[1342])}
@@ -1164,6 +1293,11 @@ var GenericConversationMessage = React.createClass({
 
                     }
                 }
+                const isGeoLocation = message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+
+                if (isGeoLocation) {
+                    messageDisplayBlock = null;
+                }
 
                 return (
                     <div className={message.messageId + " message body " + additionalClasses}>
@@ -1178,6 +1312,7 @@ var GenericConversationMessage = React.createClass({
                             {subMessageComponent}
                             {buttonsBlock}
                             {spinnerElement}
+                            {geoLocation}
                         </div>
                     </div>
                 );
@@ -1216,10 +1351,10 @@ var GenericConversationMessage = React.createClass({
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <ContactsUI.Avatar contact={message.authorContact}
+                    avatar = <Avatar contact={message.authorContact}
                                                 className="message avatar-wrapper small-rounded-avatar"/>;
                     displayName = M.getNameByHandle(message.authorContact.u);
-                    name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton contact={contact} className="message" label={displayName} />;
                 }
             }
 
@@ -1351,7 +1486,7 @@ var GenericConversationMessage = React.createClass({
                         var handle = base64urlencode(handleAndSid.substr(0, 8));
                         if (!unique[handle]) {
                             avatarsListing.push(
-                                <ContactsUI.Avatar
+                                <Avatar
                                     key={handle}
                                     contact={M.u[handle]}
                                     simpletip={M.u[handle] && M.u[handle].name}
@@ -1398,8 +1533,8 @@ var GenericConversationMessage = React.createClass({
             )
         }
     }
-});
+};
 
-module.exports = {
+export {
     GenericConversationMessage
 };

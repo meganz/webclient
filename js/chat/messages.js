@@ -563,16 +563,17 @@ Message.SOURCE = {
 };
 
 Message.MANAGEMENT_MESSAGE_TYPES = {
-    "MANAGEMENT": "\0",
+    "MANAGEMENT": "\x00",
     "ATTACHMENT": "\x10",
     "REVOKE_ATTACHMENT": "\x11",
     "CONTACT": "\x12",
     "CONTAINS_META": "\x13",
-
+    "VOICE_CLIP": "\x14"
 };
 
 Message.MESSAGE_META_TYPE = {
-    "RICH_PREVIEW": "\0",
+    "RICH_PREVIEW": "\x00",
+    "GEOLOCATION": "\x01"
 };
 
 Message._stateToText = Object.create(null);
@@ -598,7 +599,8 @@ Message.prototype.isRenderableManagement = function() {
     return this.textContents.substr(0, 1) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT && (
             this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT ||
             this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META ||
-            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTACT ||
+            this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP
         );
 };
 
@@ -609,7 +611,10 @@ Message.prototype.getManagementMessageSummaryText = function() {
     if (!this.isManagement()) {
         return this.textContents;
     }
-    if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
+    var messageHasAttachment = (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT);
+    var messageIsVoiceClip = (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP);
+
+    if (messageHasAttachment || messageIsVoiceClip) {
         var nodes = JSON.parse(this.textContents.substr(2, this.textContents.length));
         if (nodes.length === 1) {
             return __(l[8894]).replace("%s", nodes[0].name);
@@ -858,6 +863,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         self.chatdIsProcessingHistory = false;
         self.sendingListFlushed = true;
         self.expectedMessagesCount = 0;
+        if (self.$msgsHistoryLoading && self.$msgsHistoryLoading.reject) {
+            self.$msgsHistoryLoading.reject();
+        }
+        if (self.$sharedFilesLoading && self.$sharedFilesLoading.reject) {
+            self.$sharedFilesLoading.reject();
+        }
     });
 
     chatRoom.rebind('onHistoryDecrypted.mb', function() {
@@ -998,12 +1009,6 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             ) {
                 // this is an empty/new chat.
                 self.expectedMessagesCount = 0;
-                self.retrievedAllMessages = true;
-            }
-            else if (
-                self.expectedMessagesCount === requestedMessagesCount
-            ) {
-                self.haveMessages = true;
                 self.retrievedAllMessages = true;
             }
             else if (

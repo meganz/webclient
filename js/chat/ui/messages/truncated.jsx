@@ -1,15 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var TruncatedMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    render: function () {
+class TruncatedMessage extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -42,7 +40,6 @@ var TruncatedMessage = React.createClass({
                                         className="message avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time simpletip"
                             data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-            name = <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />;
         }
 
 
@@ -61,8 +58,8 @@ var TruncatedMessage = React.createClass({
             </div>
         );
     }
-});
+};
 
-module.exports = {
+export {
     TruncatedMessage
 };

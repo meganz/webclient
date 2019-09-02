@@ -23,6 +23,24 @@
             <i class="small-icon"></i>[$94]</a>
     </div>
     <div class="dropdown-section">
+        <!--<a class="dropdown-item notactive visible-col-select" megatype="fname">
+            <i class="small-icon"></i>[$86]</a>-->
+        <a class="dropdown-item visible-col-select" megatype="type">
+            <i class="small-icon"></i>[$93]</a>
+        <a class="dropdown-item visible-col-select" megatype="timeAd">
+            <i class="small-icon"></i><span>[$17445]</span></a>
+        <a class="dropdown-item visible-col-select" megatype="timeMd">
+            <i class="small-icon"></i>[$94]</a>
+        <a class="dropdown-item visible-col-select" megatype="size">
+            <i class="small-icon"></i>[$87]</a>
+        <a class="dropdown-item visible-col-select" megatype="fav">
+            <i class="small-icon"></i>[$5871]</a>
+        <a class="dropdown-item visible-col-select" megatype="versions">
+            <i class="small-icon"></i>[$17150]</a>
+        <a class="dropdown-item visible-col-select" megatype="label">
+            <i class="small-icon"></i>[$17398]</a>
+    </div>
+    <div class="dropdown-section">
         <a class="dropdown-item play-item"><i class="small-icon context videocam"></i><span>[$16275]</span></a>
         <a class="dropdown-item preview-item"><i class="small-icon context loupe"></i>[$1899]</a>
         <a class="dropdown-item open-item"><i class="small-icon context open-folder"></i>[$865]</a>
@@ -160,12 +178,46 @@
         <hr />
     </div>
     <div class="dropdown-section">
+        <a class="dropdown-item sort-grid-item-main contains-submenu"><i class="small-icon context sortgrid"></i>[$6170]</a>
+        <span class="dropdown body submenu sorting">
+            <span>
+            <span class="dropdown-item sort-grid-item sort-name s-fm s-inshare s-outshare">
+                <i class="small-icon context sort-name"></i>[$86]</span>
+            <span class="dropdown-item sort-grid-item sort-owner s-inshare">
+                <i class="small-icon context sort-owner"></i>[$5905]</span>
+            <span class="dropdown-item sort-grid-item sort-sharedwith s-outshare">
+                <i class="small-icon context sort-sharedwith"></i>[$1036]</span>
+            <span class="dropdown-item sort-grid-item sort-type s-fm">
+                <i class="small-icon context sort-type"></i>[$93]</span>
+            <span class="dropdown-item sort-grid-item sort-timeAd s-fm">
+                <i class="small-icon context sort-timeAd"></i>[$17445]</span>
+            <span class="dropdown-item sort-grid-item sort-timeMd s-fm">
+                <i class="small-icon context sort-timeMd s-fm"></i>[$94]</span>
+            <span class="dropdown-item sort-grid-item sort-size s-fm s-inshare s-outshare">
+                <i class="small-icon context sort-size "></i>[$87]</span>
+            <span class="dropdown-item sort-grid-item sort-fav s-fm s-inshare s-outshare">
+                <i class="small-icon context sort-fav"></i>[$5871]</span>
+            <span class="dropdown-item sort-grid-item sort-label s-fm">
+                <i class="small-icon context sort-label"></i>[$17398]</span>
+            <span class="dropdown-item sort-grid-item sort-access s-inshare">
+                <i class="small-icon context sort-access "></i>[$5906]</span>
+            <span class="dropdown-item sort-grid-item sort-sharecreated s-outshare">
+                <i class="small-icon context sort-sharecreated s-outshare"></i>[$20670]</span>
+            </span>
+        </span>
+        <hr />
+    </div>
+    <div class="dropdown-section">
         <a class="dropdown-item fileupload-item">
             <i class="small-icon context file-upload"></i>[$99]</a>
         <input type="file" id="fileselect3" name="fileselect3" multiple class="hidden">
         <a class="dropdown-item folderupload-item">
             <i class="small-icon context folder-upload"></i>[$98]</a>
         <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item set-nickname"><i class="small-icon context writing-pen"></i>[$20828]</a>
+        <hr />
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item remove-contact red"><i class="small-icon context red-stop"></i>[$83]</a>
@@ -738,6 +790,15 @@
         <div id="topmenu"></div>
 
         <div class="section conversations hidden">
+            <div class="fm-chat-is-loading hidden">
+                <div class="fm-empty-messages">
+                    <div class="loading-spinner js-messages-loading light manual-management"
+                         style="top: 50%;">
+                        <div class="main-loader"
+                             style="position: fixed; top: 50%; left: 50%; margin-left: -72px;"></div>
+                </div>
+            </div>;
+            </div>
         </div>
 
         <div class="fm-right-files-block">
@@ -771,35 +832,6 @@
 
             <div class="fm-right-header fm hidden">
 
-                <a class="fm-back-button"></a>
-                <div class="fm-breadcrumbs-block">
-                    <a class="fm-breadcrumbs contacts contains-directories has-next-button hidden">
-                        <span class="right-arrow-bg">
-                            <span>[$165]</span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs public-links hidden">
-                        <span class="right-arrow-bg ui-draggable">
-                            <span>
-                                <i class="small-icon context get-link"></i>
-                                [$16516]
-                                <span class="public-links-cnt">0</span>
-                            </span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs received-requests contains-directories hidden">
-                        <span class="right-arrow-bg ui-draggable">
-                            <span>[$5863]</span>
-                        </span>
-                    </a>
-                    <a class="fm-breadcrumbs sent-requests contains-directories hidden">
-                        <span class="left-arrow-bg ui-draggable">
-                            <span>[$5862]</span>
-                        </span>
-                    </a>
-                    <div class="clear"></div>
-                </div>
-
                 <div class="fm-header-buttons">
                     <!-- Please add "inactive" to "fm-files-view-icon" classname if buttons couldnt be clicked !-->
                     <a class="fm-files-view-icon block-view" title="[$5552]"></a>
@@ -823,7 +855,7 @@
                     </div>
 
                     <div class="button link-button right fm-add-user hidden">
-                        <i class="small-icon dark-grey-plus"></i>
+                        <i class="small-icon rounded-grey-plus"></i>
                         <span>[$101]</span>
                     </div>
 
@@ -917,8 +949,10 @@
                         <i class="small-icon icons-sprite small-cross"></i>
                     </div>
                 </div>
-
-                <div class="clear"></div>
+                
+                <div class="fm-breadcrumbs-wrapper">
+                    <div class="fm-breadcrumbs-block"></div>
+                </div>
 
             </div>
 
@@ -1113,26 +1147,49 @@
 
 
             <div class="files-grid-view fm hidden">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                    <tr>
-                        <th class="grid-first-th">
-                            <span class="grid-header-star fav"></span>
-                        </th>
-                        <th>
-                            <div class="arrow name label asc">[$86]</div>
-                        </th>
-                        <th>
-                            <div class="arrow size">[$87]</div>
-                        </th>
-                        <th>
-                            <div class="arrow type">[$93]</div>
-                        </th>
-                        <th>
-                            <div class="arrow date">[$896]</div>
-                        </th>
-                        <th class="grid-url-header"></th>
-                    </tr>
-                </table>
+                <div class="grid-table-header-container-sc">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
+                        <div class="column-settings overlap"></div>
+                        <tr>
+                            <th megatype="fav" class="grid-first-th">
+                                <span class="grid-header-star fav"></span>
+                            </th>
+                            <th megatype="fname">
+                                <div class="arrow name label asc">[$86]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="label">
+                                <div class="arrow label">[$17398]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="size">
+                                <div class="arrow size">[$87]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="type">
+                                <div class="arrow type">[$93]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="timeAd">
+                                <div class="arrow date">[$17445]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="timeMd">
+                                <div class="arrow mtime">[$94]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <th megatype="versions">
+                                <div class="arrow ">[$17150]</div>
+                                <div class="grid-view-resize">&nbsp;</div>
+                            </th>
+                            <!--<th megatype="extras">
+                <div class="arrow ">[$17150]</div>
+                <div class="grid-view-resize">&nbsp;</div>
+            </th>-->
+                            <th megatype="extras" class="grid-url-header"></th>
+                        </tr>
+                    </table>
+                </div>
                 <div class="grid-scrolling-table megaListContainer">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table fm">
                         <tr class="clone-of-header">
@@ -1147,23 +1204,8 @@
                         </tr>
                     </table>
                 </div>
-                <div class="search-bottom-menu">
-                    <div class="search-path-icon cloud-drive"></div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon folder"></div>
-                    <div class="search-path-txt">
-                        [$1049]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon text">
-                    </div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="clear"></div>
+                <div class="search-bottom-wrapper">
+                    <div class="search-bottom-menu"></div>
                 </div>
             </div>
 
@@ -1171,23 +1213,8 @@
             <div class="fm-blocks-view fm hidden">
                 <div class="file-block-scrolling"></div>
                 <div class="blocks-view-data"></div>
-                <div class="search-bottom-menu">
-                    <div class="search-path-icon cloud-drive"></div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon folder"></div>
-                    <div class="search-path-txt">
-                        [$1049]
-                    </div>
-                    <div class="search-path-arrow"></div>
-                    <div class="search-path-icon text">
-                    </div>
-                    <div class="search-path-txt">
-                        [$164]
-                    </div>
-                    <div class="clear"></div>
+                <div class="search-bottom-wrapper">
+                    <div class="search-bottom-menu"></div>
                 </div>
             </div>
 
@@ -1427,79 +1454,95 @@
 
                         <div class="subaccount-view-used-data">
                             <div class="view-title">[$16130]</div>
-                            <div class="used-storage-info ba-root">
-                                <i class="folder-small-icon cloud"></i>
-                                <div class="ff-name">
-                                    [$164]
+                            <div class="used-storage-wrap">
+                                <div class="used-storage-info ba-root">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon cloud"></i>
+                                    </div>
+                                    <div class="ff-name">
+                                        [$164]
+                                    </div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
+                                    </div>
+                                <div class="used-storage-info ba-inshare">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon income"></i>
+                                    </div>
+                                    <div class="ff-name">[$16770]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
+                                <div class="used-storage-info ba-inshare-ex">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon ex-in-share"></i>
+                                    </div>
+                                    <div class="ff-name">[$19187]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-inshare">
-                                <i class="folder-small-icon income"></i>
-                                <div class="ff-name">[$16770]</div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
+                                <div class="used-storage-info ba-outshare">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon income"></i>
+                                    </div>
+                                    <div class="ff-name">[$5543]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-inshare-ex">
-                                <i class="folder-small-icon ex-in-share"></i>
-                                <div class="ff-name">[$19187]</div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
+                                <div class="used-storage-info ba-outshare-ex">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon ex-out-share"></i>
+                                    </div>
+                                    <div class="ff-name">[$19926]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-outshare">
-                                <i class="folder-small-icon income"></i>
-                                <div class="ff-name">[$5543]</div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
+                                <div class="used-storage-info ba-rubbish">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon rubbish"></i>
+                                    </div>
+                                    <div class="ff-name">[$167]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-outshare-ex">
-                                <i class="folder-small-icon ex-out-share"></i>
-                                <div class="ff-name">[$19926]</div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
+                                <div class="used-storage-info ba-version">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="folder-small-icon tiny-clock"></i>
+                                    </div>
+                                    <div class="ff-name">
+                                        [$17821]
+                                        <i class="tiny-icon cog versioning-settings hidden" title="[$17580]" alt="[$17580]"></i>
+                                    </div>
+                                    <div class="ff-number">
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                    <div class="clear"></div>
                                 </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-rubbish">
-                                <i class="folder-small-icon rubbish"></i>
-                                <div class="ff-name">[$167]</div>
-                                <div class="ff-number">
-                                    <div class="folder-number"> </div>
-                                    <div class="file-number"> </div>
-                                </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
-                            </div>
-                            <div class="used-storage-info ba-version">
-                                <i class="folder-small-icon tiny-clock"></i>
-                                <div class="ff-name">
-                                    [$17821]
-                                    <i class="tiny-icon cog versioning-settings hidden" title="View file versioning settings" alt="View file versioning settings"></i>
-                                </div>
-                                <div class="ff-number">
-                                    <div class="file-number"> </div>
-                                </div>
-                                <div class="ff-occupy"> </div>
-                                <div class="clear"></div>
                             </div>
                         </div>
                     </div>
@@ -1591,7 +1634,7 @@
                                 </div>
 
 
-                                <span>Use your mouse to see statistics from particular day</span>
+                                <span>[$20936]</span>
                                 <span id="barchart-unit"> </span>
                             </div>
 
@@ -1623,75 +1666,77 @@
                             </div>
 
                             <div class="option-containers">
-                                <div class="bus-input-block">
-                                    <div class="bus-input ">
-                                        <div class="bus-input-title">[$19603]</div>
-                                        <div class="bus-reg-icon company-name"></div>
-                                        <input type="text" id="prof-cname" placeholder="[$19603]">
-                                        <div class="error-message">is the error signal too red?</div>
+                                <form autocomplete="disabled">
+                                    <div class="bus-input-block">
+                                        <div class="bus-input ">
+                                            <div class="bus-input-title">[$19603]</div>
+                                            <div class="bus-reg-icon company-name"></div>
+                                            <input type="text" id="prof-cname" placeholder="[$19603]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input ">
+                                            <div class="bus-input-title">[$20003]</div>
+                                            <div class="bus-reg-icon email"></div>
+                                            <input type="email" id="prof-email" placeholder="[$20003]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input ">
+                                            <div class="bus-input-title">[$19152]</div>
+                                            <div class="bus-reg-icon phone"></div>
+                                            <input type="tel" id="prof-phone" placeholder="[$19152]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input note">
+                                            <div class="bus-input-title tax-code-name">[$19295]</div>
+                                            <div class="setting-icon24 vat"></div>
+                                            <input type="text" id="prof-vat" placeholder="[$19295]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                            <div class="note-message">*[$19632]</div>
+                                        </div>
                                     </div>
-                                    <div class="bus-input ">
-                                        <div class="bus-input-title">[$20003]</div>
-                                        <div class="bus-reg-icon email"></div>
-                                        <input type="email" id="prof-email" placeholder="[$20003]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input ">
-                                        <div class="bus-input-title">[$19152]</div>
-                                        <div class="bus-reg-icon phone"></div>
-                                        <input type="tel" id="prof-phone" placeholder="[$19152]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input note">
-                                        <div class="bus-input-title tax-code-name">[$19295]</div>
-                                        <div class="setting-icon24 vat"></div>
-                                        <input type="text" id="prof-vat" placeholder="[$19295]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                        <div class="note-message">*[$19632]</div>
-                                    </div>
-                                </div>
 
-                                <div class="bus-input-block">
-                                    <div class="bus-input ">
-                                        <div class="bus-input-title">[$19629]</div>
-                                        <div class="setting-icon24 add"></div>
-                                        <input type="text" id="prof-addr1" placeholder="[$19629]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input short-input">
-                                        <div class="bus-input-title">[$19630]</div>
-                                        <input type="text" id="prof-addr2" placeholder="[$19630]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input short-input">
-                                        <div class="bus-input-title">[$565]</div>
-                                        <input type="text" id="prof-city" placeholder="[$565]">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input short-input">
-                                        <div class="bus-input-title">[$7352]</div>
-                                        <div class="bus-input-title zip"></div>
-                                        <input type="text" id="prof-state" placeholder="[$7352]" class="state">
-                                        <input type="text" id="prof-zip" placeholder="" class="zip">
-                                        <div class="error-message">is the error signal too red?</div>
-                                    </div>
-                                    <div class="bus-input short-input underline-dropdown-input">
-                                        <div class="bus-input-title">[$481]</div>
-                                        <div class="list-arrow"></div>
-                                        <select id="cnt-ddl" name="prf-country" placeholder="[$481]">
-                                            <option value="New Zealand">New Zealand</option>
-                                            <option value="Syria">Syria</option>
-                                            <option value="Spain">Spain</option>
-                                        </select>
+                                    <div class="bus-input-block">
+                                        <div class="bus-input ">
+                                            <div class="bus-input-title">[$19629]</div>
+                                            <div class="setting-icon24 add"></div>
+                                            <input type="text" id="prof-addr1" placeholder="[$19629]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input short-input">
+                                            <div class="bus-input-title">[$19630]</div>
+                                            <input type="text" id="prof-addr2" placeholder="[$19630]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input short-input">
+                                            <div class="bus-input-title">[$565]</div>
+                                            <input type="text" id="prof-city" placeholder="[$565]">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input short-input">
+                                            <div class="bus-input-title">[$7352]</div>
+                                            <div class="bus-input-title zip"></div>
+                                            <input type="text" id="prof-state" placeholder="[$7352]" class="state">
+                                            <input type="text" id="prof-zip" placeholder="" class="zip">
+                                            <div class="error-message">is the error signal too red?</div>
+                                        </div>
+                                        <div class="bus-input short-input underline-dropdown-input">
+                                            <div class="bus-input-title">[$481]</div>
+                                            <div class="list-arrow"></div>
+                                            <select id="cnt-ddl" name="prf-country" placeholder="[$481]">
+                                                <option value="New Zealand">New Zealand</option>
+                                                <option value="Syria">Syria</option>
+                                                <option value="Spain">Spain</option>
+                                            </select>
 
-                                        <div class="error-message">is the error signal too red?</div>
+                                            <div class="error-message">is the error signal too red?</div>
 
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="default-green-button-user-management saving-btn-profile">
-                                    [$19631]
-                                </div>
-                                <div class="clear"></div>
+                                    <div class="default-green-button-user-management saving-btn-profile">
+                                        [$19631]
+                                    </div>
+                                    <div class="clear"></div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -2050,6 +2095,10 @@
                             </a>
                         </div>
 
+                        <div class="fm-set-nickname default-white-button left small grey-txt">
+                            <span>[$20828]</span>
+                        </div>
+
                         <div class="fm-remove-contact default-white-button left small grey-txt red">
                             <span>[$1001]</span>
                         </div>
@@ -2152,7 +2201,6 @@
         <!-- check if there is any other place using account qr-block -->
         <div class="fm-right-account-block">
             <div class="fm-account-main">
-
                 <div class="account add-phone-num-banner hidden">
                     <div class="account add-phone-wrapper">
                         <div class="first-block">
@@ -2175,7 +2223,6 @@
 
                     </div>
                 </div>
-
                 <div class="settings-banner hidden">
                     <div class="first-block">
                         <div class="title-txt">[$16118]:</div>
@@ -2253,81 +2300,83 @@
                                 <div class="default-white-button avatar">[$993]</div>
                             </div>
                             <div class="settings-sub-section profile">
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$1096]
-                                        <span class="red">*</span>
+                                <form autocomplete="disabled">
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$1096]
+                                            <span class="red">*</span>
+                                        </div>
+                                        <input class="dialog-input" type="text" value="" name="account-firstname" id="account-firstname" maxlength="40" />
                                     </div>
-                                    <input class="dialog-input" type="text" value="" name="account-firstname" id="account-firstname" maxlength="40" />
-                                </div>
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$1097]</div>
-                                    <input class="dialog-input" type="text" value="" name="account-lastname" id="account-lastname" maxlength="40" />
-                                </div>
-                                <div class="dialog-input-title-ontop birth ymd hidden">
-                                    <div class="title">[$995]</div>
-                                    <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
+                                    <div class="dialog-input-title-ontop">
+                                        <div class="title">[$1097]</div>
+                                        <input class="dialog-input" type="text" value="" name="account-lastname" id="account-lastname" maxlength="40" />
                                     </div>
-                                    <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
+                                    <div class="dialog-input-title-ontop birth ymd hidden">
+                                        <div class="title">[$995]</div>
+                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <div class="error-message"></div>
                                     </div>
-                                    <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
+                                    <div class="dialog-input-title-ontop birth dmy hidden">
+                                        <div class="title">[$995]</div>
+                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <div class="error-message"></div>
                                     </div>
-                                    <div class="error-message"></div>
-                                </div>
-                                <div class="dialog-input-title-ontop birth dmy hidden">
-                                    <div class="title">[$995]</div>
-                                    <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
+                                    <div class="dialog-input-title-ontop birth mdy hidden">
+                                        <div class="title">[$995]</div>
+                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <div class="error-message"></div>
                                     </div>
-                                    <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
+                                    <div class="dialog-input-title-ontop underline-dropdown-input acc-setting-country-sec">
+                                        <div class="title">[$481]</div>
+                                        <div class="list-arrow"></div>
+                                        <div class="dialog-input default-select country" id="account-country">
+                                            <span>[$996]</span>
+                                            <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
+                                        </div>
                                     </div>
-                                    <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
-                                    </div>
-                                    <div class="error-message"></div>
-                                </div>
-                                <div class="dialog-input-title-ontop birth mdy hidden">
-                                    <div class="title">[$995]</div>
-                                    <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
-                                    </div>
-                                    <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
-                                    </div>
-                                    <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
-                                    <div class="birth-arrow-container">
-                                        <div class="birth-arrow up-control"></div>
-                                        <div class="birth-arrow down-control"></div>
-                                    </div>
-                                    <div class="error-message"></div>
-                                </div>
-                                <div class="dialog-input-title-ontop underline-dropdown-input acc-setting-country-sec">
-                                    <div class="title">[$481]</div>
-                                    <div class="list-arrow"></div>
-                                    <div class="dialog-input default-select country" id="account-country">
-                                        <span>[$996]</span>
-                                        <div class="default-select-dropdown hidden"><div class="default-select-scroll"></div></div>
-                                    </div>
-                                </div>
+                                </form>
                             </div>
                             <div class="settings-sub-section button-container save-block slide-in-out closed">
                                 <div class="default-green-button right fm-account-save slide-item">[$19631]</div>
@@ -2569,11 +2618,17 @@
                     </div>
                 </div>
                 <div class="fm-account-notifications fm-account-sections">
-                    <div class="account data-block">
+                    <div class="account data-block account-notification">
                         <div class="settings-left-block">
-                            <div class="title-txt">[$16143]</div>
+                            <div class="title-txt">[$20900]</div>
                         </div>
                         <div class="settings-right-block">
+                            <div class="settings-sub-section border">
+                                <div class="subtitle-txt">[$20899]</div>
+                                <div class="dialog-feature-toggle toggle-all" id="notif-all" >
+                                    <div class="dialog-feature-switch"></div>
+                                </div>
+                            </div>
                             <div class="switch-container cloud-drive">
                                 <div class="subtitle-txt">[$1687]</div>
                                 <div class="settings-sub-section border">
@@ -2647,7 +2702,7 @@
                                 </div>
                                 <div class="settings-sub-section">
                                     <div for="delete-request" class="content-txt">
-                                    [$16150]
+                                    [$20957]
                                     </div>
                                     <div class="dialog-feature-toggle toggle-on" id="delete-request" name="fcrdel">
                                         <div class="dialog-feature-switch no-trans-init"></div>
@@ -2657,6 +2712,98 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="account data-block email-notification">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$20898]</div>
+                            <div class="data-block-info-text content-txt">[$20982]</div>
+                            <div class="green-notification body with-btn">
+                                <div class="green-notification">
+                                    <i class="icons-sprite fvnotice"></i>
+                                </div>
+                                <div class="green-notification cell text-cell">
+                                    <div class="versioning-body-text">[$20983]</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section border">
+                                <div class="subtitle-txt">[$20897]</div>
+                                <div class="dialog-feature-toggle toggle-all" id="enotif-all" name="all">
+                                    <div class="dialog-feature-switch"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$165]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                    [$16148]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-contact-request" name="contact-request">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$7997]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$20890]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-chat-message" name="chat-message">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20891]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$20892]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-achievements" name="achievements">
+                                        <div class="dialog-feature-switch no-trans-init"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20893]</div>
+                                <div class="settings-sub-section border">
+                                    <div class="content-txt">
+                                        [$21956]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-quota" name="quota">
+                                        <div class="dialog-feature-switch no-trans-init"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div class="green-notification body with-btn">
+                                        <div class="green-notification">
+                                            <i class="icons-sprite fvnotice"></i>
+                                        </div>
+                                        <div class="green-notification cell text-cell">
+                                            <div class="versioning-body-text">[$20894]</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="switch-container">
+                                <div class="subtitle-txt">[$20895]</div>
+                                <div class="settings-sub-section">
+                                    <div class="content-txt">
+                                        [$20896]
+                                    </div>
+                                    <div class="dialog-feature-toggle toggle-on" id="enotif-inactive" name="account-inactive">
+                                        <div class="dialog-feature-switch"></div>
+                                    </div>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="fm-account-security fm-account-sections">
                     <div class="account data-block change-password">
@@ -2665,26 +2812,23 @@
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <!-- Cover with form to prevent autofilling -->
-                                <form autocomplete="off">
-                                    <div class="dialog-input-title-ontop">
-                                        <div class="title">[$717]</div>
-                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-new-password" id="account-new-password" />
-                                        <div class="account-pass-lines">
-                                             <div class="register-pass-status-line1"></div>
-                                             <div class="register-pass-status-line2"></div>
-                                             <div class="register-pass-status-line3"></div>
-                                             <div class="register-pass-status-line4"></div>
-                                             <div class="register-pass-status-line5"></div>
-                                             <div class="clear"></div>
-                                        </div>
+                                <div class="dialog-input-title-ontop">
+                                    <div class="title">[$717]</div>
+                                    <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-new-password" id="account-new-password" />
+                                    <div class="account-pass-lines">
+                                         <div class="register-pass-status-line1"></div>
+                                         <div class="register-pass-status-line2"></div>
+                                         <div class="register-pass-status-line3"></div>
+                                         <div class="register-pass-status-line4"></div>
+                                         <div class="register-pass-status-line5"></div>
+                                         <div class="clear"></div>
                                     </div>
-                                    <div class="dialog-input-title-ontop">
-                                        <div class="title">[$718]</div>
-                                        <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-confirm-password" id="account-confirm-password" />
-                                        <div class="error-message"></div>
-                                    </div>
-                                </form>
+                                </div>
+                                <div class="dialog-input-title-ontop">
+                                    <div class="title">[$718]</div>
+                                    <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-confirm-password" id="account-confirm-password" />
+                                    <div class="error-message"></div>
+                                </div>
                             </div>
                             <div class="settings-sub-section button-container slide-in-out closed">
                                 <div class="default-green-button right change-password-button slide-item">[$706]</div>
@@ -2704,7 +2848,7 @@
                                     <input class="dialog-input" type="text" value="" name="current-email" readonly id="current-email" maxlength="190" placeholder="[$7744]" />
                                 </div>
                                 <div class="dialog-input-title-ontop">
-                                     <div class="title">[$7745]</div>
+                                    <div class="title">[$7745]</div>
                                     <input class="dialog-input" type="text" value="" autocomplete="disabled" name="account-email" id="account-email" maxlength="190" />
                                     <div class="error-message"></div>
                                 </div>
@@ -2805,7 +2949,7 @@
                                         <i class="icons-sprite fvnotice"></i>
                                     </div>
                                     <div class="green-notification cell text-cell">
-                                        <div class="versioning-body-text"></div>
+                                        <div class="versioning-body-text versioning-info-message"></div>
                                     </div>
                                 </div>
                                 <div class="content-txt">[$17600]</div>
@@ -3000,11 +3144,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="ulspeedradio radioOff" id="rad3_div">
-                                        <input type="radio" id="rad3" class="ulspeedradio radioOff" value="1">
-                                    </div>
-                                    <div class="radio-txt">[$575]</div>
                                     <div class="account-counter-block">
+                                        <div class="ulspeedradio radioOff" id="rad3_div">
+                                            <input type="radio" id="rad3" class="ulspeedradio radioOff" value="1">
+                                        </div>
+                                        <div class="radio-txt">[$575]</div>
                                         <div class="account-counter-number">
                                             <input type="text" value="100" id="ulspeedvalue">
                                         </div>
@@ -3021,19 +3165,11 @@
                             <div class="title-txt">[$20171]</div>
                         </div>
                         <div class="settings-right-block">
-                            <div class="settings-sub-section border">
+                            <div class="settings-sub-section">
                                  <!-- This toggle needs to be re-function -->
                                 <div class="subtitle-txt">[$19639]</div>
                                 <div class="content-txt">[$17812]</div>
                                 <div class="dialog-feature-toggle toggle-on" id="dlThroughMEGAsync">
-                                    <div class="dialog-feature-switch no-trans-init"></div>
-                                </div>
-                            </div>
-                            <div class="settings-sub-section">
-                                <!-- This toggle needs to be re-function -->
-                                <div class="subtitle-txt">[$16272]</div>
-                                <div class="content-txt">[$16273]</div>
-                                <div class="dialog-feature-toggle toggle-on" id="transfers-tooltip">
                                     <div class="dialog-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
@@ -3068,6 +3204,7 @@
                                                             <div class="tab-icon embed"></div>
                                                             <span>[$17407]</span>
                                                         </div>
+                                                        <div class="clear"></div>
                                                     </div>
                                                 </div>
                                                 <div class="widget-body-wrapper embed-link hidden">
@@ -3301,9 +3438,6 @@
         <div class="fm-right-block dashboard hidden">
             <div class="widgets content-block">
 
-
-
-
                 <!-- for business dashboard -->
                 <div class="business-dashboard hidden">
                     <div class="business-dashboard-container">
@@ -3332,85 +3466,103 @@
                         <div class="data-container section-container">
                             <div class="subaccount-view-used-data">
                                 <div class="view-title">[$16130]</div>
-                                <div class="used-storage-info ba-root">
-                                    <i class="folder-small-icon cloud"></i>
-                                    <div class="ff-name">[$164]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number"> </div>
-                                        <div class="file-number"> </div>
+                                <div class="used-storage-wrap">
+                                    <div class="used-storage-info ba-root">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon cloud"></i>
+                                        </div>
+                                        <div class="ff-name">[$164]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number"> </div>
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
-                                </div>
-                                <div class="used-storage-info ba-inshare">
-                                    <i class="folder-small-icon income"></i>
-                                    <div class="ff-name">[$16770]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number"> </div>
-                                        <div class="file-number"> </div>
+                                    <div class="used-storage-info ba-inshare">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon income"></i>
+                                        </div>
+                                        <div class="ff-name">[$16770]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number"> </div>
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
-                                </div>
-                                <!--<div class="used-storage-info ba-inshare-ex">
-                                    <i class="folder-small-icon ex-in-share"></i>
-                                    <div class="ff-name">[$19187]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number">32 folders</div>
-                                        <div class="file-number">322 files</div>
+                                    <!--<div class="used-storage-info ba-inshare-ex">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon ex-in-share"></i>
+                                        </div>
+                                        <div class="ff-name">[$19187]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number">32 folders</div>
+                                            <div class="file-number">322 files</div>
+                                        </div>
+                                        <div class="ff-occupy">758.6 MB</div>
+                                        <div class="clear"></div>
+                                    </div>-->
+                                    <div class="used-storage-info ba-outshare">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon income"></i>
+                                        </div>
+                                        <div class="ff-name">[$5543]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number"> </div>
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy">758.6 MB</div>
-                                    <div class="clear"></div>
-                                </div>-->
-                                <div class="used-storage-info ba-outshare">
-                                    <i class="folder-small-icon income"></i>
-                                    <div class="ff-name">[$5543]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number"> </div>
-                                        <div class="file-number"> </div>
+                                    <!--<div class="used-storage-info ba-outshare-ex">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon ex-out-share"></i>
+                                        </div>
+                                        <div class="ff-name">[$5543]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number">32 folders</div>
+                                            <div class="file-number">322 files</div>
+                                        </div>
+                                        <div class="ff-occupy">758.6 MB</div>
+                                        <div class="clear"></div>
+                                    </div>-->
+                                    <div class="used-storage-info ba-rubbish">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon rubbish"></i>
+                                        </div>
+                                        <div class="ff-name">[$167]</div>
+                                        <div class="ff-number">
+                                            <div class="folder-number"> </div>
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
-                                </div>
-                                <!--<div class="used-storage-info ba-outshare-ex">
-                                    <i class="folder-small-icon ex-out-share"></i>
-                                    <div class="ff-name">[$5543]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number">32 folders</div>
-                                        <div class="file-number">322 files</div>
+                                    <div class="used-storage-info ba-pub-links">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon semi-small-icon linked"></i>
+                                        </div>
+                                        <div class="ff-name">[$16516]</div>
+                                        <div class="ff-number">
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy">758.6 MB</div>
-                                    <div class="clear"></div>
-                                </div>-->
-                                <div class="used-storage-info ba-rubbish">
-                                    <i class="folder-small-icon rubbish"></i>
-                                    <div class="ff-name">[$167]</div>
-                                    <div class="ff-number">
-                                        <div class="folder-number"> </div>
-                                        <div class="file-number"> </div>
+                                    <div class="used-storage-info ba-version">
+                                        <div class="used-storage-icon-cell">
+                                            <i class="folder-small-icon tiny-clock"></i>
+                                        </div>
+                                        <div class="ff-name">[$17821]
+                                            <i class="tiny-icon cog versioning-settings" title="[$17580]" alt="[$17580]"></i>
+                                        </div>
+                                        <div class="ff-number">
+                                            <div class="file-number"> </div>
+                                        </div>
+                                        <div class="ff-occupy"> </div>
+                                        <div class="clear"></div>
                                     </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
-                                </div>
-                                <div class="used-storage-info ba-pub-links">
-                                    <i class="folder-small-icon semi-small-icon linked"></i>
-                                    <div class="ff-name">[$16516]</div>
-                                    <div class="ff-number">
-                                        <div class="file-number"> </div>
-                                    </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
-                                </div>
-                                <div class="used-storage-info ba-version">
-                                    <i class="folder-small-icon tiny-clock"></i>
-                                    <div class="ff-name">[$17821]
-                                        <i class="tiny-icon cog versioning-settings" title="View file versioning settings" alt="View file versioning settings"></i>
-                                    </div>
-                                    <div class="ff-number">
-                                        <div class="file-number"> </div>
-                                    </div>
-                                    <div class="ff-occupy"> </div>
-                                    <div class="clear"></div>
                                 </div>
                             </div>
                         </div>
@@ -3521,7 +3673,7 @@
                                     </div>
                                     <div class="clear"></div>
                                 </div>
-                                <div class="account pr-item incoming-shares">
+                                <!--<div class="account pr-item incoming-shares">
                                     <i class="semi-small-icon left-arrow-with-dot"></i>
                                     <div class="account progress-perc pr2"></div>
                                     <div class="account progress-title">
@@ -3531,7 +3683,7 @@
                                         0 MB
                                     </div>
                                     <div class="clear"></div>
-                                </div>
+                                </div>-->
                                 <div class="account pr-item rubbish-bin">
                                     <i class="semi-small-icon rubbish-arrows"></i>
                                     <div class="account progress-perc pr1"></div>

@@ -139,6 +139,10 @@ var notify = {
             userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
         };
 
+        if (actionPacket.a === 'dshare' && actionPacket.orig && actionPacket.orig !== u_handle) {
+            newNotification.userHandle = actionPacket.orig;
+        }
+
         // Update store of user emails that it knows about if a contact request was recently accepted
         notify.addUserEmails();
 
@@ -1088,8 +1092,8 @@ var notify = {
 
         // first we are parsing an action packet.
         if (notification.data.orig) {
-            notificationOwner = notification.data.rece;
-            notificationTarget = notification.data.u;
+            notificationOwner = notification.data.u;
+            notificationTarget = notification.data.rece;
             notificationOrginating = notification.data.orig;
         }
         else {
@@ -1377,11 +1381,21 @@ var notify = {
         if (M && M.u) {
             M.u.forEach(function(contact) {
 
-                // If the email is found
-                if (contact.m === email && contact.firstName && contact.lastName) {
+                var contactEmail = contact.m;
+                var contactHandle = contact.u;
 
-                    // Set the name and email
-                    displayName = contact.firstName + ' ' + contact.lastName + ' (' + email + ')';
+                // If the email is found
+                if (contactEmail === email) {
+
+                    // If the nickname is available use: Nickname (FirstName LastName
+                    if (M.u[contactHandle].nickname !== '') {
+                        displayName = nicknames.getNicknameAndName(contactHandle);
+                    }
+                    else {
+                        // Otherwise use: FirstName LastName (Email)
+                        displayName = (M.u[contactHandle].firstName + ' ' + M.u[contactHandle].lastName).trim()
+                                    + ' (' + email + ')';
+                    }
 
                     // Exit foreach loop
                     return true;

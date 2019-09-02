@@ -1,72 +1,77 @@
 var React = require("react");
 var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../stores/mixins.js";
 var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
-var DropdownEmojiSelector = React.createClass({
-    data_categories: null,
-    data_emojis: null,
-    data_emojiByCategory: null,
-    customCategoriesOrder: [
-        "frequently_used",
-        "people",
-        "nature",
-        "food",
-        "activity",
-        "travel",
-        "objects",
-        "symbols",
-        "flags"
-    ],
-    frequentlyUsedEmojis: [
-        'slight_smile',
-        'grinning',
-        'smile',
-        'wink',
-        'yum',
-        'rolling_eyes',
-        'stuck_out_tongue',
-    ],
-    mixins: [MegaRenderMixin, RenderDebugger],
-    heightDefs: {
-        'categoryTitleHeight': 55,
-        'emojiRowHeight': 35,
-        'containerHeight': 302,
-        'totalScrollHeight': 302,
-        'numberOfEmojisPerRow': 9
-    },
-    /*
-     "PEOPLE": l[8016],
-     "NATURE": l[8017],
-     "FOOD & DRINK": l[8018],
-     "CELEBRATION": l[8019],
-     "ACTIVITY": l[8020],
-     "TRAVEL & PLACES": l[8021],
-     "OBJECTS & SYMBOLS": l[8022]
-     */
-    categoryLabels: {
-        'frequently_used': l[17737],
-        'people': l[8016],
-        'objects': l[17735],
-        'activity': l[8020],
-        'nature': l[8017],
-        'travel': l[8021],
-        'symbols': l[17736],
-        'food': l[8018],
-        'flags': l[17703]
-    },
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-            'hideable': true
-        };
-    },
-    getInitialState: function() {
-        var self = this;
+export class DropdownEmojiSelector extends MegaRenderMixin(React.Component) {
 
-        return {
+    static defaultProps = {
+        'requiresUpdateOnResize': true,
+        'hideable': true
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.data_categories = null;
+        this.data_emojis = null;
+        this.data_emojiByCategory = null;
+        this.customCategoriesOrder = [
+            "frequently_used",
+            "people",
+            "nature",
+            "food",
+            "activity",
+            "travel",
+            "objects",
+            "symbols",
+            "flags"
+        ];
+        this.frequentlyUsedEmojis = [
+            'slight_smile',
+            'grinning',
+            'smile',
+            'wink',
+            'yum',
+            'rolling_eyes',
+            'stuck_out_tongue',
+        ];
+        this.heightDefs = {
+            'categoryTitleHeight': 55,
+            'emojiRowHeight': 35,
+            'containerHeight': 302,
+            'totalScrollHeight': 302,
+            'numberOfEmojisPerRow': 9
+        };
+        /*
+         "PEOPLE": l[8016],
+         "NATURE": l[8017],
+         "FOOD & DRINK": l[8018],
+         "CELEBRATION": l[8019],
+         "ACTIVITY": l[8020],
+         "TRAVEL & PLACES": l[8021],
+         "OBJECTS & SYMBOLS": l[8022]
+         */
+        this.categoryLabels = {
+            'frequently_used': l[17737],
+            'people': l[8016],
+            'objects': l[17735],
+            'activity': l[8020],
+            'nature': l[8017],
+            'travel': l[8021],
+            'symbols': l[17736],
+            'food': l[8018],
+            'flags': l[17703]
+        };
+
+        this.state = this.getInitialState();
+        this.onSearchChange = this.onSearchChange.bind(this);
+        this.onUserScroll = this.onUserScroll.bind(this);
+        this._onScrollChanged = this._onScrollChanged.bind(this);
+    }
+    getInitialState() {
+        return clone({
             'previewEmoji': null,
             'searchValue': '',
             'browsingCategory': false,
@@ -74,9 +79,9 @@ var DropdownEmojiSelector = React.createClass({
             'isLoading': true,
             'loadFailed': false,
             'visibleCategories': "0"
-        }
-    },
-    _generateEmoji: function(meta) {
+        })
+    }
+    _generateEmoji(meta) {
         var filename = twemoji.convert.toCodePoint(meta.u);
 
         return <img
@@ -99,8 +104,8 @@ var DropdownEmojiSelector = React.createClass({
                 filename + ".png"
             }
         />;
-    },
-    _generateEmojiElement: function(emoji, cat) {
+    }
+    _generateEmojiElement(emoji, cat) {
         var self = this;
 
         var categoryName = self.data_categories[cat];
@@ -139,8 +144,8 @@ var DropdownEmojiSelector = React.createClass({
         >
             {self._generateEmoji(emoji)}
         </div>;
-    },
-    componentWillUpdate: function(nextProps, nextState) {
+    }
+    componentWillUpdate(nextProps, nextState) {
         if (
             nextState.searchValue !== this.state.searchValue ||
             nextState.browsingCategories !== this.state.browsingCategories
@@ -243,15 +248,15 @@ var DropdownEmojiSelector = React.createClass({
             self.data_emojiByCategory = null;
             self.loadingPromise = null;
         }
-    },
-    onSearchChange: function(e) {
+    }
+    onSearchChange(e) {
         var self = this;
         self.setState({
             searchValue: e.target.value,
             browsingCategory: false
         });
-    },
-    onUserScroll: function(
+    }
+    onUserScroll(
         $ps,
         elem,
         e
@@ -264,8 +269,8 @@ var DropdownEmojiSelector = React.createClass({
         }
 
         this._onScrollChanged($ps.getScrollPositionY());
-    },
-    generateEmojiElementsByCategory: function(categoryId, posTop, stateObj) {
+    }
+    generateEmojiElementsByCategory(categoryId, posTop, stateObj) {
         var self = this;
 
         if (!self._cachedNodes) {
@@ -333,15 +338,15 @@ var DropdownEmojiSelector = React.createClass({
         else {
             return self._cachedNodes[categoryId] = undefined;
         }
-    },
-    _isVisible: function(scrollTop, scrollBottom, elTop, elBottom) {
+    }
+    _isVisible(scrollTop, scrollBottom, elTop, elBottom) {
         var visibleTop = elTop < scrollTop ? scrollTop : elTop;
         var visibleBottom = elBottom > scrollBottom ? scrollBottom : elBottom;
         var visibleHeight = visibleBottom - visibleTop;
 
         return visibleBottom - visibleTop > 0;
-    },
-    _onScrollChanged: function(scrollPositionY, stateObj) {
+    }
+    _onScrollChanged(scrollPositionY, stateObj) {
         var self = this;
 
         if (!self.data_categoriesWithCustomOrder) {
@@ -365,6 +370,7 @@ var DropdownEmojiSelector = React.createClass({
         var visibleCategories = [];
         self._emojiReactElements = [];
         self.data_categoryPositions = {};
+
         self.data_categoriesWithCustomOrder.forEach(function (k) {
             var categoryDivMeta = self.generateEmojiElementsByCategory(k, currentPos, stateObj);
             if (categoryDivMeta) {
@@ -383,11 +389,19 @@ var DropdownEmojiSelector = React.createClass({
                     )
                 ) {
                     visibleCategories.push(k);
-
                     self._emojiReactElements.push(categoryDivMeta[1]);
                 }
             }
         });
+
+        if (self._emojiReactElements.length === 0) {
+            const emojisNotFound = (
+                <span className="emojis-not-found" key={'emojis-not-found'}>
+                    {l[20920]}
+                </span>
+            );
+            self._emojiReactElements.push(emojisNotFound);
+        }
 
         visibleCategories = visibleCategories.join(',');
 
@@ -395,8 +409,8 @@ var DropdownEmojiSelector = React.createClass({
             'totalScrollHeight': currentPos,
             'visibleCategories': visibleCategories
         });
-    },
-    _renderEmojiPickerPopup: function() {
+    }
+    _renderEmojiPickerPopup() {
         var self = this;
 
         var preview;
@@ -414,9 +428,6 @@ var DropdownEmojiSelector = React.createClass({
                 <div className="emoji title">{":" + meta.n + ":"}</div>
             </div>;
         }
-
-
-
 
         var categoryIcons = {
             "frequently_used": "clock-icon",
@@ -445,7 +456,7 @@ var DropdownEmojiSelector = React.createClass({
 
             categoryButtons.push(
                 <div
-                    visibleCategories={self.state.visibleCategories}
+                    visiblecategories={self.state.visibleCategories}
                     className={"button square-button emoji" + (activeClass)}
                     key={categoryIcons[categoryName]}
                     onClick={(e) => {
@@ -486,7 +497,6 @@ var DropdownEmojiSelector = React.createClass({
                     </div>
                 }
 
-
             </div>
 
 
@@ -509,8 +519,8 @@ var DropdownEmojiSelector = React.createClass({
 
             <div className="popup-footer emoji">{categoryButtons}</div>
         </div>;
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var popupContents = null;
@@ -532,7 +542,9 @@ var DropdownEmojiSelector = React.createClass({
 
 
         return <DropdownsUI.Dropdown
-            className="popup emoji" {...self.props} ref="dropdown"
+            className="popup emoji"
+            {...self.props}
+            ref="dropdown"
             isLoading={self.state.isLoading}
             loadFailed={self.state.loadFailed}
             visibleCategories={this.state.visibleCategories}
@@ -555,8 +567,4 @@ var DropdownEmojiSelector = React.createClass({
             {popupContents}
         </DropdownsUI.Dropdown>;
     }
-});
-
-module.exports = window.EmojiDropdown = {
-    DropdownEmojiSelector,
 };

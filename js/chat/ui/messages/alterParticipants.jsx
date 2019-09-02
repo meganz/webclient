@@ -1,15 +1,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var AlterParticipantsConversationMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    _ensureNameIsLoaded: function(h) {
+class AlterParticipantsConversationMessage extends ConversationMessageMixin {
+    _ensureNameIsLoaded(h) {
         var self = this;
         var contact = M.u[h] ? M.u[h] : {
             'u': h,
@@ -29,8 +26,28 @@ var AlterParticipantsConversationMessage = React.createClass({
                 }
             });
         }
-    },
-    render: function () {
+    }
+    haveMoreContactListeners() {
+        if (!this.props.message || !this.props.message.meta) {
+            return false;
+        }
+
+        if (this.props.message.meta) {
+            if (this.props.message.meta.included) {
+                return this.props.message.meta.included;
+            }
+            else if (this.props.message.meta.excluded) {
+                return this.props.message.meta.excluded;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -129,8 +146,8 @@ var AlterParticipantsConversationMessage = React.createClass({
 
         return <div>{messages}</div>;
     }
-});
+};
 
-module.exports = {
+export {
     AlterParticipantsConversationMessage
 };

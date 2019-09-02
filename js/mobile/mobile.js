@@ -12,6 +12,15 @@ var mobile = {
     toastTimer: null,
 
     /**
+     * Load the `mobile.html` page and initialize the main menu.
+     */
+    initDOM: function() {
+        'use strict';
+        parsepage(pages['mobile']);
+        topmenuUI();
+    },
+
+    /**
      * Show a simple toast message and hide it after 3 seconds
      * @param {String} message The message to show
      * @param {String} position Optional flag to show the position at the top, by default it shows at the bottom
@@ -442,15 +451,14 @@ var mobile = {
      * @param {Object} $overlay target overlay
      */
     initOverlayPopstateHandler: function($overlay) {
-
         'use strict';
 
-        history.pushState({ subpage: page }, "", "/" + page);
+        pushHistoryState(page);
 
         var $closeBtn = $overlay.find('.close-button, .cancel, .fm-dialog-close');
 
         $(window).rebind('popstate.mega-mobile', function() {
-            
+
             $closeBtn.trigger('tap');
             $(this).off('popstate.mega-mobile');
         });
@@ -545,6 +553,13 @@ mega.megadrop = {
     isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
 };
 
+var nicknames = {
+    cache: {},
+    getNicknameAndName: function() {},
+    decryptAndCacheNicknames: function() {},
+    updateNicknamesFromActionPacket: function() {}
+};
+
 var notify = {
     init: function() {},
     notifyFromActionPacket: function() {},
@@ -569,7 +584,8 @@ var alarm = {
     },
     siteUpdate: {
         init: function() {}
-    }
+    },
+    hideAllWarningPopups: function() {}
 };
 
 /* jshint strict: true */
@@ -632,8 +648,8 @@ function closeDialog() {
     }
 
     fm_hideoverlay();
-    $('.fm-dialog').trigger('dialog-closed').addClass('hidden');
-    $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');
+    $('.fm-dialog, .fm-dialog-mobile').trigger('dialog-closed').addClass('hidden');
+    $('.fm-dialog, .overlay.arrange-to-back, .fm-dialog-mobile').removeClass('arrange-to-back');
 
     delete $.dialog;
     mBroadcaster.sendMessage('closedialog');

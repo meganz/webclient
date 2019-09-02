@@ -314,52 +314,6 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 };
 
 /**
- * Create tree of out-share's children. Same structure as M.tree
- * @return {Object}
- */
-MegaData.prototype.getOutShareTree = function() {
-
-    'use strict';
-
-    var ostree = {};
-    for (var suh in M.su) {
-        if (suh !== 'EXP') {
-            for (var h in M.su[suh]) {
-                if (M.d[h]) {
-                    ostree[h] = Object.assign({}, M.d[h]);
-                    ostree[h].t = this.getTreeValue(M.d[h]);
-                }
-            }
-        }
-    }
-    return ostree;
-};
-
-/**
- * Get t value of custom view trees
- * @return {Interger}
- */
-MegaData.prototype.getTreeValue = function(n) {
-
-    'use strict';
-
-    var t = n.t;
-    if (n.fav) {
-        t |= M.IS_FAV;
-    }
-    if (M.su.EXP && M.su.EXP[n.h]) {
-        t |= M.IS_LINKED;
-    }
-    if (M.getNodeShareUsers(n, 'EXP').length || M.ps[n.h]) {
-        t |= M.IS_SHARED;
-    }
-    if (M.getNodeShare(n).down === 1) {
-        t |= M.IS_TAKENDOWN;
-    }
-    return t;
-};
-
-/**
  * Handle rubbish bin permanent items removal
  * How this works?
  * In case that param 'all' is true, then all items from rubbish are removed
@@ -804,7 +758,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             }
 
             nodesCount = importNodes - Object.keys(res).length;
-            if (t.length === 11) {
+            if (ctx.t && ctx.t.length === 11) {
                 getsc(true);
             }
         }
@@ -1728,6 +1682,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             this.nn[n.h] = n.name;
         }
 
+        // update My chat files folder
+        if (this.cf.h === n.h) {
+            this.cf = n.p === M.RubbishID ? false : n;
+        }
+
         // sync missingkeys with this node's key status
         if (crypto_keyok(n)) {
             // mark as fixed if necessary
@@ -1837,6 +1796,16 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
                 }
             }, 50);
         }
+
+        if ($('#treeli_' + n.h).length > 0) {
+            // Since n.h may not be a folder, we need to do some check to ensure we really need to do a tree redraw.
+            // In case its rendered in the dom as #treeli_hash, then this is 100% a folder that was rendered in its old
+            // order.
+            // Last but not least, we throttle this, so that big move/rename operations would only redraw the tree once
+            delay('onRenameUIUpdateTreePane', function () {
+                M.redrawTree();
+            }, 50);
+        }
     }
 
     if (M.recentsRender) {
@@ -1852,9 +1821,23 @@ MegaData.prototype.rename = function(itemHandle, newItemName) {
     }
 
     if (n && n.name !== newItemName) {
+        var oldItemName = n.name;
+
         n.name = newItemName;
-        api_setattr(n, mRandomToken('mv'));
+        if (n.t && M.tree[n.p]) {
+            Object(M.tree[n.p][n.h]).name = newItemName;
+        }
+
         this.onRenameUIUpdate(itemHandle, newItemName);
+        api_setattr(n, mRandomToken('mv'))
+            .fail(function(error) {
+                n.name = oldItemName;
+                if (n.t && M.tree[n.p]) {
+                    Object(M.tree[n.p][n.h]).name = oldItemName;
+                }
+                msgDialog('warninga', l[135], l[47], api_strerror(error));
+                M.onRenameUIUpdate(itemHandle, oldItemName);
+            });
     }
 };
 
@@ -1943,12 +1926,20 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            if (n.p === M.currentdirid) {
+            var curDir = M.currentdirid.replace('out-shares/', '').replace('public-links/', '');
+            var refresh = false;
+            if (curDir === 'public-links') {
+                if (M.v.indexOf(n) !== -1) {
+                    refresh = true;
+                }
+            }
+            if (refresh || n.p === curDir) {
+
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');
                 var currentScrollPosition = $megaContainer.prop('scrollTop');
 
-                M.openFolder(n.p, true).always(function() {
+                M.openFolder(M.currentdirid, true).always(function() {
                     $megaContainer.prop('scrollTop', currentScrollPosition);
                 }).done(reselect);
             }
@@ -2311,12 +2302,20 @@ MegaData.prototype.isFavourite = function(nodesId) {
  */
 MegaData.prototype.versioningDomUpdate = function(fh) {
     var $nodeView = $('#' + fh);
+    var $versionsCol = $nodeView.find('td[megatype="versions"]');
 
     if (M.d[fh] && M.d[fh].tvf) {// Add versioning
         $nodeView.addClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            var $verHtml = M.megaRender.versionColumnPrepare(M.d[fh].tvf, M.d[fh].tvb || 0);
+            $versionsCol.empty().append($verHtml);
+        }
     }
     else {// Remove versioning
         $nodeView.removeClass('versioning');
+        if ($versionsCol && $versionsCol.length) {
+            $versionsCol.empty();
+        }
     }
 };
 
@@ -3428,6 +3427,12 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
 
         var a;
         for (var i in this.d[h].shares) {
+
+            // If there is only public link in shares, and deletion is not target public link.
+            if (i === 'EXP' && Object.keys(this.d[h].shares).length === 1 && u !== 'EXP') {
+                updnode = true;
+            }
+
             if (this.d[h].shares[i]) {
                 a = true;
                 break;
@@ -3565,9 +3570,9 @@ MegaData.prototype.getNameByHandle = function(handle) {
     if (handle.length === 11) {
         var user = this.getUserByHandle(handle);
 
+        // If user exists locally, use Nickname (FirstName LastName) or FirstName LastName or fallback to email
         if (user) {
-            // XXX: fallback to email
-            result = user.name && $.trim(user.name) || user.m;
+            result = nicknames.getNicknameAndName(handle) || user.m;
         }
         else if (window.megaChatIsReady && megaChat.chats[handle]) {
             var chat = megaChat.chats[handle];
@@ -3688,6 +3693,12 @@ MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
 
         if (this.ps[nodeHandle] && this.ps[nodeHandle][pendingContactId]) {
             this.delPS(pendingContactId, nodeHandle);
+
+            if (this.ps[nodeHandle] === undefined &&
+                (this.d[nodeHandle].shares === undefined ||
+                ('EXP' in this.d[nodeHandle].shares && Object.keys(this.d[nodeHandle].shares).length === 1))) {
+                this.nodeUpdated(M.d[nodeHandle]);
+            }
         }
     }
 };
@@ -3896,6 +3907,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
     var _import = function(data) {
         M.onFileManagerReady(function() {
+            loadingDialog.hide('import');
             openCopyDialog(function() {
                 $.mcImport = true;
                 $.selected = data[0];
@@ -3910,7 +3922,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     };
 
     if (localStorage.folderLinkImport && !folderlink) {
-
+        loadingDialog.show('import');
         if ($.onImportCopyNodes) {
             _import($.onImportCopyNodes);
         }
@@ -3982,3 +3994,15 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
         });
     }
 };
+
+/**
+ * Utility functions to handle 'My chat files' folder.
+ * @name myChatFilesFolder
+ * @memberOf MegaData
+ * @type {Object}
+ */
+lazy(MegaData.prototype, 'myChatFilesFolder', function() {
+    'use strict';
+    return mega.attr.getFolderFactory("cf", false, true, 'h',
+        [l[-'TODO'], 'My chat files'], base64urlencode, base64urldecode);
+});

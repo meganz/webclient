@@ -157,8 +157,11 @@ var slideshowid;
 
     function slideshow_favourite(n, $overlay) {
         var $favButton = $overlay.find('.viewer-button.favourite');
+        var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || folderlink || M.getNodeRights(n.p) < 2) {
+        if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
+            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
+
             $favButton.addClass('hidden');
         }
         else {
@@ -178,7 +181,7 @@ var slideshowid;
             });
 
             // Change favourite icon
-            if (n.fav) {
+            if (M.isFavourite(n.h)) {
                 $overlay.find('.viewer-button.favourite i')
                     .removeClass('heart').addClass('red-heart');
             }
@@ -186,6 +189,34 @@ var slideshowid;
                 $overlay.find('.viewer-button.favourite i')
                     .removeClass('red-heart').addClass('heart');
             }
+        }
+    }
+
+    function slideshow_remove(n, $overlay) {
+
+        var $removeButton = $overlay.find('.viewer-button.remove');
+        var root = M.getNodeRoot(n && n.h || false);
+
+        if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
+            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
+
+            $removeButton.addClass('hidden');
+        }
+        else {
+            $removeButton.removeClass('hidden');
+
+            $removeButton.rebind('click', function() {
+
+                // check if this is a business expired account
+                if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                    history.back();
+                    showExpiredBusiness();
+                    return false;
+                }
+
+                fmremove();
+                return false;
+            });
         }
     }
 
@@ -204,7 +235,10 @@ var slideshowid;
         if ($overlay) {
             var root = M.getNodeRoot(n && n.h || false);
 
-            if (!n || !n.p || root === 'shares' || root === M.RubbishID || folderlink || M.chat) {
+            if (!n || !n.p || root === 'shares' || root === M.RubbishID ||
+                (!folderlink && M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u &&
+                 M.getNodeRights(n.p) < 2)) {
+
                 $overlay.find('.viewer-button.getlink').addClass('hidden');
             }
             else {
@@ -709,6 +743,9 @@ var slideshowid;
 
         // Favourite Icon
         slideshow_favourite(n, $overlay);
+
+        // Remove Icon
+        slideshow_remove(n, $overlay);
 
         // Set file data
         zoom_mode = false;

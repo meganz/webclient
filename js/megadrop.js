@@ -158,9 +158,11 @@ mega.megadrop = (function() {
     };
 
     var updatePUPUserName = function updatePUPUserName(newName) {
-        $.each(mega.megadrop.pufs, function(index) {
-            mega.megadrop.pupUpdate(index, 'name', newName);
-        });
+        for (var h in mega.megadrop.pufs) {
+            if (mega.megadrop.pups[mega.megadrop.pufs[h].p]) {
+                mega.megadrop.pupUpdate(h, 'name', newName);
+            }
+        }
     };
     
     /**
@@ -1108,8 +1110,9 @@ mega.megadrop = (function() {
                 var title = h === M.RootID ? l[1687] : M.d[h].name;
 
                 var html = title ? '<a class="fm-breadcrumbs folder ' + (k !== 0 ? 'has-next-button' : '') +
-                    '" title="' +  escapeHTML(title) + '" data-node="' + h + '">' + '<span class="right-arrow-bg">' +
-                    '<span>' + escapeHTML(title) + '</span></span></a>' : '';
+                    '" data-node="' + escapeHTML(h) + '">' +
+                    '<span class="right-arrow-bg simpletip" data-simpletip="' +  escapeHTML(title) + '" ><span>' +
+                    escapeHTML(title) + '</span></span></a>' : '';
 
                 return html;
 
@@ -1158,7 +1161,7 @@ mega.megadrop = (function() {
                 var $this = $(this);
 
                 $this.removeClass('closed');
-                $this.find('.close-icon > .tooltips').text('Fold');
+                $this.find('.close-icon > .tooltips').text(l[148]);
 
                 // Waiting for css animation to be finished
                 setTimeout(function() {
@@ -1268,7 +1271,12 @@ mega.megadrop = (function() {
                 console.log('settings.drawPups');
             }
             var list = Object.values(pup.items);
+            var handleList = list.map(function(pup) {
+                return pup.h;
+            });
             var item = {};
+
+            $(settingsOpts.card.wrapperClass).empty();
 
             if (!$(settingsOpts.card.wrapperClass).find('.megadrop-header').length) {
                 var $headElem = $('#megadrop-header-template').clone().removeAttr('id');
@@ -1279,22 +1287,30 @@ mega.megadrop = (function() {
                 }
             }
 
-            // Sort the MEGADrop folders by name alphabetically before rendering
-            list.sort(function (a, b) {
-                return a.fn.localeCompare(b.fn);
-            });
+            var promise = new MegaPromise();
 
-            for (var g = 0; g < list.length; g++) {
-                item = list[g];
-                if (item.p && item.s === 2) {
-                    drawPupCard(item.p);
-                }
-                else {
-                    if (d) {
-                        console.warn('settings.drawPups: non-active PUP: ', item.fn);
+            dbfetch.geta(handleList).always(function() {
+
+                // Sort the MEGADrop folders by name alphabetically before rendering
+                list.sort(function (a, b) {
+                    return a.fn.localeCompare(b.fn);
+                });
+
+                for (var g = 0; g < list.length; g++) {
+                    item = list[g];
+                    if (item.p && item.s === 2) {
+                        drawPupCard(item.p);
+                    }
+                    else {
+                        if (d) {
+                            console.warn('settings.drawPups: non-active PUP: ', item.fn);
+                        }
                     }
                 }
-            }
+                promise.resolve();
+            });
+
+            return promise;
         };
 
         /**
@@ -1303,9 +1319,8 @@ mega.megadrop = (function() {
         var widget = function settingsWidget() {
             loadingDialog.show();
 
-            drawPups();
+            drawPups().always(_eventListeners.bind(null));
             initAccountScroll();
-            _eventListeners();
             setInitialized(true);
 
             loadingDialog.hide();
@@ -1620,7 +1635,6 @@ mega.megadrop = (function() {
                 uiOpts.dlg.widget.$.code.text(uiOpts.dlg.widget.code);
             }
 
-            uiOpts.dlg.widget.$.find('.tab-url-link').click();
         };
 
         var widgetDialog = function uiWidgetDialog(pupHandle) {
@@ -1629,6 +1643,9 @@ mega.megadrop = (function() {
             // Is there a related public upload page handle
             if (puf.items[handle] && puf.items[handle].p) {
                 _widgetDlgContent(handle);
+
+                // Reset active tab
+                uiOpts.dlg.widget.$.find('.tab-url-link').click();
                 M.safeShowDialog('megadrop-dialog', uiOpts.dlg.widget.$[0]);
             }
             loadingDialog.hide();

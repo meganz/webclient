@@ -147,6 +147,8 @@ mega.tpw = new function TransferProgressWidget() {
         // upgrade account
         $('.up-action', $overQuotaBanner).off('click').on('click',
             function overquota_bannerUpgrade() {
+                $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                isHiddenByUser = true;
                 loadSubPage('pro');
             });
 
@@ -183,7 +185,7 @@ mega.tpw = new function TransferProgressWidget() {
             }
             else {
                 $overQuotaBanner.find('.head-title').text(l[5932]);
-                $overQuotaBanner.find('.content-txt').text(l[7014].replace('[A]', '<b>').replace('[/A]', '[/b]'));
+                $overQuotaBanner.find('.content-txt').safeHTML(l[7014].replace('[A]', '<b>').replace('[/A]', '</b> '));
 
                 var perc = Math.round(acc.space_used * 100 / acc.space);
 
@@ -198,6 +200,26 @@ mega.tpw = new function TransferProgressWidget() {
             $overQuotaBanner.removeClass('hidden');
 
         });
+    };
+
+    /**
+     * Clear the warnings shown on TPW header
+     * @param {Number} type     flag to distinguish upload/download
+     */
+    this.resetErrorsAndQuotasUI = function(type) {
+        if (!type) {
+            return;
+        }
+
+        $overQuotaBanner.addClass('hidden');
+
+        var $sectionType = 'download';
+
+        if (type === this.UPLOAD) {
+            $sectionType = 'upload';
+        }
+
+        $rowsHeader.find('.transfer-progress-type.' + $sectionType).removeClass('error overquota');
     };
 
 
@@ -345,7 +367,9 @@ mega.tpw = new function TransferProgressWidget() {
     var viewPreparation = function() {
         'use strict';
         init();
-        initUI();
+        if (!initUI()) {
+            return;
+        }
 
         // pages to hide always
         if (page.indexOf('transfers') !== -1) {
@@ -354,7 +378,11 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if (!isHiddenByUser) {
-            mega.tpw.showWidget();
+
+            if (page.indexOf('chat') === -1) {
+                mega.tpw.showWidget();
+            }
+
             if ($widgetHeadAndBody.hasClass('expand')) {
                 if (page.indexOf('chat') !== -1) {
                     $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
@@ -509,9 +537,15 @@ mega.tpw = new function TransferProgressWidget() {
                 if (initialDownloadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
                     if ($uploadHeader.hasClass('hidden') ||
                         $uploadHeader.find('.transfer-progress-txt').text() === l[1418]) {
-                        if ($widgetHeadAndBody.hasClass('expand')) {
-                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
-                            isMinimizedByUser = false;
+                        // widget minimizing code, kept for comparing
+                        // if ($widgetHeadAndBody.hasClass('expand')) {
+                        //    $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                        //    isMinimizedByUser = false;
+                        // }
+
+                        if ($widgetHeadAndBody.is(':visible')) {
+                            $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                            isHiddenByUser = false;
                         }
                     }
                 }
@@ -540,9 +574,15 @@ mega.tpw = new function TransferProgressWidget() {
                 if (initialUploadHeadText !== l[1418] && page.indexOf('chat') !== -1) {
                     if ($downloadHeader.hasClass('hidden') ||
                         $downloadHeader.find('.transfer-progress-txt').text() === l[1418]) {
-                        if ($widgetHeadAndBody.hasClass('expand')) {
-                            $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
-                            isMinimizedByUser = false;
+                        // widget minimizing code, kept for comparing
+                        // if ($widgetHeadAndBody.hasClass('expand')) {
+                        //    $('.transfer-progress-icon.tpw-c-e.collapse', $rowsHeader).click();
+                        //    isMinimizedByUser = false;
+                        // }
+
+                        if ($widgetHeadAndBody.is(':visible')) {
+                            $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
+                            isHiddenByUser = false;
                         }
                     }
                 }
@@ -558,6 +598,10 @@ mega.tpw = new function TransferProgressWidget() {
 
     var initUI = function() {
         var $currWidget = clearAndReturnWidget();
+
+        if (!$currWidget) {
+            return false;
+        }
 
         var rows = $currWidget.find('.transfer-task-row');
         if (rows.length) {
@@ -575,6 +619,7 @@ mega.tpw = new function TransferProgressWidget() {
                     actionsOnRowEventHandler);
             }
         }
+        return true;
     };
 
     /**
@@ -900,6 +945,8 @@ mega.tpw = new function TransferProgressWidget() {
         $errorCancelAction.find('.tooltips').text(cancelText);
         $targetedRow.find('.transfer-task-actions').empty().append($errorCancelAction);
 
+        $targetedRow.removeAttr('prepared');
+
         $rowsHeader.find('.transfer-progress-type.' + subHeaderClass).addClass('error');
 
         if (isOverQuota) {
@@ -1078,7 +1125,7 @@ mega.tpw = new function TransferProgressWidget() {
     this.showWidget = function() {
         init();
         initUI();
-        if (!$rowsContainer.find('.transfer-task-row').length) {
+        if (!$rowsContainer || !$rowsContainer.find('.transfer-task-row').length) {
             return;
         }
         $widget.removeClass('hidden');

@@ -675,10 +675,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
-    l[10631] = l[10631].replace('[A]', '<a href="https://mega.nz/general" target="_blank" rel="noopener noreferrer">')
-                       .replace('[/A]', '</a>');
-    l[10630] = l[10630].replace('[A]', '<a href="https://mega.nz/general" target="_blank" rel="noopener noreferrer">')
-                       .replace('[/A]', '</a>');
+    l[10631] = l[10631].replace('[A]',
+        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[10630] = l[10630].replace('[A]',
+        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[10634] = l[10634].replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
                        .replace('[/A]', '</a>');
 
@@ -875,6 +875,9 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
         .replace('[/A2]', '</a>');
     l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20846] = l[20846]
+        .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
+        .replace('[/A]', '</a>');
     l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[20707] = escapeHTML(l[20707]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');

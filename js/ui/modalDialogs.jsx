@@ -1,27 +1,32 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
-var Tooltips = require("./tooltips.jsx");
-var Forms = require("./forms.jsx");
+import utils  from "./utils.jsx";
+import MegaRenderMixin from "../stores/mixins.js";
+import Tooltips from "./tooltips.jsx";
+import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-var ExtraFooterElement = React.createClass({
+class ExtraFooterElement extends MegaRenderMixin(React.Component) {
     render() {
         return this.props.children;
     }
-});
+};
 
-var ModalDialog = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps() {
-        return {
-            'hideable': true
-        }
-    },
-    componentDidMount: function() {
+class ModalDialog extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'hideable': true
+    };
+
+    constructor (props) {
+        super(props);
+        this.onBlur = this.onBlur.bind(this);
+        this.onCloseClicked = this.onCloseClicked.bind(this);
+        this.onPopupDidMount = this.onPopupDidMount.bind(this);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
         $(document.body).addClass('overlayed');
         $('.fm-dialog-overlay').removeClass('hidden');
@@ -38,8 +43,8 @@ var ModalDialog = React.createClass({
                 self.onBlur();
             }
         });
-    },
-    onBlur: function(e) {
+    }
+    onBlur(e) {
         var $element = $(ReactDOM.findDOMNode(this));
 
         if(
@@ -48,33 +53,32 @@ var ModalDialog = React.createClass({
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
             this.onCloseClicked();
         }
-
-
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
         $(window).off('resize.modalDialog' + this.getUniqueId());
 
-    },
-    onCloseClicked: function(e) {
+    }
+    onCloseClicked(e) {
         var self = this;
 
         if (self.props.onClose) {
             self.props.onClose(self);
         }
-    },
-    onPopupDidMount: function(elem) {
+    }
+    onPopupDidMount(elem) {
         this.domNode = elem;
 
         if (this.props.popupDidMount) {
             // bubble up...
             this.props.popupDidMount(elem);
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var classes = "fm-dialog fm-modal-dialog " + self.props.className;
@@ -92,7 +96,7 @@ var ModalDialog = React.createClass({
             }
 
             if (
-                child.type.displayName === 'ExtraFooterElement'
+                child.type.name === 'ExtraFooterElement'
             ) {
                 extraFooterElements.push(React.cloneElement(child, {
                     key: x++
@@ -112,7 +116,7 @@ var ModalDialog = React.createClass({
             var buttons = [];
             self.props.buttons.forEach(function(v) {
                 buttons.push(
-                    <a href="javascript:;"
+                    <a
                         className={(v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : "")}
                         onClick={(e) => {
                             if ($(e.target).is(".disabled")) {
@@ -153,39 +157,39 @@ var ModalDialog = React.createClass({
             </utils.RenderTo>
         );
     }
-});
+};
 
 
 
-var SelectContactDialog = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    clickTime: 0,
-    getDefaultProps: function() {
-        return {
-            'selectLabel': __(l[1940]),
-            'cancelLabel': __(l[82]),
-            'hideable': true
-        }
-    },
-    getInitialState: function() {
-        return {
+class SelectContactDialog extends MegaRenderMixin(React.Component) {
+    static clickTime = 0;
+    static defaultProps = {
+        'selectLabel': __(l[1940]),
+        'cancelLabel': __(l[82]),
+        'hideable': true
+    };
+
+    constructor (props) {
+        super(props);
+        this.state = {
             'selected': this.props.selected ? this.props.selected : []
         }
-    },
-    onSelected: function(nodes) {
+
+        this.onSelected = this.onSelected.bind(this);
+    }
+    onSelected(nodes) {
         this.setState({'selected': nodes});
         if (this.props.onSelected) {
             this.props.onSelected(nodes);
         }
-    },
-    onSelectClicked: function() {
+    }
+    onSelectClicked() {
         this.props.onSelectClicked();
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var classes = "send-contact contrast small-footer " + self.props.className;
-
 
         return (
             <ModalDialog
@@ -237,26 +241,20 @@ var SelectContactDialog = React.createClass({
             </ModalDialog>
         );
     }
-});
+};
 
-var ConfirmDialog = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'confirmLabel': __(l[6826]),
-            'cancelLabel': __(l[82]),
-            'dontShowAgainCheckbox': true,
-            'hideable': true
-        }
-    },
-    getInitialState: function() {
-        return {
-        }
-    },
-    unbindEvents: function() {
+class ConfirmDialog extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'confirmLabel': __(l[6826]),
+        'cancelLabel': __(l[82]),
+        'dontShowAgainCheckbox': true,
+        'hideable': true
+    };
+    unbindEvents() {
         $(document).off('keyup.confirmDialog' + this.getUniqueId());
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         var self = this;
 
         // since ModalDialogs can be opened in other keyup (on enter) event handlers THIS is required to be delayed a
@@ -280,18 +278,19 @@ var ConfirmDialog = React.createClass({
                 }
             });
         }, 75);
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         self.unbindEvents();
-    },
-    onConfirmClicked: function() {
+    }
+    onConfirmClicked() {
         this.unbindEvents();
         if (this.props.onConfirmClicked) {
             this.props.onConfirmClicked();
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true)  {
@@ -363,9 +362,9 @@ var ConfirmDialog = React.createClass({
             </ModalDialog>
         );
     }
-});
+};
 
-module.exports = window.ModalDialogUI = {
+export default {
     ModalDialog,
     SelectContactDialog,
     ConfirmDialog,

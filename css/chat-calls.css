@@ -74,6 +74,12 @@ video.localViewport {
     -webkit-transform: rotateY(180deg); /* Safari and Chrome */
     -moz-transform: rotateY(180deg); /* Firefox */
 }
+
+.is-screen video.localViewport {
+    transform: none;
+    -webkit-transform: none;
+    -moz-transform: none;
+}
 .call.local-video {
     min-height: 184px;
     max-height: 184px;
@@ -395,7 +401,7 @@ video.localViewport {
 }
 .call-header .call-video-icon, .call-header .call-video-icon-warn {
     margin-right: 8px;
-    background-image: url(../images/mega/new-chat-sprite_v12.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-position: -84px -466px;
     height: 12px;
     width: 20px;
@@ -415,7 +421,7 @@ video.localViewport {
 }
 .call-header .call-switch-view {
     margin-right: 16px;
-    background-image: url(../images/mega/new-chat-sprite_v12.png);
+    background-image: url(../images/mega/new-chat-sprite_v16.png);
     background-position: -160px -464px;
     width: 16px;
     height: 16px;

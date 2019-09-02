@@ -13,19 +13,7 @@ function u_login(ctx, email, password, uh, pinCode, permanent) {
     ctx.result = u_login2;
     ctx.permanent = permanent;
 
-    // check whether the pwd came from the browser manager
-    var pwdman = passwordManager.getStoredCredentials(password);
-    if (pwdman) {
-        uh = pwdman.hash;
-        keypw = pwdman.keypw;
-
-        if (d) {
-            console.log('Using pwdman credentials.');
-        }
-    }
-    else {
-        keypw = prepare_key_pw(password);
-    }
+    keypw = prepare_key_pw(password);
 
     api_getsid(ctx, email, keypw, uh, pinCode);
 }
@@ -126,12 +114,12 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
         var exclude = [
-            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
+            'aav', 'aas', '*!>alias', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
             'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
         ];
 
         for (var n in u_attr) {
-            if (exclude.indexOf(n) === -1) {
+            if (exclude.indexOf(n) === -1 && n[0] !== '*') {
                 try {
                     u_attr[n] = from8(base64urldecode(u_attr[n]));
                 } catch (e) {
@@ -1431,6 +1419,7 @@ function processEmailChangeActionPacket(ap) {
      * @param {String} value Configuration value
      */
     ns.set = function _setConfigValue(key, value) {
+
         fmconfig[key] = value;
 
         if (d) {

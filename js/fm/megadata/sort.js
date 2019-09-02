@@ -60,6 +60,7 @@ MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
 };
 
 MegaData.prototype.getSortByNameFn = function() {
+
     var self = this;
 
     return function(a, b, d) {
@@ -82,8 +83,12 @@ MegaData.prototype.getSortByNameFn2 = function(d) {
         var intl = this.collator || new Intl.Collator('co', {numeric: true});
 
         return function(a, b) {
-            if (a.name !== b.name) {
-                return intl.compare(a.name, b.name) * d;
+
+            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
+            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
+
+            if (nameA !== nameB) {
+                return intl.compare(nameA, nameB) * d;
             }
 
             return M.doFallbackSort(a, b, d);
@@ -92,7 +97,11 @@ MegaData.prototype.getSortByNameFn2 = function(d) {
 
     return function(a, b) {
         if (typeof a.name === 'string' && typeof b.name === 'string') {
-            return a.name.localeCompare(b.name) * d;
+
+            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
+            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
+
+            return nameA.localeCompare(nameB) * d;
         }
         return M.doFallbackSort(a, b, d);
     };
@@ -154,7 +163,7 @@ MegaData.prototype.sortByDateTime = function(d) {
     this.sort();
 };
 
-MegaData.prototype.getSortByDateTimeFn = function() {
+MegaData.prototype.getSortByDateTimeFn = function(type) {
 
     var sortfn;
 
@@ -172,14 +181,23 @@ MegaData.prototype.getSortByDateTimeFn = function() {
         var time1 = a.ts - a.ts % 60;
         var time2 = b.ts - b.ts % 60;
 
-        if (M.currentdirid === 'out-shares') {
-            time1 = getMaxShared(a.shares);
-            time2 = getMaxShared(b.shares);
+        if (M.currentdirid === 'out-shares' || type === 'out-shares') {
+            time1 = M.ps[a.h] ? getMaxShared(M.ps[a.h]) : getMaxShared(a.shares);
+            time2 = M.ps[b.h] ? getMaxShared(M.ps[b.h]) : getMaxShared(b.shares);
         }
 
-        if (M.currentdirid === 'public-links' && !$.dialog) {
-            time1 = a.shares.EXP.ts;
-            time2 = b.shares.EXP.ts;
+        if ((M.currentdirid === 'public-links' && !$.dialog) || type === 'public-links') {
+            var largeNum = 99999999999 * d;
+
+            if (a.shares === undefined && M.su.EXP[a.h]) {
+                a = M.d[a.h];
+            }
+            if (b.shares === undefined && M.su.EXP[b.h]) {
+                b = M.d[b.h];
+            }
+
+            time1 = (a.shares && a.shares.EXP) ? a.shares.EXP.ts : largeNum;
+            time2 = (b.shares && b.shares.EXP) ? b.shares.EXP.ts : largeNum;
         }
 
         if (time1 !== time2) {
@@ -470,6 +488,7 @@ MegaData.prototype.sortByInteraction = function(d) {
 
 MegaData.prototype.doSort = function(n, d) {
     $('.grid-table-header .arrow').removeClass('asc desc');
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     n = String(n).replace(/\W/g, '');
     if (d > 0) {
@@ -478,6 +497,20 @@ MegaData.prototype.doSort = function(n, d) {
     else {
         $('.arrow.' + n).addClass('asc');
     }
+
+    var sortClassinSubMenu = '.sort-' + n;
+
+    if (n === 'ts') {
+        sortClassinSubMenu = '.sort-timeAd';
+    }
+    else if (n === 'mtime') {
+        sortClassinSubMenu = '.sort-timeMd';
+    }
+    else if (n === 'date') {
+        sortClassinSubMenu = '.sort-sharecreated, .sort-timeAd';
+    }
+
+    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item' + sortClassinSubMenu).addClass('selected');
 
     this.sortmode = {n: n, d: d};
 
@@ -497,32 +530,8 @@ MegaData.prototype.doSort = function(n, d) {
 };
 
 MegaData.prototype.setLastColumn = function(col) {
-    switch (col) {
-        case 'ts':
-        case 'mtime':
-            // It's valid
-            break;
-        default:
-            // Default value
-            col = "ts";
-            break;
-    }
-
-    if (col === this.lastColumn) {
-        return;
-    }
-
-    this.lastColumn = col;
-    localStorage._lastColumn = this.lastColumn;
-
-    if ($('.do-sort[data-by="' + col + '"]').length > 0) {
-        // swap the column label
-        $('.dropdown-item.do-sort').removeClass('selected');
-        $('.grid-url-header').prev().find('div')
-            .removeClass().addClass('arrow ' + col)
-            .text($('.do-sort[data-by="' + col + '"]').text());
-        $('.do-sort[data-by="' + col + '"]').addClass('selected');
-    }
+    "use strict";
+    return;
 };
 
 MegaData.prototype.sortByLabel = function(d) {

@@ -1,15 +1,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 
-var ChatHandleMessage = React.createClass({
-    mixins: [ConversationMessageMixin],
-
-    render: function () {
+class ChatHandleMessage extends ConversationMessageMixin {
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -19,7 +16,6 @@ var ChatHandleMessage = React.createClass({
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
-        var name = "";
 
 
         var datetime = <div className="message date-time"
@@ -41,7 +37,6 @@ var ChatHandleMessage = React.createClass({
             avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"/>;
             datetime = <div className="message date-time"
                             title={time2date(timestampInt)}>{timestamp}</div>;
-            name = <div className="message user-card-name">{displayName}</div>;
         }
 
 
@@ -60,8 +55,8 @@ var ChatHandleMessage = React.createClass({
             </div>
         );
     }
-});
+};
 
-module.exports = {
+export {
     ChatHandleMessage
 };

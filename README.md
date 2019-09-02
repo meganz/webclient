@@ -103,7 +103,12 @@ sudo chgrp -R www-data /var/www/html/
 sudo chown -R <your-username> /var/www/html/
 ```
 
-10. Visit http://webclient.local in your browser.
+10. Pull language files:
+```
+/var/www/html/webclient.local/scripts/lang.sh
+```
+
+11. Visit http://webclient.local in your browser.
 
 
 Directories
@@ -114,6 +119,7 @@ Directories
 * ``js/html/`` contains all JavaScript files that belong to the
   specific HTML file of the parent folder
 * ``js/vendor/`` -- contains all JavaScript files from external developers
+* ``cmaps/`` -- contains all Character mapping files for Pdf preview's Adobe font
 
 
 Our JavaScript Files

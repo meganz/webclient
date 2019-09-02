@@ -1,45 +1,74 @@
 var React = require("react");
 
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
-var RenderDebugger = require('./../../../stores/mixins.js').RenderDebugger;
+import MegaRenderMixin from '../../../stores/mixins.js';
 
-var ConversationMessageMixin = {
-    mixins: [MegaRenderMixin, RenderDebugger],
-    onAfterRenderWasTriggered: false,
-    componentWillMount: function() {
+class ConversationMessageMixin extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+        this.onAfterRenderWasTriggered = false;
+    }
+    componentWillMount() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
         var contact = self.getContact();
+        var changedCb = function(contact, oldData, k, v) {
+            if (k === "ts") {
+                // no updates needed in case of 'ts' change
+                // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
+                return;
+            }
+            self.debouncedForceUpdate();
+        };
+
         if (contact && contact.addChangeListener && !self._contactChangeListener) {
-            self._contactChangeListener = contact.addChangeListener(function(contact, oldData, k, v) {
-                if (k === "ts") {
-                    // no updates needed in case of 'ts' change
-                    // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
-                    return;
-                }
-                self.debouncedForceUpdate();
-            });
+            self._contactChangeListener = contact.addChangeListener(changedCb);
         }
-    },
-    componentWillUnmount: function() {
+        if (self.haveMoreContactListeners) {
+            if (!self._contactChangeListeners) {
+                self._contactChangeListeners = [];
+                var moreIds = self.haveMoreContactListeners();
+                if (moreIds && moreIds.forEach) {
+                    moreIds.forEach(function(handle) {
+                        if (M.u[handle] && M.u[handle].addChangeListener) {
+                            self._contactChangeListeners.push(
+                                [M.u[handle], M.u[handle].addChangeListener(changedCb)]
+                            )
+                        }
+                    });
+                }
+            }
+        }
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var contact = self.getContact();
 
         if (self._contactChangeListener && contact && contact.removeChangeListener) {
             contact.removeChangeListener(self._contactChangeListener);
         }
-    },
-    getContact: function() {
+        if (this._contactChangeListeners) {
+            this._contactChangeListeners.forEach(function(listener) {
+                listener[0].removeChangeListener(listener[1]);
+            });
+            this._contactChangeListeners = [];
+        }
+    }
+    getContact() {
+        if (this.props.contact) {
+            // optimization
+            return this.props.contact;
+        }
         var message = this.props.message;
 
         return Message.getContactForMessage(message);
-    },
-    getTimestampAsString: function() {
+    }
+    getTimestampAsString() {
         return unixtimeToTimeString(this.getTimestamp());
-    },
-    getTimestamp: function() {
+    }
+    getTimestamp() {
         var message = this.props.message;
         var timestampInt;
         if (message.getDelay) {
@@ -56,13 +85,13 @@ var ConversationMessageMixin = {
             timestampInt += message.updated;
         }
         return timestampInt;
-    },
-    getParentJsp: function() {
+    }
+    getParentJsp() {
         var $node = $(this.findDOMNode());
         var $jsp = $node.closest('.jScrollPaneContainer').data('jsp');
         return $jsp;
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
         var megaChat = chatRoom.megaChat;
@@ -82,6 +111,6 @@ var ConversationMessageMixin = {
     }
 };
 
-module.exports = {
+export {
     ConversationMessageMixin
 };

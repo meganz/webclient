@@ -1,4 +1,5 @@
-var ReactDOM = require("react-dom");
+import ReactDOM from "react-dom";
+import React from "react";
 
 // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
 // adapted to be a bit more optimal for functions...
@@ -60,19 +61,69 @@ else {
 
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
-var MegaRenderMixin = {
-    getReactId: function() {
-        return this._reactInternalInstance._rootNodeID;
-    },
-    getUniqueId: function() {
-        if (!this._reactInternalInstance) {
+
+var FUNCTIONS = [
+    'render',
+    'shouldComponentUpdate',
+    'doProgramaticScroll',
+    'componentDidMount',
+    'componentDidUpdate',
+    'componentWillUnmount',
+    'refreshUI',
+    'eventuallyInit',
+    'handleWindowResize',
+    'isActive',
+    'onMessagesScrollReinitialise',
+    'specificShouldComponentUpdate',
+    'attachAnimationEvents',
+    'eventuallyReinitialise',
+    'reinitialise',
+    'getContentHeight',
+    'onResize',
+    'isComponentEventuallyVisible'
+];
+
+var localStorageProfileRenderFns = localStorage.profileRenderFns;
+
+if (localStorageProfileRenderFns) {
+    window.REACT_RENDER_CALLS = {};
+}
+
+var ID_CURRENT = 0;
+
+export default superClass => class MegaRenderMixin extends superClass {
+    constructor (props) {
+        super(props);
+    }
+    isMounted() {
+        return !!this.__isMounted;
+    }
+    componentWillUnmount() {
+        if (super.componentWillUnmount) {
+            super.componentWillUnmount();
+        }
+        this.__isMounted = false;
+        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
+        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+
+        window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+    }
+    getReactId() {
+        // Since react dropped their _rootNodeId's, we would use some hacky locally generated id
+        if (!this._id) {
+            this._id = this._reactInternalFiber.type.name + new String(ID_CURRENT++);
+        }
+        return this._id;
+    }
+    getUniqueId() {
+        if (!this._reactInternalFiber) {
             assert(this._uniqueId, 'missing unique id.');
             return this._uniqueId;
         }
         this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
         return this._uniqueId;
-    },
-    debouncedForceUpdate: function(timeout) {
+    }
+    debouncedForceUpdate(timeout) {
         var self = this;
         if (typeof(self.skippedUpdates) === 'undefined') {
             self.skippedUpdates = 0;
@@ -94,13 +145,17 @@ var MegaRenderMixin = {
             self.debounceTimer = null;
             self.skippedUpdates = 0;
         }, TIMEOUT_VAL);
-    },
-    componentDidMount: function() {
-
-        if (this.props.requiresUpdateOnResize) {
-            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate);
+    }
+    componentDidMount() {
+        if (super.componentDidMount) {
+            super.componentDidMount();
         }
-        // window.addEventListener('hashchange', this.onHashChangeDoUpdate);
+        this.__isMounted = true;
+        if (this.props.requiresUpdateOnResize) {
+            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+        }
+        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+        window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
 
         // init on data structure change events
         if (this.props) {
@@ -121,31 +176,20 @@ var MegaRenderMixin = {
         //);
         //
         //this.requiresLazyRendering();
-
-        this._isMounted = true;
-    },
-    findDOMNode: function() {
+    }
+    findDOMNode() {
         if (this.domNode) {
             // injected by RenderTo and ModalDialogs
             return this.domNode;
         }
 
         return ReactDOM.findDOMNode(this);
-    },
-    componentWillUnmount: function() {
-        if (this.props.requiresUpdateOnResize) {
-            $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-        }
-
-        // window.removeEventListener('hashchange', this.onHashChangeDoUpdate);
-
-        this._isMounted = false;
-    },
-    isComponentVisible: function() {
+    }
+    isComponentVisible() {
         var domNode = $(this.findDOMNode());
 
-        // ._isMounted is faster then .isMounted() or any other operation
-        if (!this._isMounted) {
+        // .__isMounted is faster then .isMounted() or any other operation
+        if (!this.__isMounted) {
             return false;
         }
         // offsetParent should NOT trigger a reflow/repaint
@@ -159,20 +203,20 @@ var MegaRenderMixin = {
             return false;
         }
         return true;
-    },
+    }
     /**
      * Lightweight version of .isComponentVisible
      * @returns {bool}
      */
-    isComponentEventuallyVisible: function() {
+    isComponentEventuallyVisible() {
         var domNode = this.findDOMNode();
 
         if (this.componentSpecificIsComponentEventuallyVisible) {
             return this.componentSpecificIsComponentEventuallyVisible();
         }
 
-        // ._isMounted is faster then .isMounted() or any other operation
-        if (!this._isMounted) {
+        // .__isMounted is faster then .isMounted() or any other operation
+        if (!this.__isMounted) {
             return false;
         }
         if (this.props.isVisible) {
@@ -183,8 +227,8 @@ var MegaRenderMixin = {
             return false;
         }
         return true;
-    },
-    eventuallyUpdate: function() {
+    }
+    eventuallyUpdate() {
         var self = this;
 
         if (self._updatesDisabled === true) {
@@ -193,16 +237,17 @@ var MegaRenderMixin = {
         if (!self._wasRendered || (self._wasRendered && !self.isMounted())) {
             return;
         }
-        if (!self._isMounted) {
+        if (!self.__isMounted) {
             return;
         }
         if (!self.isComponentEventuallyVisible()) {
+            this._requiresUpdateOnResize = true;
             return;
         }
 
         self.safeForceUpdate();
-    },
-    tempDisableUpdates: function(forHowLong) {
+    }
+    tempDisableUpdates(forHowLong) {
         var self = this;
         self._updatesDisabled = true;
         if (self._updatesReenableTimer) {
@@ -218,34 +263,40 @@ var MegaRenderMixin = {
         self._updatesReenableTimer = setTimeout(function() {
             self.tempEnableUpdates();
         }, timeout);
-    },
-    tempEnableUpdates: function() {
+    }
+    tempEnableUpdates() {
         clearTimeout(this._updatesReenableTimer);
         this._updatesDisabled = false;
         this.eventuallyUpdate();
-    },
-    onResizeDoUpdate: function() {
+    }
+    queuedUpdateOnResize() {
+        if (this.isMounted() && this._requiresUpdateOnResize && this.isComponentEventuallyVisible()) {
+            this._requiresUpdateOnResize = false;
+            this.eventuallyUpdate();
+        }
+    }
+    onResizeDoUpdate() {
         if (!this.isMounted() || this._pendingForceUpdate === true) {
             return;
         }
 
         this.eventuallyUpdate();
-    },
-    // onHashChangeDoUpdate: function() {
+    }
+    // onHashChangeDoUpdate() {
     //     if (!this.isMounted() || this._pendingForceUpdate === true) {
     //         return;
     //     }
     //
     //     this.eventuallyUpdate();
-    // },
-    _recurseAddListenersIfNeeded: function(idx, map, depth) {
+    // }
+    _recurseAddListenersIfNeeded(idx, map, depth) {
         var self = this;
         depth = depth ? depth : 0;
 
 
         if (typeof map._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-                            "_" + idx;
+                "_" + idx;
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
                 _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
                     self.onPropOrStateUpdated(map, idx);
@@ -263,8 +314,8 @@ var MegaRenderMixin = {
                 self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
             }
         });
-    },
-    _checkDataStructForChanges: function(idx, valA, valB, depth) {
+    }
+    _checkDataStructForChanges(idx, valA, valB, depth) {
         var self = this;
         var foundChanges = false;
         var v = valA;
@@ -290,7 +341,7 @@ var MegaRenderMixin = {
 
         if (typeof v._dataChangeIndex !== "undefined") {
             var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() +
-                                "_" + idx;
+                "_" + idx;
 
             if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
                 if (window.RENDER_DEBUG) {
@@ -323,8 +374,8 @@ var MegaRenderMixin = {
             // console.error("NOT tracked/changed: ", k, v);
         }
         return foundChanges;
-    },
-    _recursiveSearchForDataChanges: function(idx, map, referenceMap, depth) {
+    }
+    _recursiveSearchForDataChanges(idx, map, referenceMap, depth) {
         var self = this;
         depth = depth || 0;
 
@@ -387,8 +438,8 @@ var MegaRenderMixin = {
             foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
         });
         return foundChanges;
-    },
-    shouldComponentUpdate: function(nextProps, nextState) {
+    }
+    shouldComponentUpdate(nextProps, nextState) {
         var shouldRerender = false;
 
         if (
@@ -463,7 +514,6 @@ var MegaRenderMixin = {
             console.error("shouldRerender?",
                 shouldRerender,
                 "rendered: ", this.getElementName(),
-                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
                 "props:", this.props,
                 "nextProps:", this.props,
                 "state:", this.state
@@ -487,8 +537,8 @@ var MegaRenderMixin = {
         }
 
         return shouldRerender;
-    },
-    onPropOrStateUpdated: function() {
+    }
+    onPropOrStateUpdated() {
         if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
 
         if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
@@ -496,133 +546,87 @@ var MegaRenderMixin = {
         }
 
         this.forceUpdate();
-    },
-    getElementName: function() {
-        return this.constructor.displayName;
-    },
-    getRootElement: function() {
-        var rootElement = this;
-        while(rootElement = this._reactInternalInstance._currentElement._owner) {
-            //
-        }
-        return rootElement === this ? null : rootElement;
-    },
-    getOwnerElement: function() {
-        var owner = this._reactInternalInstance._currentElement._owner;
-        if (owner) {
-            return this._reactInternalInstance._currentElement._owner._instance;
-        } else {
-            return null;
-        }
-    },
-    safeForceUpdate: function() {
+    }
+    getElementName() {
+        return this._reactInternalFiber.elementType.name;
+    }
+    safeForceUpdate() {
         try {
-            if (this._isMounted && this.isMounted()) {
+            if (this.__isMounted) {
                 this.forceUpdate();
             }
         } catch (e) {
             console.error("safeForceUpdate: ", e);
         }
     }
-};
 
-var RenderDebugger = {
-    componentDidUpdate: function() {
+    /* RenderDebug mixin */
+    componentDidUpdate() {
         if (window.RENDER_DEBUG) {
             var self = this;
             var getElementName = function() {
                 if (!self.constructor) {
                     return "unknown";
                 }
-                return self.constructor.displayName;
+                return self.constructor.name;
             };
 
             console.error(
                 "renderedX: ", getElementName(),
-                "owner: ", this.getOwnerElement() ? this.getOwnerElement()._reactInternalInstance.getName() : "none",
                 "props:", this.props,
                 "state:", this.state
             );
         }
     }
-};
-if (localStorage.profileRenderFns) {
-    window.REACT_RENDER_CALLS = {};
-    var FUNCTIONS = [
-        'render',
-        'shouldComponentUpdate',
-        'doProgramaticScroll',
-        'componentDidMount',
-        'componentDidUpdate',
-        'componentWillUnmount',
-        'refreshUI',
-        'eventuallyInit',
-        'handleWindowResize',
-        'isActive',
-        'onMessagesScrollReinitialise',
-        'specificShouldComponentUpdate',
-        'attachAnimationEvents',
-        'eventuallyReinitialise',
-        'reinitialise',
-        'getContentHeight',
-        'onResize',
-        'isComponentEventuallyVisible'
-    ];
 
-    RenderDebugger.componentWillReceiveProps = function(nextProps, nextContext) {
-        // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for performance
-        // logging
-        var self = this;
-        var componentName = self.constructor ? self.constructor.displayName : "unknown";
-        if (!this._wrappedRender) {
-            FUNCTIONS.forEach(function(fnName) {
-                var _origFn = self[fnName];
-                if (_origFn) {
-                    self[fnName] = function() {
-                        var start = performance.now();
-                        var res = _origFn.apply(this, arguments);
-                        REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[componentName + "." + fnName]
-                            || 0;
-                        REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
-                        return res;
-                    };
-                }
-            });
-            self._wrappedRender = true;
+    componentWillReceiveProps(nextProps, nextContext) {
+        if (localStorageProfileRenderFns) {
+            // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for
+            // performance logging
+            var self = this;
+            var componentName = self.constructor ? self.constructor.name : "unknown";
+            if (!this._wrappedRender) {
+                FUNCTIONS.forEach(function (fnName) {
+                    var _origFn = self[fnName];
+                    if (_origFn) {
+                        self[fnName] = function () {
+                            var start = performance.now();
+                            var res = _origFn.apply(this, arguments);
+                            REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[
+                            componentName + "." + fnName
+                                ] || 0;
+                            REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
+                            return res;
+                        };
+                    }
+                });
+                self._wrappedRender = true;
+            }
+            REACT_RENDER_CALLS.sorted = function () {
+                var sorted = [];
+                Object.keys(REACT_RENDER_CALLS).sort(function (a, b) {
+                    if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
+                        return 1;
+                    } else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }).forEach(function (k) {
+                    if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+                        sorted.push([k, REACT_RENDER_CALLS[k]]);
+                    }
+                });
+
+                return sorted;
+            };
+            REACT_RENDER_CALLS.clear = function () {
+                Object.keys(REACT_RENDER_CALLS).forEach(function (k) {
+                    if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+                        delete REACT_RENDER_CALLS[k];
+                    }
+                });
+            };
         }
-        REACT_RENDER_CALLS.sorted = function() {
-            var sorted = [];
-            Object.keys(REACT_RENDER_CALLS).sort(function(a, b) {
-                if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
-                    return 1;
-                }
-                else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }
-            }).forEach(function(k) {
-                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
-                    sorted.push([k, REACT_RENDER_CALLS[k]]);
-                }
-            });
-
-            return sorted;
-        };
-        REACT_RENDER_CALLS.clear = function() {
-            Object.keys(REACT_RENDER_CALLS).forEach(function(k) {
-                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
-                    delete REACT_RENDER_CALLS[k];
-                }
-            });
-        };
     }
-}
-
-window.MegaRenderMixin = MegaRenderMixin;
-
-module.exports = {
-    RenderDebugger: RenderDebugger,
-    MegaRenderMixin: MegaRenderMixin
 };

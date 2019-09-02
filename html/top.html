@@ -20,7 +20,7 @@
         <div class="top-icon warning astropay-payment-reminder hidden"><div class="dark-tooltip top">[$8651]</div></div>
         <div class="top-icon warning site-update-available hidden"><div class="dark-tooltip top">[$9088]</div></div>
 
-        <div class="top-icon notification">
+        <div class="top-icon notification hidden">
             <div class="notification-num hidden">0</div>
             <div class="new-notification-info">
                 1 [$2041] [$2042]
@@ -36,9 +36,9 @@
                 <div class="top-search-button hidden"></div>
                 <div class="top-clear-button hidden"></div>
                 <!-- Cover with form to prevent autofilling -->
-                <!-- <form autocomplete="off"> -->
-                <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input" />
-                <!-- </form> -->
+                <form autocomplete="disabled" id="search-fake-form">
+                    <input type="text" placeholder="[$102]" autocomplete="disabled" class="top-search-input" />
+                </form>
             </div>
         </div>
 

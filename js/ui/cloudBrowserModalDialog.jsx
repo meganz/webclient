@@ -1,19 +1,15 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
-var ModalDialogsUI = require('./modalDialogs.jsx');
-var Tooltips = require("./tooltips.jsx");
+import utils  from "./utils.jsx";
+import MegaRenderMixin from "../stores/mixins.js";
+import ModalDialogsUI from './modalDialogs.jsx';
+import Tooltips from "./tooltips.jsx";
 
-var BrowserCol = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'hideable': true
-        }
-    },
-    render: function() {
+class BrowserCol extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'hideable': true
+    };
+    render() {
         var self = this;
 
         var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
@@ -32,27 +28,26 @@ var BrowserCol = React.createClass({
             </th>
         );
     }
-});
-var BrowserEntries = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'hideable': true
-        }
-    },
-    getInitialState: function() {
+};
 
-        return {
+class BrowserEntries extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'hideable': true
+    };
+    constructor(props) {
+        super(props);
+
+        this.state = {
             'highlighted': [],
             'selected': []
         }
-    },
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         this.lastCursor = false;
         this.lastCharKeyPressed = false;
         this.lastCharKeyIndex = -1;
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
 
         if (!self.lastCursor || self.lastCursor !== self.state.cursor) {
@@ -63,14 +58,16 @@ var BrowserEntries = React.createClass({
                 $jsp.scrollToElement(tr, undefined, false);
             }
         }
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         this.bindEvents();
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         this.unbindEvents();
-    },
-    getNodesInIndexRange: function(firstIndex, lastIndex) {
+    }
+    getNodesInIndexRange(firstIndex, lastIndex) {
         var self = this;
         return self.props.entries
             .filter((node, index) => {
@@ -79,8 +76,8 @@ var BrowserEntries = React.createClass({
                 );
             })
             .map((node) => { return node.h });
-    },
-    getIndexByNodeId: function(nodeId, notFoundValue) {
+    }
+    getIndexByNodeId(nodeId, notFoundValue) {
         var self = this;
         var foundIndex = typeof(notFoundValue) === 'undefined' ? -1 : notFoundValue;
         self.props.entries.find(function (r, index) {
@@ -90,8 +87,8 @@ var BrowserEntries = React.createClass({
             }
         });
         return foundIndex;
-    },
-    setSelectedAndHighlighted: function(highlighted, cursor) {
+    }
+    setSelectedAndHighlighted(highlighted, cursor) {
         var self = this;
 
         // highlighted requires to be sorted!
@@ -125,8 +122,8 @@ var BrowserEntries = React.createClass({
 
         self.setState({'selected': selected});
         self.props.onSelected(selected);
-    },
-    _doSelect: function(selectionIncludeShift, currentIndex, targetIndex) {
+    }
+    _doSelect(selectionIncludeShift, currentIndex, targetIndex) {
         var self = this;
         if (targetIndex >= self.props.entries.length) {
             if (selectionIncludeShift) {
@@ -214,8 +211,8 @@ var BrowserEntries = React.createClass({
             highlighted = [self.props.entries[targetIndex].h];
             self.setSelectedAndHighlighted(highlighted, highlighted[0]);
         }
-    },
-    bindEvents: function() {
+    }
+    bindEvents() {
         var self = this;
 
         var KEY_A = 65;
@@ -402,11 +399,11 @@ var BrowserEntries = React.createClass({
             }
             // enter
         });
-    },
-    unbindEvents: function() {
+    }
+    unbindEvents() {
         $(document.body).off('keydown.cloudBrowserModalDialog');
-    },
-    onEntryClick: function(e, node) {
+    }
+    onEntryClick(e, node) {
         var self = this;
 
         self.lastCharKeyPressed = false;
@@ -482,7 +479,7 @@ var BrowserEntries = React.createClass({
                 self.setSelectedAndHighlighted(highlighted, highlighted.length == 0 ? false : highlighted[0]);
             }
         }
-    },
+    }
     expandFolder(nodeId) {
         var self = this;
         var node = M.getNodeByHandle(nodeId);
@@ -498,8 +495,8 @@ var BrowserEntries = React.createClass({
             self.props.onExpand(node);
             self.forceUpdate();
         }
-    },
-    onEntryDoubleClick: function(e, node) {
+    }
+    onEntryDoubleClick(e, node) {
         var self = this;
 
         self.lastCharKeyPressed = false;
@@ -521,8 +518,8 @@ var BrowserEntries = React.createClass({
             self.props.onSelected(self.state.selected);
             self.props.onAttachClicked(self.state.selected);
         }
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
 
         var items = [];
@@ -632,7 +629,7 @@ var BrowserEntries = React.createClass({
                 }
 
                 items.push(
-                    <div 
+                    <div
                         className={
                             "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
                             (isHighlighted ? " ui-selected" : "") +
@@ -764,19 +761,19 @@ var BrowserEntries = React.createClass({
             </div>
         );
     }
-});
-var CloudBrowserDialog = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'selectLabel': __(l[8023]),
-            'openLabel': __(l[1710]),
-            'cancelLabel': __(l[82]),
-            'hideable': true
-        }
-    },
-    getInitialState: function() {
-        return {
+};
+
+
+class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'selectLabel': __(l[8023]),
+        'openLabel': __(l[1710]),
+        'cancelLabel': __(l[82]),
+        'hideable': true
+    };
+    constructor(props) {
+        super(props);
+        this.state = {
             'sortBy': [
                 'name', 'asc'
             ],
@@ -785,17 +782,27 @@ var CloudBrowserDialog = React.createClass({
             'currentlyViewedEntry': M.RootID,
             'selectedTab': 'clouddrive',
             'searchValue': ''
-        }
-    },
-    toggleSortBy: function(colId) {
+        };
+        this.onAttachClicked = this.onAttachClicked.bind(this);
+        this.onClearSearchIconClick = this.onClearSearchIconClick.bind(this);
+        this.onHighlighted = this.onHighlighted.bind(this);
+        this.onPopupDidMount = this.onPopupDidMount.bind(this);
+        this.onSearchChange = this.onSearchChange.bind(this);
+        this.onSearchIconClick = this.onSearchIconClick.bind(this);
+        this.onSelected = this.onSelected.bind(this);
+        this.onTabButtonClick = this.onTabButtonClick.bind(this);
+        this.onViewButtonClick = this.onViewButtonClick.bind(this);
+        this.toggleSortBy = this.toggleSortBy.bind(this);
+    }
+    toggleSortBy(colId) {
         if (this.state.sortBy[0] === colId) {
             this.setState({'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"]});
         }
         else {
             this.setState({'sortBy': [colId, "asc"]});
         }
-    },
-    onViewButtonClick: function(e, node) {
+    }
+    onViewButtonClick(e, node) {
         var self = this;
         var $this = $(e.target);
 
@@ -813,8 +820,8 @@ var CloudBrowserDialog = React.createClass({
 
         $this.parent().find('.active').removeClass("active");
         $this.addClass("active");
-    },
-    onSearchIconClick: function(e, node) {
+    }
+    onSearchIconClick(e, node) {
         var $parentBlock = $(e.target).closest(".fm-header-buttons");
 
         if ($parentBlock.hasClass("active-search")) {
@@ -823,16 +830,17 @@ var CloudBrowserDialog = React.createClass({
             $parentBlock.addClass("active-search");
             $('input', $parentBlock).trigger("focus");
         }
-    },
-    onClearSearchIconClick: function() {
+    }
+    onClearSearchIconClick() {
         var self = this;
+
 
         self.setState({
             'searchValue': '',
             'currentlyViewedEntry': M.RootID
         })
-    },
-    onTabButtonClick: function(e, selectedTab) {
+    }
+    onTabButtonClick(e, selectedTab) {
         var $this = $(e.target);
 
         $this.parent().find('.active').removeClass("active");
@@ -851,8 +859,8 @@ var CloudBrowserDialog = React.createClass({
         this.setState(newState);
         this.onSelected([]);
         this.onHighlighted([]);
-    },
-    onSearchChange: function(e) {
+    }
+    onSearchChange(e) {
         var searchValue = e.target.value;
         var newState = {
             'selectedTab': 'search',
@@ -870,19 +878,25 @@ var CloudBrowserDialog = React.createClass({
         this.setState(newState);
         this.onSelected([]);
         this.onHighlighted([]);
-    },
-    resizeBreadcrumbs: function() {
-        var $breadcrumbs = $('.fm-breadcrumbs-block.add-from-cloud', this.findDOMNode());
-        var $breadcrumbsWrapper = $breadcrumbs.find('.breadcrumbs-wrapper');
+    }
+    resizeBreadcrumbs() {
+        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
+        var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
 
         setTimeout(function() {
-            var breadcrumbsWidth = $breadcrumbs.outerWidth();
+            var wrapperWidth = $breadcrumbsWrapper.outerWidth();
             var $el = $breadcrumbs.find('.right-arrow-bg');
             var i = 0;
             var j = 0;
             $el.removeClass('short-foldername ultra-short-foldername invisible');
 
-            while ($breadcrumbsWrapper.outerWidth() > breadcrumbsWidth) {
+            $breadcrumbsWrapper.removeClass('long-path overflowed-path');
+            if ($breadcrumbs.outerWidth() > wrapperWidth) {
+                $breadcrumbsWrapper.addClass('long-path');
+            }
+
+
+            while ($breadcrumbs.outerWidth() > wrapperWidth) {
                 if (i < $el.length - 1) {
                     $($el[i]).addClass('short-foldername');
                     i++;
@@ -893,12 +907,13 @@ var CloudBrowserDialog = React.createClass({
                     $($el[j]).addClass('short-foldername');
                 } else {
                     $($el[j]).addClass('ultra-short-foldername');
+                    $breadcrumbsWrapper.addClass('overflowed-path');
                     break;
                 }
             }
         }, 0);
-    },
-    componentDidUpdate: function(prevProps, prevState) {
+    }
+    componentDidUpdate(prevProps, prevState) {
         if (prevState.currentlyViewedEntry !== this.state.currentlyViewedEntry) {
             var self = this;
 
@@ -922,11 +937,24 @@ var CloudBrowserDialog = React.createClass({
                     });
                 return;
             }
+
+            var $jspElem = $(self.findDOMNode()).find('.jspScrollable');
+            if ($jspElem) {
+                var $jsp = $jspElem.data('jsp');
+                if ($jsp) {
+                    Soon(function() {
+                        // seems like there is a bug in JSP, if I call this too early the scroll won't move, but the area
+                        // would scroll to 0, 0
+                        $jsp.scrollTo(0, 0, false);
+                    });
+                }
+
+            }
         }
 
         this.setState({entries: null});
-    },
-    getEntries: function() {
+    }
+    getEntries() {
         var self = this;
         var order = self.state.sortBy[1] === "asc" ? 1 : -1;
         var entries = [];
@@ -961,6 +989,8 @@ var CloudBrowserDialog = React.createClass({
         }
         else if(self.state.sortBy[0] === "ts") {
             sortFunc = M.getSortByDateTimeFn();
+            // invert
+            order = order === 1 ? -1 : 1;
         }
         else /*if(self.state.sortBy[0] === "grid-header-star")*/ {
             sortFunc = M.sortByFavFn(order);
@@ -985,25 +1015,25 @@ var CloudBrowserDialog = React.createClass({
         });
 
         return folders.concat(entries);
-    },
-    onSelected: function(nodes) {
+    }
+    onSelected(nodes) {
         this.setState({'selected': nodes});
         this.props.onSelected(nodes);
-    },
-    onHighlighted: function(nodes) {
+    }
+    onHighlighted(nodes) {
         this.setState({'highlighted': nodes});
 
         if (this.props.onHighlighted) {
             this.props.onHighlighted(nodes);
         }
-    },
-    onAttachClicked: function() {
-        this.props.onAttachClicked();
-    },
-    onPopupDidMount: function(elem) {
+    }
+    onPopupDidMount(elem) {
         this.domNode = elem;
-    },
-    render: function() {
+    }
+    onAttachClicked() {
+        this.props.onAttachClicked();
+    }
+    render() {
         var self = this;
 
         var entries = self.state.entries || self.getEntries();
@@ -1041,6 +1071,13 @@ var CloudBrowserDialog = React.createClass({
                     breadcrumbClasses += " shared-with-me";
                 }
 
+                var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) :
+                    (
+                        breadcrumbNodeId === "shares" ?
+                            l[5589] :
+                            M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
+                    );
+
                 (function (breadcrumbNodeId) {
                     breadcrumb.unshift(
                         <a className={"fm-breadcrumbs contains-directories " + breadcrumbClasses}
@@ -1056,14 +1093,8 @@ var CloudBrowserDialog = React.createClass({
                                self.onSelected([]);
                                self.onHighlighted([]);
                            }}>
-                        <span className="right-arrow-bg">
-                            <span>{breadcrumbNodeId === M.RootID ? __(l[164]) :
-                                (
-                                    breadcrumbNodeId === "shares" ?
-                                        l[5589] :
-                                        M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name
-                                )
-                            }</span>
+                        <span className="right-arrow-bg simpletip" data-simpletip={folderName}>
+                            <span>{folderName}</span>
                         </span>
                         </a>
                     );
@@ -1138,7 +1169,12 @@ var CloudBrowserDialog = React.createClass({
                                     onClick={self.toggleSortBy}/>
                         <BrowserCol id="size" label={__(l[87])} sortBy={self.state.sortBy}
                                     onClick={self.toggleSortBy}/>
-                        <BrowserCol id="ts" label={__(l[16169])} sortBy={self.state.sortBy}
+                        <BrowserCol id="ts" label={__(l[16169])}
+                                    sortBy={
+                                        self.state.sortBy && self.state.sortBy[0] === "ts" ?
+                                            ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] :
+                                            self.state.sortBy
+                                    }
                                     onClick={self.toggleSortBy}/>
                     </tr>
                     </tbody>
@@ -1210,8 +1246,8 @@ var CloudBrowserDialog = React.createClass({
                         </div>
                         <div className="clear"></div>
                     </div>
-                    <div className="fm-breadcrumbs-block add-from-cloud">
-                        <div className="breadcrumbs-wrapper">
+                    <div className="fm-breadcrumbs-wrapper add-from-cloud">
+                         <div className="fm-breadcrumbs-block">
                             {breadcrumb}
                             <div className="clear"></div>
                         </div>
@@ -1245,8 +1281,12 @@ var CloudBrowserDialog = React.createClass({
             </ModalDialogsUI.ModalDialog>
         );
     }
-});
+};
 
-module.exports = window.CloudBrowserModalDialogUI = {
+window.CloudBrowserModalDialogUI = {
     CloudBrowserDialog,
 };
+
+export default {
+    CloudBrowserDialog
+}

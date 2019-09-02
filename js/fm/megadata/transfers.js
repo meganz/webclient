@@ -180,9 +180,6 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
     // if in folder link and logged-in and download using mSync is set to 0
     if (folderlink && u_type) {
         if (fmconfig.dlThroughMEGAsync === 0) {
-            if (typeof fmconfig.tpp === 'undefined') {
-                // mega.ui.tpp.setEnabled(1);
-            }
             return webdl();
         }
     }
@@ -253,7 +250,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                 };
 
                 recursivelyLoadNodes(files, n);
-                
+
             }
             catch (exx) {
                 if (d) {
@@ -646,7 +643,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             else {
                 $tr.find('.speed').addClass('unknown').text('');
             }
-            
+
             delay('percent_megatitle', percent_megatitle, 50);
         }
     }
@@ -1213,8 +1210,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     var files = [];
 
     if (toChat) {
-        // onChat = 'My chat files/' + (M.getNameByHandle(target.substr(5)) || target.substr(5));
-        toChat = 'My chat files';
+        toChat = M.myChatFilesFolder.name;
         paths[toChat] = null;
         files = u;
     }
@@ -1326,9 +1322,12 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             }
             else {
                 u = Array.prototype.concat.apply([], Object.values(queue).concat(files));
-                M.createFolders(paths, toChat ? M.RootID : target).always(function(res) {
+                M.createFolders(paths, toChat ? M.cf.p || M.RootID : target).always(function(res) {
                     if (d && res !== paths) {
                         ulmanager.logger.debug('Failed to create paths hierarchy...', res);
+                    }
+                    if (res[toChat]) {
+                        M.myChatFilesFolder.set(res[toChat]).dump('cf');
                     }
                     makeDirPromise.resolve();
                 });
@@ -1801,7 +1800,7 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
-    if ((M.currentdirid !== 'transfers' && fmconfig.tpp === false) || slideshowid) {
+    if (slideshowid) {
         var $toast;
         var $second_toast;
         var timer = 0;
@@ -1876,18 +1875,34 @@ MegaData.prototype.hideTransferToast = function hideTransferToast($toast) {
 };
 
 // report a transient upload error
-function onUploadError(ul, errorstr, reason, xhr) {
+function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
     'use strict';
+
+    if (!ul || !ul.id) {
+        return;
+    }
 
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
+
+    mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, isOverQuota);
 
     ul._gotTransferError = true;
     $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
     $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);
 }
 
+
+function resetOverQuotaTransfers(ids) {
+    $('#' + ids.join(',#'))
+        .addClass('transfer-queued')
+        .find('.transfer-status')
+        .removeClass('overquota')
+        .text(l[7227]);
+
+    mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
+}
 
 function fm_chromebar(height) {
     if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {
@@ -2235,5 +2250,5 @@ function fm_tfsupdate() {
     M.pendingTransfers = i + u;
     tfse.domUploadBlock.textContent = u || '';
     tfse.domDownloadBlock.textContent = i || '';
-    
+
 }

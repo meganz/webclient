@@ -157,6 +157,8 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
+> react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii 
+characters were removed from the files
 ---
 [smartcrop.js]: Content aware image cropping.
 
@@ -249,7 +251,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [pdf.js]: <https://github.com/mozilla/pdfjs-dist/tree/v1.9.638>
 [pdf.viewer.js]: <https://github.com/mozilla/pdf.js/releases/download/v1.8.188/pdfjs-1.8.188-dist.zip>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
-[react-dom.js, react.js]: https://github.com/facebook/react/tree/v0.14.8
+[react-dom.js, react.js]: https://github.com/facebook/react/releases/tag/v16.8.6
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>

@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { RenderDebugger, MegaRenderMixin } from './../../stores/mixins.js';
-import ContactsUI from './../ui/contacts.jsx';
-import { EmojiFormattedContent } from './../../ui/utils.jsx';
+import MegaRenderMixin from './../../stores/mixins.js';
+import {Avatar} from './../ui/contacts.jsx';
+import utils from './../../ui/utils.jsx';
 
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
 
@@ -15,23 +15,23 @@ var VIEW_MODES = {
     "CAROUSEL": 2,
 };
 
-var ConversationAudioVideoPanel = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState: function() {
-        return {
+class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
+    constructor(props) {
+        super(props);
+        this.state = {
             'messagesBlockEnabled': false,
             'fullScreenModeEnabled': false,
             'localMediaDisplay': true,
             'viewMode': VIEW_MODES.GRID,
             'selectedStreamSid': false,
         }
-    },
-    specificShouldComponentUpdate: function() {
+    }
+    specificShouldComponentUpdate() {
         if (this.state.fullScreenModeEnabled) {
             return true;
         }
-    },
-    getCurrentStreamId: function() {
+    }
+    getCurrentStreamId() {
         var self = this;
         var chatRoom = self.props.chatRoom;
         if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
@@ -41,8 +41,8 @@ var ConversationAudioVideoPanel = React.createClass({
         var streams = chatRoom.callManagerCall._streams;
         var activeStream = self.state.selectedStreamSid || Object.keys(streams)[0];
         return activeStream;
-    },
-    getViewMode: function() {
+    }
+    getViewMode() {
         var chatRoom = this.props.chatRoom;
         var callManagerCall = chatRoom.callManagerCall;
         if (callManagerCall) {
@@ -51,14 +51,25 @@ var ConversationAudioVideoPanel = React.createClass({
                 return VIEW_MODES.CAROUSEL;
             }
         }
+        if (chatRoom.type === "private") {
+            return VIEW_MODES.GRID;
+        }
+        var streamKeys = Object.keys(callManagerCall._streams);
+        for (var i = 0; i < streamKeys.length; i++) {
+            var sid = streamKeys[i];
+            if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
+                return VIEW_MODES.CAROUSEL;
+            }
+        }
+
         return this.state.viewMode;
-    },
-    onPlayerClick: function(sid) {
+    }
+    onPlayerClick(sid) {
         if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
             this.setState({'selectedStreamSid': sid});
         }
-    },
-    _hideBottomPanel: function() {
+    }
+    _hideBottomPanel() {
         var self = this;
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
@@ -70,8 +81,8 @@ var ConversationAudioVideoPanel = React.createClass({
         self.visiblePanel = false;
         $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container)
             .removeClass('visible-panel');
-    },
-    getRemoteSid: function(sid) {
+    }
+    getRemoteSid(sid) {
         var fullSid = sid || this.state.selectedStreamSid;
         if (!fullSid) {
             return false;
@@ -82,9 +93,8 @@ var ConversationAudioVideoPanel = React.createClass({
             return false;
         }
         return sid;
-
-    },
-    resizeVideos: function() {
+    }
+    resizeVideos() {
         var self = this;
         var chatRoom = self.props.chatRoom;
 
@@ -103,6 +113,11 @@ var ConversationAudioVideoPanel = React.createClass({
             totalWidth = $('.participantsContainer', $container).parent().outerWidth();
         }
 
+        if (ua.details.browser === "Safari") {
+            // for some reason, Safari adds 1px to the totalWidth
+            totalWidth -= 1;
+        }
+
         var $streams = $('.user-video, .user-audio', $container);
         var totalStreams = $streams.length;
 
@@ -118,9 +133,20 @@ var ConversationAudioVideoPanel = React.createClass({
                 $('.participantsContainer', $container).outerHeight()
             );
 
+            var callManagerCall = chatRoom.callManagerCall;
+            var mediaOpts;
+            if (this.state.selectedStreamSid === "local") {
+                mediaOpts = callManagerCall.getMediaOptions();
+            }
+            else {
+                mediaOpts = callManagerCall.getRemoteMediaOptions(self.getRemoteSid());
+            }
+            var audioIsMuted = mediaOpts.audio;
+
             $('.activeStream', $container).height(
                 activeStreamHeight
             );
+
             $('.activeStream .user-audio .avatar-wrapper', $container)
                 .width(activeStreamHeight - 20)
                 .height(activeStreamHeight - 20)
@@ -135,14 +161,7 @@ var ConversationAudioVideoPanel = React.createClass({
             $video = $('.activeStream video', $container);
             $mutedIcon = $('.activeStream .icon-audio-muted', $container);
 
-            var callManagerCall = chatRoom.callManagerCall;
-            var audioIsMuted = false;
-            if (this.state.selectedStreamSid === "local") {
-                audioIsMuted = callManagerCall.getMediaOptions().audio;
-            }
-            else {
-                audioIsMuted = callManagerCall.getRemoteMediaOptions(self.getRemoteSid()).audio;
-            }
+
 
             if ($video.length > 0 && $mutedIcon.length > 0) {
                 if ($video.outerHeight() > 0 && $video[0].videoWidth > 0 && $video[0].videoHeight > 0) {
@@ -201,12 +220,13 @@ var ConversationAudioVideoPanel = React.createClass({
                 .width(newWidth)
                 .height(newWidth);
         });
-    },
-    componentDidMount: function() {
+    }
+    componentDidMount() {
+        super.componentDidMount();
         this.resizeVideos();
         this.initialRender = false;
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
@@ -459,8 +479,8 @@ var ConversationAudioVideoPanel = React.createClass({
 
         self.resizePanes();
         self.resizeVideos();
-    },
-    resizePanes: function() {
+    }
+    resizePanes() {
         var self = this;
         var $container = $(self.findDOMNode());
         var $rootContainer = $container.parents('.conversation-panel');
@@ -468,9 +488,8 @@ var ConversationAudioVideoPanel = React.createClass({
             $('.call-block', $rootContainer).height('');
         }
         $rootContainer.trigger('resized');
-
-    },
-    bindInitialEvents: function() {
+    }
+    bindInitialEvents() {
         var self = this;
         var $container = $(ReactDOM.findDOMNode(self));
         self.avResizable = new FMResizablePane(
@@ -489,8 +508,9 @@ var ConversationAudioVideoPanel = React.createClass({
         });
 
         self.initialRender = true;
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         var self = this;
         var room = self.props.chatRoom;
 
@@ -508,8 +528,8 @@ var ConversationAudioVideoPanel = React.createClass({
         var $rootContainer = $container.parents('.conversation-panel');
         $('.call-block', $rootContainer).height('');
         self.initialRender = false;
-    },
-    toggleMessages: function(e) {
+    }
+    toggleMessages(e) {
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -536,8 +556,8 @@ var ConversationAudioVideoPanel = React.createClass({
                 $(window).trigger('resize');
             });
         }
-    },
-    fullScreenModeToggle: function(e) {
+    }
+    fullScreenModeToggle(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -548,8 +568,8 @@ var ConversationAudioVideoPanel = React.createClass({
             'fullScreenModeEnabled': newVal,
             'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
         });
-    },
-    toggleLocalVideoDisplay: function(e) {
+    }
+    toggleLocalVideoDisplay(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -567,8 +587,8 @@ var ConversationAudioVideoPanel = React.createClass({
             });
 
         this.setState({localMediaDisplay: !this.state.localMediaDisplay});
-    },
-    render: function() {
+    }
+    render() {
         var chatRoom = this.props.chatRoom;
         this.remoteVideoRefs = this.remoteVideoRefs || [];
 
@@ -640,11 +660,14 @@ var ConversationAudioVideoPanel = React.createClass({
             var clientId = streamId.split(":")[1];
             var sessionId = streamId.split(":")[2];
             var remotePlayerStream = stream;
+            var mediaOpts = callManagerCall.getRemoteMediaOptions(sessionId);
 
 
             if (
                 !remotePlayerStream ||
-                callManagerCall.getRemoteMediaOptions(sessionId).video === false
+                (
+                    mediaOpts.video === false && mediaOpts.screen === false
+                )
             ) {
                 // TODO: When rtc is ready
                 var contact = M.u[userId];
@@ -666,7 +689,7 @@ var ConversationAudioVideoPanel = React.createClass({
                                 <div className="small-icon icon-audio-muted hidden"></div>
 
                         }
-                        <ContactsUI.Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
+                        <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
                                            simpletipWrapper="#call-block"
                                            simpletipOffset={8}
                                            simpletipPosition="top"
@@ -682,7 +705,7 @@ var ConversationAudioVideoPanel = React.createClass({
             else {
                 player = <div
                     className={"call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") +
-                    " stream" + streamId.replace(/:/g, "_")}
+                    " stream" + streamId.replace(/:/g, "_") + (mediaOpts.screen ?  " is-screen" : "")}
                     key={streamId + "_"+ k}
                     onClick={(e) => {
                         self.onPlayerClick(streamId);
@@ -716,7 +739,9 @@ var ConversationAudioVideoPanel = React.createClass({
         });
 
         if (this.getViewMode() === VIEW_MODES.GRID) {
-            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+            if (!localPlayerStream || (
+                callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false
+            )) {
                 localPlayerElement = <div className={
                     "call local-audio right-aligned bottom-aligned is-avatar" +
                     (this.state.localMediaDisplay ? "" : " minimized ") +
@@ -726,7 +751,8 @@ var ConversationAudioVideoPanel = React.createClass({
                         chatRoom.megaChat.networkQuality === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                    <div className="default-white-button tiny-button call"
+                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
                     <div className={"center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden")}>
@@ -735,7 +761,7 @@ var ConversationAudioVideoPanel = React.createClass({
                                 <div className="small-icon icon-audio-muted"></div> :
                                 <div className="small-icon icon-audio-muted hidden"></div>
                         }
-                        <ContactsUI.Avatar
+                        <Avatar
                             contact={M.u[u_handle]}
                             className={
                                 "call avatar-wrapper is-avatar " +
@@ -752,13 +778,15 @@ var ConversationAudioVideoPanel = React.createClass({
                         "call local-video right-aligned is-video bottom-aligned" +
                         (this.state.localMediaDisplay ? "" : " minimized ") +
                         visiblePanelClass +
-                        (activeStreamIdOrPlayer === "local" ? " active " : "")
+                        (activeStreamIdOrPlayer === "local" ? " active " : "") +
+                        (callManagerCall.getMediaOptions().screen ? " is-screen" : "")
                     }>
                     {
                         chatRoom.megaChat.networkQuality === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    <div className="default-white-button tiny-button call" onClick={this.toggleLocalVideoDisplay}>
+                    <div className="default-white-button tiny-button call"
+                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
                     {
@@ -769,7 +797,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     <video
                         ref="localViewport"
                         className="localViewport"
-                        defaultMuted={true}
+                        defaultmuted={"true"}
                         muted={true}
                         volume={0}
                         id={"localvideo_" + callManagerCall.id}
@@ -782,7 +810,9 @@ var ConversationAudioVideoPanel = React.createClass({
         else {
             // carousel
             var localPlayer;
-            if (!localPlayerStream || callManagerCall.getMediaOptions().video === false) {
+            if (!localPlayerStream || (
+                callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false
+            )) {
                 localPlayer =  <div className={
                     "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : "")
                 } key="local"
@@ -799,7 +829,7 @@ var ConversationAudioVideoPanel = React.createClass({
                                 <div className="small-icon icon-audio-muted"></div> :
                                 <div className="small-icon icon-audio-muted hidden"></div>
                         }
-                        <ContactsUI.Avatar
+                        <Avatar
                             contact={M.u[u_handle]} className="call avatar-wrapper"
                             hideVerifiedBadge={true}
                         />
@@ -818,6 +848,8 @@ var ConversationAudioVideoPanel = React.createClass({
                     className={
                         "call user-video local-carousel is-video" + (
                             activeStreamIdOrPlayer === "local" ? " active " : ""
+                        ) + (
+                            callManagerCall.getMediaOptions().screen ? " is-screen" : ""
                         )
                     }
                     key="local-video"
@@ -836,7 +868,7 @@ var ConversationAudioVideoPanel = React.createClass({
                     <video
                         ref="localViewport"
                         className="localViewport smallLocalViewport"
-                        defaultMuted={true}
+                        defaultmuted={"true"}
                         muted={true}
                         volume={0}
                         id={"localvideo_" + callManagerCall.id}
@@ -848,7 +880,11 @@ var ConversationAudioVideoPanel = React.createClass({
 
                 if (activeStreamIdOrPlayer === "local") {
                     activeStreamIdOrPlayer = <div
-                        className="call user-video is-video local-carousel local-carousel-big"
+                        className={
+                            "call user-video is-video local-carousel local-carousel-big " + (
+                                callManagerCall.getMediaOptions().screen ? " is-screen" : ""
+                            )
+                        }
                         key="local-video2">
                         {
                             chatRoom.megaChat.networkQuality === 0 ?
@@ -861,7 +897,7 @@ var ConversationAudioVideoPanel = React.createClass({
                         }
                         <video
                             className="localViewport bigLocalViewport"
-                            defaultMuted={true}
+                            defaultmuted={"true"}
                             muted={true}
                             volume={0}
                             id={"localvideo_big_" + callManagerCall.id}
@@ -899,13 +935,24 @@ var ConversationAudioVideoPanel = React.createClass({
         }
 
 
+
         if (chatRoom.type === "group" || chatRoom.type === "public") {
+            var haveScreenShare = false;
+            var streamKeys = Object.keys(callManagerCall._streams);
+            for (var x = 0; x < streamKeys.length; x++) {
+                var sid = streamKeys[x];
+                if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
+                    haveScreenShare = true;
+                    break;
+                }
+            }
+
             header = (
                 <div className="call-header">
                     <div className="call-topic">
-                        <EmojiFormattedContent>
+                        <utils.EmojiFormattedContent>
                             {ellipsis(chatRoom.getRoomTitle(), 'end', 70)}
-                        </EmojiFormattedContent>
+                        </utils.EmojiFormattedContent>
                     </div>
                     <div className="call-participants-count">
                         {Object.keys(chatRoom.callParticipants).length}
@@ -913,7 +960,7 @@ var ConversationAudioVideoPanel = React.createClass({
 
                     <a className={
                         "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") +
-                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE ? " disabled" : "")
+                        (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : "")
                     } onClick={function(e) {
                         if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
                             return;
@@ -1054,7 +1101,8 @@ var ConversationAudioVideoPanel = React.createClass({
 
 
             <div className="call bottom-panel">
-                <div className={"button call left" + (unreadDiv ? " unread" : "")} onClick={this.toggleMessages}>
+                <div className={"button call left" + (unreadDiv ? " unread" : "")}
+                     onClick={this.toggleMessages.bind(this)}>
                     {unreadDiv}
                     <i className="big-icon conversations"></i>
                 </div>
@@ -1078,22 +1126,43 @@ var ConversationAudioVideoPanel = React.createClass({
                     callManagerCall.getMediaOptions().video === false ? " disabled" : "") +
                         (this.state.muteInProgress ? " disabled" : "")
                 } onClick={function(e) {
-                    if (self.state.muteInProgress || $(this).is(".disabled")) {
+                    if (
+                        self.state.muteInProgress ||
+                        $(this).is(".disabled")
+                    ) {
                         return;
                     }
-                    if (callManagerCall.getMediaOptions().video === true) {
+                    var videoMode = callManagerCall.videoMode();
+                    if (videoMode === Av.Video) {
                         callManagerCall.muteVideo();
-                    }
-                    else {
-                        if (!callManagerCall.hasVideoSlotLimitReached()) {
-                            callManagerCall.unmuteVideo();
-                        }
+                    } else {
+                        callManagerCall.unmuteVideo();
                     }
                 }}>
                     <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().video ? " videocam" : " crossed-videocam")
+                        "big-icon " +
+                        ((callManagerCall.videoMode() === Av.Video) ? " videocam" : " crossed-videocam")
                     }></i>
                 </div>
+
+                <div className={
+                    "button call" + ((RTC.supportsScreenCapture && chatRoom.callManagerCall
+                        && callManagerCall.rtcCall && !this.state.muteInProgress) ? "" : " disabled")
+                } onClick={function(e) {
+                    if (chatRoom.callManagerCall) {
+                        if (callManagerCall.isScreenCaptureEnabled()) {
+                            callManagerCall.stopScreenCapture();
+                        } else {
+                            callManagerCall.startScreenCapture();
+                        }
+                    }
+                }}>
+                    <i className={"big-icon " + (
+                        callManagerCall.isScreenCaptureEnabled() ?
+                            "screenshare" : "crossed-screenshare"
+                    )}></i>
+                </div>
+
                 <div className="button call" onClick={function(e) {
                     if (chatRoom.callManagerCall) {
                         chatRoom.callManagerCall.endCall();
@@ -1101,14 +1170,16 @@ var ConversationAudioVideoPanel = React.createClass({
                 }}>
                     <i className="big-icon horizontal-red-handset"></i>
                 </div>
-                <div className="button call right" onClick={this.fullScreenModeToggle}>
+
+
+                <div className="button call right" onClick={this.fullScreenModeToggle.bind(this)}>
                     <i className="big-icon nwse-resize"></i>
                 </div>
             </div>
         </div>;
     }
-});
+};
 
-module.exports = {
+export {
     ConversationAudioVideoPanel
 };

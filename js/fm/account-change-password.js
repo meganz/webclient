@@ -22,8 +22,8 @@ var accountChangePassword = {
 
         'use strict';
 
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
+        $('#account-new-password').val('').trigger('blur');
+        $('#account-confirm-password').val('').trigger('blur');
     },
 
     /**
@@ -127,9 +127,49 @@ var accountChangePassword = {
                 return false;
             }
 
+            // Trigger save password on browser with correct email
+            accountChangePassword.emulateFormSubmission(password);
+
             // Proceed to change the password
             accountChangePassword.changePassword(password);
         });
+    },
+
+    /**
+     * Emulate form submission to trigger correctly behaved password manager update.
+     * @param {String} password The new password
+     */
+    emulateFormSubmission: function(password) {
+
+        'use strict';
+
+        var form = document.createElement("form");
+        form.className = 'hidden';
+
+        var elem1 = document.createElement("input");
+        var elem2 = document.createElement("input");
+        var elemBtn = document.createElement("input");
+
+        elem1.value = u_attr.email;
+        elem1.type = 'email';
+        form.appendChild(elem1);
+
+        elem2.value = password;
+        elem2.type = 'password';
+        form.appendChild(elem2);
+
+        elemBtn.type = 'submit';
+        form.appendChild(elemBtn);
+
+        document.body.appendChild(form);
+
+        $(form).on('submit', function() {
+            return false;
+        });
+
+        elemBtn.click();
+
+        document.body.removeChild(form);
     },
 
     /**

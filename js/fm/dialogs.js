@@ -1057,6 +1057,7 @@
                 $.selected = [];
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = function() {
+                    closeDialog();
                     $.selected = [$.mcselected];
                     M.openSharingDialog();
                 };
@@ -1289,6 +1290,9 @@
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
                 var p = $.cftarget;
+
+                // Make sure parent has selected class to make it expand
+                $('#mctreea_' + p, $dialog).addClass('selected');
                 selectTreeItem(p);
                 selectTreeItem(h);
             });
@@ -1401,7 +1405,7 @@
         $swm.rebind('mouseenter', '.nw-fm-tree-item', function _try(ev) {
             var h = $(this).attr('id').replace('mctreea_', '');
 
-            if (ev !== 0xEFAEE && !M.d[h]) {
+            if (ev !== 0xEFAEE && !M.c[h]) {
                 var self = this;
                 dbfetch.get(h).always(function() {
                     _try.call(self, 0xEFAEE);
@@ -1529,7 +1533,9 @@
 
             if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
                 $.selectFolderCallback();
+                return false;
             }
+
             closeDialog();
 
             if (saveToDialog) {

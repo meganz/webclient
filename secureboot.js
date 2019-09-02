@@ -60,7 +60,7 @@ var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' &&
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
     loadFailuresDefault: {},        // Count of failures on the EU static server per file
-    maxRetryAttemptsOriginal: 3,    // Max retry attempts on the original static server before switching to the default
+    maxRetryAttemptsOriginal: 2,    // Max retry attempts on the original static server before switching to the default
     maxRetryAttemptsDefault: 3,     // Max retry attempts on the default static server per file before it shows dialog
     failureLoggedOriginal: false,   // Flag to indicate failure of original static server was logged to the API
     failureLoggedDefault: false,    // Flag to indicate failure of the default static server was logged to the API
@@ -81,11 +81,6 @@ var load_error_types = {
  * @returns {Boolean}
  */
 function isMobile() {
-
-    // If extension, not applicable
-    if (is_extension) {
-        return false;
-    }
 
     var mobileStrings = [
         'iphone', 'ipad', 'android', 'blackberry', 'nokia', 'opera mini', 'ucbrowser',
@@ -345,7 +340,9 @@ if (!browserUpdate) try
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
         }
-        if (typeof localStorage.d === 'undefined' && location.host === 'smoketest.static.mega.co.nz') {
+
+        // Enable logging on smoketest.static.mega.co.nz (old smoketest) and smoketest.mega.nz (new smoketest)
+        if (typeof localStorage.d === 'undefined' && location.host.indexOf('smoketest') > -1) {
             localStorage.d = 1;
         }
         d = localStorage.d | 0;
@@ -424,20 +421,21 @@ if (!browserUpdate) try
 
     if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
-        nocontentcheck = true;
-        var devhost = window.location.host;
+        if (location.host === 'smoketest.mega.nz') {
+            staticpath = 'https://smoketest.static.mega.nz/3/';
+            defaultStaticPath = staticpath;
+        }
+        else {
+            nocontentcheck = true;
+            var devhost = window.location.host;
 
-        // handle subdirs
-        // Disable pathSuffixes, because they are no longer supported: the webclient will now only work from root
-        var pathSuffix = '';
-        pathSuffix = pathSuffix.split("/").slice(0, -1).join("/");
+            // Set the static path and default static path for debug mode to be the same
+            staticpath = window.location.protocol + "//" + devhost + "/";
+            defaultStaticPath = staticpath;
 
-        // Set the static path and default static path for debug mode to be the same
-        staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
-        defaultStaticPath = staticpath;
-
-        if (window.d) {
-            console.debug('StaticPath set to "' + staticpath + '"');
+            if (window.d) {
+                console.debug('StaticPath set to "' + staticpath + '"');
+            }
         }
     }
 
@@ -453,6 +451,11 @@ if (!browserUpdate) try
 
     staticpath = staticpath || geoStaticPath();
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
+
+    // If dark mode flag is enabled, change styling
+    if (localStorage.getItem('darkMode') === '1') {
+        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+    }
 }
 catch(e) {
     if (!m || !cookiesDisabled) {
@@ -604,6 +607,13 @@ if (is_bot) {
     nocontentcheck = true;
 }
 
+if (String(location.pathname).indexOf('%') > 0) {
+    tmp = mURIDecode(location.pathname);
+    if (tmp.indexOf('%') < 0) {
+        location.assign(tmp);
+    }
+}
+
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
@@ -724,6 +734,11 @@ var showUpdatePage = function() {
 
     'use strict';
 
+
+    // Temperary update for disable showing updatepage feature for IE11 as requested from Management team.
+    // Please remove this when we made decision to show it again.
+    return false;
+
     var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
 
     // If they've already seen the update page in the past
@@ -772,6 +787,7 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
+    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
     'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
     'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
@@ -1484,7 +1500,7 @@ function siteLoadError(error, filename) {
 
     logStaticServerFailure(error, filename, staticpath);
 
-    var message = ['MEGA failed to load because of '];
+    var message = ['MEGA failed to load because '];
     if (location.host !== 'mega.nz') {
         message[0] += '..';
     }
@@ -1509,8 +1525,10 @@ function siteLoadError(error, filename) {
                  "update your browser and MEGA browser extension to the latest version. " +
                  "If that does not help, contact support@mega.nz");
 
-    message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua));
-    message.push('Static server: ' + staticpath);
+    message.push('BrowserID: ' + (typeof mozBrowserID !== 'undefined' ? mozBrowserID : ua) + '\n' +
+                 'Static server: ' + staticpath + '\n' +
+                 'Flipped to default static: ' + (staticServerLoading.flippedToDefault ? 'yes' : 'no') + '\n' +
+                 'Date/time: ' + new Date().toISOString());
 
     message = message.join("\n\n");
     console.error(message);
@@ -1712,7 +1730,7 @@ if (showLegacyMobilePage) {
     if (mobileblog) {
         document.body.innerHTML = '';
         mCreateElement('script', {type: 'text/javascript'}, 'head')
-            .src = ((location.host === 'mega.nz') ? '/blog.js' : 'html/js/blog.js');
+            .src = ((location.host === 'mega.nz' || location.host === 'smoketest.mega.nz') ? '/blog.js' : 'html/js/blog.js');
     }
     else {
         var prechar = '#';
@@ -2195,7 +2213,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
@@ -2225,12 +2242,16 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
     jsl.push({f:'js/vendor/jquery.qrcode.js', n: 'jqueryqrcode', j:1});
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
+    jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
-    jsl.push({f:'html/repay.html', n: 'repay', j:0});
-    jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1});
+    jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
+    jsl.push({ f: 'html/js/developersettings.js', n: 'developersettings_js', j: 1 });
+    jsl.push({ f: 'html/repay.html', n: 'repay', j: 0 });
+    jsl.push({ f: 'html/js/repay.js', n: 'repay_js', j: 1 });
 
     if (!is_mobile) {
+        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
@@ -2337,6 +2358,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
+        jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2363,6 +2385,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/txt.css', n: 'txt_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2598,6 +2621,8 @@ else if (!browserUpdate) {
         'privacycompany': {f:'html/privacycompany.html', n: 'privacycompany', j:0},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
+        'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
+        'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
         'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
@@ -2656,6 +2681,7 @@ else if (!browserUpdate) {
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager_js': {f:'js/chat/plugins/callManager.js', n: 'callManager_js', j:1},
+            'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
             'cne_js': {f:'js/chat/callNotificationsEngine.js', n: 'cne_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
             'emoticonShortcutsFilter_js': {f:'js/chat/plugins/emoticonShortcutsFilter.js', n: 'emoticonShortcutsFilter_js', j:1},
@@ -2720,7 +2746,9 @@ else if (!browserUpdate) {
         'bird': ['megabird'],
         'wp': ['uwp'],
         'uwp': ['uwp'],
-        'security': ['securitypractice', 'securitypractice_js', 'filesaver']
+        'unsub': ['unsub', 'unsub_js'],
+        'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
+        'developersettings': ['developersettings', 'developersettings_js']
     };
 
     if (is_mobile) {
@@ -2946,9 +2974,14 @@ else if (!browserUpdate) {
         }
     }
 
-    // Set no timeout, let the lower layers handle it
-    var xhr_timeout = 0;
-    var urlErrors = {};
+    // Set a 15 second timeout for receiving an initial response from the normal static server. If the static server is
+    // completely dead, the longest wait a user will have is 15 seconds before they are switched to the EU servers. If
+    // the server is ok, but their connection is slow, then it's likely they will still receive an initial response
+    // within 15 seconds. Once that first byte is received then the XHR onprogress handler will set the timeout to
+    // unlimited (0 ms) and let the lower layers handle it (e.g. use the browser default timeout) which can let the
+    // site load slowly over 5 minutes if they are on a really bad connection. For the EU static server (which we
+    // assume never fails) we set the timeout to unlimited.
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 0 : 15000;
 
     /**
      * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
@@ -2997,6 +3030,14 @@ else if (!browserUpdate) {
 
                 // Set flag to show the static server was flipped to the default EU server
                 staticServerLoading.flippedToDefault = true;
+
+                // Set the timeout to unlimited now it's on EU static
+                xhr_timeout = 0;
+
+                // Log that the loading was flipped to load from the default static servers
+                if (d) {
+                    console.log('Flipped to failsafe static server path: ' + defaultStaticPath);
+                }
             }
         }
 
@@ -3097,6 +3138,14 @@ else if (!browserUpdate) {
             if (localStorage.dd) url += '?t=' + Date.now();
             xhr_stack[xhri].open("GET", bootstaticpath + url, true);
             xhr_stack[xhri].timeout = xhr_timeout;
+
+            // If a response is received (after 50ms or the 1st byte), set the timeout to 0 so that we wait as long as
+            // possible to receive the rest of the files. This means even slow connections (< GPRS) can load the site.
+            xhr_stack[xhri].onprogress = function() {
+                this.timeout = 0;
+                xhr_timeout = 0;
+            };
+
             if (is_chrome_firefox || is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
             }
@@ -3317,15 +3366,19 @@ else if (!browserUpdate) {
         }
     }
 
-    var istaticpath = staticpath;
+    // For live we want the loading-sprite served from the root web servers so that if a static server is down we can
+    // detect that quickly with our JS static loading logic. Otherwise, these images will block the loading before then
+    var istaticpath = '/';
+
+    // The loading-sprite images are embedded inside the extensions
     if (is_chrome_web_ext || is_firefox_web_ext) {
-        istaticpath = '../';
+        istaticpath = '../images/mega/';
     }
     else if (is_chrome_firefox) {
-        istaticpath = 'chrome://mega/content/';
+        istaticpath = 'chrome://mega/content/images/mega/';
     }
 
-    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'images/mega/loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
+    mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.toast-notification{visibility:hidden}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
 
     mCreateElement('div', { "class": "loading-main-block", id: "loading"}, 'body')
         .innerHTML =
@@ -3565,6 +3618,7 @@ else if (!browserUpdate) {
     }
 }
 
+/* jshint -W098 */
 /**
  * Determines whether to show an ad or not
  * @returns {number} Returns a 0 for definitely no ads (e.g. I am using an extension). 1 will enable ads dependent on
@@ -3584,6 +3638,27 @@ function showAd() {
     showAd = (typeof localStorage.testAds === 'undefined') ? showAd : parseInt(localStorage.testAds);
 
     return showAd;
+}
+
+/**
+ * History API's pushState helper that takes into account whether we're running through an extension or public-link
+ * @param {Object|String} page The page to change to, or an history's state object
+ * @param {Object} [state] An optional state object, if an String is provided for the 1st parameter.
+ */
+function pushHistoryState(page, state) {
+    'use strict';
+
+    try {
+        if (typeof page !== 'object') {
+            page = {subpage: page};
+        }
+        state = Object.assign(page, state);
+        page = state.subpage || state.fmpage || location.hash;
+        history.pushState(state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+    }
+    catch (ex) {
+        console.warn(ex);
+    }
 }
 
 /**
@@ -3683,6 +3758,32 @@ function inherits(target, source) {
         value: target,
         enumerable: false
     });
+}
+
+function lazy(target, property, stub) {
+    'use strict';
+    Object.defineProperty(target, property, {
+        get: function() {
+            Object.defineProperty(target, property, {
+                value: stub(),
+                enumerable: true
+            });
+            return target[property];
+        },
+        configurable: true
+    });
+    return target;
+}
+
+function promisify(fc) {
+    'use strict';
+    return function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            fc.apply(self, [resolve, reject].concat(args));
+        });
+    };
 }
 
 mBroadcaster.once('startMega', function() {

@@ -37,7 +37,7 @@ var CallDataFlag = Object.freeze({
 function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
     if (!RTC) {
         throw new RtcModule.NotSupportedError(
-            "Attempting to create RtcModule, but there is no webRTC support in this browser"
+            "Attempted to create RtcModule, but there is no webRTC support in this browser"
         );
     }
     var self = this;
@@ -50,7 +50,6 @@ function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
     self._rejectedCallIds = {};
     self.allIceServers = allIceServers;
     self.iceServers = iceServers ? iceServers : allIceServers;
-    self.pc_constraints = {};
     self.pcConstraints = {
         'offerToReceiveAudio': true,
         'offerToReceiveVideo': true
@@ -282,11 +281,18 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
         var call = self.calls[parsedCallData.chatid];
         if (call) {
             if (parsedCallData.callid !== call.id) {
-                self.logger.error("Ignoring CALLDATA because its callid is different " +
-                    "than the call that we have in that chatroom");
+                if ((call.state === CallState.kCallingOut || call.state === CallState.kReqSent) && ringing) {
+                    // Incoming while outgoing call request
+                    self._updatePeerAvState(parsedCallData);
+                    self.handleCallRequest(parsedCallData); // decides which call to honor
+                } else {
+                    self.logger.error("Ignoring CALLDATA because its callid is different " +
+                        "than the call that we have in that chatroom");
+                }
                 return;
+            } else { // callid-s are equal
+                parsedCallData.call = call;
             }
-            parsedCallData.call = call;
         }
 
         self._updatePeerAvState(parsedCallData);
@@ -358,7 +364,7 @@ RtcModule.prototype.getActiveCall = function() {
             result = call;
         } else {
             assert(call.state === CallState.kRingIn);
-            assert(!call.isUserInitiated);
+            assert(!call.isCallerOrJoiner);
         }
     }
     return result;
@@ -366,14 +372,20 @@ RtcModule.prototype.getActiveCall = function() {
 
 RtcModule.prototype._updatePeerAvState = function(parsedCallData, peerIsUs) {
     var chatid = parsedCallData.chatid;
-    var userid = parsedCallData.fromUser;
-    var clientid = parsedCallData.fromClient;
-    var av = parsedCallData.av;
-    var peerid = userid + clientid;
     var roomCallState = this.offCallStates[chatid];
     if (!roomCallState) {
+        if (parsedCallData.av === 0) {
+            return;
+        }
         roomCallState = this.offCallStates[chatid] = { callId: parsedCallData.callid, peerAv: {} };
     }
+
+    var userid = parsedCallData.fromUser;
+    var clientid = parsedCallData.fromClient;
+    // clientid can be undefined only if we were disconnected from the shard, but that case is handled above
+    assert(clientid);
+    var av = parsedCallData.av;
+    var peerid = userid + clientid;
     var peerAvs = roomCallState.peerAv;
     var oldAv = peerAvs[peerid];
     if (av !== oldAv) {
@@ -437,9 +449,16 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
     var parts = chat.callParticipants;
     for (var k in parts) {
         if (k.substr(0, 8) === thisUser) {
-            // we are already in the call from another client
-            self.logger.log("Ignoring call request: We are already in the call from another client");
-            return;
+            if (k.substr(8) !== parsedCallData.shard.clientId) {
+                self.logger.log("Ignoring call request: We are already in the call from another client");
+                return;
+            } else {
+                // We appear to already be in the call from our own client. This can happen only
+                // if we are simultaneously calling each other with a peer. In this case, we must
+                // have an existing outgoing call
+                var call = self.calls[parsedCallData.chatid];
+                assert(call && call.isCallerOrJoiner);
+            }
         }
     }
     function createNewCall(replacedCall, avAutoAnswer) {
@@ -479,13 +498,13 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
             // Both calls are in same 1on1 chatroom
             if (activeCall.state < CallState.kJoining) {
                 // Concurrent call requests to each other?
-                if (!activeCall.isUserInitiated) {
+                if (!activeCall.isCallerOrJoiner) {
                     // No, just two incoming calls from different clients in same 1on1 room
                     self.logger.warn("Another incoming call during an incoming call, sending kErrAlready");
                     sendBusy(true);
                     return;
                 }
-
+                // activeCall is outgoing
                 // Concurrent call requests to each other in a 1on1 room
                 // If our user handle is greater than the calldata sender's, our outgoing call
                 // survives, and their call request is declined. Otherwise, our existing outgoing
@@ -496,14 +515,17 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
                     // answer() of the newly created call destroys all other calls in the .calls map,
                     // but in this case we are overwriting the activeCall with the new call (same chatid),
                     // so we must take care ourselves of the previous call
-                    activeCall.hangup()
+                    // If we don't delete activeCall.incallPingTimer, activeCall._destroy() will send an ENDCALL,
+                    // server will reply with an ENDCALL, which will terminate the other (surviving) call
+                    delete activeCall._inCallPingTimer;
+                    activeCall._destroy(Term.kCancelOutAnswerIn, false)
                     .then(function() {
                         // Create an incoming call from the packet, and auto answer it
                         createNewCall(activeCall, activeCall._startOrJoinAv);
                     });
                 }  else {
                     self.logger.warn("Simultaneously calling each other with peer - we have priority.",
-                        "Peer should abort their call and answer ours");
+                        "Ignoring incoming call request, peer should abort it and answer ours");
                 }
                 return;
             } else {
@@ -567,6 +589,7 @@ RtcModule.prototype._removeCall = function(call) {
         }
     }
 };
+
 Call.prototype.onNoInputAudioDetected = function() {
     this.manager._fire("onNoInputAudioDetected");
 };
@@ -594,16 +617,59 @@ Call.prototype._initialGetLocalStream = function(av) {
     var pms;
     // We always get audio, and then mute it if we don't need it
     if (needVideo) {
-        var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
-        pms = RTC.getUserMedia({audio: true, video: vidOpts})
-        .catch(function(error) {
-            self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
-            return RTC.getUserMedia({audio: true, video: false});
-        })
-        .catch(function(error) {
-            self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
-            return RTC.getUserMedia({audio: false, video: vidOpts});
-        });
+        if (av & Av.Screen) {
+            self._isCapturingScreen = true;
+            // for screen sharing, we can't obtain audio & video at the same time, they come
+            // from different APIs
+            var pmsAudio = RTC.getUserMedia({audio: true})
+            .catch(function(err) {
+                self.logger.warn("Error getting audio:", err);
+                return null;
+            });
+            var pmsScreen = RTC.getDisplayMedia({
+                video: {
+                    cursor: 'never',
+                    displaySurface: 'monitor'
+                }
+            })
+            .catch(function(err) {
+                self.logger.warn("Error getting screen:", err);
+                return null;
+            });
+            pms = Promise.all([pmsAudio, pmsScreen])
+            .then(function(streams) {
+                var audioStream = streams[0];
+                var screenStream = streams[1];
+                if (!audioStream) {
+                    return screenStream;
+                } else if (!screenStream) {
+                    return audioStream;
+                } else {
+                    var audioTrack = audioStream.getAudioTracks()[0];
+                    if (audioTrack) {
+                        screenStream.addTrack(audioTrack);
+                    }
+                    var videoTrack = screenStream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        videoTrack.onended = function() {
+                            self._onScreenCaptureEndedByFloatButton();
+                        };
+                    }
+                    return Promise.resolve(screenStream);
+                }
+            });
+        } else {
+            var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            pms = RTC.getUserMedia({audio: true, video: vidOpts})
+            .catch(function(error) {
+                self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
+                return RTC.getUserMedia({audio: true, video: false});
+            })
+            .catch(function(error) {
+                self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
+                return RTC.getUserMedia({audio: false, video: vidOpts});
+            });
+        }
     } else { // need only audio
         pms = RTC.getUserMedia({audio: true, video: false});
     }
@@ -622,14 +688,11 @@ Call.prototype._initialGetLocalStream = function(av) {
             resolved = true;
             if (self.state >= CallState.kTerminating) {
                 RTC.stopMediaStream(stream);
+                self.logger.log("_initialGetLocalStream: Call killed while getting local video");
                 return;
             }
             if (!needAudio) {
                 Av.enableAudio(stream, false);
-            }
-
-            if (self.state >= CallState.kTerminating) {
-                return Promise.reject("_initialGetLocalStream: Call killed while getting local video");
             }
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
@@ -645,6 +708,7 @@ Call.prototype._initialGetLocalStream = function(av) {
             }
             delete self._obtainingLocalStream;
             resolve(stream);
+        }).catch(function(err) { // silence DOMException logging
         });
         pms.catch(function(err) {
             resolved = true;
@@ -662,10 +726,11 @@ Call.prototype._initialGetLocalStream = function(av) {
             self._fire('onLocalMediaFail', err);
         }
         delete self._obtainingLocalStream;
+        return Promise.reject(err);
     });
 };
 
-Call.prototype._getLocalVideo = function() {
+Call.prototype._getLocalVideo = function(screenCapture) {
     var self = this;
     assert(!self.gLocalStream || !Av.streamHasVideo(self.gLocalStream));
     var resolved = false; // track whether the promise was resolved for the timeout reject
@@ -677,11 +742,21 @@ Call.prototype._getLocalVideo = function() {
             notified = true;
         }
     }, 2000);
-    var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
 
     return new Promise(function(resolve, reject) {
-        RTC.getUserMedia({audio: false, video: vidOpts})
-        .then(function(stream) {
+        var pms;
+        if (screenCapture) {
+            pms = RTC.getDisplayMedia({
+                video: {
+                    cursor: 'never',
+                    displaySurface: 'monitor'
+                }
+            });
+        } else {
+            var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            pms = RTC.getUserMedia({audio: false, video: vidOpts});
+        }
+        pms.then(function(stream) {
             if (resolved) {
                 RTC.stopMediaStream(stream);
                 return;
@@ -714,7 +789,7 @@ Call.prototype._getLocalVideo = function() {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        self.manager._fire('onLocalMediaFail', err);
+        self._fire('onLocalMediaFail', err);
         return Promise.reject(err);
     });
 };
@@ -791,7 +866,10 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
         call._setIsRecover();
     }
     self.calls[chatid] = call;
-    call._startOrJoin(av);
+    call._startOrJoin(av)
+    .catch(function(err) {
+        self.logger.log("Error starting/joining call:", err);
+    });
     return call;
 };
 
@@ -1005,7 +1083,7 @@ function Call(rtcModule, info, isGroup, role, handler) {
         this.state = CallState.kRingIn;
         this._callerInfo = info; // callerInfo is actually CALLDATA, needed for answering
     } else {
-        this.isUserInitiated = true; // both kCaller and kJoiner are user-initiated
+        this.isCallerOrJoiner = true;
         this.state = (role === CallRole.kJoiner) ? CallState.kJoining : CallState.kCallingOut;
     }
     this.handler = (handler instanceof Function) ? handler(this) : handler;
@@ -1480,6 +1558,17 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         }
         self.logger.log(logMsg);
 
+        if (self.gLocalStream) {
+            RTC.stopMediaStream(self.gLocalStream);
+            delete self.gLocalStream;
+            delete self.localMediaPromise;
+        }
+        if (self._audioMutedChecker) {
+            self._audioMutedChecker.stop();
+            self._audioMutedChecker.destroy();
+            delete self._audioMutedChecker;
+        }
+
         // reasonNoPeer can be kBusy even in a group call if we are the callee, and another client of ours
         // is already in a call. In that case, our other client will broadcast a decline with kBusy,
         // and we will see it and abort the incoming call request
@@ -1489,6 +1578,8 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             self.logger.log("Not sending CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
         } else if (self.predestroyState === CallState.kRingIn) {
             self.logger.log("Not sending CALLDATA because we were passively ringing");
+        } else if (self.predestroyState === CallState.kCallingOut) {
+            self.logger.log("Not sending CALLDATA because we haven't yet sent the call request");
         } else {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
@@ -1499,15 +1590,6 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             delete self._peerCallRecoveryWaitTimer;
         }
         self._setState(CallState.kDestroyed);
-        if (self.gLocalStream) {
-            RTC.stopMediaStream(self.gLocalStream);
-            delete self.gLocalStream;
-            delete self.localMediaPromise;
-        }
-        if (self._audioMutedChecker) {
-            self._audioMutedChecker.stop();
-            delete self._audioMutedChecker;
-        }
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, willRecover);
         self.manager._removeCall(self);
     };
@@ -1515,7 +1597,8 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         self.logger.warn("Destroying call immediately due to kAppTerminating");
         destroyCall();
         self._destroyPromise = Promise.resolve();
-    } else if (code === Term.kErrNetSignalling) {
+    } else if (code === Term.kErrNetSignalling && ((self.predestroyState === CallState.kCallInProgress)
+            || (self.predestroyState === CallState.kJoining))) {
         self.logger.warn("Destroying call immediately due to kErrNetSignalling and setting up a recovery attempt");
         // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
         self.manager._setupCallRecovery(self);
@@ -1548,7 +1631,7 @@ RtcModule.prototype._setupCallRecovery = function(call) {
         callid: callid,
         av: call.localAv(),
         callHandler: call.handler,
-        timer: setTimeout(function() {
+        timeoutTimer: setTimeout(function() {
             var recovery = self.callRecoveries[chatid];
             if (!recovery) {
                 return;
@@ -1575,7 +1658,7 @@ RtcModule.prototype.clearCallRecovery = function(chatid) {
     if (!recovery) {
         return;
     }
-    clearTimeout(recovery.timer);
+    clearTimeout(recovery.timeoutTimer);
     delete this.callRecoveries[chatid];
 };
 
@@ -1601,8 +1684,9 @@ Call.prototype._broadcastCallReq = function() {
         return false;
     }
     assert(!self._obtainingLocalStream);
-    assert(self.localAv() != null);
-    assert(self.isUserInitiated);
+    var localAv = self.localAv();
+    assert(localAv != null);
+    assert(self.isCallerOrJoiner);
     self.isRingingOut = true;
     if (!self._bcastCallData(CallDataType.kRinging)) {
         return false;
@@ -1634,6 +1718,7 @@ Call.prototype._broadcastCallReq = function() {
             return;
         }
     }, RtcModule.kCallAnswerTimeout);
+    self._fire("onCallRequestSent", { av: localAv});
     return true;
 };
 
@@ -1653,8 +1738,8 @@ Call.prototype._stopIncallPingTimer = function() {
     if (self._inCallPingTimer) {
         clearInterval(self._inCallPingTimer);
         delete self._inCallPingTimer;
+        self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
     }
-    self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
 };
 Call.prototype.hasNoSessions = function() {
     return (Object.keys(this.sessions).length === 0);
@@ -1827,6 +1912,9 @@ Call.prototype._startOrJoin = function(av) {
             av &= ~Av.Audio;
         }
     }
+    // we need _startOrJoinAv immediately after creating an outgoing call, so we can't set it
+    // after obtaining the local stream (which is an async operation)
+    self._startOrJoinAv = av;
     var pms = self._initialGetLocalStream(av);
     return pms
     .catch(function(err) {
@@ -1854,7 +1942,7 @@ Call.prototype._join = function() {
     // JOIN:
     // chatid.8 userid.8 clientid.4 dataLen.2 type.1 callid.8 anonId.8 flags.1
     // flags is sentAv + whether we support stream renegotiation
-    var data = self.id + self.manager.ownAnonId + (String.fromCharCode(Av.fromStream(self.gLocalStream) |
+    var data = self.id + self.manager.ownAnonId + (String.fromCharCode(self.localAv() |
         (RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)));
     self._setState(CallState.kJoining);
     if (!self.cmdBroadcast(RTCMD.JOIN, data)) {
@@ -2066,7 +2154,7 @@ Call.prototype._checkLocalMuteCompleted = function() {
     var self = this;
     // We are called when a session renegotiation completes, but it may be the peer that does
     // the muting
-    if (!self._localMuteInProgress) {
+    if (!self._localMuteCompletePromise) {
         return;
     }
     var sessRetries = self.sessRetries;
@@ -2093,16 +2181,22 @@ Call.prototype._checkLocalMuteCompleted = function() {
 
 Call.prototype._notifyLocalMuteInProgress = function() {
     var self = this;
-    assert(!self._localMuteInProgress);
-    self._localMuteInProgress = true;
+    assert(!self._localMuteCompletePromise);
+    self._localMuteCompletePromise = createPromiseWithResolveMethods();
     self._fire("onLocalMuteInProgress");
 };
 
-Call.prototype._notifyLocalMuteComplete = function() {
+Call.prototype._notifyLocalMuteComplete = function(err) {
     var self = this;
-    assert(self._localMuteInProgress);
-    delete self._localMuteInProgress;
+    assert(self._localMuteCompletePromise);
+    var pms = self._localMuteCompletePromise;
+    delete self._localMuteCompletePromise;
     self._fire('onLocalMuteComplete');
+    if (err) {
+        pms.reject(err);
+    } else {
+        pms.resolve();
+    }
 };
 
 Call.prototype._removeRetry = function(reason, userid, clientid) {
@@ -2145,10 +2239,6 @@ Call.prototype._notifySessionConnected = function(sess) {
     if (chat.tsCallStart == null) {
         chat.tsCallStart = Date.now();
     }
-    self._fire('onCallStarted', chat.tsCallStart);
-    if (!self.isGroup && Av.fromStream(sess.remoteStream) === 0 && Av.fromStream(self.gLocalStream) === 0) {
-        self._fire('onNoMediaOnBothEnds');
-    }
     var recovery = this.manager.callRecoveries[this.chatid];
     if (recovery) {
         if (recovery.callid === this.id) {
@@ -2164,7 +2254,7 @@ Call.prototype._notifySessionConnected = function(sess) {
     } else {
         this._fire('onCallStarted', chat.tsCallStart);
     }
-    if (!this.isGroup && Av.fromStream(sess.remoteStream) === 0 && Av.fromStream(this.manager.gLocalAv) === 0) {
+    if (!this.isGroup && Av.fromStream(sess.remoteStream) === 0 && self.localAv() === 0) {
         this._fire('onNoMediaOnBothEnds');
     }
     if (self._renegotiateAfterInitialConnect) {
@@ -2180,7 +2270,7 @@ Call.prototype.enableAudio = function(enable) {
         self.logger.warn("enableAudio: Call is terminating");
         return;
     }
-    if (self._localMuteInProgress) {
+    if (self._localMuteCompletePromise) {
         self.logger.warn("enableAudio: Local mute/unmute already in progress");
         return;
     }
@@ -2188,7 +2278,7 @@ Call.prototype.enableAudio = function(enable) {
     if (!s) {
         return;
     }
-    var oldAv = Av.fromStream(s);
+    var oldAv = self.localAv();
     var hadAudio = !!(oldAv & Av.Audio);
     if (hadAudio === enable) {
         self.logger.log("enableAudio: Nothing to change");
@@ -2202,13 +2292,12 @@ Call.prototype.enableAudio = function(enable) {
     }
     self._notifyLocalMuteInProgress();
     Av.enableAudio(s, enable);
-    var newAv = Av.fromStream(s);
     self._notifyLocalMuteComplete();
     if (hadAudio === enable) {
         self.logger.warn("Failed to enable/disable audio");
         return;
     }
-    self._bcastLocalAvChange(newAv);
+    self._bcastLocalAvChange();
     var amChecker = self._audioMutedChecker;
     if (amChecker) {
         if (!enable) {
@@ -2218,103 +2307,185 @@ Call.prototype.enableAudio = function(enable) {
         }
     }
 };
-Call.prototype.enableVideo = function(enable) {
+
+Call.prototype._canEnableDisableVideo = function(enable) {
     var self = this;
     if (self.state !== CallState.kCallInProgress) {
-        self.logger.warn("enableVideo: Call state is not kInProgress, but " + constStateToText(CallState, self.state));
-        return;
+        return "Call that is not in state kInProgress (but in " + constStateToText(CallState, self.state) + ")";
     }
-    if (self._localMuteInProgress) {
-        self.logger.warn("enableVideo: A mute/unmute operation is already in progress");
-        return;
+    if (self._localMuteCompletePromise) {
+        return "A mute/unmute operation is already in progress";
     }
-    var oldAv = Av.fromStream(self.gLocalStream);
+    var oldAv = self.localAv();
     if ((!!(oldAv & Av.Video)) === enable) { // jshint -W018
-        self.logger.log("enableVideo: Nothing to change");
-        return;
+        return "Nothing to change";
     }
-    var sndCounts = self.manager.getAudioVideoSenderCount(self.chatid);
-    assert(sndCounts);
-    if (enable && (sndCounts.video >= RtcModule.kMaxCallVideoSenders)) {
-        self.logger.warn("Can't enable video sending, too many video senders in call");
-        return;
+    return null;
+};
+
+Call.prototype._enableVideo = function(screen) {
+    var self = this;
+    var err = self._canEnableDisableVideo(true);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
     }
+    var senderCounts = self.manager.getAudioVideoSenderCount(self.chatid);
+    assert(senderCounts);
+    if (senderCounts.video >= RtcModule.kMaxCallVideoSenders) {
+        var msg = "Can't enable video sending, too many video senders in call";
+        self.logger.warn(msg);
+        return Promise.reject(msg);
+    }
+    self._isCapturingScreen = screen;
     self._notifyLocalMuteInProgress();
     var sessions = self.sessions;
-    if (enable) {
-        var pms = self._getLocalVideo();
-        pms.catch(function(err) {
-            // can't enable camera
-            self.logger.warn("Error getting local video: " + err);
-            self._notifyLocalMuteComplete();
-        });
-        pms.then(function() {
-            if (self.state >= CallState.kTerminating) {
-                return;
-            }
-            var videoTrack = self.gLocalStream.getVideoTracks()[0];
-            assert(videoTrack);
-            if (Object.keys(sessions).length === 0) {
-                self._checkLocalMuteCompleted();
-            } else {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
-                        // we can just replace the track at the sender
-                        sess._setStreamRenegTimeout();
-                        RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
-                        .then((function() {
-                            this._notifyRenegotiationComplete();
-                        }).bind(sess));
-                    } else { // no videoSender or we don't have replaceTrack support
-                        if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
-                            RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
-                        } else {
-                            sess.terminateAndDestroy(Term.kStreamChange);
-                        }
-                    }
-                }
-            }
-            self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
-        });
-    } else { // disable video
-        RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var pms = self._getLocalVideo(screen);
+    pms.catch(function(err) {
+        // can't enable camera/screen capture
+        self._isCapturingScreen = false;
+        self.logger.warn("Error getting local video: " + err);
+        self._notifyLocalMuteComplete(err);
+    });
+
+    pms.then(function() {
+        if (self.state >= CallState.kTerminating) {
+            return;
+        }
+        var videoTrack = self.gLocalStream.getVideoTracks()[0];
+        assert(videoTrack);
+        if (screen) {
+            videoTrack.onended = function() {
+                self._onScreenCaptureEndedByFloatButton();
+            };
+        }
         if (Object.keys(sessions).length === 0) {
             self._checkLocalMuteCompleted();
         } else {
-          if (RTC.supportsReplaceTrack) {
-                for (var sid in sessions) {
-                    var sess = sessions[sid];
-                    var pc = sess.rtcConn;
-                    assert(pc);
-                    var pms = RTC.peerConnRemoveVideoTrack(pc);
-                    // pms is null if there was no video track
-                    assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
-                        "but gLocalStream has one");
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                if (RTC.peerConnCanReplaceVideoTrack(sess.rtcConn)) {
+                    // we can just replace the track at the sender
                     sess._setStreamRenegTimeout();
-                    pms.then(function() {
+                    RTC.peerConnReplaceVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream)
+                    .then((function() {
                         this._notifyRenegotiationComplete();
-                    }.bind(sess));
-                    pms.catch(function(err) { // replaceTrack(null) is not supported
-                        self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
-                            " falling back to session reconnect");
-                        this.terminateAndDestroy(Term.kStreamChange);
-                    }.bind(sess));
-                }
-            } else {
-                for (var sid in sessions) {
-                    sessions[sid].terminateAndDestroy(Term.kStreamChange);
+                    }).bind(sess));
+                } else { // no videoSender or we don't have replaceTrack support
+                    if (RTC.supportsUnifiedPlan && sess.peerSupportsReneg) {
+                        RTC.peerConnAddVideoTrack(sess.rtcConn, videoTrack, self.gLocalStream);
+                    } else {
+                        sess.terminateAndDestroy(Term.kStreamChange);
+                    }
                 }
             }
         }
-        self._bcastLocalAvChange(Av.fromStream(self.gLocalStream));
-    }
+        self._bcastLocalAvChange();
+    })
+    .catch(function(err) {
+        // silence logging an unhandled promise reject in the console,
+        // since the error is passed to the pms.then() branch as well
+    });
+    return self._localMuteCompletePromise;
 };
 
-Call.prototype._bcastLocalAvChange = function(av) {
+Call.prototype.disableVideo = function() {
+    var self = this;
+    var err = self._canEnableDisableVideo(false);
+    if (err) {
+        self.logger.warn(err);
+        return Promise.reject(err);
+    }
+    delete self._isCapturingScreen;
+    self._notifyLocalMuteInProgress();
+    RTC.streamStopAndRemoveVideoTracks(self.gLocalStream);
+    var sessions = self.sessions;
+    if (Object.keys(sessions).length === 0) {
+        self._checkLocalMuteCompleted();
+    } else {
+        if (RTC.supportsReplaceTrack) {
+            for (var sid in sessions) {
+                var sess = sessions[sid];
+                var pc = sess.rtcConn;
+                assert(pc);
+                var pms = RTC.peerConnRemoveVideoTrack(pc);
+                // pms is null if there was no video track
+                assert(pms, "Disable video: Session peerconnection's sender doesn't have a video track, " +
+                    "but gLocalStream has one");
+                sess._setStreamRenegTimeout();
+                pms.then(function() {
+                    this._notifyRenegotiationComplete();
+                }.bind(sess));
+                pms.catch(function(err) { // replaceTrack(null) is not supported
+                    self.logger.warn("peerConnRemoveVideoTrack() returned failed promise: " + err +
+                        " falling back to session reconnect");
+                    this.terminateAndDestroy(Term.kStreamChange);
+                }.bind(sess));
+            }
+        } else {
+            for (var sid in sessions) {
+                sessions[sid].terminateAndDestroy(Term.kStreamChange);
+            }
+        }
+    }
+    self._bcastLocalAvChange();
+    return self._localMuteCompletePromise;
+};
+
+Call.prototype.enableScreenCapture = function() {
+    var self = this;
+    if (!RTC.supportsScreenCapture) {
+        return Promise.reject("Screen capture is not supported by this browser");
+    }
+    if (self._isCapturingScreen) {
+        return Promise.reject("Screen capture already enabled");
+    }
+    var pms = (self.localAv() & Av.Video) ? self.disableVideo() : Promise.resolve();
+    return pms
+    .then(function() {
+        return self._enableVideo(true);
+    });
+};
+
+Call.prototype.enableCamera = function() {
+    var self = this;
+    var localAv = self.localAv();
+    var pms;
+    if (localAv & Av.Video) {
+        if ((localAv & Av.Screen) === 0) {
+            return Promise.reject("Camera already enabled");
+        } else {
+            pms = self.disableVideo();
+        }
+    } else {
+        pms = Promise.resolve();
+    }
+    return pms
+    .then(function() {
+        return self._enableVideo(false);
+    });
+};
+
+Call.prototype._onScreenCaptureEndedByFloatButton = function() {
+    var self = this;
+    if (!self._isCapturingScreen) {
+        self.logger.warn("Received stop button click from screen capture, but we are not capturing screen, ignoring");
+        return;
+    }
+    delete self._isCapturingScreen;
+    self.logger.log("Screen capture ended by floating button, muting video");
+    self.disableVideo().catch(function(err) {});
+};
+
+Call.prototype.isScreenCaptureEnabled = function() {
+    return this._isCapturingScreen;
+};
+
+Call.prototype._bcastLocalAvChange = function() {
     this._bcastCallData(null); // this also calls _updateOwnPeerAvState();
     // For compatibility with older native clients that support only 1on1 calls, send RTMSG_MUTE as well
     if (!this.isGroup) {
+        var av = this.localAv();
         var sessions = this.sessions;
         for (var sid in sessions) {
             sessions[sid]._sendAv(av);
@@ -2323,7 +2494,11 @@ Call.prototype._bcastLocalAvChange = function(av) {
 };
 
 Call.prototype.localAv = function() {
-    return Av.fromStream(this.gLocalStream);
+    var av = Av.fromStream(this.gLocalStream);
+    if ((av & Av.Video) && this._isCapturingScreen) {
+        av |= Av.Screen;
+    }
+    return av;
 };
 
 /** Protocol flow:
@@ -2363,7 +2538,7 @@ Call.prototype.localAv = function() {
         => send SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
         => call state: CallState.kCallInProgress (in case of group calls call state may already be kCallInProgress)
 
-    A: send SDP_OFFER sid.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
+    A: send SDP_OFFER sid.8 anonId.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
         => call state: CallState.kInProress
         => sess state: SessState.kWaitSdpAnswer
     C: send SDP_ANSWER sid.8 fprHash.32 av.1 sdpLen.2 sdpAnswer.sdpLen
@@ -2699,7 +2874,7 @@ Session.prototype._sendSdpAnswer = function() {
         var success = self.cmd(
             opcode,
             self.ownFprHash +
-            String.fromCharCode(Av.fromStream(self.call.gLocalStream)) +
+            String.fromCharCode(self.call.localAv()) +
             Chatd.pack16le(self.ownSdpAnswer.length) +
             self.ownSdpAnswer
         );
@@ -2739,6 +2914,9 @@ Session.prototype.handleMsg = function(packet) {
             return;
         case RTCMD.ICE_CANDIDATE:
             this.msgIceCandidate(packet);
+            return;
+        case RTCMD.END_ICE_CANDIDATES:
+            this.msgEndIceCandidates(packet);
             return;
         case RTCMD.SESS_TERMINATE:
             this.msgSessTerminate(packet);
@@ -2782,6 +2960,10 @@ Session.prototype._createRtcConn = function() {
         // mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
         var cand = event.candidate;
         if (!cand) {
+            // Edge needs a null candidate to signal end of received candidates, but current clients
+            // don't tolerate ICE_CANDATE packets without payload, so we introduce a new packet type
+            // that will be simply ignored by older clients
+            self.cmd(RTCMD.END_ICE_CANDIDATES);
             return;
         }
         var ctype = cand.candidate.match(/typ\s([^\s]+)/)[1];
@@ -2803,14 +2985,20 @@ Session.prototype._createRtcConn = function() {
         self.cmd(RTCMD.ICE_CANDIDATE, data);
     };
     conn.onaddstream = function(event) {
+        self.logger.log("onaddstream");
         if (self.remoteStream) {
             self._fire("onRemoteStreamRemoved");
         }
         var stream = self.remoteStream = event.stream;
         self._fire("onRemoteStreamAdded", stream);
         if (stream.getAudioTracks().length) {
+            // Audio level notifications for all peers seems to require too much CPU
             // self.audioLevelMonitor = new AudioLevelMonitor(stream, self.handler);
         }
+        if (self.state > SessState.kSessInProgress) {
+            return;
+        }
+
         // FIXME: We never had audio work from the GUI player if video is disabled,
         // and the audio was coming from this 'internal' player. We need to fix that ASAP
         if (self.mediaWaitPlayer) {
@@ -2842,16 +3030,13 @@ Session.prototype._createRtcConn = function() {
             return;
         }
         self._onNegotiationNeededCalled = true;
+        assert(self._streamRenegTimer == null);
         self._setStreamRenegTimeout();
         self.logger.log("onNegotiationNeeded while in progress, sending sdp offer");
         self.sendOffer();
     };
     conn.ontrack = function(event) {
         self.logger.debug("ontrack:", streamInfo(event.streams[0]));
-        if (self.state !== SessState.kSessInProgress) {
-            return;
-        }
-        self._onRemoteMuteUnmute(Av.fromStream(event.streams[0]));
     };
 
     conn.onsignalingstatechange = function(event) {
@@ -2970,7 +3155,7 @@ Session.prototype.sendOffer = function() {
                 ? self.crypto.encryptNonceTo(self.peer, self.ownHashKey)
                 : '\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0') +
             self.crypto.mac(self.ownSdpOffer, self.peerHashKey) +
-            String.fromCharCode(Av.fromStream(self.call.gLocalStream)) +
+            String.fromCharCode(self.call.localAv()) +
             Chatd.pack16le(self.ownSdpOffer.length) +
             self.ownSdpOffer
         );
@@ -3305,6 +3490,10 @@ Session.prototype.verifySdpFingerprints = function(sdp) {
 Session.prototype.msgIceCandidate = function(packet) {
     // sid.8 mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
     var self = this;
+    if (RTC.isEdge && (self.rtcConn.iceConnectionState === "completed")) {
+        self.logger.warn("Edge: Ignoring received ICE candidate - we are already in 'completed' ICE conn state");
+        return;
+    }
     var data = packet.data;
     var mLineIdx = data.charCodeAt(8);
     var midLen = data.charCodeAt(9);
@@ -3315,15 +3504,28 @@ Session.prototype.msgIceCandidate = function(packet) {
     var candLen = Chatd.unpack16le(data.substr(10 + midLen, 2));
     assert(data.length >= 12 + midLen + candLen);
     var cand = new RTCIceCandidate({
-        sdpMLineIndex: mLineIdx,
-        sdpMid: mid,
-        candidate: data.substr(midLen + 12, candLen)
+            sdpMLineIndex: mLineIdx,
+            sdpMid: mid,
+            candidate: data.substr(midLen + 12, candLen)
     });
-    return self.rtcConn.addIceCandidate(cand)
-        .catch(function(err) {
-            self.terminateAndDestroy(Term.kErrProtocol, err);
-            return Promise.reject(err);
-        });
+
+    self.rtcConn.addIceCandidate(cand)
+    .catch(function(err) {
+        self.terminateAndDestroy(Term.kErrProtocol, err);
+    });
+};
+
+Session.prototype.msgEndIceCandidates = function(packet) {
+    var self = this;
+    if (RTC.isEdge && (self.rtcConn.iceConnectionState === "completed")) {
+        self.logger.warn("Edge: Ignoring received END_ICE_CANDIDATES marker - " +
+            "we are already in 'completed' ICE conn state");
+        return;
+    }
+    self.rtcConn.addIceCandidate(null)
+    .catch(function(err) {
+        self.terminateAndDestroy(Term.kErrProtocol, err);
+    });
 };
 
 Session.prototype.msgMute = function(packet) {
@@ -3538,7 +3740,9 @@ Session.prototype.calcNetworkQualityFirefox = function(sample) {
 };
 
 // jshint -W003
-var Av = { Audio: 1, Video: 2, Mask: 3 };
+// Only if the Video flag is set, the Screen flag may be also set to denote that the video is
+// a screen capture stream
+var Av = { Audio: 1, Video: 2, Screen: 8, Mask: 11 };
 Av.fromStream = function(stream) {
     if (!stream) {
         return 0;
@@ -3548,12 +3752,14 @@ Av.fromStream = function(stream) {
     for (var i = 0; i < at.length; i++) {
         if (at[i].enabled) {
             av |= Av.Audio;
+            break;
         }
     }
     var vt = stream.getVideoTracks();
     for (var i = 0; i < vt.length; i++) {
         if (vt[i].enabled) {
             av |= Av.Video;
+            break;
         }
     }
     return av;
@@ -3576,8 +3782,19 @@ Av.fromMediaOptions = function(opts) {
     var result = opts.audio ? Av.Audio : 0;
     if (opts.video) {
         result |= Av.Video;
+        if (opts.screen) {
+            result |= Av.Screen;
+        }
     }
     return result;
+};
+
+Av.toMediaOptions = function(av) {
+    return {
+        audio: !!(av & Av.Audio), // jscs:ignore disallowImplicitTypeConversion
+        video: !!(av & Av.Video), // jscs:ignore disallowImplicitTypeConversion
+        screen: !!(av & Av.Screen) // jscs:ignore disallowImplicitTypeConversion
+    };
 };
 
 Av.enableTracks = function(tracks, enable) {
@@ -3630,16 +3847,17 @@ Av.applyToStream = function(stream, av) {
 };
 
 Av.toString = function(av) {
-    if (av & Av.Audio) {
-        if (av & Av.Video) {
-            return 'a+v';
+    var vidPart = null;
+    if (av & Av.Video) {
+        if (av & Av.Screen) {
+            vidPart = 'v(screen)';
         } else {
-            return 'a';
+            vidPart = 'v';
         }
-    } else if (av & Av.Video) {
-        return 'v';
+        return (av & Av.Audio) ? ('a+' + vidPart) : vidPart;
     } else {
-        return '-';
+        // no video
+        return (av & Av.Audio) ? 'a' : '-';
     }
 };
 
@@ -3661,7 +3879,8 @@ var RTCMD = Object.freeze({
                             // it will not be detected as an error by the receiver
     MUTE: 12, // Notify peer that we muted/unmuted
     SDP_OFFER_RENEGOTIATE: 13, // SDP offer, generated after changing the local stream. Used to renegotiate the stream
-    SDP_ANSWER_RENEGOTIATE: 14 // SDP answer, resulting from SDP_OFFER_RENEGOTIATE
+    SDP_ANSWER_RENEGOTIATE: 14, // SDP answer, resulting from SDP_OFFER_RENEGOTIATE
+    END_ICE_CANDIDATES: 15 // Marks the end of the sequence of sent ICE_CANDIDATE-s. Required for Edge support
 });
 
 var Term = Object.freeze({
@@ -3679,6 +3898,8 @@ var Term = Object.freeze({
     kStreamChange: 10,      // < Session was force closed by a client because it wants to change the media stream.
                             // < This is a fallback if one of the peers doesn't support Unified Plan
                             // < stream renegotiation
+    kCancelOutAnswerIn: 11, // < Simultaneous call resolution: the outgoing 1on1 call was destroyed because we
+                             // < received an incoming call request from the same peer
     kNormalHangupLast: 20,  // < Last enum specifying a normal call termination
     kErrorFirst: 21,        // < First enum specifying call termination due to error
     kErrApiTimeout: 22,     // < Mega API timed out on some request (usually for RSA keys)
@@ -3741,7 +3962,8 @@ var CallState = Object.freeze({
 
 var CallStateAllowedStateTransitions = {};
 CallStateAllowedStateTransitions[CallState.kCallingOut] = [
-    CallState.kReqSent
+    CallState.kReqSent,
+    CallState.kTerminating
 ];
 CallStateAllowedStateTransitions[CallState.kReqSent] = [
     CallState.kCallInProgress,
@@ -3872,6 +4094,8 @@ Call.prototype.termCodeToUIState = function(terminationCode) {
             return UICallTerm.REJECTED;
         case Term.kErrAlready:
             return UICallTerm.FAILED;
+        case Term.kCancelOutAnswerIn:
+            return UICallTerm.ABORTED;
         case Term.kErrNotSupported:
             return UICallTerm.FAILED;
         case Term.kAppTerminating:
@@ -3941,10 +4165,23 @@ RtcModule.rtcmdToString = function(cmd, tx, chatdOpcode) {
                 break;
             case RTCMD.ICE_CANDIDATE:
                 // sid.8 mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
-                var midLen = cmd.charCodeAt(33);
-                var candLen = Chatd.unpack16le(cmd.substr(33 + midLen, 2));
-                result += getSid() + ', mid: ' + cmd.substr(34, midLen) +
-                    '\n' + cmd.substr(35 + midLen, candLen);
+                result += getSid();
+                if (cmd.length === 32) {
+                    result += "\n(null candidate)";
+                } else {
+                    var midLen = cmd.charCodeAt(33);
+                    var candLen = Chatd.unpack16le(cmd.substr(33 + midLen, 2));
+                    result += ', mid: ' + cmd.substr(34, midLen) +
+                        '\n' + cmd.substr(35 + midLen, candLen);
+                }
+                break;
+            case RTCMD.SDP_OFFER:
+            case RTCMD.SDP_OFFER_RENEGOTIATE:
+                result += getSid() + ', av: ' + Av.toString(cmd.charCodeAt(104));
+                break;
+            case RTCMD.SDP_ANSWER:
+            case RTCMD.SDP_ANSWER_RENEGOTIATE:
+                result += getSid() + ', av: ' + Av.toString(cmd.charCodeAt(64));
                 break;
             default:
                 result += '\ndata(' + (Chatd.unpack16le(cmd.substr(21, 2)) - 1) + '): ';
@@ -3999,6 +4236,8 @@ Call.prototype.termCodeToHistCallEndedCode = function(terminationCode) {
             return CallManager.CALL_END_REMOTE_REASON.REJECTED;
         case Term.kErrAlready:
             return CallManager.CALL_END_REMOTE_REASON.FAILED;
+        case Term.kCancelOutAnswerIn:
+        return CallManager.CALL_END_REMOTE_REASON.CANCELED;
         case Term.kErrNotSupported:
             return CallManager.CALL_END_REMOTE_REASON.FAILED;
         case Term.kAppTerminating:
@@ -4028,11 +4267,17 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         handler = { onAudioLevelChange: function(level) {  console.log("audio level change:", level);  } };
     }
     self.handler = handler;
-    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.01;
+    self._changeThreshold = changeThreshold ? (changeThreshold / 100) : 0.002;
     var ctx = self.audioCtx = new AudioContext();
+    if (!ctx) {
+        throw new Error("Can't create audio context, maybe maximum number of instances was reached");
+    }
     self.source = ctx.createMediaStreamSource(stream);
     var scriptNode = self.scriptNode = ctx.createScriptProcessor(8192, 1, 1);
     scriptNode.onaudioprocess = function(event) {
+        if (!self._connected) {
+            return;
+        }
         var inData = event.inputBuffer.getChannelData(0);
         var max = Math.abs(inData[0]);
         // Samples are in float format. Process each second sample to save some cpu cycles
@@ -4043,10 +4288,11 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
             }
         }
         var lastLevel = self._lastLevel;
+        // console.warn('max=', max);
         if (Math.abs(max - lastLevel) >= self._changeThreshold ||
-           (max < 0.001 && lastLevel >= 0.005)) { // return to zero
+           (max <= 0.001 && lastLevel >= 0.005)) { // return to zero
             self._lastLevel = max;
-            handler.onAudioLevelChange(Math.round(max * 100));
+            handler.onAudioLevelChange(max);
         }
     };
     self.connect();
@@ -4058,7 +4304,7 @@ AudioLevelMonitor.prototype.connect = function() {
         return;
     }
     self.source.connect(self.scriptNode);
-    if (RTC.isChrome) {
+    if (!RTC.isFirefox) {
         self.scriptNode.connect(self.audioCtx.destination);
     }
     self._connected = true;
@@ -4070,13 +4316,13 @@ AudioLevelMonitor.prototype.disconnect = function() {
         return;
     }
     self.source.disconnect(self.scriptNode);
-    if (RTC.isChrome) {
+    if (!RTC.isFirefox) {
         self.scriptNode.disconnect(self.audioCtx.destination);
     }
     delete self._connected;
     if (self._lastLevel >= 0.005) {
         self._lastLevel = 0.0;
-        self.handler.onAudioLevelChange(0);
+        self.handler.onAudioLevelChange(0.0);
     }
 };
 
@@ -4090,6 +4336,13 @@ AudioLevelMonitor.prototype.setChangeThreshold = function(val) {
 
 AudioLevelMonitor.prototype.lastLevel = function() {
     return Math.round(this._lastLevel * 100);
+};
+
+AudioLevelMonitor.prototype.destroy = function() {
+    if (this.audioCtx) {
+        this.audioCtx.close();
+        delete this.audioCtx;
+    }
 };
 
 function AudioMutedChecker(handler, timeout) {
@@ -4110,8 +4363,13 @@ AudioMutedChecker.prototype.start = function(stream) {
         delete self._levelMonitor;
     }
     self._stream = stream;
+    try {
+        self._levelMonitor = new AudioLevelMonitor(stream, self, 1); // also connects it to the stream
+    } catch(e) {
+        console.warn("Error creating audio level monitor:", e);
+        return false;
+    }
     self.arm();
-    self._levelMonitor = new AudioLevelMonitor(stream, self, 1); // also connects it to the stream
     return true;
 };
 
@@ -4128,9 +4386,15 @@ AudioMutedChecker.prototype.stop = function() {
     delete this._stream;
 };
 
+AudioMutedChecker.prototype.destroy = function() {
+    if (this._levelMonitor) {
+        this._levelMonitor.destroy();
+    }
+};
+
 AudioMutedChecker.prototype.onAudioLevelChange = function(level) {
     var self = this;
-    if (level < 1) {
+    if (level <= 0.001) {
         // if we disconnect, there will be an artificial change to 0
         // console.warn("AudioMutedChecker: Received level change to", level, "- should be > 0");
         return;
@@ -4247,6 +4511,9 @@ function trackInfo(track) {
 }
 
 function streamInfo(stream) {
+    if (!stream) {
+        return "(null stream)"
+    }
     var str = "stream id: " + stream.id;
     var tracks = stream.getTracks();
     var len = tracks.length;
@@ -4254,6 +4521,29 @@ function streamInfo(stream) {
         str += "\n\t" + trackInfo(tracks[i]);
     }
     return str;
+}
+function createPromiseWithResolveMethods() {
+    var cbResolve;
+    var cbReject;
+    var pms = new Promise(function(resolve, reject) {
+        cbResolve = resolve;
+        cbReject = reject;
+    });
+    pms.resolve = function(val) {
+        if (pms.done) {
+            return;
+        }
+        pms.done = true;
+        cbResolve(val);
+    };
+    pms.reject = function(err) {
+        if (pms.done) {
+            return;
+        }
+        pms.done = true;
+        cbReject(err);
+    };
+    return pms;
 }
 
 RtcModule.streamInfo = streamInfo;

@@ -39,6 +39,7 @@ mobile.cloud = {
         this.initTitleMenu();
         this.renderHeader();
         this.initGridViewToggleHandler();
+        this.initDownloadZipHandler();
         this.renderFoldersAndFiles();
         this.renderFoldersAndFilesSubHeader();
         this.showEmptyCloudIfEmpty();
@@ -83,6 +84,9 @@ mobile.cloud = {
         // Init folder and file row handlers
         this.initFileRowClickHandler();
         this.initFolderRowClickHandler();
+
+        // Toggle visibility of download as zip
+        this.initDownloadZipHandler();
 
         // Initialise context menu on each row
         mobile.cloud.contextMenu.init();
@@ -276,8 +280,8 @@ mobile.cloud = {
                 $folderSize.text(fileSizesTotal).removeClass('hidden');
             }
             else {
-                // Otherwise show the back button
-                mobile.initBackButton($fileManagerHeader);
+                // If a subfolder of the cloud drive, show the up button
+                mobile.showAndInitUpButton($upButton);
             }
 
             // Update the header with the current folder name
@@ -387,6 +391,12 @@ mobile.cloud = {
             $nodeTemplate.find('.fm-item-name').text(nodeName);
             $nodeTemplate.attr('data-handle', nodeHandle);
             $nodeTemplate.attr('id', nodeHandle);
+
+            // Add `taken-down` class to nodes that are taken down.
+            var share = M.getNodeShare(node);
+            if (share && share.down) {
+                $nodeTemplate.addClass('taken-down');
+            }
 
             // Update the current output
             output += $nodeTemplate.prop('outerHTML');
@@ -663,6 +673,23 @@ mobile.cloud = {
             // Prevent pre clicking one of the Open in Browser/App buttons
             return false;
         });
+    },
+
+    /**
+     * Functionality for download as ZIP button in page header.
+     */
+    initDownloadZipHandler: function() {
+        'use strict';
+        var $button = $('.mobile.file-manager-block .mobile.fm-icon.download-zip').off('tap');
+        if (pfid) {
+            $button.removeClass('hidden');
+            $button.on('tap', function() {
+                mobile.downloadOverlay.showOverlay(M.currentdirid);
+                return false;
+            });
+        } else {
+            $button.addClass('hidden');
+        }
     },
 
     /**

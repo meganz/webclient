@@ -300,6 +300,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             ephemeralDialog(l[1005]);
         }
         else {
+            $.selected = [h];
             mega.Share.initCopyrightsDialog([h]);
         }
         if (e) {

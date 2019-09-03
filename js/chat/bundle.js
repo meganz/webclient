@@ -11438,6 +11438,7 @@ function (_ConversationMessageM) {
       if (u_type === 0) {
         ephemeralDialog(l[1005]);
       } else {
+        $.selected = [h];
         mega.Share.initCopyrightsDialog([h]);
       }
 

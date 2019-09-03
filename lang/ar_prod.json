@@ -3264,10 +3264,10 @@
     "20891": "Bonus updates",
     "20892": "Activated and expired bonuses for your achievements",
     "20893": "Storage quota warnings",
-    "20894": "Note: The over quota warning will always be sent.",
+    "20894": "Note: Exceeding your quota will always generate a warning.",
     "20895": "Account inactivity",
-    "20896": "Reminder about account inactivity",
-    "20897": "Enable all email notifications",
+    "20896": "The friendly reminders sent when your account first becomes inactive",
+    "20897": "Allow accessory emails",
     "20898": "Email Notifications",
     "20899": "Enable all account notifications",
     "20900": "Account Notifications",
@@ -3285,5 +3285,8 @@
     "20951": "Beneficiary address",
     "20956": "Embed button options",
     "20957": "Someone has deleted you as a contact",
-    "20960": "Entered birthdate is invalid"
+    "20960": "Entered birthdate is invalid",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

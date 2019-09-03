@@ -72,9 +72,6 @@
 .bottom-page.download-content {
     opacity: 0;
     -webkit-transition: opacity 400ms ease-in-out;
-    -moz-transition: opacity 400ms ease-in-out;
-    -o-transition: opacity 400ms ease-in-out;
-    -ms-transition: opacity 400ms ease-in-out;
     transition: opacity 400ms ease-in-out;
     text-align: center;
     position: relative;
@@ -97,11 +94,8 @@
 }
 .download.top-bar.expanded .download-content {
     opacity: 1;
-    -webkit-transition-delay: 200ms;
-    -moz-transition-delay: 200ms;
-    -o-transition-delay: 200ms;
-    -ms-transition-delay: 200ms;
-    transition-delay: 200ms;
+    -webkit-transition-delay: 400ms;
+    transition-delay: 400ms;
 }
 .download.top-bar {
     background-color: #FFFFFF;
@@ -116,12 +110,21 @@
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-transition: max-height 400ms ease-in-out;
-    -moz-transition: all 400ms ease-in-out;
-    -o-transition: all 400ms ease-in-out;
-    -ms-transition: all 400ms ease-in-out;
+    -webkit-transition: all 400ms ease-in-out;
     transition: all 400ms ease-in-out;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.initial .download.bar-table {
+    opacity: 0;
+}
+.download.top-bar.initial {
+     -webkit-transition: all 200ms;
+    transition: all 200ms;
+}
+.download.top-bar.expanded.initial .download-content {
+    opacity: 1;
+    -webkit-transition-delay: 200ms;
+    transition-delay: 200ms;
 }
 body:not(.en) .download.top-bar {
     padding-bottom: 81px;
@@ -287,11 +290,8 @@ body:not(.en) .download.top-bar.floating {
     cursor: pointer;
     background: rgba(255,255,255,1);
     position: relative;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
+    -webkit-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+    transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -1581,7 +1581,7 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     margin-top: 2px;
 }
 .video-theatre-mode .download.info-block, .video-theatre-mode .download.in-progress, .video-theatre-mode .download.over-transfer-quota {
-    max-width: 840px;
+    max-width: 638px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;

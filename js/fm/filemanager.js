@@ -1280,6 +1280,18 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.dispute-item').rebind('click', function() {
+        // Find the first takendown node in the list. This is the item we will use to prefill with.
+        localStorage.removeItem('takedownDisputeNodeURL');
+        for (var i = 0; i < $.selected.length; i++) {
+            var node = M.getNodeByHandle($.selected[i]);
+            if (node.t & M.IS_TAKENDOWN || M.getNodeShare(node).down === 1) {
+                var disputeURL = mega.getPublicNodeExportLink(node);
+                if (disputeURL) {
+                    localStorage.setItem('takedownDisputeNodeURL', disputeURL);
+                }
+                break;
+            }
+        }
         loadSubPage('dispute');
     });
 
@@ -1694,7 +1706,7 @@ FileManager.prototype.initContextUI = function() {
             showExpiredBusiness();
             return;
         }
-        doClearbin(false);
+        doClearbin(true);
     });
 
     $(c + '.move-up').rebind('click', function() {

@@ -2409,3 +2409,26 @@ var exportExpiry = {
     scope.mega.UI.Share = scope.mega.UI.Share || {};
     scope.mega.UI.Share.ExportLink = UiExportLink;
 })(jQuery, window);
+
+/** Export Link as string **/
+(function($, scope) {
+    'use strict';
+
+    scope.getPublicNodeExportLink = function(node) {
+        var fileUrlWithoutKey;
+        var type;
+        if (folderlink) {
+            fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid + (node.t ? '!' : '?') + node.h;
+        }
+        else if (node.t) {
+            type = 'F';
+        }
+        else {
+            // Shared item type is file
+            type = '';
+        }
+
+        return fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(node.ph));
+    };
+
+})(jQuery, mega);

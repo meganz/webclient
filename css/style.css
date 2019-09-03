@@ -18131,8 +18131,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     filter: blur(0.25em);
     -webkit-filter: blur(0.25em);
 }
-.main-blur-block {
+.fmholder .main-blur-block {
     height: 100%;
+    display: block;
 }
 .overlayed .tooltip-blur {
     filter: blur(0.25em);

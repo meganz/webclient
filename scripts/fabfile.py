@@ -120,6 +120,11 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
     if branch_name == '':
         branch_name = local('git rev-parse --abbrev-ref HEAD', capture=True)
 
+    # If branch name is still empty, something is wrong.
+    if branch_name == '':
+        print('Something went wrong with get current branch name.\n');
+        exit();
+
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)
 

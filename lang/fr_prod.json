@@ -3267,7 +3267,7 @@
     "20894": "Note\u00a0: le rappel de d\u00e9passement du quota sera toujours envoy\u00e9.",
     "20895": "Inactivit\u00e9 du compte",
     "20896": "Rappel sur l\u2019inactivit\u00e9 du compte",
-    "20897": "Activer toutes les notifications par courriel",
+    "20897": "Allow accessory emails",
     "20898": "Notifications par courriel",
     "20899": "Activer toutes les notifications du compte",
     "20900": "Notifications du compte",
@@ -3285,5 +3285,8 @@
     "20951": "Adresse du b\u00e9n\u00e9ficiaire",
     "20956": "Options du bouton d\u2019int\u00e9gration",
     "20957": "Quelqu\u2019un vous a supprim\u00e9 en tant que contact",
-    "20960": "La date de naissance saisie est invalide"
+    "20960": "La date de naissance saisie est invalide",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

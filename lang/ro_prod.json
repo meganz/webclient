@@ -3267,7 +3267,7 @@
     "20894": "Not\u0103: Avertismentul privind dep\u0103\u0219irea cotei va fi \u00eentotdeauna trimis.",
     "20895": "Inactivitatea contului",
     "20896": "Memento cu privire la inactivitatea conturilor",
-    "20897": "Activeaz\u0103 toate notific\u0103rile prin e-mail",
+    "20897": "Allow accessory emails",
     "20898": "Notific\u0103ri prin e-mail",
     "20899": "Activeaz\u0103 toate notific\u0103rile privind contul",
     "20900": "Notific\u0103ri privind contul",
@@ -3285,5 +3285,8 @@
     "20951": "Adresa beneficiarului",
     "20956": "Op\u021biuni pentru butonul de \u00eencorporare",
     "20957": "Cineva te-a \u0219ters ca contact",
-    "20960": "Data na\u0219terii introdus\u0103 este nevalid\u0103"
+    "20960": "Data na\u0219terii introdus\u0103 este nevalid\u0103",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

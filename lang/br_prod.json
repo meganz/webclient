@@ -3267,7 +3267,7 @@
     "20894": "Observa\u00e7\u00e3o: o aviso sobre o limite de armazenamento excedido sempre ser\u00e1 enviado.",
     "20895": "Inatividade da conta",
     "20896": "Aviso de inatividade",
-    "20897": "Ativar todas as notifica\u00e7\u00f5es via email",
+    "20897": "Allow accessory emails",
     "20898": "Notifica\u00e7\u00f5es via email",
     "20899": "Ativar todas as notifica\u00e7\u00f5es da conta",
     "20900": "Notifica\u00e7\u00f5es da conta",
@@ -3285,5 +3285,8 @@
     "20951": "Endere\u00e7o do benefici\u00e1rio",
     "20956": "Op\u00e7\u00f5es do bot\u00e3o de incorpora\u00e7\u00e3o",
     "20957": "Algu\u00e9m eliminou voc\u00ea dos contatos",
-    "20960": "A data de nascimento n\u00e3o \u00e9 v\u00e1lida"
+    "20960": "A data de nascimento n\u00e3o \u00e9 v\u00e1lida",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Notifica\u00e7\u00f5es de armazenamento quase cheio"
 }

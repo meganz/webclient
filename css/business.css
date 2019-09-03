@@ -47,8 +47,9 @@
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.15);
 }
 /* End of main top menu */
-.business-page .bottom-page.top-bl {
+.business-page .bottom-page.top-bl > .vertical-centered-cell {
     overflow: hidden;
+    width: 100%;
 }
 i.medium-icon.business-sprite {
     background-image: url(../images/mega/business.png);
@@ -108,7 +109,7 @@ i.medium-icon.business-sprite {
 .bottom-page.angle-bg.low-top {
     margin-top: -134px;
 }
-.bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+.business .bottom-page.top-bl .bottom-page.angle-bg, .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
     bottom: -100px;
 }
 .business-page .bottom-page.info-block {
@@ -477,14 +478,21 @@ i.medium-icon.business-sprite {
     line-height: 32px;
     font-size: 24px;
     color: #333333;
-    font-family: 'montserrat_light', 'open_sans', sans-serif;
+    font-family: 'montserrat', 'open_sans', sans-serif;
     padding: 34px 0 24px 0;
+}
+.bottom-page.business-header.low-bott-pad {
+    padding-bottom: 18px;
 }
 .bottom-page.business-text {
     font-size: 16px;
     line-height: 30px;
     color: #666666;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.bottom-page.business-text .red {
+    color: #D8262F;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
 }
 .bottom-page.business-text.top-pad {
     padding-top: 48px;
@@ -726,6 +734,9 @@ img.bottom-page.business4 {
     position: relative;
     font-family: 'montserrat', 'open_sans', sans-serif;
 }
+.ru .business-mid-header.special-lang {
+    letter-spacing: -0.15px;
+}
 .business-txt-cols {
     font-size: 0;
     line-height: 0;
@@ -801,6 +812,28 @@ img.bottom-page.business4 {
         display: none;
     }
 }
+@media only screen and (max-width: 783px) {
+    .bottom-page.big-header.top.dark {
+        font-size: 36px;
+        line-height: 48px;
+        padding: 82px 40px 0 40px;
+    }
+    .business-page .bottom-page.top-bl {
+        height: auto;
+    }
+    .business-page .bottom-page.vertical-centered-cell {
+        vertical-align: top;
+    }
+    .top-bl .bottom-page.tabl, .top-bl .bottom-page.table .bottom-page.vertical-centered-cell {
+        display: block;
+    }
+    .img.business-top {
+        position: static;
+        max-height: 50%;
+        padding: 58px 0 0 0;
+        margin-left: -6%;
+    }
+}
 @media only screen and (max-width: 720px) {
     .business-cell .cell-bg::before, .business-cell .cell-bg::after, .business-row:nth-child(even) .cell-icon::before {
         width: -webkit-calc(100% - 15px);
@@ -812,21 +845,6 @@ img.bottom-page.business4 {
     }
  }
  @media only screen and (max-width: 660px) {
-    .business-page .bottom-page.top-bl {
-        height: auto;
-    }
-    .business-page .bottom-page.vertical-centered-cell {
-        vertical-align: top;
-    }
-    .top-bl .bottom-page.tabl, .top-bl .bottom-page.table .bottom-page.vertical-centered-cell {
-        display: block;
-    }
-    .business-page .bottom-page.big-header.dark {
-        font-size: 24px;
-        line-height: 32px;
-        margin: 0 auto;
-        padding: 51px 0 4px 0;
-    }
     .business-page .bottom-page.medium-txt.lato {
         padding: 20px 0 36px 0;
         margin: 0 auto;
@@ -835,12 +853,6 @@ img.bottom-page.business4 {
         display: block;
         width: 100%;
         height: 50%;
-    }
-    .img.business-top {
-        position: static;
-        max-height: 50%;
-        padding: 58px 0 0 0;
-        margin-left: -6%;
     }
     .bottom-page.gradient-block {
         margin-top: 12px;
@@ -1036,6 +1048,9 @@ img.bottom-page.business4 {
         text-align: center;
         padding: 33px 0 24px 0;
     }
+     .bottom-page.business-header.low-bott-pad {
+        padding: 24px 0 14px 0;
+    }
     .bottom-page.business-text {
         font-size: 14px;
         line-height: 24px;
@@ -1106,6 +1121,21 @@ img.bottom-page.business4 {
         padding: 8px 16px 8px 24px;
     }
  }
+@media only screen and (max-width: 565px) {
+    .business-page .bottom-page.big-header.dark {
+        font-size: 26px;
+        line-height: 38px;
+        margin: 0 auto;
+        padding: 47px 0 4px 0;
+    }
+}
+
+@media only screen and (max-width: 420px) {
+    .bottom-page.business-header, .business-page .bottom-page.big-header.dark {
+        font-size: 20px;
+        line-height: 28px;
+    }
+}
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     

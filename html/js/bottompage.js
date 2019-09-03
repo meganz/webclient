@@ -73,7 +73,7 @@ var bottompage = {
             if ($('body').hasClass('bottom-pages') && sessionData) {
                 $('#startholder').scrollTop(sessionData);
                 if (page === 'download') {
-                    $('.download.top-bar').removeClass('expanded').css('height', '');
+                    $('.download.top-bar').removeClass('expanded initial').css('height', '');
                     $(window).unbind('resize.download-bar');
                 }
             }
@@ -262,10 +262,10 @@ var bottompage = {
             var navTopPos;
 
             if (topPos > 150) {
-                $topHeader.removeClass('expanded');
+                $topHeader.removeClass('expanded initial');
             }
             if (topPos > 300) {
-                $topHeader.removeClass('expanded').addClass('floating');
+                $topHeader.removeClass('expanded initial').addClass('floating');
                 topResize();
                 if (topPos > 600) {
                     $topHeader.addClass('activated');

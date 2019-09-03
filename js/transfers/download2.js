@@ -2033,11 +2033,11 @@ var dlmanager = {
         else if (window.safari) {
             $elm.addClass('safari');
         }
-        else if (mega.chrome) {
-            $elm.addClass('chrome');
-        }
         else if (window.opr) {
             $elm.addClass('opera');
+        }
+        else if (mega.chrome) {
+            $elm.addClass('chrome');
         }
         else if (uad.engine === 'Gecko') {
             $elm.addClass('ff');

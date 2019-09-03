@@ -65,6 +65,9 @@ RepayPage.prototype.initPage = function() {
             return false;
         });
 
+    $('.bus-reg-agreement.mega-terms .bus-reg-checkbox', $leftSection)
+        .removeClass('checkOn').addClass('checkOff');
+
     // event handler for check box
     $('.bus-reg-agreement', $leftSection).off('click.suba').on('click.suba',
         function businessRepayCheckboxClick() {
@@ -117,6 +120,13 @@ RepayPage.prototype.initPage = function() {
 
             var $overduePaymentRow = $('.repay-breakdown-tb-content', $rightBlock);
             var $overduePaymentHeader = $('.repay-breakdown-tb-header', $rightBlock);
+
+            if ($overduePaymentRow.length > 1) {
+                var $rowBk = $($overduePaymentRow[0]).clone();
+                $overduePaymentRow.remove();
+                $rowBk.insertAfter($overduePaymentHeader);
+                $overduePaymentRow = $rowBk;
+            }
 
             var rowTemplate = $overduePaymentRow.clone();
 

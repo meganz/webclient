@@ -43,6 +43,10 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     ctx.account.downbw_used = Math.round(res.caxfer);
                     ctx.account.servbw_limit = Math.round(res.srvratio);
 
+                    if (res.nextplan) {
+                        ctx.account.nextplan = res.nextplan;
+                    }
+
                     // If a subscription, get the timestamp it will be renewed
                     if (res.stype === 'S') {
                         ctx.account.srenew = res.srenew;

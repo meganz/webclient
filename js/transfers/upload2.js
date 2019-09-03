@@ -1409,7 +1409,7 @@ ChunkUpload.prototype.io_ready = function(res) {
             ulmanager.retry(this.file, this, "IO failed: " + res);
         }
         else {
-            if (d) {
+            if (d && this.logger) {
                 this.logger.error('The FileReader finished, but this upload was cancelled...');
             }
         }

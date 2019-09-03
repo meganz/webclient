@@ -66,33 +66,6 @@ BusinessRegister.prototype.initPage = function () {
                 return loadSubPage('');
             }
             else {
-                //var totalActiveSubUsers = 0;
-                //for (var subb in M.suba) {
-                //    if (M.suba[subb].s === 0) {
-                //        totalActiveSubUsers++;
-                //    }
-                //}
-
-                //$nbUsersInput.val(Math.max(totalActiveSubUsers, this.minUsers));
-                //$nbUsersInput.prop('disabled', true);
-                //$cnameInput.prop('disabled', true);
-                //$telInput.prop('disabled', true);
-
-                //mega.attr.get(u_attr.b.bu, '%name', -1, undefined,
-                //    function(res, ctx) {
-                //        $cnameInput.prop('disabled', false);
-                //        if (typeof res !== 'number' && ctx.ua === "%name") {
-                //            $cnameInput.val(from8(base64urldecode(res)));
-                //        }
-                //    });
-
-                //mega.attr.get(u_attr.b.bu, '%phone', -1, undefined,
-                //    function(res, ctx) {
-                //        $telInput.prop('disabled', false);
-                //        if (typeof res !== 'number' && ctx.ua === "%phone") {
-                //            $telInput.val(from8(base64urldecode(res)));
-                //        }
-                //    });
                 return loadSubPage('repay');
             }
         }

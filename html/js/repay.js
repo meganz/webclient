@@ -1,7 +1,8 @@
 function RepayPage() {
+    "use strict";
     this.noOverduePaymentErrorCode = -1;
     this.unknownErrorCode = -99;
-};
+}
 
 RepayPage.prototype.initPage = function() {
     "use strict";
@@ -65,6 +66,9 @@ RepayPage.prototype.initPage = function() {
             return false;
         });
 
+    $('.bus-reg-agreement.mega-terms .bus-reg-checkbox', $leftSection)
+        .removeClass('checkOn').addClass('checkOff');
+
     // event handler for check box
     $('.bus-reg-agreement', $leftSection).off('click.suba').on('click.suba',
         function businessRepayCheckboxClick() {
@@ -101,7 +105,7 @@ RepayPage.prototype.initPage = function() {
             });
         };
 
-        overduePromise.fail(failHandler)
+        overduePromise.fail(failHandler);
 
         overduePromise.done(function(st, res) {
             // validations of API response
@@ -113,10 +117,17 @@ RepayPage.prototype.initPage = function() {
 
             var nbOfUsers = new BusinessRegister().minUsers;
 
-            var $rightBlock = ('.main-right-block', $repaySection);
+            var $rightBlock = $('.main-right-block', $repaySection);
 
             var $overduePaymentRow = $('.repay-breakdown-tb-content', $rightBlock);
             var $overduePaymentHeader = $('.repay-breakdown-tb-header', $rightBlock);
+
+            if ($overduePaymentRow.length > 1) {
+                var $rowBk = $($overduePaymentRow[0]).clone();
+                $overduePaymentRow.remove();
+                $rowBk.insertAfter($overduePaymentHeader);
+                $overduePaymentRow = $rowBk;
+            }
 
             var rowTemplate = $overduePaymentRow.clone();
 

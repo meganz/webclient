@@ -235,7 +235,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     margin-top: 4px;
 }
 .bus-reg-agreement {
-    width: 95%;
+    width: 100%;
     margin-top: 16px;
     cursor: pointer;
 }
@@ -279,10 +279,10 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 
 .bus-reg-agreement .bus-reg-txt {
-	width: 88%;
+	width: 90%;
 	font-size: 13px;
-	color:#888;
-	line-height: 18px;
+	color:#999;
+	line-height: 20px;
 	display: inline-block;
 }
 
@@ -575,7 +575,6 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 		width:100%;
 	}
 }
-
 /*For business over due payment page*/
 .card-container.bus-repay {
 	width: 850px;
@@ -591,7 +590,6 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	height: 100%;
 	width: 100%;
 	padding-top: 80px;
-	display: table;
 }
 .card-header {
 	text-align: center;
@@ -610,8 +608,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	padding: 56px 0 0;
 }
 .main-mid-pad.bus-repay .main-left-block {
-	padding-right:48px;
-	margin-left: 8px;
+	padding-right: 48px;
 }
 .main-mid-pad.bus-repay .section-wrapper:not(:first-child) {
 	margin-top: 32px;
@@ -625,7 +622,9 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	color: #333;
 	font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
 	padding-bottom: 16px;
-	margin-left: -8px;
+}
+.repay-btn.small-view-btn {
+	display: none;
 }
 .main-mid-pad.bus-repay .row-wrapper {
 	padding-bottom: 16px;
@@ -700,17 +699,20 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	width: 94px;
 	padding: 12px 8px 8px 12px;
 	box-sizing: border-box;
+	display: inline-block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-	width: 146px;
+	width: 141px;
 	padding-right: 4px;
 	box-sizing: border-box;
+	display: inline-block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
-	width: 100px;
+	width: 85px;
 	padding-right: 12px;
 	box-sizing: border-box;
-	text-align: center;
+	text-align: right;
+	display: inline-block;
 }
 .bus-reg-plan.repay .repay-breakdown-tb th {
 	font-size: 13px;
@@ -732,17 +734,60 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	line-height: 34px;
 	font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
 	text-align: left;
-	width: 120px;
+	width: 110px;
 }
 .bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-	padding-right: 20px;
-	width: 224px;
+	padding-right: 12px;
+	width: 214px;
 	text-align: right;
 }
-
-
-
-
-
-
-
+@media only screen and (max-width: 800px) {
+	.card-container.bus-repay {
+		width: 96%;
+		min-width: 406px;
+		padding: 2%;
+	}
+	.main-mid-pad.bus-repay .main-left-block, .main-mid-pad.bus-repay .main-right-block {
+		width: auto;
+		display: block;
+	}
+	.main-mid-pad.bus-repay .main-left-block {
+		padding-right: 0px;
+	}
+	.main-mid-pad.bus-repay .bus-reg-plan.repay {
+		width: 100%;
+	}
+	.main-mid-pad.bus-repay .row-wrapper {
+		padding-bottom: 8px;
+	}
+	.bus-reg-plan.repay .repay-breakdown-tb tr:not(:last-child)::before {
+		width: calc(100% - 24px);
+	}
+	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(1), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(1) {
+		width: 25%;
+		min-width: 90px;
+	}
+	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
+		width: 40%;
+		min-width: 136px;
+		white-space: normal;
+	}
+	.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(3), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(3) {
+		width: 30%;
+		min-width: 82px;
+	}
+	.bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
+		width: 70%;
+		min-width: 214px;
+	}
+	.main-mid-pad.bus-repay .btn-container {
+		text-align: center;
+	}
+	.main-mid-pad.bus-repay .section-wrapper:last-child {
+		display: none;
+	}
+	.repay-btn.small-view-btn {
+		margin: 32px auto;
+		display: inline-block;
+	}
+}

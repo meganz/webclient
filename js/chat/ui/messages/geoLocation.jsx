@@ -1,8 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function GeoLocation(props) {
     const { latitude, lng } = props;
-    
+
     const handleOnclick= (lat, lng) => {
         const openGmaps = () => {
             const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
@@ -49,9 +50,9 @@ function GeoLocation(props) {
     );
 }
 
-GeoLocation.PropTypes = {
-    latitude: React.PropTypes.string.isRequired,
-    lng: React.PropTypes.string.isRequired,
-}
+GeoLocation.propTypes = {
+    latitude: PropTypes.string.isRequired,
+    lng: PropTypes.string.isRequired,
+};
 
 export default GeoLocation;

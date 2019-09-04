@@ -3098,6 +3098,7 @@
     "20431": "Spiacenti, nessun metodo di pagamento \u00e8 supportato per gli account Business nella tua nazione. Per favore, contatta business@mega.nz per farti aiutare nella registrazione di un account Business.",
     "20432": "Non inserire mai la tua password su un dispositivo di cui non ti fidi appieno.",
     "20433": "Non c'\u00e8 nessuna procedura di recupero per le password perse o dimenticate, sii sicuro di poter ricordare la tua password ogni volta",
+    "20434": "Bytes",
     "20435": "%1 ha condiviso la seguente cartella condivisa te:",
     "20454": "La rotazione della chiave \u00e8 leggermente pi\u00f9 sicura, ma non ti permette di creare un link della chat e i nuovi partecipanti non vedranno i messaggi mandati prima del loro ingresso nella chat.",
     "20460": "C'\u00e8 una chiamata attiva in corso. [A]Unisciti[\/A]",
@@ -3253,6 +3254,7 @@
     "20831": "Hai annullato l'iscrizione con successo",
     "20832": "Non riceverai email da MEGA. Per favore, ricorda che se ti registri a MEGA in futuro ricominceremo a mandarti email.",
     "20840": "Copia tutto",
+    "20846": "Non riesci a trovare quello che stai cercando? [A]Tutti i download[\/A]",
     "20856": "Il tuo link \u00e8 scaduto.",
     "20857": "Il tuo link non \u00e8 valido.",
     "20858": "Per favore, contatta support@mega.nz per assistenza.",
@@ -3265,7 +3267,7 @@
     "20894": "Nota: l'avvertimento per aver superato la quota sar\u00e0 sempre inviato.",
     "20895": "Inattivit\u00e0 dell'account",
     "20896": "Promemoria riguardo l'inattivit\u00e0 dell'account",
-    "20897": "Attiva tutte le notifiche per email",
+    "20897": "Allow accessory emails",
     "20898": "Notifiche per email",
     "20899": "Attiva tutte le notifiche dell'account",
     "20900": "Notifiche dell'account",
@@ -3282,5 +3284,9 @@
     "20950": "Solo clienti europei",
     "20951": "Indirizzo del beneficiario",
     "20956": "Opzioni pulsanti embeddati",
-    "20957": "Qualcuno ti ha rimosso dai contatti"
+    "20957": "Qualcuno ti ha eliminato dai contatti",
+    "20960": "La data di nascita inserita non \u00e8 valida",
+    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
+    "20983": "Please note that critical warning emails cannot be disabled.",
+    "21956": "Nearly over quota warnings"
 }

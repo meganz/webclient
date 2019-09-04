@@ -1,20 +1,18 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-var MegaRenderMixin = require("../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../stores/mixins.js";
 
-
-
-
-var Checkbox = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getInitialState() {
-        return {
+class Checkbox extends MegaRenderMixin(React.Component) {
+    constructor (props) {
+        super(props);
+        this.state = {
             checked: this.props.checked ? this.props.checked : false
         }
-    },
-    onLabelClick: function(e) {
+        this.onLabelClick = this.onLabelClick.bind(this);
+        this.onChange = this.onChange.bind(this);
+    }
+    onLabelClick(e) {
         var state = !this.state.checked;
 
         this.setState({
@@ -25,12 +23,12 @@ var Checkbox = React.createClass({
             this.props.onLabelClick(e, state);
         }
         this.onChange(e);
-    },
+    }
     onChange(e) {
         if(this.props.onChange) {
             this.props.onChange(e, this.state.checked);
         }
-    },
+    }
     render() {
         var className = this.state.checked ? "checkboxOn" : "checkboxOff";
 
@@ -51,8 +49,8 @@ var Checkbox = React.createClass({
             </label>
         </div>
     }
-});
+};
 
-module.exports = {
+export default {
     Checkbox,
 };

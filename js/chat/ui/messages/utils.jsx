@@ -68,6 +68,6 @@ var getMessageString;
 
 mega.ui.chat.getMessageString = getMessageString;
 
-module.exports = {
+export {
     getMessageString
 };

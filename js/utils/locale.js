@@ -691,8 +691,8 @@ mBroadcaster.once('startMega', function populate_l() {
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
-    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
-    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red a1 mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red a2 linux">').replace('[/A2]', '</a>');
     l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
     l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
     l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
@@ -745,7 +745,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/B]', '</a>');
     l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
+        .replace('[A]', '<a class="red" href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
@@ -875,6 +875,9 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/sync">')
         .replace('[/A2]', '</a>');
     l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/sync">').replace('[/A]', '</a>');
+    l[20846] = l[20846]
+        .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
+        .replace('[/A]', '</a>');
     l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[20707] = escapeHTML(l[20707]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -888,6 +891,20 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
+    l[20922] = escapeHTML(l[20922]).replace(/\[R\/\]/g, '<sup>&reg;</sup>');
+    l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l['20923c'] = l[20923].replace('%1', 'Chrome');
+    l['20923f'] = l[20923].replace('%1', 'Firefox');
+    l['20923o'] = l[20923].replace('%1', 'Opera');
+    l['20923t'] = l[20923].replace('%1', 'Thunderbird');
+    l[20924] = escapeHTML(l[20924]);
+    l['20924c'] = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
+    l['20924f'] = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
+    l['20924o'] = l[20924].replace('%1', 'Opera<sup>&reg;</sup>');
+    l[20932] = l[20932].replace('[R/]', '<sup>&reg;</sup>');
+    l[20959] = l[20959] .replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
+        + 'target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

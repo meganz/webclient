@@ -12,7 +12,7 @@
     overflow: hidden;
 }
 .startpage.top-header {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular';
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', arial;
     font-size: 40px;
     line-height: 63px;
     color: #373737;
@@ -1234,6 +1234,7 @@ body:not(.en) .download .startpage.top-header {
 .startpage.top-header, .startpage .bottom-page.big-header {
     font-size: 20px;
     line-height: 28px;
+    font-family: 'montserrat', 'open_sans', Arial;
 }
 .startpage.top-info, .startpage .mid-green-link, .startpage .mid-green-link.small {
     font-size: 14px;

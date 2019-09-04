@@ -237,12 +237,10 @@
 }
 @font-face {
     font-family: 'montserrat';
-    src: url('../fonts/montserrat-light-webfont.eot');
-    src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
-        url('../fonts/montserrat-light-webfont.woff') format('woff'),
-        url('../fonts/montserrat-light-webfont.ttf') format('truetype'),
-        url('../fonts/montserrat-light-webfont.svg#montserratlight') format('svg');
+    src: url('../fonts/montserrat-regular-webfont.eot');
+    src: url('../fonts/montserrat-regular-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/montserrat-regular-webfont.woff') format('woff'),
+        url('../fonts/montserrat-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;
@@ -250,11 +248,9 @@
 @font-face {
     font-family: 'montserrat_semibold';
     src: url('../fonts/montserrat-semibold-webfont.eot');
-    src: url('../fonts/montserrat-semibold-webfont.eot?#iefix') format('embedded-opentype'), 
-        url('../fonts/montserrat-semibold-webfont.woff2') format('woff2'), 
-        url('../fonts/montserrat-semibold-webfont.woff') format('woff'), 
-        url('../fonts/montserrat-semibold-webfont.ttf') format('truetype'), 
-        url('../fonts/montserrat-semibold-webfont.svg#montserratsemibold') format('svg');
+    src: url('../fonts/montserrat-semibold-webfont.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/montserrat-semibold-webfont.woff') format('woff'),
+        url('../fonts/montserrat-semibold-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;
@@ -263,10 +259,8 @@
     font-family: 'montserrat_light';
     src: url('../fonts/montserrat-light-webfont.eot');
     src: url('../fonts/montserrat-light-webfont.eot?#iefix') format('embedded-opentype'),
-        url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
         url('../fonts/montserrat-light-webfont.woff') format('woff'),
-        url('../fonts/montserrat-light-webfont.ttf') format('truetype'),
-        url('../fonts/montserrat-light-webfont.svg#montserratsemibold') format('svg');
+        url('../fonts/montserrat-light-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     text-rendering: optimizeLegibility;

@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 
 class AudioPlayer extends React.Component {
     constructor(props) {
@@ -111,7 +113,7 @@ class AudioPlayer extends React.Component {
             sliderPin.style.left = `${newLeft}px`;
 
             const pinPosition = newLeft / slider.getBoundingClientRect().width;
-        
+
             const newTime = Math.ceil(self.props.playtime * pinPosition)
             const newCurrentTime = secondsToTimeShort(newTime);
             self.audioEl.currentTime = newTime;
@@ -155,7 +157,7 @@ class AudioPlayer extends React.Component {
         }
 
         let controls = (
-            <span 
+            <span
                 className={btnClass}
                 onClick={() => {
                     if (self.props.source === null) {
@@ -211,11 +213,11 @@ class AudioPlayer extends React.Component {
 }
 
 AudioPlayer.propTypes = {
-    source: React.PropTypes.string,
-    audioId: React.PropTypes.string.isRequired,
-    loading: React.PropTypes.bool.isRequired,
-    getAudioFile: React.PropTypes.func.isRequired,
-    playtime: React.PropTypes.number.isRequired
-}
+    source: PropTypes.string,
+    audioId: PropTypes.string.isRequired,
+    loading: PropTypes.bool.isRequired,
+    getAudioFile: PropTypes.func.isRequired,
+    playtime: PropTypes.number.isRequired
+};
 
 export default AudioPlayer;

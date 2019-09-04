@@ -989,22 +989,18 @@ accountUI.account = {
 
                     var $this = $(this);
                     var $parent = $this.parent();
-                    var errorMsg;
+                    var errorMsg = l[20960];
                     var max = parseInt($this.attr('max'));
                     var min = parseInt($this.attr('min'));
 
                     if ($this.is('.byear, .bmonth, .bdate')) {
                         if (this.value > max) {
-                            errorMsg = '$1 should be smaller than $2'.replace('$1', $this.data('title'))
-                                .replace('$2', $this.attr('max'));
                             $this.addClass('errored');
                             $parent.addClass('error').find('.error-message').text(errorMsg);
                             $saveBlock.addClass('closed');
                             return false;
                         }
                         else if (this.value < min) {
-                            errorMsg = '$1 should be bigger than $2'.replace('$1', $this.data('title'))
-                                .replace('$2', $this.attr('min'));
                             $this.addClass('errored');
                             $parent.addClass('error').find('.error-message').text(errorMsg);
                             $saveBlock.addClass('closed');

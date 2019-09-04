@@ -1,7 +1,6 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require('./../../stores/mixins.js').MegaRenderMixin;
-var RenderDebugger = require('./../../stores/mixins.js').RenderDebugger;
+import MegaRenderMixin from './../../stores/mixins.js';
 var ButtonsUI = require('./../../ui/buttons.jsx');
 var ModalDialogsUI = require('./../../ui/modalDialogs.jsx');
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
@@ -9,59 +8,52 @@ var ContactsUI = require('./../ui/contacts.jsx');
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 
 
-var ParticipantsList = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-            'contactCardHeight': 36
-
-        }
-    },
-    getInitialState: function() {
-        return {
+class ParticipantsList extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'requiresUpdateOnResize': true,
+        'contactCardHeight': 36
+    };
+    constructor(props) {
+        super(props);
+        this.state = {
             'scrollPositionY': 0,
             'scrollHeight': 36*4
         };
-    },
-    onUserScroll: function() {
+    }
+    onUserScroll() {
         var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
         if (this.state.scrollPositionY !== scrollPosY) {
             this.setState({
                 'scrollPositionY': scrollPosY
             });
         }
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         var self = this;
         if (!self.isMounted()) {
             return;
+        }
+        if (!self.refs.contactsListScroll) {
+            return null;
         }
 
         var $node = $(self.findDOMNode());
 
         var scrollHeight;
-        if (!self.refs.contactsListScroll) {
-            return null;
-        }
 
-        var fitHeight = scrollHeight = self.refs.contactsListScroll.getContentHeight();
+
+        var $elem = $(self.refs.contactsListScroll.findDOMNode());
+
+        var fitHeight = scrollHeight = $elem.outerHeight() - 4;
         if (fitHeight === 0) {
             // not visible at the moment.
             return null;
         }
 
         var $parentContainer = $node.closest('.chat-right-pad');
-        var maxHeight = (
-            $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-                $('.chat-right-head', $parentContainer).outerHeight(true) - 72
-        );
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
             fitHeight = Math.max(fitHeight /* margin! */, 53);
-        }
-        else if (maxHeight < fitHeight) {
-            fitHeight = Math.max(maxHeight, 53);
         }
 
         var $contactsList = $('.chat-contacts-list', $parentContainer);
@@ -78,8 +70,8 @@ var ParticipantsList = React.createClass({
             self.setState({'scrollHeight': fitHeight});
         }
         self.onUserScroll();
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -105,7 +97,7 @@ var ParticipantsList = React.createClass({
                 members={room.members}
                 ref="contactsListScroll"
                 disableCheckingVisibility={true}
-                onUserScroll={self.onUserScroll}
+                onUserScroll={self.onUserScroll.bind(self)}
                 requiresUpdateOnResize={true}
                 onAnimationEnd={function() {
                     self.safeForceUpdate();
@@ -120,25 +112,18 @@ var ParticipantsList = React.createClass({
             </PerfectScrollbar>
         </div>
     }
-});
+};
 
 
 
-var ParticipantsListInner = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    getDefaultProps: function() {
-        return {
-            'requiresUpdateOnResize': true,
-            'contactCardHeight': 32,
-            'scrollPositionY': 0,
-            'scrollHeight': 32*4
-        }
-    },
-    getInitialState: function() {
-        return {
-        };
-    },
-    render: function() {
+class ParticipantsListInner extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'requiresUpdateOnResize': true,
+        'contactCardHeight': 32,
+        'scrollPositionY': 0,
+        'scrollHeight': 32*4
+    };
+    render() {
         var self = this;
         var room = this.props.chatRoom;
 
@@ -323,7 +308,5 @@ var ParticipantsListInner = React.createClass({
                 {contactsList}
             </div>;
     }
-});
-module.exports = {
-    ParticipantsList,
 };
+export {ParticipantsList};

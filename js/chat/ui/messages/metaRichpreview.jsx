@@ -1,15 +1,14 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-var MegaRenderMixin = require('./../../../stores/mixins.js').MegaRenderMixin;
+import MegaRenderMixin from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
 var MetaRichPreviewLoading = require('./metaRichPreviewLoading.jsx').MetaRichpreviewLoading;
 
-var MetaRichpreview = React.createClass({
-    mixins: [ConversationMessageMixin],
-    getBase64Url: function(b64incoming) {
+class MetaRichpreview  extends ConversationMessageMixin {
+    getBase64Url(b64incoming) {
         if (!b64incoming || !b64incoming.split) {
             return;
         }
@@ -17,8 +16,8 @@ var MetaRichpreview = React.createClass({
         var b64i = exti[1];
         exti = exti[0];
         return "data:image/"  + exti + ";base64," + b64i;
-    },
-    render: function () {
+    }
+    render() {
         var self = this;
         var cssClasses = "message body";
 
@@ -110,8 +109,8 @@ var MetaRichpreview = React.createClass({
         }
         return <div className="message richpreview previews-container">{output}</div>;
     }
-});
+};
 
-module.exports = {
+export {
     MetaRichpreview
 };

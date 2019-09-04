@@ -31,6 +31,11 @@ var bottompage = {
             $('.bottom-menu.body .pro-link').show();
         }
 
+        // Insert variables with replaced browser names
+        if (page === 'extensions' || page === 'bird') {
+            bottompage.replaceSpecialVariables();
+        }
+
         // Init Video resizing on security page
         if (page === 'security' && !is_mobile) {
             bottompage.videoResizing();
@@ -44,6 +49,7 @@ var bottompage = {
             bottompage.initFloatingTop();
             $('body').removeClass('mobile');
             bottompage.initBackToScroll();
+            bottompage.initScrollToContent();
         }
         else {
             $('body').addClass('mobile');
@@ -55,6 +61,21 @@ var bottompage = {
                 });
             }
         }
+    },
+
+    replaceSpecialVariables: function() {
+        "use strict";
+
+        var $topBlock = $('.bottom-page.top-bl');
+
+        $topBlock.find('.top-dark-button span, .top-copyrights em').each(function() {
+            var $this = $(this);
+            var labelNum = $(this).text().match(/\$([^)]+)\]/);
+
+            if (labelNum[1] && l[labelNum[1]]) {
+                $this.safeHTML(l[labelNum[1]]);
+            }
+        });
     },
 
     initBackToScroll: function() {
@@ -73,11 +94,23 @@ var bottompage = {
             if ($('body').hasClass('bottom-pages') && sessionData) {
                 $('#startholder').scrollTop(sessionData);
                 if (page === 'download') {
-                    $('.download.top-bar').removeClass('expanded').css('height', '');
+                    $('.download.top-bar').removeClass('expanded initial').css('height', '');
                     $(window).unbind('resize.download-bar');
                 }
             }
         };
+    },
+    
+    initScrollToContent: function() {
+        "use strict";
+
+        // Init Scroll to Content event
+        $('.bottom-page.scroll-button').rebind('click', function () {
+
+            $('.fmholder, html, body').animate({
+                scrollTop: $('.bottom-page.top-bl').outerHeight()
+            }, 1600);
+        });
     },
 
     initNavButtons: function() {
@@ -262,10 +295,10 @@ var bottompage = {
             var navTopPos;
 
             if (topPos > 150) {
-                $topHeader.removeClass('expanded');
+                $topHeader.removeClass('expanded initial');
             }
             if (topPos > 300) {
-                $topHeader.removeClass('expanded').addClass('floating');
+                $topHeader.removeClass('expanded initial').addClass('floating');
                 topResize();
                 if (topPos > 600) {
                     $topHeader.addClass('activated');

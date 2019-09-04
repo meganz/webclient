@@ -507,8 +507,16 @@ var SelectionManager = function($selectable, resume) {
 
         // ensure the current 'resume' selection list is matching the current M.v
         $.selected.forEach(function(nodeId) {
-            if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId] ||
-                (M.currentdirid.type === 'public-links' && (!M.su.EXP || !M.su.EXP[nodeId]))) {
+            if (M.currentCustomView && M.previousdirid === M.currentdirid) {
+                if ((M.currentdirid === 'public-links' && !M.getNodeShare(nodeId, 'EXP')) ||
+                    (M.currentdirid === 'out-shares' && !M.getSharingUsers(nodeId).length)) {
+                    self.remove_from_selection(nodeId);
+                }
+            }
+            else if (M.previousdirid !== M.currentdirid) {
+                self.remove_from_selection(nodeId);
+            }
+            else if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId]) {
                 self.remove_from_selection(nodeId);
             }
         });

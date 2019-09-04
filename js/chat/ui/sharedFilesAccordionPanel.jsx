@@ -1,11 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var MegaRenderMixin = require("../../stores/mixins.js").MegaRenderMixin;
-var RenderDebugger = require("../../stores/mixins.js").RenderDebugger;
+import MegaRenderMixin from "../../stores/mixins.js";
+import utils from './../../ui/utils.jsx';
 
-var SharedFileItem = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    render: function () {
+class SharedFileItem extends MegaRenderMixin(React.Component) {
+    render() {
         var self = this;
         var message = this.props.message;
         var contact = Message.getContactForMessage(message);
@@ -40,11 +39,11 @@ var SharedFileItem = React.createClass({
                     </div>
                 </div>);
     }
-});
+};
 
-var SharedFilesAccordionPanel = React.createClass({
-    mixins: [MegaRenderMixin, RenderDebugger],
-    eventuallyRenderThumbnails: SoonFc(function() {
+class SharedFilesAccordionPanel extends MegaRenderMixin(React.Component) {
+    @utils.SoonFcWrap(350)
+    eventuallyRenderThumbnails() {
         if (this.allShownNodes) {
             var pending = [];
             var nodes = this.allShownNodes;
@@ -83,17 +82,18 @@ var SharedFilesAccordionPanel = React.createClass({
                 fm_thumbnails('standalone', pending, render);
             }
         }
-    }, 350),
-    componentWillMount: function() {
+    }
+    componentWillMount() {
         this.allShownNodes = {};
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
+        super.componentWillUnmount();
         delete this.allShownNodes;
-    },
-    componentDidUpdate: function() {
+    }
+    componentDidUpdate() {
         this.eventuallyRenderThumbnails();
-    },
-    render: function() {
+    }
+    render() {
         var self = this;
         var room = self.props.chatRoom;
         var mb = room.messagesBuff;
@@ -248,10 +248,10 @@ var SharedFilesAccordionPanel = React.createClass({
             </div>
         </div>;
     }
-});
+};
 
 
-module.exports = {
+export {
     SharedFileItem,
     SharedFilesAccordionPanel
 };

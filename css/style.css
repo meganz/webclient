@@ -112,7 +112,7 @@ body.mobile.bottom-pages {
     overflow: visible;
 }
 .lato {
-    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .lato-semibold {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
@@ -18131,8 +18131,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     filter: blur(0.25em);
     -webkit-filter: blur(0.25em);
 }
-.main-blur-block {
+.fmholder .main-blur-block {
     height: 100%;
+    display: block;
 }
 .overlayed .tooltip-blur {
     filter: blur(0.25em);
@@ -23177,7 +23178,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -34px -12245px;
     opacity: 0.8;
 }
-
+.content-panel.dashboard .small-icon.info-icon {
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-repeat: no-repeat;
+    background-position: -26px -12378px;
+    background-size: 48px auto;
+    display: inline-block;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 4px;
+}
+.content-panel.dashboard .small-icon.info-icon:hover {
+    opacity: 0.8;
+}
 .user-management-tree-panel-header{
     height: 48px;
     width:100%;

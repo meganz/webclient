@@ -56,6 +56,9 @@ mobile.createFolderOverlay = {
         var $folderNameWarningText = this.$overlay.find('.warning-text');
         var $createFolderButton = this.$overlay.find('.create-folder.confirm-ok-button');
 
+        // Hide warning message
+        $folderNameWarningBlock.addClass('hidden');
+
         // On clicking the Create button in the dialog
         $createFolderButton.off('tap').on('tap', function() {
 

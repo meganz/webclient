@@ -1873,8 +1873,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var promise = new MegaPromise();
 
-            if (M.h[hash]) {
-                promise.resolve(M.d[M.h[hash].substr(0, 8)]);
+            if (M.h[hash] && Object.keys(M.h[hash])[0]) {
+                promise.resolve(Object.keys(M.h[hash])[0]);
             }
             else {
                 fmdb.getbykey('f', 'c', false, [['c', hash]], 1)
@@ -1883,11 +1883,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         if (node) {
                             // got the hash and a handle it belong to
                             if (!M.h[hash]) {
-                                M.h[hash] = node.h + ' ';
+                                M.h[node.hash] = Object.create(null);
+                                M.h[node.hash][node.h] = true;
                             }
                             else {
-                                if (M.h[hash].indexOf(node.h) < 0) {
-                                    M.h[hash] += node.h + ' ';
+                                if (!M.h[node.hash][node.h]) {
+                                    M.h[node.hash][node.h] = true;
                                 }
                             }
 

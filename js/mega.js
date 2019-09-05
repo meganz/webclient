@@ -3303,7 +3303,7 @@ function folderreqerr(c, e)
     }
     else {
         // Show file/folder not found overlay
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.notFoundOverlay.show(e);
     }
 }

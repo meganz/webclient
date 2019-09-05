@@ -226,8 +226,18 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[20153]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
+
+                // If user has nextplan, show infomative tooltip
+                if (account.nextplan) {
+                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
+                        '<div class="small-icon info-icon simpletip" ' +
+                        'data-simpletip-style=\'{"max-width":"220px", "text-align":"center"}\' data-simpletip="' +
+                        escapeHTML(l[20965]) + '"></div>');
+                }
+                else {
+                    $('.account.left-pane.plan-date-info').text(l[20153]);
+                }
             }
 
             if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {

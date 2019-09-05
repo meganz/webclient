@@ -1871,11 +1871,12 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = node.h + ' ';
+                M.h[node.hash] = Object.create(null);
+                M.h[node.hash][node.h] = true;
             }
             else {
-                if (M.h[node.hash].indexOf(node.h) < 0) {
-                    M.h[node.hash] += node.h + ' ';
+                if (!M.h[node.hash][node.h]) {
+                    M.h[node.hash][node.h] = true;
                 }
             }
         }

@@ -135,12 +135,9 @@ MegaData.prototype.delHash = function(n) {
     "use strict";
 
     if (this.h[n.hash]) {
-        var p = this.h[n.hash].indexOf(n.h);
-
-        if (p >= 0) {
-            this.h[n.hash] = this.h[n.hash].substr(0, p) + this.h[n.hash].substr(p + 9);
-
-            if (!this.h[n.hash]) {
+        if (this.h[n.hash][n.h]) {
+            delete this.h[n.hash][n.h];
+            if (!Object.keys(this.h[n.hash]).length) {
                 delete this.h[n.hash];
             }
         }

@@ -35,6 +35,11 @@ RepayPage.prototype.initPage = function() {
             if ($(this).hasClass('disabled')) {
                 return false;
             }
+
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+            }
+
             addressDialog.init(mySelf.planInfo, mySelf.userInfo, new BusinessRegister());
             return false;
         });

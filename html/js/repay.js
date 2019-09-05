@@ -25,7 +25,7 @@ RepayPage.prototype.initPage = function() {
     var $leftSection = $('.main-left-block', $repaySection);
     var $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 
-    var $repayBtn = $leftSection.find('.repay-btn').addClass('disabled');
+    var $repayBtn = $repaySection.find('.repay-btn').addClass('disabled');
 
     $leftSection.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
 

@@ -6,6 +6,14 @@ function RepayPage() {
 
 RepayPage.prototype.initPage = function() {
     "use strict";
+
+    // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
+    if (is_mobile) {
+        $('.mobile.bus-repay').removeClass('hidden');
+        $('.mobile.fm-header').addClass('hidden');
+        $('.mobile.fm-header.fm-hr').removeClass('hidden');
+    }
+
     if (!u_attr || !u_attr.b || !u_attr.b.m || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
         loadSubPage('start');
         return;

@@ -25406,7 +25406,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999;
-    line-height: 21px;
+    line-height: 20px;
     width: 500px;
     height: auto;
     text-align: center;
@@ -25583,7 +25583,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -129px -98px;
 }
 
-.user-management-dialog .dialog-heading-img {
+.user-management-dialog .dialog-heading-img, .card-container .dialog-heading-img {
     background-image: url(../images/mega/big-icons_v4.png);
     margin:40px auto 24px auto;
 }
@@ -29140,7 +29140,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .dialog-subtitle {
     font-size: 14px;
     color: #999;
-    line-height: 21px;
+    line-height: 20px;
     height: auto;
     text-align: center;
     position: relative;

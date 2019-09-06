@@ -26,6 +26,9 @@ mobile.proSignupPrompt = {
 
         // Show the dialog
         this.$dialog.removeClass('hidden').addClass('overlay');
+
+        // Disable scrolling
+        $('.bottom-page.scroll-block').css('overflow', 'hidden');
     },
 
     /**
@@ -46,6 +49,9 @@ mobile.proSignupPrompt = {
 
             // Hide the dialog
             $dialog.addClass('hidden').removeClass('overlay');
+
+            // Enabled scroll again
+            $('.bottom-page.scroll-block').css('overflow', '');
 
             // Prevent any additional clicks
             return false;

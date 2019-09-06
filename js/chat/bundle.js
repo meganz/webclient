@@ -13821,9 +13821,6 @@ function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !
 
 function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
 
-var chatlinkDialog_React = __webpack_require__(0);
-
-var chatlinkDialog_ReactDOM = __webpack_require__(3);
 
 
 
@@ -13841,7 +13838,8 @@ function (_MegaRenderMixin) {
 
     _this = chatlinkDialog_possibleConstructorReturn(this, chatlinkDialog_getPrototypeOf(ChatlinkDialog).call(this, props));
     _this.state = {
-      'link': l[5533]
+      'link': l[5533],
+      newTopic: ''
     };
     _this.onPopupDidMount = _this.onPopupDidMount.bind(chatlinkDialog_assertThisInitialized(_this));
     _this.onClose = _this.onClose.bind(chatlinkDialog_assertThisInitialized(_this));
@@ -13859,8 +13857,6 @@ function (_MegaRenderMixin) {
     key: "componentWillMount",
     value: function componentWillMount() {
       var self = this;
-      var chatRoom = self.props.chatRoom;
-      var megaChat = self.props.chatRoom.megaChat;
       $.dialog = "group-chat-link";
       self.retrieveChatLink();
     }
@@ -13891,10 +13887,6 @@ function (_MegaRenderMixin) {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       chatlinkDialog_get(chatlinkDialog_getPrototypeOf(ChatlinkDialog.prototype), "componentWillUnmount", this).call(this);
-
-      var self = this;
-      var chatRoom = self.props.chatRoom;
-      var megaChat = chatRoom.megaChat;
 
       if ($.dialog === "group-chat-link") {
         closeDialog();
@@ -13953,14 +13945,14 @@ function (_MegaRenderMixin) {
     key: "render",
     value: function render() {
       var self = this;
-      var closeButton = chatlinkDialog_React.makeElement("div", {
+      var closeButton = external_React_default.a.createElement("div", {
         key: "close",
         className: "default-red-button right links-button",
         onClick: function onClick(e) {
           self.onClose();
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[148]));
-      return chatlinkDialog_React.makeElement(modalDialogs["default"].ModalDialog, {
+      }, external_React_default.a.createElement("span", null, l[148]));
+      return external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
         title: self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : "",
         className: "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (!self.props.chatRoom.topic ? " requires-topic" : ""),
         onClose: function onClose() {
@@ -13968,17 +13960,17 @@ function (_MegaRenderMixin) {
         },
         chatRoom: self.props.chatRoom,
         popupDidMount: self.onPopupDidMount
-      }, chatlinkDialog_React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "export-content-block"
-      }, self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? chatlinkDialog_React.makeElement("div", null, chatlinkDialog_React.createElement("div", {
+      }, self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? external_React_default.a.createElement("div", null, external_React_default.a.createElement("div", {
         className: "export-chat-ink-warning"
-      }, l[20617]), chatlinkDialog_React.makeElement("div", {
+      }, l[20617]), external_React_default.a.createElement("div", {
         className: "rename-input-bl",
         style: {
           width: '320px',
           margin: '10px auto 20px auto'
         }
-      }, chatlinkDialog_React.makeElement("input", {
+      }, external_React_default.a.createElement("input", {
         type: "text",
         name: "newTopic",
         value: self.state.newTopic,
@@ -13992,34 +13984,34 @@ function (_MegaRenderMixin) {
         onKeyPress: self.onTopicFieldKeyPress.bind(self),
         placeholder: l[20616],
         maxLength: "30"
-      }))) : chatlinkDialog_React.makeElement("div", {
+      }))) : external_React_default.a.createElement("div", {
         className: "fm-dialog-body"
-      }, chatlinkDialog_React.makeElement("i", {
+      }, external_React_default.a.createElement("i", {
         className: "big-icon group-chat"
-      }), chatlinkDialog_React.makeElement("div", {
+      }), external_React_default.a.createElement("div", {
         className: "chat-title"
-      }, chatlinkDialog_React.makeElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.topic)), chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.topic)), external_React_default.a.createElement("div", {
         className: "chat-link-input"
-      }, chatlinkDialog_React.makeElement("i", {
+      }, external_React_default.a.createElement("i", {
         className: "small-icon blue-chain colorized"
-      }), chatlinkDialog_React.makeElement("input", {
+      }), external_React_default.a.createElement("input", {
         type: "text",
         readOnly: true,
         value: !self.props.chatRoom.topic ? l[20660] : self.state.link
-      })), chatlinkDialog_React.makeElement("div", {
+      })), external_React_default.a.createElement("div", {
         className: "info"
-      }, self.props.chatRoom.publicLink ? l[20644] : null))), chatlinkDialog_React.makeElement("div", {
+      }, self.props.chatRoom.publicLink ? l[20644] : null))), external_React_default.a.createElement("div", {
         className: "fm-notifications-bottom"
-      }, self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ? chatlinkDialog_React.makeElement("div", {
+      }, self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ? external_React_default.a.createElement("div", {
         key: "deleteLink",
         className: "default-white-button left links-button" + (self.loading && self.loading.state() === 'pending' ? " disabled" : ""),
         onClick: function onClick(e) {
           self.props.chatRoom.updatePublicHandle(1);
           self.onClose();
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[20487])) : null, self.props.chatRoom.topic ? self.props.chatRoom.publicLink ? chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[20487])) : null, self.props.chatRoom.topic ? self.props.chatRoom.publicLink ? external_React_default.a.createElement("div", {
         className: "default-green-button button right copy-to-clipboard" + (self.loading && self.loading.state() === 'pending' ? " disabled" : "")
-      }, chatlinkDialog_React.makeElement("span", null, l[63])) : closeButton : self.props.chatRoom.iAmOperator() ? chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[63])) : closeButton : self.props.chatRoom.iAmOperator() ? external_React_default.a.createElement("div", {
         key: "setTopic",
         className: "default-red-button right links-button" + (self.state.newTopic && $.trim(self.state.newTopic) ? "" : " disabled"),
         onClick: function onClick(e) {
@@ -14027,14 +14019,14 @@ function (_MegaRenderMixin) {
             self.props.chatRoom.setRoomTitle(self.state.newTopic);
           }
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[20615])) : closeButton, chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[20615])) : closeButton, external_React_default.a.createElement("div", {
         className: "clear"
       })));
     }
   }]);
 
   return ChatlinkDialog;
-}(Object(mixins["default"])(chatlinkDialog_React.Component));
+}(Object(mixins["default"])(external_React_default.a.Component));
 
 chatlinkDialog_ChatlinkDialog.defaultProps = {
   'requiresUpdateOnResize': true,

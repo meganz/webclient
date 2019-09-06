@@ -3296,8 +3296,8 @@
     "20959": "Die Browsererweiterungen enthalten allen JavaScript-, HTML- und CSS-Code. Sicherheitskritische Komponenten werden daher von Ihrem Computer und nicht \u00fcber das Internet via SSL geladen. Updates sind kryptographisch gesch\u00fctzt. Weitere Informationen in unserem Sicherheits-Whitepaper ([A]https:\/\/mega.nz\/SecurityWhitepaper.pdf[\/A]), Kapitel 2.2.",
     "20960": "Ung\u00fcltiges Geburtsdatum",
     "20965": "An diesem Tag l\u00e4uft Ihr PRO-Status aus.",
-    "20982": "MEGA occasionally sends you emails to keep you informed about the status of your account. You can elect to stop receiving the less important warning emails.",
-    "20983": "Please note that critical warning emails cannot be disabled.",
-    "21956": "Almost over quota warnings",
-    "22001": "You are logged into a different account than the one you are trying to cancel. Please logout, login again with account that you wish to cancel, and then try clicking the same account cancellation link again."
+    "20982": "MEGA sendet Ihnen gelegentlich Informationen \u00fcber den Status Ihres Accounts. Sie k\u00f6nnen den Versand der weniger wichtigen Warnungen abschalten.",
+    "20983": "Achtung: Kritische Warnungen k\u00f6nnen nicht abgeschaltet werden.",
+    "21956": "Warnung bei nahezu vollem Account",
+    "22001": "Sie sind derzeit mit einem anderen Account als dem zu stornierenden angemeldet. Bitte melden Sie sich ab, loggen Sie sich in den zu stornierenden Account ein, und klicken Sie dann erneut auf denselben Stornierungslink."
 }

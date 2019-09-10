@@ -91,8 +91,8 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
         }
     }
     render() {
-        var self = this;
-        var room = this.props.chatRoom;
+        const self = this;
+        const { chatRoom: room } = self.props;
 
         if (!room || !room.roomId) {
             // destroyed
@@ -326,11 +326,11 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
-                        {room.type === "public" ? <div className="accordion-text observers">
+                        {room.type === "public" && room.observers > 0 ? <div className="accordion-text observers">
                             {l[20466]}
                             <span className="observers-count">
                                 <i className="tiny-icon eye"></i>
-                                {self.props.chatRoom.observers}
+                                {room.observers}
                             </span>
                         </div> : <div></div>}
 

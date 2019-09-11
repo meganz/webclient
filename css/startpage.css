@@ -12,7 +12,7 @@
     overflow: hidden;
 }
 .startpage.top-header {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular';
+    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', arial;
     font-size: 40px;
     line-height: 63px;
     color: #373737;
@@ -200,7 +200,7 @@ body:not(.en) .download .startpage.top-header {
     top: 10px;
 }
 .startpage.small-icon, .startpage.mid-icon {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
     width: 20px;
@@ -577,7 +577,7 @@ body:not(.en) .download .startpage.top-header {
     word-break: break-word;
 }
 .startpage.rating-block span {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -161px -618px;
     background-repeat: no-repeat;
     width: 14px;
@@ -599,7 +599,7 @@ body:not(.en) .download .startpage.top-header {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -220px -650px;
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
@@ -711,7 +711,7 @@ body:not(.en) .download .startpage.top-header {
     box-sizing: border-box;
     padding: 0 4px;
     vertical-align: top;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -243px 14px;
     background-repeat: no-repeat;
 }
@@ -738,7 +738,7 @@ body:not(.en) .download .startpage.top-header {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: #CECECE;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -214px -688px;
     cursor: pointer;
     -webkit-transition: background-color 200ms ease-in-out, opacity 200ms ease-in-out;
@@ -843,13 +843,61 @@ body:not(.en) .download .startpage.top-header {
     width: 106px;
     height: 20px;
     margin: 20px auto 0 auto;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -108px -1447px;
 }
-
+.startpage.italic-text {
+    font-style: italic;
+    font-size: 18px;
+    line-height: 36px;
+    color: rgba(0,0,0,0.7);
+    max-width: 810px;
+    padding: 0 15px;
+    margin: 0 auto;
+    position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.startpage.quote-icon {
+    position: absolute;
+    width: 36px;
+    height: 26px;
+    left: 14px;
+    top: -25px;
+    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-position: -115px -2739px;
+}
+.startpage.quote-icon.close {
+    left: auto;
+    top: auto;
+    bottom: -25px;
+    right: 14px;
+    background-position: -218px -2739px;
+}
+.startpage.declaration-lnk {
+    text-align: center;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 0 10px;
+    color: #FF333A;
+    font-family: 'montserrat', 'open_sans', sans-serif;
+}
+.startpage.medium-icon.declaration {
+    background-position: 1px -2723px;
+    margin: 27px auto 22px auto;
+}
+.startpage.medium-icon {
+    width: 66px;
+    height: 66px;
+    margin: 20px auto 12px auto;
+    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-position: 1px -2723px;
+    background-repeat: no-repeat;
+}
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon, .startpage.small-icon, .startpage.mid-icon, .startpage.rating-block span, .startpage.carousel-control, .startpage.scroll-to-top, .startpage.os-icons, .startpage.scroll-to-top {
-    background-image: url(../images/mega/startpage-sprite_v9@2x.png) !important;
+.reg-st3-membership-icon, .membership-icon, .mobile.membership-icon, .pro-icon, div.pro-feature-icon, .startpage.mega-logo, .startpage.upload-cloud-icon, .startpage.white-question, .pages-nav.nav-icon, .bottom-page.big-icon, .startpage.medium-icon, .small-red-link i, .flip-bg, .startpage.quote-icon, .bottom-menu.logo, .loginrequired-dialog .fm-notification-icon, .top-arrow-icon, .mobile.icon, .startpage.small-icon, .startpage.mid-icon, .startpage.rating-block span, .startpage.carousel-control, .startpage.scroll-to-top, .startpage.os-icons, .startpage.scroll-to-top, .startpage.quote-icon {
+    background-image: url(../images/mega/startpage-sprite_v10@2x.png) !important;
     background-size: 267px auto;
 }
 .bottom-page.large-icon, .cropped-page .bottom-page.big-icon {
@@ -1124,8 +1172,10 @@ body:not(.en) .download .startpage.top-header {
 .startpage.plan-price {
     font-size: 15px;
 }
+.startpage.italic-text {
+    font-size: 14px;
 }
-
+}
 @media only screen and (max-width: 705px) {
 .startpage.square-block.top-margin, .chaotic .startpage.square-block:nth-child(odd) {
     margin-top: 8px;
@@ -1234,6 +1284,7 @@ body:not(.en) .download .startpage.top-header {
 .startpage.top-header, .startpage .bottom-page.big-header {
     font-size: 20px;
     line-height: 28px;
+    font-family: 'montserrat', 'open_sans', Arial;
 }
 .startpage.top-info, .startpage .mid-green-link, .startpage .mid-green-link.small {
     font-size: 14px;

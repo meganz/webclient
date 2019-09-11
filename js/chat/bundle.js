@@ -6427,8 +6427,8 @@ function (_MegaRenderMixin2) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(BrowserEntries).call(this, props));
     _this.state = {
-      'highlighted': [],
-      'selected': []
+      'highlighted': _this.props.initialHighlighted || [],
+      'selected': _this.props.initialSelected || []
     };
     return _this;
   }
@@ -7172,7 +7172,9 @@ function (_MegaRenderMixin3) {
       }
 
       self.setState({
-        entries: self.getEntries()
+        entries: self.getEntries(),
+        selected: self.state.selected,
+        highlighted: self.state.highlighted
       });
       $this.parent().find('.active').removeClass("active");
       $this.addClass("active");
@@ -7645,6 +7647,9 @@ function (_MegaRenderMixin3) {
         onSelected: self.onSelected,
         onHighlighted: self.onHighlighted,
         onAttachClicked: self.onAttachClicked,
+        viewMode: localStorage.dialogViewMode,
+        initialSelected: self.state.selected,
+        initialHighlighted: self.state.highlighted,
         ref: function ref(browserEntries) {
           self.browserEntries = browserEntries;
         }
@@ -11438,6 +11443,7 @@ function (_ConversationMessageM) {
       if (u_type === 0) {
         ephemeralDialog(l[1005]);
       } else {
+        $.selected = [h];
         mega.Share.initCopyrightsDialog([h]);
       }
 
@@ -12489,21 +12495,14 @@ function (_ConversationMessageM) {
             textMessage = "<div class=\"bold mainMessage\">" + textMessage + "</div>" + "<div class=\"extraCallInfo\">" + translationString + "</div>";
 
             if (message.type === "call-started" && message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()) {
-              var callParts = Object.keys(chatRoom.callParticipants);
-              var unique = {};
-              callParts.forEach(function (handleAndSid) {
-                var handle = base64urlencode(handleAndSid.substr(0, 8));
-
-                if (!unique[handle]) {
-                  avatarsListing.push(external_React_default.a.createElement(ui_contacts["Avatar"], {
-                    key: handle,
-                    contact: M.u[handle],
-                    simpletip: M.u[handle] && M.u[handle].name,
-                    className: "message avatar-wrapper small-rounded-avatar"
-                  }));
-                }
-
-                unique[handle] = 1;
+              var unique = chatRoom.uniqueCallParts ? Object.keys(chatRoom.uniqueCallParts) : [];
+              unique.forEach(function (handle) {
+                avatarsListing.push(external_React_default.a.createElement(ui_contacts["Avatar"], {
+                  key: handle,
+                  contact: M.u[handle],
+                  simpletip: M.u[handle] && M.u[handle].name,
+                  className: "message avatar-wrapper small-rounded-avatar"
+                }));
               });
             }
           }
@@ -13820,9 +13819,6 @@ function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !
 
 function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
 
-var chatlinkDialog_React = __webpack_require__(0);
-
-var chatlinkDialog_ReactDOM = __webpack_require__(3);
 
 
 
@@ -13840,7 +13836,8 @@ function (_MegaRenderMixin) {
 
     _this = chatlinkDialog_possibleConstructorReturn(this, chatlinkDialog_getPrototypeOf(ChatlinkDialog).call(this, props));
     _this.state = {
-      'link': l[5533]
+      'link': l[5533],
+      newTopic: ''
     };
     _this.onPopupDidMount = _this.onPopupDidMount.bind(chatlinkDialog_assertThisInitialized(_this));
     _this.onClose = _this.onClose.bind(chatlinkDialog_assertThisInitialized(_this));
@@ -13858,8 +13855,6 @@ function (_MegaRenderMixin) {
     key: "componentWillMount",
     value: function componentWillMount() {
       var self = this;
-      var chatRoom = self.props.chatRoom;
-      var megaChat = self.props.chatRoom.megaChat;
       $.dialog = "group-chat-link";
       self.retrieveChatLink();
     }
@@ -13890,10 +13885,6 @@ function (_MegaRenderMixin) {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       chatlinkDialog_get(chatlinkDialog_getPrototypeOf(ChatlinkDialog.prototype), "componentWillUnmount", this).call(this);
-
-      var self = this;
-      var chatRoom = self.props.chatRoom;
-      var megaChat = chatRoom.megaChat;
 
       if ($.dialog === "group-chat-link") {
         closeDialog();
@@ -13952,14 +13943,14 @@ function (_MegaRenderMixin) {
     key: "render",
     value: function render() {
       var self = this;
-      var closeButton = chatlinkDialog_React.makeElement("div", {
+      var closeButton = external_React_default.a.createElement("div", {
         key: "close",
         className: "default-red-button right links-button",
         onClick: function onClick(e) {
           self.onClose();
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[148]));
-      return chatlinkDialog_React.makeElement(modalDialogs["default"].ModalDialog, {
+      }, external_React_default.a.createElement("span", null, l[148]));
+      return external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
         title: self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : "",
         className: "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (!self.props.chatRoom.topic ? " requires-topic" : ""),
         onClose: function onClose() {
@@ -13967,17 +13958,17 @@ function (_MegaRenderMixin) {
         },
         chatRoom: self.props.chatRoom,
         popupDidMount: self.onPopupDidMount
-      }, chatlinkDialog_React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "export-content-block"
-      }, self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? chatlinkDialog_React.makeElement("div", null, chatlinkDialog_React.createElement("div", {
+      }, self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? external_React_default.a.createElement("div", null, external_React_default.a.createElement("div", {
         className: "export-chat-ink-warning"
-      }, l[20617]), chatlinkDialog_React.makeElement("div", {
+      }, l[20617]), external_React_default.a.createElement("div", {
         className: "rename-input-bl",
         style: {
           width: '320px',
           margin: '10px auto 20px auto'
         }
-      }, chatlinkDialog_React.makeElement("input", {
+      }, external_React_default.a.createElement("input", {
         type: "text",
         name: "newTopic",
         value: self.state.newTopic,
@@ -13991,34 +13982,34 @@ function (_MegaRenderMixin) {
         onKeyPress: self.onTopicFieldKeyPress.bind(self),
         placeholder: l[20616],
         maxLength: "30"
-      }))) : chatlinkDialog_React.makeElement("div", {
+      }))) : external_React_default.a.createElement("div", {
         className: "fm-dialog-body"
-      }, chatlinkDialog_React.makeElement("i", {
+      }, external_React_default.a.createElement("i", {
         className: "big-icon group-chat"
-      }), chatlinkDialog_React.makeElement("div", {
+      }), external_React_default.a.createElement("div", {
         className: "chat-title"
-      }, chatlinkDialog_React.makeElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.topic)), chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.topic)), external_React_default.a.createElement("div", {
         className: "chat-link-input"
-      }, chatlinkDialog_React.makeElement("i", {
+      }, external_React_default.a.createElement("i", {
         className: "small-icon blue-chain colorized"
-      }), chatlinkDialog_React.makeElement("input", {
+      }), external_React_default.a.createElement("input", {
         type: "text",
         readOnly: true,
         value: !self.props.chatRoom.topic ? l[20660] : self.state.link
-      })), chatlinkDialog_React.makeElement("div", {
+      })), external_React_default.a.createElement("div", {
         className: "info"
-      }, self.props.chatRoom.publicLink ? l[20644] : null))), chatlinkDialog_React.makeElement("div", {
+      }, self.props.chatRoom.publicLink ? l[20644] : null))), external_React_default.a.createElement("div", {
         className: "fm-notifications-bottom"
-      }, self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ? chatlinkDialog_React.makeElement("div", {
+      }, self.props.chatRoom.iAmOperator() && self.props.chatRoom.publicLink ? external_React_default.a.createElement("div", {
         key: "deleteLink",
         className: "default-white-button left links-button" + (self.loading && self.loading.state() === 'pending' ? " disabled" : ""),
         onClick: function onClick(e) {
           self.props.chatRoom.updatePublicHandle(1);
           self.onClose();
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[20487])) : null, self.props.chatRoom.topic ? self.props.chatRoom.publicLink ? chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[20487])) : null, self.props.chatRoom.topic ? self.props.chatRoom.publicLink ? external_React_default.a.createElement("div", {
         className: "default-green-button button right copy-to-clipboard" + (self.loading && self.loading.state() === 'pending' ? " disabled" : "")
-      }, chatlinkDialog_React.makeElement("span", null, l[63])) : closeButton : self.props.chatRoom.iAmOperator() ? chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[63])) : closeButton : self.props.chatRoom.iAmOperator() ? external_React_default.a.createElement("div", {
         key: "setTopic",
         className: "default-red-button right links-button" + (self.state.newTopic && $.trim(self.state.newTopic) ? "" : " disabled"),
         onClick: function onClick(e) {
@@ -14026,14 +14017,14 @@ function (_MegaRenderMixin) {
             self.props.chatRoom.setRoomTitle(self.state.newTopic);
           }
         }
-      }, chatlinkDialog_React.makeElement("span", null, l[20615])) : closeButton, chatlinkDialog_React.createElement("div", {
+      }, external_React_default.a.createElement("span", null, l[20615])) : closeButton, external_React_default.a.createElement("div", {
         className: "clear"
       })));
     }
   }]);
 
   return ChatlinkDialog;
-}(Object(mixins["default"])(chatlinkDialog_React.Component));
+}(Object(mixins["default"])(external_React_default.a.Component));
 
 chatlinkDialog_ChatlinkDialog.defaultProps = {
   'requiresUpdateOnResize': true,
@@ -14912,7 +14903,7 @@ function (_MegaRenderMixin) {
           className: "call-topic"
         }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, ellipsis(chatRoom.getRoomTitle(), 'end', 70))), external_React_default.a.createElement("div", {
           className: "call-participants-count"
-        }, Object.keys(chatRoom.callParticipants).length), external_React_default.a.createElement("a", {
+        }, chatRoom.callParticipants().length), external_React_default.a.createElement("a", {
           className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : ""),
           onClick: function onClick(e) {
             if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
@@ -15197,7 +15188,7 @@ function (_MegaRenderMixin) {
     value: function render() {
       var room = this.props.chatRoom;
 
-      if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+      if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
         return external_React_default.a.createElement("div", {
           className: "in-call-notif yellow join"
         }, external_React_default.a.createElement("i", {
@@ -15267,7 +15258,7 @@ function (_MegaRenderMixin2) {
     key: "render",
     value: function render() {
       var self = this;
-      var room = this.props.chatRoom;
+      var room = self.props.chatRoom;
 
       if (!room || !room.roomId) {
         // destroyed
@@ -15341,7 +15332,7 @@ function (_MegaRenderMixin2) {
       }
 
       if (room.type === "group" || room.type === "public") {
-        if (room.callParticipants && Object.keys(room.callParticipants).length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
+        if (room.callParticipants().length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
           // call is active, but I'm not in
           startAudioCallButton = startVideoCallButton = null;
         }
@@ -15453,13 +15444,13 @@ function (_MegaRenderMixin2) {
         className: "small-pad",
         title: l[8876],
         key: "participants"
-      }, participantsList) : null, room.type === "public" ? external_React_default.a.createElement("div", {
+      }, participantsList) : null, room.type === "public" && room.observers > 0 ? external_React_default.a.createElement("div", {
         className: "accordion-text observers"
       }, l[20466], external_React_default.a.createElement("span", {
         className: "observers-count"
       }, external_React_default.a.createElement("i", {
         className: "tiny-icon eye"
-      }), self.props.chatRoom.observers)) : external_React_default.a.createElement("div", null), external_React_default.a.createElement(AccordionPanel, {
+      }), room.observers)) : external_React_default.a.createElement("div", null), external_React_default.a.createElement(AccordionPanel, {
         className: "have-animation buttons",
         title: l[7537],
         key: "options"
@@ -19930,7 +19921,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     flags: 0x00,
     publicLink: null,
     archivedSelected: false,
-    callParticipants: false,
     observers: 0
   }, true);
   this.roomId = roomId;
@@ -19938,6 +19928,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   this.type = type;
   this.ctime = ctime;
   this.lastActivity = lastActivity ? lastActivity : 0;
+  this.chatd = megaChat.plugins.chatdIntegration.chatd;
   this.chatId = chatId;
   this.chatIdBin = chatId ? base64urldecode(chatId) : "";
   this.chatShard = chatShard;
@@ -19993,15 +19984,9 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
 
   self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
     if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-      var cd = self.megaChat.plugins.chatdIntegration.chatd;
-
-      if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
-        var cid = cd.chatIdMessages[self.chatIdBin];
-
-        if (cd.chatIdShard[self.chatIdBin].isOnline()) {
-          // this should never happen, but just in case...
-          cd.chatIdMessages[self.chatIdBin].resend();
-        }
+      if (self.chatd && self.isOnline() && self.chatIdBin) {
+        // this should never happen, but just in case...
+        self.chat().resend();
       }
     }
   }); // activity on a specific room (show, hidden, got new message, etc)
@@ -20152,12 +20137,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     }
   });
   self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
-    if (participants) {
-      self.callParticipants = participants;
-    } else if (!userid && !clientid && !participants) {
-      self.callParticipants = {};
-    }
-
     self.callParticipantsUpdated();
   });
   self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
@@ -20277,6 +20256,30 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function (ap, isMcf) {
   if (this.membersSetFromApi) {
     this.membersSetFromApi.trackFromActionPacket(ap, isMcf);
   }
+};
+/**
+ * @returns An array with the userid+clientid (binary) of the call participants in this room
+ * If there is no call or there is no chatd chat with this chatid, returns an empty array
+ */
+
+
+ChatRoom.prototype.callParticipants = function () {
+  var chat = this.chat();
+
+  if (!chat) {
+    return [];
+  } else {
+    return Object.keys(chat.callInfo.participants);
+  }
+};
+
+ChatRoom.prototype.chat = function () {
+  return this.chatd.chatIdMessages[this.chatIdBin];
+};
+
+ChatRoom.prototype.isOnline = function () {
+  var shard = this.chatd.shards[this.chatShard];
+  return shard ? shard.isOnline() : false;
 };
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
@@ -21284,7 +21287,7 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 };
 
 ChatRoom.prototype._clearChatMessagesFromChatd = function () {
-  megaChat.plugins.chatdIntegration.chatd.shards[0].retention(base64urldecode(this.chatId), 1);
+  this.chatd.shards[0].retention(base64urldecode(this.chatId), 1);
 };
 
 ChatRoom.prototype.isReadOnly = function () {
@@ -21371,31 +21374,6 @@ ChatRoom.prototype.truncate = function () {
     }
   }
 };
-/**
- * Helper tool that iterates all `chatRoom.callParticipants` and returns the sum of sessions
- *
- * @returns {number}
- */
-
-
-ChatRoom.prototype.getTotalCallSessionCount = function () {
-  var self = this;
-
-  if (!self.callParticipants || !Object.keys(self.callParticipants).length) {
-    return 0;
-  }
-
-  var count = 0;
-  Object.keys(self.callParticipants).forEach(function (k) {
-    if (!self.callParticipants[k]) {
-      return;
-    }
-
-    var currentCount = Object.keys(self.callParticipants[k]);
-    count += currentCount.length || 0;
-  });
-  return count;
-};
 
 ChatRoom.prototype.haveActiveCall = function () {
   return this.callManagerCall && this.callManagerCall.isActive() === true;
@@ -21403,10 +21381,12 @@ ChatRoom.prototype.haveActiveCall = function () {
 
 ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
+  var parts = self.callParticipants();
+  var haveCallParticipants = parts && parts.length > 0;
 
-  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && haveCallParticipants) {
     return true;
-  } else if (!self.callManagerCall && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+  } else if (!self.callManagerCall && haveCallParticipants) {
     return true;
   } else {
     return false;
@@ -21465,11 +21445,11 @@ ChatRoom.prototype.callParticipantsUpdated = function ()
     msgId = self.getActiveCallMessageId(true);
   }
 
-  var callParts = Object.keys(self.callParticipants);
+  var callParts = self.callParticipants();
   var uniqueCallParts = {};
   callParts.forEach(function (handleAndSid) {
     var handle = base64urlencode(handleAndSid.substr(0, 8));
-    uniqueCallParts[handle] = 1;
+    uniqueCallParts[handle] = true;
   });
   self.uniqueCallParts = uniqueCallParts;
   var msg = self.messagesBuff.getMessageById(msgId);

@@ -6,7 +6,6 @@
      * @constructor
      */
     var AccountClosure = function(opts) {
-        var self = this;
 
         var defaultOptions = {
             'prefix': 'cancel',
@@ -24,21 +23,18 @@
             'fbType': 'accClosureUserFeedback'
         };
 
-        self.opt = $.extend(true, {}, defaultOptions, opts);
+        this.opt = $.extend(true, {}, defaultOptions, opts);
     };
 
-    AccountClosure.prototype._initAccountClosure = function(_accountClosureCallback, obj) {
+    AccountClosure.prototype._initAccountClosure = function() {
 
         $('body').removeClass('overlayed');
         $('.fm-dialog').removeClass('error active');
-        $('.fm-dialog' + obj.opt.fbDlgClass)
+        $('.fm-dialog' + this.opt.fbDlgClass)
             .addClass('hidden')
             .removeClass('active');
 
-        // Get the email cancel code
-        obj.opt.code = page.replace(obj.opt.prefix, '');
-
-        _accountClosureCallback(obj.opt.code, u_attr.email, obj.opt.secret.toString());
+        this._accountClosure(this.opt.code, u_attr.email, this.opt.secret.toString());
     };
 
     /**
@@ -86,10 +82,15 @@
      * @param {callback} on success call this function
      *
      */
-    AccountClosure.prototype._getEmail = function(_handleFeedbackCallback, callback_obj) {
-        var self = this;
+    AccountClosure.prototype._getEmail = function() {
 
-        api_req({a: 'erv', c: self.opt.code}, {
+        var self = this;
+        var promise = new MegaPromise();
+
+        // Get the email cancel code
+        this.opt.code = page.replace(this.opt.prefix, '');
+
+        api_req({a: 'erv', c: this.opt.code}, {
             callback: function(res) {
                 if (typeof res === 'number') {
                     if (res === EEXPIRED) {
@@ -97,24 +98,26 @@
                         msgDialog('warninga', l[6184], l[6185], '', function() {
                             loadSubPage('fm/account');
                         });
+                        promise.reject(res);
                     }
                     else {
                         loadingDialog.hide();
                         msgDialog('warninga', l[6186], l[6187], '', function() {
                             loadSubPage('fm/account');
                         });
+                        promise.reject(res);
                     }
                 }
                 else {
                     if (res[0] === 21) {
                         self.opt.email = res[1];
-                        if (_handleFeedbackCallback) {
-                            _handleFeedbackCallback(callback_obj);
-                        }
+                        promise.resolve();
                     }
                 }
             }
         });
+
+        return promise;
     };
 
     AccountClosure.prototype._gatherFeedback = function() {
@@ -173,7 +176,7 @@
             self.opt.feedbackText = self._prepareJsonString(self._gatherFeedback());
             api_req({ 'a': 'clog', 't': self.opt.fbType, 'd': self.opt.feedbackText });
 
-            self._initAccountClosure(self._accountClosure, self);
+            self._initAccountClosure();
         });
 
         // Cancel button listener
@@ -182,7 +185,7 @@
             self.opt.feedbackText = self._prepareJsonString("User did NOT provide feedback.");
             api_req({ 'a': 'clog', 't': self.opt.fbType, 'd': self.opt.feedbackText });
 
-            self._initAccountClosure(self._accountClosure, self);
+            self._initAccountClosure();
         });
 
 
@@ -208,6 +211,25 @@
             $(this).removeClass('radioOff').addClass('radioOn').parent().removeClass('radioOff').addClass('radioOn').next().addClass('active');
         });
 
+    };
+
+    AccountClosure.prototype.validateCodeWithSession = function() {
+
+        var self = this;
+        var promise = new MegaPromise();
+
+        var getProsmie = this._getEmail().done(function() {
+            if (self.opt.email === u_attr.email) {
+                promise.resolve();
+            }
+            else {
+                promise.reject();
+            }
+        });
+
+        promise.linkFailTo(getProsmie);
+
+        return promise;
     };
 
     //export

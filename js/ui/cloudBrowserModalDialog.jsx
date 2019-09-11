@@ -38,8 +38,8 @@ class BrowserEntries extends MegaRenderMixin(React.Component) {
         super(props);
 
         this.state = {
-            'highlighted': [],
-            'selected': []
+            'highlighted': this.props.initialHighlighted || [],
+            'selected': this.props.initialSelected || []
         }
     }
     componentWillMount() {
@@ -816,7 +816,11 @@ class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
             localStorage.dialogViewMode = "0";
         }
 
-        self.setState({entries: self.getEntries()});
+        self.setState({
+            entries: self.getEntries(),
+            selected: self.state.selected,
+            highlighted: self.state.highlighted,
+        });
 
         $this.parent().find('.active').removeClass("active");
         $this.addClass("active");
@@ -1272,6 +1276,9 @@ class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
                     onSelected={self.onSelected}
                     onHighlighted={self.onHighlighted}
                     onAttachClicked={self.onAttachClicked}
+                    viewMode={localStorage.dialogViewMode}
+                    initialSelected={self.state.selected}
+                    initialHighlighted={self.state.highlighted}
                     ref={
                         (browserEntries) => {
                             self.browserEntries = browserEntries;

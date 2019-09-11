@@ -112,7 +112,7 @@ body.mobile.bottom-pages {
     overflow: visible;
 }
 .lato {
-    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .lato-semibold {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
@@ -308,7 +308,7 @@ a.nlanguage-lnk.language-template {
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
-    color: #BF1900;
+    color: #F0373B;
 }
 .languages-dialog-body {
     padding: 10px 28px 10px 16px;
@@ -821,7 +821,7 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     margin-top: 5px;
 }
 a.account-manage-button:hover {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 .account-bandwidth-txt {
@@ -1484,7 +1484,7 @@ input.radioOn, input.radioOff {
     box-sizing: border-box;
     padding: 1px 0 0 0;
     text-align: center;
-    background-color: #BF1900;
+    background-color: #F0373B;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -2174,7 +2174,7 @@ a.nt-back-button:hover {
     padding: 0 10px 0 8px;
 }
 a.nt-back-button:hover span {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 .nt-settings-button, a.nt-settings-button, a.nt-settings-button:link, a.nt-settings-button:visited, a.nt-settings-button:active {
@@ -2191,7 +2191,7 @@ a.nt-back-button:hover span {
     float: left;
 }
 a.nt-settings-button:hover {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 a.nt-settings-button:hover span {
@@ -3155,7 +3155,7 @@ strong.small-header {
     display: block;
 }
 .blog-new-full ul li a {
-    color: #BF1900;
+    color: #F0373B;
 }
 .blog-new-full ul ul {
     margin: 0 0 0 30px;
@@ -3326,7 +3326,7 @@ img.blog-new-logos {
     box-sizing: border-box;
 }
 .browsers-logo-lnk:hover {
-    border: 3px solid #BF1900;
+    border: 3px solid #F0373B;
     height: 186px;
     margin: -1px;
 }
@@ -8933,7 +8933,7 @@ body:not(.en) .warning-dialog-a.wide {
     line-height: 32px;
     font-size: 13px;
     float: left;
-    color: #BF1900;
+    color: #F0373B;
     padding-left: 10px;
 }
 .notification-txt {
@@ -12126,15 +12126,15 @@ table {
     font-size: 14px;
 }
 .main-mid-pad {
-    width: 970px;
+    max-width: 970px;
     margin: 0 auto;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
-.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay {
-    width: 100%;
+.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay{
+    max-width: 100%;
     padding: 0 0;
     background-color: #F5F7F9;
 }
@@ -12148,6 +12148,7 @@ table {
 }
 .key3.main-mid-pad {
     width: 100%;
+    max-width: 100%;
     padding: 0;
 }
 .main-left-block {
@@ -13448,54 +13449,6 @@ strong, b {
 .about-top-block p {
     padding: 8px 0 10px 0;
 }
-.privacy-company h1 {
-    padding: 45px 0 20px 0;
-}
-.privacy-company-block {
-    padding: 35px 0;
-}
-.privacy-company-icon {
-    float: left;
-    width: 171px;
-    height: 120px;
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: left top;
-    background-repeat: no-repeat;
-}
-.privacy-company-icon.lock {
-    background-position: left -204px;
-    height: 126px;
-}
-.privacy-company-icon.future {
-    background-position: left -404px;
-    height: 132px;
-}
-.privacy-company-txt {
-    margin-left: 171px;
-}
-.privacy-company-header {
-    font-size: 16px;
-    line-height: 20px;
-    letter-spacing: -0.1px;
-    color: #BF1900;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 2px 0 0 0;
-}
-.privacy-company-txt p {
-    font-size: 14px;
-    color: #3F4646;
-    line-height: 26px;
-    margin: 0;
-    padding: 7px 0 9px 0;
-}
-.privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: -10px -650px;
-    background-repeat: no-repeat;
-}
-.privacy-company-bott .st-quote-right {
-    background-position: -70px -748px;
-}
 .widget-block {
     position: absolute;
     width: 54px;
@@ -14534,7 +14487,7 @@ a.contact-new-button:hover {
     font-size: 16px;
     line-height: 24px;
     letter-spacing: -0.1px;
-    color: #BF1900;
+    color: #F0373B;
     font-family: 'Open Sans Semibold Italic', Arial;
     padding: 13px 10px;
 }
@@ -14760,7 +14713,7 @@ span.roman-number {
     text-align: center;
 }
 p.copyrights-red {
-    color: #BF1900;
+    color: #F0373B;
     padding-bottom: 6px;
 }
 .register-st2-button.active.copyrights-form {
@@ -14926,7 +14879,7 @@ h1.help-home-header {
     cursor: pointer;
 }
 .help-listing:hover {
-    color: #BF1900;
+    color: #F0373B;
 }
 .jspVerticalBar {
     z-index: 120;
@@ -20249,7 +20202,7 @@ body.pro:after {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;
@@ -23178,7 +23131,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -34px -12245px;
     opacity: 0.8;
 }
-
+.content-panel.dashboard .small-icon.info-icon {
+    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-repeat: no-repeat;
+    background-position: -26px -12378px;
+    background-size: 48px auto;
+    display: inline-block;
+    opacity: 0.4;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 4px;
+}
+.content-panel.dashboard .small-icon.info-icon:hover {
+    opacity: 0.8;
+}
 .user-management-tree-panel-header{
     height: 48px;
     width:100%;

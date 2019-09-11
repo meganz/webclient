@@ -4686,7 +4686,7 @@ li.token-input-token-invite .input-close {
     right: 10px;
 }
 .fm-dialog.group-chat-link {
-    width: 360px;
+    width: 440px;
     margin: -142px 0 0 -180px;
     text-align: center;
     font-family: 'LatoWeb', 'source_sans_proregular';
@@ -4997,7 +4997,7 @@ body.en .register-side-pane.container.visible {
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;

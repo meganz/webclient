@@ -1,5 +1,4 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
+import React from 'react';
 import MegaRenderMixin from './../../stores/mixins.js';
 import ModalDialogsUI  from './../../ui/modalDialogs.jsx';
 import utils  from './../../ui/utils.jsx';
@@ -13,7 +12,8 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
     constructor(props) {
         super(props);
         this.state = {
-            'link': l[5533]
+            'link': l[5533],
+            newTopic: ''
         };
         this.onPopupDidMount = this.onPopupDidMount.bind(this);
         this.onClose = this.onClose.bind(this);
@@ -24,16 +24,13 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
         this.$popupNode = $node;
     }
     componentWillMount() {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        var megaChat = self.props.chatRoom.megaChat;
+        const self = this;
         $.dialog = "group-chat-link";
-
         self.retrieveChatLink();
     }
     retrieveChatLink() {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
+        const self = this;
+        const chatRoom = self.props.chatRoom;
         if (!chatRoom.topic) {
             delete self.loading;
             return;
@@ -51,17 +48,13 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
     }
     componentWillUnmount() {
         super.componentWillUnmount();
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        var megaChat = chatRoom.megaChat;
-
         if ($.dialog === "group-chat-link") {
             closeDialog();
         }
     }
     componentDidUpdate() {
-        var self = this;
-        var chatRoom = this.props.chatRoom;
+        const self = this;
+        const chatRoom = this.props.chatRoom;
         if (!this.loading && chatRoom.topic) {
             this.retrieveChatLink();
         }
@@ -73,8 +66,8 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
             return;
         }
 
-        var $node = this.$popupNode;
-        var $copyButton = $('.copy-to-clipboard', $node);
+        const $node = this.$popupNode;
+        const $copyButton = $('.copy-to-clipboard', $node);
 
         $copyButton.rebind('click', function() {
             copyToClipboard(self.state.link, self.toastTxt);
@@ -93,20 +86,25 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
         this.setState({'newTopic': e.target.value});
     }
     onTopicFieldKeyPress(e) {
-        var self = this;
-       if (e.which === 13) {
+        const self = this;
+        if (e.which === 13) {
            self.props.chatRoom.setRoomTitle(self.state.newTopic);
-       }
+        }
     }
     render() {
-        var self = this;
+        const self = this;
 
-        var closeButton = <div key="close" className={"default-red-button right links-button"}
-                               onClick={function(e) {
-                                   self.onClose();
-                               }}>
-            <span>{l[148]}</span>
-        </div>;
+        const closeButton = (
+            <div 
+                key="close"
+                className={"default-red-button right links-button"}
+                onClick={function(e) {
+                    self.onClose();
+                }}
+            >
+                <span>{l[148]}</span>
+            </div>
+        );
 
         return <ModalDialogsUI.ModalDialog
             title={self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : ""}
@@ -119,8 +117,6 @@ class ChatlinkDialog extends MegaRenderMixin(React.Component) {
             }}
             chatRoom={self.props.chatRoom}
             popupDidMount={self.onPopupDidMount}>
-
-
 
             <div className="export-content-block">
                 {

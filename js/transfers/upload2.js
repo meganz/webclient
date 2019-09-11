@@ -936,11 +936,11 @@ var ulmanager = {
         if (identical && fmconfig.ul_skipIdentical) {
             n = identical;
         }
-        else if (!M.h[uq.hash] && !identical) {
+        else if ((!M.h[uq.hash] || !Object.keys(M.h[uq.hash]).length) && !identical) {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = mNode || M.d[M.h[uq.hash].substr(0, 8)];
+            n = mNode || M.d[Object.keys(M.h[uq.hash])[0]];
             // identical = n;
         }
         if (!n) {
@@ -1065,7 +1065,7 @@ var ulmanager = {
             var identical = ulmanager.ulIdentical(aFile);
             ulmanager.logger.info(aFile.name, "fingerprint", aFile.hash, M.h[aFile.hash], identical);
 
-            if (M.h[aFile.hash] || identical) {
+            if ((M.h[aFile.hash] && Object.keys(M.h[aFile.hash]).length) || identical) {
                 ulmanager.ulDeDuplicate(aFileUpload, identical, hashNode);
             }
             else {
@@ -1079,7 +1079,19 @@ var ulmanager = {
             promises.push(dbfetch.get(aFile.target, new MegaPromise()));
         }
 
-        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].substr(0, 8)]) && !mega.megadrop.isInit()) {
+        var isHashFetchNeeded = false;
+
+        if (!M.h[aFile.hash]) {
+            isHashFetchNeeded = true;
+        }
+        else {
+            var hashesArray = Object.keys(M.h[aFile.hash]);
+            if (!hashesArray.length || !M.d[hashesArray[0]]) {
+                isHashFetchNeeded = true;
+            }
+        }
+
+        if (isHashFetchNeeded && !mega.megadrop.isInit()) {
             promises.push(
                 dbfetch.hash(aFile.hash)
                     .always(function(node) {
@@ -1409,7 +1421,7 @@ ChunkUpload.prototype.io_ready = function(res) {
             ulmanager.retry(this.file, this, "IO failed: " + res);
         }
         else {
-            if (d) {
+            if (d && this.logger) {
                 this.logger.error('The FileReader finished, but this upload was cancelled...');
             }
         }

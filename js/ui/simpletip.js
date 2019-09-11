@@ -36,6 +36,10 @@
      * C) Manually add extra top/bottom offset by passing `data-simpletipoffset="10"`
      * Example:
      * ```<a href="#" data-simpletip="Hey! +/-20px offset for this tip." data-simpletipoffset="20">Mouse over me</a>```
+     *
+     * D) Add any custom styling to tooltip by `data-simpletip-style='"max-width":"200px"'`
+     * Example:
+     * ```<a href="#" data-simpletip="Hey! custom styling." data-simpletip-style='"width":"200px"'>Mouse over me</a>```
      */
 
 
@@ -58,7 +62,7 @@
             return false;
         }
 
-        var contents = $(this).attr('data-simpletip');
+        var contents = $this.attr('data-simpletip');
         if (contents) {
             var $node = $template.clone();
             contents = escapeHTML(contents).replace(/\[BR\]/g, '<br>')
@@ -72,6 +76,11 @@
             var wrapper = $this.attr('data-simpletipwrapper') || "";
             if (wrapper) {
                 wrapper += ",";
+            }
+
+            var customStyle = $this.data('simpletip-style');
+            if (customStyle) {
+                $currentNode.css(customStyle);
             }
 
             var my = "center top";

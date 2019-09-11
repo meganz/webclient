@@ -15260,7 +15260,7 @@ function (_MegaRenderMixin2) {
     key: "render",
     value: function render() {
       var self = this;
-      var room = this.props.chatRoom;
+      var room = self.props.chatRoom;
 
       if (!room || !room.roomId) {
         // destroyed
@@ -15446,13 +15446,13 @@ function (_MegaRenderMixin2) {
         className: "small-pad",
         title: l[8876],
         key: "participants"
-      }, participantsList) : null, room.type === "public" ? external_React_default.a.createElement("div", {
+      }, participantsList) : null, room.type === "public" && room.observers > 0 ? external_React_default.a.createElement("div", {
         className: "accordion-text observers"
       }, l[20466], external_React_default.a.createElement("span", {
         className: "observers-count"
       }, external_React_default.a.createElement("i", {
         className: "tiny-icon eye"
-      }), self.props.chatRoom.observers)) : external_React_default.a.createElement("div", null), external_React_default.a.createElement(AccordionPanel, {
+      }), room.observers)) : external_React_default.a.createElement("div", null), external_React_default.a.createElement(AccordionPanel, {
         className: "have-animation buttons",
         title: l[7537],
         key: "options"

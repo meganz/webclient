@@ -923,10 +923,12 @@ function (_MegaRenderMixin2) {
               loadSubPage('fm/' + contact.u);
             }
           }
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "name"
         }, username, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactPresence, {
           className: "small",
           contact: contact
-        }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "email"
         }, contact.m))));
         moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactFingerprint, {
@@ -11903,10 +11905,12 @@ function (_ConversationMessageM) {
                   contact: contact
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
+                }, external_React_default.a.createElement("div", {
+                  className: "name"
                 }, M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
                   className: "small",
                   contact: contact
-                }), external_React_default.a.createElement("span", {
+                })), external_React_default.a.createElement("div", {
                   className: "email"
                 }, M.u[contact.u].m))), external_React_default.a.createElement(ui_contacts["ContactFingerprint"], {
                   contact: contact
@@ -11948,10 +11952,12 @@ function (_ConversationMessageM) {
                   contact: contact
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
+                }, external_React_default.a.createElement("div", {
+                  className: "name"
                 }, M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
                   className: "small",
                   contact: contact
-                }), external_React_default.a.createElement("span", {
+                })), external_React_default.a.createElement("div", {
                   className: "email"
                 }, M.u[contact.u].m))), external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "rounded-grey-plus",

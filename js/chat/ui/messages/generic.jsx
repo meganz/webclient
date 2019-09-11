@@ -792,11 +792,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="dropdown-avatar rounded">
                                         <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
-                                            {M.getNameByHandle(contact.u)}
-                                            <ContactPresence className="small" contact={contact} />
-                                            <span className="email">
+                                             <div className="name">
+                                                 {M.getNameByHandle(contact.u)}
+                                                 <ContactPresence className="small" contact={contact} />
+                                            </div>
+                                            <div className="email">
                                                  {M.u[contact.u].m}
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <ContactFingerprint contact={contact} />
@@ -843,11 +845,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="dropdown-avatar rounded">
                                         <Avatar className="avatar-wrapper context-avatar" contact={contact} />
                                         <div className="dropdown-user-name">
-                                            {M.getNameByHandle(contact.u)}
-                                            <ContactPresence className="small" contact={contact} />
-                                            <span className="email">
+                                             <div className="name">
+                                                 {M.getNameByHandle(contact.u)}
+                                                 <ContactPresence className="small" contact={contact} />
+                                            </div>
+                                            <div className="email">
                                                  {M.u[contact.u].m}
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
 

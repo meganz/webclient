@@ -585,11 +585,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
                 // Set contact avatar
                 $contactDetails.find('.dropdown-avatar').removeClass('hidden')
-                    .safeHTML(useravatar.contact(id, 'context-avatar'));
+                    .find('.avatar').safeHTML(useravatar.contact(id, 'context-avatar'));
 
                 // Set username
                 $contactDetails.find('.dropdown-user-name').removeClass('hidden')
-                    .find('span').text(username);
+                    .find('.name span').text(username);
             }
 
             // Set contact fingerprint

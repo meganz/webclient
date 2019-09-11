@@ -40,7 +40,7 @@ export class JoinCallNotification extends MegaRenderMixin(React.Component) {
     }
     render() {
         var room = this.props.chatRoom;
-        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+        if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
                 <i className="small-icon audio-call colorized"/>
                 {l[20200]}
@@ -180,8 +180,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
 
         if (room.type === "group" || room.type === "public") {
             if (
-                room.callParticipants &&
-                Object.keys(room.callParticipants).length > 0 &&
+                room.callParticipants().length > 0 &&
                 (
                     !room.callManagerCall ||
                     room.callManagerCall.isActive() === false

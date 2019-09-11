@@ -72,7 +72,7 @@ var Chatd = function(userId, megaChat, options) {
             }
         },
         onShutdown: function() {},
-        onShardOnline: function(shard) {}
+        onChatOnline: function(chat) {}
     };
     /* jshint +W098 */
 
@@ -494,7 +494,7 @@ Chatd.Shard.prototype.retrieveMcurlAndExecuteOnce = function(chatId, resolvedCb,
 
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {
-    return this.s && this.s.readyState === this.s.OPEN;
+    return (!!this.s) && this.s.readyState === this.s.OPEN;
 };
 
 /**
@@ -611,7 +611,7 @@ Chatd.Shard.prototype.handleDisconnect = function() {
     for (var chatid in self.chatIds) {
         var chat = chats[chatid];
         assert(chat);
-        chat.callParticipants = {};
+        chat._clearCallInfo();
     }
     chatd.trigger('onClose', {
         shard: self
@@ -1306,7 +1306,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     if (priv === -1) { // we left the chatroom
                         if (chat) {
                             chat._setLoginState(null); // chat disabled, don't join upon re/connect
-                            chat.callParticipants = {};
+                            chat._clearCallInfo();
                             chatd.rtcHandler.onKickedFromChatroom(chat);
                         }
                     } else if (priv === 0 || priv === 1 || priv === 2 || priv === 3) {
@@ -1478,7 +1478,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     self.logger.log("Assigned CLIENTID " + Chatd.clientIdToString(self.clientId),
                         " for shard", self.shard);
                 }
-                self.chatd.rtcHandler.onShardOnline(self);
                 break;
             case Chatd.Opcode.SEEN:
                 self.keepAlive.restart();
@@ -1620,6 +1619,7 @@ Chatd.Shard.prototype.exec = function(a) {
                     var loginState = chat.loginState();
                     if ((loginState !== null) && (loginState < LoginState.HISTDONE)) {
                         chat._setLoginState(LoginState.HISTDONE); // logged in
+                        self.chatd.rtcHandler.onChatOnline(chat);
                     }
                     chat.restoreIfNeeded(cmd.substr(1, 8));
                 }
@@ -1899,7 +1899,7 @@ Chatd.Messages = function(chatd, shard, chatId, oldInstance) {
     // expired message list
     this.expired = {};
     this.needsRestore = true;
-    this.callParticipants = {};
+    this._clearCallInfo();
     this._loginState = oldInstance ? oldInstance._loginState : LoginState.DISCONN;
 };
 
@@ -1919,6 +1919,28 @@ Chatd.Messages.prototype._setLoginState = function(state) {
 Chatd.Messages.prototype.loginState = function() {
     return this._loginState;
 };
+
+Chatd.Messages.prototype._clearCallInfo = function() {
+    this.callInfo = new CallInfo();
+};
+
+function CallInfo() {
+    /* callInfo structure when there is a call:
+        callInfo = {
+            callId: binstring,
+            participants: {
+                <peerid1>: av1,
+                <peerid2>: av2
+            }
+        }
+    */
+    this.participants = {};
+};
+
+CallInfo.prototype.participantCount = function() {
+    return Object.keys(this.participants).length;
+};
+
 // send JOIN
 Chatd.Messages.prototype.join = function() {
     var self = this;
@@ -1930,7 +1952,7 @@ Chatd.Messages.prototype.join = function() {
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(self.chatId));
 
     // reset chat state before join
-    self.callParticipants = {}; // map of userid->array[clientid]
+    self._clearCallInfo();
     self._setLoginState(LoginState.JOIN_SENT); // joining
     // send a `JOIN` (if no local messages are buffered) or a `JOINRANGEHIST` (if local messages are buffered)
     if (
@@ -2260,7 +2282,7 @@ Chatd.Messages.prototype._joinrangehistViaMessagesBuff = function() {
     var chatId = self.chatId;
     var chatRoom = self.chatd.megaChat.getChatById(base64urlencode(chatId));
     // we are a lower level func, the login state is set by the higher level one
-    assert(self._loginState === LoginState.JOIN_SENT);
+    assert(self._loginState <= LoginState.JOIN_SENT);
     var firstLast;
     if (chatRoom && chatRoom.messagesBuff && chatRoom.messagesBuff.messages.length > 0) {
         var firstLast = chatRoom.messagesBuff.getLowHighIds();
@@ -2351,6 +2373,7 @@ Chatd.Messages.prototype.handlejoinrangehist = function(chatId, handle) {
 Chatd.Messages.prototype.joinrangehist = function() {
     var self = this;
     var chatId = self.chatId;
+    self._setLoginState(LoginState.JOIN_SENT);
     if (self.chatd.chatdPersist) {
         // this would be called on reconnect if messages were added to the buff,
         // so ensure we are using the correct first/last msgIds as from the actual
@@ -3216,13 +3239,20 @@ Chatd.Messages.prototype.onInCall = function(userid, clientid) {
     if (self._loginState < LoginState.JOIN_RECEIVED) {
         return;
     }
-    var parts = self.callParticipants;
+    var parts = self.callInfo.participants;
     var endpointId = userid + clientid;
-    if (parts[endpointId]) {
-        self.chatd.logger.warn("INCALL received for user that is already known to be in the call");
-        return;
+    var val = parts[endpointId];
+    if (val != null) {
+        if (!isNaN(val)) {
+            if (base64urlencode(userid) !== u_handle) {
+                self.chatd.logger.warn("Received INCALL for a user that has valid A/V flags, but that user is not us");
+            }
+        } else {
+            self.chatd.logger.warn("INCALL received for user that is already known to be in the call");
+            return;
+        }
     }
-    parts[endpointId] = -1;
+    parts[endpointId] = true; // to be replaced by av flags when RtcModule receives CALLDATA for that peer
     self.chatd.rtcHandler.onClientJoinedCall(self, userid, clientid);
 };
 
@@ -3233,19 +3263,23 @@ Chatd.Messages.prototype.onEndCall = function(userid, clientid) {
         return;
     }
 
-    var parts = self.callParticipants;
+    var info = self.callInfo;
+    var parts = info.participants;
     var endpointId = userid + clientid;
-    if (!parts[endpointId]) {
+    if (parts[endpointId] == null) {
         self.chatd.logger.warn("ENDCALL received for user that is not known to be in the call", JSON.stringify(parts));
         return; // Don't have it, should not normally happend
     }
     delete parts[endpointId];
+    if (info.participantCount() === 0) {
+        self._clearCallInfo();
+    }
     self.chatd.rtcHandler.onClientLeftCall(self, userid, clientid);
 };
 
 Chatd.Messages.prototype.onUserLeftRoom = function(userid) {
     var self = this;
-    var parts = self.callParticipants;
+    var parts = self.callInfo.participants;
     for (var k in parts) {
         if (k.substr(0, 8) === userid) {
             delete parts[k];

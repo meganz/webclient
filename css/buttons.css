@@ -885,9 +885,9 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-56px-button {
     display: block;
     font-size: 18px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
     line-height: 55px;
     color: white;
     padding: 0 15px;
@@ -925,6 +925,23 @@ body:not(.rtl) .default-white-button::first-letter {
     border-radius: 4px;
     background-color: #F0373A;
     box-shadow: 0 1px 2px 0 rgba(217,0,7,0.3);
+}
+.default-56px-button.green-button {
+    color: white;
+    background: #00BFA5;
+}
+.default-56px-button.green-button::before {
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
+}
+.default-56px-button.green-button::before {
+    -webkit-box-shadow: 0 0 0 1px #00B098;
+    -moz-box-shadow: 0 0 0 1px #00B098;
+    box-shadow: 0 0 0 1px #00B098;
+}
+.default-56px-button.green-button:hover {
+    background-color:#00AC94;
 }
 .recovery-key-container .recovery-key-button .default-red-button {
     height: 32px;

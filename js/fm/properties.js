@@ -282,7 +282,13 @@
             p.t2 = '<b>' + fm_contains(filecnt, foldercnt) + '</b>';
             p.t3 = l[894] + ':';
             p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
-            p.t5 = ' second';
+            if (foldercnt) {
+                p.t5 = '';
+                p.t6 = l[897] + ':';
+                p.t7 = fm_contains(sfilecnt + filecnt, sfoldercnt + foldercnt, true);
+            } else {
+                p.t5 = ' second';
+            }
             p.t8 = l[93] + ':';
             p.t9 = l[1025];
             p.t12 = '';
@@ -304,11 +310,11 @@
             + '<div class="properties-float-bl' + p.t17 + '"><span class="properties-small-gray">' + p.t18 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t19 + '</span></div>'
             : '';
-        var singlenodeinfohtml  = (((filecnt + foldercnt) === 1) || (versioningFlag === false))
-            ?
-            '<div class="properties-float-bl' + p.t5 + '"><span class="properties-small-gray">' + p.t6 + '</span>'
-            + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>'
-            : '';
+
+        var singlenodeinfohtml  = '<div class="properties-float-bl' + p.t5 + '">'
+            + '<span class="properties-small-gray">' + p.t6 + '</span>'
+            + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>';
+
         var shareinfohtml = (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined')
             ? ''
             : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
@@ -329,7 +335,7 @@
             + '</div></div>'
             + shareinfohtml;
 
-        $('.properties-txt-pad').html(html);
+        $('.properties-txt-pad').safeHTML(html);
 
         if ($dialog.hasClass('shared-with-me')) {
             $('.properties-txt-pad').find('.contact-list-icon').remove();

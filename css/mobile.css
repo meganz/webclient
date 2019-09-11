@@ -2651,7 +2651,7 @@ div.checkboxOn, div.checkboxOff {
     margin-bottom: 48px;
     margin-top: 48px;
 }
-.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1 {
+.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1, .privacy-company h1 {
     font-family: 'montserrat_semibold', sans-serif;
     font-size: 32px;
     color: #262F3B;
@@ -3133,7 +3133,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4805,7 +4805,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -11100,7 +11100,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         font-size: 24px;
         line-height: 36px;
     }
-
+    .privacy-company h1 {
+        font-size: 25px;
+    }
 }
 
 

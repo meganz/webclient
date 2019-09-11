@@ -329,18 +329,17 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactPresence extends MegaRenderMixin(React.Component) {
-    render() {
-        var self = this;
-        var contact = this.props.contact;
-        if (!contact || !contact.c) {
-            return null;
-        }
-
-        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).userPresenceToCssClass(contact.presence);
-
-        return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
+export const ContactPresence = ({ contact, megaChat = window.megaChat, className = ''}) => {
+    if (!contact || !contact.c) {
+        return null;
     }
+
+    const pres = megaChat.userPresenceToCssClass(contact.presence);
+
+    return (
+        <div className={`user-card-presence ${pres} ${className}`}>
+        </div>
+    );
 };
 
 export class ContactFingerprint extends MegaRenderMixin(React.Component) {
@@ -490,7 +489,8 @@ export class Avatar extends MegaRenderMixin(React.Component) {
 export class ContactCard extends MegaRenderMixin(React.Component) {
     static defaultProps = {
         'dropdownButtonClasses': "default-white-button tiny-button",
-        'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
+        'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
+        presenceClassName: ''
     }
     specificShouldComponentUpdate(nextProps, nextState) {
         var self = this;

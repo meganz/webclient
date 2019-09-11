@@ -1182,41 +1182,26 @@ function (_MegaRenderMixin3) {
   return ContactVerified;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
 ;
-var ContactPresence =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
-  _inherits(ContactPresence, _MegaRenderMixin4);
+var ContactPresence = function ContactPresence(_ref) {
+  var contact = _ref.contact,
+      _ref$megaChat = _ref.megaChat,
+      megaChat = _ref$megaChat === void 0 ? window.megaChat : _ref$megaChat,
+      _ref$className = _ref.className,
+      className = _ref$className === void 0 ? '' : _ref$className;
 
-  function ContactPresence() {
-    _classCallCheck(this, ContactPresence);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(ContactPresence).apply(this, arguments));
+  if (!contact || !contact.c) {
+    return null;
   }
 
-  _createClass(ContactPresence, [{
-    key: "render",
-    value: function render() {
-      var self = this;
-      var contact = this.props.contact;
-
-      if (!contact || !contact.c) {
-        return null;
-      }
-
-      var pres = (this.props.megaChat ? this.props.megaChat : megaChat).userPresenceToCssClass(contact.presence);
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "user-card-presence " + pres + " " + this.props.className
-      });
-    }
-  }]);
-
-  return ContactPresence;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
-;
+  var pres = megaChat.userPresenceToCssClass(contact.presence);
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "user-card-presence ".concat(pres, " ").concat(className)
+  });
+};
 var ContactFingerprint =
 /*#__PURE__*/
-function (_MegaRenderMixin5) {
-  _inherits(ContactFingerprint, _MegaRenderMixin5);
+function (_MegaRenderMixin4) {
+  _inherits(ContactFingerprint, _MegaRenderMixin4);
 
   function ContactFingerprint() {
     _classCallCheck(this, ContactFingerprint);
@@ -1284,8 +1269,8 @@ function (_MegaRenderMixin5) {
 var _noAvatars = {};
 var Avatar =
 /*#__PURE__*/
-function (_MegaRenderMixin6) {
-  _inherits(Avatar, _MegaRenderMixin6);
+function (_MegaRenderMixin5) {
+  _inherits(Avatar, _MegaRenderMixin5);
 
   function Avatar() {
     _classCallCheck(this, Avatar);
@@ -1382,8 +1367,8 @@ function (_MegaRenderMixin6) {
 ;
 var ContactCard =
 /*#__PURE__*/
-function (_MegaRenderMixin7) {
-  _inherits(ContactCard, _MegaRenderMixin7);
+function (_MegaRenderMixin6) {
+  _inherits(ContactCard, _MegaRenderMixin6);
 
   function ContactCard() {
     _classCallCheck(this, ContactCard);
@@ -1559,13 +1544,14 @@ function (_MegaRenderMixin7) {
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
 ContactCard.defaultProps = {
   'dropdownButtonClasses': "default-white-button tiny-button",
-  'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
+  'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
+  presenceClassName: ''
 };
 ;
 var ContactItem =
 /*#__PURE__*/
-function (_MegaRenderMixin8) {
-  _inherits(ContactItem, _MegaRenderMixin8);
+function (_MegaRenderMixin7) {
+  _inherits(ContactItem, _MegaRenderMixin7);
 
   function ContactItem() {
     _classCallCheck(this, ContactItem);
@@ -1615,8 +1601,8 @@ function (_MegaRenderMixin8) {
 ;
 var ContactPickerWidget =
 /*#__PURE__*/
-function (_MegaRenderMixin9) {
-  _inherits(ContactPickerWidget, _MegaRenderMixin9);
+function (_MegaRenderMixin8) {
+  _inherits(ContactPickerWidget, _MegaRenderMixin8);
 
   function ContactPickerWidget(props) {
     var _this;
@@ -3053,7 +3039,6 @@ DropdownItem.defaultProps = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
@@ -3504,7 +3489,7 @@ ConfirmDialog.defaultProps = {
   'hideable': true
 };
 ;
-/* harmony default export */ __webpack_exports__["default"] = ({
+/* harmony default export */ __webpack_exports__["a"] = ({
   ModalDialog: ModalDialog,
   SelectContactDialog: SelectContactDialog,
   ConfirmDialog: ConfirmDialog,
@@ -5625,7 +5610,7 @@ function (_MegaRenderMixin4) {
         var room = this.props.chats[self.state.confirmUnarchiveChat];
 
         if (room) {
-          confirmUnarchiveDialog = React.makeElement(_ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__["default"].ConfirmDialog, {
+          confirmUnarchiveDialog = React.makeElement(_ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__[/* default */ "a"].ConfirmDialog, {
             megaChat: room.megaChat,
             chatRoom: room,
             title: __(l[19063]),
@@ -7573,7 +7558,7 @@ function (_MegaRenderMixin3) {
         });
       }
 
-      return React.makeElement(modalDialogs["default"].ModalDialog, {
+      return React.makeElement(modalDialogs["a" /* default */].ModalDialog, {
         title: self.props.title || __(l[8011]),
         className: classes,
         onClose: function onClose() {
@@ -7674,7 +7659,7 @@ window.CloudBrowserModalDialogUI = {
   CloudBrowserDialog: cloudBrowserModalDialog_CloudBrowserDialog
 });
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(5);
+var ui_dropdowns = __webpack_require__(5);
 
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var ui_contacts = __webpack_require__(2);
@@ -9852,15 +9837,8 @@ function participantsList_inherits(subClass, superClass) { if (typeof superClass
 
 function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return participantsList_setPrototypeOf(o, p); }
 
-var participantsList_React = __webpack_require__(0);
-
-var participantsList_ReactDOM = __webpack_require__(3);
 
 
-
-var participantsList_ButtonsUI = __webpack_require__(7);
-
-var ModalDialogsUI = __webpack_require__(6);
 
 var participantsList_DropdownsUI = __webpack_require__(5);
 
@@ -9868,7 +9846,7 @@ var ContactsUI = __webpack_require__(2);
 
 var participantsList_PerfectScrollbar = __webpack_require__(11).PerfectScrollbar;
 
-var ParticipantsList =
+var participantsList_ParticipantsList =
 /*#__PURE__*/
 function (_MegaRenderMixin) {
   participantsList_inherits(ParticipantsList, _MegaRenderMixin);
@@ -9965,9 +9943,9 @@ function (_MegaRenderMixin) {
         contact = {};
       }
 
-      return participantsList_React.makeElement("div", {
+      return external_React_default.a.createElement("div", {
         className: "chat-contacts-list"
-      }, participantsList_React.makeElement(participantsList_PerfectScrollbar, {
+      }, external_React_default.a.createElement(participantsList_PerfectScrollbar, {
         chatRoom: room,
         members: room.members,
         ref: "contactsListScroll",
@@ -9977,7 +9955,7 @@ function (_MegaRenderMixin) {
         onAnimationEnd: function onAnimationEnd() {
           self.safeForceUpdate();
         }
-      }, participantsList_React.makeElement(ParticipantsListInner, {
+      }, external_React_default.a.createElement(ParticipantsListInner, {
         chatRoom: room,
         members: room.members,
         disableCheckingVisibility: true,
@@ -9988,188 +9966,176 @@ function (_MegaRenderMixin) {
   }]);
 
   return ParticipantsList;
-}(Object(mixins["default"])(participantsList_React.Component));
+}(Object(mixins["default"])(external_React_default.a.Component));
 
-ParticipantsList.defaultProps = {
+participantsList_ParticipantsList.defaultProps = {
   'requiresUpdateOnResize': true,
   'contactCardHeight': 36
 };
 ;
 
-var ParticipantsListInner =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
-  participantsList_inherits(ParticipantsListInner, _MegaRenderMixin2);
+function ParticipantsListInner(_ref) {
+  var _ref$requiresUpdateOn = _ref.requiresUpdateOnResize,
+      requiresUpdateOnResize = _ref$requiresUpdateOn === void 0 ? true : _ref$requiresUpdateOn,
+      _ref$contactCardHeigh = _ref.contactCardHeight,
+      contactCardHeight = _ref$contactCardHeigh === void 0 ? 32 : _ref$contactCardHeigh,
+      _ref$scrollPositionY = _ref.scrollPositionY,
+      scrollPositionY = _ref$scrollPositionY === void 0 ? 0 : _ref$scrollPositionY,
+      _ref$scrollHeight = _ref.scrollHeight,
+      scrollHeight = _ref$scrollHeight === void 0 ? 128 : _ref$scrollHeight,
+      room = _ref.chatRoom;
+  var _ChatRoom$MembersSet$ = ChatRoom.MembersSet.PRIVILEGE_STATE,
+      FULL = _ChatRoom$MembersSet$.FULL,
+      OPERATOR = _ChatRoom$MembersSet$.OPERATOR,
+      READONLY = _ChatRoom$MembersSet$.READONLY;
 
-  function ParticipantsListInner() {
-    participantsList_classCallCheck(this, ParticipantsListInner);
-
-    return participantsList_possibleConstructorReturn(this, participantsList_getPrototypeOf(ParticipantsListInner).apply(this, arguments));
+  if (!room) {
+    // destroyed
+    return null;
   }
 
-  participantsList_createClass(ParticipantsListInner, [{
-    key: "render",
-    value: function render() {
-      var self = this;
-      var room = this.props.chatRoom;
+  if (!room.isCurrentlyActive && room._leaving !== true) {
+    // save some memory/DOM
+    return false;
+  }
 
-      if (!room) {
-        // destroyed
-        return null;
+  var contactHandle;
+  var contact;
+  var contacts = room.getParticipantsExceptMe();
+
+  if (contacts && contacts.length > 0) {
+    contactHandle = contacts[0];
+    contact = M.u[contactHandle];
+  } else {
+    contact = {};
+  }
+
+  var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
+  var contactsList = [];
+  var firstVisibleUserNum = Math.floor(scrollPositionY / contactCardHeight);
+  var visibleUsers = Math.ceil(scrollHeight / contactCardHeight);
+  var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
+  var contactListInnerStyles = {
+    'height': contacts.length * contactCardHeight
+  }; // slice and only add a specific number of contacts to the list
+
+  if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving() && room.members.hasOwnProperty(u_handle)) {
+    contacts.unshift(u_handle);
+    contactListInnerStyles.height += contactCardHeight;
+  }
+
+  var i = 0;
+  contacts.forEach(function (contactHash) {
+    var contact = M.u[contactHash];
+
+    if (contact) {
+      if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
+        i++;
+        return;
       }
 
-      if (!room.isCurrentlyActive && room._leaving !== true) {
-        // save some memory/DOM
-        return false;
-      }
+      var dropdowns = [];
+      var privilege = null;
+      var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
 
-      var contactHandle;
-      var contact;
-      var contacts = room.getParticipantsExceptMe();
+      if (room.type === "public" || room.type === "group" && room.members) {
+        var dropdownRemoveButton = [];
 
-      if (contacts && contacts.length > 0) {
-        contactHandle = contacts[0];
-        contact = M.u[contactHandle];
-      } else {
-        contact = {};
-      }
-
-      var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-      var contactsList = [];
-      var firstVisibleUserNum = Math.floor(self.props.scrollPositionY / self.props.contactCardHeight);
-      var visibleUsers = Math.ceil(self.props.scrollHeight / self.props.contactCardHeight);
-      var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
-      var contactListInnerStyles = {
-        'height': contacts.length * self.props.contactCardHeight
-      }; // slice and only add a specific number of contacts to the list
-
-      if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving() && room.members.hasOwnProperty(u_handle)) {
-        contacts.unshift(u_handle);
-        contactListInnerStyles.height += self.props.contactCardHeight;
-      }
-
-      var i = 0;
-      contacts.forEach(function (contactHash) {
-        var contact = M.u[contactHash];
-
-        if (contact) {
-          if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
-            i++;
-            return;
-          }
-
-          var dropdowns = [];
-          var privilege = null;
-          var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
-
-          if (room.type === "public" || room.type === "group" && room.members && myPresence !== 'offline') {
-            var dropdownRemoveButton = [];
-
-            if (room.iAmOperator() && contactHash !== u_handle) {
-              dropdownRemoveButton.push(participantsList_React.makeElement(participantsList_DropdownsUI.DropdownItem, {
-                className: "red",
-                key: "remove",
-                icon: "rounded-stop",
-                label: __(l[8867]),
-                onClick: function onClick() {
-                  $(room).trigger('onRemoveUserRequest', [contactHash]);
-                }
-              }));
+        if (room.iAmOperator() && contactHash !== u_handle) {
+          dropdownRemoveButton.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+            className: "red",
+            key: "remove",
+            icon: "rounded-stop",
+            label: __(l[8867]),
+            onClick: function onClick() {
+              $(room).trigger('onRemoveUserRequest', [contactHash]);
             }
-
-            if (room.iAmOperator() || contactHash === u_handle) {
-              // operator
-              dropdowns.push(participantsList_React.makeElement("div", {
-                key: "setPermLabel",
-                className: "dropdown-items-info"
-              }, __(l[8868])));
-              dropdowns.push(participantsList_React.makeElement(participantsList_DropdownsUI.DropdownItem, {
-                key: "privOperator",
-                icon: "gentleman",
-                label: __(l[8875]),
-                className: "tick-item " + (room.members[contactHash] === 3 ? "active" : ""),
-                disabled: contactHash === u_handle,
-                onClick: function onClick() {
-                  if (room.members[contactHash] !== 3) {
-                    $(room).trigger('alterUserPrivilege', [contactHash, 3]);
-                  }
-                }
-              }));
-              dropdowns.push(participantsList_React.makeElement(participantsList_DropdownsUI.DropdownItem, {
-                key: "privFullAcc",
-                icon: "conversation-icon",
-                className: "tick-item " + (room.members[contactHash] === 2 ? "active" : ""),
-                disabled: contactHash === u_handle,
-                label: __(l[8874]),
-                onClick: function onClick() {
-                  if (room.members[contactHash] !== 2) {
-                    $(room).trigger('alterUserPrivilege', [contactHash, 2]);
-                  }
-                }
-              }));
-              dropdowns.push(participantsList_React.makeElement(participantsList_DropdownsUI.DropdownItem, {
-                key: "privReadOnly",
-                icon: "eye-icon",
-                className: "tick-item " + (room.members[contactHash] === 0 ? "active" : ""),
-                disabled: contactHash === u_handle,
-                label: __(l[8873]),
-                onClick: function onClick() {
-                  if (room.members[contactHash] !== 0) {
-                    $(room).trigger('alterUserPrivilege', [contactHash, 0]);
-                  }
-                }
-              }));
-            } else if (room.members[u_handle] === 2) {// full access
-            } else if (room.members[u_handle] === 1) {// read write
-              // should not happen.
-            } else if (room.isReadOnly()) {// read only
-            } else {} // should not happen.
-              // other user privilege
-
-
-            if (room.members[contactHash] === 3) {
-              dropdownIconClasses = "small-icon gentleman";
-            } else if (room.members[contactHash] === 2) {
-              dropdownIconClasses = "small-icon conversation-icon";
-            } else if (room.members[contactHash] === 0) {
-              dropdownIconClasses = "small-icon eye-icon";
-            } else {// should not happen.
-            }
-          }
-
-          contactsList.push(participantsList_React.makeElement(ContactsUI.ContactCard, {
-            key: contact.u,
-            contact: contact,
-            megaChat: room.megaChat,
-            className: "right-chat-contact-card",
-            dropdownPositionMy: "left top",
-            dropdownPositionAt: "left top",
-            dropdowns: dropdowns,
-            dropdownDisabled: contactHash === u_handle || anonymouschat,
-            dropdownButtonClasses: (room.type == "group" || room.type === "public") && myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown",
-            dropdownRemoveButton: dropdownRemoveButton,
-            dropdownIconClasses: dropdownIconClasses,
-            isInCall: room.uniqueCallParts && room.uniqueCallParts[contactHash]
           }));
-          i++;
         }
-      });
-      return participantsList_React.makeElement("div", {
-        className: "chat-contacts-list-inner",
-        style: contactListInnerStyles
-      }, contactsList);
+
+        if (room.iAmOperator() || contactHash === u_handle) {
+          // operator
+          dropdowns.push(external_React_default.a.createElement("div", {
+            key: "setPermLabel",
+            className: "dropdown-items-info"
+          }, __(l[8868])));
+          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+            key: "privOperator",
+            icon: "gentleman",
+            label: __(l[8875]),
+            className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
+            disabled: contactHash === u_handle,
+            onClick: function onClick() {
+              if (room.members[contactHash] !== FULL) {
+                $(room).trigger('alterUserPrivilege', [contactHash, FULL]);
+              }
+            }
+          }));
+          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+            key: "privFullAcc",
+            icon: "conversation-icon",
+            className: "tick-item " + (room.members[contactHash] === OPERATOR ? "active" : ""),
+            disabled: contactHash === u_handle,
+            label: __(l[8874]),
+            onClick: function onClick() {
+              if (room.members[contactHash] !== OPERATOR) {
+                $(room).trigger('alterUserPrivilege', [contactHash, OPERATOR]);
+              }
+            }
+          }));
+          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+            key: "privReadOnly",
+            icon: "eye-icon",
+            className: "tick-item " + (room.members[contactHash] === READONLY ? "active" : ""),
+            disabled: contactHash === u_handle,
+            label: __(l[8873]),
+            onClick: function onClick() {
+              if (room.members[contactHash] !== READONLY) {
+                $(room).trigger('alterUserPrivilege', [contactHash, READONLY]);
+              }
+            }
+          }));
+        } else if (room.members[u_handle] === OPERATOR) {// full access
+        } else if (room.members[u_handle] === 1) {// read write
+          // should not happen.
+        } else if (room.isReadOnly()) {// read only
+        } else {} // should not happen.
+          // other user privilege
+
+
+        if (room.members[contactHash] === FULL) {
+          dropdownIconClasses = "small-icon gentleman";
+        } else if (room.members[contactHash] === OPERATOR) {
+          dropdownIconClasses = "small-icon conversation-icon";
+        } else if (room.members[contactHash] === READONLY) {
+          dropdownIconClasses = "small-icon eye-icon";
+        } else {// should not happen.
+        }
+      }
+
+      contactsList.push(external_React_default.a.createElement(ContactsUI.ContactCard, {
+        key: contact.u,
+        contact: contact,
+        megaChat: room.megaChat,
+        className: "right-chat-contact-card",
+        dropdownPositionMy: "left top",
+        dropdownPositionAt: "left top",
+        dropdowns: dropdowns,
+        dropdownDisabled: contactHash === u_handle || anonymouschat,
+        dropdownButtonClasses: (room.type == "group" || room.type === "public") && myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown",
+        dropdownRemoveButton: dropdownRemoveButton,
+        dropdownIconClasses: dropdownIconClasses,
+        isInCall: room.uniqueCallParts && room.uniqueCallParts[contactHash]
+      }));
+      i++;
     }
-  }]);
+  });
+  return external_React_default.a.createElement("div", {
+    className: "chat-contacts-list-inner",
+    style: contactListInnerStyles
+  }, contactsList);
+}
 
-  return ParticipantsListInner;
-}(Object(mixins["default"])(participantsList_React.Component));
-
-ParticipantsListInner.defaultProps = {
-  'requiresUpdateOnResize': true,
-  'contactCardHeight': 32,
-  'scrollPositionY': 0,
-  'scrollHeight': 32 * 4
-};
 ;
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/utils.jsx
@@ -13950,7 +13916,7 @@ function (_MegaRenderMixin) {
           self.onClose();
         }
       }, external_React_default.a.createElement("span", null, l[148]));
-      return external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
+      return external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
         title: self.props.chatRoom.iAmOperator() && !self.props.chatRoom.topic ? l[9080] : "",
         className: "fm-dialog chat-rename-dialog export-chat-links-dialog group-chat-link" + (!self.props.chatRoom.topic ? " requires-topic" : ""),
         onClose: function onClose() {
@@ -15377,7 +15343,7 @@ function (_MegaRenderMixin2) {
       var participantsList = null;
 
       if (room.type === "group" || room.type === "public") {
-        participantsList = external_React_default.a.createElement("div", null, isReadOnlyElement, external_React_default.a.createElement(ParticipantsList, {
+        participantsList = external_React_default.a.createElement("div", null, isReadOnlyElement, external_React_default.a.createElement(participantsList_ParticipantsList, {
           chatRoom: room,
           members: room.members,
           isCurrentlyActive: room.isCurrentlyActive
@@ -15392,7 +15358,7 @@ function (_MegaRenderMixin2) {
         disabled:
         /* Disable in case I don't have any more contacts to add ... */
         !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
-      }, external_React_default.a.createElement(dropdowns["DropdownContactsSelector"], {
+      }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
         contacts: this.props.contacts,
         megaChat: this.props.megaChat,
         chatRoom: room,
@@ -15494,7 +15460,7 @@ function (_MegaRenderMixin2) {
         icon: "rounded-grey-up-arrow colorized",
         label: __(l[6834] + "..."),
         disabled: room.isReadOnly()
-      }, external_React_default.a.createElement(dropdowns["Dropdown"], {
+      }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
         contacts: this.props.contacts,
         megaChat: this.props.megaChat,
         className: "wide-dropdown send-files-selector light",
@@ -15503,14 +15469,14 @@ function (_MegaRenderMixin2) {
         onClick: function onClick() {}
       }, external_React_default.a.createElement("div", {
         className: "dropdown info-txt"
-      }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(dropdowns["DropdownItem"], {
+      }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         className: "link-button light",
         icon: "grey-cloud colorized",
         label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
         onClick: function onClick() {
           self.props.onAttachFromCloudClicked();
         }
-      }), external_React_default.a.createElement(dropdowns["DropdownItem"], {
+      }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         className: "link-button light",
         icon: "grey-computer colorized",
         label: __(l[19795]) ? __(l[19795]) : "My computer",
@@ -16392,7 +16358,7 @@ function (_MegaRenderMixin3) {
 
       if (self.state.nonLoggedInJoinChatDialog === true) {
         var usersCount = Object.keys(room.members).length;
-        nonLoggedInJoinChatDialog = external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
+        nonLoggedInJoinChatDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
           title: l[20596],
           className: "fm-dialog chat-links-preview-desktop",
           megaChat: room.megaChat,
@@ -16444,7 +16410,7 @@ function (_MegaRenderMixin3) {
       if (self.state.privateChatDialog === true) {
         if (!$.dialog || $.dialog === "create-private-chat") {
           $.dialog = "create-private-chat";
-          privateChatDialog = external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
+          privateChatDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
             title: l[20594],
             className: "fm-dialog create-private-chat",
             megaChat: room.megaChat,
@@ -16527,7 +16493,7 @@ function (_MegaRenderMixin3) {
           });
         }
 
-        sendContactDialog = external_React_default.a.createElement(modalDialogs["default"].SelectContactDialog, {
+        sendContactDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].SelectContactDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           exclude: excludedContacts,
@@ -16550,7 +16516,7 @@ function (_MegaRenderMixin3) {
       var confirmDeleteDialog = null;
 
       if (self.state.confirmDeleteDialog === true) {
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ConfirmDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[8004]),
@@ -16615,7 +16581,7 @@ function (_MegaRenderMixin3) {
       var pasteImageConfirmDialog = null;
 
       if (self.state.pasteImageConfirmDialog) {
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ConfirmDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[20905]),
@@ -16673,7 +16639,7 @@ function (_MegaRenderMixin3) {
       var confirmTruncateDialog = null;
 
       if (self.state.truncateDialog === true) {
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ConfirmDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[8871]),
@@ -16699,7 +16665,7 @@ function (_MegaRenderMixin3) {
       }
 
       if (self.state.archiveDialog === true) {
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ConfirmDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[19068]),
@@ -16724,7 +16690,7 @@ function (_MegaRenderMixin3) {
       }
 
       if (self.state.unarchiveDialog === true) {
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ConfirmDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[19063]),
@@ -16762,7 +16728,7 @@ function (_MegaRenderMixin3) {
         };
 
         var renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
-        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["default"].ModalDialog, {
+        confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
           megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[9080]),
@@ -17129,7 +17095,7 @@ function (_MegaRenderMixin3) {
         className: "popup-button left",
         icon: "small-icon grey-small-plus",
         disabled: room.isReadOnly()
-      }, external_React_default.a.createElement(dropdowns["Dropdown"], {
+      }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
         className: "wide-dropdown attach-to-chat-popup light",
         noArrow: "true",
         positionMy: "left top",
@@ -17137,7 +17103,7 @@ function (_MegaRenderMixin3) {
         vertOffset: 4
       }, external_React_default.a.createElement("div", {
         className: "dropdown info-txt"
-      }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(dropdowns["DropdownItem"], {
+      }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         className: "link-button light",
         icon: "grey-cloud colorized",
         label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
@@ -17146,7 +17112,7 @@ function (_MegaRenderMixin3) {
             'attachCloudDialog': true
           });
         }
-      }), external_React_default.a.createElement(dropdowns["DropdownItem"], {
+      }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         className: "link-button light",
         icon: "grey-computer colorized",
         label: __(l[19795]) ? __(l[19795]) : "My computer",
@@ -17155,7 +17121,7 @@ function (_MegaRenderMixin3) {
         }
       }), external_React_default.a.createElement("div", {
         className: "chat-button-seperator"
-      }), external_React_default.a.createElement(dropdowns["DropdownItem"], {
+      }), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
         className: "link-button light",
         icon: "square-profile colorized",
         label: __(l[8628]),
@@ -22031,7 +21997,7 @@ function (_MegaRenderMixin) {
         }, l[20573]) : null);
       }
 
-      return startGroupChatWizard_React.makeElement(modalDialogs["default"].ModalDialog, {
+      return startGroupChatWizard_React.makeElement(modalDialogs["a" /* default */].ModalDialog, {
         step: self.state.step,
         title: l[19483],
         className: classes,

@@ -3793,7 +3793,7 @@ FileManager.prototype.addTreeUI = function() {
         console.time('treeUI');
     }
     var $treePanel = $('.fm-tree-panel');
-    var $treeItem = $('.nw-fm-tree-item:visible', $treePanel);
+    var $treeItem = $(folderlink ? '.nw-fm-tree-item' : '.nw-fm-tree-item:visible', $treePanel);
 
     $treeItem.draggable(
         {

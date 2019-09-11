@@ -6427,8 +6427,8 @@ function (_MegaRenderMixin2) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(BrowserEntries).call(this, props));
     _this.state = {
-      'highlighted': [],
-      'selected': []
+      'highlighted': _this.props.initialHighlighted || [],
+      'selected': _this.props.initialSelected || []
     };
     return _this;
   }
@@ -7172,7 +7172,9 @@ function (_MegaRenderMixin3) {
       }
 
       self.setState({
-        entries: self.getEntries()
+        entries: self.getEntries(),
+        selected: self.state.selected,
+        highlighted: self.state.highlighted
       });
       $this.parent().find('.active').removeClass("active");
       $this.addClass("active");
@@ -7645,6 +7647,9 @@ function (_MegaRenderMixin3) {
         onSelected: self.onSelected,
         onHighlighted: self.onHighlighted,
         onAttachClicked: self.onAttachClicked,
+        viewMode: localStorage.dialogViewMode,
+        initialSelected: self.state.selected,
+        initialHighlighted: self.state.highlighted,
         ref: function ref(browserEntries) {
           self.browserEntries = browserEntries;
         }

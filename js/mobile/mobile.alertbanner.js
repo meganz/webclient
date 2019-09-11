@@ -70,7 +70,7 @@ mobile.alertBanner = {
 
         this.$alertBannerText.safeHTML(message);
 
-        this.$alertBanner.removeClass('warning error');
+        this.$alertBanner.removeClass('warning error business');
         if (style !== null) {
             this.$alertBanner.addClass(style);
         }

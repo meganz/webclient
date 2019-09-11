@@ -5187,6 +5187,9 @@ div.checkboxOn, div.checkboxOff {
     margin-top: 0px;
     z-index: 98; /* 1 Less than titlebar as it needs to slide under when fixed.*/
 }
+.mobile.alert-banner.business {
+    height:initial;
+}
 .mobile.fixed-alert-banner .mobile.alert-banner {
     position: fixed;
 }
@@ -5207,6 +5210,9 @@ div.checkboxOn, div.checkboxOff {
     width: 40px;
     float: right;
 }
+.mobile.alert-banner.business .alert-close {
+    display:none;
+}
 .mobile.alert-banner .alert-text-container {
     position: absolute;
     left: 10px;
@@ -5220,6 +5226,10 @@ div.checkboxOn, div.checkboxOff {
     display: table-cell;
     line-height: 50px;
     padding: 5px;
+}
+.mobile.alert-banner.business .alert-text-container {
+    float: none;
+    position: initial;
 }
 .mobile.alert-banner .alert-text-container .alert-text {
     display: inline-block;

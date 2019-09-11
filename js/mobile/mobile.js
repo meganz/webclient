@@ -483,6 +483,52 @@ var mobile = {
     }
 };
 
+mBroadcaster.once('fm:initialized', function () {
+    'use strict';
+
+    if (!isMobile) {
+        // not neccessary check, but to make sure.
+        return;
+    }
+
+    var $banner;
+    if (u_attr && u_attr.b) {
+        if (u_attr.b.m) {
+            var msg = '';
+
+            if (u_attr.b.s === -1) { // expired
+                if (u_attr.b.m) {
+                    msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                        .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                }
+                else {
+                    msg = l[20462];
+                }
+
+                $banner = mobile.alertBanner.showError(msg);
+                $banner.$alertBanner.addClass('business');
+                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
+            }
+            else if (u_attr.b.s === 2) { // grace
+                if (u_attr.b.m) {
+                    msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
+                        .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                    $banner = mobile.alertBanner.showWarning(msg);
+                    $banner.$alertBanner.addClass('business');
+                    $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
+                }
+            }
+        }
+        else { // not master user
+            if (u_attr.b.s === -1) { // expired
+                $banner = mobile.alertBanner.showError(l[20462]);
+                $banner.$alertBanner.addClass('business');
+                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
+            }
+        }
+
+    }
+});
 
 mBroadcaster.once('startMega:mobile', function() {
     'use strict';

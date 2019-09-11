@@ -955,7 +955,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                         </utils.EmojiFormattedContent>
                     </div>
                     <div className="call-participants-count">
-                        {Object.keys(chatRoom.callParticipants).length}
+                        {chatRoom.callParticipants().length}
                     </div>
 
                     <a className={

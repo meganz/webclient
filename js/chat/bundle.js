@@ -12495,21 +12495,14 @@ function (_ConversationMessageM) {
             textMessage = "<div class=\"bold mainMessage\">" + textMessage + "</div>" + "<div class=\"extraCallInfo\">" + translationString + "</div>";
 
             if (message.type === "call-started" && message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()) {
-              var callParts = Object.keys(chatRoom.callParticipants);
-              var unique = {};
-              callParts.forEach(function (handleAndSid) {
-                var handle = base64urlencode(handleAndSid.substr(0, 8));
-
-                if (!unique[handle]) {
-                  avatarsListing.push(external_React_default.a.createElement(ui_contacts["Avatar"], {
-                    key: handle,
-                    contact: M.u[handle],
-                    simpletip: M.u[handle] && M.u[handle].name,
-                    className: "message avatar-wrapper small-rounded-avatar"
-                  }));
-                }
-
-                unique[handle] = 1;
+              var unique = chatRoom.uniqueCallParts ? Object.keys(chatRoom.uniqueCallParts) : [];
+              unique.forEach(function (handle) {
+                avatarsListing.push(external_React_default.a.createElement(ui_contacts["Avatar"], {
+                  key: handle,
+                  contact: M.u[handle],
+                  simpletip: M.u[handle] && M.u[handle].name,
+                  className: "message avatar-wrapper small-rounded-avatar"
+                }));
               });
             }
           }
@@ -14910,7 +14903,7 @@ function (_MegaRenderMixin) {
           className: "call-topic"
         }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, ellipsis(chatRoom.getRoomTitle(), 'end', 70))), external_React_default.a.createElement("div", {
           className: "call-participants-count"
-        }, Object.keys(chatRoom.callParticipants).length), external_React_default.a.createElement("a", {
+        }, chatRoom.callParticipants().length), external_React_default.a.createElement("a", {
           className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : ""),
           onClick: function onClick(e) {
             if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
@@ -15195,7 +15188,7 @@ function (_MegaRenderMixin) {
     value: function render() {
       var room = this.props.chatRoom;
 
-      if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+      if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
         return external_React_default.a.createElement("div", {
           className: "in-call-notif yellow join"
         }, external_React_default.a.createElement("i", {
@@ -15339,7 +15332,7 @@ function (_MegaRenderMixin2) {
       }
 
       if (room.type === "group" || room.type === "public") {
-        if (room.callParticipants && Object.keys(room.callParticipants).length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
+        if (room.callParticipants().length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
           // call is active, but I'm not in
           startAudioCallButton = startVideoCallButton = null;
         }
@@ -19928,7 +19921,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     flags: 0x00,
     publicLink: null,
     archivedSelected: false,
-    callParticipants: false,
     observers: 0
   }, true);
   this.roomId = roomId;
@@ -19936,6 +19928,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   this.type = type;
   this.ctime = ctime;
   this.lastActivity = lastActivity ? lastActivity : 0;
+  this.chatd = megaChat.plugins.chatdIntegration.chatd;
   this.chatId = chatId;
   this.chatIdBin = chatId ? base64urldecode(chatId) : "";
   this.chatShard = chatShard;
@@ -19991,15 +19984,9 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
 
   self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
     if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-      var cd = self.megaChat.plugins.chatdIntegration.chatd;
-
-      if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
-        var cid = cd.chatIdMessages[self.chatIdBin];
-
-        if (cd.chatIdShard[self.chatIdBin].isOnline()) {
-          // this should never happen, but just in case...
-          cd.chatIdMessages[self.chatIdBin].resend();
-        }
+      if (self.chatd && self.isOnline() && self.chatIdBin) {
+        // this should never happen, but just in case...
+        self.chat().resend();
       }
     }
   }); // activity on a specific room (show, hidden, got new message, etc)
@@ -20150,12 +20137,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     }
   });
   self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
-    if (participants) {
-      self.callParticipants = participants;
-    } else if (!userid && !clientid && !participants) {
-      self.callParticipants = {};
-    }
-
     self.callParticipantsUpdated();
   });
   self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
@@ -20275,6 +20256,30 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function (ap, isMcf) {
   if (this.membersSetFromApi) {
     this.membersSetFromApi.trackFromActionPacket(ap, isMcf);
   }
+};
+/**
+ * @returns An array with the userid+clientid (binary) of the call participants in this room
+ * If there is no call or there is no chatd chat with this chatid, returns an empty array
+ */
+
+
+ChatRoom.prototype.callParticipants = function () {
+  var chat = this.chat();
+
+  if (!chat) {
+    return [];
+  } else {
+    return Object.keys(chat.callInfo.participants);
+  }
+};
+
+ChatRoom.prototype.chat = function () {
+  return this.chatd.chatIdMessages[this.chatIdBin];
+};
+
+ChatRoom.prototype.isOnline = function () {
+  var shard = this.chatd.shards[this.chatShard];
+  return shard ? shard.isOnline() : false;
 };
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
@@ -21282,7 +21287,7 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 };
 
 ChatRoom.prototype._clearChatMessagesFromChatd = function () {
-  megaChat.plugins.chatdIntegration.chatd.shards[0].retention(base64urldecode(this.chatId), 1);
+  this.chatd.shards[0].retention(base64urldecode(this.chatId), 1);
 };
 
 ChatRoom.prototype.isReadOnly = function () {
@@ -21369,31 +21374,6 @@ ChatRoom.prototype.truncate = function () {
     }
   }
 };
-/**
- * Helper tool that iterates all `chatRoom.callParticipants` and returns the sum of sessions
- *
- * @returns {number}
- */
-
-
-ChatRoom.prototype.getTotalCallSessionCount = function () {
-  var self = this;
-
-  if (!self.callParticipants || !Object.keys(self.callParticipants).length) {
-    return 0;
-  }
-
-  var count = 0;
-  Object.keys(self.callParticipants).forEach(function (k) {
-    if (!self.callParticipants[k]) {
-      return;
-    }
-
-    var currentCount = Object.keys(self.callParticipants[k]);
-    count += currentCount.length || 0;
-  });
-  return count;
-};
 
 ChatRoom.prototype.haveActiveCall = function () {
   return this.callManagerCall && this.callManagerCall.isActive() === true;
@@ -21401,10 +21381,12 @@ ChatRoom.prototype.haveActiveCall = function () {
 
 ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
+  var parts = self.callParticipants();
+  var haveCallParticipants = parts && parts.length > 0;
 
-  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && haveCallParticipants) {
     return true;
-  } else if (!self.callManagerCall && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+  } else if (!self.callManagerCall && haveCallParticipants) {
     return true;
   } else {
     return false;
@@ -21463,11 +21445,11 @@ ChatRoom.prototype.callParticipantsUpdated = function ()
     msgId = self.getActiveCallMessageId(true);
   }
 
-  var callParts = Object.keys(self.callParticipants);
+  var callParts = self.callParticipants();
   var uniqueCallParts = {};
   callParts.forEach(function (handleAndSid) {
     var handle = base64urlencode(handleAndSid.substr(0, 8));
-    uniqueCallParts[handle] = 1;
+    uniqueCallParts[handle] = true;
   });
   self.uniqueCallParts = uniqueCallParts;
   var msg = self.messagesBuff.getMessageById(msgId);

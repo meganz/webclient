@@ -175,7 +175,7 @@
         return base64urldecode(room.getParticipantsExceptMe()[0]);
     };
 
-    RtcGlobalEventHandler.prototype.onClientJoinedCall = function(chatId, userid, clientid, parts) {
+    RtcGlobalEventHandler.prototype.onClientJoinedCall = function(chatId, userid, clientid) {
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
@@ -183,15 +183,14 @@
                 'onCallParticipantsUpdated',
                 [
                     base64urlencode(userid),
-                    base64urlencode(clientid),
-                    parts
+                    base64urlencode(clientid)
                 ]
             );
             chatRoom.trigger('onClientJoinedCall', {userId: userid, clientId: clientid});
         }
     };
 
-    RtcGlobalEventHandler.prototype.onClientLeftCall = function(chatId, userid, clientid, parts) {
+    RtcGlobalEventHandler.prototype.onClientLeftCall = function(chatId, userid, clientid) {
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
@@ -199,8 +198,7 @@
                 'onCallParticipantsUpdated',
                 [
                     base64urlencode(userid),
-                    base64urlencode(clientid),
-                    parts
+                    base64urlencode(clientid)
                 ]
             );
             chatRoom.trigger('onClientLeftCall', {userId: userid, clientId: clientid});

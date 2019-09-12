@@ -4001,5 +4001,5 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 lazy(MegaData.prototype, 'myChatFilesFolder', function() {
     'use strict';
     return mega.attr.getFolderFactory("cf", false, true, 'h',
-        [l[-'TODO'], 'My chat files'], base64urlencode, base64urldecode);
+        [l[20157], 'My chat files'], base64urlencode, base64urldecode);
 });

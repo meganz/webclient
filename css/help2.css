@@ -8,6 +8,7 @@
 .main-mid-pad#help2-main {
     width: 100%;
     min-width: 1024px;
+    max-width: 100%;
     padding-top: 46px;
 }
 .main-pad-block.help-home-page {

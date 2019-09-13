@@ -891,6 +891,16 @@
 
         dialogPositioning($dialog);
 
+        // 'New contact' button
+
+        if (section === 'shared-with-me' || section === 'cloud-drive') {
+            $('.dialog-newcontact-button', $dialog).addClass('hidden');
+        }
+        else {
+            $('.dialog-newcontact-button', $dialog).removeClass('hidden');
+        }
+
+
         // Activate tab
         $('.fm-picker-dialog-button.' + section, $dialog).addClass('active');
     };

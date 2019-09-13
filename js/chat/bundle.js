@@ -6327,10 +6327,6 @@ var modalDialogs = __webpack_require__(6);
 var tooltips = __webpack_require__(12);
 
 // CONCATENATED MODULE: ./js/ui/cloudBrowserModalDialog.jsx
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6343,67 +6339,54 @@ function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) ===
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-var React = __webpack_require__(0);
-
-var ReactDOM = __webpack_require__(3);
 
 
 
 
 
 
-var BrowserCol =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
-  _inherits(BrowserCol, _MegaRenderMixin);
+function BrowserCol(_ref) {
+  var id = _ref.id,
+      _ref$className = _ref.className,
+      className = _ref$className === void 0 ? '' : _ref$className,
+      label = _ref.label,
+      sortBy = _ref.sortBy,
+      _onClick = _ref.onClick;
+  var classes = "".concat(id, " ").concat(className);
 
-  function BrowserCol() {
-    _classCallCheck(this, BrowserCol);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(BrowserCol).apply(this, arguments));
+  if (sortBy[0] === id) {
+    var ordClass = sortBy[1] == "desc" ? "asc" : "desc";
+    classes = "".concat(classes, " ").concat(ordClass);
   }
 
-  _createClass(BrowserCol, [{
-    key: "render",
-    value: function render() {
-      var self = this;
-      var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
+  return React.makeElement("th", {
+    onClick: function onClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-      if (self.props.sortBy[0] === self.props.id) {
-        var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
-        classes = classes + " " + ordClass;
-      }
-
-      return React.makeElement("th", {
-        onClick: function onClick(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          self.props.onClick(self.props.id);
-        }
-      }, React.makeElement("span", {
-        className: "arrow " + classes
-      }, self.props.label));
+      _onClick(id);
     }
-  }]);
+  }, React.makeElement("span", {
+    className: "arrow ".concat(classes)
+  }, label));
+}
 
-  return BrowserCol;
-}(Object(mixins["default"])(React.Component));
-
-BrowserCol.defaultProps = {
-  'hideable': true
-};
 ;
 
 var cloudBrowserModalDialog_BrowserEntries =
 /*#__PURE__*/
-function (_MegaRenderMixin2) {
-  _inherits(BrowserEntries, _MegaRenderMixin2);
+function (_MegaRenderMixin) {
+  _inherits(BrowserEntries, _MegaRenderMixin);
 
   function BrowserEntries(props) {
     var _this;
@@ -6891,9 +6874,18 @@ function (_MegaRenderMixin2) {
 
         var isFolder = node.t;
         var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
+        var fileIconType = fileIcon(node); // megadrop or shared folder
+
+        var isSharedFolder = fileIconType === 'puf-folder' || fileIconType === 'folder-shared';
+        var sharedFolderClass = '';
+
+        if (isSharedFolder) {
+          sharedFolderClass = fileIconType;
+        }
+
         var tooltipElement = null;
         var icon = React.makeElement("span", {
-          className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)
+          className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + '' + fileIconType
         }, " ");
         var image = null;
         var src = null;
@@ -7004,7 +6996,7 @@ function (_MegaRenderMixin2) {
           }), React.makeElement("div", {
             className: "data-item-icon indicator"
           })), React.makeElement("div", {
-            className: "block-view-file-type " + (isFolder ? " folder " : " file " + fileIcon(node))
+            className: "block-view-file-type " + (isFolder ? " folder " : " file " + fileIcon(node)) + sharedFolderClass
           }, image), is_video(node) ? React.makeElement("div", {
             className: "video-thumb-details"
           }, React.makeElement("i", {
@@ -7088,7 +7080,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return BrowserEntries;
-}(Object(mixins["default"])(React.Component));
+}(Object(mixins["default"])(external_React_["Component"]));
 
 cloudBrowserModalDialog_BrowserEntries.defaultProps = {
   'hideable': true
@@ -7097,8 +7089,8 @@ cloudBrowserModalDialog_BrowserEntries.defaultProps = {
 
 var cloudBrowserModalDialog_CloudBrowserDialog =
 /*#__PURE__*/
-function (_MegaRenderMixin3) {
-  _inherits(CloudBrowserDialog, _MegaRenderMixin3);
+function (_MegaRenderMixin2) {
+  _inherits(CloudBrowserDialog, _MegaRenderMixin2);
 
   function CloudBrowserDialog(props) {
     var _this2;
@@ -7408,7 +7400,7 @@ function (_MegaRenderMixin3) {
       var self = this;
       var entries = self.state.entries || self.getEntries();
       var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
-      var classes = "add-from-cloud " + (self.props.className || '');
+      var classes = "add-from-cloud ".concat(self.props.className);
       var folderIsHighlighted = false;
       var breadcrumb = [];
       M.getPath(self.state.currentlyViewedEntry).forEach(function (breadcrumbNodeId, k) {
@@ -7643,13 +7635,14 @@ function (_MegaRenderMixin3) {
   }]);
 
   return CloudBrowserDialog;
-}(Object(mixins["default"])(React.Component));
+}(Object(mixins["default"])(external_React_["Component"]));
 
 cloudBrowserModalDialog_CloudBrowserDialog.defaultProps = {
   'selectLabel': __(l[8023]),
   'openLabel': __(l[1710]),
   'cancelLabel': __(l[82]),
-  'hideable': true
+  'hideable': true,
+  className: ''
 };
 ;
 window.CloudBrowserModalDialogUI = {
@@ -8236,7 +8229,7 @@ function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototype
 
 var emojiAutocomplete_React = __webpack_require__(0);
 
-var emojiAutocomplete_ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(3);
 
 
 

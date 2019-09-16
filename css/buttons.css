@@ -1146,7 +1146,7 @@ body:not(.rtl) .default-white-button::first-letter {
     height: 48px;
     line-height: 47px;
     letter-spacing: 0;
-    font-size: 20px;
+    font-size: 18px;
     margin: 0;
     background-color: #00BFA5;
     border: 0;

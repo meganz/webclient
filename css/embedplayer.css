@@ -350,7 +350,7 @@ input, textarea {
 	left: 48px;
 	top: 50%;
 	margin: -33px 0 0 0;
-	background-image: url(../images/mega/icons-sprite_v30.png);
+	background-image: url(../images/mega/icons-sprite_v32.png);
 	background-position: -188px -670px;
 	-webkit-transition: opacity 200ms ease-in-out;
 	-moz-transition: opacity 200ms ease-in-out;
@@ -1036,7 +1036,7 @@ input, textarea {
 	position: absolute;
 	right: 7px;
 	top: 9px;
-	background-image: url(../images/mega/icons-sprite_v30.png);
+	background-image: url(../images/mega/icons-sprite_v32.png);
 	background-repeat: no-repeat;
 	background-position: -106px -254px;
 	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);

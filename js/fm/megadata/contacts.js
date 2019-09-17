@@ -717,6 +717,10 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
             self.u[userId].name = "";
         }
 
+        if (nicknames.cache[userId]) {
+            self.u[userId].nickname = nicknames.cache[userId];
+        }
+
         if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
             self.u[userId].avatar = false;
             useravatar.loaded(userId);
@@ -824,6 +828,7 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 else if (M.currentdirid === 'contacts') {
                     M.openFolder(M.currentdirid, true);
                 }
+
                 eventuallyReorderContactsTreePane();
             }, 1000);
         }

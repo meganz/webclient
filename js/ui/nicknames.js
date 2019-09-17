@@ -19,6 +19,7 @@ var nicknames = {
         'use strict';
 
         if (M.u && typeof M.u[userId] !== 'undefined' && M.u[userId].name) {
+            // M.u[userId].c === 1 is because we only want those to appear for contacts.
 
             // Set format to FirstName LastName (or just FirstName if the last name is not set)
             var userName = (M.u[userId].name).trim();
@@ -86,16 +87,20 @@ var nicknames = {
                 }
 
                 // Loop through all the properties in M.u
-                Object.keys(M.u).forEach(function(key) {
+                M.u.keys().forEach(function(key) {
 
                     // If an active contact
-                    if (typeof M.u[key] !== 'undefined' && M.u[key].c === 1) {
+                    if (typeof M.u[key] !== 'undefined' && M.u[key].h) {
 
                         // Use if set or use empty string so it will get updated in the UI if they had it set before
                         var newNickname = (typeof contactNicknames[key] !== 'undefined') ? contactNicknames[key] : '';
-
                         // Set the nickname in the UI (will automagically update)
-                        M.u[key].nickname = newNickname;
+                        var oldNickname = M.u[key].nickname;
+                        if (oldNickname !== newNickname) {
+                            M.u[key].nickname = newNickname;
+                            M.avatars([key]);
+                        }
+
                     }
                 });
 
@@ -264,12 +269,14 @@ var nicknames = {
                     // If the nickname previously existed, delete it
                     if (M.u[contactUserHandle].nickname !== '') {
                         M.u[contactUserHandle].nickname = '';
+                        M.avatars([contactUserHandle]);
                         updateApi = true;
                     }
                 }
                 else {
                     // Set the nickname
                     M.u[contactUserHandle].nickname = nickname;
+                    M.avatars([contactUserHandle]);
                     updateApi = true;
                 }
 
@@ -304,10 +311,10 @@ var nicknames = {
             var contactNicknames = {};
 
             // Loop through the keys in M.u
-            Object.keys(M.u).forEach(function(key) {
+            M.u.keys().forEach(function(key) {
 
                 // If an active contact and they have a nickname, add it
-                if (typeof M.u[key] !== 'undefined' && M.u[key].c === 1 && M.u[key].nickname !== '') {
+                if (typeof M.u[key] !== 'undefined' && M.u[key].nickname !== '') {
                     contactNicknames[key] = M.u[key].nickname;
                 }
             });

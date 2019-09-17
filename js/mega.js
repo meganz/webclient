@@ -3784,8 +3784,14 @@ function fmsortmode(id, n, d)
     var sortmodes = {};
     if (typeof fmconfig.sortmodes !== 'undefined')
         sortmodes = fmconfig.sortmodes;
-    if (n === 'name' && d > 0)
+    if (n === 'name' && d > 0 && id !== "contacts") {
+        // don't delete for "contacts" section, since "status" is the default there.
         delete sortmodes[id];
+    }
+    else if (n === "status" && d > 0 && id === "contacts") {
+        // DO delete for "contacts" section, since "status" is the default there, so default is already d > 1.
+        delete sortmodes[id];
+    }
     else
         sortmodes[id] = {n: n, d: d};
     mega.config.set('sortmodes', sortmodes);

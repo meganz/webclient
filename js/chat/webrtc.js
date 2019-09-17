@@ -3035,10 +3035,17 @@ Session.prototype._createRtcConn = function() {
             self.cmd(RTCMD.END_ICE_CANDIDATES);
             return;
         }
-        var ctype = cand.candidate.match(/typ\s([^\s]+)/)[1];
-        if (localStorage.forceRelay && ctype !== 'relay') {
-            self.logger.warn("forceRelay: Not sending a '" + ctype + "' ICE candidate because it is not a relay");
-            return;
+        if (localStorage.forceRelay) {
+        // "manual" match, in theory should not be needed, as we specify iceTransportPolicy=relay
+        // but just in case iceTransportPolicy is not recognized
+            var m = cand.candidate.match(/typ\s([^\s]+)/);
+            if (m && (m.length > 1)) {
+                var ctype = m[1];
+                if (ctype !== 'relay') {
+                    self.logger.warn("forceRelay: Not sending a '" + ctype + "' ICE candidate because it is not a relay");
+                    return;
+                }
+            }
         }
         var idx = cand.sdpMLineIndex;
         var mid = cand.sdpMid;

@@ -1346,6 +1346,8 @@ var attribCache = false;
                 M[attribute] = res[0] || M[attribute];
                 if (M[attribute].p === M.RubbishID) {
                     M[attribute] = false;
+                } else if (M[attribute].name !== localeName) {
+                    M.rename(M[attribute].h, localeName);
                 }
                 if (d) {
                     log.info("Updating folder...", M[attribute]);

@@ -4526,6 +4526,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: relative;
     cursor: pointer;
 }
+.fm-avatar:empty {
+    display: none;
+}
 .fm-avatar .avatar-wrapper {
     height: 28px;
     width: 28px;

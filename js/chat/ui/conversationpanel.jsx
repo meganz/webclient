@@ -40,7 +40,7 @@ export class JoinCallNotification extends MegaRenderMixin(React.Component) {
     }
     render() {
         var room = this.props.chatRoom;
-        if (Object.keys(room.callParticipants).length >= RtcModule.kMaxCallReceivers) {
+        if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
                 <i className="small-icon audio-call colorized"/>
                 {l[20200]}
@@ -91,8 +91,8 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
         }
     }
     render() {
-        var self = this;
-        var room = this.props.chatRoom;
+        const self = this;
+        const { chatRoom: room } = self.props;
 
         if (!room || !room.roomId) {
             // destroyed
@@ -180,8 +180,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
 
         if (room.type === "group" || room.type === "public") {
             if (
-                room.callParticipants &&
-                Object.keys(room.callParticipants).length > 0 &&
+                room.callParticipants().length > 0 &&
                 (
                     !room.callManagerCall ||
                     room.callManagerCall.isActive() === false
@@ -326,11 +325,11 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
-                        {room.type === "public" ? <div className="accordion-text observers">
+                        {room.type === "public" && room.observers > 0 ? <div className="accordion-text observers">
                             {l[20466]}
                             <span className="observers-count">
                                 <i className="tiny-icon eye"></i>
-                                {self.props.chatRoom.observers}
+                                {room.observers}
                             </span>
                         </div> : <div></div>}
 

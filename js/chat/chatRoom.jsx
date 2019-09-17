@@ -50,7 +50,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             flags: 0x00,
             publicLink: null,
             archivedSelected: false,
-            callParticipants: false,
             observers: 0
         },
         true
@@ -61,6 +60,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.type = type;
     this.ctime = ctime;
     this.lastActivity = lastActivity ? lastActivity : 0;
+    this.chatd = megaChat.plugins.chatdIntegration.chatd;
+
     this.chatId = chatId;
     this.chatIdBin = chatId ? base64urldecode(chatId) : "";
 
@@ -129,13 +130,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
         if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-            var cd = self.megaChat.plugins.chatdIntegration.chatd;
-            if (self.chatIdBin && cd && cd.chatIdMessages[self.chatIdBin]) {
-                var cid = cd.chatIdMessages[self.chatIdBin];
-                if (cd.chatIdShard[self.chatIdBin].isOnline()) {
-                    // this should never happen, but just in case...
-                    cd.chatIdMessages[self.chatIdBin].resend();
-                }
+            if (self.chatd && self.isOnline() && self.chatIdBin) {
+                // this should never happen, but just in case...
+                self.chat().resend();
             }
         }
     });
@@ -294,13 +291,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
     self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
-        if (participants) {
-            self.callParticipants = participants;
-        }
-        else if (!userid && !clientid && !participants) {
-            self.callParticipants = {};
-        }
-
         self.callParticipantsUpdated();
     });
 
@@ -430,6 +420,28 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function(ap, isMcf) {
     if (this.membersSetFromApi) {
         this.membersSetFromApi.trackFromActionPacket(ap, isMcf);
     }
+};
+
+/**
+ * @returns An array with the userid+clientid (binary) of the call participants in this room
+ * If there is no call or there is no chatd chat with this chatid, returns an empty array
+ */
+ChatRoom.prototype.callParticipants = function() {
+    var chat = this.chat();
+    if (!chat) {
+        return [];
+    } else {
+        return Object.keys(chat.callInfo.participants);
+    }
+};
+
+ChatRoom.prototype.chat = function() {
+    return this.chatd.chatIdMessages[this.chatIdBin];
+};
+
+ChatRoom.prototype.isOnline = function() {
+    var shard = this.chatd.shards[this.chatShard];
+    return shard ? shard.isOnline() : false;
 };
 
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function(timeout) {
@@ -1536,7 +1548,7 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function() {
 };
 
 ChatRoom.prototype._clearChatMessagesFromChatd = function() {
-    megaChat.plugins.chatdIntegration.chatd.shards[0].retention(
+    this.chatd.shards[0].retention(
         base64urldecode(this.chatId), 1
     );
 };
@@ -1630,33 +1642,14 @@ ChatRoom.prototype.truncate = function() {
     }
 };
 
-/**
- * Helper tool that iterates all `chatRoom.callParticipants` and returns the sum of sessions
- *
- * @returns {number}
- */
-ChatRoom.prototype.getTotalCallSessionCount = function() {
-    var self = this;
-    if (!self.callParticipants || !Object.keys(self.callParticipants).length) {
-        return 0;
-    }
-    var count = 0;
-    Object.keys(self.callParticipants).forEach(function(k) {
-        if (!self.callParticipants[k]) {
-            return;
-        }
-        var currentCount = Object.keys(self.callParticipants[k]);
-        count += currentCount.length || 0;
-    });
-    return count;
-};
-
 ChatRoom.prototype.haveActiveCall = function() {
     return this.callManagerCall && this.callManagerCall.isActive() === true;
 };
 
 ChatRoom.prototype.havePendingGroupCall = function() {
     var self = this;
+    var parts = self.callParticipants();
+    var haveCallParticipants = parts && parts.length > 0;
     if (
         (self.type === "group" || self.type === "public") &&
         (
@@ -1664,13 +1657,11 @@ ChatRoom.prototype.havePendingGroupCall = function() {
                 self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING ||
                 self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING
             )
-        ) &&
-        self.callParticipants &&
-        Object.keys(self.callParticipants).length > 0
+        ) && haveCallParticipants
     ) {
         return true;
     }
-    else if (!self.callManagerCall && self.callParticipants && Object.keys(self.callParticipants).length > 0) {
+    else if (!self.callManagerCall && haveCallParticipants) {
         return true;
     }
     else {
@@ -1732,11 +1723,11 @@ ChatRoom.prototype.callParticipantsUpdated = function(
         msgId = self.getActiveCallMessageId(true);
     }
 
-    var callParts = Object.keys(self.callParticipants);
+    var callParts = self.callParticipants();
     var uniqueCallParts = {};
     callParts.forEach(function(handleAndSid) {
         var handle = base64urlencode(handleAndSid.substr(0, 8));
-        uniqueCallParts[handle] = 1;
+        uniqueCallParts[handle] = true;
     });
     self.uniqueCallParts = uniqueCallParts;
 

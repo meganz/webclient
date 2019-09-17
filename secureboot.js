@@ -2246,7 +2246,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
-    jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1});
+    jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });
+    jsl.push({f:'html/repay.html', n: 'repay', j:0 });
+    jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});

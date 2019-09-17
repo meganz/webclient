@@ -1389,11 +1389,17 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         return operationPromise.reject(0, 12, 'Empty business plan details');
     }
 
+    var boughtItemPrice = businessPlan.totalPrice;
+
+    if (businessPlan.currInvoice && businessPlan.currInvoice.et) {
+        boughtItemPrice = businessPlan.currInvoice.et;
+    }
+
     var request = {
         a: 'uts',
         it: businessPlan.it,
         si: businessPlan.id,
-        p: businessPlan.totalPrice,
+        p: boughtItemPrice,
         c: businessPlan.c,
         aff: 0,
         m: m,
@@ -1402,40 +1408,54 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         num: businessPlan.totalUsers        // number of users
     };
 
-
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res) && res < 0) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else {
-
-                var utcRequest = {
-                    a: 'utc',                   // User Transaction Complete
-                    s: [res],                   // Sale ID
-                    m: addressDialog.gatewayId, // Gateway number
-                    bq: 0,                      // Log for bandwidth quota triggered
-                    extra: payDetails           // Extra information for the specific gateway
-                };
-
-                api_req(utcRequest, {
-                    callback: function (res) {
-                        if ($.isNumeric(res) && res < 0) {
-                            operationPromise.reject(0, res, 'API returned error');
-                        }
-                        else if (!res.EUR || !res.EUR.url) {
-                            operationPromise.reject(0, res, 'API returned error');
-                        }
-                        else {
-                            operationPromise.resolve(1, res); // ready of redirection
-                        }
-                    }
-
-                });
-            }
+    var utcApiCallback = function(res) {
+        if ($.isNumeric(res) && res < 0) {
+            operationPromise.reject(0, res, 'API returned error');
         }
+        else {
+            var salesIDs = [res];
 
-    });
+            if (businessPlan.pastInvoice && businessPlan.pastInvoice.si
+                && businessPlan.pastInvoice.si !== res) {
+                salesIDs.push(businessPlan.pastInvoice.si);
+            }
+
+            var utcRequest = {
+                a: 'utc',                   // User Transaction Complete
+                s: salesIDs,                // Sale ID
+                m: addressDialog.gatewayId, // Gateway number
+                bq: 0,                      // Log for bandwidth quota triggered
+                extra: payDetails           // Extra information for the specific gateway
+            };
+
+            api_req(utcRequest, {
+                callback: function(res) {
+                    if ($.isNumeric(res) && res < 0) {
+                        operationPromise.reject(0, res, 'API returned error');
+                    }
+                    else if (!res.EUR || !res.EUR.url) {
+                        operationPromise.reject(0, res, 'API returned error');
+                    }
+                    else {
+                        operationPromise.resolve(1, res); // ready of redirection
+                    }
+                }
+
+            });
+        }
+    };
+
+    if (businessPlan.totalUsers > 0) {
+        api_req(request, {
+            callback: utcApiCallback
+        });
+    }
+    else if (businessPlan.pastInvoice && businessPlan.pastInvoice.si) {
+        utcApiCallback(businessPlan.pastInvoice.si);
+    }
+    else {
+        return operationPromise.reject(0, 20, 'Not valid paying(repaying) arguments');
+    }
 
     return operationPromise;
 };
@@ -1577,6 +1597,34 @@ BusinessAccount.prototype.resendInvitation = function (subuserHandle) {
 
     return operationPromise;
 };
+
+
+/**
+ * Ask API about due payments
+ */
+BusinessAccount.prototype.getOverduePayments = function() {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    var request = {
+        "a": "iu"
+    };
+
+    api_req(request, {
+        callback: function(res) {
+            if (typeof res === 'object') {
+                operationPromise.resolve(1, res);
+            }
+            else {
+                operationPromise.reject(0, res, 'API returned error, ret=' + res);
+            }
+        }
+    });
+
+    return operationPromise;
+};
+
+
 
 
 /**

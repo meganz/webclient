@@ -1481,24 +1481,17 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     message.type === "call-started" &&
                     message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()
                 ) {
-                    var callParts = Object.keys(chatRoom.callParticipants);
-                    var unique = {};
-                    callParts.forEach(function(handleAndSid) {
-                        var handle = base64urlencode(handleAndSid.substr(0, 8));
-                        if (!unique[handle]) {
-                            avatarsListing.push(
-                                <Avatar
-                                    key={handle}
-                                    contact={M.u[handle]}
-                                    simpletip={M.u[handle] && M.u[handle].name}
-                                    className="message avatar-wrapper small-rounded-avatar"
-                                />
-                            );
-                        }
-
-                        unique[handle] = 1;
-                    })
-
+                    var unique = chatRoom.uniqueCallParts ? Object.keys(chatRoom.uniqueCallParts) : [];
+                    unique.forEach(function(handle) {
+                        avatarsListing.push(
+                            <Avatar
+                                key={handle}
+                                contact={M.u[handle]}
+                                simpletip={M.u[handle] && M.u[handle].name}
+                                className="message avatar-wrapper small-rounded-avatar"
+                            />
+                        );
+                    });
                 }
             }
 

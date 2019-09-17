@@ -4328,11 +4328,12 @@ li.token-input-token-invite .input-close {
     padding-bottom: 40px;
     text-align: center;
 }
-.user-management-dialog.payment-reminder .payment-reminder-logo {
+.payment-reminder-logo {
     background-position: -20px -969px;
     width: 80px;
     height: 80px;
     display: block;
+    margin-left: calc(50% - 40px);
 }
 .user-management-dialog.payment-reminder .big-red-button {
     margin: 0;
@@ -4996,7 +4997,7 @@ body.en .register-side-pane.container.visible {
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;

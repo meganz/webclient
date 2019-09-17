@@ -229,7 +229,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -276,7 +276,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0;
@@ -292,7 +292,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -345,7 +345,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -486,12 +486,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v26.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v27.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v26.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v27.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -755,7 +755,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -1070,7 +1070,7 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -1374,7 +1374,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1497,7 +1497,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1704,7 +1704,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1848,7 +1848,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1992,7 +1992,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
@@ -2243,7 +2243,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2345,6 +2345,33 @@ input[type='checkbox'] {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
+    opacity: 0.3;
+}
+.repay-btn.small-view-btn {
+    background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
+    border: 1px solid #00A58F;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0;
+    position: relative;
+    font-size: 16px;
+    text-align: center;
+    line-height: 48px;
+    color: #fff;
+    height: 48px;
+    margin-left: 16px;
+    margin-right: 16px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    cursor: pointer;
+    opacity: 1;
+}
+.repay-btn.small-view-btn.disabled {
     opacity: 0.3;
 }
 .mobile.register-cancel-button {
@@ -2513,7 +2540,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -2651,7 +2678,7 @@ div.checkboxOn, div.checkboxOff {
     margin-bottom: 48px;
     margin-top: 48px;
 }
-.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1 {
+.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1, .privacy-company h1 {
     font-family: 'montserrat_semibold', sans-serif;
     font-size: 32px;
     color: #262F3B;
@@ -3133,7 +3160,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -3596,7 +3623,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
 }
 .mobile.membership-step2 .provider-details .provider-icon {
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     height: 32px;
     vertical-align: middle;
@@ -3921,13 +3948,13 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v26@2x.png);
+    background: url(../images/mobile/mobile-sprite_v27@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
-    background-size: 280px 3383px;
+    background-size: 280px auto;
 }
 .mobile.header-icon.gray-mega {
     background-position: -126px -14px;
@@ -4374,7 +4401,7 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: right -2354px;
     -webkit-box-sizing: border-box;
@@ -4805,7 +4832,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -4835,7 +4862,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -4995,7 +5022,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -5160,6 +5187,9 @@ div.checkboxOn, div.checkboxOff {
     margin-top: 0px;
     z-index: 98; /* 1 Less than titlebar as it needs to slide under when fixed.*/
 }
+.mobile.alert-banner.business {
+    height:initial;
+}
 .mobile.fixed-alert-banner .mobile.alert-banner {
     position: fixed;
 }
@@ -5180,6 +5210,9 @@ div.checkboxOn, div.checkboxOff {
     width: 40px;
     float: right;
 }
+.mobile.alert-banner.business .alert-close {
+    display:none;
+}
 .mobile.alert-banner .alert-text-container {
     position: absolute;
     left: 10px;
@@ -5193,6 +5226,10 @@ div.checkboxOn, div.checkboxOff {
     display: table-cell;
     line-height: 50px;
     padding: 5px;
+}
+.mobile.alert-banner.business .alert-text-container {
+    float: none;
+    position: initial;
 }
 .mobile.alert-banner .alert-text-container .alert-text {
     display: inline-block;
@@ -5423,7 +5460,7 @@ div.checkboxOn, div.checkboxOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5470,7 +5507,7 @@ div.checkboxOn, div.checkboxOff {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite_v26.png);
+    background: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -81px -2275px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -5797,7 +5834,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -6244,7 +6281,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -7448,7 +7485,7 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -236px -293px;
     background-repeat: no-repeat;
     background-size: 280px auto;
@@ -8947,7 +8984,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -9042,7 +9079,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     all: initial;
     display: inline-block;
     height: 32px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -9274,7 +9311,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     all: initial;
     display: inline-block;
     height: 28px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
     position: absolute;
     left: 10px;
@@ -9900,7 +9937,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v26.png);
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11100,7 +11137,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         font-size: 24px;
         line-height: 36px;
     }
-
+    .privacy-company h1 {
+        font-size: 25px;
+    }
 }
 
 
@@ -11356,7 +11395,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-image: url(../images/mobile/android@2x.png);
     }
     .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v26@2x.png) !important;
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important;
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -11376,7 +11415,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v26@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
         background-size: 280px auto;
     }
     .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
@@ -11384,12 +11423,20 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         background-size: 72px auto;
     }
     .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
-    background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
-    background-size: 344px auto;
+        background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
+        background-size: 344px auto;
     }
     .membership-question-mark span {
         background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
         background-size: 755px auto;
+    }
+    .mobile .bus-reg-icon {
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
+        background-size: 280px auto;
+    }
+    .mobile .card-container .dialog-heading-img {
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
+        background-size: 280px auto;
     }
 }
 
@@ -11603,3 +11650,88 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: 100%;
 }
 /** End Developer Settings Page **/
+
+/*For business over due payment page*/
+.mobile .card-container.bus-repay {
+    margin: 0;
+    border: none;
+    width: 100%;
+    min-width: 0;
+    padding: 3%;
+}
+.mobile .mobile.bus-repay {
+    display: block;
+}
+.mobile .mobile.bus-repay .fm-header {
+    position: absolute;
+}
+.mobile .bus-repay .dialog-title {
+    display: none;
+}
+.mobile .bus-reapy-block {
+    top: 
+}
+.mobile .main-pad-block {
+    z-index: 1;
+}
+.mobile .mobile.bus-repay {
+    z-index: 99;
+}
+.mobile .bus-repay .dialog-subtitle {
+    font-size: 14px;
+    color: #999;
+    line-height: 21px;
+    height: auto;
+    text-align: center;
+    position: relative;
+}
+.main-mid-pad.bus-repay .main-left-block, .main-mid-pad.bus-repay .main-right-block {
+    padding: 32px 0 0;
+}
+.mobile .bus-reg-icon {
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+    float: none;
+    display: inline-block
+}
+.mobile .bus-reg-icon.company-name {
+    background-position: -91px -3025px;
+}
+.mobile .bus-reg-icon.email {
+    background-position: -125px -3025px;
+}
+.mobile .bus-reg-icon.number-of-user {
+    background-position: -158px -3025px;
+}
+.mobile .card-container .dialog-heading-img {
+    background-image: url(../images/mobile/mobile-sprite_v27.png);
+}
+.mobile .payment-reminder-logo {
+    background-position: -56px -2946px;
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin-left: calc(50% - 40px);
+}
+.mobile .main-mid-pad.bus-repay .bus-reg-plan.repay {
+    width: 106%;
+    left: -3%;
+    box-shadow: none;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 8px;
+}
+.mobile .repay-btn.small-view-btn {
+    display: block;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
+    width: 37%;
+    min-width: 100px;
+}
+.bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
+    width: 67%;
+    min-width: 182px;
+}

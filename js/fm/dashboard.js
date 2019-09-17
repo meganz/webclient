@@ -282,7 +282,12 @@ function dashboardUI() {
 
         /* Registration date, bandwidth notification link */
         $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
-            loadSubPage('pro');
+            if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+                loadSubPage('repay');
+            }
+            else {
+                loadSubPage('pro');
+            }
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));

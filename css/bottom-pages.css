@@ -1,4 +1,52 @@
 /* Old bottom pages stylinng */
+.privacy-company h1 {
+    padding: 45px 0 20px 0;
+}
+.privacy-company-block {
+    padding: 35px 0;
+}
+.privacy-company-icon {
+    float: left;
+    width: 171px;
+    height: 120px;
+    background-image: url(../images/mega/privacy-sprite_v2.png);
+    background-position: left top;
+    background-repeat: no-repeat;
+}
+.privacy-company-icon.lock {
+    background-position: left -204px;
+    height: 126px;
+}
+.privacy-company-icon.future {
+    background-position: left -404px;
+    height: 132px;
+}
+.privacy-company-txt {
+    margin-left: 171px;
+}
+.privacy-company-header {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.1px;
+    color: #F0373B;
+    font-family: 'Open Sans Semibold Italic', Arial;
+    padding: 2px 0 0 0;
+}
+.privacy-company-txt p {
+    font-size: 14px;
+    color: #3F4646;
+    line-height: 26px;
+    margin: 0;
+    padding: 7px 0 9px 0;
+}
+.privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
+    background-image: url(../images/mega/privacy-sprite_v2.png);
+    background-position: -10px -650px;
+    background-repeat: no-repeat;
+}
+.privacy-company-bott .st-quote-right {
+    background-position: -70px -748px;
+}
 .copyrights-dispute-bottom {
     background-color: #FAFAFA;
     margin-top: 24px;
@@ -828,7 +876,7 @@ body.mobile:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     vertical-align: top;
     width: 8px;
     height: 13px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -165px -7px;
     background-repeat: no-repeat;
 }
@@ -864,7 +912,7 @@ body.mobile:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     width: 102px;
     height: 102px;
     margin: 10px auto 26px auto;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: 0 -533px;
     background-repeat: no-repeat;
     padding: 0;
@@ -1354,7 +1402,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
     margin: 12px auto 5px auto;
     width: 22px;
     height: 24px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: -0px -73px;
     opacity: 0.5;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -4736,6 +4784,24 @@ a.opensource-icon-txt.coming-soon {
 }
 .bottom-page.left-cell.right-txt-align {
     text-align: center;
+}
+.privacy-company-icon {
+    float: none;
+    margin: 0 auto 30px auto;
+    width: 120px;
+}
+.privacy-company-icon:first-child {
+    margin-top: 10px;
+}
+.privacy-company-icon.future {
+    width: 132px;
+}
+.privacy-company-txt {
+    margin-left: 0;
+    text-align: center;
+}
+.privacy-company.new-bottom-pages {
+    padding-bottom: 20px;
 }
 }
 @media only screen and (max-width: 783px) and (max-height: 640px) {

@@ -308,7 +308,7 @@ a.nlanguage-lnk.language-template {
     background-repeat: no-repeat;
 }
 .nlanguage-bottom a, .nlanguage-bottom a:link, .nlanguage-bottom a:visited, .nlanguage-bottom a:hover, .nlanguage-bottom a:active {
-    color: #BF1900;
+    color: #F0373B;
 }
 .languages-dialog-body {
     padding: 10px 28px 10px 16px;
@@ -821,7 +821,7 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     margin-top: 5px;
 }
 a.account-manage-button:hover {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 .account-bandwidth-txt {
@@ -1484,7 +1484,7 @@ input.radioOn, input.radioOff {
     box-sizing: border-box;
     padding: 1px 0 0 0;
     text-align: center;
-    background-color: #BF1900;
+    background-color: #F0373B;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
@@ -2174,7 +2174,7 @@ a.nt-back-button:hover {
     padding: 0 10px 0 8px;
 }
 a.nt-back-button:hover span {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 .nt-settings-button, a.nt-settings-button, a.nt-settings-button:link, a.nt-settings-button:visited, a.nt-settings-button:active {
@@ -2191,7 +2191,7 @@ a.nt-back-button:hover span {
     float: left;
 }
 a.nt-settings-button:hover {
-    background-color: #BF1900;
+    background-color: #F0373B;
     color: white;
 }
 a.nt-settings-button:hover span {
@@ -3155,7 +3155,7 @@ strong.small-header {
     display: block;
 }
 .blog-new-full ul li a {
-    color: #BF1900;
+    color: #F0373B;
 }
 .blog-new-full ul ul {
     margin: 0 0 0 30px;
@@ -3326,7 +3326,7 @@ img.blog-new-logos {
     box-sizing: border-box;
 }
 .browsers-logo-lnk:hover {
-    border: 3px solid #BF1900;
+    border: 3px solid #F0373B;
     height: 186px;
     margin: -1px;
 }
@@ -8933,7 +8933,7 @@ body:not(.en) .warning-dialog-a.wide {
     line-height: 32px;
     font-size: 13px;
     float: left;
-    color: #BF1900;
+    color: #F0373B;
     padding-left: 10px;
 }
 .notification-txt {
@@ -12126,15 +12126,15 @@ table {
     font-size: 14px;
 }
 .main-mid-pad {
-    width: 970px;
+    max-width: 970px;
     margin: 0 auto;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
-.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey{
-    width: 100%;
+.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay{
+    max-width: 100%;
     padding: 0 0;
     background-color: #F5F7F9;
 }
@@ -12148,6 +12148,7 @@ table {
 }
 .key3.main-mid-pad {
     width: 100%;
+    max-width: 100%;
     padding: 0;
 }
 .main-left-block {
@@ -13448,54 +13449,6 @@ strong, b {
 .about-top-block p {
     padding: 8px 0 10px 0;
 }
-.privacy-company h1 {
-    padding: 45px 0 20px 0;
-}
-.privacy-company-block {
-    padding: 35px 0;
-}
-.privacy-company-icon {
-    float: left;
-    width: 171px;
-    height: 120px;
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: left top;
-    background-repeat: no-repeat;
-}
-.privacy-company-icon.lock {
-    background-position: left -204px;
-    height: 126px;
-}
-.privacy-company-icon.future {
-    background-position: left -404px;
-    height: 132px;
-}
-.privacy-company-txt {
-    margin-left: 171px;
-}
-.privacy-company-header {
-    font-size: 16px;
-    line-height: 20px;
-    letter-spacing: -0.1px;
-    color: #BF1900;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 2px 0 0 0;
-}
-.privacy-company-txt p {
-    font-size: 14px;
-    color: #3F4646;
-    line-height: 26px;
-    margin: 0;
-    padding: 7px 0 9px 0;
-}
-.privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: -10px -650px;
-    background-repeat: no-repeat;
-}
-.privacy-company-bott .st-quote-right {
-    background-position: -70px -748px;
-}
 .widget-block {
     position: absolute;
     width: 54px;
@@ -14534,7 +14487,7 @@ a.contact-new-button:hover {
     font-size: 16px;
     line-height: 24px;
     letter-spacing: -0.1px;
-    color: #BF1900;
+    color: #F0373B;
     font-family: 'Open Sans Semibold Italic', Arial;
     padding: 13px 10px;
 }
@@ -14760,7 +14713,7 @@ span.roman-number {
     text-align: center;
 }
 p.copyrights-red {
-    color: #BF1900;
+    color: #F0373B;
     padding-bottom: 6px;
 }
 .register-st2-button.active.copyrights-form {
@@ -14926,7 +14879,7 @@ h1.help-home-header {
     cursor: pointer;
 }
 .help-listing:hover {
-    color: #BF1900;
+    color: #F0373B;
 }
 .jspVerticalBar {
     z-index: 120;
@@ -20249,7 +20202,7 @@ body.pro:after {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;
@@ -25409,7 +25362,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog * {
     font-family: 'LatoWeb';
 }
-
 .user-management-dialog .dialog-tree-panel-scroll {
     overflow:hidden;
 }
@@ -25417,11 +25369,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:32px auto 8px 40px;
     text-align: left;
 }
-
 .user-management-dialog .dialog-subtitle {
     font-size: 14px;
     color: #999;
-    line-height: 21px;
+    line-height: 20px;
     width: 500px;
     height: auto;
     text-align: center;
@@ -25435,13 +25386,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     padding: 0;
 }
-
 .user-management-dialog .dialog-input-container .input-user .confirm-img.icon {
     position: absolute;
     bottom: 36px;
     left: 220px;
 }
-
 .toggle-optional-inputs-container{
     text-align: center;
     display: block;
@@ -25600,7 +25549,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -129px -98px;
 }
 
-.user-management-dialog .dialog-heading-img {
+.user-management-dialog .dialog-heading-img, .card-container .dialog-heading-img {
     background-image: url(../images/mega/big-icons_v4.png);
     margin:40px auto 24px auto;
 }
@@ -26231,8 +26180,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .setting-block .title .icon48 {
     margin:16px 40px 0px 40px;
 }
-
-
 .user-management-account-settings .contact-icon48.icon48 {
     background-position: 0 -172px;
     opacity: 0.2;
@@ -26257,32 +26204,21 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -144px -458px;
      opacity: 0.2;
 }
-
-.user-management-account-settings .number-of-user, .user-management-dialog .number-of-user {
+.bus-reg-icon.number-of-user {
     background-position: center -1582px;
-
 }
-
-.user-management-account-settings .company-name, .user-management-dialog .company-name{
+.bus-reg-icon.company-name{
     background-position: center -1661px;
-
 }
-
-.user-management-account-settings .phone, .user-management-dialog .phone {
+.bus-reg-icon.phone {
     background-position: center -1621px;
-
 }
-
-.user-management-account-settings .email, .user-management-dialog .email{
+.bus-reg-icon.email{
     background-position: center -1701px;
-
 }
-
-.user-management-account-settings .pw, .user-management-dialog .pw{
+.bus-reg-icon.pw{
     background-position: center -1741px;
-
 }
-
 .user-management-account-settings .setting-icon24, .user-management-dialog .setting-icon24{
     background-image: url(../images/mega/big-icons_v4.png);
     background-repeat: no-repeat;
@@ -26417,18 +26353,18 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .bus-input.short-input .bus-input-title.zip {
     left: calc(56% + 12px);
 }
-
-
-.user-management-account-settings .bus-input .bus-reg-icon,
-.user-management-dialog .bus-reg-icon{
+.bus-reg-icon{
     margin: 24px 12px 0 6px;
-    opacity: 0.7;
+    opacity: 0.6;
     float: left;
     display: inline-block;
 }
-
+.card-container.bus-repay .bus-reg-icon {
+    margin: 0;
+    float: none;
+}
 .user-management-account-settings .bus-input input,
-.user-management-dialog .dialog-input-title-ontop input{
+.user-management-dialog .dialog-input-title-ontop input {
     border: none;
     width: -webkit-calc(100% - 56px);
     width: -moz-calc(100% - 56px);
@@ -29142,26 +29078,24 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .fm-picker-dialog .contact24-icon{
     background-position: -1px -8135px;
 }
-.fm-picker-dialog .chat24-icon{
+.fm-picker-dialog .chat24-icon {
     background-position: -0px -12640px;
     opacity: 0.4;
 }
-.fm-picker-dialog .search-icon{
+.fm-picker-dialog .search-icon {
     background-position: -14px -2971px;
     opacity: 0.4;
     height: 22px;
 }
-.fm-picker-dialog .add-more-img,
-.fm-right-account-block .add-more-img
- {
+.fm-picker-dialog .add-more-img, .fm-right-account-block .add-more-img {
     background-position: 0 -12376px;
 }
-.fm-picker-dialog-title, .user-management-dialog .dialog-title {
+.fm-picker-dialog-title, .dialog-title {
     font-size: 20px;
     color: #333333;
-    line-height: 24px;
+    line-height: 30px;
     position: relative;
-    margin:20px auto;
+    margin: 20px auto 16px;
     text-align: center;
     display: block;
 }
@@ -29169,18 +29103,25 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 40px 32px;
     line-height: 30px;
 }
-.fm-picker-dialog .dialog-subtitle {
+.dialog-subtitle {
     font-size: 14px;
-    color: #999999;
-    line-height: 24px;
+    color: #999;
+    line-height: 20px;
+    height: auto;
+    text-align: center;
+    position: relative;
+}
+.fm-picker-dialog .dialog-subtitle {
     width: 380px;
     left: 50%;
     margin-left: -190px;
     margin-bottom: 24px;
     height: auto;
-    text-align: center;
-    position: relative;
     display: block;
+}
+.user-management-dialog .dialog-subtitle {
+    width: 500px;
+    margin:0 auto 40px auto;
 }
 .fm-picker-dialog .dialog-button-container {
     height: 56px;

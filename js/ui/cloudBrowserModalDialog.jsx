@@ -1,36 +1,29 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-import utils  from "./utils.jsx";
+import { Component } from 'react';
+import utils from "./utils.jsx";
 import MegaRenderMixin from "../stores/mixins.js";
 import ModalDialogsUI from './modalDialogs.jsx';
 import Tooltips from "./tooltips.jsx";
 
-class BrowserCol extends MegaRenderMixin(React.Component) {
-    static defaultProps = {
-        'hideable': true
-    };
-    render() {
-        var self = this;
+function BrowserCol({ id, className = '', label, sortBy, onClick }) {
+    let classes = `${id} ${className}`;
 
-        var classes = self.props.id + " " + (self.props.className ? self.props.className : "");
-
-        if (self.props.sortBy[0] === self.props.id) {
-            var ordClass = self.props.sortBy[1] == "desc" ? "asc" : "desc";
-            classes = classes + " " + ordClass;
-        }
-        return (
-            <th onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                self.props.onClick(self.props.id);
-            }}>
-                <span className={"arrow " + classes}>{self.props.label}</span>
-            </th>
-        );
+    if (sortBy[0] === id) {
+        const ordClass = sortBy[1] == "desc" ? "asc" : "desc";
+        classes = `${classes} ${ordClass}`;
     }
+
+    return (
+        <th onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onClick(id);
+        }}>
+            <span className={`arrow ${classes}`}>{label}</span>
+        </th>
+    );
 };
 
-class BrowserEntries extends MegaRenderMixin(React.Component) {
+class BrowserEntries extends MegaRenderMixin(Component) {
     static defaultProps = {
         'hideable': true
     };
@@ -38,8 +31,8 @@ class BrowserEntries extends MegaRenderMixin(React.Component) {
         super(props);
 
         this.state = {
-            'highlighted': [],
-            'selected': []
+            'highlighted': this.props.initialHighlighted || [],
+            'selected': this.props.initialSelected || []
         }
     }
     componentWillMount() {
@@ -537,13 +530,21 @@ class BrowserEntries extends MegaRenderMixin(React.Component) {
                 return;
             }
 
-            var isFolder = node.t;
+            const isFolder = node.t;
             var isHighlighted = self.state.highlighted.indexOf(node.h) !== -1;
+            const fileIconType = fileIcon(node);
+            // megadrop or shared folder
+            const isSharedFolder = (fileIconType === 'puf-folder' || fileIconType === 'folder-shared');
+            let sharedFolderClass = '';
+
+            if (isSharedFolder) {
+                sharedFolderClass = fileIconType;
+            }
 
             var tooltipElement = null;
 
                 var icon = <span
-                className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + fileIcon(node)}> </span>;
+                className={"transfer-filetype-icon " + (isFolder ? " folder " : "") + '' + fileIconType}> </span>;
 
             var image = null;
             var src = null;
@@ -655,7 +656,7 @@ class BrowserEntries extends MegaRenderMixin(React.Component) {
                                 <div className="data-item-icon indicator" />
                             </div>
                             <div className={"block-view-file-type " +
-                                (isFolder ? " folder " :" file " + fileIcon(node))
+                                (isFolder ? " folder " :" file " + fileIcon(node)) + sharedFolderClass
                             }>
                                 {image}
                             </div>
@@ -764,12 +765,13 @@ class BrowserEntries extends MegaRenderMixin(React.Component) {
 };
 
 
-class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
+class CloudBrowserDialog extends MegaRenderMixin(Component) {
     static defaultProps = {
         'selectLabel': __(l[8023]),
         'openLabel': __(l[1710]),
         'cancelLabel': __(l[82]),
-        'hideable': true
+        'hideable': true,
+        className: ''
     };
     constructor(props) {
         super(props);
@@ -816,7 +818,11 @@ class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
             localStorage.dialogViewMode = "0";
         }
 
-        self.setState({entries: self.getEntries()});
+        self.setState({
+            entries: self.getEntries(),
+            selected: self.state.selected,
+            highlighted: self.state.highlighted,
+        });
 
         $this.parent().find('.active').removeClass("active");
         $this.addClass("active");
@@ -1036,10 +1042,10 @@ class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
     render() {
         var self = this;
 
-        var entries = self.state.entries || self.getEntries();
-        var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
+        const entries = self.state.entries || self.getEntries();
+        const viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
-        var classes = "add-from-cloud " + (self.props.className || '');
+        const classes = `add-from-cloud ${self.props.className}`;
 
         var folderIsHighlighted = false;
 
@@ -1272,6 +1278,9 @@ class CloudBrowserDialog extends MegaRenderMixin(React.Component) {
                     onSelected={self.onSelected}
                     onHighlighted={self.onHighlighted}
                     onAttachClicked={self.onAttachClicked}
+                    viewMode={localStorage.dialogViewMode}
+                    initialSelected={self.state.selected}
+                    initialHighlighted={self.state.highlighted}
                     ref={
                         (browserEntries) => {
                             self.browserEntries = browserEntries;

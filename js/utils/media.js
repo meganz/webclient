@@ -643,6 +643,9 @@ function FullScreenManager($button, $element) {
         else {
             $element.fullScreen(true);
         }
+        if (is_mobile) {
+            mobile.slideshow.toggleForHeaderAndButtons();
+        }
         return false;
     };
 
@@ -922,7 +925,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     // play/pause on click
                     $video.rebind('click', function() {
-                        $playpause.trigger('click');
+                        if (!is_mobile) {
+                            $playpause.trigger('click');
+                        }
                     });
 
                     // jump to full screen on double-click
@@ -1480,6 +1485,45 @@ FullScreenManager.prototype.enterFullscreen = function() {
         return s;
     };
 
+    /** Animation for hiding the mobile video controls*/
+    var hideMobileVideoControlsAnimation = null;
+
+    /**
+     * Init & reset hide the mobile video controls animation function
+     * @param $wrapper
+     * @private
+     */
+    var _initHideMobileVideoControlsAnimation = function($wrapper) {
+        clearTimeout(hideMobileVideoControlsAnimation);
+        hideMobileVideoControlsAnimation = setTimeout(function () {
+            $wrapper.find('.video-controls').addClass('invisible');
+        }, 3000);
+    };
+
+    /**
+     * Toggle hiding and showing the mobile video controls
+     * @param $wrapper
+     * @private
+     */
+    var _initMobileVideoControlsToggle = function($wrapper) {
+        var $video = $wrapper.find('.video-block');
+        var $videoControl = $wrapper.find('.video-controls');
+
+        $video.off().on('tap', function (ev) {
+            if ($(ev.target).is('.mobile-gallery, #video')) {
+                if ($videoControl.hasClass('invisible')) {
+                    $videoControl.removeClass('invisible');
+                    _initHideMobileVideoControlsAnimation($wrapper);
+                } else {
+                    $videoControl.addClass('invisible');
+                }
+            }
+            else if ($(ev.target).closest('.video-controls').length) {
+                _initHideMobileVideoControlsAnimation($wrapper);
+            }
+        });
+    };
+
     /**
      * Fire video stream
      * @param {MegaNode} node An ufs node
@@ -1587,6 +1631,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }).fail(console.warn.bind(console));
 
                     $wrapper.addClass('video-theatre-mode');
+                    if (is_mobile) {
+                        _initHideMobileVideoControlsAnimation($wrapper);
+                        _initMobileVideoControlsToggle($wrapper);
+                    }
                 });
 
                 if (vsp) {

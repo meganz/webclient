@@ -40,7 +40,7 @@ export class JoinCallNotification extends MegaRenderMixin(React.Component) {
     }
     render() {
         var room = this.props.chatRoom;
-        if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
+        if (room.getCallParticipants().length >= RtcModule.kMaxCallReceivers) {
             return <div className="in-call-notif yellow join">
                 <i className="small-icon audio-call colorized"/>
                 {l[20200]}
@@ -115,89 +115,62 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
         }
         self._wasAppendedEvenOnce = true;
 
-        var disabledCalls = (
-            room.isReadOnly() ||
-            !room.chatId ||
-            (
-                room.callManagerCall &&
-                room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
-            )
-        );
+        var startCallDisabled = isStartCallDisabled(room);
+        var startCallButtonClass = startCallDisabled ? " disabled" : "";
+        var startAudioCallButton;
+        var startVideoCallButton;
+        var endCallButton;
 
-
-        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
-            (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG
-        );
-
-        var startAudioCallButtonClass = "";
-        var startVideoCallButtonClass = "";
-
-        if (disabledCalls || disableStartCalls) {
-            startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
-        }
-
-        var startAudioCallButton =
-            <div className={"link-button light" + " " + startVideoCallButtonClass} onClick={() => {
-                if (!disableStartCalls) {
-                    room.startAudioCall();
-                }
-            }}>
-                <i className="small-icon colorized audio-call"></i>
-                <span>{__(l[5896])}</span>
-            </div>;
-
-        var startVideoCallButton =
-            <div className={"link-button light" + " " + startVideoCallButtonClass} onClick={() => {
-                if (!disableStartCalls) {
-                    room.startVideoCall();
-                }
-            }}>
-                <i className="small-icon colorized video-call"></i>
-                <span>{__(l[5897])}</span>
-            </div>;
-        var AVseperator = <div className="chat-button-seperator"></div>;
-        var endCallButton =
-                    <div className={"link-button light red"} onClick={() => {
-                        if (room.callManagerCall) {
-                            room.callManagerCall.endCall();
-                        }
-                    }}>
-            <i className="small-icon colorized horizontal-red-handset"></i>
-                        <span>{room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}</span>
-        </div>;
-
-
-        if (
-            room.callManagerCall &&
-            room.callManagerCall.isActive() === true
-        ) {
+        var isInCall = !!room.callManagerCall && room.callManagerCall.isActive();
+        if (isInCall) {
             startAudioCallButton = startVideoCallButton = null;
         } else {
             endCallButton = null;
         }
 
-
-
         if (room.type === "group" || room.type === "public") {
-            if (
-                room.callParticipants().length > 0 &&
-                (
-                    !room.callManagerCall ||
-                    room.callManagerCall.isActive() === false
-                )
-            ) {
+            if (!ENABLE_GROUP_CALLING_FLAG ||
+                ((room.getCallParticipants().length > 0) && !isInCall)
+            ){
                 // call is active, but I'm not in
                 startAudioCallButton = startVideoCallButton = null;
             }
         }
 
-
-        if ((room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG) {
-            startAudioCallButton = startVideoCallButton = null;
+        if (startAudioCallButton !== null) {
+            startAudioCallButton =
+                <div className={"link-button light" + startCallButtonClass} onClick={() => {
+                    if (!startCallDisabled) {
+                        room.startAudioCall();
+                    }
+                }}>
+                <i className="small-icon colorized audio-call"></i>
+                <span>{__(l[5896])}</span>
+            </div>;
         }
-
-
-
+        if (startVideoCallButton !== null) {
+            startVideoCallButton =
+                <div className={"link-button light" + startCallButtonClass} onClick={() => {
+                    if (!startCallDisabled) {
+                        room.startVideoCall();
+                    }
+                }}>
+                <i className="small-icon colorized video-call"></i>
+                <span>{__(l[5897])}</span>
+            </div>;
+        }
+        var AVseperator = <div className="chat-button-seperator"></div>;
+        if (endCallButton !== null) {
+            endCallButton =
+                <div className={"link-button light red"} onClick={() => {
+                    if (room.callManagerCall) {
+                        room.callManagerCall.endCall();
+                    }
+                }}>
+                <i className="small-icon colorized horizontal-red-handset"></i>
+                <span>{room.type === "group" || room.type === "public" ? "Leave call" : l[5884]}</span>
+            </div>;
+        }
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
@@ -535,9 +508,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
             </PerfectScrollbar>
         </div>;
     }
-};
-
-
+}
 
 export class ConversationPanel extends MegaRenderMixin(React.Component) {
     static lastScrollPositionPerc = 1;
@@ -1932,20 +1903,8 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                 key={contact.u}/>
         }
 
-        var disabledCalls = (
-            room.isReadOnly() ||
-            !room.chatId ||
-            (
-                room.callManagerCall &&
-                room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
-            )
-        );
-
-
-        var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (
-            (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG
-        );
-
+        var startCallDisabled = isStartCallDisabled(room);
+        var startCallButtonClass = startCallDisabled ? " disabled" : "";
         return (
             <div className={conversationPanelClasses} onMouseMove={self.onMouseMove.bind(self)}
                  data-room-id={self.props.chatRoom.chatId}>
@@ -2098,25 +2057,23 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                 <div
                                      className="button right"
                                      onClick={function() {
-                                         if (!disabledCalls) {
+                                         if (!startCallDisabled) {
                                              room.startVideoCall();
                                          }
                                      }}>
-                                    <i className={"small-icon small-icon video-call colorized" + (
-                                        room.isReadOnly() || disableStartCalls ? " disabled" : ""
-                                    )}></i>
+                                    <i className={"small-icon small-icon video-call colorized" + startCallButtonClass
+                                }></i>
                                 </div>
 
                                 <div
                                      className="button right"
                                      onClick={function() {
-                                         if (!disabledCalls) {
+                                         if (!startCallDisabled) {
                                              room.startAudioCall();
                                          }
                                      }}>
-                                    <i className={"small-icon small-icon audio-call colorized" + (
-                                        room.isReadOnly() || disableStartCalls ? " disabled" : ""
-                                    )}></i>
+                                    <i className={"small-icon small-icon audio-call colorized" + startCallButtonClass
+                                    }></i>
                                 </div>
                             </span>
                         </div>
@@ -2436,3 +2393,15 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
         }
     }
 };
+function isStartCallDisabled(room) {
+    return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
+        (
+            room.callManagerCall &&
+            room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
+        )
+        || (megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) ||
+        (
+            (room.type === "group" || room.type === "public")
+            && !ENABLE_GROUP_CALLING_FLAG
+        ));
+}

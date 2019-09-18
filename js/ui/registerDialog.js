@@ -440,7 +440,7 @@
             };
             loadingDialog.show();
 
-            var newEmail = $.trim($('input', $dialog).val()) || accountData.email;
+            var newEmail = $.trim($('input', $dialog).val());
 
             // Verify the new email address is in valid format
             if (!isValidEmail(newEmail)) {

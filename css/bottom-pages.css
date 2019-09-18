@@ -2078,7 +2078,7 @@ bottom-page.top-title.uwp::before {
     text-align: center;
     padding: 14px 20px 0 20px;
     white-space: nowrap;
-    margin: 25px 15px 0 15px;
+    margin: 6px 15px 0 15px;
     -webkit-transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
     transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
     cursor: pointer;
@@ -2194,6 +2194,11 @@ bottom-page.top-title.uwp::before {
     padding: 23px 0 0 0;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
+.bottom-page.top-copyrights.small-pad {
+    font-size: 13px;
+    padding: 0 0 0 0;
+    margin: -2px 0 0 0;
+}
 .bottom-page.top-copyrights sup {
     top: 1px;
     margin-left: 1px;
@@ -2204,6 +2209,10 @@ bottom-page.top-title.uwp::before {
 .bottom-page.top-copyrights a {
     cursor: pointer;
     color: #F0373B;
+}
+.mobile .browsers .bottom-page.top-copyrights a {
+    color: inherit;
+    cursor: default;
 }
 .bottom-page.top-copyrights .available {
     display: block;
@@ -4521,13 +4530,15 @@ a.opensource-icon-txt.coming-soon {
 .bottom-page.top-dark-button {
     min-width: 100px;
     padding: 14px 15px 0 15px;
-    margin: -7px 0 0 0;
 }
 .bottom-page.top-dark-button i {
     margin-right: 10px;
 }
 .bottom-page.top-dark-button .label {
     font-size: 20px;
+}
+.bottom-page.top-copyrights.small-pad {
+    margin: -14px 0 0 0;
 }
 .bottom-page.img.bird-top {
     margin: 50px 0 0 0;

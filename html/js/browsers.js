@@ -9,7 +9,10 @@ var browserspage = {
     init: function() {
         "use strict";
 
-        if (window.opr)  {
+        if (is_mobile)  {
+            browserspage.setBrowserData('firefox');
+        }
+        else if (window.opr)  {
             browserspage.setBrowserData('opera');
         }
         else if (mega.chrome)  {
@@ -62,9 +65,15 @@ var browserspage = {
         var $downloadButton = $topBlock.find('.top-dark-button');
 
         $browserLinks.find('a').rebind('click', function(e) {
-            var browserName = escapeHTML($(this).text()).toLowerCase();
+            var browserName;
 
             e.preventDefault();
+
+            if (is_mobile) {
+                return false;
+            }
+
+            browserName = escapeHTML($(this).text()).toLowerCase();
 
             if (browserName) {
                 browserspage.setBrowserData(browserName);

@@ -4686,8 +4686,8 @@ li.token-input-token-invite .input-close {
     right: 10px;
 }
 .fm-dialog.group-chat-link {
-    width: 440px;
-    margin: -142px 0 0 -180px;
+    width: 480px;
+    margin: -142px 0 0 -240px;
     text-align: center;
     font-family: 'LatoWeb', 'source_sans_proregular';
     background-color: white;

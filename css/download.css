@@ -26,6 +26,9 @@
     margin: 0 0 0 -2px;
     cursor: pointer;
 }
+.top-expand-button.button, .top-expand-txt.button {
+    display: inline-block;
+}
 .top-expand-wrap  {
     position: absolute;
     bottom: 14px;

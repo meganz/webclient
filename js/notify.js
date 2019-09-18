@@ -217,6 +217,11 @@ var notify = {
                     return true;
                 }
                 break;
+            case 'd':
+                if (notification.v) {
+                    return true;
+                }
+                break;
         }
 
         switch (notification.a || notification.t) {
@@ -281,17 +286,23 @@ var notify = {
 
         // If there are no previous notifications, nothing can be combined,
         // so add it to start of the list without modification and exit
-        if (notify.notifications.length === 0) {
-            notify.notifications.unshift(currentNotification);
-            return false;
-        }
 
         // Get the previous notification (list is already sorted by most recent at the top)
         var previousNotification = notify.notifications[0];
 
-        // If the new notification or the previous notification is not a new folder/file (put) notification, then they
-        // can't be combined (need to be the same), so add it to start of the list without modification and exit
-        if (currentNotification.type !== 'put' || previousNotification.type !== 'put') {
+        if (!previousNotification) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // if prev+curr notifications are not from the same type
+        if (currentNotification.type !== previousNotification.type) {
+            notify.notifications.unshift(currentNotification);
+            return false;
+        }
+
+        // we only for now combine "put" and "d" (del)
+        if (currentNotification.type !== 'put' && currentNotification.type !== 'd') {
             notify.notifications.unshift(currentNotification);
             return false;
         }
@@ -318,18 +329,31 @@ var notify = {
         var previousNotificationParentHandle = previousNotification.data.n;
         var previousNotificationNodes = previousNotification.data.f;
 
-        // If parent folders are not the same, they cannot be combined, so
-        // add it to start of the list without modification and exit
-        if (currentNotificationParentHandle !== previousNotificationParentHandle) {
-            notify.notifications.unshift(currentNotification);
-            return false;
+
+        if (currentNotification.type === 'put') {
+            // If parent folders are not the same, they cannot be combined, so
+            // add it to start of the list without modification and exit
+            if (currentNotificationParentHandle !== previousNotificationParentHandle) {
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+
+            // Combine the folder/file nodes from the current notification to the previous one
+            var combinedNotificationNodes = previousNotificationNodes.concat(currentNotificationNodes);
+
+            // Replace the current notification's nodes with the combined nodes
+            currentNotification.data.f = combinedNotificationNodes;
+
         }
+        else { // it's 'd'
 
-        // Combine the folder/file nodes from the current notification to the previous one
-        var combinedNotificationNodes = previousNotificationNodes.concat(currentNotificationNodes);
+            if (!Array.isArray(previousNotificationParentHandle)) {
+                previousNotificationParentHandle = [previousNotificationParentHandle];
+            }
 
-        // Replace the current notification's nodes with the combined nodes
-        currentNotification.data.f = combinedNotificationNodes;
+            var deletedCombinedNodes = previousNotificationParentHandle.concat(currentNotificationParentHandle);
+            currentNotification.data.n = deletedCombinedNodes;
+        }
 
         // Remove the previous notification and add the current notification with combined nodes from the previous
         notify.notifications.shift();

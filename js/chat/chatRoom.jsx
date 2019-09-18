@@ -132,7 +132,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
             if (self.chatd && self.isOnline() && self.chatIdBin) {
                 // this should never happen, but just in case...
-                self.chat().resend();
+                self.getChatIdMessages().resend();
             }
         }
     });
@@ -426,8 +426,8 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function(ap, isMcf) {
  * @returns An array with the userid+clientid (binary) of the call participants in this room
  * If there is no call or there is no chatd chat with this chatid, returns an empty array
  */
-ChatRoom.prototype.callParticipants = function() {
-    var chat = this.chat();
+ChatRoom.prototype.getCallParticipants = function() {
+    var chat = this.getChatIdMessages();
     if (!chat) {
         return [];
     } else {
@@ -435,7 +435,7 @@ ChatRoom.prototype.callParticipants = function() {
     }
 };
 
-ChatRoom.prototype.chat = function() {
+ChatRoom.prototype.getChatIdMessages = function() {
     return this.chatd.chatIdMessages[this.chatIdBin];
 };
 
@@ -1548,7 +1548,7 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function() {
 };
 
 ChatRoom.prototype._clearChatMessagesFromChatd = function() {
-    this.chatd.shards[0].retention(
+    this.chatd.shards[this.chatShard].retention(
         base64urldecode(this.chatId), 1
     );
 };
@@ -1648,8 +1648,7 @@ ChatRoom.prototype.haveActiveCall = function() {
 
 ChatRoom.prototype.havePendingGroupCall = function() {
     var self = this;
-    var parts = self.callParticipants();
-    var haveCallParticipants = parts && parts.length > 0;
+    var haveCallParticipants = self.getCallParticipants().length > 0;
     if (
         (self.type === "group" || self.type === "public") &&
         (
@@ -1723,7 +1722,7 @@ ChatRoom.prototype.callParticipantsUpdated = function(
         msgId = self.getActiveCallMessageId(true);
     }
 
-    var callParts = self.callParticipants();
+    var callParts = self.getCallParticipants();
     var uniqueCallParts = {};
     callParts.forEach(function(handleAndSid) {
         var handle = base64urlencode(handleAndSid.substr(0, 8));

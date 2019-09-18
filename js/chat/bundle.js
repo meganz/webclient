@@ -14874,7 +14874,7 @@ function (_MegaRenderMixin) {
           className: "call-topic"
         }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, ellipsis(chatRoom.getRoomTitle(), 'end', 70))), external_React_default.a.createElement("div", {
           className: "call-participants-count"
-        }, chatRoom.callParticipants().length), external_React_default.a.createElement("a", {
+        }, chatRoom.getCallParticipants().length), external_React_default.a.createElement("a", {
           className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : ""),
           onClick: function onClick(e) {
             if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
@@ -15159,7 +15159,7 @@ function (_MegaRenderMixin) {
     value: function render() {
       var room = this.props.chatRoom;
 
-      if (room.callParticipants().length >= RtcModule.kMaxCallReceivers) {
+      if (room.getCallParticipants().length >= RtcModule.kMaxCallReceivers) {
         return external_React_default.a.createElement("div", {
           className: "in-call-notif yellow join"
         }, external_React_default.a.createElement("i", {
@@ -15253,64 +15253,67 @@ function (_MegaRenderMixin2) {
       }
 
       self._wasAppendedEvenOnce = true;
-      var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING;
-      var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
-      var startAudioCallButtonClass = "";
-      var startVideoCallButtonClass = "";
+      var startCallDisabled = isStartCallDisabled(room);
+      var startCallButtonClass = startCallDisabled ? " disabled" : "";
+      var startAudioCallButton;
+      var startVideoCallButton;
+      var endCallButton;
+      var isInCall = !!room.callManagerCall && room.callManagerCall.isActive();
 
-      if (disabledCalls || disableStartCalls) {
-        startAudioCallButtonClass = startVideoCallButtonClass = "disabled";
-      }
-
-      var startAudioCallButton = external_React_default.a.createElement("div", {
-        className: "link-button light" + " " + startVideoCallButtonClass,
-        onClick: function onClick() {
-          if (!disableStartCalls) {
-            room.startAudioCall();
-          }
-        }
-      }, external_React_default.a.createElement("i", {
-        className: "small-icon colorized audio-call"
-      }), external_React_default.a.createElement("span", null, __(l[5896])));
-      var startVideoCallButton = external_React_default.a.createElement("div", {
-        className: "link-button light" + " " + startVideoCallButtonClass,
-        onClick: function onClick() {
-          if (!disableStartCalls) {
-            room.startVideoCall();
-          }
-        }
-      }, external_React_default.a.createElement("i", {
-        className: "small-icon colorized video-call"
-      }), external_React_default.a.createElement("span", null, __(l[5897])));
-      var AVseperator = external_React_default.a.createElement("div", {
-        className: "chat-button-seperator"
-      });
-      var endCallButton = external_React_default.a.createElement("div", {
-        className: "link-button light red",
-        onClick: function onClick() {
-          if (room.callManagerCall) {
-            room.callManagerCall.endCall();
-          }
-        }
-      }, external_React_default.a.createElement("i", {
-        className: "small-icon colorized horizontal-red-handset"
-      }), external_React_default.a.createElement("span", null, room.type === "group" || room.type === "public" ? "Leave call" : l[5884]));
-
-      if (room.callManagerCall && room.callManagerCall.isActive() === true) {
+      if (isInCall) {
         startAudioCallButton = startVideoCallButton = null;
       } else {
         endCallButton = null;
       }
 
       if (room.type === "group" || room.type === "public") {
-        if (room.callParticipants().length > 0 && (!room.callManagerCall || room.callManagerCall.isActive() === false)) {
+        if (!ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0 && !isInCall) {
           // call is active, but I'm not in
           startAudioCallButton = startVideoCallButton = null;
         }
       }
 
-      if ((room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG) {
-        startAudioCallButton = startVideoCallButton = null;
+      if (startAudioCallButton !== null) {
+        startAudioCallButton = external_React_default.a.createElement("div", {
+          className: "link-button light" + startCallButtonClass,
+          onClick: function onClick() {
+            if (!startCallDisabled) {
+              room.startAudioCall();
+            }
+          }
+        }, external_React_default.a.createElement("i", {
+          className: "small-icon colorized audio-call"
+        }), external_React_default.a.createElement("span", null, __(l[5896])));
+      }
+
+      if (startVideoCallButton !== null) {
+        startVideoCallButton = external_React_default.a.createElement("div", {
+          className: "link-button light" + startCallButtonClass,
+          onClick: function onClick() {
+            if (!startCallDisabled) {
+              room.startVideoCall();
+            }
+          }
+        }, external_React_default.a.createElement("i", {
+          className: "small-icon colorized video-call"
+        }), external_React_default.a.createElement("span", null, __(l[5897])));
+      }
+
+      var AVseperator = external_React_default.a.createElement("div", {
+        className: "chat-button-seperator"
+      });
+
+      if (endCallButton !== null) {
+        endCallButton = external_React_default.a.createElement("div", {
+          className: "link-button light red",
+          onClick: function onClick() {
+            if (room.callManagerCall) {
+              room.callManagerCall.endCall();
+            }
+          }
+        }, external_React_default.a.createElement("i", {
+          className: "small-icon colorized horizontal-red-handset"
+        }), external_React_default.a.createElement("span", null, room.type === "group" || room.type === "public" ? "Leave call" : l[5884]));
       }
 
       var isReadOnlyElement = null;
@@ -15577,7 +15580,6 @@ function (_MegaRenderMixin2) {
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-;
 var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (_temp = _class2 =
 /*#__PURE__*/
 function (_MegaRenderMixin3) {
@@ -16823,8 +16825,8 @@ function (_MegaRenderMixin3) {
         });
       }
 
-      var disabledCalls = room.isReadOnly() || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING;
-      var disableStartCalls = disabledCalls || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
+      var startCallDisabled = isStartCallDisabled(room);
+      var startCallButtonClass = startCallDisabled ? " disabled" : "";
       return external_React_default.a.createElement("div", {
         className: conversationPanelClasses,
         onMouseMove: self.onMouseMove.bind(self),
@@ -16952,21 +16954,21 @@ function (_MegaRenderMixin3) {
       }), external_React_default.a.createElement("span", null, external_React_default.a.createElement("div", {
         className: "button right",
         onClick: function onClick() {
-          if (!disabledCalls) {
+          if (!startCallDisabled) {
             room.startVideoCall();
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "small-icon small-icon video-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "")
+        className: "small-icon small-icon video-call colorized" + startCallButtonClass
       })), external_React_default.a.createElement("div", {
         className: "button right",
         onClick: function onClick() {
-          if (!disabledCalls) {
+          if (!startCallDisabled) {
             room.startAudioCall();
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "small-icon small-icon audio-call colorized" + (room.isReadOnly() || disableStartCalls ? " disabled" : "")
+        className: "small-icon small-icon audio-call colorized" + startCallButtonClass
       })))), topicInfo), external_React_default.a.createElement("div", {
         className: "messages-block " + additionalClass
       }, external_React_default.a.createElement("div", {
@@ -17250,6 +17252,10 @@ function (_MegaRenderMixin4) {
   return ConversationPanels;
 }(Object(mixins["default"])(external_React_default.a.Component));
 ;
+
+function isStartCallDisabled(room) {
+  return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
+}
 
 /***/ }),
 /* 17 */
@@ -19957,7 +19963,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
       if (self.chatd && self.isOnline() && self.chatIdBin) {
         // this should never happen, but just in case...
-        self.chat().resend();
+        self.getChatIdMessages().resend();
       }
     }
   }); // activity on a specific room (show, hidden, got new message, etc)
@@ -20234,8 +20240,8 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function (ap, isMcf) {
  */
 
 
-ChatRoom.prototype.callParticipants = function () {
-  var chat = this.chat();
+ChatRoom.prototype.getCallParticipants = function () {
+  var chat = this.getChatIdMessages();
 
   if (!chat) {
     return [];
@@ -20244,7 +20250,7 @@ ChatRoom.prototype.callParticipants = function () {
   }
 };
 
-ChatRoom.prototype.chat = function () {
+ChatRoom.prototype.getChatIdMessages = function () {
   return this.chatd.chatIdMessages[this.chatIdBin];
 };
 
@@ -21258,7 +21264,7 @@ ChatRoom.prototype.stateIsLeftOrLeaving = function () {
 };
 
 ChatRoom.prototype._clearChatMessagesFromChatd = function () {
-  this.chatd.shards[0].retention(base64urldecode(this.chatId), 1);
+  this.chatd.shards[this.chatShard].retention(base64urldecode(this.chatId), 1);
 };
 
 ChatRoom.prototype.isReadOnly = function () {
@@ -21352,8 +21358,7 @@ ChatRoom.prototype.haveActiveCall = function () {
 
 ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
-  var parts = self.callParticipants();
-  var haveCallParticipants = parts && parts.length > 0;
+  var haveCallParticipants = self.getCallParticipants().length > 0;
 
   if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && haveCallParticipants) {
     return true;
@@ -21416,7 +21421,7 @@ ChatRoom.prototype.callParticipantsUpdated = function ()
     msgId = self.getActiveCallMessageId(true);
   }
 
-  var callParts = self.callParticipants();
+  var callParts = self.getCallParticipants();
   var uniqueCallParts = {};
   callParts.forEach(function (handleAndSid) {
     var handle = base64urlencode(handleAndSid.substr(0, 8));

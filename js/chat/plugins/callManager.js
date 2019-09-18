@@ -97,13 +97,9 @@ CallManager.prototype.registerCall = function (chatRoom, rtcCall, fromUser) {
 
 CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
     var self = this;
-
-    // if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
-    //     chatRoom.callManagerCall.endCall('other');
-    // }
-
-    var $masterPromise = new MegaPromise();
-
+    if (chatRoom._callSetupPromise) {
+        return chatRoom._callSetupPromise;
+    }
     chatRoom.megaChat.closeChatPopups();
 
     var participants = chatRoom.getParticipantsExceptMe();
@@ -121,7 +117,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
         }
         return;
     }
-
+    var $masterPromise = chatRoom._callSetupPromise = new MegaPromise();
     var $promise = chatRoom._retrieveTurnServerFromLoadBalancer(4000);
 
     $promise.always(function () {
@@ -138,6 +134,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
                 return callManagerCall;
             }
         );
+        delete chatRoom._callSetupPromise;
         if (!callObj) {
             // call already starte/dup call.
             $masterPromise.reject();
@@ -175,7 +172,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
 
         self.trigger('WaitingResponseOutgoing', [callManagerCall, mediaOptions]);
         $masterPromise.resolve(callManagerCall);
-
     });
 
     return $masterPromise;
@@ -183,11 +179,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
 
 CallManager.prototype.joinCall = function (chatRoom, mediaOptions) {
     var self = this;
-
-    // if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
-    //     chatRoom.callManagerCall.endCall('other');
-    // }
-
     var $masterPromise = new MegaPromise();
 
     chatRoom.megaChat.closeChatPopups();

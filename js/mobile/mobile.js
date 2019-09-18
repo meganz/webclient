@@ -239,7 +239,7 @@ var mobile = {
                 }
             }
             else {
-                loadSubPage('terms');
+                window.open('/terms', '_blank');
             }
 
             // Prevent double clicks

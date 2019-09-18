@@ -605,8 +605,20 @@ function dl_g(res) {
                 $(window).rebind('resize.download-bar', _resizer);
             })();
 
+            // Expand top bar if its clicked
+            $topBar.rebind('click', function(e) {
+                var $target = $(e.target);
+
+                if ($(this).find('.download-content').height() < 15
+                    && $target.not('.button') && !$target.closest('.button').length
+                    && !$target.closest('.top-menu-popup').length) {
+
+                    _expand();
+                }
+            });
+
             // Collapse/Expand top bar events
-            $('.top-expand-button, .top-expand-txt').rebind('click', function() {
+            $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
                 if ($(this).hasClass('active')) {
                     $topBar.removeClass('expanded initial').css('height', '');
                     return $(window).unbind('resize.download-bar');

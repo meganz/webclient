@@ -1218,6 +1218,10 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     display: block;
     margin-top: -5px;
 }
+.free .reg-st3-bott-title span.period.free {
+    color:#31B500;
+    margin-top: 16px;
+}
 .pro4 .reg-st3-bott-title span.period {
     color: #FFA500;
 }

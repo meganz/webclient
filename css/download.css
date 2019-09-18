@@ -868,39 +868,52 @@ body:not(.en) .download.top-bar.floating {
 .download.video .download.warning-block {
     max-width: 768px;
     margin: 0 0 -20px -384px;
-    position:fixed;
-    background-color: white;
+    position: fixed;
     left: 50%;
     bottom: 20px;
-    color: #333;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
-    -webkit-box-shadow: 0 1px 12px 0 rgba(0,0,0,0.15);
-    -moz-box-shadow: 0 1px 12px 0 rgba(0,0,0,0.15);
-    box-shadow: 0 1px 12px 0 rgba(0,0,0,0.15);
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
     height: 0;
     z-index: 30;
     -webkit-transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
-    -moz-transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
-    -o-transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
-    -ms-transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
     transition: visibility 200ms ease-in-out, margin-bottom 200ms ease-in-out;
     visibility: hidden;
     opacity: 0;
     overflow: visible;
-    padding-top: 20px;
+    padding: 15px 20px 15px 15px;
 }
 .download.video .download.warning-block .download.big-icon {
-    margin: 13px 0 0 -6px;
+    margin: -43px 0 0 -6px;
+    top:  50%;
+}
+.download.video .download.warning-block .default-white-button {
+    margin-top: 0;
+}
+.download.video .download.warning-block .table-cell:last-child {
+    width: 20px;
+    padding: 0 0 0 10px;
 }
 .download.warning-block  .fm-dialog-close {
-    opacity: 0.7;
-    right: 8px;
-    top: 8px;
+    opacity: 0.9;
+    border-radius: 100%;
+    right: -8px;
+    top: -8px;
+    background-color: white;
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
+    width: 28px;
+    height: 28px;
+    background-position: -133px -5348px;
+}
+.download.warning-block  .fm-dialog-close::before {
+    content: '';
+    display: block;
+    border-radius: 100%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+    width: 100%;
+    height: 100%;
 }
 .download.warning-block  .fm-dialog-close:hover {
-    opacity: 0.9;
+    opacity: 1;
 }
 .download.video .download.warning-block::before {
     content: '';
@@ -910,9 +923,7 @@ body:not(.en) .download.top-bar.floating {
     left: 0;
     top:  0;
     border-radius: inherit;
-    -webkit-box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
-    -moz-box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
-    box-shadow: 0px 0px 0px 1px rgba(22,135,187,0.1);
+    box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.4);
 }
 .download.video .download.warning-block.visible {
     -webkit-animation: seconds 1s forwards;

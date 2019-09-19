@@ -6952,11 +6952,11 @@ textarea.mobile.support-text-field {
     background-color: #000;
 }
 .slideshow-image-previewer .mobile.video .download.video-block {
-    position: absolute;
+    position: fixed;
     top: 0;
     bottom: 0;
     margin: auto;
-    height: 100vh;
+    height: 100%;
     width: 100%;
 }
 .mobile.video .download.video-block video {
@@ -10530,9 +10530,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .security-page-video-block.mobile.video .download.video-block {
         height: auto;
     }
-    .slideshow-image-previewer .mobile.video .download.video-block {
-        height: fit-content;
-    }
 }
 
 
@@ -10542,9 +10539,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
     .security-page-video-block.mobile.video .download.video-block {
         height: auto;
-    }
-    .slideshow-image-previewer .mobile.video .download.video-block {
-        height: fit-content;
     }
 }
 
@@ -10822,9 +10816,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
     .security-page-video-block.mobile.video .download.video-block {
         height: auto;
-    }
-    .slideshow-image-previewer .mobile.video .download.video-block {
-        height: fit-content;
     }
 }
 

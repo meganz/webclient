@@ -6962,7 +6962,7 @@ textarea.mobile.support-text-field {
 .mobile.video .download.video-block video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
@@ -7199,9 +7199,20 @@ textarea.mobile.support-text-field {
 }
 .mobile.video .video-controls {
     display: block;
+    opacity: 1;
+    visibility: visible;
 }
 .mobile.video .video-theatre-mode .video-controls {
     display: block;
+}
+.mobile.video .video-controls.invisible {
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    opacity: 0;
+    visibility: hidden;
 }
 .mobile.video .video-progress-block {
     padding: 11px 98px 20px 94px;

@@ -581,6 +581,11 @@ dashboardUI.updateCloudDataWidget = function() {
         return false;
     });
 
+    $('.data-item .rubbish-bin-dashboard').rebind('click', function() {
+        loadSubPage('fm/' + M.RubbishID);
+        return false;
+    });
+
     $('.data-item .incoming').rebind('click', function() {
         loadSubPage('fm/shares');
         return false;

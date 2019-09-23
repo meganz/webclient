@@ -769,5 +769,15 @@ mobile.downloadOverlay = {
                 $appInfoBlock.addClass('android');
                 break;
         }
+    },
+
+    /**
+     * Resume a download
+     * @param nodeHandle
+     */
+    resumeDownload: function(nodeHandle) {
+        'use strict';
+        this.showOverlay(nodeHandle);
+        this.startDownload(nodeHandle);
     }
 };

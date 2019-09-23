@@ -280,8 +280,7 @@
         if (typeof page !== 'undefined' && page === 'chat') {
             $('.dialog-dark-bottom.login', $dialog).removeClass('hidden').find('a')
                 .rebind('click.doSignup', function() {
-                    delete $.registerDialog;
-                    closeDialog();
+                    closeRegisterDialog($dialog, true);
                     megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
                 });
         }

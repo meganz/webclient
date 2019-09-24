@@ -301,6 +301,9 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
         }
     }
     render() {
+        if (anonymouschat) {
+            return null;
+        }
         var self = this;
 
         var contact = this.props.contact;
@@ -321,12 +324,14 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
         else {
             var self = this;
 
-            crypt.getPubEd25519(contact.u)
+            !pubEd25519[contact.u] && crypt.getPubEd25519(contact.u)
                 .done(function() {
-                    if(self.isMounted()) {
-                        self.safeForceUpdate();
-                    }
-                })
+                    onIdle(function() {
+                        if (pubEd25519[contact.u] && self.isMounted()) {
+                            self.safeForceUpdate();
+                        }
+                    });
+                });
         }
 
 

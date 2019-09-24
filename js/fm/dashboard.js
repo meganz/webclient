@@ -110,8 +110,14 @@ function dashboardUI() {
 
         // QR Code
         var drawQRCanvas = function _drawQRCanvas() {
-            var cutPlace = location.href.indexOf('/fm/');
-            var myHost = location.href.substr(0, cutPlace);
+            var myHost = '';
+            if (!is_extension) {
+                var cutPlace = location.href.indexOf('/fm/');
+                myHost = location.href.substr(0, cutPlace);
+            }
+            else {
+                myHost = 'https://mega.nz';
+            }
             myHost += '/' + M.account.contactLink;
             if (account.contactLink && account.contactLink.length) {
                 var QRoptions = {

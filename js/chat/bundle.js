@@ -1156,6 +1156,10 @@ function (_MegaRenderMixin3) {
   }, {
     key: "render",
     value: function render() {
+      if (anonymouschat) {
+        return null;
+      }
+
       var self = this;
       var contact = this.props.contact;
 
@@ -1172,10 +1176,12 @@ function (_MegaRenderMixin3) {
         }) : null;
       } else {
         var self = this;
-        crypt.getPubEd25519(contact.u).done(function () {
-          if (self.isMounted()) {
-            self.safeForceUpdate();
-          }
+        !pubEd25519[contact.u] && crypt.getPubEd25519(contact.u).done(function () {
+          onIdle(function () {
+            if (pubEd25519[contact.u] && self.isMounted()) {
+              self.safeForceUpdate();
+            }
+          });
         });
       }
 

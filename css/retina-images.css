@@ -321,8 +321,12 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-image: url("../images/mega/cloud-background@2x.png");
     background-size: 512px auto;
 }
-.register-side-pane.top-block, .register-side-pane.top-bg {
-    background-image: url(../images/mega/register-sprite_v1@2x.png);
+.register-side-pane.top-block, .register-side-pane.top-bg, .big-illustration.register, .big-illustration.login {
+    background-image: url(../images/mega/register-sprite_v2@2x.png);
     background-size: 612px auto;
+}
+.register-page .slider-ctrl-button {
+    background-image: url(../images/mega/business@2x.png) !important;
+    background-size: 367px auto;
 }
 }

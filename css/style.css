@@ -12136,7 +12136,10 @@ table {
     box-sizing: border-box;
     padding: 0 15px 0 15px;
 }
-.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay{
+.main-mid-pad.register1, .main-mid-pad.login {
+    width: 1020px;
+}
+.main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay {
     max-width: 100%;
     padding: 0 0;
     background-color: #F5F7F9;
@@ -12167,6 +12170,7 @@ table {
 }
 .sign .main-right-block {
     padding-top: 100px;
+    margin-left: 560px;
 }
 h3.main-italic-header {
     font-size: 19px;

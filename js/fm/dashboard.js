@@ -32,7 +32,7 @@ function dashboardUI() {
     if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-        if (u_attr.b.s !== -1) {
+        if (u_attr.b.s !== -1 || !u_attr.b.m) {
             $('.dashboard .button.upgrade-account').addClass('hidden');
         }
         else {
@@ -419,7 +419,7 @@ function dashboardUI() {
         }
         else {
             // someone modified CSS, hidden class is overwitten --> .hide()
-            if (u_attr.b.s !== -1) {
+            if (u_attr.b.s !== -1 || !u_attr.b.m) {
                 $('.dashboard .upgrade-account').addClass('hidden').hide();
             }
             $('.business-dashboard .user-management-storage .storage-transfer-data')

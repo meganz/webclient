@@ -1555,7 +1555,12 @@ MegaData.prototype.ulerror = function(ul, error) {
         }
     }
     else if (!overquota) {
-        msgDialog('warninga', l[135], l[47], api_strerror(error));
+        if (error === ESHAREROVERQUOTA) {
+            msgDialog('warninga', l[135], l[8435]);
+        }
+        else {
+            msgDialog('warninga', l[135], l[47], api_strerror(error));
+        }
     }
 };
 

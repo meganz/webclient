@@ -2205,7 +2205,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:5,w:5});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
@@ -3309,6 +3309,31 @@ else if (!browserUpdate) {
                         }
                     }
                     window[jsl[i].n] = blobLink;
+                }
+            }
+            else if (jsl[i].j === 5) {
+                // a type of resources that we want to modify before loading.
+                if (jsl[i].n === 'dexie_js') {
+                    var replaceString = 'try {\r\n' +
+                        '        // Be able to patch native async functions\r\n' +
+                        '        return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();\r\n' +
+                        '    }\r\n' +
+                        '    catch (e) {\r\n' +
+                        '        var P = _global.Promise;\r\n' +
+                        '        return P ?\r\n' +
+                        '            [P.resolve(), P.prototype, P.resolve()] :\r\n' +
+                        '            [];\r\n' +
+                        '    }';
+
+                    var replaceByString = 'var P = _global.Promise; ' +
+                        'return P ?' +
+                        '[P.resolve(), P.prototype, P.resolve()] : ' +
+                        '[];';
+
+                    jsl[i].text = jsl[i].text.replace(replaceString, replaceByString);
+
+                    jsar.push(jsl[i].text + '\n\n');
+
                 }
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {

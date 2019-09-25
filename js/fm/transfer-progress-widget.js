@@ -553,7 +553,7 @@ mega.tpw = new function TransferProgressWidget() {
             setProgressCircle($downloadHeader, totalD, doneD);
             $downloadHeader.removeClass('hidden');
             if (!dRows.filter('.error').length) {
-                $downloadHeader.removeClass('error');
+                $downloadHeader.removeClass('error overquota');
             }
 
         }
@@ -590,7 +590,7 @@ mega.tpw = new function TransferProgressWidget() {
             setProgressCircle($uploadHeader, totalU, doneU);
             $uploadHeader.removeClass('hidden');
             if (!uRows.filter('.error').length) {
-                $uploadHeader.removeClass('error');
+                $uploadHeader.removeClass('error overquota');
             }
         }
 

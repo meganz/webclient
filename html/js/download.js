@@ -481,9 +481,9 @@ function dl_g(res) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
                 if (is_image(filename) || isVideo) {
-                    var $ipb = $infoBlock.find('.img-preview-button');
+                    var $ipb = $infoBlock.find('.img-preview-button, .thumb-block');
 
-                    $ipb.removeClass('hidden')
+                    $ipb.addClass('clickable').removeClass('hidden')
                         .rebind('click', function() {
                             slideshow(dl_node);
 
@@ -503,6 +503,7 @@ function dl_g(res) {
                     prevBut = false;
                 }
                 else {
+
                     // load thumbnail
                     getImage(dl_node).then(function(uri) {
                         var $infoBlock = $('.download.info-block');

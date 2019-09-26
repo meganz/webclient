@@ -908,6 +908,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[A]', '<a href="/security" class="green txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
         .replace('[A]', '<a href="/security" class="red txt-bold" target="_blank">').replace('[/A]', '</a>');
+    l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

@@ -1164,8 +1164,16 @@ accountUI.account = {
 
             this.$QRSettings =  $('.qr-settings');
 
-            var cutPlace = location.href.indexOf('/fm/');
-            var myHost = location.href.substr(0, cutPlace) + '/' + account.contactLink;
+            var myHost = '';
+            if (!is_extension) {
+                var cutPlace = location.href.indexOf('/fm/');
+                myHost = location.href.substr(0, cutPlace);
+            }
+            else {
+                myHost = 'https://mega.nz';
+            }
+
+            myHost += '/' + account.contactLink;
             var QRoptions = {
                 width: 106,
                 height: 106,

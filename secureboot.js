@@ -2205,7 +2205,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:5,w:5});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
@@ -2493,6 +2493,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
         jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3308,6 +3309,20 @@ else if (!browserUpdate) {
                         }
                     }
                     window[jsl[i].n] = blobLink;
+                }
+            }
+            else if (jsl[i].j === 5) {
+                // a type of resources that we want to modify before loading.
+                if (jsl[i].n.indexOf('dexie_js') > -1) {
+                    var replaceString =
+                        'return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();';
+
+                    var replaceByString = 'throw new Error();';
+
+                    jsl[i].text = jsl[i].text.replace(replaceString, replaceByString);
+
+                    jsar.push(jsl[i].text + '\n\n');
+
                 }
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {

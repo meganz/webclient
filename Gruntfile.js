@@ -341,7 +341,11 @@ var Secureboot = function() {
             if (f.f == "\0.jsx") {
                 groups.push(null);
                 size = 0;
-            } else {
+            }
+            else if (f.j == 5) {
+                groups.push(null);
+                size = 0;
+            }else {
                 // if (f.f === 'sjcl.js' && ++sjcl) fileLimit = 78e4; // bigger files for embed player
                 var fsize = fs.statSync(f.f)['size'];
                 if (size + fsize > fileLimit) {

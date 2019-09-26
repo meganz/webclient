@@ -131,6 +131,13 @@ var tooltiplogin = {
             return false;
         }
 
+        if (is_extension) {
+            $('.extension-advise', $dialog).addClass('hidden');
+        }
+        else {
+            $('.extension-advise', $dialog).removeClass('hidden');
+        }
+
         $dialog.find('form').replaceWith(getTemplate('top-login'));
 
         $inputs = $('.account.input-wrapper input',  $dialog);

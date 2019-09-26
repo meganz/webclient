@@ -279,6 +279,13 @@ function init_login() {
     var $inputs = $formWrapper.find('.account.input-wrapper input');
     var $button = $formWrapper.find('.big-red-button');
 
+    if (is_extension) {
+        $('.extension-advise').addClass('hidden');
+    }
+    else {
+        $('.extension-advise').removeClass('hidden');
+    }
+
     if (login_email) {
         $('#login-name2', $formWrapper).val(login_email);
     }

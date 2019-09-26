@@ -1648,8 +1648,14 @@ function openAccessQRDialog() {
         $dialog.removeClass('hidden');
         $dialog.removeClass('disabled');
         if (M.account.contactLink && M.account.contactLink.length) {
-            var cutPlace = location.href.indexOf('/fm/');
-            var myHost = location.href.substr(0, cutPlace);
+            var myHost = '';
+            if (!is_extension) {
+                var cutPlace = location.href.indexOf('/fm/');
+                myHost = location.href.substr(0, cutPlace);
+            }
+            else {
+                myHost = 'https://mega.nz';
+            }
             myHost += '/' + M.account.contactLink;
             var QRoptions = {
                 width: 222,

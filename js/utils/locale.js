@@ -575,8 +575,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l['208a'] = l['208a'].replace('[/A]', '</a>');
     l['208s'] = l[208].replace('[A]', '<span class="red">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
-    l['208g'] = l[208].replace('[A]', '<a class="green">');
-    l['208g'] = l['208g'].replace('[/A]', '</a>');
+    l['208.g'] = l[208].replace('[A]', '<a class="green txt-bold">').replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
@@ -905,13 +904,17 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20959] = l[20959] .replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
         + 'target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
+    l['20975.b'] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="/security" class="green txt-bold" target="_blank">').replace('[/A]', '</a>');
+    l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="/security" class="red txt-bold" target="_blank">').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
-        19814, 19854, 19821, 19930, 20402, 20462
+        19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973
     ];
     for (i = common.length; i--;) {
         var num = common[i];

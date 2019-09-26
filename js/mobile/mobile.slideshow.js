@@ -35,7 +35,7 @@ mobile.slideshow = {
         mobile.slideshow.initPreviousImageFunctionality();
         mobile.slideshow.initNextImageFunctionality();
         mobile.slideshow.initCloseButton();
-        mobile.slideshow.initHideShowToggleForHeaderAndButtons();
+        mobile.slideshow.initHideShowToggleForHeaderAndButtons(nodeHandle);
         mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
 
         mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
@@ -65,37 +65,46 @@ mobile.slideshow = {
 
     /**
      * Toggle hiding and showing the header and footer buttons when the black background or image is clicked
+     * @param {String} nodeHandle The node handle/id for the image to be fetched
      */
-    initHideShowToggleForHeaderAndButtons: function() {
+    initHideShowToggleForHeaderAndButtons: function(nodeHandle) {
 
         'use strict';
 
         // Cache selectors
-        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper, .fs');
-        var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
-        var $slideShowFooterButtons = mobile.slideshow.$overlay.find('.slideshow-buttons');
-        var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
+        var $slideShowBackground = mobile.slideshow.$overlay.find('.slideshow-wrapper');
 
         // On clicking the image or black background of the slideshow
-        $slideShowBackground.off().on('tap', SoonFc(function(ev) {
-            if ($(ev.target).closest('.video-controls').length) {
-                return false;
-            }
-
-            if ($slideShowHeader.hasClass('hidden')) {
-                $slideShowHeader.removeClass('hidden');
-                $slideShowFooterButtons.removeClass('hidden');
-                $slideShowNavButtons.removeClass('hidden');
-            }
-            else {
-                // Otherwise hide them
-                $slideShowHeader.addClass('hidden');
-                $slideShowFooterButtons.addClass('hidden');
-                $slideShowNavButtons.addClass('hidden');
+        $slideShowBackground.off().on('tap', SoonFc(function() {
+            if (!is_video(M.d[nodeHandle])) {
+                mobile.slideshow.toggleForHeaderAndButtons();
             }
         }));
     },
 
+    /**
+     * Action to toggle hiding and showing the header and footer buttons
+     */
+    toggleForHeaderAndButtons: function() {
+
+        'use strict';
+
+        var $slideShowHeader = mobile.slideshow.$overlay.find('.slideshow-header');
+        var $slideShowFooterButtons = mobile.slideshow.$overlay.find('.slideshow-buttons');
+        var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
+
+        if ($slideShowHeader.hasClass('hidden')) {
+            $slideShowHeader.removeClass('hidden');
+            $slideShowFooterButtons.removeClass('hidden');
+            $slideShowNavButtons.removeClass('hidden');
+        }
+        else {
+            // Otherwise hide them
+            $slideShowHeader.addClass('hidden');
+            $slideShowFooterButtons.addClass('hidden');
+            $slideShowNavButtons.addClass('hidden');
+        }
+    },
 
     /**
      * Fetch the image data from the API, populate the 'previews' object, then run the callback provided
@@ -207,6 +216,12 @@ mobile.slideshow = {
                     if (ok) {
                         mobile.slideshow.$overlay.find('.scroll-block').addClass('video');
                         $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
+                        $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function (e) {
+                            e.stopPropagation();
+                            mobile.slideshow.toggleForHeaderAndButtons();
+                            $(this).click();
+                            return false;
+                        });
                     }
                 });
             });
@@ -282,6 +297,9 @@ mobile.slideshow = {
             // Fetch the image and then display it
             mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'right');
 
+            // Rebind the hide/show toggle event for header and buttons
+            mobile.slideshow.initHideShowToggleForHeaderAndButtons(nextImageHandle);
+
             // Prevent double taps
             return false;
         });
@@ -294,6 +312,9 @@ mobile.slideshow = {
 
             // Fetch the image and then display it
             mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'right');
+
+            // Rebind the hide/show toggle event for header and buttons
+            mobile.slideshow.initHideShowToggleForHeaderAndButtons(nextImageHandle);
 
             // Prevent double swipe
             return false;
@@ -361,6 +382,9 @@ mobile.slideshow = {
             // Fetch the image and then display it
             mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'left');
 
+            // Rebind the hide/show toggle event for header and buttons
+            mobile.slideshow.initHideShowToggleForHeaderAndButtons(nextImageHandle);
+
             // Prevent double taps
             return false;
         });
@@ -373,6 +397,9 @@ mobile.slideshow = {
 
             // Fetch the image and then display it
             mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'left');
+
+            // Rebind the hide/show toggle event for header and buttons
+            mobile.slideshow.initHideShowToggleForHeaderAndButtons(nextImageHandle);
 
             // Prevent double swipe
             return false;

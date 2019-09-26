@@ -3313,7 +3313,7 @@ else if (!browserUpdate) {
             }
             else if (jsl[i].j === 5) {
                 // a type of resources that we want to modify before loading.
-                if (jsl[i].n === 'dexie_js') {
+                if (jsl[i].n.indexOf('dexie_js') > -1) {
                     var replaceString = 'try {\r\n' +
                         '        // Be able to patch native async functions\r\n' +
                         '        return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();\r\n' +

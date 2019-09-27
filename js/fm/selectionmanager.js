@@ -499,7 +499,7 @@ var SelectionManager = function($selectable, resume) {
 
     this.selectionNotification = function (nodeId, isAddToSelection) {
 
-        if (page.indexOf('fm/chat') > -1) {
+        if (M.chat || !M.d[nodeId]) {
             return false;
         }
 

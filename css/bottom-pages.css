@@ -2620,7 +2620,7 @@ bottom-page.top-title.uwp::before {
     height: 634px;
     content: '';
     left: 0;
-    background-image: url(../images/mega/bottom-page/gray-blue-angle@2x.png);
+    background-image: url(../images/mega/bottom-page/gray-blue-angle_v1@2x.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-color: #fff;
@@ -2628,7 +2628,10 @@ bottom-page.top-title.uwp::before {
     margin-top: 4px;
 }
 .bottom-page.grey-angle-bg {
-    background-image: url(../images/mega/bottom-page/grey-angle.png);
+    background-image: url(../images/mega/bottom-page/grey-angle_v1.png);
+    background-image: 
+        linear-gradient(transparent, transparent),
+        url(../images/mega/bottom-page/grey-angle_v1.svg);
     margin: 0;
     height: 1280px;
 }

@@ -480,7 +480,7 @@ function dl_g(res) {
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
-                if (is_image(filename) || isVideo) {
+                if (is_image2(dl_node) || isVideo) {
                     var $ipb = $infoBlock.find('.img-preview-button, .thumb-block');
 
                     $ipb.addClass('clickable').removeClass('hidden')

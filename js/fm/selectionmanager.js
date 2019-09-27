@@ -498,6 +498,11 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this.selectionNotification = function (nodeId, isAddToSelection) {
+
+        if (page.indexOf('fm/chat') > -1) {
+            return false;
+        }
+
         if (this.selected_list.length === 0) {
             this.selected_totalSize = 0;
             this.hideSelectionBar();

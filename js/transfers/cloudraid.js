@@ -782,6 +782,7 @@
             if (d) {
                 this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
             }
+            this.status = (fetchResponse.status | 0) || 520;
             this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
             return;
         }

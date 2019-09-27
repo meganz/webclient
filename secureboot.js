@@ -1596,7 +1596,7 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
     var tag=document.createElement('link');
     tag.rel = "shortcut icon";
     tag.type = "image/vnd.microsoft.icon";
-    tag.href = "https://mega.nz/favicon.ico";
+    tag.href = "/favicon.ico";
     document.getElementsByTagName('head')[0].appendChild(tag);
     m=true;
 }

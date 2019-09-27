@@ -34,6 +34,7 @@ MegaData.prototype.reset = function() {
     this.RubbishID = undefined;
     this.InboxID = undefined;
     this.viewmode = 0; // 0 list view, 1 block view
+    this.currentCustomView = false;
 
     var tree$tmpl = document.getElementById('template-tree-item');
     this.tree$tmpl = tree$tmpl && tree$tmpl.firstElementChild.cloneNode(true) || document.createElement('li');

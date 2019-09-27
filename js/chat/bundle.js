@@ -10598,7 +10598,7 @@ function (_ConversationMessageM) {
           }, external_React_default.a.createElement("span", {
             className: "message richpreview url-favicon"
           }, external_React_default.a.createElement("img", {
-            src: "/favicon.ico?v=3&c=1",
+            src: "https://mega.nz/favicon.ico?v=3&c=1",
             width: 16,
             height: 16,
             onError: function onError(e) {

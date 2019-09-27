@@ -349,7 +349,7 @@
             sumFails += this.part[i].failCount;
         }
 
-        if (sumFails > 2 || status > 200) {
+        if (sumFails > 2 || (status > 200 && status !== 503)) {
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",

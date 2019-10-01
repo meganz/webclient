@@ -326,10 +326,9 @@
     // from a working fetch for over 40 seconds (experimentally determined)
     CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
-    CloudRaidRequest.prototype.onFailure = function (ev, failedPartNum) {
+    CloudRaidRequest.prototype.onPartFailure = function (ev, failedPartNum, partStatus) {
         var self = this;
         var xhr = ev.target;
-        var status = xhr.readyState > 1 && xhr.status;
 
         this.cloudRaidSettings.onFails += 1;
 
@@ -349,13 +348,13 @@
             sumFails += this.part[i].failCount;
         }
 
-        if (sumFails > 2 || (status > 200 && status !== 503)) {
+        if (sumFails > 2 || (partStatus > 200 && partStatus !== 503)) {
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",
                     sumFails > 2 ? 'too many fails' : 'network error', ev);
             }
-            this.status = status | 0;
+            this.status = partStatus | 0;
             this.cloudRaidSettings.toomanyfails += 1;
             this.response = false;
             return this.dispatchLoadEnd();
@@ -781,7 +780,7 @@
             if (d) {
                 this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
             }
-            this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
+            this.onPartFailure($.Event('error', { target: this, message: "fetch failure" }), partNum, fetchResponse.status);
             return;
         }
 
@@ -791,7 +790,9 @@
 
             this.channelReplyState |= (1 << partNum);
 
-            this.logger.debug("received reply on: %s bitfield now: %s", partNum, this.channelReplyState);
+            if (d) {
+                this.logger.debug("received reply on: %s bitfield now: %s", partNum, this.channelReplyState);
+            }
 
             for (var i = this.RAIDPARTS; i--;) {
                 if ((this.channelReplyState | (1 << i)) === 63) {
@@ -801,7 +802,7 @@
 
             if (mia !== -1) {
                 if (d) {
-                    this.logger.info("Slowest channel was %s, closing it.", mia);
+                    this.logger.info("All channels but %s are working, closing channel %s.", mia, mia);
                 }
                 this.cloudRaidSettings.lastFailedChannel = mia;
 
@@ -908,18 +909,18 @@
                 if (d) {
                     this.logger.warn("Timeout on part %s", partNum);
                 }
-                this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+                this.onPartFailure($.Event('error', { target: this, message: ex }), partNum, 408);
                 part.timedout = false;
             }
             else {
-                this.logger.debug('Fetch on %s was the slowest.', partNum);
+                this.logger.debug('Fetch on %s would have been the slowest (or failed).', partNum);
             }
         }
         else {
             if (d) {
                 this.logger.warn("Caught exception from fetch on part: %s", partNum, ex);
             }
-            this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+            this.onPartFailure($.Event('error', { target: this, message: ex }), partNum, 409);
         }
     };
 

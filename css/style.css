@@ -15226,11 +15226,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     cursor: default;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -15391,13 +15386,13 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
-.search .grid-scrolling-table, .search .contacts-grid-scrolling-table, .select .grid-scrolling-table, .select .contacts-grid-scrolling-table {
+.search .grid-scrolling-table, .search .contacts-grid-scrolling-table, .select .grid-scrolling-table {
     height: 100%;
     height: -webkit-calc(100% - 60px);
     height: -moz-calc(100% - 60px);
     height: calc(100% - 60px);
 }
-.search .file-block-scrolling, .search .fm-contacts-blocks-view, .select .file-block-scrolling, .select .fm-contacts-blocks-view {
+.search .file-block-scrolling, .search .fm-contacts-blocks-view, .select .file-block-scrolling, .select .shared-blocks-scrolling, .select .out-shared-blocks-scrolling {
     height: 100%;
     height: -webkit-calc(100% - 35px);
     height: -moz-calc(100% - 35px);

@@ -560,6 +560,7 @@
                     this.outputByteCount / this.bytesProcessed, channelPauseCount, channelPauseMs, this.totalRequests);
             }
 
+            this.status = 200;
             onIdle(this.dispatchLoadEnd.bind(this));
         }
     };

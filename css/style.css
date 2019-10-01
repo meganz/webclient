@@ -25724,6 +25724,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .user-management-dialog.bus-pw-reset .verification-container .context-txt {
     display: inline-block;
+    user-select: text;
 }
 .user-management-add-user-dialog .verification-container .verification-user-info {
     width: auto;

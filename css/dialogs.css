@@ -5133,7 +5133,6 @@ body.en .register-side-pane.container.visible {
     top: 4px;
     opacity: 0.6;
     cursor: pointer;
-    transition: 0.3s;
 }
 .user-management-dialog.bus-pw-reset .verification-container .icons-sprite.medium-icon:hover {
     opacity: 0.8;

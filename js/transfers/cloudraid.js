@@ -742,7 +742,6 @@
         }
 
         this.totalRequests++;
-        this.channelReplyState = 0;
 
         // Execute the fetch, with continuation functions for each buffer piece that arrives
         part.abortController = new AbortController();
@@ -782,7 +781,6 @@
             if (d) {
                 this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
             }
-            this.status = (fetchResponse.status | 0) || 520;
             this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
             return;
         }
@@ -792,6 +790,8 @@
             var mia = -1;
 
             this.channelReplyState |= (1 << partNum);
+
+            this.logger.debug("received reply on: %s bitfield now: %s", partNum, this.channelReplyState);
 
             for (var i = this.RAIDPARTS; i--;) {
                 if ((this.channelReplyState | (1 << i)) === 63) {

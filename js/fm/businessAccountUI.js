@@ -975,7 +975,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
     // event handler for sub-user password reset
     $subAccountContainer.find('.profile-button-container .reset-sub-user-password')
-        .off('click.subuser').on('click.subuser',function resetPasswordSubUserClickHandler() {
+        .off('click.subuser').on('click.subuser', function resetPasswordSubUserClickHandler() {
             if ($(this).hasClass('disabled')) {
                 return;
             }
@@ -2812,7 +2812,7 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
     var lName = from8(base64urldecode(subUser.lastname));
 
     var subTitle = l[22077].replace('[S]', '<span class="green strong">')
-        .replace('[/S]', '</span>').replace('{0}', fName + ' ' + lName);
+        .replace('[S]', '</span>').replace('{0}', fName + ' ' + lName);
 
     $subTitle.safeHTML(subTitle);
 
@@ -2863,6 +2863,42 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
 
     $copyPassBtn.off('click.subuser').on('click.subuser', copyGeneratedPass);
     $tempPass.off('copy.subuser').on('copy.subuser', copyGeneratedPass);
+
+    var resetPasswordResultHandler = function(c, res, txt) {
+        if (c) {
+
+            M.safeShowDialog('pass-reset-success-subuser-dlg', function() {
+                var $resetDialog =
+                    $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+                $('.yes-answer', $resetDialog).off('click.suba').on('click.suba', closeDialog);
+                $resetDialog.find('.dialog-text-one')
+                    .safeHTML(l[22081].replace('{0}', '<b>' + subUser.e + '</b>'));
+
+                return $resetDialog;
+            });
+        }
+        else {
+            if (d) {
+                console.error(txt + ' ' + res);
+            }
+            msgDialog('info', '', l[22082]);
+        }
+
+    };
+
+    $confirmBtn.off('click.subuser').on('click.subuser',
+        function confirmResetPassBtn() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+
+            closeDialog();
+
+            var resetPassOperation = mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass);
+
+            resetPassOperation.always(resetPasswordResultHandler);
+
+        });
 
     M.safeShowDialog('sub-user-resetPass-dlg', function() {
         return $dialog;

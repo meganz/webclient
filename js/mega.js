@@ -927,10 +927,32 @@ scparser.$add('t', function(a, scnodes) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
             delete scnodes[i].arrivalOrder;
+
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
+
+            var h = scnodes[i].h;
+
+            if (!$.moveNodeShares || !$.moveNodeShares[h]) {
+                continue;
+            }
+
+            for (var su in $.moveNodeShares[h]) {
+                if ($.moveNodeShares[h][su]) {
+                    M.nodeShare(h, $.moveNodeShares[h][su], true);
+                    if (su === 'EXP') {
+                        scpubliclinksuiupd = true;
+                    }
+                    else {
+                        scsharesuiupd = true;
+                    }
+                }
+            }
+
+            delete $.moveNodeShares[h];
         }
     }
+
     ufsc.save(rootNode);
 
     if (d) {
@@ -1246,6 +1268,24 @@ scparser.$add('d', function(a) {
     if (fileDeletion) {
         topVersion = fileversioning.getTopNodeSync(a.n);
     }
+
+    // This is node move
+    if (a.m) {
+        $.moveNodeShares = !$.moveNodeShares ? {} : $.moveNodeShares;
+        (function _checkMoveNodeShare(h) {
+            if (M.d[h].shares) {
+                $.moveNodeShares[h] = M.d[h].shares;
+            }
+            if (M.d[h].t) {
+                for (var childHandle in M.c[h]) {
+                    if (M.c[h][childHandle]) {
+                        _checkMoveNodeShare(childHandle);
+                    }
+                }
+            }
+        })(a.n);
+    }
+
     // node deletion
     M.delNode(a.n);
 

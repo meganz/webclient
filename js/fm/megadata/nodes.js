@@ -969,7 +969,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                 }
             }
 
-            removeUInode(h, p);
+            // If user is on out-shares or public-link list page, move should not remove node from the list
+            if (M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links') {
+                removeUInode(h, p);
+            }
             M.nodeUpdated(n);
             newnodes.push(n);
 

@@ -326,9 +326,8 @@
     // from a working fetch for over 40 seconds (experimentally determined)
     CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
-    CloudRaidRequest.prototype.onPartFailure = function (ev, failedPartNum, partStatus) {
+    CloudRaidRequest.prototype.onPartFailure = function(failedPartNum, partStatus) {
         var self = this;
-        var xhr = ev.target;
 
         this.cloudRaidSettings.onFails += 1;
 
@@ -336,7 +335,7 @@
         this.lastFailureTime = Date.now();
 
         if (d) {
-            this.logger.warn("Recovering from fail, part %s (%s)", failedPartNum, ev.type,
+            this.logger.warn("Recovering from fail, part %s", failedPartNum,
                 this.part[0].failCount, this.part[1].failCount, this.part[2].failCount,
                 this.part[3].failCount, this.part[4].failCount, this.part[5].failCount);
         }
@@ -352,12 +351,11 @@
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",
-                    sumFails > 2 ? 'too many fails' : 'network error', ev);
+                    sumFails > 2 ? 'too many fails' : 'network error');
             }
-            this.status = partStatus | 0;
-            this.cloudRaidSettings.toomanyfails += 1;
             this.response = false;
-            return this.dispatchLoadEnd();
+            this.cloudRaidSettings.toomanyfails++;
+            return this.dispatchLoadEnd(partStatus);
         }
 
         var partStartPos = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
@@ -387,7 +385,8 @@
 
     };
 
-    CloudRaidRequest.prototype.dispatchLoadEnd = function() {
+    CloudRaidRequest.prototype.dispatchLoadEnd = function(status) {
+        this.status = status | 0;
         this.dispatchEvent('readystatechange', XMLHttpRequest.DONE);
         this.dispatchEvent('loadend');
     };
@@ -560,8 +559,7 @@
                     this.outputByteCount / this.bytesProcessed, channelPauseCount, channelPauseMs, this.totalRequests);
             }
 
-            this.status = 200;
-            onIdle(this.dispatchLoadEnd.bind(this));
+            onIdle(this.dispatchLoadEnd.bind(this, 200));
         }
     };
 
@@ -777,11 +775,11 @@
             this.dispatchEvent('readystatechange', XMLHttpRequest.LOADING);
         }
 
-        if (!fetchResponse.ok || fetchResponse.status !== 200) {
+        if (fetchResponse.status !== 200) {
             if (d) {
                 this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
             }
-            this.onPartFailure($.Event('error', { target: this, message: "fetch failure" }), partNum, fetchResponse.status);
+            this.onPartFailure(partNum, fetchResponse.status);
             return;
         }
 
@@ -910,7 +908,7 @@
                 if (d) {
                     this.logger.warn("Timeout on part %s", partNum);
                 }
-                this.onPartFailure($.Event('error', { target: this, message: ex }), partNum, 408);
+                this.onPartFailure(partNum, 408);
                 part.timedout = false;
             }
             else {
@@ -921,7 +919,7 @@
             if (d) {
                 this.logger.warn("Caught exception from fetch on part: %s", partNum, ex);
             }
-            this.onPartFailure($.Event('error', { target: this, message: ex }), partNum, 409);
+            this.onPartFailure(partNum, 409);
         }
     };
 

@@ -3136,7 +3136,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                     if (d) {
                         console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
                     }
-                    return failing(l[19146]);
+                    var failMsg = l[22083].replace('{0}', '<b>' + subUser.e + '</b></br></br>');
+                    return failing(failMsg);
                 }
             );
 

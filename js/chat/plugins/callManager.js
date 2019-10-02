@@ -70,6 +70,12 @@ CallManager.CALL_END_REMOTE_REASON = {
     "CANCELED": 0x05
 };
 
+function makeStreamId(rtcSess) {
+    return base64urlencode(rtcSess.peer) +
+        ":" + base64urlencode(rtcSess.peerClient) +
+        ":" + base64urlencode(rtcSess.sid);
+}
+
 /**
  * Entry point, for attaching the chat store to a specific `Chat` instance
  *
@@ -1144,10 +1150,6 @@ CallManagerCall.prototype.onCallTerminated = function () {
     }, 1000);
 };
 
-CallManagerCall.prototype.onNewSession = function(rtcCallSession) {
-    return new RtcSessionEventHandler(this, rtcCallSession);
-};
-
 CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, msg, willRecover) {
     var self = this;
     if (willRecover) {
@@ -1203,22 +1205,24 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
     self.onCallTerminated();
 };
 
-CallManagerCall.prototype.onRemoteStreamAdded = function (rtcCallSession, stream) {
-    var peerId = base64urlencode(rtcCallSession.peer);
-    var clientId = base64urlencode(rtcCallSession.peerClient);
-    var sid = base64urlencode(rtcCallSession.sid);
-    this._streams[peerId + ":" + clientId + ":" + sid] = stream;
+CallManagerCall.prototype.onSessionConnected = function(id) {
+    if (typeof this._streams[id] !== "undefined") {
+        return;
+    }
+    // onRemoteStreamAdded may be called before onConnect, so the stream may be set
+    // there to a valid one. But if not, set it to null. Otherwise we won't have an entry
+    // for that peer in ._streams, and the GUI will not show that peer's avatar at all.
+    this._streams[id] = null;
     this._renderInCallUI();
 };
 
-CallManagerCall.prototype.onRemoteStreamRemoved = function (rtcCallSession) {
-    var peerId = base64urlencode(rtcCallSession.peer);
-    var clientId = base64urlencode(rtcCallSession.peerClient);
-    var sid = base64urlencode(rtcCallSession.sid);
-    var idx = peerId + ":" + clientId + ":" + sid;
-    if (this._streams[idx]) {
-        delete this._streams[idx];
-    }
+CallManagerCall.prototype.onRemoteStreamAdded = function (streamId, stream) {
+    this._streams[streamId] = stream;
+    this._renderInCallUI();
+};
+
+CallManagerCall.prototype.onRemoteStreamRemoved = function (streamId) {
+    delete this._streams[streamId];
     this.room.trackDataChange();
 };
 
@@ -1575,6 +1579,77 @@ CallManagerCall.prototype.hasVideoSlotLimitReached = function() {
 
 CallManagerCall.prototype.destroy = function () {
     // TODO: self destruct + remove self from the CallManager's registers onCallTerminated with some timeout.
+};
+
+var RtcSessionEventHandler = function (callManagerCall, rtcSession) {
+    this.call = callManagerCall;
+    this.rtcSession = rtcSession;
+};
+
+/**
+ *
+ * @param {SessionState} sessionState
+ */
+RtcSessionEventHandler.prototype.onStateChange = function (sessionState) {
+    // unused
+};
+
+RtcSessionEventHandler.prototype.onDestroy = function () {
+    // unused
+};
+
+RtcSessionEventHandler.prototype.onConnect = function () {
+    this.call.onSessionConnected(makeStreamId(this.rtcSession));
+};
+
+RtcSessionEventHandler.prototype.onRemoteStreamAdded = function (stream) {
+    /* The peer will send a stream
+     to us on that stream object. You can obtain the stream URL via
+     window.URL.createObjectURL(stream) or you can attach the player via the
+     attachToStream() polyfill function
+     stream - the stream object to which a player should be attached
+     */
+    this.call.onRemoteStreamAdded(makeStreamId(this.rtcSession), stream);
+};
+
+RtcSessionEventHandler.prototype.onRemoteStreamRemoved = function () {
+    //  The peer's stream is about to be removed.
+    this.call.onRemoteStreamRemoved(makeStreamId(this.rtcSession));
+};
+
+RtcSessionEventHandler.prototype.onRemoteMute = function (av) {
+    this.call.onRemoteMute();
+};
+
+/**
+ *  Called when network quality for this session changes.
+ *
+ * @param {Number} q
+ */
+RtcSessionEventHandler.prototype.onPeerNetworkQualityChange = function(q) {
+    var idx = makeStreamId(this.rtcSession);
+    var call = this.call;
+    if (call && (call.peerQuality[idx] !== q)) {
+        call.peerQuality[idx] = q;
+        call.room.trackDataChange();
+    }
+};
+
+/**
+ * Called on level change of the remote audio level.
+ *
+ * @param {Number} level 0-100
+ */
+RtcSessionEventHandler.prototype.onAudioLevelChange = function(level) {
+    if (this.call) {
+        // call ended?
+        var idx = makeStreamId(this.rtcSession);
+        call.trigger('onAudioLevelChange', [idx, level]);
+    }
+};
+
+CallManagerCall.prototype.onNewSession = function(rtcCallSession) {
+    return new RtcSessionEventHandler(this, rtcCallSession);
 };
 
 scope.CallManagerCall = CallManagerCall;

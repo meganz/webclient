@@ -412,6 +412,9 @@ var attribCache = false;
 
     /**
      * Removes a user attribute for oneself.
+     * Note: THIS METHOD IS LEFT HERE FOR DEVELOPMENT AND TESTING PURPOSES, PLEASE DON'T USE FOR PRODUCTION FEATURES.
+     *
+     * @deprecated
      *
      * @param attribute {string}
      *     Name of the attribute.
@@ -434,22 +437,35 @@ var attribCache = false;
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric, encodeValues) {
+        if (d) {
+            console.error("mega.attr.remove is to be used only for development purposes and should not be used in " +
+                "real world scenario related code.");
+        }
         attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
         var cacheKey = buildCacheKey(u_handle, attribute);
         var promise = new MegaPromise();
 
+
+        var self = this;
+        var req = {'a': 'upr', 'ua': attribute, 'v': 1};
+        if (self._versions[cacheKey]) {
+            // req['av'] = self._versions[cacheKey];
+        }
         attribCache.removeItem(cacheKey)
             .always(function() {
-                api_req({'a': 'upr', 'ua': attribute}, {
+                api_req(req, {
                     callback: function(res) {
                         // Revoke pending attribute retrieval, if any.
                         revokeRequest(cacheKey);
 
-                        if (typeof res !== 'number' || res < 0) {
+                        if (typeof res === 'number' || res < 0) {
                             logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
                             promise.reject(res);
                         }
                         else {
+                            if (self._versions[cacheKey] && typeof res === 'string') {
+                                self._versions[cacheKey] = res;
+                            }
                             logger.info('Removed user attribute "%s", result: ' + res, attribute);
                             promise.resolve();
                         }
@@ -579,7 +595,14 @@ var attribCache = false;
                         attribCache.removeItem(cacheKey);
 
                         self.get(
-                            u_handle, attrName, pub, nonHistoric
+                            u_handle,
+                            attrName,
+                            pub,
+                            nonHistoric,
+                            false,
+                            false,
+                            false,
+                            encodeValues
                         )
                             .done(function(attrVal) {
                                 var valObj = {
@@ -603,7 +626,8 @@ var attribCache = false;
                                             callback,
                                             ctx,
                                             mode,
-                                            useVersion
+                                            useVersion,
+                                            encodeValues
                                         )
                                     );
                                 }
@@ -686,8 +710,8 @@ var attribCache = false;
     ns._versions = Object.create(null);
     ns._conflictHandlers = Object.create(null);
 
-    ns.registerConflictHandler = function (attributeName, pub, nonHistoric, mergeFn) {
-        var attributeId = buildAttribute(attributeName, pub, nonHistoric);
+    ns.registerConflictHandler = function (attributeName, pub, nonHistoric, encodeValues, mergeFn) {
+        var attributeId = buildAttribute(attributeName, pub, nonHistoric, encodeValues);
 
         if (!this._conflictHandlers[attributeId]) {
             this._conflictHandlers[attributeId] = [];
@@ -1420,45 +1444,63 @@ var attribCache = false;
         return Object.freeze(ns);
     };
 
-    ns.registerConflictHandler("lstint", false, true, function(valObj, index) {
-        var remoteValues = valObj.remoteValue;
-        var localValues = valObj.localValue;
-        // merge and compare any changes from remoteValues[u_h] = {type: timestamp} -> mergedValues
-        Object.keys(remoteValues).forEach(function(k) {
-            // not yet added to local values, merge
-            if (!localValues[k]) {
-                valObj.mergedValue[k] = remoteValues[k];
-            }
-            else {
-                // exists in local values
-                var remoteData = remoteValues[k].split(":");
-                var remoteTs = parseInt(remoteData[1]);
-
-                var localData = localValues[k].split(":");
-                var localTs = parseInt(localData[1]);
-                if (localTs > remoteTs) {
-                    // local timestamp is newer then the remote one, use local
-                    valObj.mergedValue[k] = localValues[k];
-                }
-                else if (localTs < remoteTs) {
-                    // remote timestamp is newer, use remote
+    ns.registerConflictHandler(
+        "lstint",
+        false,
+        true,
+        false,
+        function(valObj) {
+            var remoteValues = valObj.remoteValue;
+            var localValues = valObj.localValue;
+            // merge and compare any changes from remoteValues[u_h] = {type: timestamp} -> mergedValues
+            Object.keys(remoteValues).forEach(function(k) {
+                // not yet added to local values, merge
+                if (!localValues[k]) {
                     valObj.mergedValue[k] = remoteValues[k];
                 }
-            }
+                else {
+                    // exists in local values
+                    var remoteData = remoteValues[k].split(":");
+                    var remoteTs = parseInt(remoteData[1]);
+
+                    var localData = localValues[k].split(":");
+                    var localTs = parseInt(localData[1]);
+                    if (localTs > remoteTs) {
+                        // local timestamp is newer then the remote one, use local
+                        valObj.mergedValue[k] = localValues[k];
+                    }
+                    else if (localTs < remoteTs) {
+                        // remote timestamp is newer, use remote
+                        valObj.mergedValue[k] = remoteValues[k];
+                    }
+                }
+            });
+
+            // add any entries which exists locally, but not remotely.
+            Object.keys(localValues).forEach(function(k) {
+                if (!remoteValues[k]) {
+                    valObj.mergedValue[k] = localValues[k];
+                }
+            });
+
+            // logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
+
+
+            return true;
         });
 
-        // add any entries which exists locally, but not remotely.
-        Object.keys(localValues).forEach(function(k) {
-            if (!remoteValues[k]) {
-                valObj.mergedValue[k] = localValues[k];
-            }
+    ns.registerConflictHandler(
+        "alias",
+        false,
+        true,
+        true,
+        function(valObj) {
+            valObj.mergedValue = $.extend({}, valObj.localValue, valObj.remoteValue, nicknames._dirty);
+
+            // logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
+
+            return true;
         });
-
-        // logger.debug("merged: ", valObj.localValue, valObj.remoteValue, valObj.mergedValue);
-
-
-        return true;
-    });
 
     if (d) {
         ns._inflight = _inflight;

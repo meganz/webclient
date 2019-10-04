@@ -22,9 +22,9 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
         super(props);
 
         var haveContacts = false;
-        var keys = this.props.contacts.keys();
+        var keys = M.u.keys();
         for (var i = 0; i < keys.length; i++) {
-            if (this.props.contacts[keys[i]].c === 1) {
+            if (M.u[keys[i]].c === 1) {
                 haveContacts = true;
                 break;
             }
@@ -72,7 +72,7 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
 
         var classes = "new-group-chat contrast small-footer " + self.props.className;
 
-        var contacts = self.props.contacts;
+        var contacts = M.u;
         var haveContacts = self.state.haveContacts;
         var buttons = [];
         var allowNext = false;
@@ -244,9 +244,8 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
                 {chatInfoElements}
                 <ContactPickerWidget
                     changedHashProp={self.state.step}
-                    megaChat={self.props.megaChat}
-                    contacts={contacts}
                     exclude={self.props.exclude}
+                    contacts={contacts}
                     selectableContacts="true"
                     onSelectDone={self.onSelectClicked}
                     onSelected={self.onSelected}

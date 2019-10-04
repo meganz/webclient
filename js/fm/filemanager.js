@@ -529,6 +529,9 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+        if (M.chat) {
+            return;
+        }
         if (thElm && thElm.length) {
 
             var newWidth = startOffset + col.pageX;
@@ -564,6 +567,10 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+        if (M.chat) {
+            return;
+        }
+
         if (thElm) {
             M.columnsWidth.makeNameColumnStatic();
 
@@ -676,15 +683,16 @@ FileManager.prototype.initFileManagerUI = function() {
         if ($.hideTopMenu) {
             $.hideTopMenu(e);
         }
+        if (M.chat) {
+            // chat can handle its own links..no need to return false on every "click" and "element" :O
+            // halt early, to save some CPU cycles if in chat.
+            return;
+        }
         var $target = $(e.target);
         var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
 
         if (!$target.is('.account-history-dropdown-button')) {
             $('.account-history-dropdown').addClass('hidden');
-        }
-        if ($target.parents('.conversationsApp').length || $target.is('.chatlink')) {
-            // chat can handle its own links..no need to return false on every "click" and "element" :O
-            return;
         }
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)
@@ -2011,6 +2019,10 @@ FileManager.prototype.initUIKeyEvents = function() {
     "use strict";
 
     $(window).rebind('keydown.uikeyevents', function(e) {
+        if (M.chat && !$.dialog) {
+            return true;
+        }
+
         if (e.keyCode == 9 && !$(e.target).is("input,textarea,select")) {
             return false;
         }
@@ -2051,9 +2063,6 @@ FileManager.prototype.initUIKeyEvents = function() {
             s = tempSel.attrs('id');
         }
 
-        if (M.chat && !$.dialog) {
-            return true;
-        }
 
         if (!is_fm() && page !== 'login' && page.substr(0, 3) !== 'pro') {
             return true;

@@ -16,10 +16,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
 
         var roomType = false;
-        megaChat.displayArchivedChats = false;
+        var displayArchivedChats = false;
         if (roomOrUserHash === "archived") {
             roomType = "archived";
-            megaChat.displayArchivedChats = true;
+             displayArchivedChats = true;
         }
         else if (roomOrUserHash.substr(0, 2) === "g/" || roomOrUserHash.substr(0, 2) === "c/" || isPubLink) {
             roomType = (isPubLink || roomOrUserHash.substr(0, 2) === "c/") ? "public" : "group";
@@ -44,7 +44,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
             }
 
-            megaChat.displayArchivedChats = false;
             if (publicChatId && megaChat.chats[publicChatId]) {
                 megaChat.chats[publicChatId].show();
             }
@@ -100,7 +99,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             if (roomOrUserHash.substr(0, 2) === "p/") {
                 roomOrUserHash = roomOrUserHash.substr(2);
             }
-            megaChat.displayArchivedChats = false;
             if (!M.u[roomOrUserHash]) {
                 setTimeout(function () {
                     loadSubPage('fm/chat');
@@ -177,8 +175,10 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
             return;
         }
 
-
-
+        if (displayArchivedChats !== megaChat.displayArchivedChats) {
+            megaChat.displayArchivedChats = displayArchivedChats;
+            megaChat.safeForceUpdate();
+        }
 
         // since .fm-chat-block is out of the scope of the CovnersationsApp, this should be done manually :(
         $('.fm-chat-block').removeClass('hidden');
@@ -435,7 +435,7 @@ Chat.prototype.init = function() {
             console.time('chatReactUiInit');
         }
 
-        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} contacts={M.u} />;
+        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
             self.$conversationsApp,
@@ -958,6 +958,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
             self.favico.reset();
             self.favico.badge(unreadCount);
         });
+
 
         self.updateDashboard();
     }
@@ -1574,7 +1575,7 @@ Chat.prototype.sendMessage = function(roomJid, val) {
 
         createTimeoutPromise(function() {
             return !!self.chats[roomJid]
-        }, 100, self.options.delaySendMessageIfRoomNotAvailableTimeout)
+        }, 500, self.options.delaySendMessageIfRoomNotAvailableTimeout)
             .done(function() {
                 self.chats[roomJid].sendMessage(val);
             });
@@ -1652,11 +1653,12 @@ Chat.prototype.refreshConversations = function() {
     if (self.$container.parent('.section.conversations .fm-right-files-block').length == 0) {
         $('.section.conversations .fm-right-files-block').append(self.$container);
     }
+    self.$leftPane = self.$leftPane || $('.conversationsApp .fm-left-panel');
     if (anonymouschat) {
-        $('.conversationsApp .fm-left-panel').addClass('hidden');
+        self.$leftPane.addClass('hidden');
     }
     else {
-        $('.conversationsApp .fm-left-panel').removeClass('hidden');
+        self.$leftPane.removeClass('hidden');
     }
 };
 
@@ -2555,7 +2557,7 @@ Chat.prototype.getFrequentContacts = function() {
             var promise = createTimeoutPromise(function() {
                 return finishedLoadingChats[r.chatId] === true;
             },
-                300,
+                500,
                 10000,
                 undefined,
                 undefined,
@@ -2573,7 +2575,7 @@ Chat.prototype.getFrequentContacts = function() {
             $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
             var promise = createTimeoutPromise(function() {
                 return finishedLoadingChats[r.chatId] === true;
-            }, 300, 15000);
+            }, 500, 15000);
             promises.push(promise);
             r.messagesBuff.retrieveChatHistory(false);
         }

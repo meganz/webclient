@@ -805,6 +805,12 @@ MegaData.prototype.syncContactEmail = function(userHash) {
 
     var eventuallyReorderContactsTreePane = function() {
         if (
+            (
+                M.currentdirid === "contacts" ||
+                M.currentdirid === "ipc" ||
+                M.currentdirid === "opc" ||
+                M.u[M.currentdirid]
+            ) &&
             typeof $.sortTreePanel !== 'undefined' &&
             typeof $.sortTreePanel.contacts !== 'undefined' &&
             $.sortTreePanel.contacts.by === 'status'
@@ -828,8 +834,9 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 else if (M.currentdirid === 'contacts') {
                     M.openFolder(M.currentdirid, true);
                 }
-
-                eventuallyReorderContactsTreePane();
+                if (M.u[contact.h] && M.u[contact.h].c) {
+                    eventuallyReorderContactsTreePane();
+                }
             }, 1000);
         }
     };

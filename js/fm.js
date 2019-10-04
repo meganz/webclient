@@ -2495,12 +2495,19 @@ function addImportedDataToAddContactsDialog(data) {
 
 function closeImportContactNotification(c) {
     loadingDialog.hide();
-    $('.imported-contacts-notification').fadeOut(200);
-    $(c + ' .import-contacts-dialog').fadeOut(200);
-    $('.import-contacts-link').removeClass('active');
+    if (!$('.imported-contacts-notification').is(".hidden")) {
+        $('.imported-contacts-notification').fadeOut(200);
+    }
+
+    if (!$(c + ' .import-contacts-dialog').is(".hidden")) {
+        $(c + ' .import-contacts-dialog').fadeOut(200);
+    }
+    $('.import-contacts-link.active').removeClass('active');
 
     // Remove focus from input element, related to tokeninput plugin
-    $(c + ' input#token-input-').trigger("blur");
+    if ($(c + ' input#token-input-').is(":focus")) {
+        $(c + ' input#token-input-').trigger("blur");
+    }
 }
 
 /**
@@ -2615,7 +2622,7 @@ function closeDialog(ev) {
         $('.import-contacts-service').removeClass('imported');
 
         // share dialog permission menu
-        $('.permissions-menu').fadeOut(0);
+        $('.permissions-menu').hide();
         $('.permissions-icon').removeClass('active');
         closeImportContactNotification('.share-dialog');
         closeImportContactNotification('.add-user-popup');
@@ -3504,12 +3511,16 @@ function fingerprintDialog(userid) {
 
                 closeFngrPrntDialog();
 
-                M.u[userid] && M.u[userid].trackDataChange();
+                if (M.u[userid]) {
+                    M.u[userid].trackDataChange(M.u[userid], "fingerprint");
+                }
 
                 if (result && result.always) {
                     // wait for the setContactAuthenticated to finish and then trigger re-rendering.
                     result.always(function() {
-                        M.u[userid] && M.u[userid].trackDataChange();
+                        if (M.u[userid]) {
+                            M.u[userid].trackDataChange(M.u[userid], "fingerprint");
+                        }
                     });
                 }
             })

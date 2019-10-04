@@ -521,7 +521,7 @@ MegaData.prototype.treeSearchUI = function() {
         }); // END left panel header click
 
         // Make a search
-        $('.nw-fm-search-icon').show().rebind('click', function() {
+        !M.chat && $('.nw-fm-search-icon').show().rebind('click', function() {
             var $self = $(this);
 
             treesearch = false;

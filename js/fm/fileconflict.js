@@ -300,9 +300,10 @@
          * @param {Object} node The existing node
          * @param {Number} remaining The remaining conflicts
          * @param {String} target Location where the new file(s) will be placed
+         * @param {Number} dupsNB {optional} in case of duplications, total number
          * @returns {MegaPromise}
          */
-        prompt: function(op, file, node, remaining, target) {
+        prompt: function(op, file, node, remaining, target, dupsNB) {
             var promise = new MegaPromise();
             var $dialog = $('.fm-dialog.duplicate-conflict');
             var name = M.getSafeName(file.name);
@@ -334,6 +335,23 @@
             }
 
             switch (op) {
+                case 'dups':
+                    if (file.t) {
+                        return;
+                    }
+                    else {
+                        $('.red-header', $a1).text('Rename duplicates');
+                        $('.red-header', $a3).text('Merge and version');
+                        $('.red-header', $a2).text('Keep the newest');
+                        $('.light-grey', $a1).text('The newest file will keep its name, while older files will be renamed with suffixes (1), (2) ... ');
+                        $('.light-grey', $a3).text('The newest file will be kept, older files will be stored as previous versions of the file');
+                        $('.light-grey', $a2).text('The newest file will be kept, all older files will be removed');
+
+                        $('.info-txt-fn', $dialog)
+                            //.safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
+                            .safeHTML('Multiple files with the same name <strong>' + name + '</strong> exist in this location.');
+                    }
+                    break;
                 case 'copy':
                     if (file.t) {
                         $('.red-header', $a1).text(l[17551]);
@@ -401,12 +419,23 @@
                 $('.file-size', $a1).text(bytesToSize(file.size || file.s || ''));
                 $('.file-name', $a3).text(this.findNewName(file.name, target));
                 $('.file-size', $a2).text(bytesToSize(node.size || node.s));
+                if (op === 'dups') {
+                    $('.file-name', $a1).text(this.findNewName(file.name, target));
+                    $('.file-name', $a2).text(name);
+                    $('.file-name', $a3).text(name);
+                    $('.file-size', $a2).text(dupsNB + ' files will be removed');
+                    $('.file-date', $a1).text('');
+                    $('.file-date', $a2).text('');
+
+                }
             }
-            var myTime = file.mtime || file.ts || (file.lastModified / 1000);
-            $('.file-date', $a1).text(myTime ? time2date(myTime, 2) : '');
-            $('.file-name', $a2).text(node.name);
-            myTime = node.mtime || node.ts;
-            $('.file-date', $a2).text(myTime ? time2date(myTime, 2) : '');
+            if (op !== 'dups') {
+                var myTime = file.mtime || file.ts || (file.lastModified / 1000);
+                $('.file-date', $a1).text(myTime ? time2date(myTime, 2) : '');
+                $('.file-name', $a2).text(node.name);
+                myTime = node.mtime || node.ts;
+                $('.file-date', $a2).text(myTime ? time2date(myTime, 2) : '');
+            }
 
             var done = function(file, name, action) {
                 closeDialog();
@@ -414,7 +443,7 @@
                 if (checked) {
                     // Show loading while process multiple files
                     loadingDialog.show();
-                    promise.always(function () {
+                    promise.always(function() {
                         loadingDialog.hide();
                     });
                 }
@@ -562,6 +591,17 @@
                     return r;
                 }
             }
+        },
+
+        resolveExistedDuplication: function(dups, target) {
+            if (!dups || dups.files || !Object.keys(dups).length) {
+                return;
+            }
+            for (var name in dups.files) {
+                if (dups.files[name].length) {
+                }
+            }
+
         },
 
         REPLACE: 1,

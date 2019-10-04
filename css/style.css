@@ -6443,9 +6443,9 @@ table {
 }
 .grid-scrolling-table, .contacts-grid-scrolling-table, .transfer-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 23px);
-    height: -moz-calc(100% - 23px);
-    height: calc(100% - 23px);
+    height: -webkit-calc(100% - 24px);
+    height: -moz-calc(100% - 24px);
+    height: calc(100% - 24px);
 }
 .archived-chats .grid-scrolling-table {
     height: 100%;
@@ -30549,3 +30549,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 100%;
 }
 /** End Developer Settings Page **/
+.files-grid-view.fm .duplicated-items-found {
+    background-color: orangered;
+    color: white;
+    font-size: 15px;
+    height: 35px;
+    padding-left: 7px;
+    padding-top: 3px;
+}
+.files-grid-view.fm .duplicated-items-found .default-white-button{
+    display: inline-block;
+}
+.duplication-found .grid-scrolling-table {
+    height: 100%;
+    height: -webkit-calc(100% - 64px);
+    height: -moz-calc(100% - 64px);
+    height: calc(100% - 64px);
+}

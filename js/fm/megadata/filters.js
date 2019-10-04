@@ -94,6 +94,73 @@ MegaData.prototype.filterByParent = function(id) {
         this.filterBy(function(node) {
             return (node.p === id);
         });
+
+        if (M.getNodeRoot(handle) === 'shares') {
+            if (M.getNodeRights(id) < 2) {
+                return;
+            }
+        }
+
+        // at this point we have V prepared.
+        
+        var names = Object.create(null);
+
+        // count duplications O(n)
+        for (var k = 0; k < this.v.length; k++) {
+            if (!names[this.v[k].name]) {
+                names[this.v[k].name] = Object.create(null);
+                names[this.v[k].name][this.v[k].t] = Object.create(null);
+                names[this.v[k].name][this.v[k].t].total = 1;
+                names[this.v[k].name][this.v[k].t].list = [this.v[k].h];
+            }
+            else {
+                if (!names[this.v[k].name][this.v[k].t]) {
+                    names[this.v[k].name][this.v[k].t] = Object.create(null);
+                    names[this.v[k].name][this.v[k].t].total = 1;
+                    names[this.v[k].name][this.v[k].t].list = [this.v[k].h];
+                }
+                else {
+                    names[this.v[k].name][this.v[k].t].total++;
+                    names[this.v[k].name][this.v[k].t].list.push(this.v[k].h);
+                }
+            }
+        }
+
+        // extract duplication O(n), if we have any
+        // O(1) if we dont have any
+        var dups = Object.create(null);
+        var dupsFolders = Object.create(null);
+
+        if (this.v.length > Object.keys(names).length) {
+
+            var found = false;
+
+            for (var nodeName in names) {
+                found = false;
+
+                if (names[nodeName][0] && names[nodeName][0].total > 1) {
+                    dups[nodeName] = names[nodeName][0].list;
+                    found = true;
+                }
+                if (names[nodeName][1] && names[nodeName][1].total > 1) {
+                    dupsFolders[nodeName] = names[nodeName][1].list;
+                    found = true;
+                }
+
+                if (!found) {
+                    names[nodeName] = null;
+                }
+            }
+
+            if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+                console.error("Strange case, no Duplications were found in the time when" +
+                    "we have a mismatch in length " + id);
+            }
+            return Object.create(null, {
+                files: dups,
+                folders: dupsFolders
+            });
+        }
     }
 };
 

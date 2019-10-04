@@ -133,7 +133,13 @@
                 this.filterByParent(this.currentCustomView.nodeID);
             }
             else {
-                this.filterByParent(this.currentdirid);
+                var dups = this.filterByParent(this.currentdirid);
+                if (dups && dups.files) {
+                    var myId = this.currentdirid;
+                    mBroadcaster.once('mega:openfolder', function resolveDuplicates() {
+                        fileconflict.resolveExistedDuplication(dups, myId);
+                    });
+                }
             }
 
             if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {

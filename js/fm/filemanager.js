@@ -4022,7 +4022,7 @@ FileManager.prototype.getLinkAction = function() {
         if (mdList.length) {
             var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
 
-            msgDialog('confirmation', l[1003], fldName, false, function(e) {
+            msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
                 if (e) {
                     mega.megadrop.pufRemove(mdList);
                     // set showDialog as callback for after delete puf.

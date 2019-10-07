@@ -187,9 +187,6 @@
 /* end of Old bottom pages stylinng */
 
 /* Bottom pages common styles*/
-.red {
-    color: #F0373B;
-}
 body.bottom-pages .fmholder {
     overflow: hidden;
     overflow-y: auto;
@@ -5674,6 +5671,11 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 .bottom-page.unsub .button-container {
     padding-top: 40px;
 }
+.bottom-page.unsub .headline-txt {
+    padding: 24px 32px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 /*end of subscription page*/
-
-

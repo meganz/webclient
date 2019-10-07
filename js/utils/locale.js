@@ -573,7 +573,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l['472c'] = l[472].replace('[X]', 250);
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l['208s'] = l[208].replace('[A]', '<span class="red">');
+    l['208s'] = l[208].replace('[A]', '<span class="red txt-bold">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
     l['208.g'] = l[208].replace('[A]', '<a class="green txt-bold">').replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');

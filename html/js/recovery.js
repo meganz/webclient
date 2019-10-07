@@ -15,7 +15,7 @@ function AccountRecoveryControl() {
     this.$btnYes = $('.button-container .recover-button.yes', this.$recoveryContents);
     this.$btnNo = $('.button-container .recover-button.no', this.$recoveryContents);
     this.$emailBlock = $('.recover-account-email-block', this.$recoveryContents);
-    this.$emailBlockError = this.$emailBlock.find('.error-message');
+    this.$emailInput = this.$emailBlock.find('input');
     this.currStep = 0;
     this.prevStep = -1;
     this.currBranch = 0;
@@ -53,9 +53,9 @@ function AccountRecoveryControl() {
         window.open("https://mega.nz/help");
     });
 
-    this.$emailBlock.find('input').rebind('keydown.recoverpageemail', function (e) {
-        self.$emailBlockError.addClass('hidden');
-        self.$emailBlock.removeClass('incorrect');
+    var emailMegaInput = new mega.ui.MegaInputs(this.$emailInput);
+
+    this.$emailInput.rebind('keydown.recoverpageemail', function (e) {
         if (e.keyCode === 13) {
             self.$btnYes.click();
             return false;
@@ -93,26 +93,23 @@ function AccountRecoveryControl() {
     });
 
     var stepZero = function() {
-        var enteredEmail = $('.input-wrapper.email input', self.$recoveryContents).val();
+        var enteredEmail = self.$emailInput.val();
 
         // Check user skips the email entering
         self.emSkiped = enteredEmail ? false : !self.emSkiped;
 
         // No email is entered, show message for first time.
         if (self.emSkiped) {
-            var emailWarn = l[18506];
-            self.$emailBlockError.text(emailWarn).removeClass('hidden');
-            self.$emailBlock.addClass('incorrect');
+            emailMegaInput.showError(l[18506]);
             return false;
         }
 
         // Entered email is not valid
         if (enteredEmail && !isValidEmail(enteredEmail)) {
-            self.$emailBlockError.text(l[1101]).removeClass('hidden');
-            self.$emailBlock.addClass('incorrect');
+            emailMegaInput.showError(l[1101]);
         }
         else { // Entered email is valid, or user click the button again withoout email.
-            self.$emailBlock.removeClass('incorrect');
+            emailMegaInput.hideError();
 
             // Email is not entered.
             if (!enteredEmail) {
@@ -159,7 +156,7 @@ function AccountRecoveryControl() {
                 break;
             }
             case -2: { // Result - Success
-                var email = $('.input-wrapper.email input', self.$recoveryContents).val();
+                var email = $('#recover-input1', self.$recoveryContents).val();
                 self.startRecovery(email); // recover
                 break;
             }
@@ -211,8 +208,7 @@ AccountRecoveryControl.prototype.checkAccount = function _checkAccount(enteredEm
         callback: function (res) {
             loadingDialog.phide();
             if (res === -9) { // invalid email
-                self.$emailBlock.addClass('incorrect');
-                self.$emailBlockError.text(l[18668]).removeClass('hidden');
+                self.$emailInput.megaInputsShowError(l[18668]);
                 return;
             }
             else if (typeof res === 'object' && (res.val === 0 || res.val === 1)) {
@@ -661,11 +657,8 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         .removeClass('checkboxOn').addClass('checkboxOff');
     $('.parkbtn', $dialog).addClass('disabled');
     $('.checkbox-block.park-account-checkbox', $dialog).removeClass('hidden');
-    var enteredEmail = $('.input-wrapper.email input', self.$recoveryContents).val();
-    $('.input-wrapper.email input', $dialog).val(enteredEmail);
-    if (is_mobile) {
-        $('.login-register-input.email input', $dialog).val(enteredEmail);
-    }
+    var enteredEmail = $('#recover-input1', self.$recoveryContents).val();
+    var $emailInput = $('#recover-input1-di', $dialog).val(enteredEmail).blur();
     var warn2 = l[18311];
     var warn1 = l[18312];
     $('#warn2-check', $dialog).safeHTML(warn2);
@@ -683,6 +676,8 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
     else {
         $('.mobile #startholder.fmholder').removeClass('no-scroll');
     }
+
+    var emailMegaInput = new mega.ui.MegaInputs($emailInput);
 
     var closeDialogLocal = function _closeDialog() {
         if (is_mobile) {
@@ -724,11 +719,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
             return;
         }
 
-        var email = $('.input-wrapper.email input', $dialog).val();
-
-        if (is_mobile) {
-            email = $('.login-register-input.email input', $dialog).val();
-        }
+        var email = $emailInput.val();
 
         closeDialogLocal();
         self.startRecovery(email, true);
@@ -742,7 +733,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
                 closeDialogLocal();
             }
         });
-        $('.input-wrapper.email input', $dialog).rebind('keydown.parkwarn', function (e) {
+        $emailInput.rebind('keydown.parkwarn', function (e) {
             if (e.keyCode === 13) {
                 $('.parkbtn', $dialog).click();
             }

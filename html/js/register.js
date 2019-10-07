@@ -117,9 +117,7 @@ var loginFromEphemeral = {
             twofactor.loginDialog.closeDialog();
 
             // Show message that the email has already been registered and to choose an alternative email to proceed
-            $('.account.input-wrapper.email .account.input-tooltip')
-                .safeHTML(l[1100] + '<br>' + l[1297]);
-            $('.account.input-wrapper.email').addClass('incorrect');
+            $('#register-email-registerpage2').megaInputsShowError(l[1297]);
             $('.account.input-wrapper.email input').focus();
             msgDialog('warninga', 'Error', l[7869]);
         }
@@ -260,11 +258,11 @@ function pageregister() {
 
     var err = false;
     var $formWrapper = $('.main-mid-pad.register1 form');
-    var $firstName = $('.input-wrapper.name .f-name', $formWrapper);
-    var $lastName = $('.input-wrapper.name .l-name', $formWrapper);
-    var $email = $('.input-wrapper.email input', $formWrapper);
-    var $password = $('.input-wrapper.first input', $formWrapper);
-    var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
+    var $firstName = $('#register-firstname-registerpage2', $formWrapper);
+    var $lastName = $('#register-lastname-registerpage2', $formWrapper);
+    var $email = $('#register-email-registerpage2', $formWrapper);
+    var $password = $('#register-password-registerpage2', $formWrapper);
+    var $confirmPassword = $('#register-password-registerpage3', $formWrapper);
 
     var firstName = $.trim($firstName.val());
     var lastName = $.trim($lastName.val());
@@ -279,29 +277,25 @@ function pageregister() {
     if (passwordValidationResult !== true) {
 
         // Show error for password field, clear the value and refocus it
-        $password.parent().addClass('incorrect');
-        $password.parent().find('.account.password-status').removeClass('checked');
-        $password.parent().find('.account.input-tooltip').safeHTML(l[1102] + '<br>' + passwordValidationResult);
-        $password.val('');
-        $password.focus();
+        $password.val('').focus().trigger('input');
+        $password.megaInputsShowError(l[1102] + ' ' + passwordValidationResult);
 
         // Show error for confirm password field and clear the value
-        $confirmPassword.parent().addClass('incorrect');
         $confirmPassword.val('');
+        $confirmPassword.parent().addClass('error');
 
         err = 1;
     }
 
     if (email === '' || !isValidEmail(email)) {
-        $email.parent().addClass('incorrect');
-        $email.parent().find('.account.input-tooltip')
-            .safeHTML(l[1100] + '<br>' + l[1101]);
+        $email.megaInputsShowError(l[1100] + ' ' + l[1101]);
         $email.focus();
         err = 1;
     }
 
     if (firstName === '' || lastName === '') {
-        $firstName.parent().addClass('incorrect');
+        $firstName.megaInputsShowError(l[1098] + ' ' + l[1099]);
+        $lastName.megaInputsShowError();
         $firstName.focus();
         err = 1;
     }
@@ -377,10 +371,11 @@ function init_register() {
     'use strict';
 
     var $formWrapper = $('.main-mid-pad.register1');
-    var $inputs = $formWrapper.find('.account.input-wrapper input');
+    var $inputs = $formWrapper.find('input');
     var $button = $formWrapper.find('.big-red-button');
-    var $email = $formWrapper.find('.account.input-wrapper.email input');
-    var $password = $formWrapper.find('.account.input-wrapper.password input');
+    var $email = $formWrapper.find('#register-email-registerpage2');
+    var $firstName = $formWrapper.find('#register-firstname-registerpage2');
+    var $lastName = $formWrapper.find('#register-lastname-registerpage2');
 
     if (register_txt) {
         $('.main-top-info-block').removeClass('hidden');
@@ -392,26 +387,20 @@ function init_register() {
         $email.val(localStorage.registeremail);
     }
 
+    $firstName.rebind('input.resetWithLastname', function() {
+        $lastName.megaInputsHideError();
+    });
+
+    $lastName.rebind('input.resetWithFirstname', function() {
+        $firstName.megaInputsHideError();
+    });
+
     $inputs.rebind('keydown.initregister', function(e) {
         if (e.keyCode === 13) {
             pageregister();
             return false;
         }
     });
-
-    $password.first().rebind('blur.password, keyup.password', function() {
-        registerpwcheck();
-    });
-
-    if (typeof zxcvbn === 'undefined') {
-        $('.account.input-wrapper.password').addClass('loading');
-
-        M.require('zxcvbn_js')
-            .done(function() {
-                $('.account.input-wrapper.password').removeClass('loading');
-                registerpwcheck();
-            });
-    }
 
     $button.rebind('click.initregister', function() {
         pageregister();
@@ -435,28 +424,24 @@ function init_register() {
         return false;
     });
 
-
     var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
-    $('.input-wrapper.name', $regInfoContainer).removeClass('hidden');
-    $('.input-wrapper.email', $regInfoContainer).removeClass('hidden');
-    $('.account.top-header.wide', $regInfoContainer).safeHTML(l[1095]);
+    $('.mega-input-title-ontop', $regInfoContainer).removeClass('hidden');
+    $('.account.top-header', $regInfoContainer).safeHTML(l[1095]);
 
     // business sub-account registration
     if (localStorage.businessSubAc) {
         var userInfo = JSON.parse(localStorage.businessSubAc);
         // we know here that userInfo contain all needed attr, otherwise higher layers wont allow us
         // to get here.
-        $('.input-wrapper.email input').val(userInfo.e);
-        // $('#register-email').attr('readonly', true);
-        $('.input-wrapper.name .l-name').val(from8(base64urldecode(userInfo.lastname)));
-        // $('#register-lastname').attr('readonly', true);
-        $('.input-wrapper.name .f-name').val(from8(base64urldecode(userInfo.firstname)));
-        // $('#register-firstname').attr('readonly', true);
+        $email.val(userInfo.e);
+        $lastName.val(from8(base64urldecode(userInfo.lastname)));
+        $firstName.val(from8(base64urldecode(userInfo.firstname)));
         var headerText = l[19129].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-        $('.account.top-header.wide', $regInfoContainer).safeHTML(headerText);
+        $('.account.top-header', $regInfoContainer).safeHTML(headerText);
 
-        $('.input-wrapper.name', $regInfoContainer).addClass('hidden');
-        $('.input-wrapper.email', $regInfoContainer).addClass('hidden');
+        $email.addClass('hidden');
+        $lastName.addClass('hidden');
+        $firstName.addClass('hidden');
     }
 
     // Init inputs events
@@ -510,23 +495,6 @@ function init_register() {
         startTimer();
     });
 }
-
-
-function registerpwcheck() {
-    'use strict';
-
-    $('.account.password-status')
-        .removeClass('good1 good2 good3 good4 good5 checked');
-
-    var trimmedPassword = $.trim($('#register-password-registerpage2').val());
-
-    if (typeof zxcvbn === 'undefined' || trimmedPassword === '') {
-        return false;
-    }
-
-    classifyPassword(trimmedPassword);
-}
-
 
 function register_signup(email) {
     document.getElementById('register_email').value = email;

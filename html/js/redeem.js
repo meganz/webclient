@@ -678,8 +678,8 @@ var redeem = {
         var path = getSitePath();
         var $overlay = $('.main-pad-block.redeem-promo-page').removeClass('hidden');
         var $button = $('.redeem-voucher', $overlay);
-        var $inputo = $('.dialog-input-title-ontop', $overlay);
-        var $input = $('input', $inputo);
+        var $input = $('input', $overlay);
+        var megaInput = new mega.ui.MegaInputs($input);
 
         if (path.indexOf('computerbild') > 0) {
             promoter = 0;
@@ -698,7 +698,6 @@ var redeem = {
             else {
                 $button.removeClass('active').addClass('disabled');
             }
-            $inputo.removeClass('error');
             return false;
         });
 
@@ -716,7 +715,7 @@ var redeem = {
                 })
                 .catch(function() {
                     $input.val('');
-                    $inputo.addClass('error');
+                    megaInput.showError(l[20420]);
                     loadingDialog.hide();
                     $button.removeClass('active').addClass('disabled');
                 });

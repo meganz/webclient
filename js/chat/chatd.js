@@ -134,6 +134,8 @@ var Chatd = function(userId, megaChat, options) {
     window.addEventListener('beforeunload', function() {
         self.shutdown();
     });
+
+    this._proxyEventsToRooms();
 };
 
 makeObservable(Chatd);
@@ -239,6 +241,43 @@ var LoginState = Chatd.LoginState = Object.freeze({
  */
 Chatd.sendingnum = 2 << 30;
 
+
+Chatd.prototype._proxyEventsToRooms = function() {
+    "use strict";
+    var self = this;
+    [
+        'onMessagesHistoryDone',
+        'onMessageStore',
+        'onMessageKeysDone',
+        'onMessageKeyRestore',
+        'onMessageLastSeen',
+        'onMessageLastReceived',
+        'onMessagesHistoryRequest',
+        'onBroadcast',
+        'onRoomDisconnected',
+        'onMembersUpdated',
+        'onMessageConfirm',
+        'onMessageUpdated',
+        'onMessagesHistoryRetrieve',
+        'onMessageCheck',
+        'onMessagesKeyIdDone',
+        'onMessageIncludeKey'
+    ]
+        .forEach(function(eventName) {
+            self.rebind(eventName + '.chatdProxy', function(e, eventData) {
+                assert(eventData.chatId, 'chatid is missing');
+                var chatRoom = megaChat.getChatById(eventData.chatId);
+                if (chatRoom) {
+                    chatRoom.trigger(eventName, eventData);
+                }
+                else {
+                    if (d) {
+                        console.warn("chatRoom was missing for event:", eventName, eventData);
+                    }
+                }
+            });
+        });
+};
 
 // add a new chatd shard
 Chatd.prototype._addShardAndChat = function(chatId, shardNo, url) {
@@ -439,6 +478,7 @@ Chatd.Shard = function(chatd, shard) {
         }
     });
 };
+
 
 Chatd.Shard.prototype.markAsJoinRequested = function(chatId) {
     this.userRequestedJoin[chatId] = true;

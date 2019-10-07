@@ -40,7 +40,6 @@ var _arrayAliases = [
 ];
 
 
-
 /**
  * Helper Exception to be used for "break"-ing .forEach calls
  */
@@ -182,12 +181,12 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
         var self = this;
 
         if (self._dataChangeThrottlingTimer) {
-            clearTimeout(self._dataChangeThrottlingTimer);
+            _cancelOnIdleOrTimeout(self._dataChangeThrottlingTimer);
         }
 
         var args = toArray.apply(null, arguments);
 
-        self._dataChangeThrottlingTimer = setTimeout(function() {
+        self._dataChangeThrottlingTimer = _onIdleOrTimeout(function() {
             delete self._dataChangeThrottlingTimer;
             if (self._dataChangeIndex > MAX_INDEX_NUMBER) {
                 self._dataChangeIndex = 0;
@@ -215,7 +214,8 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
                 );
 
                 if (window.RENDER_PROFILING) {
-                    console.error(self._getDataChangeEventName(), args, new Date() - startTime);
+                    var endTime = new Date() - startTime;
+                    console.error(self._getDataChangeEventName(), args, self, endTime);
                 }
             }
 
@@ -223,7 +223,12 @@ var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
 
 
         if (self._parent && self._parent.trackDataChange) {
-            self._parent.trackDataChange(); // trigger bubble-like effect, in the order of: child -> parent
+            self._parent.trackDataChange.apply(
+                self._parent,
+                [
+                    self,
+                ].concat(args)
+            ); // trigger bubble-like effect, in the order of: child -> parent
         }
     };
 

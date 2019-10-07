@@ -234,6 +234,7 @@ ChatdIntegration.mcfHasFinishedPromise = new MegaPromise();
  * @type {MegaPromise}
  */
 ChatdIntegration.allChatsHadLoaded = new MegaPromise();
+
 ChatdIntegration._queuedChats = {};
 
 ChatdIntegration._loadingChats = {};
@@ -358,54 +359,6 @@ ChatdIntegration.prototype.requiresUpdate = function() {
         }
     });
 };
-ChatdIntegration.prototype._getChatRoomFromEventData = function(eventData) {
-    var self = this;
-    var chatRoomId = self.chatIdToRoomId[eventData.chatId];
-    if (chatRoomId) {
-        return self.megaChat.chats[chatRoomId];
-    }
-    else if (self.megaChat.chats[eventData.chatId]) {
-        return self.megaChat.chats[eventData.chatId];
-    }
-    else {
-        assert(false, 'chat room not found for chat id: ' + eventData.chatId);
-    }
-};
-
-ChatdIntegration.prototype._getKarereObjFromChatdObj = function(chatdEventObj) {
-    var self = this;
-    var chatRoom = self._getChatRoomFromEventData(chatdEventObj);
-
-    var msgContents;
-
-    msgContents = chatdEventObj.message;
-
-    var state;
-
-    if (!chatdEventObj.userId || chatdEventObj.userId === u_handle) {
-        state = Message.STATE.SENT;
-    }
-    else if (chatdEventObj.seen) {
-        state = Message.STATE.SEEN;
-    }
-
-    return new Message(
-        chatRoom,
-        chatRoom.messagesBuff,
-        {
-
-            'userId': chatdEventObj.userId,
-            'messageId': chatdEventObj.messageId,
-            'message': false,
-            'textContents': msgContents,
-            'delay': chatdEventObj.ts,
-            'state': state,
-            'updated': false,
-            'deleted': false,
-            'revoked': false
-        }
-    );
-};
 
 ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
     if (chatRoom.protocolHandler) {
@@ -419,12 +372,12 @@ ChatdIntegration._waitForProtocolHandler = function (chatRoom, cb) {
         }
         else {
             createTimeoutPromise(function() {
-                return chatRoom.protocolHandler ? true : false;
-            }, 300, 5000).done(function() {
-                cb();
-            }).fail(function() {
-                // debugger;
-            });
+                    return chatRoom.protocolHandler ? true : false;
+                }, 500, 5000).done(function() {
+                    cb();
+                }).fail(function() {
+                    // debugger;
+                });
         }
     }
 };
@@ -718,20 +671,20 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
             if (setAsActive) {
                 // wait for the .protocolHandler to be initialized
                 createTimeoutPromise(function() {
-                    return !!chatRoom.protocolHandler;
-                }, 300, 10000)
-                    .done(function() {
-                        var promise = chatRoom.setRoomTitle(setAsActive.topic);
-                        if (promise && setAsActive.createChatLink) {
-                            promise.always(function () {
-                                chatRoom.trigger('showGetChatLinkDialog');
-                            });
-                        }
-                    })
-                    .fail(function() {
-                        self.logger.warn("Timed out waiting for the protocolHandler to init, so that we can set" +
-                            "room title");
-                    });
+                        return !!chatRoom.protocolHandler;
+                    }, 500, 10000)
+                        .done(function() {
+                            var promise = chatRoom.setRoomTitle(setAsActive.topic);
+                            if (promise && setAsActive.createChatLink) {
+                                promise.always(function () {
+                                    chatRoom.trigger('showGetChatLinkDialog');
+                                });
+                            }
+                        })
+                        .fail(function() {
+                            self.logger.warn("Timed out waiting for the protocolHandler to init, so that we can set" +
+                                "room title");
+                        });
             }
         }
         else {
@@ -908,7 +861,7 @@ ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
                             function() {
                                 return !!chatRoom.chatId;
                             },
-                            100,
+                            500,
                             30000 /* API can be down... */
                         )
                             .done(function() {
@@ -1031,14 +984,14 @@ ChatdIntegration._waitForShardToBeAvailable = function(fn) {
         var chatIdDecoded = base64urldecode(chatRoom.chatId);
         if (!self.chatd.chatIdShard[chatIdDecoded]) {
             createTimeoutPromise(function() {
-                return !!self.chatd.chatIdShard[chatIdDecoded];
-            }, 100, 10000)
-                .done(function() {
-                    masterPromise.linkDoneAndFailToResult(fn, self, args);
-                })
-                .fail(function() {
-                    masterPromise.reject(arguments);
-                });
+                    return !!self.chatd.chatIdShard[chatIdDecoded];
+                }, 500, 10000)
+                    .done(function() {
+                        masterPromise.linkDoneAndFailToResult(fn, self, args);
+                    })
+                    .fail(function() {
+                        masterPromise.reject(arguments);
+                    });
         }
         else {
             masterPromise.linkDoneAndFailToResult(fn, self, args);
@@ -1284,114 +1237,25 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
         }
     });
 
-    self.chatd.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
-        var foundChatRoom = self._getChatRoomFromEventData(eventData);
-
-        if (!foundChatRoom) {
-            self.logger.warn("Room not found for: ", e, eventData);
-            return;
-        }
-
-        if (foundChatRoom.roomId === chatRoom.roomId) {
-            foundChatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
-        }
+    chatRoom.rebind('onBroadcast.chatdInt' + chatRoomId, function(e, eventData) {
+        chatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
     });
 
-    self.chatd.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+    chatRoom.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
         if (self.megaChat.isLoggingOut) {
             return;
         }
 
-        var foundChatRoom = self._getChatRoomFromEventData(eventData);
-
-        if (!foundChatRoom) {
-            self.logger.warn("Room not found for: ", e, eventData);
-            return;
+        chatRoom.chatdUrl = null;
+        if (chatRoom.messagesBuff) {
+            chatRoom.messagesBuff.sendingListFlushed = false;
         }
-
-        if (foundChatRoom.roomId === chatRoom.roomId) {
-            chatRoom.chatdUrl = null;
-            if (chatRoom.messagesBuff) {
-                chatRoom.messagesBuff.sendingListFlushed = false;
-            }
-            if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
-                chatRoom.membersLoaded = false;
-                chatRoom.setState(
-                    ChatRoom.STATE.JOINING,
-                    true
-                );
-            }
-        }
-    });
-    // chatd events
-    self.chatd.rebind('onMembersUpdated.chatdInt' + chatRoomId, function(e, eventData) {
-        var foundChatRoom = self._getChatRoomFromEventData(eventData);
-
-        if (!foundChatRoom) {
-            self.logger.warn("Room not found for: ", e, eventData);
-            return;
-        }
-
-        if (foundChatRoom.roomId === chatRoom.roomId) {
-            if (
-                chatRoom.state === ChatRoom.STATE.LEFT &&
-                eventData.priv >= 0 && eventData.priv < 255
-            ) {
-                // joining
-                chatRoom.membersLoaded = false;
-                chatRoom.setState(ChatRoom.STATE.JOINING, true);
-            }
-
-            var queuedMembersUpdatedEvent = false;
-
-            if (chatRoom.membersLoaded === false) {
-                if (eventData.priv >= 0 && eventData.priv < 255) {
-                    var addParticipant = function addParticipant() {
-                        // add group participant in strongvelope
-                        chatRoom.protocolHandler.addParticipant(eventData.userId);
-                        // also add to our list
-                        chatRoom.members[eventData.userId] = eventData.priv;
-
-                        ChatdIntegration._ensureNamesAreLoaded([eventData.userId], chatRoom.publicChatHandle);
-                        $(chatRoom).trigger('onMembersUpdated', eventData);
-                    };
-
-                    ChatdIntegration._waitForProtocolHandler(chatRoom, addParticipant);
-                    queuedMembersUpdatedEvent = true;
-                }
-            }
-            else if (eventData.priv === 255 || eventData.priv === -1) {
-                var deleteParticipant = function deleteParticipant() {
-                    if (eventData.userId === u_handle) {
-                        // remove all participants from the room.
-                        Object.keys(chatRoom.members).forEach(function(userId) {
-                            // remove group participant in strongvelope
-                            chatRoom.protocolHandler.removeParticipant(userId);
-                            // also remove from our list
-                            delete chatRoom.members[userId];
-                        });
-                    }
-                    else {
-                        // remove group participant in strongvelope
-                        chatRoom.protocolHandler.removeParticipant(eventData.userId);
-                        // also remove from our list
-                        delete chatRoom.members[eventData.userId];
-                    }
-
-                    $(chatRoom).trigger('onMembersUpdated', eventData);
-                };
-
-                ChatdIntegration._waitForProtocolHandler(chatRoom, deleteParticipant);
-                queuedMembersUpdatedEvent = true;
-            }
-
-            if (eventData.userId === u_handle) {
-                chatRoom.membersLoaded = true;
-            }
-            if (!queuedMembersUpdatedEvent) {
-                chatRoom.members[eventData.userId] = eventData.priv;
-                $(chatRoom).trigger('onMembersUpdated', eventData);
-            }
+        if (chatRoom.state === ChatRoom.STATE.READY || chatRoom.state === ChatRoom.STATE.JOINED) {
+            chatRoom.membersLoaded = false;
+            chatRoom.setState(
+                ChatRoom.STATE.JOINING,
+                true
+            );
         }
     });
 

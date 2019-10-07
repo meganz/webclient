@@ -685,7 +685,7 @@ MegaPromise.QueuedPromiseCallbacks = function() {
             currentQueuedEntry.executionTimeoutPromise = createTimeoutPromise(
                 function() {
                     return execPromise.state() !== 'pending';
-                }, 50, 5000
+                }, 500, 10000
             )
                 .fail(function() {
                     if (typeof console !== 'undefined' && typeof console.warn !== 'undefined') {

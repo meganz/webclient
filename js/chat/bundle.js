@@ -10602,7 +10602,9 @@ function (_ConversationMessageM) {
             width: 16,
             height: 16,
             onError: function onError(e) {
-              e.target.parentNode.removeChild(e.target);
+              if (e && e.target && e.target.parentNode) {
+                e.target.parentNode.removeChild(e.target);
+              }
             },
             alt: ""
           })), external_React_default.a.createElement("span", {

@@ -30566,3 +30566,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: -moz-calc(100% - 64px);
     height: calc(100% - 64px);
 }
+.select.duplication-found .grid-scrolling-table {
+    height: 100%;
+    height: -webkit-calc(100% - 110px);
+    height: -moz-calc(100% - 110px);
+    height: calc(100% - 110px);
+}

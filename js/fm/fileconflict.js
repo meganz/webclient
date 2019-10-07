@@ -343,7 +343,7 @@
                         $('.red-header', $a1).text('Rename duplicates');
                         $('.red-header', $a3).text('Merge and version');
                         $('.red-header', $a2).text('Keep the newest');
-                        $('.light-grey', $a1).text('The newest file will keep its name, while older files will be renamed with suffixes (1), (2) ... ');
+                        $('.light-grey', $a1).text('The newest file will keep its name, older files will be renamed with suffixes (1), (2) ... ');
                         $('.light-grey', $a3).text('The newest file will be kept, older files will be stored as previous versions of the file');
                         $('.light-grey', $a2).text('The newest file will be kept, all older files will be removed');
 
@@ -423,7 +423,7 @@
                     $('.file-name', $a1).text(this.findNewName(file.name, target));
                     $('.file-name', $a2).text(name);
                     $('.file-name', $a3).text(name);
-                    $('.file-size', $a2).text(dupsNB + ' files will be removed');
+                    $('.file-size', $a2).text((dupsNB - 1) + ' files will be removed');
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
 
@@ -594,13 +594,92 @@
         },
 
         resolveExistedDuplication: function(dups, target) {
-            if (!dups || dups.files || !Object.keys(dups).length) {
+            if (!dups || !dups.files || !Object.keys(dups).length) {
                 return;
             }
-            for (var name in dups.files) {
-                if (dups.files[name].length) {
+
+            var dupsKeys = Object.keys(dups.files);
+            var allDups = dupsKeys.length;
+
+            var resolveDup = function(duplicateEntries, keys, kIndex) {
+                if (kIndex >= keys.length) {
+                    return;
                 }
-            }
+
+                var name = keys[kIndex];
+
+                fileconflict.prompt('dups', M.d[duplicateEntries.files[name][0]],
+                    M.d[duplicateEntries.files[name][1]], allDups, target,
+                    duplicateEntries.files[name].length).always(
+                        function contuineResolving(file, fname, action, checked) {
+
+                            var olderNode = null;
+                            var newestTS = -1;
+                            var newestIndex = -1;
+
+                            if (duplicateEntries.files[name].length == 2) {
+                                olderNode = duplicateEntries.files[name][0];
+                                if (M.d[duplicateEntries.files[name][1]].ts < M.d[olderNode].ts) {
+                                    olderNode = duplicateEntries.files[name][1];
+                                }
+                            }
+                            else {
+                                for (var k = 0; k < duplicateEntries.files[name].length; k++) {
+                                    if (M.d[duplicateEntries.files[name][k]].ts > newestTS) {
+                                        newestTS = M.d[duplicateEntries.files[name][k]].ts;
+                                        newestIndex = k;
+                                    }
+                                }
+                            }
+
+                            switch (action) {
+                                case ns.REPLACE:
+                                    // rename old files
+
+                                    var newName;
+                                    if (olderNode) {
+                                        newName = fileconflict.findNewName(name, target);
+                                        M.rename(olderNode, newName);
+                                    }
+                                    else {
+                                        for (var h = 0; h < duplicateEntries.files[name].length; h++) {
+                                            if (h === newestIndex) {
+                                                continue;
+                                            }
+                                            newName = fileconflict.findNewName(name, target);
+                                            M.rename(duplicateEntries.files[name][h], newName);
+                                        }
+                                    }
+                                    break;
+                                case ns.KEEPBOTH:
+                                    // merge and version
+                                    break;
+                                case ns.DONTCOPY:
+                                    // keep the newest
+
+                                    if (olderNode) {
+                                        M.safeRemoveNodes(olderNode);
+                                    }
+                                    else {
+                                        var nodeToRemove = duplicateEntries.files[name].splice(newestIndex, 1);
+                                        M.safeRemoveNodes(nodeToRemove);
+                                    }
+                                    break;
+                            }
+
+                            resolveDup(duplicateEntries, keys, ++kIndex);
+                        }
+                    );
+            };
+
+            resolveDup(dups, dupsKeys, 0);
+
+            //for (var name in dups.files) {
+            //    if (dups.files[name].length >= 2) {
+            //        this.prompt('dups', dups.files[name][0],
+            //            dups.files[name][1], allDups, target, dups.files[name].length);
+            //    }
+            //}
 
         },
 

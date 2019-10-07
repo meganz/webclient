@@ -64,6 +64,7 @@
         }
 
         $('.nw-fm-tree-item').removeClass('opened');
+        $('.files-grid-view.fm').removeClass('duplication-found').find('.duplicated-items-found').addClass('hidden');
 
         if (this.chat) {
             this.v = [];
@@ -136,9 +137,12 @@
                 var dups = this.filterByParent(this.currentdirid);
                 if (dups && dups.files) {
                     var myId = this.currentdirid;
-                    mBroadcaster.once('mega:openfolder', function resolveDuplicates() {
-                        fileconflict.resolveExistedDuplication(dups, myId);
-                    });
+
+                    $('.files-grid-view.fm').addClass('duplication-found')
+                        .find('.duplicated-items-found').removeClass('hidden').find('.fix-me-btn')
+                        .off('click').on('click', function fixMeClickHandler() {
+                            fileconflict.resolveExistedDuplication(dups, myId);
+                        });
                 }
             }
 

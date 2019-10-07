@@ -1369,13 +1369,12 @@ MegaIntBitMap.prototype.load = function() {
  */
 MegaIntBitMap.prototype.save = function() {
     'use strict';
-    var self = this;
-    return new MegaPromise(function(resolve, reject) {
-        var actionResult = self.value === 0
-            ? mega.attr.remove(self.attribute, self.pub, self.nonHistoric)
-            : mega.attr.set(self.attribute, self.value, self.pub, self.nonHistoric);
-        actionResult.then(resolve, reject);
-    });
+    return mega.attr.set(
+        this.attribute,
+        this.value,
+        this.pub,
+        this.nonHistoric
+    );
 };
 
 /**

@@ -30550,15 +30550,18 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 /** End Developer Settings Page **/
 .files-grid-view.fm .duplicated-items-found {
-    background-color: orangered;
-    color: white;
-    font-size: 15px;
-    height: 35px;
-    padding-left: 7px;
-    padding-top: 3px;
+    background-color: #fbedb6;
+    color: #333;
+    font-size: 14px;
+    padding: 4px 16px;
+    text-align: center;
 }
-.files-grid-view.fm .duplicated-items-found .default-white-button{
+.files-grid-view.fm .duplicated-items-found .fix-me-btn{
     display: inline-block;
+    text-decoration: underline;
+    font-weight: bold;
+    padding-left: 8px;
+    font-family: 'LatoWebBold','source_sans_probold';
 }
 .duplication-found .grid-scrolling-table {
     height: 100%;

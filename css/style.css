@@ -30562,6 +30562,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-weight: bold;
     padding-left: 8px;
     font-family: 'LatoWebBold','source_sans_probold';
+    cursor: pointer;
 }
 .duplication-found .grid-scrolling-table {
     height: 100%;

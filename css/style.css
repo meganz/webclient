@@ -30549,14 +30549,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 100%;
 }
 /** End Developer Settings Page **/
-.files-grid-view.fm .duplicated-items-found {
+.duplicated-items-found {
     background-color: #fbedb6;
     color: #333;
     font-size: 14px;
     padding: 4px 16px;
     text-align: center;
 }
-.files-grid-view.fm .duplicated-items-found .fix-me-btn{
+.duplicated-items-found .fix-me-btn{
     display: inline-block;
     text-decoration: underline;
     font-weight: bold;

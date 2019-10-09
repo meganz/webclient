@@ -64,7 +64,8 @@
         }
 
         $('.nw-fm-tree-item').removeClass('opened');
-        $('.files-grid-view.fm').removeClass('duplication-found').find('.duplicated-items-found').addClass('hidden');
+        $('.files-grid-view.fm').removeClass('duplication-found');
+        $('.duplicated-items-found').addClass('hidden');
 
         if (this.chat) {
             this.v = [];
@@ -138,8 +139,8 @@
                 if (dups && dups.files) {
                     var myId = this.currentdirid;
 
-                    $('.files-grid-view.fm').addClass('duplication-found')
-                        .find('.duplicated-items-found').removeClass('hidden').find('.fix-me-btn')
+                    $('.files-grid-view.fm').addClass('duplication-found');
+                    $('.duplicated-items-found').removeClass('hidden').find('.fix-me-btn')
                         .off('click').on('click', function fixMeClickHandler() {
                             fileconflict.resolveExistedDuplication(dups, myId);
                         });

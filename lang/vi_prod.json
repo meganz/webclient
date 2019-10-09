@@ -2460,7 +2460,7 @@
     "19505": "Nh\u1eadn \u0111\u01b0\u1ee3c",
     "19506": "\u0110\u00e3 g\u1eedi",
     "19507": "C\u1ea7n ph\u1ea3i \u0111i\u1ec1n t\u00ean c\u00f4ng ty, xin \u0111i\u1ec1n v\u00e0o khung tr\u1ed1ng t\u00ean c\u00f4ng ty",
-    "19508": "L\u1ed7i ph\u00e1t sinh th\u1ef1c hi\u1ec7n \u0111\u0103ng k\u00fd t\u00e0i kho\u1ea3n, xin th\u1eed l\u1ea1i sau.N\u1ebfu l\u1ed7i v\u1eabn ti\u1ebfp t\u1ee5c ph\u00e1t sinh xin li\u00ean l\u1ea1c v\u1edbi MEGA qua email business@mega.nz \u0111\u1ec3 \u0111\u01b0\u1ee3c gi\u00fap \u0111\u1ee1",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "\u0110\u1eb7t t\u1ef1 \u0111\u1ed9ng th\u00e2u ti\u1ec1n  \u0111\u1ecbnh k\u1ef3 g\u00f3i c\u01b0\u1edbc h\u1eb1ng th\u00e1ng cho T\u00e0i Kho\u1ea3n Doanh Nghi\u1ec7p",
     "19510": "T\u00e0i Kho\u1ea3n Doanh Nghi\u1ec7p",
     "19511": "Qu\u00e1 tr\u00ecnh thanh to\u00e1n b\u1ecb th\u1ea5t b\u1ea1i, xin qu\u00fd kh\u00e1ch vui l\u00f2ng th\u1eed l\u1ea1i sau. N\u1ebfu l\u1ed7i v\u1eabn ti\u1ebfp di\u1ec5n xin li\u00ean h\u1ec7 v\u1edbi MEGA t\u1ea1i https:\/\/mega.nz\/support \u0111\u1ec3 \u0111\u01b0\u1ee3c gi\u00fap \u0111\u1ee1",
@@ -3311,5 +3311,7 @@
     "21956": "Almost over quota warnings",
     "21957": "Please tick the checkbox to acknowledge that you understand the danger of losing your password.",
     "22001": "You are logged into a different account than the one you are trying to cancel. Please logout, login again with account that you wish to cancel, and then try clicking the same account cancellation link again.",
-    "22002": "always free"
+    "22002": "always free",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

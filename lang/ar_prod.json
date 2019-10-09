@@ -2460,7 +2460,7 @@
     "19505": "\u062a\u0645 \u0627\u0644\u0627\u0633\u062a\u0642\u0628\u0627\u0644",
     "19506": "\u062a\u0645 \u0627\u0644\u0627\u0631\u0633\u0627\u0644",
     "19507": "\u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629 \u0636\u0631\u0648\u0631\u064a\u060c \u064a\u0631\u062c\u0649 \u0627\u062f\u062e\u0627\u0644 \u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629",
-    "19508": "\u062d\u062f\u062b \u062e\u0637\u0623 \u0627\u062b\u0646\u0627\u0621 \u0639\u0645\u0644\u064a\u0629 \u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062d\u0633\u0627\u0628\u060c \u064a\u0631\u062c\u0649 \u0627\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0644\u0627\u062d\u0642\u0627\u064b. \u0627\u0630\u0627 \u0627\u0633\u062a\u0645\u0631\u062a \u0627\u0644\u0645\u0634\u0644\u0643\u0629 \u064a\u0631\u062c\u0649 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0645\u0639 \u0641\u0631\u064a\u0642 \u0627\u0644\u062f\u0639\u0645 \u0644\u062f\u0649 MEGA \u0639\u0644\u0649 business@mega.nz",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "\u0627\u0639\u062f\u0627\u062f \u062a\u062c\u062f\u064a\u062f \u0627\u0634\u062a\u0631\u0627\u0643 \u062a\u0644\u0642\u0627\u0626\u064a \u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u062d\u0633\u0627\u0628 MEGA \u0644\u0644\u0627\u0639\u0645\u0627\u0644 Business",
     "19510": "\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0639\u0645\u0627\u0644 Business",
     "19511": "\u0641\u0634\u0644 \u0639\u0645\u0644\u064a\u0629 \u0627\u0644\u062f\u0641\u0639\u060c \u064a\u0631\u062c\u0649 \u0627\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629 \u0644\u0627\u062d\u0642\u0627\u064b. \u0627\u0630\u0627 \u0627\u0633\u062a\u0645\u0631\u062a \u0627\u0644\u0645\u0634\u0643\u0644\u0629 \u064a\u0631\u062c\u0649 \u0627\u0644\u0627\u062a\u0635\u0627\u0644 \u0645\u0639 \u0641\u0631\u064a\u0642 \u0627\u0644\u062f\u0639\u0645 \u0644\u062f\u0649 MEGA \u0639\u0644\u0649 https:\/\/mega.nz\/support",
@@ -3311,5 +3311,7 @@
     "21956": "Almost over quota warnings",
     "21957": "Please tick the checkbox to acknowledge that you understand the danger of losing your password.",
     "22001": "You are logged into a different account than the one you are trying to cancel. Please logout, login again with account that you wish to cancel, and then try clicking the same account cancellation link again.",
-    "22002": "always free"
+    "22002": "always free",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

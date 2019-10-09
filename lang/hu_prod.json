@@ -2460,7 +2460,7 @@
     "19505": "\u00c9rkezett",
     "19506": "Elk\u00fcldve",
     "19507": "A c\u00e9gn\u00e9v elengedhetetlen. K\u00e9rj\u00fck, t\u00f6ltse ki a mez\u0151t.",
-    "19508": "Hiba t\u00f6rt\u00e9nt a fi\u00f3kregisztr\u00e1l\u00e1si k\u00eds\u00e9rletkor, pr\u00f3b\u00e1lja \u00fajra k\u00e9s\u0151bb. A gond k\u00e9s\u0151bb is fenn\u00e1ll, l\u00e9pjen kapcsolatba a MEGA t\u00e1mogat\u00e1ssal itt: business@mega.nz",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "Automatikus havi fizet\u00e9s az \u00dczleti Fi\u00f3k el\u0151fizet\u00e9sre",
     "19510": "\u00dczleti Fi\u00f3k",
     "19511": "A fizet\u00e9si m\u0171velet sikertelen, pr\u00f3b\u00e1lja \u00fajra k\u00e9s\u0151bb. Ha ez k\u00e9s\u0151bb sem v\u00e1ltozik, l\u00e9pjen kapcsolatba a MEGA t\u00e1mogat\u00e1ssal: https:\/\/mega.nz\/support",
@@ -3311,5 +3311,7 @@
     "21956": "Almost over quota warnings",
     "21957": "Please tick the checkbox to acknowledge that you understand the danger of losing your password.",
     "22001": "You are logged into a different account than the one you are trying to cancel. Please logout, login again with account that you wish to cancel, and then try clicking the same account cancellation link again.",
-    "22002": "always free"
+    "22002": "always free",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

@@ -257,7 +257,7 @@
     "732": "Est\u00e1s conectado a una cuenta diferente a la que esta confirmando. Por favor, comprueba tu sesi\u00f3n actual, descon\u00e9ctate, y haz clic en el enlace de confirmaci\u00f3n de nuevo.",
     "735": "Por favor, comprueba tu correo electr\u00f3nico.",
     "741": "Por favor, selecciona una nueva contrase\u00f1a segura.",
-    "742": "Cambiar",
+    "742": "Restablecer",
     "754": "La extensi\u00f3n de MEGA Firefox es segura e invisible. Si prefieres utilizar MEGA sin la extensi\u00f3n, te recomendamos utilizar [A]Google Chrome[\/A].",
     "761": "Confirmaci\u00f3n necesaria",
     "776": "Guardar",
@@ -1010,7 +1010,7 @@
     "7686": "Uno de los enlaces proporcionados no es un enlace MEGA v\u00e1lido.",
     "7687": "Los ajustes de transferencia son solo para usuarios registrados.",
     "7688": "Tus comunicaciones podr\u00edan estar siendo interceptadas por un atacante. Por favor resetea las credenciales de identificaci\u00f3n de este contacto y a continuaci\u00f3n verifica con el otro usuario que sean correctas por medio de un canal seguro o en persona.",
-    "7689": "Resetear credenciales de contacto",
+    "7689": "Restablecer credenciales de contacto",
     "7690": "Usa el bot\u00f3n de reseteo a continuaci\u00f3n para resetear las credenciales de este contacto.",
     "7691": "Nuevas credenciales de contacto",
     "7692": "Verificar credenciales",
@@ -2460,7 +2460,7 @@
     "19505": "Recibida",
     "19506": "Enviada",
     "19507": "El nombre de la empresa es obligatorio, completa el campo del nombre de la empresa",
-    "19508": "Se ha producido un error al intentar registrar la cuenta. Int\u00e9ntalo de nuevo m\u00e1s tarde. Si el problema persiste, ponte en contacto con el soporte de MEGA en business@mega.nz",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "Configurar el pago mensual autom\u00e1tico para la suscripci\u00f3n de la cuenta Business",
     "19510": "Cuenta Business",
     "19511": "El pago no se ha realizado, int\u00e9ntalo de nuevo m\u00e1s tarde. Si el problema persiste, ponte en contacto con el soporte de MEGA https:\/\/mega.nz\/support",
@@ -3311,5 +3311,7 @@
     "21956": "Est\u00e1s llegando al l\u00edmite de almacenamiento",
     "21957": "Marca la casilla para reconocer que comprendes el peligro de perder la contrase\u00f1a.",
     "22001": "Est\u00e1s conectado a una cuenta diferente a la que est\u00e1s intentando cancelar. Cierra sesi\u00f3n, vuelve a conectarte con la cuenta que deseas cancelar y haz clic de nuevo en el enlace de cancelaci\u00f3n de cuenta.",
-    "22002": "Gratis para siempre"
+    "22002": "Gratis para siempre",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

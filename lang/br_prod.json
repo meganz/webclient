@@ -2460,7 +2460,7 @@
     "19505": "Recebida",
     "19506": "Enviada",
     "19507": "O nome da empresa \u00e9 obrigat\u00f3rio. Por favor, preencha o campo correspondente.",
-    "19508": "N\u00e3o foi poss\u00edvel criar a conta. Tente novamente mais tarde. Se o problema persistir, entre em contato com o suporte do MEGA em business@mega.nz",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "Configurar o pagamento mensal autom\u00e1tico para a assinatura da conta Business",
     "19510": "Conta Business",
     "19511": "N\u00e3o foi poss\u00edvel fazer o pagamento - tente novamente mais tarde. Se o problema persistir, entre em contato com o suporte do MEGA em https:\/\/mega.nz\/support",
@@ -3311,5 +3311,7 @@
     "21956": "Notifica\u00e7\u00f5es de armazenamento quase cheio",
     "21957": "Marque a caixa de sele\u00e7\u00e3o para confirmar que voc\u00ea entende os riscos de perder a sua senha.",
     "22001": "Voc\u00ea est\u00e1 logado em uma conta diferente da que est\u00e1 tentando cancelar. Fa\u00e7a logout, fa\u00e7a login na conta que voc\u00ea quer cancelar e ent\u00e3o clique novamente no link de cancelamento da conta.",
-    "22002": "gratuita para sempre"
+    "22002": "gratuita para sempre",
+    "22074": "Clique em [S]ASSINAR[\/S] quando estiver satisfeito com as suas op\u00e7\u00f5es de pagamento. Para concluir a sua compra, voc\u00ea ver\u00e1 uma nova caixa de di\u00e1logo, ou ser\u00e1 redirecionado para uma nova p\u00e1gina.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

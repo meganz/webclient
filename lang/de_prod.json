@@ -2460,7 +2460,7 @@
     "19505": "Empfangen",
     "19506": "Gesendet",
     "19507": "Der Firmenname ist Pflichtfeld",
-    "19508": "Serverfehler bei der Accounterstellung. Bitte versucnen Sie es noch einmal oder setzen Sie sich mit support@mega.nz in Verbindung.",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "Monatliche Zahlung f\u00fcr den Business-Account einrichten",
     "19510": "Business-Account",
     "19511": "Die Zahlung ist leider fehlgeschlagen. Bitte versuchen Sie es sp\u00e4ter noch einmal oder setzen Sie sich mit https:\/\/mega.nz\/support in Verbindung.",
@@ -3305,11 +3305,13 @@
     "20971": "[B]Sch\u00fctzen[\/B] Sie Ihr Passwort",
     "20972": "Mehr Informationen zum Thema Ende-zu-Ende-Verschl\u00fcsselung",
     "20973": "[B]Sichern Sie Ihren Rettungsschl\u00fcssel[\/B][BR]Andernfalls: Passwortverlust = Datenverlust!",
-    "20975": "Ich habe verstanden, dass ich [B]ohne mein Passwot alle meine Daten verliere[\/B] Weitere Informationen \u00fcber unsere [A]Ende-zu-Ende-Verschl\u00fcsselung[\/A]",
+    "20975": "Mir ist bekannt, dass ich [B]ohne mein Passwort alle meine Daten verliere[\/B] Weitere Informationen \u00fcber unsere [A]Ende-zu-Ende-Verschl\u00fcsselung[\/A]",
     "20982": "MEGA sendet Ihnen gelegentlich Informationen \u00fcber den Status Ihres Accounts. Sie k\u00f6nnen den Versand der weniger wichtigen Warnungen abschalten.",
     "20983": "Achtung: Kritische Warnungen k\u00f6nnen nicht abgeschaltet werden.",
     "21956": "Warnung bei nahezu vollem Account",
     "21957": "Bitte best\u00e4tigen Sie, dass Ihnen die Konsequenzen eines Passwortverlusts bekannt sind.",
     "22001": "Sie sind derzeit mit einem anderen Account als dem zu stornierenden angemeldet. Bitte melden Sie sich ab, loggen Sie sich in den zu stornierenden Account ein und klicken Sie dann erneut auf denselben Stornierungslink.",
-    "22002": "keine Kosten"
+    "22002": "keine Kosten",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
 }

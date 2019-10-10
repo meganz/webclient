@@ -214,6 +214,11 @@ var slideshowid;
                     return false;
                 }
 
+                // Has to exit the full screen mode in order to show remove confirmation diagram
+                if ($(document).fullScreen()) {
+                    $(document).fullScreen(false);
+                }
+
                 fmremove();
                 return false;
             });

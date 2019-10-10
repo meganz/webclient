@@ -11304,7 +11304,7 @@ table {
     width: 100%;
     text-align: center;
     font-size: 15px;
-    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #333;
     line-height: 18px;
     margin:8px 0 16px 0;
@@ -29765,12 +29765,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #FC5401;
 }
 .transfer-progress-type.error.overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #F0373A;
     font-size: 14px;
 }
 .transfer-progress-type.error.almost-overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #FFA500;
     font-size: 14px;
 }
@@ -30372,7 +30372,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #F0373A;
 }
 .quota-info-pr-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     font-size: 12px;
     color: #333;
     line-height: 18px;
@@ -30385,7 +30385,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
 }
 .right-section.upgrade-block .head-title {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     left: 0;
     top: 0;
     padding: 0;

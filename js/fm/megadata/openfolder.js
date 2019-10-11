@@ -136,7 +136,7 @@
             }
             else {
                 var dups = this.filterByParent(this.currentdirid);
-                if (dups && dups.files) {
+                if (dups && (dups.files || dups.folders)) {
                     var myId = this.currentdirid;
 
                     $('.files-grid-view.fm').addClass('duplication-found');

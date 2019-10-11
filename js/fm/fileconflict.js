@@ -31,7 +31,7 @@
          * @returns {MegaPromise} Resolves with a non-conflicting array
          * @memberof fileconflict
          */
-        check: function(files, target, op, defaultAction) {
+        check: function(files, target, op, defaultAction, defaultActionFolders) {
             var noFileConflicts = !!localStorage.noFileConflicts;
             var promise = new MegaPromise();
             var conflicts = [];
@@ -39,6 +39,7 @@
             var merges = [];
             var mySelf = this;
             var breakOP = false;
+            var foldersRepeatAction = null;
 
             // this is special if for copying from chat
             // 1- must be 1 item
@@ -79,7 +80,7 @@
                 var nodeName = M.getSafeName(file.name);
 
                 if (M.c[nodeTarget]) {
-                    found = this.getNodeByName(nodeTarget, nodeName, !file.t);
+                    found = this.getNodeByName(nodeTarget, nodeName, false);
                 }
 
                 if (!found) {
@@ -103,7 +104,7 @@
             };
 
             if (conflicts.length) {
-                var repeat = [];
+                var repeat = null;
                 var self = this;
                 var save = function(file, name, action, node) {
                     var stop = false;
@@ -112,7 +113,11 @@
                         var isAddNode = true;
 
                         if (action === ns.REPLACE) {
-                            if (file.t === 1) {
+                            if (!file.t) {
+                                // node.id if it's for an upload queue entry
+                                file._replaces = node.h || node.id;
+                            }
+                            else {
                                 merges.push([file, node]);
                                 isAddNode = false;
                                 if (op === 'move') {
@@ -124,10 +129,6 @@
                                         stop = true;
                                     }
                                 }
-                            }
-                            else {
-                                // node.id if it's for an upload queue entry
-                                file._replaces = node.h || node.id;
                             }
                         }
                         if (isAddNode) {
@@ -147,7 +148,13 @@
                     case ns.REPLACE:
                     case ns.DONTCOPY:
                     case ns.KEEPBOTH:
-                        repeat[0] = defaultAction;
+                        repeat = defaultAction;
+                }
+                switch (defaultActionFolders) {
+                    case ns.REPLACE:
+                    case ns.DONTCOPY:
+                    case ns.KEEPBOTH:
+                        foldersRepeatAction = defaultActionFolders;
                 }
 
                 var applyCheck = function _prompt(a) {
@@ -160,7 +167,8 @@
                             var node = file[1];
                             file = file[0];
 
-                            var action = repeat[file.t | 0];
+                            var action = (file.t && file.t === 1) ? foldersRepeatAction : repeat;
+
                             if (action) {
                                 var name = file.name;
 
@@ -185,7 +193,12 @@
                                         }
                                         else {
                                             if (checked) {
-                                                repeat[file.t | 0] = action;
+                                                if (!file.t) {
+                                                    repeat = action;
+                                                }
+                                                else {
+                                                    foldersRepeatAction = action;
+                                                }
                                             }
                                             if (action !== ns.DONTCOPY) {
                                                 if (!save(file, name, action, node)) {
@@ -218,7 +231,7 @@
                         }
                         result = result.concat(okNodes);
 
-                        repeat[1] = ns.REPLACE; // per specifications, merge all internal folders
+                        foldersRepeatAction = ns.REPLACE; // per specifications, merge all internal folders
                         applyCheck(conflictedNodes).always(resolve);
                     }
                     else {
@@ -238,10 +251,15 @@
             var folderFound = false;
             var conflictedNodes = [];
 
-            nodesToCopy = target ? Object.keys(nodesToCopy || {}) : [];
+            if (!nodesToCopy || !target) {
+                return [];
+            }
+            if (!Array.isArray(nodesToCopy)) {
+                nodesToCopy = Object.keys(nodesToCopy);
+            }
+
 
             for (var k = 0; k < nodesToCopy.length; k++) {
-                var found = null;
                 var currNode = clone(M.d[nodesToCopy[k]] || false);
 
                 if (!currNode) {
@@ -249,6 +267,8 @@
                     continue;
                 }
                 currNode.keepParent = target;
+
+                var found = null;
 
                 var nodeName = M.getSafeName(currNode.name);
                 if (M.c[target]) {
@@ -337,19 +357,30 @@
             switch (op) {
                 case 'dups':
                     if (file.t) {
-                        return;
+                        // $a2.addClass('hidden');
+                        $a3.addClass('hidden');
+                        $('.info-txt.light-grey', $dialog).text('Please select what you want to do:');
+                        $('.info-txt-fn', $dialog)
+                            .safeHTML('Multiple folders with the same name <strong>' + name + '</strong> exist in this location.');
+
+                        $('.red-header', $a1).text('Rename duplicates');
+                        $('.light-grey', $a1).text('The newest folder will keep its name, older folders will be renamed with suffixes (1), (2) ...');
+
+                        $('.red-header', $a2).text('Merge duplicates');
+                        $('.light-grey', $a2).text('Duplicated folders will be merged into a single folder');
                     }
                     else {
+                        $a3.addClass('hidden');
+                        $('.info-txt.light-grey', $dialog).text('Please select what you want to do:');
+
                         $('.red-header', $a1).text('Rename duplicates');
-                        $('.red-header', $a3).text('Merge and version');
                         $('.red-header', $a2).text('Keep the newest');
-                        $('.light-grey', $a1).text('The newest file will keep its name, older files will be renamed with suffixes (1), (2) ... ');
-                        $('.light-grey', $a3).text('The newest file will be kept, older files will be stored as previous versions of the file');
+                        $('.light-grey', $a1).text('The newest file will keep its name, older files will be renamed with suffixes (1), (2) ...');
                         $('.light-grey', $a2).text('The newest file will be kept, all older files will be removed');
 
                         $('.info-txt-fn', $dialog)
-                            //.safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
                             .safeHTML('Multiple files with the same name <strong>' + name + '</strong> exist in this location.');
+
                     }
                     break;
                 case 'copy':
@@ -414,6 +445,12 @@
             if (file.t) {
                 $('.file-size', $a1).text('');
                 $('.file-size', $a2).text('');
+                if (op === 'dups') {
+                    $('.file-name', $a1).text(this.findNewName(file.name, target));
+                    $('.file-name', $a2).text(name);
+                    $('.file-date', $a1).text('');
+                    $('.file-date', $a2).text('');
+                }
             }
             else {
                 $('.file-size', $a1).text(bytesToSize(file.size || file.s || ''));
@@ -594,39 +631,41 @@
         },
 
         resolveExistedDuplication: function(dups, target) {
-            if (!dups || !dups.files || !Object.keys(dups).length) {
+            if (!dups || (!dups.files && !dups.folders) || !Object.keys(dups).length) {
                 return;
             }
 
             var dupsKeys = Object.keys(dups.files);
             var allDups = dupsKeys.length;
+            var operationsOrderPromise = new MegaPromise();
 
-            var resolveDup = function(duplicateEntries, keys, kIndex) {
+            var resolveDup = function(duplicateEntries, keys, kIndex,type) {
                 if (kIndex >= keys.length) {
+                    operationsOrderPromise.resolve();
                     return;
                 }
 
                 var name = keys[kIndex];
 
-                fileconflict.prompt('dups', M.d[duplicateEntries.files[name][0]],
-                    M.d[duplicateEntries.files[name][1]], allDups, target,
-                    duplicateEntries.files[name].length).always(
+                fileconflict.prompt('dups', M.d[duplicateEntries[type][name][0]],
+                    M.d[duplicateEntries[type][name][1]], allDups - 1, target,
+                    duplicateEntries[type][name].length).always(
                         function contuineResolving(file, fname, action, checked) {
 
                             var olderNode = null;
                             var newestTS = -1;
                             var newestIndex = -1;
 
-                            if (duplicateEntries.files[name].length == 2) {
-                                olderNode = duplicateEntries.files[name][0];
-                                if (M.d[duplicateEntries.files[name][1]].ts < M.d[olderNode].ts) {
-                                    olderNode = duplicateEntries.files[name][1];
+                            if (duplicateEntries[type][name].length == 2) {
+                                olderNode = duplicateEntries[type][name][0];
+                                if (M.d[duplicateEntries[type][name][1]].ts < M.d[olderNode].ts) {
+                                    olderNode = duplicateEntries[type][name][1];
                                 }
                             }
                             else {
-                                for (var k = 0; k < duplicateEntries.files[name].length; k++) {
-                                    if (M.d[duplicateEntries.files[name][k]].ts > newestTS) {
-                                        newestTS = M.d[duplicateEntries.files[name][k]].ts;
+                                for (var k = 0; k < duplicateEntries[type][name].length; k++) {
+                                    if (M.d[duplicateEntries[type][name][k]].ts > newestTS) {
+                                        newestTS = M.d[duplicateEntries[type][name][k]].ts;
                                         newestIndex = k;
                                     }
                                 }
@@ -642,44 +681,53 @@
                                         M.rename(olderNode, newName);
                                     }
                                     else {
-                                        for (var h = 0; h < duplicateEntries.files[name].length; h++) {
+                                        for (var h = 0; h < duplicateEntries[type][name].length; h++) {
                                             if (h === newestIndex) {
                                                 continue;
                                             }
                                             newName = fileconflict.findNewName(name, target);
-                                            M.rename(duplicateEntries.files[name][h], newName);
+                                            M.rename(duplicateEntries[type][name][h], newName);
                                         }
                                     }
                                     break;
                                 case ns.KEEPBOTH:
-                                    // merge and version
+                                    // merge
+
                                     break;
                                 case ns.DONTCOPY:
                                     // keep the newest
-
-                                    if (olderNode) {
-                                        M.safeRemoveNodes(olderNode);
+                                    if (type === 'files') {
+                                        if (olderNode) {
+                                            M.safeRemoveNodes(olderNode);
+                                        }
+                                        else {
+                                            var nodeToRemove = duplicateEntries[type][name].splice(newestIndex, 1);
+                                            M.safeRemoveNodes(nodeToRemove);
+                                        }
                                     }
                                     else {
-                                        var nodeToRemove = duplicateEntries.files[name].splice(newestIndex, 1);
-                                        M.safeRemoveNodes(nodeToRemove);
+                                        // merge
+                                        if (olderNode) {
+                                            // 2 items
+                                            fileconflict.check([M.d[olderNode]], M.d[olderNode].p, 'move', null, fileconflict.REPLACE);
+                                        }
                                     }
                                     break;
                             }
 
-                            resolveDup(duplicateEntries, keys, ++kIndex);
+                            resolveDup(duplicateEntries, keys, ++kIndex, 'files');
                         }
                     );
             };
 
-            resolveDup(dups, dupsKeys, 0);
+            resolveDup(dups, dupsKeys, 0, 'files');
 
-            //for (var name in dups.files) {
-            //    if (dups.files[name].length >= 2) {
-            //        this.prompt('dups', dups.files[name][0],
-            //            dups.files[name][1], allDups, target, dups.files[name].length);
-            //    }
-            //}
+            operationsOrderPromise.done(function() {
+                dupsKeys = Object.keys(dups.folders);
+                allDups = dupsKeys.length;
+
+                resolveDup(dups, dupsKeys, 0, 'folders');
+            });
 
         },
 

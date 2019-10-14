@@ -485,7 +485,7 @@ catch(e) {
 
 var mega = {
     ui: {},
-    flags: 0,
+    state: 0,
     utils: {},
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
@@ -501,7 +501,9 @@ var mega = {
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
 
-    /** An object with flags detailing which features are enabled on the API */
+    /** An object with flags detailing which features are enabled on the API
+     *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
+     */
     apiMiscFlags: {},
 
     /** Get browser brancd internal ID */
@@ -564,7 +566,7 @@ var mega = {
         }, 2000);
 
         this.loadReport = r;
-        this.flags |= window.MEGAFLAG_LOADINGCLOUD;
+        this.state |= window.MEGAFLAG_LOADINGCLOUD;
     },
 
     /** Parameters to append to API requests */
@@ -593,6 +595,13 @@ var mega = {
         return this._urlParams;
     }
 };
+
+Object.defineProperty(mega, 'flags', {
+    get: function() {
+        'use strict';
+        return typeof u_attr === 'object' && u_attr.flags || this.apiMiscFlags || false;
+    }
+});
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
@@ -1828,7 +1837,7 @@ else if (!browserUpdate) {
                 return false;
             }
 
-            if ((mega.flags & window.MEGAFLAG_MDBOPEN)
+            if ((mega.state & window.MEGAFLAG_MDBOPEN)
                     && (dump.m === 'InvalidStateError'
                         || (dump.m === 'UnknownError'))) {
                 // Prevent InvalidStateError exceptions from indexedDB.open
@@ -3185,15 +3194,6 @@ else if (!browserUpdate) {
                 }
             });
 
-            // Get information about what API flags are enabled e.g. 2FA, New Registration etc
-            if (!is_iframed) {
-                M.req('gmf').done(function(result) {
-                    if (typeof result === 'object') {
-                        // Cache flags object
-                        mega.apiMiscFlags = result;
-                    }
-                });
-            }
             mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
         });
 
@@ -3427,7 +3427,7 @@ else if (!browserUpdate) {
         catch (ex) {}
     }
 
-    var u_storage, loginresponse, u_sid, dl_res, voucher;
+    var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     (function _crossTabSession(u_storage) {
@@ -3459,9 +3459,42 @@ else if (!browserUpdate) {
             xhr.send(JSON.stringify([].concat(data)));
         };
 
+        var gmf = function() {
+            gmf_res = true;
+
+            xhr(false, {a: 'gmf'}, function(result) {
+                if (Array.isArray(result) && typeof result[0] === 'object') {
+                    // Cache flags object
+                    mega.apiMiscFlags = result[0];
+                }
+                else {
+                    if (d) {
+                        console.error('API request error, no flags given...');
+                    }
+
+                    mBroadcaster.once('startMega', function() {
+                        if (typeof M.req === 'function') {
+                            setTimeout(function() {
+                                M.req('gmf').always(function(result) {
+                                    if (typeof result === 'object') {
+                                        mega.apiMiscFlags = result;
+                                    }
+                                    else if (d) {
+                                        console.error('Giving up retrieving API flags...');
+                                    }
+                                });
+                            }, 700);
+                        }
+                    });
+                }
+                gmf_res = false;
+            });
+        };
+
         var ack = function() {
             if (!(u_sid = u_storage.sid)) {
                 loginresponse = false;
+                gmf();
             }
 
             if (loginresponse) {
@@ -3473,6 +3506,11 @@ else if (!browserUpdate) {
                     }
                     else if (typeof response[0] === 'object') {
                         loginresponse = response;
+                    }
+
+                    if (!Array.isArray(loginresponse)) {
+                        // Invalid login session, retrieve raw API flags.
+                        gmf();
                     }
                 });
             }
@@ -3511,7 +3549,7 @@ else if (!browserUpdate) {
             }
 
             boot_done();
-            ack = xhr = undefined;
+            ack = undefined;
         };
 
         // No session handling needed for
@@ -3608,7 +3646,7 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        if (loginresponse === true || dl_res === true || voucher === true || !jsl_done || !jj_done) {
+        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
             return;
         }
 

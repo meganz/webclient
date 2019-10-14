@@ -927,10 +927,32 @@ scparser.$add('t', function(a, scnodes) {
             delete scnodes[i].i;
             delete scnodes[i].scni;
             delete scnodes[i].arrivalOrder;
+
             M.addNode(scnodes[i]);
             ufsc.feednode(scnodes[i]);
+
+            var h = scnodes[i].h;
+
+            if (!$.moveNodeShares || !$.moveNodeShares[h]) {
+                continue;
+            }
+
+            for (var su in $.moveNodeShares[h]) {
+                if ($.moveNodeShares[h][su]) {
+                    M.nodeShare(h, $.moveNodeShares[h][su], true);
+                    if (su === 'EXP') {
+                        scpubliclinksuiupd = true;
+                    }
+                    else {
+                        scsharesuiupd = true;
+                    }
+                }
+            }
+
+            delete $.moveNodeShares[h];
         }
     }
+
     ufsc.save(rootNode);
 
     if (d) {
@@ -1246,6 +1268,24 @@ scparser.$add('d', function(a) {
     if (fileDeletion) {
         topVersion = fileversioning.getTopNodeSync(a.n);
     }
+
+    // This is node move
+    if (a.m) {
+        $.moveNodeShares = !$.moveNodeShares ? {} : $.moveNodeShares;
+        (function _checkMoveNodeShare(h) {
+            if (M.d[h].shares) {
+                $.moveNodeShares[h] = M.d[h].shares;
+            }
+            if (M.d[h].t) {
+                for (var childHandle in M.c[h]) {
+                    if (M.c[h][childHandle]) {
+                        _checkMoveNodeShare(childHandle);
+                    }
+                }
+            }
+        })(a.n);
+    }
+
     // node deletion
     M.delNode(a.n);
 
@@ -1336,7 +1376,24 @@ scparser.mcpc = scparser.mcc = function (a) {
         } else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
         } else if (Array.isArray(loadfm.chatmcf)) {
-            loadfm.chatmcf.push(a);
+            // Merge if exists.
+            // This can happen in case some data came from fmdb, but there were still queued ap's (mcpc for
+            // added/removed participants). If this doesn't merge the chatmcf entry, this would end up removing the
+            // 'ck', since mcpc doesn't contain 'ck' properties and the chat would render useless (no key).
+            var exists = false;
+            for (var i = 0; i < loadfm.chatmcf.length; i++) {
+                var entry = loadfm.chatmcf[i];
+                if (entry.id === a.id) {
+                    delete a.a;
+                    Object.assign(entry, a);
+                    exists = true;
+                    a = entry;
+                    break;
+                }
+            }
+            if (!exists) {
+                loadfm.chatmcf.push(a);
+            }
         } else {
             srvlog('@lp unable to parse mcc packet');
         }
@@ -1871,11 +1928,12 @@ function emplacenode(node, noc) {
 
         if (node.hash) {
             if (!M.h[node.hash]) {
-                M.h[node.hash] = node.h + ' ';
+                M.h[node.hash] = Object.create(null);
+                M.h[node.hash][node.h] = true;
             }
             else {
-                if (M.h[node.hash].indexOf(node.h) < 0) {
-                    M.h[node.hash] += node.h + ' ';
+                if (!M.h[node.hash][node.h]) {
+                    M.h[node.hash][node.h] = true;
                 }
             }
         }
@@ -2857,7 +2915,7 @@ function processPH(publicHandles) {
         if (value.d) {
             M.delNodeShare(nodeId, 'EXP');
 
-            if (M.currentdirid === 'public-links') {
+            if (fminitialized && M.currentdirid === 'public-links') {
                 removeUInode(nodeId, value.p);
             }
 
@@ -3074,21 +3132,22 @@ function process_u(users, ignoreDB) {
         var userHandle = users[i].u;
         var userStatus = users[i].c;
 
+        users[i].nickname = '';
+
+        // If this user had a nickname in the past, don't delete it if they are now added as a contact
+        if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
+            users[i].nickname = M.u[userHandle].nickname;
+        }
+
+        // Or if the nickname is set in the initial 'ug' API request, then set it
+        else if (nicknames.cache[userHandle]) {
+            users[i].nickname = nicknames.cache[userHandle];
+        }
+
         if (userStatus === 1) {
             users[i].h = userHandle;
             users[i].t = 1;
             users[i].p = 'contacts';
-            users[i].nickname = '';
-
-            // If this user had a nickname in the past, don't delete it if they are now added as a contact
-            if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
-                users[i].nickname = M.u[userHandle].nickname;
-            }
-
-            // Or if the nickname is set in the initial 'ug' API request, then set it
-            else if (nicknames.cache[userHandle]) {
-                users[i].nickname = nicknames.cache[userHandle];
-            }
 
             M.addNode(users[i], ignoreDB);
 
@@ -3302,7 +3361,7 @@ function folderreqerr(c, e)
     }
     else {
         // Show file/folder not found overlay
-        parsepage(pages['mobile']);
+        mobile.initDOM();
         mobile.notFoundOverlay.show(e);
     }
 }
@@ -3783,8 +3842,14 @@ function fmsortmode(id, n, d)
     var sortmodes = {};
     if (typeof fmconfig.sortmodes !== 'undefined')
         sortmodes = fmconfig.sortmodes;
-    if (n === 'name' && d > 0)
+    if (n === 'name' && d > 0 && id !== "contacts") {
+        // don't delete for "contacts" section, since "status" is the default there.
         delete sortmodes[id];
+    }
+    else if (n === "status" && d > 0 && id === "contacts") {
+        // DO delete for "contacts" section, since "status" is the default there, so default is already d > 1.
+        delete sortmodes[id];
+    }
     else
         sortmodes[id] = {n: n, d: d};
     mega.config.set('sortmodes', sortmodes);

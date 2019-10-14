@@ -173,7 +173,7 @@ class SelectContactDialog extends MegaRenderMixin(React.Component) {
         super(props);
         this.state = {
             'selected': this.props.selected ? this.props.selected : []
-        }
+        };
 
         this.onSelected = this.onSelected.bind(this);
     }
@@ -229,12 +229,12 @@ class SelectContactDialog extends MegaRenderMixin(React.Component) {
             ]}>
             <ContactsUI.ContactPickerWidget
                 megaChat={self.props.megaChat}
-                contacts={self.props.contacts}
                 exclude={self.props.exclude}
                 selectableContacts="true"
                 onSelectDone={self.props.onSelectClicked}
                 onSelected={self.onSelected}
                 selected={self.state.selected}
+                contacts={M.u}
                 headerClasses="left-aligned"
                 multiple={true}
                 />

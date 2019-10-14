@@ -3050,7 +3050,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -4328,11 +4328,12 @@ li.token-input-token-invite .input-close {
     padding-bottom: 40px;
     text-align: center;
 }
-.user-management-dialog.payment-reminder .payment-reminder-logo {
+.payment-reminder-logo {
     background-position: -20px -969px;
     width: 80px;
     height: 80px;
     display: block;
+    margin-left: calc(50% - 40px);
 }
 .user-management-dialog.payment-reminder .big-red-button {
     margin: 0;
@@ -4685,8 +4686,8 @@ li.token-input-token-invite .input-close {
     right: 10px;
 }
 .fm-dialog.group-chat-link {
-    width: 360px;
-    margin: -142px 0 0 -180px;
+    width: 480px;
+    margin: -142px 0 0 -240px;
     text-align: center;
     font-family: 'LatoWeb', 'source_sans_proregular';
     background-color: white;
@@ -4833,7 +4834,7 @@ body.en .register-side-pane.container.visible {
 .register-side-pane.top-block {
     height: 176px;
     background-color: #E4EBEF;
-    background-image: url(../images/mega/register-sprite_v1.png);
+    background-image: url(../images/mega/register-sprite_v2.png);
     background-position: -114px -180px;
     background-repeat: no-repeat;
     border-top-left-radius: inherit;
@@ -4846,7 +4847,7 @@ body.en .register-side-pane.container.visible {
     margin-bottom: -11px;
 }
 .register-side-pane.top-bg {
-    background-image: url(../images/mega/register-sprite_v1.png);
+    background-image: url(../images/mega/register-sprite_v2.png);
     background-position: -168px 0;
     width: 254px;
     height: 127px;
@@ -4996,7 +4997,7 @@ body.en .register-side-pane.container.visible {
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
     height: 70px;
-    background-image: url(../images/mega/startpage-sprite_v9.png);
+    background-image: url(../images/mega/startpage-sprite_v10.png);
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
@@ -5071,8 +5072,10 @@ body.en .register-side-pane.container.visible {
 }
 .pro-register-dialog .button {
     cursor: pointer;
-    float: right;
     margin-top: 11px;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
 }
 .pro-register-dialog .account.input-wrapper {
     margin: 0 0 37px 0;

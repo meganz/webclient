@@ -32,7 +32,7 @@ function dashboardUI() {
     if (u_attr && u_attr.b) {
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-        if (u_attr.b.s !== -1) {
+        if (u_attr.b.s !== -1 || !u_attr.b.m) {
             $('.dashboard .button.upgrade-account').addClass('hidden');
         }
         else {
@@ -110,8 +110,14 @@ function dashboardUI() {
 
         // QR Code
         var drawQRCanvas = function _drawQRCanvas() {
-            var cutPlace = location.href.indexOf('/fm/');
-            var myHost = location.href.substr(0, cutPlace);
+            var myHost = '';
+            if (!is_extension) {
+                var cutPlace = location.href.indexOf('/fm/');
+                myHost = location.href.substr(0, cutPlace);
+            }
+            else {
+                myHost = 'https://mega.nz';
+            }
             myHost += '/' + M.account.contactLink;
             if (account.contactLink && account.contactLink.length) {
                 var QRoptions = {
@@ -226,8 +232,18 @@ function dashboardUI() {
             }
             else if (account.stype == 'O') {
                 // one-time or cancelled subscription
-                $('.account.left-pane.plan-date-info').text(l[20153]);
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
+
+                // If user has nextplan, show infomative tooltip
+                if (account.nextplan) {
+                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
+                        '<div class="small-icon info-icon simpletip" ' +
+                        'data-simpletip-style=\'{"max-width":"220px", "text-align":"center"}\' data-simpletip="' +
+                        escapeHTML(l[20965]) + '"></div>');
+                }
+                else {
+                    $('.account.left-pane.plan-date-info').text(l[20153]);
+                }
             }
 
             if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {
@@ -272,7 +288,12 @@ function dashboardUI() {
 
         /* Registration date, bandwidth notification link */
         $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
-            loadSubPage('pro');
+            if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+                loadSubPage('repay');
+            }
+            else {
+                loadSubPage('pro');
+            }
         });
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
@@ -404,7 +425,7 @@ function dashboardUI() {
         }
         else {
             // someone modified CSS, hidden class is overwitten --> .hide()
-            if (u_attr.b.s !== -1) {
+            if (u_attr.b.s !== -1 || !u_attr.b.m) {
                 $('.dashboard .upgrade-account').addClass('hidden').hide();
             }
             $('.business-dashboard .user-management-storage .storage-transfer-data')
@@ -563,6 +584,11 @@ dashboardUI.updateCloudDataWidget = function() {
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
+        return false;
+    });
+
+    $('.data-item .rubbish-bin-dashboard').rebind('click', function() {
+        loadSubPage('fm/' + M.RubbishID);
         return false;
     });
 

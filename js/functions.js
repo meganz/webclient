@@ -403,14 +403,12 @@ function makeid(len) {
 function isValidEmail(email) {
 
     'use strict';
-
-    var input = document.createElement('input');
-
-    input.type = 'email';
-    input.required = true;
-    input.value = email;
-
-    return input.checkValidity();
+    // reference to html spec https://html.spec.whatwg.org/multipage/input.html#e-mail-state-(type=email)
+    // with one modification, that the standard allows emails like khaled@mega
+    // which is possible in local environment/networks but not in WWW.
+    // so I applied + instead of * at the end
+    var regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    return regex.test(email);
 }
 
 /**

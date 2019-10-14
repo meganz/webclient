@@ -5,6 +5,9 @@ Fabfile for deploying the Mega Web Client.
 * To deploy/update the current branch on beta.developers.mega.co.nz:
   fab dev
 
+* To login using specific username on beta.developers.mega.co.nz:
+  fab dev:u=YOUR_USER_NAME
+
 * To deploy/update a specific branch on beta.developers.mega.co.nz:
   fab dev:branch_name=1657-simple-translations
 
@@ -97,11 +100,14 @@ def _build_chat_bundle(target_dir):
 
 
 @task
-def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=False, build_chrome_ext=False, fetch_lang=False):
+def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=False, build_chrome_ext=False, fetch_lang=False, u=False):
     """
     Clones a branch and deploys it to beta.developers.mega.co.nz.
     It will then output a test link which can be pasted into a Redmine
     ticket or run in the browser.
+
+    note: Unless specific username is given, this will tries to get local git email address to trackdown username to use on the beta server.
+    Beta server username and email used on gitlab should be match for this to work automaically.
 
     Usage:
         1) Enter your code directory and run: Fab dev
@@ -111,6 +117,15 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
            Fab dev:del_exist=True
     """
 
+    # If username is given use it, otherwise try to use same username from local git.
+    if u:
+        username = u;
+    else:
+        local_email = local('git config user.email', capture=True)
+        username = local_email.replace('@mega.co.nz', '')
+
+    BETA_DEV_HOST = username + '@beta.developers.mega.co.nz:28999'
+
     # If none other given, use beta.developers server
     if not env.host_string:
         beta_dev()
@@ -119,6 +134,11 @@ def dev(build_bundle=False, branch_name='', del_exist=False, build_firefox_ext=F
     # Get the current branch if not passed in
     if branch_name == '':
         branch_name = local('git rev-parse --abbrev-ref HEAD', capture=True)
+
+    # If branch name is still empty, something is wrong.
+    if branch_name == '':
+        print('Something went wrong with get current branch name.\n');
+        exit();
 
     # Get the remote path e.g. /var/www/xxx-branch-name
     remote_branch_path = os.path.join(env.target_dir, branch_name)

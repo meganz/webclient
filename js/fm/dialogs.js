@@ -1290,6 +1290,9 @@
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
                 var p = $.cftarget;
+
+                // Make sure parent has selected class to make it expand
+                $('#mctreea_' + p, $dialog).addClass('selected');
                 selectTreeItem(p);
                 selectTreeItem(h);
             });
@@ -1424,6 +1427,7 @@
             var $tooltip = $('.contact-preview', $dialog);
             var avatar = useravatar.contact(owner, '', 'div');
             var note = !share.level && !share.circular && l[19340];
+            var displayName = user.nickname || user.name || user.m;
 
             $tooltip.find('.contacts-info.body')
                 .safeHTML(
@@ -1432,7 +1436,7 @@
                     '  <div class="user-card-name small">@@<span class="grey">(@@)</span></div>' +
                     '  <div class="user-card-email small">@@</div>' +
                     '  <div class="user-card-email small @@">@@</div>' +
-                    '</div>', user.name || '', l[8664], user.m || '', note ? 'note' : '', note || ''
+                    '</div>', displayName || '', l[8664], user.m || '', note ? 'note' : '', note || ''
                 );
 
             clearTimeout(dialogTooltipTimer);

@@ -56,6 +56,7 @@ mobile.cloud.contextMenu = {
 
         // Get the node type
         var nodeType = M.d[nodeHandle].t;
+        var share = M.getNodeShare(nodeHandle);
 
         // Show overlay
         $overlay.removeClass('hidden');
@@ -82,10 +83,16 @@ mobile.cloud.contextMenu = {
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
-            mobile.cloud.contextMenu.initLinkButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
+
+            if (share && share.down) {
+                $folderContextMenu.find('.link-button').addClass('hidden');
+            } else {
+                $folderContextMenu.find('.link-button').removeClass('hidden');
+                mobile.cloud.contextMenu.initLinkButton($folderContextMenu, nodeHandle);
+            }
 
             // Hide the file context menu if open and show the folder context menu
             $fileContextMenu.addClass('hidden');
@@ -95,11 +102,17 @@ mobile.cloud.contextMenu = {
 
             // Initialise buttons
             mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
-            mobile.cloud.contextMenu.initDownloadButton($fileContextMenu, nodeHandle);
-            mobile.cloud.contextMenu.initLinkButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($fileContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
+
+            if (share && share.down) {
+                $fileContextMenu.find('.download-file-button, .link-button').addClass('hidden');
+            } else {
+                $fileContextMenu.find('.download-file-button, .link-button').removeClass('hidden');
+                mobile.cloud.contextMenu.initDownloadButton($fileContextMenu, nodeHandle);
+                mobile.cloud.contextMenu.initLinkButton($fileContextMenu, nodeHandle);
+            }
 
             // Hide the folder context menu if open and show the file context menu
             $folderContextMenu.addClass('hidden');

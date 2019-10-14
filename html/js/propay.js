@@ -41,8 +41,8 @@ pro.propay = {
             loadSubPage('start');
             return;
         }
-        if (u_attr && u_attr.b && u_attr.b.m && u_attr.b.s === -1) {
-            loadSubPage('registerb');
+        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            loadSubPage('repay');
             return;
         }
 
@@ -566,6 +566,7 @@ pro.propay = {
 
         // Set text
         var subscribeOrPurchase = (recurringEnabled) ? l[6172] : l[6190].toLowerCase();
+        var subscribeOrPurchaseInstruction = (recurringEnabled) ? l[22074] : l[7996];
         var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
         var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];
         var autoRenewMonthOrYearQuestion = (numOfMonths === 1) ? l[10638] : l[10639];
@@ -631,7 +632,7 @@ pro.propay = {
 
         // Update depending on recurring or one off payment
         $step2.find('.membership-bott-button').text(subscribeOrPurchase);
-        $step2.find('.payment-instructions .purchase').text(subscribeOrPurchase);
+        $step2.find('.payment-instructions').safeHTML(subscribeOrPurchaseInstruction);
         $step2.find('.choose-renewal .duration-text').text(autoRenewMonthOrYearQuestion);
         $step2.find('.charge-information').text(chargeInfoDuration);
         $paymentDialog.find('.payment-buy-now').text(subscribeOrPurchase);

@@ -480,10 +480,10 @@ function dl_g(res) {
             var showPreviewButton = function($infoBlock) {
                 $infoBlock = $infoBlock || $('.download.info-block');
 
-                if (is_image(filename) || isVideo) {
-                    var $ipb = $infoBlock.find('.img-preview-button');
+                if (is_image2(dl_node) || isVideo) {
+                    var $ipb = $infoBlock.find('.img-preview-button, .thumb-block');
 
-                    $ipb.removeClass('hidden')
+                    $ipb.addClass('clickable').removeClass('hidden')
                         .rebind('click', function() {
                             slideshow(dl_node);
 
@@ -503,6 +503,7 @@ function dl_g(res) {
                     prevBut = false;
                 }
                 else {
+
                     // load thumbnail
                     getImage(dl_node).then(function(uri) {
                         var $infoBlock = $('.download.info-block');
@@ -605,10 +606,22 @@ function dl_g(res) {
                 $(window).rebind('resize.download-bar', _resizer);
             })();
 
+            // Expand top bar if its clicked
+            $topBar.rebind('click', function(e) {
+                var $target = $(e.target);
+
+                if ($(this).find('.download-content').height() < 15
+                    && $target.not('.button') && !$target.closest('.button').length
+                    && !$target.closest('.top-menu-popup').length) {
+
+                    _expand();
+                }
+            });
+
             // Collapse/Expand top bar events
-            $('.top-expand-button, .top-expand-txt').rebind('click', function() {
+            $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
                 if ($(this).hasClass('active')) {
-                    $topBar.removeClass('expanded').css('height', '');
+                    $topBar.removeClass('expanded initial').css('height', '');
                     return $(window).unbind('resize.download-bar');
                 }
                 _expand();
@@ -625,10 +638,10 @@ function dl_g(res) {
                     || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;
 
                 if ((delta > 120 || delta < -120) && $this.is('.activated')) {
-                    $this.removeClass('expanded').css('height', '');
+                    $this.removeClass('expanded initial').css('height', '');
                 }
             });
-        }, 1500);
+        }, 100);
     }
 
     var pf = navigator.platform.toUpperCase();
@@ -687,7 +700,7 @@ function dlPageStartDownload(isDlWithMegaSync) {
 
     // Collapse top bar
     if (!$downloadPage.hasClass('video-theatre-mode')) {
-        $downloadPage.removeClass('expanded').css('height', '');
+        $downloadPage.removeClass('expanded initial').css('height', '');
     }
     $('.download .pause-transfer').removeClass('hidden active').find('span').text(l[9112]);
     $(window).unbind('resize.download-bar');
@@ -1084,7 +1097,7 @@ function dlPageCleanup() {
 
     if (dl_node) {
         $(window).unbind('resize.download-bar');
-        $('.download.top-bar').removeClass('expanded');
+        $('.download.top-bar').removeClass('expanded initial');
         $(window).trigger('video-destroy');
         dl_node = false;
     }

@@ -203,7 +203,11 @@
         }
 
         if (!err) {
-            if ($('.register-check', $dialog).hasClass('checkboxOff')) {
+            if ($('.understand-check', $dialog).hasClass('checkboxOff')) {
+                hideOverlay();
+                msgDialog('warninga', l[1117], l[21957]);
+            }
+            else if ($('.register-check', $dialog).hasClass('checkboxOff')) {
                 hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
             }
@@ -280,7 +284,7 @@
         if (typeof page !== 'undefined' && page === 'chat') {
             $('.dialog-dark-bottom.login', $dialog).removeClass('hidden').find('a')
                 .rebind('click.doSignup', function() {
-                    closeDialog();
+                    closeRegisterDialog($dialog, true);
                     megaChat.loginOrRegisterBeforeJoining(undefined, false, true);
                 });
         }
@@ -365,8 +369,6 @@
             }
         });
 
-        $('.checkbox-block.register .radio-txt', $dialog).safeHTML(l['208g']);
-
         $('.checkbox-block.register a', $dialog).rebind('click', function(e) {
             e.preventDefault();
             $.termsAgree = function() {
@@ -439,7 +441,7 @@
             };
             loadingDialog.show();
 
-            var newEmail = $.trim($('input', $dialog).val()) || accountData.email;
+            var newEmail = $.trim($('input', $dialog).val());
 
             // Verify the new email address is in valid format
             if (!isValidEmail(newEmail)) {

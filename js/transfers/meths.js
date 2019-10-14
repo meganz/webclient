@@ -91,26 +91,45 @@ mBroadcaster.once('startMega', function() {
                         }
 
                         if (entries.length) {
-                            var $dialog = $('.fm-dialog.resume-transfer');
 
-                            $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
-                                closeDialog();
-
+                            // Cancel transfers callback.
+                            var cancelTransfers = function() {
                                 for (var i = entries.length; i--;) {
                                     M.delPersistentData(prefix + entries[i]);
                                 }
-                            });
+                            };
 
-                            $('.big-button.red', $dialog).rebind('click', function() {
+                            // Continue transfers callback.
+                            var continueTransfers = function() {
                                 if (d) {
                                     dlmanager.logger.info('Resuming transfers...', entries);
                                 }
 
-                                closeDialog();
-                                M.addDownload(entries);
-                            });
+                                if (is_mobile) {
+                                    // We only resume a single download on mobile.
+                                    mobile.downloadOverlay.resumeDownload(entries[0]);
+                                } else {
+                                    M.addDownload(entries);
+                                }
+                            };
 
-                            M.safeShowDialog('resume-transfer', $dialog);
+                            if (is_mobile) {
+                                mobile.resumeTransfersOverlay.show(continueTransfers, cancelTransfers);
+                            } else {
+                                var $dialog = $('.fm-dialog.resume-transfer');
+
+                                $('.fm-dialog-close, .cancel', $dialog).rebind('click', function() {
+                                    closeDialog();
+                                    cancelTransfers();
+                                });
+
+                                $('.resume-transfers-button', $dialog).rebind('click', function() {
+                                    closeDialog();
+                                    continueTransfers();
+                                });
+
+                                M.safeShowDialog('resume-transfer', $dialog);
+                            }
                         }
                     });
             });

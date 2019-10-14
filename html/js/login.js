@@ -99,8 +99,13 @@ var signin = {
             return false;
         }
 
+        // close two-factor dialog if it was opened
+        if (twofactor && twofactor.loginDialog) {
+            twofactor.loginDialog.closeDialog();
+        }
+
         // If successful result
-        else if (result !== false && result >= 0) {
+        if (result !== false && result >= 0) {
 
             // Otherwise if email confirm code is ok, proceed with RSA key generation
             if (confirmok) {
@@ -273,6 +278,13 @@ function init_login() {
     var $formWrapper = $('.main-mid-pad.login');
     var $inputs = $formWrapper.find('.account.input-wrapper input');
     var $button = $formWrapper.find('.big-red-button');
+
+    if (is_extension) {
+        $('.extension-advise').addClass('hidden');
+    }
+    else {
+        $('.extension-advise').removeClass('hidden');
+    }
 
     if (login_email) {
         $('#login-name2', $formWrapper).val(login_email);

@@ -249,7 +249,7 @@ var useravatar = (function() {
 
         if (M.u[user]) {
             // .trackDataChange() will trigger some parts in the Chat UI to re-render.
-            M.u[user].trackDataChange();
+            M.u[user].trackDataChange(M.u[user], "avatar");
         }
 
         var $avatar = null;

@@ -1586,7 +1586,7 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     if (u_attr.b.s === -1) { // expired
         if (u_attr.b.m) {
             msg = l[20400].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
         }
         else {
             msg = l[20462];
@@ -1598,8 +1598,9 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     else if (u_attr.b.s === 2) { // grace
         if (u_attr.b.m) {
             msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
+                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
             $('.fm-notification-block.grace-business').safeHTML(msg).show();
+            clickURLs();
         }
     }
 };
@@ -1623,7 +1624,7 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
         $dialog.find('.pay-reactive-acc').off('click.subuser')
             .on('click.subuser', function payReactivateAccountButtonClickHandler() {
                 closeDialog();
-                loadSubPage('registerb');
+                loadSubPage('repay');
             });
 
         M.safeShowDialog('expired-business-dialog', function() {
@@ -1820,6 +1821,8 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         function companyProfileSaveButtonClick() {
             var attrsToChange = [];
             var valid = true;
+            var isTaxChanged = false;
+
             if ($cNameInput.val().trim() !== cName) {
                 if (!$cNameInput.val().trim()) {
                     $cNameInput.parent().addClass('error').find('.error-message').text(l[19507]);
@@ -1854,7 +1857,16 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
             }
             if ($cVatInput.val().trim() !== cVat) {
-                attrsToChange.push({ key: '%taxnum', val: $cVatInput.val().trim() });
+                if (!$cVatInput.val().trim()) {
+                    $cVatInput.parent().addClass('error').find('.error-message').text(l[20953]);
+                    $cVatInput.focus();
+                    valid = false;
+                }
+                else {
+                    $cVatInput.parent().removeClass('error').addClass('correctinput');
+                    attrsToChange.push({ key: '%taxnum', val: $cVatInput.val().trim() });
+                    isTaxChanged = true;
+                }
             }
             if ($cAddressInput.val().trim() !== cAddress) {
                 attrsToChange.push({ key: '%address1', val: $cAddressInput.val().trim() });
@@ -1881,9 +1893,71 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                     var $savingNotidication = $('.auto-save', $accountContainer);
                     $savingNotidication.removeClass('hidden');
                     $savingNotidication.show();
+
+                    M.safeShowDialog('business-profile-up-success', function() {
+                        var $dialog =
+                            $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+                        $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
+                        var msg = l[20954];
+
+                        if (isTaxChanged) {
+                            var myNow = new Date();
+
+                            if (u_attr && (myNow.getTime() - (u_attr.since * 1000) < 2592e6)) {
+                                // if difference is less than one month
+                                msg += ' ' + l[20955];
+                            }
+                            else if (M && M.account && M.account.purchases && M.account.purchases.length) {
+                                // get first business purchase
+                                var firstPurchase = null;
+                                for (var pur = 0; pur < M.account.purchases.length; pur++) {
+                                    if (M.account.purchases[pur][1] && M.account.purchases[pur][5]) {
+                                        if (M.account.purchases[pur][5] === 100) {
+                                            firstPurchase = M.account.purchases[pur];
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (myNow.getTime() - (firstPurchase[1] * 1000) < 2592e6) {
+                                    msg += ' ' + l[20955];
+                                }
+                            }
+                        }
+                        $dialog.find('.dialog-text-one').text(msg);
+
+                        return $dialog;
+                    });
+
+                    // we will clean up cached data of invoices to insure updating if needed
+                    if (mega && mega.buinsessAccount && mega.buinsessAccount.invoicesList
+                        && mega.buinsessAccount.invoicesList.list) {
+                        if (mega.buinsessAccount.invoicesList.list.length === 1) {
+                            mega.buinsessAccount.invoicesList = null;
+                            if (mega.buinsessAccount.invoicesDetailsList) {
+                                mega.buinsessAccount.invoicesDetailsList = null;
+                            }
+                        }
+                        else {
+                            var bInv = 0;
+                            for (var iv = 0; iv < mega.buinsessAccount.invoicesList.list.length && bInv <= 2; iv++) {
+                                if (mega.buinsessAccount.invoicesList.list[iv].b) {
+                                    bInv++;
+                                }
+                            }
+                            if (bInv === 1) {
+                                mega.buinsessAccount.invoicesList = null;
+                                if (mega.buinsessAccount.invoicesDetailsList) {
+                                    mega.buinsessAccount.invoicesDetailsList = null;
+                                }
+                            }
+                        }
+                    }
+
                     setTimeout(function () {
                         $savingNotidication.fadeOut(1000);
-                    }, 1000);
+                    }, 4000);
+
                 }
                 else {
                     msgDialog('warningb', '', l[19528]);
@@ -3062,7 +3136,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                     if (d) {
                         console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
                     }
-                    return failing(l[19146]);
+                    var failMsg = l[22083].replace('{0}', '<b>' + subUser.e + '</b></br></br>');
+                    return failing(failMsg);
                 }
             );
 

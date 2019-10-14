@@ -42,6 +42,9 @@ var QuickFinder = function(searchable_elements, containers) {
         if ($(e.target).is("input, textarea, select") || $.dialog) {
             return;
         }
+        if (M.chat) {
+            return;
+        }
 
         var charCode = e.which || e.keyCode; // ff
 
@@ -63,6 +66,7 @@ var QuickFinder = function(searchable_elements, containers) {
             self._is_active = true;
 
             $(self).trigger("activated");
+            self.was_activated();
 
 
             var foundIds = [];
@@ -178,21 +182,24 @@ var QuickFinder = function(searchable_elements, containers) {
         }
     });
 
-    // hide the search field when the user had clicked somewhere in the document
-    $(document.body).on('mousedown', '> *', function() {
-        if (!is_fm()) {
-            return;
-        }
-        if (self.is_active()) {
-            self.deactivate();
-            return false;
-        }
-    });
+    self.was_activated = function() {
+        // hide the search field when the user had clicked somewhere in the document
+        $(document.body).on('mousedown.qfinder', '> *', function () {
+            if (!is_fm()) {
+                return;
+            }
+            if (self.is_active()) {
+                self.deactivate();
+                return false;
+            }
+        });
+    };
 
     // use events as a way to communicate with this from the outside world.
     self.deactivate = function() {
         self._is_active = false;
         $(self).trigger("deactivated");
+        $(document.body).off('mousedown.qfinder', '> *');
     };
 
     self.is_active = function() {

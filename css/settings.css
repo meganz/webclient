@@ -53,7 +53,7 @@
     height: 16px;
     left: 16px;
     top: 10px;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-repeat: no-repeat;
     opacity: 0.3;
 }
@@ -65,7 +65,7 @@
     height: 24px;
     right: 16px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v31.png);
     background-repeat: no-repeat;
     background-position: -98px -249px;
     opacity: 0;
@@ -325,6 +325,9 @@
 .fm-account-notifications .content-txt {
     padding: 0px;
     display: inline-block;
+}
+.fm-account-notifications .email-notification .data-block-info-text {
+    margin-top: 20px;
 }
 .slider-percentage-bl .content-txt {
     font-size: 12px;
@@ -1405,7 +1408,7 @@
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-    padding: 0 16px 0 12px;
+    padding: 0 8px;
 }
 .settings-sub-section.rub-grn-noti {
     margin-bottom: 24px;

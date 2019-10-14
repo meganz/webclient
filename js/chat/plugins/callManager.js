@@ -97,13 +97,9 @@ CallManager.prototype.registerCall = function (chatRoom, rtcCall, fromUser) {
 
 CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
     var self = this;
-
-    // if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
-    //     chatRoom.callManagerCall.endCall('other');
-    // }
-
-    var $masterPromise = new MegaPromise();
-
+    if (chatRoom._callSetupPromise) {
+        return chatRoom._callSetupPromise;
+    }
     chatRoom.megaChat.closeChatPopups();
 
     var participants = chatRoom.getParticipantsExceptMe();
@@ -121,7 +117,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
         }
         return;
     }
-
+    var $masterPromise = chatRoom._callSetupPromise = new MegaPromise();
     var $promise = chatRoom._retrieveTurnServerFromLoadBalancer(4000);
 
     $promise.always(function () {
@@ -138,6 +134,7 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
                 return callManagerCall;
             }
         );
+        delete chatRoom._callSetupPromise;
         if (!callObj) {
             // call already starte/dup call.
             $masterPromise.reject();
@@ -175,7 +172,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
 
         self.trigger('WaitingResponseOutgoing', [callManagerCall, mediaOptions]);
         $masterPromise.resolve(callManagerCall);
-
     });
 
     return $masterPromise;
@@ -183,11 +179,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
 
 CallManager.prototype.joinCall = function (chatRoom, mediaOptions) {
     var self = this;
-
-    // if (chatRoom.callManagerCall && !chatRoom.callManagerCall.isTerminated()) {
-    //     chatRoom.callManagerCall.endCall('other');
-    // }
-
     var $masterPromise = new MegaPromise();
 
     chatRoom.megaChat.closeChatPopups();
@@ -917,8 +908,7 @@ CallManagerCall.prototype.onCallStarting = function () {
 };
 
 CallManagerCall.prototype.localStream = function() {
-    var call = this.rtcCall;
-    return call ? call.localStream() : null;
+    return this.room.megaChat.rtc.callLocalStream(this.room.chatIdBin);
 };
 
 CallManagerCall.prototype.onCallAnswered = function () {
@@ -1051,7 +1041,6 @@ CallManagerCall.prototype.onCallRejected = function (e, reason) {
 
 CallManagerCall.prototype.onCallRecovered = function(newCall, tsCallStart) {
     var self = this;
-    assert(newCall.isRecover);
     self.rtcCall = newCall;
     self._renderInCallUI();
     self.room.trigger('onCallSessReconnected', [self]);
@@ -1166,12 +1155,12 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
         self.room.trigger('onCallSessReconnecting', [self]);
         return;
     }
+    var callMgr = self.getCallManager();
 
     // in case rtcCall is empty, this is a "Call resume timeout"'s destroy event
     if (self.rtcCall) {
         var state = self.rtcCall.termCodeToUIState(terminationCode);
         self.setState(state);
-        var callMgr = self.getCallManager();
         if (terminationCode === Term.kCancelOutAnswerIn) {
             // @lp Simultaneous 1on1 call to each other
             // Terminate the call but don't display anything in the history
@@ -1206,14 +1195,12 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
                     " for termcode ", RtcModule.getTermCodeName(terminationCode));
                 break;
         }
+    } else {
+        // recovery failed/timed out
+        self.setState(CallManagerCall.STATE.FAILED);
+        callMgr.trigger('CallFailed', [self, terminationCode]);
     }
     self.onCallTerminated();
-};
-
-CallManagerCall.prototype.onCallRecoveryTimeout = function(terminationCode) {
-    var self = this;
-    self.setState(CallManagerCall.STATE.FAILED);
-    self.getCallManager().trigger('CallFailed', [self, terminationCode]);
 };
 
 CallManagerCall.prototype.onRemoteStreamAdded = function (rtcCallSession, stream) {
@@ -1258,7 +1245,7 @@ CallManagerCall.prototype.onStateChanged = function (e, session, oldState, newSt
 CallManagerCall.prototype.endCall = function (reason) {
     var self = this;
     if (!self.rtcCall) { // we don't have a valid call object
-        self.room.megaChat.rtc.clearCallRecovery(self.room.chatIdBin);
+        self.room.megaChat.rtc.abortCallRecovery(self.room.chatIdBin);
         self.getCallManager().trigger('CallEnded', [self, Term.kUserHangup]);
         self.onCallTerminated();
         return;

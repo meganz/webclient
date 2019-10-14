@@ -307,7 +307,10 @@ function pageregister() {
     }
 
     if (!err) {
-        if ($('.register-check', $formWrapper).hasClass('checkboxOff')) {
+        if ($('.understand-check', $formWrapper).hasClass('checkboxOff')) {
+            msgDialog('warninga', l[1117], l[21957]);
+        }
+        else if ($('.register-check', $formWrapper).hasClass('checkboxOff')) {
             msgDialog('warninga', l[1117], l[1118]);
         }
         else {
@@ -438,11 +441,6 @@ function init_register() {
     $('.input-wrapper.email', $regInfoContainer).removeClass('hidden');
     $('.account.top-header.wide', $regInfoContainer).safeHTML(l[1095]);
 
-    var $tipsContainer = $('.main-mid-pad.big-pad.register1 .main-right-block');
-    $('.dont-forget-pass', $tipsContainer).removeClass('hidden'); // 19130
-    $('p.account-sec', $tipsContainer).safeHTML(l[1093] + ' ' + l[1094]);
-    $('.account-business', $tipsContainer).addClass('hidden');
-
     // business sub-account registration
     if (localStorage.businessSubAc) {
         var userInfo = JSON.parse(localStorage.businessSubAc);
@@ -459,13 +457,58 @@ function init_register() {
 
         $('.input-wrapper.name', $regInfoContainer).addClass('hidden');
         $('.input-wrapper.email', $regInfoContainer).addClass('hidden');
-        $('.dont-forget-pass', $tipsContainer).addClass('hidden');
-        $('p.account-sec', $tipsContainer).text(l[19131]);
-        $('.account-business', $tipsContainer).removeClass('hidden');
     }
 
     // Init inputs events
     accountinputs.init($formWrapper);
+
+    // New register sercurity info slider
+    var timer;
+
+    // Aniamte slide -1 to previous, 1 to next, 0 is nothing
+    var animateSlide = function(direction) {
+        var $slideWrapper = $('.register-slide-wrapper', $formWrapper);
+        var lastSlide = $slideWrapper.find('.register-slide-page').length;
+        var currentSlide = parseInt($slideWrapper.attr('data-slide'));
+        var to = 0;
+
+        if (direction < 0) {
+            to = currentSlide === 1 ? lastSlide : currentSlide - 1;
+            $slideWrapper.attr('data-slide', to);
+        }
+        else if (direction > 0) {
+            to = currentSlide === lastSlide ? 1 : currentSlide + 1;
+            $slideWrapper.attr('data-slide', to);
+        }
+    };
+
+    // Auto looping for the slider
+    var startTimer = function () {
+        clearInterval(timer);
+
+        timer = setInterval(function() {
+
+            // Prevent multiple jump after refocused tab
+            if (document.visibilityState === 'hidden') {
+                return false;
+            }
+
+            animateSlide(1);
+        }, 4000);
+    };
+
+    startTimer();
+
+    // Click next or prev.
+    $('.slider-ctrl-button', $formWrapper).rebind('click', function() {
+        if ($(this).hasClass('prev')) {
+            animateSlide(-1);
+        }
+        else if ($(this).hasClass('next')) {
+            animateSlide(1);
+        }
+        startTimer();
+    });
 }
 
 

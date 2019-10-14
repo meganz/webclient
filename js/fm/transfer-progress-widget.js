@@ -553,7 +553,7 @@ mega.tpw = new function TransferProgressWidget() {
             setProgressCircle($downloadHeader, totalD, doneD);
             $downloadHeader.removeClass('hidden');
             if (!dRows.filter('.error').length) {
-                $downloadHeader.removeClass('error');
+                $downloadHeader.removeClass('error overquota');
             }
 
         }
@@ -590,7 +590,7 @@ mega.tpw = new function TransferProgressWidget() {
             setProgressCircle($uploadHeader, totalU, doneU);
             $uploadHeader.removeClass('hidden');
             if (!uRows.filter('.error').length) {
-                $uploadHeader.removeClass('error');
+                $uploadHeader.removeClass('error overquota');
             }
         }
 
@@ -878,8 +878,10 @@ mega.tpw = new function TransferProgressWidget() {
             var $finishedActionsRow = $actionsRow.clone();
             $targetedRow.find('.transfer-complete-actions').remove();
             $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
-            $finishedAction.find('.tooltips').text(l[59]);
-            $finishedActionsRow.append($finishedAction);
+            if (M.getNodeRoot(handle) !== 'shares') {
+                $finishedAction.find('.tooltips').text(l[59]);
+                $finishedActionsRow.append($finishedAction);
+            }
             $finishedAction = $transferActionTemplate.clone(true).addClass('cloud-folder');
             $finishedAction.find('.tooltips').text(l[20695]);
             $finishedActionsRow.append($finishedAction);

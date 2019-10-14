@@ -477,7 +477,9 @@
             // - the user had a textarea, input or select field focused
             // - there is a visible/active dialog
             var skipShowingDialog = !self.showIcon()
-                || $('textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible').length > 0;
+                || $(
+                    'textarea:focus, input:focus, select:focus, .dropdown:visible:first, .fm-dialog:visible:first'
+                ).length > 0;
 
             if (
                 !skipShowingDialog &&

@@ -193,7 +193,12 @@ accountUI.general = {
 
         // Upgrade Account Button
         $('.upgrade-to-pro').rebind('click', function() {
-            loadSubPage('pro');
+            if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+                loadSubPage('repay');
+            }
+            else {
+                loadSubPage('pro');
+            }
         });
     },
 
@@ -1159,8 +1164,16 @@ accountUI.account = {
 
             this.$QRSettings =  $('.qr-settings');
 
-            var cutPlace = location.href.indexOf('/fm/');
-            var myHost = location.href.substr(0, cutPlace) + '/' + account.contactLink;
+            var myHost = '';
+            if (!is_extension) {
+                var cutPlace = location.href.indexOf('/fm/');
+                myHost = location.href.substr(0, cutPlace);
+            }
+            else {
+                myHost = 'https://mega.nz';
+            }
+
+            myHost += '/' + account.contactLink;
             var QRoptions = {
                 width: 106,
                 height: 106,
@@ -2431,7 +2444,7 @@ accountUI.security = {
             var html = '<tr class="' + (currentSession ? "current" : sessionId) + '">'
                 + '<td class="browser-os"><span class="fm-browsers-icon"><img title="'
                 + escapeHTML(userAgent.replace(/\s*megext/i, ''))
-                + '" src="' + staticpath + 'images/browser/' + browser.icon
+                + '" src="' + staticpath + 'images/browser-icons/' + browser.icon
                 + '" /></span><span class="fm-browsers-txt">' + htmlentities(browserName)
                 + '</span></td>'
                 + '<td class="ip-addr">' + ipAddress + '</td>'

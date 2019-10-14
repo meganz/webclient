@@ -135,12 +135,9 @@ MegaData.prototype.delHash = function(n) {
     "use strict";
 
     if (this.h[n.hash]) {
-        var p = this.h[n.hash].indexOf(n.h);
-
-        if (p >= 0) {
-            this.h[n.hash] = this.h[n.hash].substr(0, p) + this.h[n.hash].substr(p + 9);
-
-            if (!this.h[n.hash]) {
+        if (this.h[n.hash][n.h]) {
+            delete this.h[n.hash][n.h];
+            if (!Object.keys(this.h[n.hash]).length) {
                 delete this.h[n.hash];
             }
         }
@@ -743,9 +740,16 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
             if (typeof res === 'number' && res < 0) {
                 loadingDialog.phide();
                 if (promise) {
-                    return promise.reject(res);
+                    promise.reject(res);
                 }
-                return M.ulerror(null, res);
+
+                // If target of copy/move is in-shared folder, -17 may means ESHAREROVERQUOTA
+                if (res === EOVERQUOTA && sharer(ctx.t)) {
+                    return M.ulerror(null, ESHAREROVERQUOTA);
+                }
+                else {
+                    return M.ulerror(null, res);
+                }
             }
 
             if (ctx.del) {
@@ -965,7 +969,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                 }
             }
 
-            removeUInode(h, p);
+            // If user is on out-shares or public-link list page, move should not remove node from the list
+            if (M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links') {
+                removeUInode(h, p);
+            }
             M.nodeUpdated(n);
             newnodes.push(n);
 
@@ -4004,5 +4011,5 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 lazy(MegaData.prototype, 'myChatFilesFolder', function() {
     'use strict';
     return mega.attr.getFolderFactory("cf", false, true, 'h',
-        [l[-'TODO'], 'My chat files'], base64urlencode, base64urldecode);
+        [l[20157], 'My chat files'], base64urlencode, base64urldecode);
 });

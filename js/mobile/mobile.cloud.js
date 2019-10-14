@@ -211,6 +211,7 @@ mobile.cloud = {
 
         // If they choose to Open in Browser, then show the file manager
         $openInBrowserButton.off('tap').on('tap', function(event) {
+            var preSelected = $.selected;
 
             // Prevent default redirect to / path
             event.preventDefault();
@@ -218,6 +219,13 @@ mobile.cloud = {
             // Hide the overlay and render the layout
             $initialFolderView.addClass('hidden');
             mobile.cloud.renderLayout();
+
+            // If there were selected items, restore them and init selected UI.
+            if (Array.isArray(preSelected) && preSelected.length > 0) {
+                $.selected = preSelected;
+                reselect(1);
+                mobile.cloud.scrollToFile($.selected[0]);
+            }
             return false;
         });
 
@@ -391,6 +399,12 @@ mobile.cloud = {
             $nodeTemplate.find('.fm-item-name').text(nodeName);
             $nodeTemplate.attr('data-handle', nodeHandle);
             $nodeTemplate.attr('id', nodeHandle);
+
+            // Add `taken-down` class to nodes that are taken down.
+            var share = M.getNodeShare(node);
+            if (share && share.down) {
+                $nodeTemplate.addClass('taken-down');
+            }
 
             // Update the current output
             output += $nodeTemplate.prop('outerHTML');
@@ -859,4 +873,16 @@ mobile.cloud = {
         });
     },
 
+    /**
+     * Scroll the FM to a certain file row.
+     * @param handle The file handle
+     * @param animationTime Animation time offset (default 500ms).
+     */
+    scrollToFile: function(handle, animationTime) {
+        'use strict';
+        animationTime = animationTime === 0 ? 0 : (animationTime || 500);
+        $('.mobile.fm-scrolling').animate({
+            scrollTop: document.getElementById(handle).offsetTop
+        }, animationTime);
+    }
 };

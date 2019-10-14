@@ -9,6 +9,11 @@ var nicknames = {
     cache: false,
 
     /**
+     * List of nicknames (handle -> nickname) that are in progress of saving (e.g. not yet confirmed by the server)
+     */
+    _dirty: {},
+
+    /**
      * Gets the user's nickname if it's available
      * @param {String} userId The Base64 string of the user handle
      * @returns {String} Returns the display name in format Nickname (FirstName LastName), or (FirstName LastName),
@@ -18,10 +23,11 @@ var nicknames = {
 
         'use strict';
 
-        if (M.u && typeof M.u[userId] !== 'undefined' && M.u[userId].name) {
+        if (M.u && typeof M.u[userId] !== 'undefined') {
+            // M.u[userId].c === 1 is because we only want those to appear for contacts.
 
             // Set format to FirstName LastName (or just FirstName if the last name is not set)
-            var userName = (M.u[userId].name).trim();
+            var userName = (M.u[userId].name || M.u[userId].m).trim();
 
             // Check if a nickname for this contact exists
             if (M.u[userId].nickname !== '') {
@@ -86,16 +92,20 @@ var nicknames = {
                 }
 
                 // Loop through all the properties in M.u
-                Object.keys(M.u).forEach(function(key) {
+                M.u.keys().forEach(function(key) {
 
                     // If an active contact
-                    if (typeof M.u[key] !== 'undefined' && M.u[key].c === 1) {
+                    if (typeof M.u[key] !== 'undefined' && M.u[key].h) {
 
                         // Use if set or use empty string so it will get updated in the UI if they had it set before
                         var newNickname = (typeof contactNicknames[key] !== 'undefined') ? contactNicknames[key] : '';
-
                         // Set the nickname in the UI (will automagically update)
-                        M.u[key].nickname = newNickname;
+                        var oldNickname = M.u[key].nickname;
+                        if (oldNickname !== newNickname) {
+                            M.u[key].nickname = newNickname;
+                            M.avatars([key]);
+                        }
+
                     }
                 });
 
@@ -264,27 +274,42 @@ var nicknames = {
                     // If the nickname previously existed, delete it
                     if (M.u[contactUserHandle].nickname !== '') {
                         M.u[contactUserHandle].nickname = '';
+                        M.avatars([contactUserHandle]);
                         updateApi = true;
                     }
                 }
                 else {
                     // Set the nickname
                     M.u[contactUserHandle].nickname = nickname;
+                    M.avatars([contactUserHandle]);
                     updateApi = true;
                 }
 
                 // If the API should be updated with the new attribute or have it removed
                 if (updateApi) {
+                    nicknames._dirty[contactUserHandle] = M.u[contactUserHandle].nickname;
 
                     // Get all the contacts with nicknames
                     var contactNicknames = self.getNicknamesForAllContacts();
 
                     // If there are nicknames, save them to a private encrypted attribute
+                    var promise;
                     if (Object.keys(contactNicknames).length > 0) {
-                        self.saveNicknamesToApi(contactNicknames);
+                        promise = self.saveNicknamesToApi(contactNicknames);
                     }
                     else {
-                        self.removeNicknamesFromApi();
+                        promise = self.removeNicknamesFromApi();
+                    }
+                    promise.always(function() {
+                        // versioned attributes would proxy their second .get and merge requests and the original
+                        // promise would wait before getting resolve/rejected (so that merge/set had finished
+                        // successfully)
+                        delete nicknames._dirty[contactUserHandle];
+                    });
+
+                    // Update left panel if it has been initialised
+                    if (M.getNodeRoot(M.currentdirid) === 'contacts' && $.sortTreePanel) {
+                        M.contacts();
                     }
                 }
 
@@ -304,10 +329,10 @@ var nicknames = {
             var contactNicknames = {};
 
             // Loop through the keys in M.u
-            Object.keys(M.u).forEach(function(key) {
+            M.u.keys().forEach(function(key) {
 
                 // If an active contact and they have a nickname, add it
-                if (typeof M.u[key] !== 'undefined' && M.u[key].c === 1 && M.u[key].nickname !== '') {
+                if (typeof M.u[key] !== 'undefined' && M.u[key].nickname !== '') {
                     contactNicknames[key] = M.u[key].nickname;
                 }
             });
@@ -318,6 +343,7 @@ var nicknames = {
         /**
          * Save the nicknames object to the API which will be TLV encoded and encrypted
          * @param {Object} contactNicknames An object containing mappings of contact handles to nicknames
+         * @returns {MegaPromise}
          */
         saveNicknamesToApi: function(contactNicknames) {
 
@@ -326,7 +352,7 @@ var nicknames = {
             loadingDialog.show();
 
             // Set the attribute API side to *!>alias
-            mega.attr.set(
+            return mega.attr.set(
                 'alias',            // Attribute name
                 contactNicknames,   // Data to save
                 false,              // Set to private and encrypted
@@ -334,7 +360,7 @@ var nicknames = {
                 false,              // No callback required
                 false,              // No context required
                 undefined,          // Use default AES_GCM_12_16 encryption mode
-                false,              // Do not use versioning
+                true,              // Do not use versioning
                 true                // Set to encode values as UTF-8
             )
             .always(function() {
@@ -344,6 +370,8 @@ var nicknames = {
 
         /**
          * Remove the nicknames object from the API
+         *
+         * @returns {MegaPromise}
          */
         removeNicknamesFromApi: function() {
 
@@ -351,20 +379,21 @@ var nicknames = {
 
             loadingDialog.show();
 
-            // Remove the *!>alias attribute API side
-            mega.attr.remove(
-                'alias',
-                false,      // Private and encrypted
-                true,       // Non-historic
-                true        // Encode values as UTF-8 (required to build *!>alias name properly)
-            )
-            .always(function() {
-
-                // Clean up local attribute
-                delete u_attr['*!>alias'];
-
-                loadingDialog.hide();
-            });
+            // Set the attribute API side to *!>alias
+            return mega.attr.set(
+                'alias',            // Attribute name
+                {},   // Data to save
+                false,              // Set to private and encrypted
+                true,               // Set to non-historic, this won't retain previous values on API server
+                false,              // No callback required
+                false,              // No context required
+                undefined,          // Use default AES_GCM_12_16 encryption mode
+                true,              // Do not use versioning
+                true                // Set to encode values as UTF-8
+                )
+                .always(function() {
+                    loadingDialog.hide();
+                });
         },
 
         /**

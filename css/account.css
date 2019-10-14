@@ -451,7 +451,7 @@ body.ar .sms-verification-number-input {
     padding: 0 0 14px 1px;
 }
 .register-side-pane .account.checkbox-block.small {
-    padding: 24px 0 20px 8px;
+    padding: 0 0 16px 8px;
 }
 .account.checkbox-block.small .radio-txt {
     font-size: 13px;
@@ -605,4 +605,103 @@ body.ar .sms-verification-number-input {
 }
 .dropdown.body.popup.top-login-popup {
     width: 400px;
+}
+
+/* New register page */
+.big-illustration.register, .big-illustration.login {
+    width: 400px;
+    height: 142px;
+    display: inline-block;
+    background-image: url(../images/mega/register-sprite_v2.png);
+    background-repeat: no-repeat;
+}
+.big-illustration.register.shield {
+    background-position: -17px -833px;
+}
+.big-illustration.register.pw-lock {
+    background-position: -17px -994px;
+}
+.big-illustration.register.safe-key, .big-illustration.login.safe-key {
+    background-position: -19px -1172px;
+}
+.register-slide {
+    width: 456px;
+    position: relative;
+}
+.register-slide-block, .login-slide-block {
+    text-align: center;
+    width: 456px;
+    overflow: hidden;
+    position: relative;
+    margin: 48px 0 0;
+}
+.login-slide-block {
+    margin-top: 0;
+}
+.register-slide-block h2, .login-slide-block h2 {
+    font-weight: 300;
+    font-family: 'LatoWebLight','source_sans_proregular', Arial;
+    margin: 32px 0 20px 0;
+    white-space: normal;
+}
+.register-slide-block h2 b, .login-slide-block h2 b  {
+    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+}
+.register-slide-block a, .login-slide-block a {
+    color: #FF333A;
+    font-size: 14px;
+    line-height: 20px;
+    text-decoration: underline;
+}
+.register-slide-wrapper {
+    white-space: nowrap;
+    position: relative;
+    top: 0;
+    width: 456px;
+    transition: left 700ms ease-in-out;
+}
+.register-slide-wrapper[data-slide="1"] {
+    left: 0;
+}
+.register-slide-wrapper[data-slide="2"] {
+    left: -457px;
+}
+.register-slide-wrapper[data-slide="3"] {
+    left: -913px;
+}
+.register-slide .slider-ctrl-button {
+    position: absolute;
+    top: 60%;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    margin: 0;
+    opacity: 0.8;
+    -webkit-transition: all 250ms ease-in-out;
+    -moz-transition: all 250ms ease-in-out;
+    -o-transition: all 250ms ease-in-out;
+    -ms-transition: all 250ms ease-in-out;
+    transition: all 250ms ease-in-out;
+}
+.register-slide:hover .slider-ctrl-button {
+    opacity: 1;
+}
+.register-slide .slider-ctrl-button:hover {
+    opacity: 1;
+    background-color: rgba(255,255,255,0.8);
+    border-radius: 100%;
+}
+.register-slide .slider-ctrl-button.prev {
+    left: -32px;
+}
+.register-slide .slider-ctrl-button.next {
+    right: -32px;
+}
+.register-slide .slider-ctrl-button:before {
+    display: none;
+}
+.register-slide-page {
+    display: inline-block;
+    width: 100%;
+    vertical-align: top;
 }

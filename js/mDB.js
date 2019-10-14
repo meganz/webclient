@@ -63,6 +63,9 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
+    // a flag to know if we have sn set in database. -1 = we don't know, 0 = not set, 1 = is set 
+    this.sn_Set = -1;
+
     // initialise additional channels
     for (var i in this.channelmap) {
         i = this.channelmap[i];
@@ -101,7 +104,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm25_';
+    var dbpfx = 'fm26_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -344,7 +347,7 @@ FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
 };
 
 // enqueue a table write - type 0 == addition, type 1 == deletion
-// IndexedDB activity is triggered once we have at least 1000 pending rows or the sn
+// IndexedDB activity is triggered once we have at least 10240 pending rows or the sn
 // (writing the sn - which is done last - completes the transaction and starts a new one)
 FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
     "use strict";
@@ -393,10 +396,10 @@ FMDB.prototype.enqueue = function fmdb_enqueue(table, row, type) {
 
     // force a flush when a lot of data is pending or the _sn was updated
     // also, force a flush for non-transactional channels (> 0)
-    if (ch || table[0] == '_' || c[c.h].length > 8192) {
-        // if we have the _sn, the next write goes to a fresh transaction
-        if (!ch && table[0] == '_') fmdb.head[ch]++;
-        fmdb.writepending(fmdb.head.length-1);
+     if (ch || table[0] == '_' || c[c.h].length > 10240) {
+        //  the next write goes to a fresh transaction
+         if (!ch) fmdb.head[ch]++;
+         fmdb.writepending(fmdb.head.length - 1);
     }
 };
 
@@ -411,7 +414,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
     }
 
     // iterate all channels to find pending writes
-    if (!this.pending[ch][this.tail[ch]]) return this.writepending(ch-1);
+    if (!this.pending[ch][this.tail[ch]]) {
+        return this.writepending(ch - 1);
+    }
+
+    if (this.tail[ch] >= this.head[ch]) {
+        return;
+    }
 
     var fmdb = this;
 
@@ -420,7 +429,8 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             Object(fmdb.pending[0][fmdb.tail[0]])._sn, fmdb.cantransact);
     }
 
-    if (!ch && fmdb.state < 0 && fmdb.pending[0][fmdb.tail[0]]._sn && fmdb.cantransact) {
+    if (!ch && fmdb.state < 0 && fmdb.cantransact) {
+
         // if the write job is on channel 0 and already complete (has _sn set),
         // we execute it in a single transaction without first clearing sn
         fmdb.state = 1;
@@ -433,10 +443,24 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 }
                 fmdb.commit = false;
                 fmdb.cantransact = 1;
-                dispatchputs();
-            }).then(function(){
+
+                if (fmdb.sn_Set && !fmdb.pending[0][fmdb.tail[0]]._sn && currsn) {
+                    fmdb.db._sn.clear().then(function() {
+                        fmdb.sn_Set = 0;
+                        dispatchputs();
+                    });
+                }
+                else {
+                    dispatchputs();
+                }
+            }).then(function() {
                 // transaction completed: delete written data
                 delete fmdb.pending[0][fmdb.tail[0]++];
+
+                if (d) {
+                    fmdb.logger.log("HEAD = " + fmdb.head[0] + " --- Tail = " + fmdb.tail[0]);
+                }
+
                 fmdb.state = -1;
                 if (d) {
                     fmdb.logger.log("Transaction committed");
@@ -461,6 +485,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             });
     }
     else {
+        if (d) {
+            console.error('channel 1 Block ... invoked');
+        }
         // we do not inject write-through operations into a live transaction
         if (fmdb.state > 0) {
             dispatchputs();
@@ -472,6 +499,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
             if (ch) {
                 // non-transactional channel: go ahead and write
+
                 dispatchputs();
             }
             else {
@@ -480,17 +508,32 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.writing = 2;
                 // we clear the sn (the new sn will be written as the last action in this write job)
                 // unfortunately, the DB will have to be wiped in case anything goes wrong
-                fmdb.db._sn.clear().then(function(){
+                var sendOperation = function() {
                     fmdb.commit = false;
                     fmdb.writing = 3;
+                    
                     dispatchputs();
-                }).catch(function(e){
-                    fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
-                    fmdb.state = -1;
-                    fmdb.invalidate();
+                };
+                if (currsn) {
+                    fmdb.db._sn.clear().then(
+                        function() {
+                            if (d) {
+                                console.error('channel 1 + Sn cleared');
+                            }
+                            fmdb.sn_Set = 0;
+                            sendOperation();
+                        }
+                    ).catch(function(e) {
+                        fmdb.logger.error("SN clearing failed, marking DB as crashed", e);
+                        fmdb.state = -1;
+                        fmdb.invalidate();
 
-                    eventlog(99724, '$wpsn:' + e, true);
-                });
+                        eventlog(99724, '$wpsn:' + e, true);
+                    });
+                }
+                else {
+                    sendOperation();
+                }
 
             }
         }
@@ -527,7 +570,11 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
 
             // if we had a real IndexedDB transaction open, it will commit
             // as soon as the browser main thread goes idle
-            return;
+
+            // I wont return, because this is relying on processing _sn table as the last
+            // table in the current pending operations..
+
+            // return;
         }
 
         var tablesremaining = false;
@@ -564,6 +611,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // request a commit after the operation completes.
                 if (ch || table[0] == '_') {
                     fmdb.commit = true;
+                    fmdb.sn_Set = 1;
                 }
 
                 // record what we are sending...
@@ -575,20 +623,19 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 // ...and send update off to IndexedDB for writing
                 var op = t.t & 1 ? 'bulkDelete' : 'bulkPut';
                 var data = t[t.t++];
-                var limit = 4096;
+                var limit = 16384; // increase the limit of the batch
 
                 if (data.length < limit) {
                     fmdb.db[table][op](data).then(writeend).catch(writeerror);
                 }
                 else {
-                    var idx = 0;
                     (function bulkTick() {
-                        var rows = data.slice(idx, idx += limit);
+                        var rows = data.splice(0, limit);
 
                         if (rows.length) {
                             if (d > 1) {
-                                fmdb.logger.debug('%s for %d rows, %d remaining...',
-                                    op, rows.length, idx > data.length ? 0 : data.length - idx);
+                                fmdb.logger.log('%s for %d rows, %d remaining.....................................',
+                                    op, rows.length, data.length);
                             }
                             fmdb.db[table][op](rows).then(bulkTick).catch(writeerror);
                         }
@@ -1873,8 +1920,8 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             var promise = new MegaPromise();
 
-            if (M.h[hash]) {
-                promise.resolve(M.d[M.h[hash].substr(0, 8)]);
+            if (M.h[hash] && Object.keys(M.h[hash])[0]) {
+                promise.resolve(Object.keys(M.h[hash])[0]);
             }
             else {
                 fmdb.getbykey('f', 'c', false, [['c', hash]], 1)
@@ -1883,11 +1930,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
                         if (node) {
                             // got the hash and a handle it belong to
                             if (!M.h[hash]) {
-                                M.h[hash] = node.h + ' ';
+                                M.h[node.hash] = Object.create(null);
+                                M.h[node.hash][node.h] = true;
                             }
                             else {
-                                if (M.h[hash].indexOf(node.h) < 0) {
-                                    M.h[hash] += node.h + ' ';
+                                if (!M.h[node.hash][node.h]) {
+                                    M.h[node.hash][node.h] = true;
                                 }
                             }
 

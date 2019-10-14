@@ -1199,35 +1199,55 @@ function init_page() {
         }
     }
     else if (page.substr(0, 6) === 'cancel' && page.length > 24) {
-        if (is_mobile) {
-            if (u_type) {
-                mobile.initDOM();
-                mobile.account.cancel.init();
-            }
-            else {
-                login_next = page;
-                loadSubPage('login');
-            }
+
+        // If logged in
+        if (u_type) {
+            var ac = new mega.AccountClosure();
+
+            // Validate code with current logged in session
+            ac.validateCodeWithSession().done(function() {
+                if (is_mobile) {
+                    mobile.initDOM();
+                    mobile.account.cancel.init();
+                }
+                else {
+                    ac.handleFeedback();
+                }
+            })
+            .fail(function(res) {
+
+                // If this is not errored from server but failed verification
+                if (typeof res !== 'number') {
+                    if (is_mobile) {
+                        mobile.initDOM();
+                    }
+                    msgDialog('warninga', l[135], l[22001], false, function () {
+                        loadSubPage('fm');
+                    });
+                }
+            });
         }
         else {
-            // If desktop and logged in
-            if (u_type) {
-                var ac = new mega.AccountClosure();
-                ac.handleFeedback();
+            // Unable to cancel, not logged in
+            if (is_mobile) {
+                mobile.initDOM();
+                login_next = page;
+                msgDialog('warninga', l[6186], l[5841], false, function () {
+                    loadSubPage('login');
+                });
             }
             else {
-                // Unable to cancel, not logged in
                 mega.ui.showLoginRequiredDialog({
                     title: l[6186],
                     textContent: l[5841]
                 })
-                    .done(init_page)
-                    .fail(function (aError) {
-                        if (aError) {
-                            alert(aError);
-                        }
-                        loadSubPage('start');
-                    });
+                .done(init_page)
+                .fail(function (aError) {
+                    if (aError) {
+                        alert(aError);
+                    }
+                    loadSubPage('start');
+                });
             }
         }
     }
@@ -1476,6 +1496,18 @@ function init_page() {
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
+    }
+    else if (page === 'repay') {
+        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            parsepage(pages['repay']);
+            var repayPage = new RepayPage();
+            repayPage.initPage();
+        }
+        else {
+            loadSubPage('start');
+            return;
+        }
+
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -2132,7 +2164,7 @@ function topmenuUI() {
         $topHeader.find('.top-icon.achievements').addClass('hidden');
         $topHeader.find('.create-account-button').removeClass('hidden');
 
-        if (u_type === 0) {
+        if (u_type === 0 && is_fm()) {
             $topHeader.find('.left.individual').addClass('hidden');
         }
 
@@ -2516,7 +2548,7 @@ function topmenuUI() {
     });
 
     // If the main Mega M logo in the header is clicked
-    $('.top-head, .fm-main').find('.logo').rebind('click', function () {
+    $('.top-head, .fm-main, .bar-table').find('.logo').rebind('click', function () {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             if (folderlink) {
                 M.openFolder(M.RootID, true);

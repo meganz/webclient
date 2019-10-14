@@ -6,6 +6,20 @@ import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
 export class ContactsListItem extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'avatar',
+            'presence'
+        ]);
+    }
     render() {
         var classString = "nw-conversations-item";
 
@@ -15,7 +29,7 @@ export class ContactsListItem extends MegaRenderMixin(React.Component) {
             return null;
         }
 
-        classString += " " + this.props.megaChat.userPresenceToCssClass(
+        classString += " " + megaChat.userPresenceToCssClass(
             contact.presence
         );
 
@@ -35,6 +49,18 @@ export class ContactsListItem extends MegaRenderMixin(React.Component) {
 };
 
 export class ContactButton extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname'
+        ]);
+    }
     render() {
         var self = this;
 
@@ -46,7 +72,6 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
         var dropdownPosition = "left top";
         var vertOffset = 0;
         var horizOffset = -30;
-        var megaChat = self.props.megaChat ? self.props.megaChat : window.megaChat;
 
         if (label) {
             classes = "user-card-name " + classes;
@@ -77,15 +102,20 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
                                     loadSubPage('fm/' + contact.u);
                                 }
                     }} />
-                        <div className="dropdown-user-name" onClick={() => {
-                            if (contact.c === 2) {
-                                loadSubPage('fm/account');
-                            }
-                            if (contact.c === 1) {
-                                loadSubPage('fm/' + contact.u);
-                            }}}>
-                        {username}
-                        <ContactPresence className="small" contact={contact} />
+                    <div className="dropdown-user-name" onClick={() => {
+                        if (contact.c === 2) {
+                            loadSubPage('fm/account');
+                        }
+                        if (contact.c === 1) {
+                            loadSubPage('fm/' + contact.u);
+                        }}}>
+                         <div className="name">
+                            {username}
+                            <ContactPresence className="small" contact={contact} />
+                        </div>
+                        <span className="email">
+                            {contact.m}
+                        </span>
                     </div>
                 </div>
             );
@@ -276,26 +306,19 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
 };
 
 export class ContactVerified extends MegaRenderMixin(React.Component) {
-    componentWillMount() {
-        var self = this;
-
-        var contact = this.props.contact;
-        if (contact && contact.addChangeListener) {
-            self._contactListener = contact.addChangeListener(function () {
-                self.safeForceUpdate();
-            });
-        }
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
     }
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        var self = this;
-
-        var contact = this.props.contact;
-        if (contact && self._contactListener) {
-            contact.removeChangeListener(self._contactListener);
-        }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'fingerprint',
+        ]);
     }
     render() {
+        if (anonymouschat) {
+            return null;
+        }
         var self = this;
 
         var contact = this.props.contact;
@@ -316,12 +339,14 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
         else {
             var self = this;
 
-            crypt.getPubEd25519(contact.u)
+            !pubEd25519[contact.u] && crypt.getPubEd25519(contact.u)
                 .done(function() {
-                    if(self.isMounted()) {
-                        self.safeForceUpdate();
-                    }
-                })
+                    onIdle(function() {
+                        if (pubEd25519[contact.u] && self.isMounted()) {
+                            self.safeForceUpdate();
+                        }
+                    });
+                });
         }
 
 
@@ -330,20 +355,46 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
 };
 
 export class ContactPresence extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'avatar'
+        ]);
+    }
     render() {
-        var self = this;
         var contact = this.props.contact;
+        var className = this.props.className || '';
+
         if (!contact || !contact.c) {
             return null;
         }
 
-        var pres = (this.props.megaChat ? this.props.megaChat : megaChat).userPresenceToCssClass(contact.presence);
+        const pres = megaChat.userPresenceToCssClass(contact.presence);
 
-        return <div className={"user-card-presence " + pres + " " + this.props.className}></div>;
+        return (
+            <div className={`user-card-presence ${pres} ${className}`}>
+            </div>
+        );
     }
 };
 
 export class ContactFingerprint extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'fingerprint'
+        ]);
+    }
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -403,6 +454,19 @@ export class ContactFingerprint extends MegaRenderMixin(React.Component) {
 var _noAvatars = {};
 
 export class Avatar extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'avatar'
+        ]);
+    }
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -490,7 +554,20 @@ export class Avatar extends MegaRenderMixin(React.Component) {
 export class ContactCard extends MegaRenderMixin(React.Component) {
     static defaultProps = {
         'dropdownButtonClasses': "default-white-button tiny-button",
-        'dropdownIconClasses': "tiny-icon icons-sprite grey-dots"
+        'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
+        'presenceClassName': '',
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'presence',
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'avatar'
+        ]);
     }
     specificShouldComponentUpdate(nextProps, nextState) {
         var self = this;
@@ -542,8 +619,7 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
             return null;
         }
 
-        var pres =
-            (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
+        var pres = megaChat.userPresenceToCssClass(contact.presence);
         var avatarMeta = generateAvatarMeta(contact.u);
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
 
@@ -645,7 +721,6 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
                              contact={contact}
                              className={self.props.dropdownButtonClasses}
                              dropdownRemoveButton={dropdownRemoveButton}
-                             megaChat={self.props.megaChat ? this.props.megaChat : window.megaChat}
                         />
                 }
                 {selectionTick}
@@ -655,6 +730,19 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
 };
 
 export class ContactItem extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true,
+        'skipQueuedUpdatesOnResize': true
+    }
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'avatar'
+        ]);
+    }
     render() {
         var classString = "nw-conversations-item";
         var self = this;
@@ -784,7 +872,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
             return false;
         }
 
-        var pres = self.props.megaChat.getPresence(
+        var pres = megaChat.getPresence(
             v.u
         );
 
@@ -901,7 +989,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
 
         if (self.props.readOnly) {
             (self.state.selected || []).forEach(function (v, k) {
-                contactsSelected.push(<ContactItem contact={self.props.contacts[v]} key={v} />);
+                contactsSelected.push(<ContactItem contact={M.u[v]} key={v} />);
             });
         }
         else if (self.props.multiple) {
@@ -978,7 +1066,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
 
                 onContactSelectDoneCb = onContactSelectDoneCb.bind(self);
                 (self.state.selected || []).forEach(function (v, k) {
-                    contactsSelected.push(<ContactItem contact={self.props.contacts[v]}
+                    contactsSelected.push(<ContactItem contact={M.u[v]}
                                                        onClick={onContactSelectDoneCb}
                                                        key={v}
                     />);

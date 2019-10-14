@@ -101,6 +101,7 @@ UFSSizeCache.prototype.save = function(rootNode) {
                     this.addToDB(n);
                 }
             }
+            this.cache[h] = null;
         }
     }
 

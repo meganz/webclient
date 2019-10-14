@@ -23,6 +23,7 @@ mobile.notFoundOverlay = {
         else if (pfid) {
             $errorText.text(l[16346]);
             $image.attr('src', mobile.imagePath + 'folder.png');
+            folderlink = 1; // Trigger FM load home.
         }
         else {
             // Otherwise show "The file you are trying to download is no longer available."

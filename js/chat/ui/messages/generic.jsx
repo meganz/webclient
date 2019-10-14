@@ -31,7 +31,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
     }
     componentDidUpdate(oldProps, oldState) {
         var self = this;
-        if (self.isBeingEdited() && self.isMounted()) {
+        var isBeingEdited = self.isBeingEdited();
+        var isMounted = self.isMounted();
+        if (isBeingEdited && isMounted) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
             if ($textarea.length > 0 && !$textarea.is(":focus")) {
@@ -44,7 +46,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 }
             }
         }
-        else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
+        else if (isMounted && !isBeingEdited && oldState.editing === true) {
             if (self.props.onUpdate) {
                 self.props.onUpdate();
             }
@@ -300,6 +302,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             ephemeralDialog(l[1005]);
         }
         else {
+            $.selected = [h];
             mega.Share.initCopyrightsDialog([h]);
         }
         if (e) {
@@ -789,13 +792,18 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactPresence className="small" contact={contact} />
-                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
-                                            {M.getNameByHandle(contact.u)}
+                                             <div className="name">
+                                                 {M.getNameByHandle(contact.u)}
+                                                 <ContactPresence className="small" contact={contact} />
+                                            </div>
+                                            <div className="email">
+                                                 {M.u[contact.u].m}
+                                            </div>
                                         </div>
                                     </div>
-                                    <ContactFingerprint contact={contact} />
+                                    <ContactFingerprint contact={M.u[contact.u]} />
 
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
@@ -837,10 +845,15 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <ContactPresence className="small" contact={contact} />
-                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
-                                            {M.getNameByHandle(contact.u)}
+                                             <div className="name">
+                                                 {M.getNameByHandle(contact.u)}
+                                                 <ContactPresence className="small" contact={contact} />
+                                            </div>
+                                            <div className="email">
+                                                 {M.u[contact.u].m}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -890,7 +903,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactVerified className="right-align" contact={contact} /> :
+                                            <ContactVerified className="right-align" contact={M.u[contact.u]} /> :
                                             null
                                     }
 
@@ -900,11 +913,11 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactPresence className="small" contact={contact} /> :
+                                                <ContactPresence className="small" contact={M.u[contact.u]} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -1480,24 +1493,17 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     message.type === "call-started" &&
                     message.messageId === "call-started-" + chatRoom.getActiveCallMessageId()
                 ) {
-                    var callParts = Object.keys(chatRoom.callParticipants);
-                    var unique = {};
-                    callParts.forEach(function(handleAndSid) {
-                        var handle = base64urlencode(handleAndSid.substr(0, 8));
-                        if (!unique[handle]) {
-                            avatarsListing.push(
-                                <Avatar
-                                    key={handle}
-                                    contact={M.u[handle]}
-                                    simpletip={M.u[handle] && M.u[handle].name}
-                                    className="message avatar-wrapper small-rounded-avatar"
-                                />
-                            );
-                        }
-
-                        unique[handle] = 1;
-                    })
-
+                    var unique = chatRoom.uniqueCallParts ? Object.keys(chatRoom.uniqueCallParts) : [];
+                    unique.forEach(function(handle) {
+                        avatarsListing.push(
+                            <Avatar
+                                key={handle}
+                                contact={M.u[handle]}
+                                simpletip={M.u[handle] && M.u[handle].name}
+                                className="message avatar-wrapper small-rounded-avatar"
+                            />
+                        );
+                    });
                 }
             }
 

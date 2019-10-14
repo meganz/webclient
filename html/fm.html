@@ -124,8 +124,16 @@
         <hr />
     </div>
     <div class="dropdown-contact-details">
-        <div class="dropdown-avatar hidden"></div>
-        <div class="dropdown-user-name hidden"><span></span><div class="nw-contact-status"></div></div>
+        <div class="dropdown-avatar rounded hidden">
+            <div class="avatar"></div>
+            <div class="dropdown-user-name hidden">
+                <div class="name">
+                    <span></span>
+                    <div class="nw-contact-status"></div>
+                </div>
+                <div class="email"></div>
+            </div>
+        </div>
         <a class="dropdown-item view-profile-item"><i class="small-icon human-profile"></i>[$8866]</a>
         <div class="dropdown-fingerprint">
             <div class="contact-fingerprint-title">
@@ -716,6 +724,10 @@
                             <div class="settings-menu-arrow"></div>
                             [$862]
                         </div>
+                        <div class="sub-title-container slide-item">
+                            <div class="sub-title" data-scrollto="account-notification">[$20900]</div>
+                            <div class="sub-title" data-scrollto="email-notification">[$20898]</div>
+                        </div>
                     </div>
                     <div class="fm-account-button slide-in-out ts-500 closed security">
                         <div class="head-title">
@@ -949,7 +961,6 @@
                         <i class="small-icon icons-sprite small-cross"></i>
                     </div>
                 </div>
-                
                 <div class="fm-breadcrumbs-wrapper">
                     <div class="fm-breadcrumbs-block"></div>
                 </div>
@@ -1204,6 +1215,11 @@
                         </tr>
                     </table>
                 </div>
+                <!-- Selection-status notification -->
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col"></span>
+                </div>
+                <!-- END of Selection-status notification -->
                 <div class="search-bottom-wrapper">
                     <div class="search-bottom-menu"></div>
                 </div>
@@ -1213,6 +1229,9 @@
             <div class="fm-blocks-view fm hidden">
                 <div class="file-block-scrolling"></div>
                 <div class="blocks-view-data"></div>
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col"></span>
+                </div>
                 <div class="search-bottom-wrapper">
                     <div class="search-bottom-menu"></div>
                 </div>
@@ -2008,12 +2027,20 @@
                 <div class="grid-scrolling-table">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me"></table>
                 </div>
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col">
+                        <span class="selection-bar-col"></span>
+                    </span>
+                </div>
             </div>
 
             <div class="shared-blocks-view hidden">
                 <div class="shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col"></span>
+                </div>
             </div>
 
             <div class="out-shared-grid-view hidden">
@@ -2041,12 +2068,18 @@
                 <div class="grid-scrolling-table">
                     <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table out-shares"></table>
                 </div>
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col"></span>
+                </div>
             </div>
 
             <div class="out-shared-blocks-view hidden">
                 <div class="out-shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
+                <div class="selection-status-bar">
+                    <span class="selection-bar-col"></span>
+                </div>
             </div>
 
 
@@ -2716,6 +2749,15 @@
                     <div class="account data-block email-notification">
                         <div class="settings-left-block">
                             <div class="title-txt">[$20898]</div>
+                            <div class="data-block-info-text content-txt">[$20982]</div>
+                            <div class="green-notification body with-btn">
+                                <div class="green-notification">
+                                    <i class="icons-sprite fvnotice"></i>
+                                </div>
+                                <div class="green-notification cell text-cell">
+                                    <div class="versioning-body-text">[$20983]</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section border">
@@ -2764,12 +2806,20 @@
                                 <div class="subtitle-txt">[$20893]</div>
                                 <div class="settings-sub-section border">
                                     <div class="content-txt">
-                                        [$20894]
+                                        [$21956]
                                     </div>
                                     <div class="dialog-feature-toggle toggle-on" id="enotif-quota" name="quota">
                                         <div class="dialog-feature-switch no-trans-init"></div>
                                     </div>
                                     <div class="clear"></div>
+                                    <div class="green-notification body with-btn">
+                                        <div class="green-notification">
+                                            <i class="icons-sprite fvnotice"></i>
+                                        </div>
+                                        <div class="green-notification cell text-cell">
+                                            <div class="versioning-body-text">[$20894]</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="switch-container">
@@ -2840,7 +2890,7 @@
                                 [$19201] [$7747]
                             </div>
                             <div class="settings-sub-section button-container slide-in-out closed">
-                                <div class="default-green-button right change-email-button slide-item">[$19631]</div>
+                                <div class="default-green-button right change-email-button slide-item">[$7743]</div>
                                 <div class="clear"></div>
                             </div>
                         </div>
@@ -2932,7 +2982,7 @@
                                         <i class="icons-sprite fvnotice"></i>
                                     </div>
                                     <div class="green-notification cell text-cell">
-                                        <div class="versioning-body-text"></div>
+                                        <div class="versioning-body-text versioning-info-message"></div>
                                     </div>
                                 </div>
                                 <div class="content-txt">[$17600]</div>
@@ -3844,7 +3894,7 @@
                                 <div class="account data-item">
                                     <div class="account data-td">
                                         <i class="semi-small-icon rubbish"></i>
-                                        <span>[$168]</span>
+                                        <span class="rubbish-bin-dashboard pointer-c">[$168]</span>
                                     </div>
                                     <div class="account data-td">
                                         0 files

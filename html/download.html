@@ -1,10 +1,11 @@
 <div class="bottom-page scroll-block startpage download light-grey-top">
     <div class="bottom-page content">
 
-        <div class="download top-bar">
+        <div class="download top-bar initial">
             ((TOP))
             <div class="download bar-table">
                 <div class="download bar-cell">
+                    <a class="logo"></a>
                     <span class="transfer-filetype-icon"></span>
                     <div class="download bar-fileinfo">
                         <span class="download bar-filename"></span>
@@ -42,15 +43,15 @@
                             <span class="dark-numbers"></span>
                             <span class="light-txt small"></span>
                         </span>
-                         <a class="default-white-button small grey-txt pause-transfer inline">
+                         <a class="button default-white-button small grey-txt pause-transfer inline">
                             <i class="semi-small-icon icons-sprite pause"></i>
                             <span>[$9112]</span>
                         </a>
-                        <a class="default-white-button small grey-txt open-in-folder inline hidden">
+                        <a class="button default-white-button small grey-txt open-in-folder inline hidden">
                             <i class="semi-small-icon icons-sprite folder-with-loupe"></i>
                             <span>[$20695]</span>
                         </a>
-                        <a class="default-white-button small grey-txt retry-transfer inline hidden">
+                        <a class="button default-white-button small grey-txt retry-transfer inline hidden">
                             <i class="semi-small-icon icons-sprite grey-down-arrow"></i>
                             <span>[$1364]</span>
                         </a>
@@ -58,34 +59,34 @@
                 </div>
                 <div class="download bar-cell right-txt-align">
                     <div class="download bar-buttons">
-                        <div class="download mid-button to-clouddrive transition">
+                        <div class="button download mid-button to-clouddrive transition">
                             [$8752]
                         </div>
-                        <div class="download download-file mid-button green transition">
+                        <div class="button download download-file mid-button green transition">
                             <i class="semi-small-icon icons-sprite download"></i>
                             <span>[$58]</span>
                         </div>
                     </div>
                     <div class="download top-transfer-buttons">
-                        <a class="default-white-button small grey-txt button share-content-button inline hidden">
+                        <a class="button default-white-button small grey-txt button share-content-button inline hidden">
                             <i class="semi-small-icon icons-sprite linked"></i>
                             <span>[$1344]</span>
                         </a>
-                        <a class="default-white-button small grey-txt button see-our-plans inline hidden">
+                        <a class="button default-white-button small grey-txt button see-our-plans inline hidden">
                             <span>[$16353]</span>
                         </a>
-                       <a class="default-green-button small grey-txt button create-account-button inline hidden">
+                       <a class="button default-green-button small grey-txt button create-account-button inline hidden">
                             <span>[$16352]</span>
                         </a>
-                        <a class="default-white-button small grey-txt button get-more-bonuses inline hidden">
+                        <a class="button default-white-button small grey-txt button get-more-bonuses inline hidden">
                             <span>[$16309]</span>
                         </a>
                     </div>
-                    <a class="top-expand-button transition">
+                    <a class="button top-expand-button transition">
                         <i class="small-icon icons-sprite arrows-to-bottom"></i>
                         <div class="dark-tooltip top">[$20172]</div>
                     </a>
-                    <a class="main-top top-icon menu">
+                    <a class="button main-top top-icon menu">
                         <div class="dark-tooltip top">[$169]</div>
                     </a>
                 </div>
@@ -358,10 +359,10 @@
 
                             </div>
                         <div class="top-expand-wrap">
-                            <a class="top-expand-button transition active">
+                            <a class="button top-expand-button transition active">
                                 <i class="small-icon icons-sprite arrows-to-top"></i>
                             </a>
-                            <div class="top-expand-txt transition active">
+                            <div class="button top-expand-txt transition active">
                                 [$20762]
                             </div>
                         </div>
@@ -374,13 +375,13 @@
                 <i class="download big-icon"></i>
                 <!-- Please Change text according browser !-->
                 <div class="table-cell">
-                    <div  class="fm-dialog-close medium"></div>
                     <span class="txt">[$16866]</span>
-                    <a class="default-white-button right">
+                </div>
+                <div class="table-cell">
+                    <div  class="fm-dialog-close medium"></div>
+                    <a class="default-white-button inline">
                         [$20697]
                     </a>
-                    <a class="clickurl underlined right" href="/sync">[$8512]</a>
-                    <div class="clear"></div>
                 </div>
             </div>
             ((PAGESMENU))
@@ -442,11 +443,18 @@
                         <input type="password" name="pane-register-password2" id="pane-register-password2" placeholder="[$1114]" />
                     </div>
                     <div class="account checkbox-block register small">
+                        <div class="understand-check checkboxOff checkbox">
+                            <input class="checkboxOff" type="checkbox" checked="">
+                        </div>
+                        <label class="radio-txt">[$20975.b]</label>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="account checkbox-block register small">
                         <div class="register-check checkboxOff checkbox">
                             <input class="checkboxOff" type="checkbox" name="pane-terms" id="pane-terms" checked="">
                         </div>
-
-                        <label class="radio-txt">[$208]</label>
+                        <label class="radio-txt">[$208.g]</label>
                         <div class="clear"></div>
                     </div>
                     <div class="default-big-button green outer-shadow button right" tabindex="0">

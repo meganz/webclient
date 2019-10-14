@@ -131,6 +131,13 @@ var tooltiplogin = {
             return false;
         }
 
+        if (is_extension) {
+            $('.extension-advise', $dialog).addClass('hidden');
+        }
+        else {
+            $('.extension-advise', $dialog).removeClass('hidden');
+        }
+
         $dialog.find('form').replaceWith(getTemplate('top-login'));
 
         $inputs = $('.account.input-wrapper input',  $dialog);
@@ -313,8 +320,14 @@ var tooltiplogin = {
             return false;
         }
 
+
+        // close two-factor dialog if it was opened
+        if (twofactor && twofactor.loginDialog) {
+            twofactor.loginDialog.closeDialog();
+        }
+
         // If successful result
-        else if (result !== false && result >= 0) {
+        if (result !== false && result >= 0) {
             passwordManager('#form_login_header');
             u_type = result;
 

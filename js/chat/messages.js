@@ -906,58 +906,35 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         chatRoom.trigger('onHistoryDecryptedDone');
     });
 
-    self.chatd.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.setLastSeen(eventData.messageId, eventData.chatd);
-            self.trackDataChange();
-        }
+    chatRoom.rebind('onMessageLastSeen.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.setLastSeen(eventData.messageId, eventData.chatd);
+        self.trackDataChange();
     });
-    self.chatd.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
 
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
+    chatRoom.rebind('onMembersUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
 
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            if ((eventData.userId === u_handle)
-                    || (chatRoom.type === "public"))  {
-                self.joined = true;
-                if (chatRoom.state === ChatRoom.STATE.JOINING) {
-                    chatRoom.setState(ChatRoom.STATE.READY);
-                }
+        if ((eventData.userId === u_handle)
+                || (chatRoom.type === "public"))  {
+            self.joined = true;
+            if (chatRoom.state === ChatRoom.STATE.JOINING) {
+                chatRoom.setState(ChatRoom.STATE.READY);
             }
         }
     });
 
-    self.chatd.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.lastSent = eventData.messageId;
-            self.trackDataChange();
-        }
+    self.chatRoom.rebind('onMessageConfirm.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.lastSent = eventData.messageId;
+        self.trackDataChange();
     });
 
-    self.chatd.rebind('onMessageLastReceived.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
-            self.setLastReceived(eventData.messageId);
-        }
+    self.chatRoom.rebind('onMessageLastReceived.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.setLastReceived(eventData.messageId);
     });
 
-    self.chatd.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+    self.chatRoom.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
 
-        var validSameRoom = chatRoom && chatRoom.roomId === self.chatRoom.roomId;
         var requestedMessagesCount;
         if (self.isRetrievingSharedFiles) {
             requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
@@ -991,7 +968,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 self.$sharedFilesLoading.resolve();
             }
         }
-        else if (validSameRoom) {
+        else {
             requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
             self.isRetrievingHistory = false;
             self.chatdIsProcessingHistory = false;
@@ -1042,158 +1019,122 @@ var MessagesBuff = function(chatRoom, chatdInt) {
     });
 
 
-    self.chatd.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
+    self.chatRoom.rebind('onMessagesHistoryRequest.messagesBuff' + chatRoomId, function(e, eventData) {
+        if (!eventData.isRetrievingSharedFiles) {
+            self.isRetrievingHistory = true;
+        }
+        else {
+            self.isRetrievingSharedFiles = true;
+        }
+        self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
+        self.trackDataChange();
+    });
 
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        if (!chatRoom) {
-            self.logger.warn("Chat room not found for onMessagesHistoryRequest, called with eventData:", eventData);
+    self.chatRoom.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.haveMessages = true;
+        self.trackDataChange();
+        self.retrieveChatHistory(true);
+    });
+
+    self.chatRoom.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
+        self.haveMessages = true;
+
+        var msgObject = new Message(
+            chatRoom,
+            self,
+            {
+                'messageId': eventData.messageId,
+                'userId': eventData.userId,
+                'keyid': eventData.keyid,
+                'message': eventData.message,
+                'delay': eventData.ts,
+                'orderValue': eventData.id,
+                'updated': eventData.updated,
+                'sent': (eventData.userId === u_handle) ? Message.STATE.SENT : Message.STATE.NOT_SENT
+            }
+        );
+
+        if (!self.isRetrievingSharedFiles) {
+            if (eventData.messageId === self.lastSeen) {
+                self.lastSeenMessageRetrieved = true;
+            }
+            if (eventData.messageId === self.lastDelivered) {
+                self.lastDeliveredMessageRetrieved = true;
+            }
         }
 
-        if (chatRoom && chatRoom.roomId === self.chatRoom.roomId) {
-            if (!eventData.isRetrievingSharedFiles) {
-                self.isRetrievingHistory = true;
+
+        if (!eventData.isNew) {
+            if (typeof self.expectedMessagesCount !== 'undefined') {
+                self.expectedMessagesCount--;
+            }
+
+            if (!self.isRetrievingSharedFiles) {
+                if (eventData.userId !== u_handle) {
+                    if (self.lastDeliveredMessageRetrieved === true) {
+                        // received a message from history, which was NOT marked as received, e.g. was sent during
+                        // this user was offline, so -> do proceed and mark it as received automatically
+                        self.setLastReceived(eventData.messageId);
+
+                    }
+                }
+                self.messagesBatchFromHistory.push(msgObject);
             }
             else {
-                self.isRetrievingSharedFiles = true;
+                // is a shared file entry
+                self.sharedFilesBatchFromHistory.push(msgObject);
             }
-            self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
-            self.trackDataChange();
+        }
+        else {
+            if (eventData.pendingid) {
+                var foundMessage = self.getByInternalId(eventData.pendingid);
+
+                // its ok if foundMessage is empty, e.g. it can be sent from another client
+                if (foundMessage && foundMessage.textContents) {
+                    msgObject.textContents = foundMessage.textContents;
+                }
+
+                msgObject.pendingMessageId = foundMessage.messageId;
+
+                [
+                    'meta',
+                    'metaType',
+                    'pendingMessageId'
+                ].forEach(function(k) {
+                    if (foundMessage[k]) {
+                        msgObject[k] = foundMessage[k];
+                    }
+                });
+            }
+
+            self.messagesBatchFromHistory.push(msgObject);
+
+            // if not from history
+            // mark as received if not sent by me
+            if (eventData.userId !== u_handle) {
+                self.setLastReceived(eventData.messageId);
+            }
+
+            if (!self.isRetrievingHistory) {
+                $(self).trigger('onNewMessageReceived', msgObject);
+            }
+
+            if (eventData.pendingid) {
+                $(chatRoom).trigger('onPendingMessageConfirmed', msgObject);
+            }
         }
     });
 
-    self.chatd.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+    self.chatRoom.rebind('onMessageCheck.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.haveMessages = true;
 
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.haveMessages = true;
-            self.trackDataChange();
+        if (!self.messages[eventData.messageId]) {
             self.retrieveChatHistory(true);
         }
     });
 
-    self.chatd.rebind('onMessageStore.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-
-        var validSameRoom = chatRoom && chatRoom.roomId === self.chatRoom.roomId;
-        if (validSameRoom) {
-            self.haveMessages = true;
-
-            var msgObject = new Message(
-                chatRoom,
-                self,
-                {
-                    'messageId': eventData.messageId,
-                    'userId': eventData.userId,
-                    'keyid': eventData.keyid,
-                    'message': eventData.message,
-                    'delay': eventData.ts,
-                    'orderValue': eventData.id,
-                    'updated': eventData.updated,
-                    'sent': (eventData.userId === u_handle) ? Message.STATE.SENT : Message.STATE.NOT_SENT
-                }
-            );
-
-            if (!self.isRetrievingSharedFiles) {
-                if (eventData.messageId === self.lastSeen) {
-                    self.lastSeenMessageRetrieved = true;
-                }
-                if (eventData.messageId === self.lastDelivered) {
-                    self.lastDeliveredMessageRetrieved = true;
-                }
-            }
-
-
-            if (!eventData.isNew) {
-                if (typeof self.expectedMessagesCount !== 'undefined') {
-                    self.expectedMessagesCount--;
-                }
-
-                if (!self.isRetrievingSharedFiles) {
-                    if (eventData.userId !== u_handle) {
-                        if (self.lastDeliveredMessageRetrieved === true) {
-                            // received a message from history, which was NOT marked as received, e.g. was sent during
-                            // this user was offline, so -> do proceed and mark it as received automatically
-                            self.setLastReceived(eventData.messageId);
-
-                        }
-                    }
-                    self.messagesBatchFromHistory.push(msgObject);
-                }
-                else {
-                    // is a shared file entry
-                    self.sharedFilesBatchFromHistory.push(msgObject);
-                }
-            }
-            else {
-                if (eventData.pendingid) {
-                    var foundMessage = self.getByInternalId(eventData.pendingid);
-
-                    // its ok if foundMessage is empty, e.g. it can be sent from another client
-                    if (foundMessage && foundMessage.textContents) {
-                        msgObject.textContents = foundMessage.textContents;
-                    }
-
-                    msgObject.pendingMessageId = foundMessage.messageId;
-
-                    [
-                        'meta',
-                        'metaType',
-                        'pendingMessageId'
-                    ].forEach(function(k) {
-                        if (foundMessage[k]) {
-                            msgObject[k] = foundMessage[k];
-                        }
-                    });
-                }
-
-                self.messagesBatchFromHistory.push(msgObject);
-
-                // if not from history
-                // mark as received if not sent by me
-                if (eventData.userId !== u_handle) {
-                    self.setLastReceived(eventData.messageId);
-                }
-
-                if (!self.isRetrievingHistory) {
-                    $(self).trigger('onNewMessageReceived', msgObject);
-                }
-
-                if (eventData.pendingid) {
-                    $(chatRoom).trigger('onPendingMessageConfirmed', msgObject);
-                }
-            }
-        }
-    });
-
-    self.chatd.rebind('onMessageCheck.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (!chatRoom) {
-            self.logger.warn("Message not found for: ", e, eventData);
-            return;
-        }
-
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.haveMessages = true;
-
-            if (!self.messages[eventData.messageId]) {
-                self.retrieveChatHistory(true);
-            }
-        }
-    });
-
-    self.chatd.rebind('onMessageUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-
-        if (self.chatRoom.chatId !== chatRoom.chatId) {
-            return; // ignore event
-        }
-        self.logger.debug(eventData.id, eventData.state, eventData);
+    self.chatRoom.rebind('onMessageUpdated.messagesBuff' + chatRoomId, function(e, eventData) {
         // convert id to unsigned.
         eventData.id = (eventData.id>>>0);
 
@@ -1545,28 +1486,22 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         // pending would be handled automatically, because all NEW messages are set with state === NOT_SENT(== PENDING)
     });
 
-    self.chatd.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+    self.chatRoom.rebind('onMessagesKeyIdDone.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
         if (!chatRoom.protocolHandler) {
             ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
                 chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
-
-                if (chatRoom.roomId === self.chatRoom.roomId) {
-                    self.trackDataChange();
-                }
+                self.trackDataChange();
             });
         }
         else {
             chatRoom.protocolHandler.setKeyID(eventData.keyxid, eventData.keyid);
-
-            if (chatRoom.roomId === self.chatRoom.roomId) {
-                self.trackDataChange();
-            }
+            self.trackDataChange();
         }
     });
 
-    self.chatd.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+    self.chatRoom.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
         var keys = eventData.keys;
         if (!chatRoom.notDecryptedKeys) {
             chatRoom.notDecryptedKeys = {};
@@ -1593,22 +1528,16 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
         });
 
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.trackDataChange();
-        }
+        self.trackDataChange();
     });
 
-    self.chatd.rebind('onMessageIncludeKey.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
-        chatRoom.protocolHandler.setIncludeKey(true);
-
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.trackDataChange();
-        }
+    self.chatRoom.rebind('onMessageIncludeKey.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.chatRoom.protocolHandler.setIncludeKey(true);
+        self.trackDataChange();
     });
 
-    self.chatd.rebind('onMessageKeyRestore.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatdInt._getChatRoomFromEventData(eventData);
+    self.chatRoom.rebind('onMessageKeyRestore.messagesBuff' + chatRoomId, function(e, eventData) {
+        var chatRoom = self.chatRoom;
         var keyxid = eventData.keyid || eventData.keyxid;
         var keys = eventData.keys;
 
@@ -1624,9 +1553,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         };
         ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
 
-        if (chatRoom.roomId === self.chatRoom.roomId) {
-            self.trackDataChange();
-        }
+        self.trackDataChange();
     });
 
     self.addChangeListener(function() {
@@ -1656,6 +1583,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
         });
         if (self._unreadCountCache !== newCounter) {
             self._unreadCountCache = newCounter;
+            self.chatRoom.trigger('onUnreadCountUpdate', newCounter);
             self.chatRoom.megaChat.updateSectionUnreadCount();
         }
     });
@@ -1977,7 +1905,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     var timeoutPromise = createTimeoutPromise(function() {
         return self.$msgsHistoryLoading.state() !== 'pending';
-    }, 75, 10000)
+    }, 500, 10000)
         .always(function() {
             self.chatdIsProcessingHistory = false;
         })

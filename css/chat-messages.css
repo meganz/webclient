@@ -304,6 +304,14 @@
 .message.shared-block {
     position: relative;
 }
+.message.shared-block .data-block-view,
+.message.shared-block .data-block-view .avatar-wrapper {
+    cursor: pointer;
+}
+.message.shared-block.contact-link {
+    padding: 2px 10px;
+    cursor: pointer;
+}
 .message.shared-info {
     white-space: nowrap;
     padding: 17px 0 4px 0;
@@ -798,7 +806,7 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
-  
+
 .message .audio-player .audio-player__play-btn {
     width: 0;
     height: 0;
@@ -936,7 +944,7 @@
 }
 
 .geolocation-icon {
-    background: url('../images/mega/icons-sprite_v30.png') no-repeat -121px -1960px;
+    background: url('../images/mega/icons-sprite_v31.png') no-repeat -121px -1960px;
     width: 10px;
     height: 15px;
     display: inline-block;

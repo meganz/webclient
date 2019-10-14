@@ -575,8 +575,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l['208a'] = l['208a'].replace('[/A]', '</a>');
     l['208s'] = l[208].replace('[A]', '<span class="red">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
-    l['208g'] = l[208].replace('[A]', '<a class="green">');
-    l['208g'] = l['208g'].replace('[/A]', '</a>');
+    l['208.g'] = l[208].replace('[A]', '<a class="green txt-bold">').replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
@@ -691,8 +690,8 @@ mBroadcaster.once('startMega', function populate_l() {
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
-    l[12485] = l[12485].replace('[A1]', '<a href="" class="red mac">').replace('[/A1]', '</a>');
-    l[12485] = l[12485].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
+    l[12485] = l[12485].replace('[A1]', '<a href="" class="red a1 mac">').replace('[/A1]', '</a>');
+    l[12485] = l[12485].replace('[A2]', '<a href="" class="red a2 linux">').replace('[/A2]', '</a>');
     l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
     l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
     l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
@@ -745,7 +744,7 @@ mBroadcaster.once('startMega', function populate_l() {
         .replace('[/B]', '</a>');
     l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
+        .replace('[A]', '<a class="red" href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
 
     l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
@@ -891,13 +890,34 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
+    l[20922] = escapeHTML(l[20922]).replace(/\[R\/\]/g, '<sup>&reg;</sup>');
+    l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
+    l['20923c'] = l[20923].replace('%1', 'Chrome');
+    l['20923f'] = l[20923].replace('%1', 'Firefox');
+    l['20923o'] = l[20923].replace('%1', 'Opera');
+    l['20923t'] = l[20923].replace('%1', 'Thunderbird');
+    l[20924] = escapeHTML(l[20924]);
+    l['20924c'] = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
+    l['20924f'] = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
+    l['20924o'] = l[20924].replace('%1', 'Opera<sup>&reg;</sup>');
+    l[20932] = l[20932].replace('[R/]', '<sup>&reg;</sup>');
+    l[20959] = l[20959] .replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
+        + 'target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
+    l['20975.b'] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="/security" class="green txt-bold" target="_blank">').replace('[/A]', '</a>');
+    l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="/security" class="red txt-bold" target="_blank">').replace('[/A]', '</a>');
+    l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
+    l[22094] = l[22094].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
+    l[22095] = l[22095].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
-        19814, 19854, 19821, 19930, 20402, 20462
+        19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973
     ];
     for (i = common.length; i--;) {
         var num = common[i];

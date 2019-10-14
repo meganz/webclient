@@ -144,6 +144,11 @@
                         .off('click').on('click', function fixMeClickHandler() {
                             fileconflict.resolveExistedDuplication(dups, myId);
                         });
+                    $('.duplicated-items-found').find('.fix-me-close')
+                        .off('click').on('click', function closeBarFixMe() {
+                            $('.files-grid-view.fm').removeClass('duplication-found');
+                            $('.duplicated-items-found').addClass('hidden');
+                        });
                 }
             }
 

@@ -356,30 +356,26 @@
 
             switch (op) {
                 case 'dups':
+                    $a3.addClass('hidden');
+                    $('.info-txt.light-grey', $dialog).text(l[22103]);
                     if (file.t) {
-                        // $a2.addClass('hidden');
-                        $a3.addClass('hidden');
-                        $('.info-txt.light-grey', $dialog).text('Please select what you want to do:');
                         $('.info-txt-fn', $dialog)
-                            .safeHTML('Multiple folders with the same name <strong>' + name + '</strong> exist in this location.');
+                            .safeHTML(l[22104].replace('{0}', '<strong>' + name + '</strong>'));
 
-                        $('.red-header', $a1).text('Rename duplicates');
-                        $('.light-grey', $a1).text('The newest folder will keep its name, older folders will be renamed with suffixes (1), (2) ...');
+                        $('.red-header', $a1).text(l[22105]);
+                        $('.light-grey', $a1).text(l[22110]);
 
-                        $('.red-header', $a2).text('Merge duplicates');
-                        $('.light-grey', $a2).text('Duplicated folders will be merged into a single folder');
+                        $('.red-header', $a2).text(l[22111]);
+                        $('.light-grey', $a2).text(l[22112]);
                     }
                     else {
-                        $a3.addClass('hidden');
-                        $('.info-txt.light-grey', $dialog).text('Please select what you want to do:');
-
-                        $('.red-header', $a1).text('Rename duplicates');
-                        $('.red-header', $a2).text('Keep the newest');
-                        $('.light-grey', $a1).text('The newest file will keep its name, older files will be renamed with suffixes (1), (2) ...');
-                        $('.light-grey', $a2).text('The newest file will be kept, all older files will be removed');
+                        $('.red-header', $a1).text(l[22105]);
+                        $('.red-header', $a2).text(l[22106]);
+                        $('.light-grey', $a1).text(l[22107]);
+                        $('.light-grey', $a2).text(l[22108]);
 
                         $('.info-txt-fn', $dialog)
-                            .safeHTML('Multiple files with the same name <strong>' + name + '</strong> exist in this location.');
+                            .safeHTML(l[22109].replace('{0}', '<strong>' + name + '</strong>'));
 
                     }
                     break;
@@ -450,6 +446,9 @@
                     $('.file-name', $a2).text(name);
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
+                    if (dupsNB > 2) {
+                        $a2.addClass('hidden');
+                    }
                 }
             }
             else {
@@ -460,7 +459,7 @@
                     $('.file-name', $a1).text(this.findNewName(file.name, target));
                     $('.file-name', $a2).text(name);
                     $('.file-name', $a3).text(name);
-                    $('.file-size', $a2).text((dupsNB - 1) + ' files will be removed');
+                    $('.file-size', $a2).text(l[22113].replace('{0}', dupsNB - 1));
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
 
@@ -639,9 +638,12 @@
             var allDups = dupsKeys.length;
             var operationsOrderPromise = new MegaPromise();
 
-            var resolveDup = function(duplicateEntries, keys, kIndex,type) {
+            loadingDialog.pshow();
+
+            var resolveDup = function(duplicateEntries, keys, kIndex, type) {
                 if (kIndex >= keys.length) {
                     operationsOrderPromise.resolve();
+                    loadingDialog.phide();
                     return;
                 }
 
@@ -655,6 +657,7 @@
                             var olderNode = null;
                             var newestTS = -1;
                             var newestIndex = -1;
+                            var pauseRecusrion = false;
 
                             if (duplicateEntries[type][name].length == 2) {
                                 olderNode = duplicateEntries[type][name][0];
@@ -709,13 +712,33 @@
                                         // merge
                                         if (olderNode) {
                                             // 2 items
-                                            fileconflict.check([M.d[olderNode]], M.d[olderNode].p, 'move', null, fileconflict.REPLACE);
+                                            pauseRecusrion = true;
+
+                                            var originalParent = M.d[olderNode].p;
+
+                                            var mergeOperation = M.moveNodes([olderNode],
+                                                M.RubbishID, true);
+
+                                            mergeOperation.always(function() {
+
+                                                M.moveNodes([olderNode],
+                                                    originalParent, true, fileconflict.REPLACE).always(
+                                                        function() {
+                                                            // no need to updateUI,
+                                                            // for optimization we will only hide the bar
+                                                            $('.files-grid-view.fm').removeClass('duplication-found');
+                                                            $('.duplicated-items-found').addClass('hidden');
+                                                            resolveDup(duplicateEntries, keys, ++kIndex, type);
+                                                        }
+                                                    );
+                                            });
+
                                         }
                                     }
                                     break;
                             }
 
-                            resolveDup(duplicateEntries, keys, ++kIndex, 'files');
+                            !pauseRecusrion && resolveDup(duplicateEntries, keys, ++kIndex, type);
                         }
                     );
             };
@@ -725,6 +748,8 @@
             operationsOrderPromise.done(function() {
                 dupsKeys = Object.keys(dups.folders);
                 allDups = dupsKeys.length;
+
+                loadingDialog.pshow();
 
                 resolveDup(dups, dupsKeys, 0, 'folders');
             });

@@ -3650,6 +3650,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.nw-fm-tree-header.folder-link').hide();
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
+    // Prevent autofill prevent fake form to be submitted
+    $('#search-fake-form-2').rebind('submit', function () {
+        return false;
+    });
+
     if (folderlink) {
         // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
         /*if (!isValidShareLink()) {

@@ -928,17 +928,17 @@
                     if (!this.viewmode) {
                         if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
                             props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
-                            props.mTime = time2date(aNode.mtime || aNode.ts);
+                            props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
                         }
                         else if (aNode.p !== "contacts") {
                             // props.time = time2date(aNode[M.lastColumn] || aNode.ts);
                             props.time = time2date(aNode.ts);
-                            props.mTime = time2date(aNode.mtime || aNode.ts);
+                            props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
                         }
                         else {
                             props.time = time2date(aNode.ts
                                 || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
-                            props.mTime = props.time;
+                            props.mTime = '';
                         }
                     }
 

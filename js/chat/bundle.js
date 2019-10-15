@@ -18759,6 +18759,7 @@ Chat.prototype.smartOpenChat = function () {
       var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
 
       if (chatRoom) {
+        chatRoom.show();
         return waitForReadyState(chatRoom, args[5]);
       }
     }

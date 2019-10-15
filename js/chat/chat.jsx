@@ -1470,6 +1470,7 @@ Chat.prototype.smartOpenChat = function() {
         if (args[0].length === 2 && args[1] === 'private') {
             var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
             if (chatRoom) {
+                chatRoom.show();
                 return waitForReadyState(chatRoom, args[5]);
             }
         }

@@ -761,6 +761,9 @@ var slideshowid;
         $overlay.find('.viewer-mid-button.prev,.viewer-mid-button.next').removeClass('active');
         $overlay.find('.viewer-progress p').removeAttr('style');
 
+        // Init full screen icon
+        $overlay.find('.viewer-button.fs .icons-img').removeClass('lowscreen').addClass('fullscreen');
+
         var steps = slideshowsteps();
         if (steps.backward.length > 0) {
             $overlay.find('.viewer-mid-button.prev').addClass('active');

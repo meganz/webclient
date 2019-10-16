@@ -437,14 +437,13 @@ var attribCache = false;
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.remove = function _removeUserAttribute(attribute, pub, nonHistoric, encodeValues) {
-        if (d) {
-            console.error("mega.attr.remove is to be used only for development purposes and should not be used in " +
-                "real world scenario related code.");
-        }
         attribute = buildAttribute(attribute, pub, nonHistoric, encodeValues);
         var cacheKey = buildCacheKey(u_handle, attribute);
         var promise = new MegaPromise();
 
+        if (d) {
+            console.warn("Removing attribute %s, I really hope you know what you are doing!", attribute);
+        }
 
         var self = this;
         var req = {'a': 'upr', 'ua': attribute, 'v': 1};

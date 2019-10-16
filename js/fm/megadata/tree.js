@@ -847,9 +847,6 @@ MegaData.prototype.redrawTree = function(f) {
     else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();
     }
-    else if (M.currentrootid === 'chat') {
-        console.log('render the entire contact list filtered by search query into the conversations list');
-    }
     M.addTreeUI();
     $('.nw-fm-tree-item').noTransition(function() {
         M.onTreeUIOpen(M.currentdirid, false);

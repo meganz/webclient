@@ -1904,6 +1904,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                     {!room.megaChat.chatUIFlags['convPanelCollapse'] ? <ConversationRightArea
                         isVisible={this.props.chatRoom.isCurrentlyActive}
                         chatRoom={this.props.chatRoom}
+                        roomFlags={this.props.chatRoom.flags}
                         members={this.props.chatRoom.membersSetFromApi}
                         messagesBuff={room.messagesBuff}
                         onAttachFromComputerClicked={function() {
@@ -2319,6 +2320,17 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
                     });
                 }
             });
+            // also update immediately after chats had loaded, since there may be no history/chats to pull
+            var finishedLoadingInitial = function() {
+                if (megaChat.chats.length === 0) {
+                    Soon(function () {
+                        self.safeForceUpdate();
+                    });
+                }
+            };
+
+            ChatdIntegration.allChatsHadLoaded.always(finishedLoadingInitial);
+            ChatdIntegration.mcfHasFinishedPromise.always(finishedLoadingInitial);
         }
 
         var now = Date.now();
@@ -2330,6 +2342,7 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
                         chatUIFlags={self.props.chatUIFlags}
                         isExpanded={chatRoom.megaChat.chatUIFlags['convPanelCollapse']}
                         chatRoom={chatRoom}
+                        roomType={chatRoom.type}
                         isActive={chatRoom.isCurrentlyActive}
                         messagesBuff={chatRoom.messagesBuff}
                         key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
@@ -2339,6 +2352,11 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
         });
 
         if (megaChat.chats.length === 0) {
+            if (!self._MuChangeListener) {
+                self._MuChangeListener = M.u.addChangeListener(function() {
+                    self.safeForceUpdate();
+                });
+            }
             var contactsList = [];
             var contactsListOffline = [];
 
@@ -2388,6 +2406,10 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
             );
         }
         else {
+            if (self._MuChangeListener) {
+                M.u.removeChangeListener(self._MuChangeListener);
+                delete self._MuChangeListener;
+            }
             if (M.currentdirid === "chat" && conversations.length === 0 && megaChat.chats.length !== 0 && hadLoaded) {
                 // initial load on /fm/chat. focring to show a room.
                 onIdle(function() {

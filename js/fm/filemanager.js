@@ -3081,6 +3081,10 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     $('.grid-table-header .arrow').rebind('click', function(e) {
+        // this grid-table is used in the chat - in Archived chats. It won't work there, so - skip doing anything.
+        if (M.chat) {
+            return;
+        }
         var cls = $(this).attr('class');
         var dir = 1;
 
@@ -3846,6 +3850,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         else {
             $('.section').addClass('hidden');
             $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
+        }
+    }
+    {
+        if (id === 'contacts' || id === 'opc' || id === "opc") {
+            // ensure contacts sections are updated ON section change, instead of always updating in the background
+            // (and wasting CPU)
+            M.contacts();
         }
     }
 };

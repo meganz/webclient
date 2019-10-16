@@ -421,29 +421,47 @@
         else if (id === 'public-links') {
             id = 'public-links';
         }
+        else if (id === 'chat/archived' && !megaChatIsReady) {
+            this.chat = true;
+
+            this.renderChatIsLoading();
+            mBroadcaster.once('chat_initialized', function() {
+                if (M.currentdirid === 'chat/archived') {
+                    megaChat.displayArchivedChats = true;
+                }
+            });
+        }
         else if (id === 'chat') {
             this.chat = true;
-            if (megaChatIsReady) {
-                megaChat.displayArchivedChats = false;
+            var initChatUI = function() {
                 megaChat.refreshConversations();
                 M.addTreeUI();
                 var room = megaChat.renderListing();
 
                 if (room) {
                     newHashLocation = room.getRoomUrl();
-                } else {
+                }
+                else if (megaChat.displayArchivedChats) {
+                    newHashLocation = 'fm/chat/archived';
+                }
+                else {
                     if (megaChat.$conversationsAppInstance) {
                         megaChat.safeForceUpdate();
                     }
                 }
+            };
+
+            if (megaChatIsReady) {
+                initChatUI();
             }
             else {
                 this.renderChatIsLoading();
-                mBroadcaster.addListener('chat_initialized', function() {
+                mBroadcaster.once('chat_initialized', function() {
                     if (M.currentdirid === 'chat') {
                         setTimeout(function () {
                             loadSubPage('fm/chat');
                             M.openFolder('chat');
+                            initChatUI();
                         }, 100);
                     }
                 });

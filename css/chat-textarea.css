@@ -146,6 +146,8 @@
     line-height: 0;
     position: relative;
     min-height: 20px;
+    /* otherwise, JScrollPane may set width to 0! */
+    width: 100% !important;
 }
 .chat-textarea-scroll .jspPane, .message.textarea-scroll .jspPane, .textarea-scroll .textarea-wrapper .jspPane {
 	margin-left:  0 !important;

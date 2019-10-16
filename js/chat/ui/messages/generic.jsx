@@ -43,6 +43,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             if (!oldState.editing) {
                 if (self.props.onEditStarted) {
                     self.props.onEditStarted($generic);
+                    moveCursortoToEnd($textarea);
                 }
             }
         }

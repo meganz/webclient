@@ -261,7 +261,8 @@ Chatd.prototype._proxyEventsToRooms = function() {
         'onMessagesHistoryRetrieve',
         'onMessageCheck',
         'onMessagesKeyIdDone',
-        'onMessageIncludeKey'
+        'onMessageIncludeKey',
+        'onMarkAsJoinRequested'
     ]
         .forEach(function(eventName) {
             self.rebind(eventName + '.chatdProxy', function(e, eventData) {
@@ -481,7 +482,13 @@ Chatd.Shard = function(chatd, shard) {
 
 
 Chatd.Shard.prototype.markAsJoinRequested = function(chatId) {
-    this.userRequestedJoin[chatId] = true;
+    "use strict";
+    if (!this.userRequestedJoin[chatId]) {
+        this.chatd.trigger('onMarkAsJoinRequested', {
+            chatId: base64urlencode(chatId)
+        });
+        this.userRequestedJoin[chatId] = true;
+    }
 };
 
 

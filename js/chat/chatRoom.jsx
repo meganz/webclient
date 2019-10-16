@@ -50,6 +50,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             flags: 0x00,
             publicLink: null,
             archivedSelected: false,
+            showArchived: false,
             observers: 0
         },
         true
@@ -362,6 +363,34 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
     self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
 
+    self.initialMessageHistLoaded = new MegaPromise();
+    self._initialMessageHistLoadedTimer = null;
+    self.initialMessageHistLoaded.always(function() {
+        self.unbind('onMarkAsJoinRequested.initHist');
+        self.unbind('onHistoryDecrypted.initHist');
+        self.unbind('onMessagesHistoryDone.initHist');
+    });
+
+    var _historyIsAvailable = function() {
+        if (self.initialMessageHistLoaded.state() === 'pending') {
+            self.initialMessageHistLoaded.resolve();
+            if (self._initialMessageHistLoadedTimer) {
+                clearTimeout(self._initialMessageHistLoadedTimer);
+            }
+        }
+    };
+    self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
+    self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
+
+    self.rebind('onMarkAsJoinRequested.initHist', function(e, eventData) {
+        self._initialMessageHistLoadedTimer = setTimeout(function () {
+            if (d) {
+                console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+            }
+            self.initialMessageHistLoaded.reject();
+        }, 5000);
+    });
+
 
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
@@ -647,6 +676,7 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
             megaChat.safeForceUpdate();
         }
     }
+    this.trackDataChange();
 };
 
 
@@ -1081,10 +1111,17 @@ ChatRoom.prototype.show = function() {
             oldRoom.hide();
         }
     }
+
     M.onSectionUIOpen('conversations');
 
     self.megaChat.currentlyOpenedChat = self.roomId;
     self.megaChat.lastOpenedChat = self.roomId;
+    if (self.isArchived()) {
+        self.showArchived = true;
+    }
+    else {
+        self.showArchived = false;
+    }
     self.megaChat.setAttachments(self.roomId);
 
     self.trigger('activity');
@@ -1096,10 +1133,30 @@ ChatRoom.prototype.show = function() {
     else {
         $('.section.conversations').removeClass('privatechat');
     }
+
     Soon(function() {
         megaChat.chats.trackDataChange();
     });
     $('.conversation-panel[data-room-id="' + self.chatId + '"]').removeClass('hidden');
+    $.tresizer();
+
+    self.scrollToChat();
+};
+
+
+ChatRoom.prototype.scrollToChat = function() {
+    if (megaChat.$chatTreePanePs) {
+        var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
+        if ($li && $li[0]) {
+            var pos = $li[0].offsetTop;
+            if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
+                megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+                this._scrollToOnUpdate = false;
+            }
+        } else {
+            this._scrollToOnUpdate = true;
+        }
+    }
 };
 
 /**

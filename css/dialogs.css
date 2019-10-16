@@ -4328,6 +4328,90 @@ li.token-input-token-invite .input-close {
     padding-bottom: 40px;
     text-align: center;
 }
+.fm-dialog.voucher-info-redeem {
+    width: 596px;
+    margin-left: -298px;
+    margin-top: -190px;
+    padding-bottom: 40px;
+    text-align: center;
+}
+.voucher-info-redeem .voucher-logo {
+    width: 335px;
+    height: 100px;
+    margin-left: calc(50% - 166px);
+    margin-top: 52px;
+    margin-bottom: 26px;
+    background-color: #EB4444;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+    border-radius: 4px 4px 4px 4px;
+    text-align: initial;
+}
+.voucher-info-redeem .voucher-logo .voucher-head{
+    border-radius: 4px 4px 0 0;
+    background-color: rgba(0,0,0,0.1);
+    text-align: center;
+}
+.voucher-info-redeem .voucher-logo .voucher-head .v-header-text{
+    height: 24px;
+    color: #FFFFFF;
+    font-size: 18px;
+    line-height: 24px;
+    text-align: center;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+.voucher-logo .plan-icon {
+    background-position: -0px -1620px;
+    height: 32px;
+    width: 32px;
+    left: unset;
+    top: unset;
+    margin: initial;
+    margin-top: 18px;
+    margin-left: 14px;
+    position: relative;
+    display: inline-block;
+}
+.voucher-logo .plan-icon.pro1 {
+    background-position: -0px -1670px;
+}
+.voucher-logo .plan-icon.pro2 {
+    background-position: -0px -1720px;
+}
+.voucher-logo .plan-icon.pro3 {
+    background-position: -0px -1770px;
+}
+.voucher-logo .plan-icon.pro4 {
+    background-position: -0px -1620px;
+}
+.voucher-logo .v-separator {
+    height: 32px;
+    width: 1px;
+    opacity: 0.5;
+    background-color: #F2F2F2;
+    margin-left: 14px;
+    margin-top: 18px;
+    display: inline-block;
+}
+.voucher-logo .plan-info {
+    width: 122px;
+    display: inline-block;
+    text-align: center;
+}
+.voucher-logo .plan-info .size-head{
+	height: 21px;
+	color: #FFFFFF;
+	font-size: 17px;
+	line-height: 21px;
+	text-align: center;
+}
+.voucher-logo .plan-info .size-bottom{
+	height: 15px;
+	color: #FFFFFF;
+	font-size: 12px;
+	line-height: 15px;
+    text-transform:uppercase;
+}
 .payment-reminder-logo {
     background-position: -20px -969px;
     width: 80px;

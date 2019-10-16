@@ -1951,8 +1951,9 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     width: 32px;
     position: absolute;
 }
+
 .onboarding-suggestions .pro1 .mobile.membership-icon {
-    background-position: -0px -1669px;
+    background-position: -0px -1670px;
 }
 .onboarding-suggestions .pro2 .mobile.membership-icon {
     background-position: -0px -1720px;
@@ -1960,6 +1961,10 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 .onboarding-suggestions .pro3 .mobile.membership-icon {
     background-position: -0px -1770px;
 }
+.onboarding-suggestions .pro4 .mobile.membership-icon {
+    background-position: -0px -1620px;
+}
+
 /* Promotion Voucher code, I will remove once I have more time */
 .redeem-promo-page .dialog-input-title-ontop .dialog-input {
     border: none;
@@ -1975,6 +1980,7 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
    text-overflow: ellipsis;
    background-color: none;
    cursor: text;
+   text-transform: uppercase;
 }
 .redeem-promo-page .dialog-input-title-ontop {
     width: 320px;

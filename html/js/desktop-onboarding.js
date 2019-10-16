@@ -13,6 +13,7 @@
 
         $('.post-download', $wrapper).addClass('hidden');
         $('.pre-download', $wrapper).removeClass('hidden');
+        $('.redeemed-v', $wrapper).addClass('hidden');
 
         $('.top-head .left.individual').addClass('hidden');
 
@@ -30,10 +31,23 @@
             if (!is_mobile) {
                 $('.voucher-message', $wrapper).text(l[20133]);
             }
+            $voucherBlock.removeClass('pro1 pro2 pro3 pro4')
+                .addClass('pro' + vd.proNum);
+
+            if (vd.proNum === 4) {
+                $('.promo-voucher-card', $voucherBlock).removeClass('red-block')
+                    .addClass('yellow-block');
+            }
+            else {
+                $('.promo-voucher-card', $voucherBlock).removeClass('yellow-block')
+                    .addClass('red-block');
+            }
 
             // Show PRO plan details
             $('.storage-amount', $voucherBlock).text(bytesToSize(vd.storage * 0x40000000, 0));
             $('.transfer-amount', $voucherBlock).text(bytesToSize(vd.bandwidth * 0x40000000, 0));
+
+            $('.redeemed-v', $wrapper).removeClass('hidden');
         }
 
         $('.redirect-clouddrive', $wrapper).rebind('click', goToCloud);

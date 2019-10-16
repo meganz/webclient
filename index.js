@@ -1632,7 +1632,22 @@ function init_page() {
 
         // If not logged in, direct them to login or register first
         if (!u_type) {
-            redeem.showVoucherInfoDialog();
+            if (typeof redeem === 'undefined') {
+                // we have voucher directly
+                if (u_wasloggedin()) {
+                    login_txt = l[7712];
+                    loadSubPage('login');
+                }
+                else {
+                    register_txt = l[7712];
+                    loadSubPage('register');
+                }
+                return false;
+            }
+            else {
+                // we are coming form redeem page
+                redeem.showVoucherInfoDialog();
+            }
         }
         else if (u_type < 3) {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and

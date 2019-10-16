@@ -20,6 +20,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         if (roomOrUserHash === "archived") {
             roomType = "archived";
              displayArchivedChats = true;
+             delete megaChat.lastOpenedChat;
         }
         else if (roomOrUserHash.substr(0, 2) === "g/" || roomOrUserHash.substr(0, 2) === "c/" || isPubLink) {
             roomType = (isPubLink || roomOrUserHash.substr(0, 2) === "c/") ? "public" : "group";
@@ -116,6 +117,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
+        if (megaChat.displayArchivedChats) {
+            $('.files-grid-view.archived-chat-view').removeClass('hidden');
+        }
         $('.fm-right-account-block').addClass('hidden');
         $('.contacts-details-block').addClass('hidden');
 
@@ -144,9 +148,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 });
         }
         else if(roomType === "group") {
-            if (megaChat.chats[roomOrUserHash].isArchived()) {
-                megaChat.chats[roomOrUserHash].showArchived = true;
-            }
             megaChat.chats[roomOrUserHash].show();
         }
         else if(roomType === "public") {
@@ -435,7 +436,9 @@ Chat.prototype.init = function() {
             console.time('chatReactUiInit');
         }
 
-        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} />;
+        self.$conversationsApp = <ConversationsUI.ConversationsApp
+            megaChat={self}
+        />;
 
         self.$conversationsAppInstance = ReactDOM.render(
             self.$conversationsApp,
@@ -548,6 +551,17 @@ Chat.prototype.init = function() {
 
 
     self.registerUploadListeners();
+
+    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            "currentlyOpenedChat": null,
+            "displayArchivedChats": false,
+        },
+        true
+    );
+
     self.trigger("onInit");
 };
 
@@ -1737,7 +1751,13 @@ Chat.prototype.renderListing = function() {
         }
         else {
             if (self.chats.length > 0) {
-                return self.showLastActive();
+                if (!self.displayArchivedChats) {
+                    return self.showLastActive();
+                }
+                else {
+                    return false;
+                }
+
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');
@@ -2029,7 +2049,7 @@ Chat.prototype._doneLoadingImage = function(h) {
 Chat.prototype.showLastActive = function() {
     var self = this;
 
-    if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+    if (self.chats.length > 0 && self.allChatsHadInitialLoadedHistory()) {
         var sortedConversations = obj_values(self.chats.toJS());
 
         sortedConversations.sort(M.sortObjFn("lastActivity", -1));
@@ -2065,6 +2085,21 @@ Chat.prototype.allChatsHadLoadedHistory = function() {
     for (var i = 0; i < chatIds.length; i++) {
         var room = self.chats[chatIds[i]];
         if (room.isLoading()) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+Chat.prototype.allChatsHadInitialLoadedHistory = function() {
+    var self = this;
+
+    var chatIds = self.chats.keys();
+
+    for (var i = 0; i < chatIds.length; i++) {
+        var room = self.chats[chatIds[i]];
+        if (room.initialMessageHistLoaded.state() === 'pending') {
             return false;
         }
     }

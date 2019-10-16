@@ -150,6 +150,23 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
         self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
         self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
     }
+    componentDidMount() {
+        super.componentDidMount();
+        this.eventuallyScrollTo();
+    }
+    componentDidUpdate() {
+        super.componentDidUpdate();
+
+       this.eventuallyScrollTo();
+    }
+    eventuallyScrollTo() {
+        if (
+            this.props.chatRoom._scrollToOnUpdate &&
+            megaChat.currentlyOpenedChat === this.props.chatRoom.roomId
+        ) {
+            this.props.chatRoom.scrollToChat();
+        }
+    }
     render() {
         var classString = "";
 
@@ -603,6 +620,10 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
         this.currentCallClicked = this.currentCallClicked.bind(this);
         this.endCurrentCall = this.endCurrentCall.bind(this);
     }
+    componentDidUpdate() {
+        super.componentDidUpdate && super.componentDidUpdate();
+        M.treeSearchUI();
+    }
 
     conversationClicked(room, e) {
         loadSubPage(room.getRoomUrl());
@@ -872,7 +893,7 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
 
         var confirmUnarchiveDialog = null;
         if (self.state.confirmUnarchiveDialogShown === true) {
-            var room = this.props.chats[self.state.confirmUnarchiveChat];
+            var room = megaChat.chats[self.state.confirmUnarchiveChat];
             if (room) {
             confirmUnarchiveDialog = <ModalDialogsUI.ConfirmDialog
                             chatRoom={room}
@@ -902,10 +923,10 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
                     <tbody>
                         <tr>
                         <th className="calculated-width" onClick = {self.onSortNameClicked}>
-                            <div className={"arrow name " + nameOrderClass} >{__(l[86])}</div>
+                            <div className={"is-chat arrow name " + nameOrderClass} >{__(l[86])}</div>
                         </th>
                         <th width="330" onClick = {self.onSortTimeClicked}>
-                            <div className={"arrow interaction " + timerOrderClass}>{__(l[5904])}</div>
+                            <div className={"is-chat arrow interaction " + timerOrderClass}>{__(l[5904])}</div>
                         </th>
                         </tr>
                     </tbody>
@@ -1098,7 +1119,11 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
             treesearch = false;
         });
 
-        M.treeSearchUI();
+        if (ChatdIntegration.allChatsHadLoaded.state() !== 'resolved') {
+            ChatdIntegration.allChatsHadLoaded.done(function() {
+                self.safeForceUpdate();
+            });
+        }
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -1188,6 +1213,25 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
         }
         return self._topButtonsContactsPicker;
     }
+    isWaitingForInitialLoadingToFinish() {
+        var self = this;
+        // since in big accounts, a lot chats may finish at the same moment, this requires to be throttled.
+        var forceUpdate = SoonFc(function(roomId) {
+            delete self._isWaitingChatsLoad[roomId];
+            self.safeForceUpdate();
+        }, 300);
+
+        self._isWaitingChatsLoad = self._isWaitingChatsLoad || {};
+        var roomIds = megaChat.chats.keys();
+        for (var i = 0; i < roomIds.length; i++) {
+            var roomId = roomIds[i];
+            var chatRoom = megaChat.chats[roomId];
+            if (!self._isWaitingChatsLoad[roomId] && chatRoom.initialMessageHistLoaded.state() === 'pending') {
+                self._isWaitingChatsLoad[roomId] = true;
+                chatRoom.initialMessageHistLoaded.always(forceUpdate.bind(undefined, roomId));
+            }
+        }
+    }
     render() {
         var self = this;
 
@@ -1215,8 +1259,10 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
         }
 
         var loadingOrEmpty = null;
+        var isLoading = false;
 
-        if (megaChat.chats.length === 0) {
+        var nonArchivedChats = megaChat.chats.map(function(r) { return !r.isArchived() ? r : undefined; });
+        if (nonArchivedChats.length === 0) {
             loadingOrEmpty = <div className="fm-empty-messages hidden">
                 <div className="fm-empty-pad">
                     <div className="fm-empty-messages-bg"></div>
@@ -1235,7 +1281,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
             </div>;
         }
         else if (
-            megaChat.allChatsHadLoadedHistory() === false &&
+            megaChat.allChatsHadInitialLoadedHistory() === false &&
             !megaChat.currentlyOpenedChat &&
             megaChat.displayArchivedChats !== true
         ) {
@@ -1249,28 +1295,31 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     }}></div>
                 </div>
             </div>;
+            self.isWaitingForInitialLoadingToFinish();
+            isLoading = true;
         }
 
         var rightPaneStyles = {};
         if (anonymouschat) {
             rightPaneStyles = {'marginLeft': 0};
         }
+
         var rightPane = <div className="fm-right-files-block in-chat" style={rightPaneStyles}>
                 {loadingOrEmpty}
-
                 {
-                    megaChat.displayArchivedChats === true ?
+                    !isLoading && megaChat.displayArchivedChats === true ?
                         <ArchivedConversationsList key={"archivedchats"}/>
                         :
                         null
                 }
-                <ConversationPanels
+            {!isLoading ? <ConversationPanels
                     {...this.props}
                     chatUIFlags={megaChat.chatUIFlags}
+                    displayArchivedChats={megaChat.displayArchivedChats}
                     className={megaChat.displayArchivedChats === true ? "hidden" : ""}
                     currentlyOpenedChat={megaChat.currentlyOpenedChat}
                     chats={megaChat.chats}
-                    />
+                    /> : null}
             </div>;
 
         var archivedChatsCount = this.calcArchiveChats();
@@ -1285,8 +1334,9 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        <div className="nw-fm-tree-header conversations">
-                            <input type="text" className="chat-quick-search"
+                        <div className={"nw-fm-tree-header conversations" + (self.state.quickSearchText ?
+                            ' filled-input' : '')}>
+                            <input type="text" className={"chat-quick-search"}
                                    onChange={function(e) {
                                        if (e.target.value) {
                                            treesearch = e.target.value;
@@ -1294,10 +1344,9 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                                         self.setState({'quickSearchText': e.target.value});
                                    }}
                                    onBlur={function(e) {
-                                       if (e.target.value) {
-                                           treesearch = e.target.value;
-                                       }
-                                        self.setState({'quickSearchText': e.target.value});
+                                        if (e.target.value) {
+                                            treesearch = e.target.value;
+                                        }
                                    }}
                                    value={self.state.quickSearchText}
                                    placeholder={l[7997]} />
@@ -1317,14 +1366,18 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                         </div>
                     </div>
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
-                        <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height" >
+                        <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height"
+                                          ref={function(ref) {
+                            megaChat.$chatTreePanePs = ref;
+                        }}>
                             <div className={
                                 "content-panel conversations" + (
 
                                     getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
-                                <ConversationsList quickSearchText={this.state.quickSearchText} />
+                                <ConversationsList
+                                                   quickSearchText={this.state.quickSearchText} />
                             </div>
                         </PerfectScrollbar>
                         <div className="left-pane-button new-link" onClick={function(e) {

@@ -434,6 +434,9 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             self.updateScroll(false);
         });
         self.triggerOnUpdate(true);
+        if ($container.is(":visible")) {
+            self.updateScroll(false);
+        }
 
     }
     componentWillMount() {
@@ -545,12 +548,15 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         }
         return textareaMaxHeight;
     }
-    @utils.SoonFcWrap(50)
+    @utils.SoonFcWrap(10)
     updateScroll(keyEvents) {
         var self = this;
 
         // DONT update if not visible...
         if (!this.props.chatRoom.isCurrentlyActive) {
+            return;
+        }
+        if (!this.isMounted()) {
             return;
         }
 

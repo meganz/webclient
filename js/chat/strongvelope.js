@@ -1859,14 +1859,14 @@ var strongvelope = {};
             verifyPromise.fail(function(arg) {
                 if (arg !== 0xDEAD) {
                     logger.critical('Signature invalid for message from *** on ***');
-                    logger.error('Signature invalid for message from ' + sender);
+                    logger.error('Signature invalid for message from ' + sender + ', chatId:' + self.chatRoom.chatId);
                 }
             });
 
             verifyPromise.always(function(arg) {
                 if (!arg) {
                     // signature verification failed.
-                    logger.error('Signature invalid for message from ' + sender);
+                    logger.error('Signature invalid for message from ' + sender, 'chatId:', self.chatRoom.chatId);
                 }
 
                 try {

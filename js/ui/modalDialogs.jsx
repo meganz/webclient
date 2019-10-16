@@ -250,6 +250,10 @@ class ConfirmDialog extends MegaRenderMixin(React.Component) {
         'dontShowAgainCheckbox': true,
         'hideable': true
     };
+    constructor (props) {
+        super(props);
+        this._wasAutoConfirmed = undefined;
+    }
     unbindEvents() {
         $(document).off('keyup.confirmDialog' + this.getUniqueId());
     }
@@ -283,6 +287,7 @@ class ConfirmDialog extends MegaRenderMixin(React.Component) {
         super.componentWillUnmount();
         var self = this;
         self.unbindEvents();
+        delete this._wasAutoConfirmed;
     }
     onConfirmClicked() {
         this.unbindEvents();
@@ -294,7 +299,11 @@ class ConfirmDialog extends MegaRenderMixin(React.Component) {
         var self = this;
 
         if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true)  {
+            if (this._wasAutoConfirmed) {
+                return null;
+            }
             if (this.props.onConfirmClicked) {
+                this._wasAutoConfirmed = 1;
                 // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
                 setTimeout(function() {
                     self.unbindEvents();

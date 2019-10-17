@@ -26,6 +26,10 @@ var redeem = {
         redeem.$backgroundOverlay = $('.fm-dialog-overlay');
         redeem.$successOverlay = $('.payment-result.success');
 
+        if (!u_type || u_type < 3) {
+            return redeem.goToCloud();
+        }
+
         // Init functionality
         if (localStorage.oldRedeemFlow) {
             return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
@@ -624,6 +628,7 @@ var redeem = {
 
             $('.voucher-info-login', $dlg).off('click').on('click',
                 function() {
+                    closeDialog();
                     login_txt = l[7712];
                     loadSubPage('login');
                     return false;
@@ -631,6 +636,7 @@ var redeem = {
 
             $('.voucher-info-create', $dlg).off('click').on('click',
                 function() {
+                    closeDialog();
                     register_txt = l[7712];
                     loadSubPage('register');
                     return false;

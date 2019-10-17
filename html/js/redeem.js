@@ -774,7 +774,7 @@ var redeem = {
                     }
                 }
                 else {
-                    reject(ENOENT);
+                    return operation.reject(ENOENT);
                 }
             }
         });

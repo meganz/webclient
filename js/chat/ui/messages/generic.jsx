@@ -31,7 +31,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
     }
     componentDidUpdate(oldProps, oldState) {
         var self = this;
-        if (self.isBeingEdited() && self.isMounted()) {
+        var isBeingEdited = self.isBeingEdited();
+        var isMounted = self.isMounted();
+        if (isBeingEdited && isMounted) {
             var $generic = $(self.findDOMNode());
             var $textarea = $('textarea', $generic);
             if ($textarea.length > 0 && !$textarea.is(":focus")) {
@@ -41,10 +43,11 @@ class GenericConversationMessage extends ConversationMessageMixin {
             if (!oldState.editing) {
                 if (self.props.onEditStarted) {
                     self.props.onEditStarted($generic);
+                    moveCursortoToEnd($textarea);
                 }
             }
         }
-        else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
+        else if (isMounted && !isBeingEdited && oldState.editing === true) {
             if (self.props.onUpdate) {
                 self.props.onUpdate();
             }
@@ -790,7 +793,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
                                              <div className="name">
                                                  {M.getNameByHandle(contact.u)}
@@ -801,7 +804,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                             </div>
                                         </div>
                                     </div>
-                                    <ContactFingerprint contact={contact} />
+                                    <ContactFingerprint contact={M.u[contact.u]} />
 
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
@@ -843,7 +846,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
                                              <div className="name">
                                                  {M.getNameByHandle(contact.u)}
@@ -901,7 +904,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="message data-title">{M.getNameByHandle(contact.u)}</div>
                                     {
                                         M.u[contact.u] ?
-                                            <ContactVerified className="right-align" contact={contact} /> :
+                                            <ContactVerified className="right-align" contact={M.u[contact.u]} /> :
                                             null
                                     }
 
@@ -911,11 +914,11 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <div className="data-block-view semi-big">
                                         {
                                             M.u[contact.u] ?
-                                                <ContactPresence className="small" contact={contact} /> :
+                                                <ContactPresence className="small" contact={M.u[contact.u]} /> :
                                                 null
                                         }
                                         {dropdown}
-                                        <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>

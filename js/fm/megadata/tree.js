@@ -521,7 +521,7 @@ MegaData.prototype.treeSearchUI = function() {
         }); // END left panel header click
 
         // Make a search
-        $('.nw-fm-search-icon').show().rebind('click', function() {
+        !M.chat && $('.nw-fm-search-icon').show().rebind('click', function() {
             var $self = $(this);
 
             treesearch = false;
@@ -846,9 +846,6 @@ MegaData.prototype.redrawTree = function(f) {
     }
     else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();
-    }
-    else if (M.currentrootid === 'chat') {
-        console.log('render the entire contact list filtered by search query into the conversations list');
     }
     M.addTreeUI();
     $('.nw-fm-tree-item').noTransition(function() {

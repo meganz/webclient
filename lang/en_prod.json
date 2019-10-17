@@ -895,7 +895,7 @@
     "7090": "Resource Usage:",
     "7093": "File Size:",
     "7094": "UNLIMITED",
-    "7100": "Please upgrade to PRO to continue immediately, or wait %1 to continue for free.",
+    "7100": "Please upgrade your account to continue immediately, or wait %1 to continue for free.",
     "7101": "Resume transfers",
     "7108": "Balance",
     "7109": "UnionPay",
@@ -2460,7 +2460,7 @@
     "19505": "Received",
     "19506": "Sent",
     "19507": "Company name is required, please fill the company name field",
-    "19508": "An error occurred while trying to register the account, please try again later.If the problem persists please contact MEGA support at business@mega.nz",
+    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
     "19509": "Set up automatic monthly payment for Business Account subscription",
     "19510": "Business Account",
     "19511": "The payment operation failed, please try again later. If the problem persists please contact MEGA support at https:\/\/mega.nz\/support",
@@ -3311,5 +3311,10 @@
     "21956": "Almost over quota warnings",
     "21957": "Please tick the checkbox to acknowledge that you understand the danger of losing your password.",
     "22001": "You are logged into a different account than the one you are trying to cancel. Please logout, login again with account that you wish to cancel, and then try clicking the same account cancellation link again.",
-    "22002": "always free"
+    "22002": "always free",
+    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
+    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz",
+    "22114": "PRO account voucher",
+    "22117": "Congratulations! [BR]Your voucher has been redeemed.",
+    "22120": "Please login or create your free account to redeem."
 }

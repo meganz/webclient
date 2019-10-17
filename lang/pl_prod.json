@@ -895,7 +895,7 @@
     "7090": "Zaj\u0119ta pami\u0119\u0107:",
     "7093": "Rozmiar:",
     "7094": "BEZ OGRANICZE\u0143",
-    "7100": "Wybierz konto PRO aby kontynuowa\u0107 teraz, lub poczekaj %1 aby kontynuowa\u0107 w ramach darmowego konta.",
+    "7100": "Zaktualizuj swoje konto, aby kontynuowa\u0107 od razu, lub poczekaj %1, aby kontynuowa\u0107 za darmo.",
     "7101": "Wznowienie",
     "7108": "Stan",
     "7109": "UnionPay",
@@ -2460,7 +2460,7 @@
     "19505": "Odebrane",
     "19506": "Wys\u0142ane",
     "19507": "Nazwa firmy jest wymagana, prosz\u0119 wype\u0142ni\u0107 pole nazwy firmy",
-    "19508": "Wyst\u0105pi\u0142 b\u0142\u0105d podczas pr\u00f3by zarejestrowania konta. Spr\u00f3buj ponownie p\u00f3\u017aniej.Je\u015bli problem b\u0119dzie si\u0119 powtarza\u0142, skontaktuj si\u0119 z dzia\u0142em wsparcia MEGA pod adresem business@mega.nz",
+    "19508": "Wyst\u0105pi\u0142 b\u0142\u0105d podczas pr\u00f3by zarejestrowania konta, spr\u00f3buj ponownie p\u00f3\u017aniej. Je\u015bli problem b\u0119dzie si\u0119 powtarza\u0142, skontaktuj si\u0119 z pomoc\u0105 techniczn\u0105 MEGA pod adresem business@mega.nz",
     "19509": "Skonfiguruj automatyczn\u0105 miesi\u0119czn\u0105 op\u0142at\u0119 za subskrypcj\u0119 konta biznesowego",
     "19510": "Konto biznesowe",
     "19511": "Operacja p\u0142atno\u015bci nie powiod\u0142a si\u0119. Spr\u00f3buj ponownie p\u00f3\u017aniej. Je\u015bli problem b\u0119dzie si\u0119 powtarza\u0142, skontaktuj si\u0119 z pomoc\u0105 techniczn\u0105 MEGA pod adresem https:\/\/mega.nz\/support",
@@ -3311,5 +3311,10 @@
     "21956": "Prawie ponad ostrze\u017cenia o limitach",
     "21957": "Zaznacz pole wyboru, aby potwierdzi\u0107, \u017ce rozumiesz niebezpiecze\u0144stwo utraty has\u0142a.",
     "22001": "Jeste\u015b zalogowany na inne konto ni\u017c to, kt\u00f3re pr\u00f3bujesz anulowa\u0107. Wyloguj si\u0119, zaloguj ponownie przy u\u017cyciu konta, kt\u00f3re chcesz anulowa\u0107, a nast\u0119pnie spr\u00f3buj ponownie klikn\u0105\u0107 ten sam link do anulowania konta.",
-    "22002": "zawsze za darmo"
+    "22002": "zawsze za darmo",
+    "22074": "Kliknij [S]SUBSKRYBUJ[\/S], je\u015bli jeste\u015b zadowolony z opcji p\u0142atno\u015bci. Zostanie wy\u015bwietlone nowe okno dialogowe lub nast\u0105pi przekierowanie do nowej strony w celu doko\u0144czenia zakupu.",
+    "22083": "Migracja danych nie powiod\u0142a si\u0119 z powodu braku wymaganego klucza szyfrowania dla {0}. To konto prawdopodobnie nie zako\u0144czy\u0142o jeszcze konfiguracji, w przeciwnym razie skontaktuj si\u0119 z pomoc\u0105 techniczn\u0105 pod adresem business@mega.nz",
+    "22114": "Kupon do konta PRO",
+    "22117": "Gratulacje! [BR]Tw\u00f3j kupon zosta\u0142 wykorzystany.",
+    "22120": "Please login or create your free account to redeem."
 }

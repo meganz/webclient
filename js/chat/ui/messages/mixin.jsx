@@ -14,7 +14,7 @@ class ConversationMessageMixin extends MegaRenderMixin(React.Component) {
         var megaChat = chatRoom.megaChat;
         var contact = self.getContact();
         var changedCb = function(contact, oldData, k, v) {
-            if (k === "ts") {
+            if (k === "ts" || k === "ats") {
                 // no updates needed in case of 'ts' change
                 // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
                 return;

@@ -15226,11 +15226,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -moz-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -o-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    -ms-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
-    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out, bottom 500ms ease-in-out, margin-bottom 500ms ease-in-out;
     cursor: default;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
@@ -15391,13 +15386,13 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
-.search .grid-scrolling-table, .search .contacts-grid-scrolling-table, .select .grid-scrolling-table, .select .contacts-grid-scrolling-table {
+.search .grid-scrolling-table, .search .contacts-grid-scrolling-table, .select .grid-scrolling-table {
     height: 100%;
     height: -webkit-calc(100% - 60px);
     height: -moz-calc(100% - 60px);
     height: calc(100% - 60px);
 }
-.search .file-block-scrolling, .search .fm-contacts-blocks-view, .select .file-block-scrolling, .select .fm-contacts-blocks-view {
+.search .file-block-scrolling, .search .fm-contacts-blocks-view, .select .file-block-scrolling, .select .shared-blocks-scrolling, .select .out-shared-blocks-scrolling {
     height: 100%;
     height: -webkit-calc(100% - 35px);
     height: -moz-calc(100% - 35px);
@@ -23544,13 +23539,27 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -24px -12691px;
 }
 
-.user-management-view .delete-img, .fm-right-header-user-management .delete-img, .user-management-dialog .delete-img{
+.voucher-info-redeem .delete-img, .user-management-view .delete-img, .fm-right-header-user-management .delete-img, .user-management-dialog .delete-img {
     background-position: 0px -12400px;
     opacity: 0.4;
     cursor: pointer;
 }
-
-.user-management-view .delete-img:hover, .fm-right-header-user-management .delete-img:hover, .user-management-dialog .delete-img:hover{
+.voucher-info-redeem .delete-img {
+    float: right;
+    margin-top: 16px;
+    margin-right: 16px;
+}
+.voucher-info-redeem .default-white-button,
+.voucher-info-redeem .default-green-button {
+    display:inline-block;
+}
+.voucher-info-redeem .default-green-button {
+    margin-left: 16px;
+}
+.voucher-info-redeem .button-block {
+    margin-top: 48px;
+}
+.voucher-info-redeem .delete-img:hover, .user-management-view .delete-img:hover, .fm-right-header-user-management .delete-img:hover, .user-management-dialog .delete-img:hover{
     opacity: 0.7;
 }
 
@@ -25546,11 +25555,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-left: 24px;
 }
 
-.user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon{
+.voucher-info-redeem .icon, .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-repeat: no-repeat;
-    width:24px;
-    height:24px;
+    width: 24px;
+    height: 24px;
 }
 .user-management-view .icon48, .user-management-dialog .icon48 {
     background-image: url(../images/mega/big-icons_v4.png);

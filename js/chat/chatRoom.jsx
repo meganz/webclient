@@ -50,6 +50,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             flags: 0x00,
             publicLink: null,
             archivedSelected: false,
+            showArchived: false,
             observers: 0
         },
         true
@@ -213,11 +214,75 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     });
 
+    // onMembersUpdated core room data management
+    self.rebind('onMembersUpdated.coreRoomDataMngmt', function(e, eventData) {
+        if (
+            self.state === ChatRoom.STATE.LEFT &&
+            eventData.priv >= 0 && eventData.priv < 255
+        ) {
+            // joining
+            self.membersLoaded = false;
+            self.setState(ChatRoom.STATE.JOINING, true);
+        }
+
+        var queuedMembersUpdatedEvent = false;
+
+        if (self.membersLoaded === false) {
+            if (eventData.priv >= 0 && eventData.priv < 255) {
+                var addParticipant = function addParticipant() {
+                    // add group participant in strongvelope
+                    self.protocolHandler.addParticipant(eventData.userId);
+                    // also add to our list
+                    self.members[eventData.userId] = eventData.priv;
+
+                    ChatdIntegration._ensureNamesAreLoaded([eventData.userId], self.publicChatHandle);
+                    self.trigger('onMembersUpdatedUI', eventData);
+                };
+
+                ChatdIntegration._waitForProtocolHandler(self, addParticipant);
+                queuedMembersUpdatedEvent = true;
+            }
+        }
+        else if (eventData.priv === 255 || eventData.priv === -1) {
+            var deleteParticipant = function deleteParticipant() {
+                if (eventData.userId === u_handle) {
+                    // remove all participants from the room.
+                    Object.keys(self.members).forEach(function(userId) {
+                        // remove group participant in strongvelope
+                        self.protocolHandler.removeParticipant(userId);
+                        // also remove from our list
+                        delete self.members[userId];
+                    });
+                }
+                else {
+                    // remove group participant in strongvelope
+                    self.protocolHandler.removeParticipant(eventData.userId);
+                    // also remove from our list
+                    delete self.members[eventData.userId];
+                }
+
+                self.trigger('onMembersUpdatedUI', eventData);
+            };
+
+            ChatdIntegration._waitForProtocolHandler(self, deleteParticipant);
+            queuedMembersUpdatedEvent = true;
+        }
+
+        if (eventData.userId === u_handle) {
+            self.membersLoaded = true;
+        }
+        if (!queuedMembersUpdatedEvent) {
+            self.members[eventData.userId] = eventData.priv;
+            self.trigger('onMembersUpdatedUI', eventData);
+        }
+    });
+
+
     /**
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
     var membersSnapshot = {};
-    self.rebind('onMembersUpdated.chatRoomMembersSync', function(e, eventData) {
+    self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function(e, eventData) {
         var roomRequiresUpdate = false;
 
         if (eventData.userId === u_handle) {
@@ -250,7 +315,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             var contact = M.u[u_h];
             if (contact && contact.addChangeListener) {
                 membersSnapshot[u_h] = contact.addChangeListener(function() {
-                    self.trackDataChange();
+                    self.trackDataChange.apply(self, arguments);
                 });
             }
         });
@@ -297,6 +362,34 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
     self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+
+    self.initialMessageHistLoaded = new MegaPromise();
+    self._initialMessageHistLoadedTimer = null;
+    self.initialMessageHistLoaded.always(function() {
+        self.unbind('onMarkAsJoinRequested.initHist');
+        self.unbind('onHistoryDecrypted.initHist');
+        self.unbind('onMessagesHistoryDone.initHist');
+    });
+
+    var _historyIsAvailable = function() {
+        if (self.initialMessageHistLoaded.state() === 'pending') {
+            self.initialMessageHistLoaded.resolve();
+            if (self._initialMessageHistLoadedTimer) {
+                clearTimeout(self._initialMessageHistLoadedTimer);
+            }
+        }
+    };
+    self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
+    self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
+
+    self.rebind('onMarkAsJoinRequested.initHist', function(e, eventData) {
+        self._initialMessageHistLoadedTimer = setTimeout(function () {
+            if (d) {
+                console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+            }
+            self.initialMessageHistLoaded.reject();
+        }, 5000);
+    });
 
 
 
@@ -583,6 +676,7 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
             megaChat.safeForceUpdate();
         }
     }
+    this.trackDataChange();
 };
 
 
@@ -998,6 +1092,7 @@ ChatRoom.prototype.show = function() {
     self.megaChat.hideAllChats();
 
     self.isCurrentlyActive = true;
+    self.lastShownInUI = Date.now();
 
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
@@ -1016,10 +1111,17 @@ ChatRoom.prototype.show = function() {
             oldRoom.hide();
         }
     }
+
     M.onSectionUIOpen('conversations');
 
     self.megaChat.currentlyOpenedChat = self.roomId;
     self.megaChat.lastOpenedChat = self.roomId;
+    if (self.isArchived()) {
+        self.showArchived = true;
+    }
+    else {
+        self.showArchived = false;
+    }
     self.megaChat.setAttachments(self.roomId);
 
     self.trigger('activity');
@@ -1031,11 +1133,30 @@ ChatRoom.prototype.show = function() {
     else {
         $('.section.conversations').removeClass('privatechat');
     }
+
     Soon(function() {
-        if (megaChat.$conversationsAppInstance) {
-            megaChat.safeForceUpdate();
-        }
+        megaChat.chats.trackDataChange();
     });
+    $('.conversation-panel[data-room-id="' + self.chatId + '"]').removeClass('hidden');
+    $.tresizer();
+
+    self.scrollToChat();
+};
+
+
+ChatRoom.prototype.scrollToChat = function() {
+    if (megaChat.$chatTreePanePs) {
+        var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
+        if ($li && $li[0]) {
+            var pos = $li[0].offsetTop;
+            if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
+                megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+                this._scrollToOnUpdate = false;
+            }
+        } else {
+            this._scrollToOnUpdate = true;
+        }
+    }
 };
 
 /**
@@ -1114,10 +1235,12 @@ ChatRoom.prototype.hide = function() {
     var self = this;
 
     self.isCurrentlyActive = false;
+    self.lastShownInUI = Date.now();
 
     if (self.megaChat.currentlyOpenedChat === self.roomId) {
         self.megaChat.currentlyOpenedChat = null;
     }
+    $('.conversation-panel[data-room-id="' + self.chatId + '"]').addClass('hidden');
 };
 
 /**

@@ -326,10 +326,8 @@
     // from a working fetch for over 40 seconds (experimentally determined)
     CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
-    CloudRaidRequest.prototype.onFailure = function (ev, failedPartNum) {
+    CloudRaidRequest.prototype.onPartFailure = function(failedPartNum, partStatus) {
         var self = this;
-        var xhr = ev.target;
-        var status = xhr.readyState > 1 && xhr.status;
 
         this.cloudRaidSettings.onFails += 1;
 
@@ -337,7 +335,7 @@
         this.lastFailureTime = Date.now();
 
         if (d) {
-            this.logger.warn("Recovering from fail, part %s (%s)", failedPartNum, ev.type,
+            this.logger.warn("Recovering from fail, part %s", failedPartNum,
                 this.part[0].failCount, this.part[1].failCount, this.part[2].failCount,
                 this.part[3].failCount, this.part[4].failCount, this.part[5].failCount);
         }
@@ -349,16 +347,15 @@
             sumFails += this.part[i].failCount;
         }
 
-        if (sumFails > 2 || status > 200) {
+        if (sumFails > 2 || (partStatus > 200 && partStatus !== 503)) {
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",
-                    sumFails > 2 ? 'too many fails' : 'network error', ev);
+                    sumFails > 2 ? 'too many fails' : 'network error');
             }
-            this.status = status | 0;
-            this.cloudRaidSettings.toomanyfails += 1;
             this.response = false;
-            return this.dispatchLoadEnd();
+            this.cloudRaidSettings.toomanyfails++;
+            return this.dispatchLoadEnd(partStatus);
         }
 
         var partStartPos = this.wholeFileDatalinePos / (this.RAIDPARTS - 1);
@@ -388,7 +385,8 @@
 
     };
 
-    CloudRaidRequest.prototype.dispatchLoadEnd = function() {
+    CloudRaidRequest.prototype.dispatchLoadEnd = function(status) {
+        this.status = status | 0;
         this.dispatchEvent('readystatechange', XMLHttpRequest.DONE);
         this.dispatchEvent('loadend');
     };
@@ -561,7 +559,7 @@
                     this.outputByteCount / this.bytesProcessed, channelPauseCount, channelPauseMs, this.totalRequests);
             }
 
-            onIdle(this.dispatchLoadEnd.bind(this));
+            onIdle(this.dispatchLoadEnd.bind(this, 200));
         }
     };
 
@@ -742,7 +740,6 @@
         }
 
         this.totalRequests++;
-        this.channelReplyState = 0;
 
         // Execute the fetch, with continuation functions for each buffer piece that arrives
         part.abortController = new AbortController();
@@ -778,11 +775,11 @@
             this.dispatchEvent('readystatechange', XMLHttpRequest.LOADING);
         }
 
-        if (!fetchResponse.ok || fetchResponse.status !== 200) {
+        if (fetchResponse.status !== 200) {
             if (d) {
                 this.logger.error("response status: %s %s", fetchResponse.status, fetchResponse.ok);
             }
-            this.onFailure($.Event('error', { target: this, message: "fetch failure" }), partNum);
+            this.onPartFailure(partNum, fetchResponse.status);
             return;
         }
 
@@ -792,6 +789,10 @@
 
             this.channelReplyState |= (1 << partNum);
 
+            if (d) {
+                this.logger.debug("received reply on: %s bitfield now: %s", partNum, this.channelReplyState);
+            }
+
             for (var i = this.RAIDPARTS; i--;) {
                 if ((this.channelReplyState | (1 << i)) === 63) {
                     mia = i;
@@ -800,7 +801,7 @@
 
             if (mia !== -1) {
                 if (d) {
-                    this.logger.info("Slowest channel was %s, closing it.", mia);
+                    this.logger.info("All channels but %s are working, closing channel %s.", mia, mia);
                 }
                 this.cloudRaidSettings.lastFailedChannel = mia;
 
@@ -907,18 +908,18 @@
                 if (d) {
                     this.logger.warn("Timeout on part %s", partNum);
                 }
-                this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+                this.onPartFailure(partNum, 408);
                 part.timedout = false;
             }
             else {
-                this.logger.debug('Fetch on %s was the slowest.', partNum);
+                this.logger.debug('Fetch on %s would have been the slowest (or failed).', partNum);
             }
         }
         else {
             if (d) {
                 this.logger.warn("Caught exception from fetch on part: %s", partNum, ex);
             }
-            this.onFailure($.Event('error', { target: this, message: ex }), partNum);
+            this.onPartFailure(partNum, 409);
         }
     };
 

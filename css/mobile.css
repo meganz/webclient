@@ -11736,3 +11736,134 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: 67%;
     min-width: 182px;
 }
+
+
+.voucher-info-redeem {
+    padding-top: 50%;
+    text-align: center;
+}
+.voucher-info-redeem .voucher-block {
+    width: 94%;
+    display: inline-block;
+    text-align: center;
+}
+.voucher-info-redeem .voucher-logo {
+    width: 340px;
+    height: 100px;
+    margin-top: 52px;
+    margin-bottom: 26px;
+    background-color: #EB4444;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+    border: 1px solid #d90007;
+    border-radius: 4px 4px 4px 4px;
+    text-align: initial;
+    display: inline-block;
+}
+.voucher-info-redeem .voucher-logo.pro-l {
+    background-color: #FFAF00;
+    border: 1px solid #FD8116;
+    color: #fff;
+}
+.voucher-info-redeem .voucher-logo .voucher-head{
+    border-radius: 4px 4px 0 0;
+    background-color: rgba(0,0,0,0.1);
+    text-align: center;
+}
+.voucher-info-redeem .dialog-title{
+    text-align: center;
+}
+.voucher-info-redeem .voucher-logo .voucher-head .v-header-text{
+    height: 24px;
+    color: #FFFFFF;
+    font-size: 18px;
+    line-height: 24px;
+    text-align: center;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+.voucher-logo .plan-icon {
+    background-position: -0px -1620px;
+    height: 32px;
+    width: 32px;
+    left: unset;
+    top: unset;
+    margin: initial;
+    margin-top: 18px;
+    margin-left: 14px;
+    position: relative;
+    display: inline-block;
+}
+.voucher-logo .plan-icon.pro1 {
+    background-position: -0px -1670px;
+}
+.voucher-logo .plan-icon.pro2 {
+    background-position: -0px -1720px;
+}
+.voucher-logo .plan-icon.pro3 {
+    background-position: -0px -1770px;
+}
+.voucher-logo .plan-icon.pro4 {
+    background-position: -0px -1620px;
+}
+.voucher-logo .v-separator {
+    height: 32px;
+    width: 1px;
+    opacity: 0.5;
+    background-color: #F2F2F2;
+    margin-left: 14px;
+    margin-top: 18px;
+    display: inline-block;
+}
+.voucher-logo .plan-info {
+    width: 122px;
+    display: inline-block;
+    text-align: center;
+}
+.voucher-logo .plan-info .size-head{
+	height: 21px;
+	color: #FFFFFF;
+	font-size: 17px;
+	line-height: 21px;
+	text-align: center;
+}
+.voucher-logo .plan-info .size-bottom{
+	height: 15px;
+	color: #FFFFFF;
+	font-size: 12px;
+	line-height: 15px;
+    text-transform:uppercase;
+}
+
+/*.voucher-info-redeem .delete-img {
+    margin-top: 16px;
+    margin-right: 16px;
+    background-position: 0px -12400px;
+    opacity: 0.4;
+    cursor: pointer;
+}
+*/
+.voucher-info-redeem .inline-buttons {
+    margin-top: 36px;
+}
+.voucher-info-redeem .inline-buttons .red-button.first {
+    background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
+    border: 1px solid #00A58F;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.11), inset 0 2px 1px 0 rgba(255,255,255,0.20);
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    color: #fff;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

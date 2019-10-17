@@ -5,6 +5,7 @@ import MegaRenderMixin from './../../stores/mixins.js';
 import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
 import { Button } from './../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
+import utils from './../../ui/utils.jsx';
 
 export class TypingArea extends MegaRenderMixin(React.Component) {
     static validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
@@ -433,6 +434,9 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             self.updateScroll(false);
         });
         self.triggerOnUpdate(true);
+        if ($container.is(":visible")) {
+            self.updateScroll(false);
+        }
 
     }
     componentWillMount() {
@@ -489,7 +493,9 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         var room = this.props.chatRoom;
 
         if (room.isCurrentlyActive && self.isMounted()) {
-            if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
+            if ($(
+                document.querySelector('textarea:focus,select:focus,input:focus')
+            ).filter(":visible").length === 0) {
                 // no other element is focused...
                 this.focusTypeArea();
             }
@@ -542,22 +548,26 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         }
         return textareaMaxHeight;
     }
+    @utils.SoonFcWrap(10)
     updateScroll(keyEvents) {
         var self = this;
 
         // DONT update if not visible...
-        if (!self.isComponentEventuallyVisible()) {
+        if (!this.props.chatRoom.isCurrentlyActive) {
+            return;
+        }
+        if (!this.isMounted()) {
             return;
         }
 
+        var $node = self.$node = self.$node || $(self.findDOMNode());
 
-        var $node = $(self.findDOMNode());
-
-        var $textarea = $('textarea:first', $node);
-        var $textareaClone = $('.message-preview', $node);
+        var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
+        var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
         var textareaMaxHeight = self.getTextareaMaxHeight();
 
-        var $textareaScrollBlock = $('.textarea-scroll', $node);
+        var $textareaScrollBlock = self.$textareaScrollBlock = self.$textareaScrollBlock ||
+            $('.textarea-scroll', $node);
 
 
         var textareaContent = $textarea.val();
@@ -568,10 +578,8 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
         var scrPos = 0;
         var viewRatio = 0;
 
-
         // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
         if (
-            keyEvents &&
             self.lastContent === textareaContent &&
             self.lastPosition === cursorPosition
         ) {
@@ -614,7 +622,7 @@ export class TypingArea extends MegaRenderMixin(React.Component) {
             jsp = $textareaScrollBlock.data('jsp');
 
             if (!textareaIsFocused) {
-                moveCursortoToEnd($('textarea:visible:first', $node)[0]);
+                moveCursortoToEnd($textarea[0]);
             }
         }
 

@@ -73,7 +73,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
             return false;
         }
 
-        var currentContacts = self.props.contacts;
+        var currentContacts = M.u;
         var foundNonMembers = 0;
         currentContacts.forEach(function(u, k) {
             if (u.c === 1) {
@@ -233,7 +233,6 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                     className="link-button green light"
                     icon="rounded-plus colorized"
                     label={__(l[8007])}
-                    contacts={this.props.contacts}
                     disabled={
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
@@ -245,7 +244,6 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                 >
                     <DropdownContactsSelector
                         contacts={this.props.contacts}
-                        megaChat={this.props.megaChat}
                         chatRoom={room}
                         exclude={
                             excludedParticipants
@@ -371,8 +369,6 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                                 disabled={room.isReadOnly()}
                                 >
                                 <Dropdown
-                                    contacts={this.props.contacts}
-                                    megaChat={this.props.megaChat}
                                     className="wide-dropdown send-files-selector light"
                                     noArrow="true"
                                     vertOffset={4}
@@ -689,12 +685,12 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             self.handleWindowResize();
         }
 
-        var ns = ".convPanel";
-        $container
-            .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
-                self.safeForceUpdate(true);
-                $.tresizer();
-            });
+        // var ns = ".convPanel";
+        // $container
+        //     .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
+        //         self.safeForceUpdate(true);
+        //         $.tresizer();
+        //     });
     }
     componentWillMount() {
         var self = this;
@@ -704,12 +700,26 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         $(chatRoom).rebind('onHistoryDecrypted.cp', function() {
             self.eventuallyUpdate();
         });
+
+        this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(function() {
+            // wait for scrolling (if such is happening at the moment) to finish
+            Soon(function() {
+                if (self.isMounted()) {
+                    $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+                }
+            });
+        });
+
+
     }
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
+
+        chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+        delete this._messagesBuffChangeHandler;
 
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
@@ -788,6 +798,16 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         if (!M.chat) {
             return;
         }
+        if (!this.isMounted()) {
+            // not mounted? remove.
+            this.componentWillUnmount();
+            return;
+        }
+
+        if (!this.props.chatRoom.isCurrentlyActive) {
+            return;
+        }
+
         var $container = $(ReactDOM.findDOMNode(this));
         var self = this;
 
@@ -1051,8 +1071,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             topicBlockClass += " privateChat";
         }
         var privateChatDiv = (room.type === "group") ? "privateChatDiv" : '' ;
-        var messagesList = [
-        ];
+        var messagesList = [];
 
         if (
             (
@@ -1076,9 +1095,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
             self.loadingShown = true;
         }
-        else if (
-            room.messagesBuff.joined === true
-        ) {
+        else if (room.messagesBuff.joined === true) {
             if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
                 var headerText = (
                     room.messagesBuff.messages.length === 0 ?
@@ -1119,7 +1136,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                     </div>
                 );
             }
-
             delete self.loadingShown;
         }
         else {
@@ -1133,7 +1149,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         var lastMessageState = null;
         var grouped = false;
 
-        room.messagesBuff.messages.forEach(function(v, k) {
+        room.messagesBuff.messages.forEach(function (v, k) {
             if (!v.protocol && v.revoked !== true) {
                 var shouldRender = true;
                 if (
@@ -1153,8 +1169,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                 if (todayOrYesterday(iso)) {
                     // if in last 2 days, use the time2lastSeparator
                     curTimeMarker = time2lastSeparator(iso);
-                }
-                else {
+                } else {
                     // if not in the last 2 days, use 1st June [Year]
                     curTimeMarker = acc_time2date(timestamp, true);
                 }
@@ -1164,7 +1179,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                     lastTimeMarker = curTimeMarker;
                     messagesList.push(
                         <div className="message date-divider" key={v.messageId + "_marker"}
-                        title={time2date(timestamp)}>{curTimeMarker}</div>
+                             title={time2date(timestamp)}>{curTimeMarker}</div>
                     );
 
                     grouped = false;
@@ -1189,26 +1204,22 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         if (!lastMessageFrom || (userId && lastMessageFrom === userId)) {
                             if (timestamp - lastGroupedMessageTimeStamp < (5 * 60)) {
                                 grouped = true;
-                            }
-                            else {
+                            } else {
                                 grouped = false;
                                 lastMessageFrom = userId;
                                 lastGroupedMessageTimeStamp = timestamp;
                                 lastMessageState = currentState;
                             }
-                        }
-                        else {
+                        } else {
                             grouped = false;
                             lastMessageFrom = userId;
                             if (lastMessageFrom === userId) {
                                 lastGroupedMessageTimeStamp = timestamp;
-                            }
-                            else {
+                            } else {
                                 lastGroupedMessageTimeStamp = null;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         grouped = false;
                         lastMessageFrom = null;
                         lastGroupedMessageTimeStamp = null;
@@ -1233,40 +1244,35 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
-                    }
-                    else if (v.dialogType === 'truncated') {
+                    } else if (v.dialogType === 'truncated') {
                         messageInstance = <TruncatedMessage
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
-                    }
-                    else if (v.dialogType === 'privilegeChange') {
+                    } else if (v.dialogType === 'privilegeChange') {
                         messageInstance = <PrivilegeChange
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
-                    }
-                    else if (v.dialogType === 'topicChange') {
+                    } else if (v.dialogType === 'topicChange') {
                         messageInstance = <TopicChange
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
-                    }
-                    else if (v.dialogType === 'openModeClosed') {
+                    } else if (v.dialogType === 'openModeClosed') {
                         messageInstance = <CloseOpenModeMessage
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
                         />
-                    }
-                    else if (v.dialogType === 'chatHandleUpdate') {
+                    } else if (v.dialogType === 'chatHandleUpdate') {
                         messageInstance = <ChatHandleMessage
                             message={v}
                             key={v.messageId}
@@ -1275,8 +1281,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         />
                     }
                     messagesList.push(messageInstance);
-                }
-                else {
+                } else {
                     if (!v.chatRoom) {
                         // ChatDialogMessages...
                         v.chatRoom = room;
@@ -1310,8 +1315,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
-                                }
-                                else if (messageContents) {
+                                } else if (messageContents) {
                                     $(room).trigger('onMessageUpdating', v);
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
@@ -1355,8 +1359,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
                                     self.messagesListScrollable.scrollToBottom(true);
                                     self.lastScrollPositionPerc = 1;
-                                }
-                                else if (messageContents.length === 0) {
+                                } else if (messageContents.length === 0) {
 
                                     self.setState({
                                         'confirmDeleteDialog': true,
@@ -1366,7 +1369,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
                                 self.setState({'editing': false});
 
-                                Soon(function() {
+                                Soon(function () {
                                     $('.chat-textarea-block:visible textarea').focus();
                                 }, 300);
                             }}
@@ -1414,7 +1417,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             nonLoggedInJoinChatDialog = <ModalDialogsUI.ModalDialog
                 title={l[20596]}
                 className={"fm-dialog chat-links-preview-desktop"}
-                megaChat={room.megaChat}
                 chatRoom={room}
                 onClose={() => {
                     self.setState({'nonLoggedInJoinChatDialog': false});
@@ -1465,7 +1467,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                 privateChatDialog = <ModalDialogsUI.ModalDialog
                     title={l[20594]}
                     className={"fm-dialog create-private-chat"}
-                    megaChat={room.megaChat}
                     chatRoom={room}
                     onClose={() => {
                         self.setState({'privateChatDialog': false});
@@ -1544,10 +1545,8 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             }
 
             sendContactDialog = <ModalDialogsUI.SelectContactDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 exclude={excludedContacts}
-                contacts={M.u}
                 onClose={() => {
                     self.setState({'sendContactDialog': false});
                     selected = [];
@@ -1563,7 +1562,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         var confirmDeleteDialog = null;
         if (self.state.confirmDeleteDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[8004])}
                 name="delete-message"
@@ -1648,7 +1646,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         var pasteImageConfirmDialog = null;
         if (self.state.pasteImageConfirmDialog) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[20905])}
                 name="paste-image-chat"
@@ -1712,7 +1709,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         var confirmTruncateDialog = null;
         if (self.state.truncateDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[8871])}
                 name="truncate-conversation"
@@ -1741,7 +1737,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
         if (self.state.archiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[19068])}
                 name="archive-conversation"
@@ -1768,7 +1763,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         }
         if (self.state.unarchiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[19063])}
                 name="unarchive-conversation"
@@ -1806,7 +1800,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                 self.props.chatRoom.getRoomTitle();
 
             confirmDeleteDialog = <ModalDialogsUI.ModalDialog
-                megaChat={room.megaChat}
                 chatRoom={room}
                 title={__(l[9080])}
                 name="rename-group"
@@ -1890,15 +1883,13 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             </div>;
         }
         else {
-            var contacts = room.getParticipantsExceptMe();
-            var contactHandle = contacts[0];
-            var contact = M.u[contactHandle];
+            contactHandle = contacts[0];
+            contact = M.u[contactHandle];
 
             topicInfo = <ContactCard
                 className="short"
                 noContextButton="true"
                 contact={contact}
-                megaChat={self.props.chatRoom.megaChat}
                 showLastGreen={true}
                 key={contact.u}/>
         }
@@ -1913,9 +1904,8 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                     {!room.megaChat.chatUIFlags['convPanelCollapse'] ? <ConversationRightArea
                         isVisible={this.props.chatRoom.isCurrentlyActive}
                         chatRoom={this.props.chatRoom}
+                        roomFlags={this.props.chatRoom.flags}
                         members={this.props.chatRoom.membersSetFromApi}
-                        contacts={self.props.contacts}
-                        megaChat={this.props.chatRoom.megaChat}
                         messagesBuff={room.messagesBuff}
                         onAttachFromComputerClicked={function() {
                             self.uploadFromComputer();
@@ -1989,8 +1979,6 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         room.callManagerCall && room.callManagerCall.isStarted() ?
                             <ConversationAudioVideoPanel
                                 chatRoom={this.props.chatRoom}
-                                contacts={self.props.contacts}
-                                megaChat={this.props.chatRoom.megaChat}
                                 unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
                                 onMessagesToggle={function(isActive) {
                                     self.setState({
@@ -2108,7 +2096,11 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                 >
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
-                                        <div className="loading-spinner js-messages-loading light manual-management"
+                                        <div className={
+                                            "loading-spinner js-messages-loading light manual-management" + (
+                                                !self.loadingShown ? " hidden" : ""
+                                            )
+                                        }
                                          key="loadingSpinner" style={{top: "50%"}}>
                                             <div className="main-loader" style={{
                                                 'position': 'fixed',
@@ -2302,56 +2294,85 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
         if (hadLoaded && getSitePath() === "/fm/chat") {
             // do we need to "activate" an conversation?
             var activeFound = false;
-            self.props.conversations.forEach(function (chatRoom) {
-                if (chatRoom.isCurrentlyActive) {
-                    activeFound = true;
-                }
-            });
-            if (self.props.conversations.length > 0 && !activeFound) {
-                self.props.megaChat.showLastActive();
+           if (megaChat.currentlyOpenedChat && megaChat[megaChat.currentlyOpenedChat]) {
+               activeFound = true;
+           }
+
+            if (megaChat.chats.length > 0 && !activeFound) {
+                megaChat.showLastActive();
             }
         }
 
-        hadLoaded && self.props.conversations.forEach(function(chatRoom) {
-            var otherParticipants = chatRoom.getParticipantsExceptMe();
+        if (!hadLoaded && !self._waitLoadingChats) {
+            self._waitLoadingChats = true;
+            megaChat.plugins.chatdIntegration.chatd.rebind('onMessagesHistoryDone.convUImain', function() {
+                if (anonymouschat || (
+                    ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
+                    ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
+                    Object.keys(ChatdIntegration._loadingChats).length === 0
+                )) {
+                    megaChat.plugins.chatdIntegration.chatd.unbind('onMessagesHistoryDone.convUImain');
+                    Soon(function() {
+                        self.safeForceUpdate();
+                        if (M.currentdirid === "chat") {
+                            megaChat.showLastActive();
+                        }
+                    });
+                }
+            });
+            // also update immediately after chats had loaded, since there may be no history/chats to pull
+            var finishedLoadingInitial = function() {
+                if (megaChat.chats.length === 0) {
+                    Soon(function () {
+                        self.safeForceUpdate();
+                    });
+                }
+            };
 
-            var contact;
-            if (otherParticipants && otherParticipants.length > 0) {
-                contact = M.u[otherParticipants[0]];
-            }
+            ChatdIntegration.allChatsHadLoaded.always(finishedLoadingInitial);
+            ChatdIntegration.mcfHasFinishedPromise.always(finishedLoadingInitial);
+        }
 
-            conversations.push(
-                <ConversationPanel
-                    chatUIFlags={self.props.chatUIFlags}
-                    isExpanded={chatRoom.megaChat.chatUIFlags['convPanelCollapse']}
-                    chatRoom={chatRoom}
-                    isActive={chatRoom.isCurrentlyActive}
-                    messagesBuff={chatRoom.messagesBuff}
-                    contacts={M.u}
-                    contact={contact}
-                    key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
+        var now = Date.now();
+
+        hadLoaded && megaChat.chats.forEach(function(chatRoom) {
+            if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
+                conversations.push(
+                    <ConversationPanel
+                        chatUIFlags={self.props.chatUIFlags}
+                        isExpanded={chatRoom.megaChat.chatUIFlags['convPanelCollapse']}
+                        chatRoom={chatRoom}
+                        roomType={chatRoom.type}
+                        isActive={chatRoom.isCurrentlyActive}
+                        messagesBuff={chatRoom.messagesBuff}
+                        key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
                     />
-            );
+                );
+            }
         });
 
-        if (conversations.length === 0) {
+        if (megaChat.chats.length === 0) {
+            if (!self._MuChangeListener) {
+                self._MuChangeListener = M.u.addChangeListener(function() {
+                    self.safeForceUpdate();
+                });
+            }
             var contactsList = [];
             var contactsListOffline = [];
 
             if (hadLoaded) {
-                self.props.contacts.forEach(function (contact) {
-                    if (contact.u === u_handle) {
-                        return;
-                    }
-                    if(contact.c === 1) {
-                        var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
+                var lim = Math.min(10, M.u.length);
+                var userHandles = M.u.keys();
+                for (var i = 0; i < lim; i++) {
+                    var contact = M.u[userHandles[i]];
+                    if(contact.u !== u_handle && contact.c === 1) {
+                        var pres = megaChat.userPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactCard contact={contact} megaChat={self.props.megaChat}
-                                                    key={contact.u}/>
+                            <ContactCard contact={contact} key={contact.u}/>
                         );
                     }
-                });
+                }
             }
             var emptyMessage = hadLoaded ?
                 l[8008] :
@@ -2359,14 +2380,14 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
 
             return (
                 <div>
-                    <div className="chat-right-area">
+                    {hadLoaded ? <div className="chat-right-area">
                         <div className="chat-right-area contacts-list-scroll">
                             <div className="chat-right-pad">
                                 {contactsList}
                                 {contactsListOffline}
                             </div>
                         </div>
-                    </div>
+                    </div> : null}
                     <div className="empty-block">
                         <div className="empty-pad conversations">
                             <div className="fm-empty-conversations-bg"></div>
@@ -2385,6 +2406,16 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
             );
         }
         else {
+            if (self._MuChangeListener) {
+                M.u.removeChangeListener(self._MuChangeListener);
+                delete self._MuChangeListener;
+            }
+            if (M.currentdirid === "chat" && conversations.length === 0 && megaChat.chats.length !== 0 && hadLoaded) {
+                // initial load on /fm/chat. focring to show a room.
+                onIdle(function() {
+                    megaChat.showLastActive();
+                });
+            }
             return (
                 <div className={"conversation-panels " + self.props.className}>
                     {conversations}

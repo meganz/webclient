@@ -2495,6 +2495,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
+        jsl.push({f:'html/voucherinfo.html', n: 'm_voucherinfo', j: 0, w: 1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2983,7 +2984,7 @@ else if (!browserUpdate) {
     // unlimited (0 ms) and let the lower layers handle it (e.g. use the browser default timeout) which can let the
     // site load slowly over 5 minutes if they are on a really bad connection. For the EU static server (which we
     // assume never fails) we set the timeout to unlimited.
-    var xhr_timeout = (staticpath === defaultStaticPath) ? 0 : 15000;
+    var xhr_timeout = (staticpath === defaultStaticPath || is_msie) ? 0 : 15000;
 
     /**
      * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
@@ -3143,10 +3144,13 @@ else if (!browserUpdate) {
 
             // If a response is received (after 50ms or the 1st byte), set the timeout to 0 so that we wait as long as
             // possible to receive the rest of the files. This means even slow connections (< GPRS) can load the site.
-            xhr_stack[xhri].onprogress = function() {
-                this.timeout = 0;
-                xhr_timeout = 0;
-            };
+            // excluding IE, since IE doesnt support setting "timeout" after "send"
+            if (!is_msie) {
+                xhr_stack[xhri].onprogress = function() {
+                    this.timeout = 0;
+                    xhr_timeout = 0;
+                };
+            }
 
             if (is_chrome_firefox || is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');

@@ -289,7 +289,7 @@ export class DropdownContactsSelector extends MegaRenderMixin(React.Component) {
                 <ContactPickerWidget
                     active={this.props.active}
                     className="popup contacts-search tooltip-blur small-footer"
-                    contacts={this.props.contacts}
+                    contacts={M.u}
                     selectFooter={this.props.selectFooter}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}

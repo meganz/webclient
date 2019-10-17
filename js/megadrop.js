@@ -90,7 +90,7 @@ mega.megadrop = (function() {
             'confirmation',
             l[1003],
             fldName,
-            false,
+            l[18229],
             function(e) {
                 if (e) {
                     closeDialog();

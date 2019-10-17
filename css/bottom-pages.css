@@ -4176,7 +4176,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
     font-family: 'LatoWebBold';
-    color: #495057;
     font-size: 17px;
     line-height: 25px
 }
@@ -4189,7 +4188,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
     font-size: 14px;
-    color: #FDA416;
     margin-top: 4px;
     text-transform: uppercase;
     line-height: 20px;

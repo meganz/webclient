@@ -97,7 +97,7 @@ module.exports = React;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
@@ -183,7 +183,7 @@ if (window._propertyTrackChangesVars) {
 }
 
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
-var FUNCTIONS = ['render', 'shouldComponentUpdate', 'doProgramaticScroll', 'componentDidMount', 'componentDidUpdate', 'componentWillUnmount', 'refreshUI', 'eventuallyInit', 'handleWindowResize', 'isActive', 'onMessagesScrollReinitialise', 'specificShouldComponentUpdate', 'attachAnimationEvents', 'eventuallyReinitialise', 'reinitialise', 'getContentHeight', 'onResize', 'isComponentEventuallyVisible'];
+var FUNCTIONS = ['render', 'shouldComponentUpdate', 'doProgramaticScroll', 'componentDidMount', 'componentDidUpdate', 'componentWillUnmount', 'refreshUI', 'eventuallyInit', 'handleWindowResize', 'focusTypeArea', 'initScrolling', 'updateScroll', 'isActive', 'onMessagesScrollReinitialise', 'specificShouldComponentUpdate', 'attachAnimationEvents', 'eventuallyReinitialise', 'reinitialise', 'reinitialised', 'getContentHeight', 'getScrollWidth', 'isAtBottom', 'onResize', 'isComponentEventuallyVisible', 'getCursorPosition', 'getTextareaMaxHeight'];
 var localStorageProfileRenderFns = localStorage.profileRenderFns;
 
 if (localStorageProfileRenderFns) {
@@ -198,9 +198,13 @@ var ID_CURRENT = 0;
       _inherits(MegaRenderMixin, _superClass);
 
       function MegaRenderMixin(props) {
+        var _this;
+
         _classCallCheck(this, MegaRenderMixin);
 
-        return _possibleConstructorReturn(this, _getPrototypeOf(MegaRenderMixin).call(this, props));
+        _this = _possibleConstructorReturn(this, _getPrototypeOf(MegaRenderMixin).call(this, props));
+        _this.__intersectionObserver = _this.__intersectionObserver.bind(_assertThisInitialized(_this));
+        return _this;
       }
 
       _createClass(MegaRenderMixin, [{
@@ -219,6 +223,21 @@ var ID_CURRENT = 0;
           $(window).off('resize.megaRenderMixing' + this.getUniqueId());
           $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
           window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+
+          if (typeof this.__intersectionVisibility !== 'undefined' && this.__intersectionObserver && this.__intersectionObserver.unobserve) {
+            this.__intersectionObserver.disconnect();
+
+            delete this.__intersectionObserver;
+            this.__intersectionVisibility = undefined;
+          }
+
+          if (this._dataStructListeners) {
+            this._internalDetachRenderCallbacks();
+          }
+
+          if (this.detachRerenderCallbacks) {
+            this.detachRerenderCallbacks();
+          }
         }
       }, {
         key: "getReactId",
@@ -269,6 +288,15 @@ var ID_CURRENT = 0;
           }, TIMEOUT_VAL);
         }
       }, {
+        key: "__intersectionObserver",
+        value: function __intersectionObserver(entries) {
+          if (entries[0].intersectionRatio <= 0) {
+            this.__intersectionVisibility = false;
+          } else {
+            this.__intersectionVisibility = true;
+          }
+        }
+      }, {
         key: "componentDidMount",
         value: function componentDidMount() {
           if (_get(_getPrototypeOf(MegaRenderMixin.prototype), "componentDidMount", this)) {
@@ -281,7 +309,10 @@ var ID_CURRENT = 0;
             $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
           }
 
-          $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+          if (!this.props.skipQueuedUpdatesOnResize) {
+            $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+          }
+
           window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this)); // init on data structure change events
 
           if (this.props) {
@@ -301,6 +332,21 @@ var ID_CURRENT = 0;
           //
           //this.requiresLazyRendering();
 
+
+          if (typeof IntersectionObserver !== 'undefined') {
+            var node = this.findDOMNode();
+
+            if (node) {
+              this.__intersectionVisibility = false;
+              this.__intersectionObserver = new IntersectionObserver(this.__intersectionObserver);
+
+              this.__intersectionObserver.observe(node);
+            }
+          }
+
+          if (this.attachRerenderCallbacks) {
+            this.attachRerenderCallbacks();
+          }
         }
       }, {
         key: "findDOMNode",
@@ -319,6 +365,12 @@ var ID_CURRENT = 0;
 
           if (!this.__isMounted) {
             return false;
+          }
+
+          if (this.__intersectionVisibility === false) {
+            return false;
+          } else {
+            return true;
           } // offsetParent should NOT trigger a reflow/repaint
 
 
@@ -356,6 +408,12 @@ var ID_CURRENT = 0;
           }
 
           if (this.props.isVisible) {
+            return true;
+          }
+
+          if (this.__intersectionVisibility === false) {
+            return false;
+          } else {
             return true;
           } // offsetParent should NOT trigger a reflow/repaint
 
@@ -415,7 +473,7 @@ var ID_CURRENT = 0;
       }, {
         key: "queuedUpdateOnResize",
         value: function queuedUpdateOnResize() {
-          if (this.isMounted() && this._requiresUpdateOnResize && this.isComponentEventuallyVisible()) {
+          if (this._requiresUpdateOnResize && this.isMounted() && this.isComponentEventuallyVisible()) {
             this._requiresUpdateOnResize = false;
             this.eventuallyUpdate();
           }
@@ -447,7 +505,7 @@ var ID_CURRENT = 0;
 
             if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
               _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
-                self.onPropOrStateUpdated(map, idx);
+                self.throttledOnPropOrStateUpdated(map, idx);
               });
             }
           }
@@ -456,12 +514,17 @@ var ID_CURRENT = 0;
             return;
           }
 
-          var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
-          mapKeys.forEach(function (k) {
-            if (map[k]) {
-              self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
+          if (!self.props.manualDataChangeTracking) {
+            var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+
+            for (var i = 0; i < mapKeys.length; i++) {
+              var k = mapKeys[i];
+
+              if (map[k]) {
+                self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
+              }
             }
-          });
+          }
         }
       }, {
         key: "_checkDataStructForChanges",
@@ -577,6 +640,10 @@ var ID_CURRENT = 0;
         value: function shouldComponentUpdate(nextProps, nextState) {
           var shouldRerender = false;
 
+          if (megaChat && megaChat.isLoggingOut) {
+            return false;
+          }
+
           if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             if (window.RENDER_DEBUG) {
               console.error("shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState);
@@ -589,6 +656,10 @@ var ID_CURRENT = 0;
             // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
             if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
               this._queueUpdateWhenVisible = true;
+
+              if (window.RENDER_DEBUG) {
+                console.error("shouldUpdate? No.", "F1.1", this.getElementName(), this.props, nextProps, this.state, nextState);
+              }
             } else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
               delete this._queueUpdateWhenVisible;
               return true;
@@ -604,6 +675,7 @@ var ID_CURRENT = 0;
                 console.error("shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState);
               }
 
+              this._requiresUpdateOnResize = true;
               return false;
             } else if (r === true) {
               return true;
@@ -615,6 +687,7 @@ var ID_CURRENT = 0;
               console.error("shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState);
             }
 
+            this._requiresUpdateOnResize = true;
             return false;
           }
 
@@ -663,6 +736,10 @@ var ID_CURRENT = 0;
 
           if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
             return;
+          }
+
+          if (megaChat && megaChat.isLoggingOut) {
+            return false;
           }
 
           this.forceUpdate();
@@ -757,6 +834,49 @@ var ID_CURRENT = 0;
             };
           }
         }
+      }, {
+        key: "throttledOnPropOrStateUpdated",
+        value: function throttledOnPropOrStateUpdated() {
+          if (this.throttledOnPropOrStateUpdatedHandler) {
+            _cancelOnIdleOrTimeout(this.throttledOnPropOrStateUpdatedHandler);
+          }
+
+          _onIdleOrTimeout(this.onPropOrStateUpdated.bind(this), 300);
+        }
+      }, {
+        key: "_internalDetachRenderCallbacks",
+        value: function _internalDetachRenderCallbacks() {
+          if (!this._dataStructListeners) {
+            return;
+          }
+
+          this._dataStructListeners.forEach(function (row) {
+            if (row[0] === 'dsprops') {
+              row[2].removeChangeListener(row[1]);
+            }
+          });
+        }
+      }, {
+        key: "addDataStructListenerForProperties",
+        value: function addDataStructListenerForProperties(obj, properties) {
+          if (!obj) {
+            // this should not happen, but in rare cases it does...so we should just skip.
+            return;
+          }
+
+          if (!this._dataStructListeners) {
+            this._dataStructListeners = [];
+          }
+
+          var self = this;
+          var id = obj.addChangeListener(function (obj, data, k) {
+            if (properties.indexOf(k) > -1) {
+              self.throttledOnPropOrStateUpdated();
+            }
+          });
+
+          this._dataStructListeners.push(['dsprops', id, obj]);
+        }
       }]);
 
       return MegaRenderMixin;
@@ -782,17 +902,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(4);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
 /* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -828,6 +948,11 @@ function (_MegaRenderMixin) {
   }
 
   _createClass(ContactsListItem, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'avatar', 'presence']);
+    }
+  }, {
     key: "render",
     value: function render() {
       var classString = "nw-conversations-item";
@@ -837,7 +962,7 @@ function (_MegaRenderMixin) {
         return null;
       }
 
-      classString += " " + this.props.megaChat.userPresenceToCssClass(contact.presence);
+      classString += " " + megaChat.userPresenceToCssClass(contact.presence);
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: classString,
         onClick: this.props.onContactClicked.bind(this)
@@ -853,6 +978,10 @@ function (_MegaRenderMixin) {
 
   return ContactsListItem;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+ContactsListItem.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
 ;
 var ContactButton =
 /*#__PURE__*/
@@ -866,6 +995,11 @@ function (_MegaRenderMixin2) {
   }
 
   _createClass(ContactButton, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname']);
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
@@ -877,7 +1011,6 @@ function (_MegaRenderMixin2) {
       var dropdownPosition = "left top";
       var vertOffset = 0;
       var horizOffset = -30;
-      var megaChat = self.props.megaChat ? self.props.megaChat : window.megaChat;
 
       if (label) {
         classes = "user-card-name " + classes;
@@ -1117,6 +1250,10 @@ function (_MegaRenderMixin2) {
 
   return ContactButton;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+ContactButton.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
 ;
 var ContactVerified =
 /*#__PURE__*/
@@ -1130,28 +1267,9 @@ function (_MegaRenderMixin3) {
   }
 
   _createClass(ContactVerified, [{
-    key: "componentWillMount",
-    value: function componentWillMount() {
-      var self = this;
-      var contact = this.props.contact;
-
-      if (contact && contact.addChangeListener) {
-        self._contactListener = contact.addChangeListener(function () {
-          self.safeForceUpdate();
-        });
-      }
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      _get(_getPrototypeOf(ContactVerified.prototype), "componentWillUnmount", this).call(this);
-
-      var self = this;
-      var contact = this.props.contact;
-
-      if (contact && self._contactListener) {
-        contact.removeChangeListener(self._contactListener);
-      }
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
     }
   }, {
     key: "render",
@@ -1191,27 +1309,55 @@ function (_MegaRenderMixin3) {
 
   return ContactVerified;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
-;
-var ContactPresence = function ContactPresence(_ref) {
-  var contact = _ref.contact,
-      _ref$megaChat = _ref.megaChat,
-      megaChat = _ref$megaChat === void 0 ? window.megaChat : _ref$megaChat,
-      _ref$className = _ref.className,
-      className = _ref$className === void 0 ? '' : _ref$className;
-
-  if (!contact || !contact.c) {
-    return null;
-  }
-
-  var pres = megaChat.userPresenceToCssClass(contact.presence);
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "user-card-presence ".concat(pres, " ").concat(className)
-  });
+ContactVerified.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
 };
-var ContactFingerprint =
+;
+var ContactPresence =
 /*#__PURE__*/
 function (_MegaRenderMixin4) {
-  _inherits(ContactFingerprint, _MegaRenderMixin4);
+  _inherits(ContactPresence, _MegaRenderMixin4);
+
+  function ContactPresence() {
+    _classCallCheck(this, ContactPresence);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(ContactPresence).apply(this, arguments));
+  }
+
+  _createClass(ContactPresence, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'avatar']);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var contact = this.props.contact;
+      var className = this.props.className || '';
+
+      if (!contact || !contact.c) {
+        return null;
+      }
+
+      var pres = megaChat.userPresenceToCssClass(contact.presence);
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "user-card-presence ".concat(pres, " ").concat(className)
+      });
+    }
+  }]);
+
+  return ContactPresence;
+}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+ContactPresence.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
+;
+var ContactFingerprint =
+/*#__PURE__*/
+function (_MegaRenderMixin5) {
+  _inherits(ContactFingerprint, _MegaRenderMixin5);
 
   function ContactFingerprint() {
     _classCallCheck(this, ContactFingerprint);
@@ -1220,6 +1366,11 @@ function (_MegaRenderMixin4) {
   }
 
   _createClass(ContactFingerprint, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
@@ -1275,12 +1426,16 @@ function (_MegaRenderMixin4) {
 
   return ContactFingerprint;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+ContactFingerprint.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
 ;
 var _noAvatars = {};
 var Avatar =
 /*#__PURE__*/
-function (_MegaRenderMixin5) {
-  _inherits(Avatar, _MegaRenderMixin5);
+function (_MegaRenderMixin6) {
+  _inherits(Avatar, _MegaRenderMixin6);
 
   function Avatar() {
     _classCallCheck(this, Avatar);
@@ -1289,6 +1444,11 @@ function (_MegaRenderMixin5) {
   }
 
   _createClass(Avatar, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'avatar']);
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
@@ -1374,11 +1534,15 @@ function (_MegaRenderMixin5) {
 
   return Avatar;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+Avatar.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
 ;
 var ContactCard =
 /*#__PURE__*/
-function (_MegaRenderMixin6) {
-  _inherits(ContactCard, _MegaRenderMixin6);
+function (_MegaRenderMixin7) {
+  _inherits(ContactCard, _MegaRenderMixin7);
 
   function ContactCard() {
     _classCallCheck(this, ContactCard);
@@ -1387,6 +1551,11 @@ function (_MegaRenderMixin6) {
   }
 
   _createClass(ContactCard, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['presence', 'name', 'firstName', 'lastName', 'nickname', 'avatar']);
+    }
+  }, {
     key: "specificShouldComponentUpdate",
     value: function specificShouldComponentUpdate(nextProps, nextState) {
       var self = this;
@@ -1444,7 +1613,7 @@ function (_MegaRenderMixin6) {
         return null;
       }
 
-      var pres = (this.props.megaChat ? this.props.megaChat : window.megaChat).userPresenceToCssClass(contact.presence);
+      var pres = megaChat.userPresenceToCssClass(contact.presence);
       var avatarMeta = generateAvatarMeta(contact.u);
       var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
 
@@ -1544,8 +1713,7 @@ function (_MegaRenderMixin6) {
         noContextMenu: noContextMenu,
         contact: contact,
         className: self.props.dropdownButtonClasses,
-        dropdownRemoveButton: dropdownRemoveButton,
-        megaChat: self.props.megaChat ? this.props.megaChat : window.megaChat
+        dropdownRemoveButton: dropdownRemoveButton
       }), selectionTick, userCard);
     }
   }]);
@@ -1555,13 +1723,15 @@ function (_MegaRenderMixin6) {
 ContactCard.defaultProps = {
   'dropdownButtonClasses': "default-white-button tiny-button",
   'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
-  presenceClassName: ''
+  'presenceClassName': '',
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
 };
 ;
 var ContactItem =
 /*#__PURE__*/
-function (_MegaRenderMixin7) {
-  _inherits(ContactItem, _MegaRenderMixin7);
+function (_MegaRenderMixin8) {
+  _inherits(ContactItem, _MegaRenderMixin8);
 
   function ContactItem() {
     _classCallCheck(this, ContactItem);
@@ -1570,6 +1740,11 @@ function (_MegaRenderMixin7) {
   }
 
   _createClass(ContactItem, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'avatar']);
+    }
+  }, {
     key: "render",
     value: function render() {
       var classString = "nw-conversations-item";
@@ -1608,11 +1783,15 @@ function (_MegaRenderMixin7) {
 
   return ContactItem;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+ContactItem.defaultProps = {
+  'manualDataChangeTracking': true,
+  'skipQueuedUpdatesOnResize': true
+};
 ;
 var ContactPickerWidget =
 /*#__PURE__*/
-function (_MegaRenderMixin8) {
-  _inherits(ContactPickerWidget, _MegaRenderMixin8);
+function (_MegaRenderMixin9) {
+  _inherits(ContactPickerWidget, _MegaRenderMixin9);
 
   function ContactPickerWidget(props) {
     var _this;
@@ -1733,7 +1912,7 @@ function (_MegaRenderMixin8) {
         return false;
       }
 
-      var pres = self.props.megaChat.getPresence(v.u);
+      var pres = megaChat.getPresence(v.u);
 
       if (!forced && (v.c != 1 || v.u == u_handle)) {
         return false;
@@ -1843,7 +2022,7 @@ function (_MegaRenderMixin8) {
       if (self.props.readOnly) {
         (self.state.selected || []).forEach(function (v, k) {
           contactsSelected.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactItem, {
-            contact: self.props.contacts[v],
+            contact: M.u[v],
             key: v
           }));
         });
@@ -1920,7 +2099,7 @@ function (_MegaRenderMixin8) {
           onContactSelectDoneCb = onContactSelectDoneCb.bind(self);
           (self.state.selected || []).forEach(function (v, k) {
             contactsSelected.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactItem, {
-              contact: self.props.contacts[v],
+              contact: M.u[v],
               onClick: onContactSelectDoneCb,
               key: v
             }));
@@ -2148,12 +2327,6 @@ ContactPickerWidget.defaultProps = {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-module.exports = ReactDOM;
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2183,7 +2356,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 /**
@@ -2557,6 +2730,12 @@ function SoonFcWrap(milliseconds) {
 });
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
 /* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2565,7 +2744,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Dropdown", function() { return Dropdown; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownContactsSelector", function() { return DropdownContactsSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownItem", function() { return DropdownItem; });
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2910,7 +3089,7 @@ function (_MegaRenderMixin2) {
       }, React.makeElement(_chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__["ContactPickerWidget"], {
         active: this.props.active,
         className: "popup contacts-search tooltip-blur small-footer",
-        contacts: this.props.contacts,
+        contacts: M.u,
         selectFooter: this.props.selectFooter,
         megaChat: this.props.megaChat,
         exclude: this.props.exclude,
@@ -3049,7 +3228,7 @@ DropdownItem.defaultProps = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(12);
 /* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
@@ -3077,7 +3256,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -3337,12 +3516,12 @@ function (_MegaRenderMixin3) {
         }]
       }, React.makeElement(ContactsUI.ContactPickerWidget, {
         megaChat: self.props.megaChat,
-        contacts: self.props.contacts,
         exclude: self.props.exclude,
         selectableContacts: "true",
         onSelectDone: self.props.onSelectClicked,
         onSelected: self.onSelected,
         selected: self.state.selected,
+        contacts: M.u,
         headerClasses: "left-aligned",
         multiple: true
       }));
@@ -3365,10 +3544,14 @@ var ConfirmDialog =
 function (_MegaRenderMixin4) {
   _inherits(ConfirmDialog, _MegaRenderMixin4);
 
-  function ConfirmDialog() {
+  function ConfirmDialog(props) {
+    var _this3;
+
     _classCallCheck(this, ConfirmDialog);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(ConfirmDialog).apply(this, arguments));
+    _this3 = _possibleConstructorReturn(this, _getPrototypeOf(ConfirmDialog).call(this, props));
+    _this3._wasAutoConfirmed = undefined;
+    return _this3;
   }
 
   _createClass(ConfirmDialog, [{
@@ -3413,6 +3596,7 @@ function (_MegaRenderMixin4) {
 
       var self = this;
       self.unbindEvents();
+      delete this._wasAutoConfirmed;
     }
   }, {
     key: "onConfirmClicked",
@@ -3429,8 +3613,13 @@ function (_MegaRenderMixin4) {
       var self = this;
 
       if (self.props.dontShowAgainCheckbox && mega.config.get('confirmModal_' + self.props.name) === true) {
+        if (this._wasAutoConfirmed) {
+          return null;
+        }
+
         if (this.props.onConfirmClicked) {
-          // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
+          this._wasAutoConfirmed = 1; // this would most likely cause a .setState, so it should be done in a separate cycle/call stack.
+
           setTimeout(function () {
             self.unbindEvents();
             self.props.onConfirmClicked();
@@ -3538,9 +3727,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 var _buttonGroups = {};
@@ -3796,7 +3985,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -3824,7 +4013,7 @@ function (_MegaRenderMixin) {
       var contact = self.getContact();
 
       var changedCb = function changedCb(contact, oldData, k, v) {
-        if (k === "ts") {
+        if (k === "ts" || k === "ats") {
           // no updates needed in case of 'ts' change
           // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
           return;
@@ -4076,7 +4265,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 var x = 0;
@@ -4097,6 +4286,15 @@ function (_MegaRenderMixin) {
   }
 
   _createClass(PerfectScrollbar, [{
+    key: "get$Node",
+    value: function get$Node() {
+      if (!this.$Node) {
+        this.$Node = $(this.findDOMNode());
+      }
+
+      return this.$Node;
+    }
+  }, {
     key: "doProgramaticScroll",
     value: function doProgramaticScroll(newPos, forced, isX) {
       if (!this.isMounted()) {
@@ -4104,14 +4302,9 @@ function (_MegaRenderMixin) {
       }
 
       var self = this;
-      var $elem = $(ReactDOM.findDOMNode(self));
+      var $elem = self.get$Node();
       var animFrameInner = false;
       var prop = !isX ? 'scrollTop' : 'scrollLeft';
-
-      if (!forced && $elem[0] && $elem[0][prop] === newPos) {
-        return;
-      }
-
       var idx = self.scrollEventIncId++;
       $elem.rebind('scroll.progscroll' + idx, function (idx, e) {
         if (animFrameInner) {
@@ -4132,6 +4325,7 @@ function (_MegaRenderMixin) {
         self.isUserScroll = true;
         $elem.off('scroll.progscroll' + idx);
       }.bind(this, idx));
+      return true;
     }
   }, {
     key: "componentDidMount",
@@ -4139,7 +4333,7 @@ function (_MegaRenderMixin) {
       _get(_getPrototypeOf(PerfectScrollbar.prototype), "componentDidMount", this).call(this);
 
       var self = this;
-      var $elem = $(ReactDOM.findDOMNode(self));
+      var $elem = self.get$Node();
       $elem.height('100%');
       var options = $.extend({}, {
         'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection']
@@ -4180,7 +4374,7 @@ function (_MegaRenderMixin) {
     value: function componentWillUnmount() {
       _get(_getPrototypeOf(PerfectScrollbar.prototype), "componentWillUnmount", this).call(this);
 
-      var $elem = $(ReactDOM.findDOMNode(this));
+      var $elem = this.get$Node();
       $elem.off('ps-scroll-y.ps' + this.getUniqueId());
       var ns = '.ps' + this.getUniqueId();
       $elem.parents('.have-animation').unbind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
@@ -4192,23 +4386,21 @@ function (_MegaRenderMixin) {
 
       if (!self.isMounted()) {
         return;
-      }
+      } // var $haveAnimationNode = self._haveAnimNode;
+      //
+      // if (!$haveAnimationNode) {
+      //     var $node = self.get$Node();
+      //     var ns = '.ps' + self.getUniqueId();
+      //     $haveAnimationNode = self._haveAnimNode = $node.parents('.have-animation');
+      // }
+      // $haveAnimationNode.rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns,
+      //     function(e) {
+      //         self.safeForceUpdate(true);
+      //         if (self.props.onAnimationEnd) {
+      //             self.props.onAnimationEnd();
+      //         }
+      //     });
 
-      var $haveAnimationNode = self._haveAnimNode;
-
-      if (!$haveAnimationNode) {
-        var $node = $(self.findDOMNode());
-        var ns = '.ps' + self.getUniqueId();
-        $haveAnimationNode = self._haveAnimNode = $node.parents('.have-animation');
-      }
-
-      $haveAnimationNode.rebind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function (e) {
-        self.safeForceUpdate(true);
-
-        if (self.props.onAnimationEnd) {
-          self.props.onAnimationEnd();
-        }
-      });
     }
   }, {
     key: "eventuallyReinitialise",
@@ -4223,7 +4415,7 @@ function (_MegaRenderMixin) {
         return;
       }
 
-      var $elem = $(self.findDOMNode());
+      var $elem = self.get$Node();
 
       if (forced || self._currHeight != self.getContentHeight()) {
         self._currHeight = self.getContentHeight();
@@ -4234,16 +4426,7 @@ function (_MegaRenderMixin) {
   }, {
     key: "_doReinit",
     value: function _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
-      var self = this;
-
-      if (!self.isMounted()) {
-        return;
-      }
-
-      if (!self.isComponentEventuallyVisible()) {
-        return;
-      } // triggers an
-
+      var self = this; // triggers an
 
       self.doProgramaticScroll($elem[0].scrollTop, true);
       var manualReinitialiseControl = false;
@@ -4267,7 +4450,9 @@ function (_MegaRenderMixin) {
   }, {
     key: "scrollToBottom",
     value: function scrollToBottom(skipReinitialised) {
-      this.doProgramaticScroll(9999999);
+      if (!this.doProgramaticScroll(PerfectScrollbar.MAX_BOTTOM_POS)) {
+        return false;
+      }
 
       if (!skipReinitialised) {
         this.reinitialised(true);
@@ -4276,7 +4461,7 @@ function (_MegaRenderMixin) {
   }, {
     key: "reinitialise",
     value: function reinitialise(skipReinitialised) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
       this.isUserScroll = false;
       Ps.update($elem[0]);
       this.isUserScroll = true;
@@ -4288,8 +4473,8 @@ function (_MegaRenderMixin) {
   }, {
     key: "getScrollHeight",
     value: function getScrollHeight() {
-      var $elem = $(this.findDOMNode());
-      var outerHeightContainer = $elem.children(":first").outerHeight();
+      var $elem = this.get$Node();
+      var outerHeightContainer = $($elem[0].children[0]).outerHeight();
       var outerHeightScrollable = $elem.outerHeight();
       var res = outerHeightContainer - outerHeightScrollable;
 
@@ -4304,8 +4489,8 @@ function (_MegaRenderMixin) {
   }, {
     key: "getScrollWidth",
     value: function getScrollWidth() {
-      var $elem = $(this.findDOMNode());
-      var outerWidthContainer = $elem.children(":first").outerWidth();
+      var $elem = this.get$Node();
+      var outerWidthContainer = $($elem[0].children[0]).outerWidth();
       var outerWidthScrollable = $elem.outerWidth();
       var res = outerWidthContainer - outerWidthScrollable;
 
@@ -4320,13 +4505,13 @@ function (_MegaRenderMixin) {
   }, {
     key: "getContentHeight",
     value: function getContentHeight() {
-      var $elem = $(this.findDOMNode());
-      return $elem.children(":first").outerHeight();
+      var $elem = this.get$Node();
+      return $elem[0].children[0].offsetHeight;
     }
   }, {
     key: "setCssContentHeight",
     value: function setCssContentHeight(h) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
       return $elem.css('height', h);
     }
   }, {
@@ -4357,64 +4542,64 @@ function (_MegaRenderMixin) {
   }, {
     key: "scrollToPercentY",
     value: function scrollToPercentY(posPerc, skipReinitialised) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
       var targetPx = this.getScrollHeight() / 100 * posPerc;
 
       if ($elem[0].scrollTop !== targetPx) {
-        this.doProgramaticScroll(targetPx);
-
-        if (!skipReinitialised) {
-          this.reinitialised(true);
+        if (this.doProgramaticScroll(targetPx)) {
+          if (!skipReinitialised) {
+            this.reinitialised(true);
+          }
         }
       }
     }
   }, {
     key: "scrollToPercentX",
     value: function scrollToPercentX(posPerc, skipReinitialised) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
       var targetPx = this.getScrollWidth() / 100 * posPerc;
 
       if ($elem[0].scrollLeft !== targetPx) {
-        this.doProgramaticScroll(targetPx, false, true);
-
-        if (!skipReinitialised) {
-          this.reinitialised(true);
+        if (this.doProgramaticScroll(targetPx, false, true)) {
+          if (!skipReinitialised) {
+            this.reinitialised(true);
+          }
         }
       }
     }
   }, {
     key: "scrollToY",
     value: function scrollToY(posY, skipReinitialised) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
 
       if ($elem[0].scrollTop !== posY) {
-        this.doProgramaticScroll(posY);
-
-        if (!skipReinitialised) {
-          this.reinitialised(true);
+        if (this.doProgramaticScroll(posY)) {
+          if (!skipReinitialised) {
+            this.reinitialised(true);
+          }
         }
       }
     }
   }, {
     key: "scrollToElement",
     value: function scrollToElement(element, skipReinitialised) {
-      var $elem = $(this.findDOMNode());
+      var $elem = this.get$Node();
 
-      if (!element || !element.offsetTop) {
+      if (!element || !element.offsetParent) {
         return;
       }
 
-      this.doProgramaticScroll(element.offsetTop);
-
-      if (!skipReinitialised) {
-        this.reinitialised(true);
+      if (this.doProgramaticScroll(element.offsetTop)) {
+        if (!skipReinitialised) {
+          this.reinitialised(true);
+        }
       }
     }
   }, {
     key: "disable",
     value: function disable() {
       if (this.isMounted()) {
-        var $elem = $(this.findDOMNode());
+        var $elem = this.get$Node();
         $elem.attr('data-scroll-disabled', true);
         $elem.addClass('ps-disabled');
         Ps.disable($elem[0]);
@@ -4424,7 +4609,7 @@ function (_MegaRenderMixin) {
     key: "enable",
     value: function enable() {
       if (this.isMounted()) {
-        var $elem = $(this.findDOMNode());
+        var $elem = this.get$Node();
         $elem.removeAttr('data-scroll-disabled');
         $elem.removeClass('ps-disabled');
         Ps.enable($elem[0]);
@@ -4434,7 +4619,7 @@ function (_MegaRenderMixin) {
     key: "reinitialised",
     value: function reinitialised(forced) {
       if (this.props.onReinitialise) {
-        this.props.onReinitialise(this, $(this.findDOMNode()), forced ? forced : false);
+        this.props.onReinitialise(this, this.get$Node(), forced ? forced : false);
       }
     }
   }, {
@@ -4446,6 +4631,11 @@ function (_MegaRenderMixin) {
       }
 
       this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
+    }
+  }, {
+    key: "inViewport",
+    value: function inViewport(domNode) {
+      return verge.inViewport(domNode);
     }
   }, {
     key: "componentDidUpdate",
@@ -4462,14 +4652,7 @@ function (_MegaRenderMixin) {
       var self = this;
       return React.makeElement("div", {
         style: this.props.style,
-        className: this.props.className,
-        onAnimationEnd: function onAnimationEnd() {
-          self.onResize();
-
-          if (self.props.triggerGlobalResize) {
-            $.tresizer();
-          }
-        }
+        className: this.props.className
       }, self.props.children);
     }
   }]);
@@ -4482,6 +4665,7 @@ PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
   requiresUpdateOnResize: true
 };
+PerfectScrollbar.MAX_BOTTOM_POS = 9999999;
 ;
 
 /***/ }),
@@ -4510,9 +4694,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -4747,7 +4931,7 @@ Tooltip.defaultProps = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
@@ -4783,7 +4967,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -4849,6 +5033,7 @@ var renderMessageSummary = function renderMessageSummary(lastMessage) {
     if (!lastMessage._contactChangeListener && author.addChangeListener) {
       lastMessage._contactChangeListener = author.addChangeListener(function () {
         delete lastMessage.renderableSummary;
+        lastMessage.trackDataChange();
       });
     }
 
@@ -4908,6 +5093,10 @@ function (_MegaRenderMixin) {
         self.debouncedForceUpdate(750);
       };
 
+      self.props.chatRoom.rebind('onUnreadCountUpdate.convlistitem', function () {
+        delete self.lastMessageId;
+        self.safeForceUpdate();
+      });
       self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
     }
   }, {
@@ -4917,6 +5106,28 @@ function (_MegaRenderMixin) {
 
       var self = this;
       self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
+      self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      _get(_getPrototypeOf(ConversationsListItem.prototype), "componentDidMount", this).call(this);
+
+      this.eventuallyScrollTo();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      _get(_getPrototypeOf(ConversationsListItem.prototype), "componentDidUpdate", this).call(this);
+
+      this.eventuallyScrollTo();
+    }
+  }, {
+    key: "eventuallyScrollTo",
+    value: function eventuallyScrollTo() {
+      if (this.props.chatRoom._scrollToOnUpdate && megaChat.currentlyOpenedChat === this.props.chatRoom.roomId) {
+        this.props.chatRoom.scrollToChat();
+      }
     }
   }, {
     key: "render",
@@ -5001,7 +5212,17 @@ function (_MegaRenderMixin) {
       var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
       var lastMsgDivClasses;
 
-      if (lastMessage) {
+      if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
+        lastMsgDivClasses = this._lastMsgDivClassesCache;
+        lastMessageDiv = this._lastMessageDivCache;
+        lastMessageDatetimeDiv = this._lastMessageDatetimeDivCache;
+        lastMsgDivClasses += isUnread ? " unread" : "";
+
+        if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+          lastMsgDivClasses += " call";
+          classString += " call-exists";
+        }
+      } else if (lastMessage) {
         lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : ""); // safe some CPU cycles...
 
         var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
@@ -5092,6 +5313,11 @@ function (_MegaRenderMixin) {
           className: "date-time"
         }, l[19077].replace("%s1", curTimeMarker));
       }
+
+      this.lastMessageId = lastMessage && lastMessage.messageId;
+      this._lastMsgDivClassesCache = lastMsgDivClasses.replace(" call-exists", "").replace(" unread", "");
+      this._lastMessageDivCache = lastMessageDiv;
+      this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
 
       if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
         var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
@@ -5303,6 +5529,25 @@ var ConversationsList =
 function (_MegaRenderMixin3) {
   _inherits(ConversationsList, _MegaRenderMixin3);
 
+  _createClass(ConversationsList, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      var self = this;
+      self._megaChatsListener = megaChat.chats.addChangeListener(function () {
+        self.throttledOnPropOrStateUpdated();
+      });
+    }
+  }, {
+    key: "detachRerenderCallbacks",
+    value: function detachRerenderCallbacks() {
+      if (_get(_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this)) {
+        _get(_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this).call(this);
+      }
+
+      megaChat.chats.removeChangeListener(this._megaChatsListener);
+    }
+  }]);
+
   function ConversationsList(props) {
     var _this;
 
@@ -5315,6 +5560,12 @@ function (_MegaRenderMixin3) {
   }
 
   _createClass(ConversationsList, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      _get(_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this) && _get(_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this).call(this);
+      M.treeSearchUI();
+    }
+  }, {
     key: "conversationClicked",
     value: function conversationClicked(room, e) {
       loadSubPage(room.getRoomUrl());
@@ -5323,7 +5574,7 @@ function (_MegaRenderMixin3) {
   }, {
     key: "currentCallClicked",
     value: function currentCallClicked(e) {
-      var activeCallSession = this.props.megaChat.activeCallSession;
+      var activeCallSession = megaChat.activeCallSession;
 
       if (activeCallSession) {
         this.conversationClicked(activeCallSession.room, e);
@@ -5338,7 +5589,7 @@ function (_MegaRenderMixin3) {
   }, {
     key: "endCurrentCall",
     value: function endCurrentCall(e) {
-      var activeCallSession = this.props.megaChat.activeCallSession;
+      var activeCallSession = megaChat.activeCallSession;
 
       if (activeCallSession) {
         activeCallSession.endCall('hangup');
@@ -5353,7 +5604,6 @@ function (_MegaRenderMixin3) {
         'className': "nw-conversations-item current-calling",
         'data-jid': ''
       };
-      var megaChat = this.props.megaChat;
       var activeCallSession = megaChat.activeCallSession;
 
       if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
@@ -5375,7 +5625,7 @@ function (_MegaRenderMixin3) {
       }
 
       var currConvsList = [];
-      var sortedConversations = obj_values(this.props.chats.toJS());
+      var sortedConversations = obj_values(megaChat.chats.toJS());
       sortedConversations.sort(M.sortObjFn(function (room) {
         return !room.lastActivity ? room.ctime : room.lastActivity;
       }, -1));
@@ -5449,6 +5699,9 @@ function (_MegaRenderMixin3) {
   return ConversationsList;
 }(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
 
+ConversationsList.defaultProps = {
+  'manualDataChangeTracking': true
+};
 ;
 
 var ArchivedConversationsList =
@@ -5472,7 +5725,7 @@ function (_MegaRenderMixin4) {
     key: "getInitialState",
     value: function getInitialState() {
       return {
-        'items': this.props.chats,
+        'items': megaChat.chats,
         'orderby': 'lastActivity',
         'nameorder': 1,
         'timeorder': -1,
@@ -5492,7 +5745,7 @@ function (_MegaRenderMixin4) {
     value: function conversationSelected(room, e) {
       var self = this;
       var previousState = room.archivedSelected ? room.archivedSelected : false;
-      var sortedConversations = obj_values(this.props.chats.toJS());
+      var sortedConversations = obj_values(megaChat.chats.toJS());
       sortedConversations.forEach(function (chatRoom) {
         if (!chatRoom || !chatRoom.roomId) {
           return;
@@ -5543,9 +5796,8 @@ function (_MegaRenderMixin4) {
     key: "render",
     value: function render() {
       var self = this;
-      var megaChat = this.props.megaChat;
       var currConvsList = [];
-      var sortedConversations = obj_values(this.props.chats.toJS());
+      var sortedConversations = obj_values(megaChat.chats.toJS());
       var orderValue = -1;
       var orderKey = "lastActivity";
       var nameOrderClass = "";
@@ -5602,7 +5854,6 @@ function (_MegaRenderMixin4) {
           chatRoom: chatRoom,
           contact: contact,
           messages: chatRoom.messagesBuff,
-          megaChat: megaChat,
           onConversationClicked: function onConversationClicked(e) {
             self.conversationClicked(chatRoom, e);
           },
@@ -5617,11 +5868,10 @@ function (_MegaRenderMixin4) {
       var confirmUnarchiveDialog = null;
 
       if (self.state.confirmUnarchiveDialogShown === true) {
-        var room = this.props.chats[self.state.confirmUnarchiveChat];
+        var room = megaChat.chats[self.state.confirmUnarchiveChat];
 
         if (room) {
           confirmUnarchiveDialog = React.makeElement(_ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__[/* default */ "a"].ConfirmDialog, {
-            megaChat: room.megaChat,
             chatRoom: room,
             title: __(l[19063]),
             name: "unarchive-conversation",
@@ -5658,12 +5908,12 @@ function (_MegaRenderMixin4) {
         className: "calculated-width",
         onClick: self.onSortNameClicked
       }, React.makeElement("div", {
-        className: "arrow name " + nameOrderClass
+        className: "is-chat arrow name " + nameOrderClass
       }, __(l[86]))), React.makeElement("th", {
         width: "330",
         onClick: self.onSortTimeClicked
       }, React.makeElement("div", {
-        className: "arrow interaction " + timerOrderClass
+        className: "is-chat arrow interaction " + timerOrderClass
       }, __(l[5904])))))), React.makeElement("div", {
         className: "grid-scrolling-table archive-chat-list"
       }, React.makeElement("table", {
@@ -5726,8 +5976,6 @@ function (_MegaRenderMixin5) {
           return;
         }
 
-        var megaChat = self.props.megaChat;
-
         if (megaChat.currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
           // is visible/active at the moment
@@ -5737,7 +5985,7 @@ function (_MegaRenderMixin5) {
           /* ctrl+... */
           || e.keyCode === 27
           /* esc */
-          || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
+          || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
             return;
           }
 
@@ -5752,7 +6000,7 @@ function (_MegaRenderMixin5) {
       });
       $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
         // prevent recursion!
-        if (e.megaChatHandled || slideshowid) {
+        if (!M.chat || e.megaChatHandled || slideshowid) {
           return;
         }
 
@@ -5762,7 +6010,7 @@ function (_MegaRenderMixin5) {
         if (megaChat.currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
           // is visible/active at the moment
-          if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $('.fm-dialog:visible,.dropdown:visible').length > 0 || $('input:focus,textarea:focus,select:focus').length > 0) {
+          if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
             return;
           }
 
@@ -5777,7 +6025,7 @@ function (_MegaRenderMixin5) {
       });
       self.fmConfigThrottling = null;
       self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function () {
-        var lPane = $('.conversationsApp .fm-left-panel');
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
         clearTimeout(self.fmConfigThrottling);
         self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
           self.setState({
@@ -5786,20 +6034,20 @@ function (_MegaRenderMixin5) {
           $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
           $('.jScrollPaneContainer:visible').trigger('forceResize');
         }, 75);
-        lPane.width(mega.config.get('leftPaneWidth'));
-        $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
+        megaChat.$leftPane.width(mega.config.get('leftPaneWidth'));
+        $('.fm-tree-panel', megaChat.$leftPane).width(mega.config.get('leftPaneWidth'));
       });
 
       var lPaneResizableInit = function lPaneResizableInit() {
-        var lPane = $('.conversationsApp .fm-left-panel');
-        $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+        $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
 
         if (fmconfig.leftPaneWidth) {
-          lPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
+          megaChat.$leftPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
         }
 
         $($.leftPaneResizableChat).on('resize', function () {
-          var w = lPane.width();
+          var w = megaChat.$leftPane.width();
 
           if (w >= $.leftPaneResizableChat.options.maxWidth) {
             $('.left-pane-drag-handle').css('cursor', 'w-resize');
@@ -5812,7 +6060,7 @@ function (_MegaRenderMixin5) {
           $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
         });
         $($.leftPaneResizableChat).on('resizestop', function () {
-          $('.fm-left-panel').width(lPane.width());
+          $('.fm-left-panel').width(megaChat.$leftPane.width());
           $('.jScrollPaneContainer:visible').trigger('forceResize');
           setTimeout(function () {
             $('.hiden-when-dragging').removeClass('hiden-when-dragging');
@@ -5828,10 +6076,12 @@ function (_MegaRenderMixin5) {
         lPaneResizableInit();
       }
 
+      megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+
       if (anonymouschat) {
-        $('.conversationsApp .fm-left-panel').addClass('hidden');
+        megaChat.$leftPane.addClass('hidden');
       } else {
-        $('.conversationsApp .fm-left-panel').removeClass('hidden');
+        megaChat.$leftPane.removeClass('hidden');
       }
 
       this.handleWindowResize();
@@ -5841,7 +6091,12 @@ function (_MegaRenderMixin5) {
         });
         treesearch = false;
       });
-      M.treeSearchUI();
+
+      if (ChatdIntegration.allChatsHadLoaded.state() !== 'resolved') {
+        ChatdIntegration.allChatsHadLoaded.done(function () {
+          self.safeForceUpdate();
+        });
+      }
     }
   }, {
     key: "componentWillUnmount",
@@ -5857,7 +6112,7 @@ function (_MegaRenderMixin5) {
     value: function componentDidUpdate() {
       this.handleWindowResize();
 
-      if (this.props.megaChat.displayArchivedChats === true) {
+      if (megaChat.displayArchivedChats === true) {
         this.initArchivedChatsScrolling();
       }
     }
@@ -5900,7 +6155,7 @@ function (_MegaRenderMixin5) {
     key: "calcArchiveChats",
     value: function calcArchiveChats() {
       var count = 0;
-      this.props.megaChat.chats.forEach(function (chatRoom) {
+      megaChat.chats.forEach(function (chatRoom) {
         if (!chatRoom || !chatRoom.roomId) {
           return;
         }
@@ -5950,6 +6205,28 @@ function (_MegaRenderMixin5) {
       return self._topButtonsContactsPicker;
     }
   }, {
+    key: "isWaitingForInitialLoadingToFinish",
+    value: function isWaitingForInitialLoadingToFinish() {
+      var self = this; // since in big accounts, a lot chats may finish at the same moment, this requires to be throttled.
+
+      var forceUpdate = SoonFc(function (roomId) {
+        delete self._isWaitingChatsLoad[roomId];
+        self.safeForceUpdate();
+      }, 300);
+      self._isWaitingChatsLoad = self._isWaitingChatsLoad || {};
+      var roomIds = megaChat.chats.keys();
+
+      for (var i = 0; i < roomIds.length; i++) {
+        var roomId = roomIds[i];
+        var chatRoom = megaChat.chats[roomId];
+
+        if (!self._isWaitingChatsLoad[roomId] && chatRoom.initialMessageHistLoaded.state() === 'pending') {
+          self._isWaitingChatsLoad[roomId] = true;
+          chatRoom.initialMessageHistLoaded.always(forceUpdate.bind(undefined, roomId));
+        }
+      }
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
@@ -5958,9 +6235,7 @@ function (_MegaRenderMixin5) {
       if (self.state.startGroupChatDialogShown === true) {
         startGroupChatDialog = React.makeElement(StartGroupChatWizard, {
           name: "start-group-chat",
-          megaChat: self.props.megaChat,
           flowType: self.startGroupChatFlow,
-          contacts: M.u,
           onClose: function onClose() {
             self.setState({
               'startGroupChatDialogShown': false
@@ -5983,9 +6258,12 @@ function (_MegaRenderMixin5) {
       }
 
       var loadingOrEmpty = null;
-      var megaChat = this.props.megaChat;
+      var isLoading = false;
+      var nonArchivedChats = megaChat.chats.map(function (r) {
+        return !r.isArchived() ? r : undefined;
+      });
 
-      if (megaChat.chats.length === 0) {
+      if (nonArchivedChats.length === 0) {
         loadingOrEmpty = React.makeElement("div", {
           className: "fm-empty-messages hidden"
         }, React.makeElement("div", {
@@ -6004,7 +6282,7 @@ function (_MegaRenderMixin5) {
         }), React.makeElement("div", {
           className: "fm-not-logged-button create-account"
         }, __(l[968])))));
-      } else if (megaChat.allChatsHadLoadedHistory() === false && !megaChat.currentlyOpenedChat && megaChat.displayArchivedChats !== true) {
+      } else if (megaChat.allChatsHadInitialLoadedHistory() === false && !megaChat.currentlyOpenedChat && megaChat.displayArchivedChats !== true) {
         loadingOrEmpty = React.makeElement("div", {
           className: "fm-empty-messages"
         }, React.makeElement("div", {
@@ -6021,21 +6299,30 @@ function (_MegaRenderMixin5) {
             "marginLeft": "72px"
           }
         })));
+        self.isWaitingForInitialLoadingToFinish();
+        isLoading = true;
       }
 
-      var rightPane = null;
-      rightPane = React.makeElement("div", {
-        className: "fm-right-files-block in-chat"
-      }, loadingOrEmpty, megaChat.displayArchivedChats === true ? React.makeElement(ArchivedConversationsList, {
-        chats: this.props.megaChat.chats,
-        megaChat: this.props.megaChat,
-        contacts: this.props.contacts,
+      var rightPaneStyles = {};
+
+      if (anonymouschat) {
+        rightPaneStyles = {
+          'marginLeft': 0
+        };
+      }
+
+      var rightPane = React.makeElement("div", {
+        className: "fm-right-files-block in-chat",
+        style: rightPaneStyles
+      }, loadingOrEmpty, !isLoading && megaChat.displayArchivedChats === true ? React.makeElement(ArchivedConversationsList, {
         key: "archivedchats"
-      }) : null, React.makeElement(_ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__["ConversationPanels"], _extends({}, this.props, {
+      }) : null, !isLoading ? React.makeElement(_ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__["ConversationPanels"], _extends({}, this.props, {
         chatUIFlags: megaChat.chatUIFlags,
+        displayArchivedChats: megaChat.displayArchivedChats,
         className: megaChat.displayArchivedChats === true ? "hidden" : "",
-        conversations: this.props.megaChat.chats
-      })));
+        currentlyOpenedChat: megaChat.currentlyOpenedChat,
+        chats: megaChat.chats
+      })) : null);
       var archivedChatsCount = this.calcArchiveChats();
       var arcBtnClass = megaChat.displayArchivedChats === true ? "left-pane-button archived active" : "left-pane-button archived";
       var arcIconClass = megaChat.displayArchivedChats === true ? "small-icon archive white" : "small-icon archive colorized";
@@ -6050,7 +6337,7 @@ function (_MegaRenderMixin5) {
       }), React.makeElement("div", {
         className: "fm-left-menu conversations"
       }, React.makeElement("div", {
-        className: "nw-fm-tree-header conversations"
+        className: "nw-fm-tree-header conversations" + (self.state.quickSearchText ? ' filled-input' : '')
       }, React.makeElement("input", {
         type: "text",
         className: "chat-quick-search",
@@ -6067,10 +6354,6 @@ function (_MegaRenderMixin5) {
           if (e.target.value) {
             treesearch = e.target.value;
           }
-
-          self.setState({
-            'quickSearchText': e.target.value
-          });
         },
         value: self.state.quickSearchText,
         placeholder: l[7997]
@@ -6078,12 +6361,9 @@ function (_MegaRenderMixin5) {
         className: "small-icon thin-search-icon"
       }), React.makeElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__["Button"], {
         group: "conversationsListing",
-        icon: "chat-with-plus",
-        contacts: this.props.contacts
+        icon: "chat-with-plus"
       }, React.makeElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__["DropdownContactsSelector"], {
         className: "main-start-chat-dropdown",
-        contacts: this.props.contacts,
-        megaChat: this.props.megaChat,
         onSelectDone: this.startChatClicked.bind(this),
         multiple: false,
         showTopButtons: self.getTopButtonsForContactsPicker()
@@ -6092,13 +6372,13 @@ function (_MegaRenderMixin5) {
         style: leftPanelStyles
       }, React.makeElement(PerfectScrollbar, {
         style: leftPanelStyles,
-        className: "conversation-reduce-height"
+        className: "conversation-reduce-height",
+        ref: function ref(_ref) {
+          megaChat.$chatTreePanePs = _ref;
+        }
       }, React.makeElement("div", {
         className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "")
       }, React.makeElement(ConversationsList, {
-        chats: this.props.megaChat.chats,
-        megaChat: this.props.megaChat,
-        contacts: this.props.contacts,
         quickSearchText: this.state.quickSearchText
       }))), React.makeElement("div", {
         className: "left-pane-button new-link",
@@ -6165,9 +6445,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -6270,9 +6550,9 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -6318,11 +6598,11 @@ var external_React_ = __webpack_require__(0);
 var external_React_default = /*#__PURE__*/__webpack_require__.n(external_React_);
 
 // EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(3);
+var external_ReactDOM_ = __webpack_require__(4);
 var external_ReactDOM_default = /*#__PURE__*/__webpack_require__.n(external_ReactDOM_);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -6865,6 +7145,11 @@ function (_MegaRenderMixin) {
       }
     }
   }, {
+    key: "componentSpecificIsComponentEventuallyVisible",
+    value: function componentSpecificIsComponentEventuallyVisible() {
+      return true;
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
@@ -7093,7 +7378,8 @@ function (_MegaRenderMixin) {
 }(Object(mixins["default"])(external_React_["Component"]));
 
 cloudBrowserModalDialog_BrowserEntries.defaultProps = {
-  'hideable': true
+  'hideable': true,
+  'requiresUpdateOnResize': true
 };
 ;
 
@@ -7204,6 +7490,7 @@ function (_MegaRenderMixin2) {
         newState['currentlyViewedEntry'] = M.RootID;
       }
 
+      newState['isLoading'] = false;
       this.setState(newState);
       this.onSelected([]);
       this.onHighlighted([]);
@@ -7277,12 +7564,11 @@ function (_MegaRenderMixin2) {
           });
           dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise()).done(function () {
             self.setState({
-              'isLoading': false
-            });
-            self.setState({
-              entries: self.getEntries()
+              'isLoading': false,
+              'entries': null
             });
           });
+          return;
         }
 
         if (!M.d[handle] || M.d[handle].t && !M.c[handle]) {
@@ -7291,10 +7577,8 @@ function (_MegaRenderMixin2) {
           });
           dbfetch.get(handle).always(function () {
             self.setState({
-              'isLoading': false
-            });
-            self.setState({
-              entries: self.getEntries()
+              'isLoading': false,
+              'entries': null
             });
           });
           return;
@@ -7313,11 +7597,11 @@ function (_MegaRenderMixin2) {
             });
           }
         }
-      }
 
-      this.setState({
-        entries: null
-      });
+        this.setState({
+          entries: null
+        });
+      }
     }
   }, {
     key: "getEntries",
@@ -7690,7 +7974,7 @@ function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Obj
 
 var emojiDropdown_React = __webpack_require__(0);
 
-var emojiDropdown_utils = __webpack_require__(4);
+var emojiDropdown_utils = __webpack_require__(3);
 
 
 
@@ -8239,7 +8523,7 @@ function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototype
 
 var emojiAutocomplete_React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -8519,6 +8803,8 @@ EmojiAutocomplete.defaultProps = {
 };
 ;
 // CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
+var _dec, _class, _class2, _temp;
+
 function typingArea_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { typingArea_typeof = function _typeof(obj) { return typeof obj; }; } else { typingArea_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return typingArea_typeof(obj); }
 
 function typingArea_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -8541,16 +8827,19 @@ function typingArea_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return typingArea_setPrototypeOf(o, p); }
 
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+
 // libs
 var typingArea_React = __webpack_require__(0);
 
-var typingArea_ReactDOM = __webpack_require__(3);
+var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
 
 
-var typingArea_TypingArea =
+
+var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 =
 /*#__PURE__*/
 function (_MegaRenderMixin) {
   typingArea_inherits(TypingArea, _MegaRenderMixin);
@@ -9014,6 +9303,10 @@ function (_MegaRenderMixin) {
         self.updateScroll(false);
       });
       self.triggerOnUpdate(true);
+
+      if ($container.is(":visible")) {
+        self.updateScroll(false);
+      }
     }
   }, {
     key: "componentWillMount",
@@ -9068,7 +9361,7 @@ function (_MegaRenderMixin) {
       var room = this.props.chatRoom;
 
       if (room.isCurrentlyActive && self.isMounted()) {
-        if ($('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
+        if ($(document.querySelector('textarea:focus,select:focus,input:focus')).filter(":visible").length === 0) {
           // no other element is focused...
           this.focusTypeArea();
         }
@@ -9131,15 +9424,19 @@ function (_MegaRenderMixin) {
     value: function updateScroll(keyEvents) {
       var self = this; // DONT update if not visible...
 
-      if (!self.isComponentEventuallyVisible()) {
+      if (!this.props.chatRoom.isCurrentlyActive) {
         return;
       }
 
-      var $node = $(self.findDOMNode());
-      var $textarea = $('textarea:first', $node);
-      var $textareaClone = $('.message-preview', $node);
+      if (!this.isMounted()) {
+        return;
+      }
+
+      var $node = self.$node = self.$node || $(self.findDOMNode());
+      var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
+      var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
       var textareaMaxHeight = self.getTextareaMaxHeight();
-      var $textareaScrollBlock = $('.textarea-scroll', $node);
+      var $textareaScrollBlock = self.$textareaScrollBlock = self.$textareaScrollBlock || $('.textarea-scroll', $node);
       var textareaContent = $textarea.val();
       var cursorPosition = self.getCursorPosition($textarea[0]);
       var $textareaCloneSpan;
@@ -9147,7 +9444,7 @@ function (_MegaRenderMixin) {
       var scrPos = 0;
       var viewRatio = 0; // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
 
-      if (keyEvents && self.lastContent === textareaContent && self.lastPosition === cursorPosition) {
+      if (self.lastContent === textareaContent && self.lastPosition === cursorPosition) {
         return;
       } else {
         self.lastContent = textareaContent;
@@ -9180,7 +9477,7 @@ function (_MegaRenderMixin) {
         jsp = $textareaScrollBlock.data('jsp');
 
         if (!textareaIsFocused) {
-          moveCursortoToEnd($('textarea:visible:first', $node)[0]);
+          moveCursortoToEnd($textarea[0]);
         }
       }
 
@@ -9458,11 +9755,9 @@ function (_MegaRenderMixin) {
   }]);
 
   return TypingArea;
-}(Object(mixins["default"])(typingArea_React.Component));
-typingArea_TypingArea.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
-typingArea_TypingArea.defaultProps = {
+}(Object(mixins["default"])(typingArea_React.Component)), _class2.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi"), _class2.defaultProps = {
   'textareaMaxHeight': "40%"
-};
+}, _temp), (_applyDecoratedDescriptor(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype)), _class));
 ;
 // CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 function whosTyping_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { whosTyping_typeof = function _typeof(obj) { return typeof obj; }; } else { whosTyping_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return whosTyping_typeof(obj); }
@@ -9489,7 +9784,7 @@ function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.se
 
 var whosTyping_React = __webpack_require__(0);
 
-var whosTyping_ReactDOM = __webpack_require__(3);
+var whosTyping_ReactDOM = __webpack_require__(4);
 
 
 
@@ -9674,7 +9969,7 @@ function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setP
 
 var accordion_React = __webpack_require__(0);
 
-var accordion_ReactDOM = __webpack_require__(3);
+var accordion_ReactDOM = __webpack_require__(4);
 
 
 
@@ -9869,14 +10164,12 @@ function (_MegaRenderMixin) {
 
   participantsList_createClass(ParticipantsList, [{
     key: "onUserScroll",
-    value: function onUserScroll() {
-      var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
-
-      if (this.state.scrollPositionY !== scrollPosY) {
-        this.setState({
-          'scrollPositionY': scrollPosY
-        });
-      }
+    value: function onUserScroll() {// var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
+      // if (this.state.scrollPositionY !== scrollPosY) {
+      //     this.setState({
+      //         'scrollPositionY': scrollPosY
+      //     });
+      // }
     }
   }, {
     key: "componentDidUpdate",
@@ -9885,41 +10178,6 @@ function (_MegaRenderMixin) {
 
       if (!self.isMounted()) {
         return;
-      }
-
-      if (!self.refs.contactsListScroll) {
-        return null;
-      }
-
-      var $node = $(self.findDOMNode());
-      var scrollHeight;
-      var $elem = $(self.refs.contactsListScroll.findDOMNode());
-      var fitHeight = scrollHeight = $elem.outerHeight() - 4;
-
-      if (fitHeight === 0) {
-        // not visible at the moment.
-        return null;
-      }
-
-      var $parentContainer = $node.closest('.chat-right-pad');
-
-      if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
-        fitHeight = Math.max(fitHeight
-        /* margin! */
-        , 53);
-      }
-
-      var $contactsList = $('.chat-contacts-list', $parentContainer);
-
-      if ($contactsList.height() !== fitHeight + 4) {
-        $('.chat-contacts-list', $parentContainer).height(fitHeight + 4);
-        self.refs.contactsListScroll.eventuallyReinitialise(true);
-      }
-
-      if (self.state.scrollHeight !== fitHeight) {
-        self.setState({
-          'scrollHeight': fitHeight
-        });
       }
 
       self.onUserScroll();
@@ -9948,23 +10206,11 @@ function (_MegaRenderMixin) {
 
       return external_React_default.a.createElement("div", {
         className: "chat-contacts-list"
-      }, external_React_default.a.createElement(participantsList_PerfectScrollbar, {
-        chatRoom: room,
-        members: room.members,
-        ref: "contactsListScroll",
-        disableCheckingVisibility: true,
-        onUserScroll: self.onUserScroll.bind(self),
-        requiresUpdateOnResize: true,
-        onAnimationEnd: function onAnimationEnd() {
-          self.safeForceUpdate();
-        }
       }, external_React_default.a.createElement(ParticipantsListInner, {
         chatRoom: room,
         members: room.members,
-        disableCheckingVisibility: true,
-        scrollPositionY: self.state.scrollPositionY,
-        scrollHeight: self.state.scrollHeight
-      })));
+        disableCheckingVisibility: true
+      }));
     }
   }]);
 
@@ -10014,10 +10260,12 @@ function ParticipantsListInner(_ref) {
   }
 
   var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-  var contactsList = [];
-  var firstVisibleUserNum = Math.floor(scrollPositionY / contactCardHeight);
-  var visibleUsers = Math.ceil(scrollHeight / contactCardHeight);
-  var lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
+  var contactsList = []; // const firstVisibleUserNum = Math.floor(scrollPositionY/contactCardHeight);
+  // const visibleUsers = Math.ceil(scrollHeight/contactCardHeight);
+  // const lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
+
+  var firstVisibleUserNum = 0;
+  var lastVisibleUserNum = contacts.length;
   var contactListInnerStyles = {
     'height': contacts.length * contactCardHeight
   }; // slice and only add a specific number of contacts to the list
@@ -10032,6 +10280,7 @@ function ParticipantsListInner(_ref) {
     var contact = M.u[contactHash];
 
     if (contact) {
+      // TODO: eventually re-implement "show on scroll" and dynamic rendering.
       if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
         i++;
         return;
@@ -10119,7 +10368,6 @@ function ParticipantsListInner(_ref) {
       contactsList.push(external_React_default.a.createElement(ContactsUI.ContactCard, {
         key: contact.u,
         contact: contact,
-        megaChat: room.megaChat,
         className: "right-chat-contact-card",
         dropdownPositionMy: "left top",
         dropdownPositionAt: "left top",
@@ -10168,9 +10416,9 @@ function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf =
 
 var metaRichpreview_React = __webpack_require__(0);
 
-var metaRichpreview_ReactDOM = __webpack_require__(3);
+var metaRichpreview_ReactDOM = __webpack_require__(4);
 
-var metaRichpreview_utils = __webpack_require__(4);
+var metaRichpreview_utils = __webpack_require__(3);
 
 
 
@@ -10324,9 +10572,9 @@ function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfi
 
 var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
-var metaRichpreviewConfirmation_ReactDOM = __webpack_require__(3);
+var metaRichpreviewConfirmation_ReactDOM = __webpack_require__(4);
 
-var metaRichpreviewConfirmation_utils = __webpack_require__(4);
+var metaRichpreviewConfirmation_utils = __webpack_require__(3);
 
 
 
@@ -10602,7 +10850,9 @@ function (_ConversationMessageM) {
             width: 16,
             height: 16,
             onError: function onError(e) {
-              e.target.parentNode.removeChild(e.target);
+              if (e && e.target && e.target.parentNode) {
+                e.target.parentNode.removeChild(e.target);
+              }
             },
             alt: ""
           })), external_React_default.a.createElement("span", {
@@ -11147,8 +11397,10 @@ function (_ConversationMessageM) {
     key: "componentDidUpdate",
     value: function componentDidUpdate(oldProps, oldState) {
       var self = this;
+      var isBeingEdited = self.isBeingEdited();
+      var isMounted = self.isMounted();
 
-      if (self.isBeingEdited() && self.isMounted()) {
+      if (isBeingEdited && isMounted) {
         var $generic = $(self.findDOMNode());
         var $textarea = $('textarea', $generic);
 
@@ -11160,9 +11412,10 @@ function (_ConversationMessageM) {
         if (!oldState.editing) {
           if (self.props.onEditStarted) {
             self.props.onEditStarted($generic);
+            moveCursortoToEnd($textarea);
           }
         }
-      } else if (self.isMounted() && !self.isBeingEdited() && oldState.editing === true) {
+      } else if (isMounted && !isBeingEdited && oldState.editing === true) {
         if (self.props.onUpdate) {
           self.props.onUpdate();
         }
@@ -11872,7 +12125,7 @@ function (_ConversationMessageM) {
                   className: "dropdown-avatar rounded"
                 }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
-                  contact: contact
+                  contact: M.u[contact.u]
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
                 }, external_React_default.a.createElement("div", {
@@ -11883,7 +12136,7 @@ function (_ConversationMessageM) {
                 })), external_React_default.a.createElement("div", {
                   className: "email"
                 }, M.u[contact.u].m))), external_React_default.a.createElement(ui_contacts["ContactFingerprint"], {
-                  contact: contact
+                  contact: M.u[contact.u]
                 }), external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "human-profile",
                   label: __(l[5868]),
@@ -11919,7 +12172,7 @@ function (_ConversationMessageM) {
                   className: "dropdown-avatar rounded"
                 }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
-                  contact: contact
+                  contact: M.u[contact.u]
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
                 }, external_React_default.a.createElement("div", {
@@ -11966,7 +12219,7 @@ function (_ConversationMessageM) {
                 className: "message data-title"
               }, M.getNameByHandle(contact.u)), M.u[contact.u] ? external_React_default.a.createElement(ui_contacts["ContactVerified"], {
                 className: "right-align",
-                contact: contact
+                contact: M.u[contact.u]
               }) : null, external_React_default.a.createElement("div", {
                 className: "user-card-email"
               }, contactEmail)), external_React_default.a.createElement("div", {
@@ -11975,10 +12228,10 @@ function (_ConversationMessageM) {
                 className: "data-block-view semi-big"
               }, M.u[contact.u] ? external_React_default.a.createElement(ui_contacts["ContactPresence"], {
                 className: "small",
-                contact: contact
+                contact: M.u[contact.u]
               }) : null, dropdown, external_React_default.a.createElement(ui_contacts["Avatar"], {
                 className: "avatar-wrapper medium-avatar",
-                contact: contact
+                contact: M.u[contact.u]
               })), external_React_default.a.createElement("div", {
                 className: "clear"
               }))));
@@ -12535,9 +12788,9 @@ function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototype
 
 var alterParticipants_React = __webpack_require__(0);
 
-var alterParticipants_ReactDOM = __webpack_require__(3);
+var alterParticipants_ReactDOM = __webpack_require__(4);
 
-var alterParticipants_utils = __webpack_require__(4);
+var alterParticipants_utils = __webpack_require__(3);
 
 var alterParticipants_ContactsUI = __webpack_require__(2);
 
@@ -12722,9 +12975,9 @@ function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setP
 
 var truncated_React = __webpack_require__(0);
 
-var truncated_ReactDOM = __webpack_require__(3);
+var truncated_ReactDOM = __webpack_require__(4);
 
-var truncated_utils = __webpack_require__(4);
+var truncated_utils = __webpack_require__(3);
 
 
 
@@ -12825,9 +13078,9 @@ function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf =
 
 var privilegeChange_React = __webpack_require__(0);
 
-var privilegeChange_ReactDOM = __webpack_require__(3);
+var privilegeChange_ReactDOM = __webpack_require__(4);
 
-var privilegeChange_utils = __webpack_require__(4);
+var privilegeChange_utils = __webpack_require__(3);
 
 
 
@@ -12955,9 +13208,9 @@ function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.
 
 var topicChange_React = __webpack_require__(0);
 
-var topicChange_ReactDOM = __webpack_require__(3);
+var topicChange_ReactDOM = __webpack_require__(4);
 
-var topicChange_utils = __webpack_require__(4);
+var topicChange_utils = __webpack_require__(3);
 
 
 
@@ -13007,8 +13260,15 @@ function (_ConversationMessageM) {
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var topic = message.meta.topic;
+      var formattedTopic = this._formattedTopic;
 
-      var text = __(l[9081]).replace("%s", '<strong className="dark-grey-txt">"' + megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic)) + '"</strong>');
+      if (this._oldTopic !== topic) {
+        this._oldTopic = topic;
+        formattedTopic = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic));
+        this._formattedTopic = formattedTopic;
+      }
+
+      var text = __(l[9081]).replace("%s", '<strong className="dark-grey-txt">"' + formattedTopic + '"</strong>');
 
       messages.push(topicChange_React.makeElement("div", {
         className: "message body",
@@ -13036,13 +13296,13 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
-var _dec, _class;
+var sharedFilesAccordionPanel_dec, sharedFilesAccordionPanel_class;
 
 function sharedFilesAccordionPanel_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { sharedFilesAccordionPanel_get = Reflect.get; } else { sharedFilesAccordionPanel_get = function _get(target, property, receiver) { var base = sharedFilesAccordionPanel_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return sharedFilesAccordionPanel_get(target, property, receiver || target); }
 
 function sharedFilesAccordionPanel_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = sharedFilesAccordionPanel_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+function sharedFilesAccordionPanel_applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
 
 function sharedFilesAccordionPanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return sharedFilesAccordionPanel_typeof(obj); }
 
@@ -13064,7 +13324,7 @@ function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPa
 
 var sharedFilesAccordionPanel_React = __webpack_require__(0);
 
-var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(3);
+var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
@@ -13129,7 +13389,7 @@ function (_MegaRenderMixin) {
 }(Object(mixins["default"])(sharedFilesAccordionPanel_React.Component));
 
 ;
-var SharedFilesAccordionPanel = (_dec = utils["default"].SoonFcWrap(350), (_class =
+var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class =
 /*#__PURE__*/
 function (_MegaRenderMixin2) {
   sharedFilesAccordionPanel_inherits(SharedFilesAccordionPanel, _MegaRenderMixin2);
@@ -13314,7 +13574,7 @@ function (_MegaRenderMixin2) {
               var imgId = "sharedFiles!" + node.ch;
               files.push(sharedFilesAccordionPanel_React.makeElement(SharedFileItem, {
                 message: message,
-                key: message.messageId,
+                key: node.h + "_" + message.messageId,
                 isLoading: self.isLoadingMore,
                 node: node,
                 icon: icon,
@@ -13368,7 +13628,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return SharedFilesAccordionPanel;
-}(Object(mixins["default"])(sharedFilesAccordionPanel_React.Component)), (_applyDecoratedDescriptor(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype)), _class));
+}(Object(mixins["default"])(sharedFilesAccordionPanel_React.Component)), (sharedFilesAccordionPanel_applyDecoratedDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails", [sharedFilesAccordionPanel_dec], Object.getOwnPropertyDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails"), sharedFilesAccordionPanel_class.prototype)), sharedFilesAccordionPanel_class));
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
@@ -13392,7 +13652,7 @@ function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccor
 
 var incomingSharesAccordionPanel_React = __webpack_require__(0);
 
-var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(3);
+var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
@@ -13594,9 +13854,9 @@ function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Obj
 
 var closeOpenMode_React = __webpack_require__(0);
 
-var closeOpenMode_ReactDOM = __webpack_require__(3);
+var closeOpenMode_ReactDOM = __webpack_require__(4);
 
-var closeOpenMode_utils = __webpack_require__(4);
+var closeOpenMode_utils = __webpack_require__(3);
 
 
 
@@ -13695,9 +13955,9 @@ function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.se
 
 var chatHandle_React = __webpack_require__(0);
 
-var chatHandle_ReactDOM = __webpack_require__(3);
+var chatHandle_ReactDOM = __webpack_require__(4);
 
-var chatHandle_utils = __webpack_require__(4);
+var chatHandle_utils = __webpack_require__(3);
 
 var chatHandle_ContactsUI = __webpack_require__(2);
 
@@ -15085,7 +15345,7 @@ function (_MegaRenderMixin) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
-var conversationpanel_dec, _dec2, conversationpanel_class, _class2, _temp;
+var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
 
@@ -15215,7 +15475,7 @@ function (_MegaRenderMixin2) {
         return false;
       }
 
-      var currentContacts = self.props.contacts;
+      var currentContacts = M.u;
       var foundNonMembers = 0;
       currentContacts.forEach(function (u, k) {
         if (u.c === 1) {
@@ -15368,13 +15628,11 @@ function (_MegaRenderMixin2) {
         className: "link-button green light",
         icon: "rounded-plus colorized",
         label: __(l[8007]),
-        contacts: this.props.contacts,
         disabled:
         /* Disable in case I don't have any more contacts to add ... */
         !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
       }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
         contacts: this.props.contacts,
-        megaChat: this.props.megaChat,
         chatRoom: room,
         exclude: excludedParticipants,
         multiple: true,
@@ -15475,8 +15733,6 @@ function (_MegaRenderMixin2) {
         label: __(l[6834] + "..."),
         disabled: room.isReadOnly()
       }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
-        contacts: this.props.contacts,
-        megaChat: this.props.megaChat,
         className: "wide-dropdown send-files-selector light",
         noArrow: "true",
         vertOffset: 4,
@@ -15586,7 +15842,7 @@ function (_MegaRenderMixin2) {
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (_temp = _class2 =
+var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 =
 /*#__PURE__*/
 function (_MegaRenderMixin3) {
   conversationpanel_inherits(ConversationPanel, _MegaRenderMixin3);
@@ -15775,13 +16031,13 @@ function (_MegaRenderMixin3) {
 
       if (doResize !== false) {
         self.handleWindowResize();
-      }
+      } // var ns = ".convPanel";
+      // $container
+      //     .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
+      //         self.safeForceUpdate(true);
+      //         $.tresizer();
+      //     });
 
-      var ns = ".convPanel";
-      $container.rebind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function (e) {
-        self.safeForceUpdate(true);
-        $.tresizer();
-      });
     }
   }, {
     key: "componentWillMount",
@@ -15792,6 +16048,14 @@ function (_MegaRenderMixin3) {
       $(chatRoom).rebind('onHistoryDecrypted.cp', function () {
         self.eventuallyUpdate();
       });
+      this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(function () {
+        // wait for scrolling (if such is happening at the moment) to finish
+        Soon(function () {
+          if (self.isMounted()) {
+            $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+          }
+        });
+      });
     }
   }, {
     key: "componentWillUnmount",
@@ -15801,6 +16065,8 @@ function (_MegaRenderMixin3) {
       var self = this;
       var chatRoom = self.props.chatRoom;
       var megaChat = chatRoom.megaChat;
+      chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+      delete this._messagesBuffChangeHandler;
       window.removeEventListener('resize', self.handleWindowResize);
       window.removeEventListener('keydown', self.handleKeyDown);
       $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
@@ -15879,6 +16145,16 @@ function (_MegaRenderMixin3) {
     key: "handleWindowResize",
     value: function handleWindowResize(e, scrollToBottom) {
       if (!M.chat) {
+        return;
+      }
+
+      if (!this.isMounted()) {
+        // not mounted? remove.
+        this.componentWillUnmount();
+        return;
+      }
+
+      if (!this.props.chatRoom.isCurrentlyActive) {
         return;
       }
 
@@ -16374,7 +16650,6 @@ function (_MegaRenderMixin3) {
         nonLoggedInJoinChatDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
           title: l[20596],
           className: "fm-dialog chat-links-preview-desktop",
-          megaChat: room.megaChat,
           chatRoom: room,
           onClose: function onClose() {
             self.setState({
@@ -16426,7 +16701,6 @@ function (_MegaRenderMixin3) {
           privateChatDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
             title: l[20594],
             className: "fm-dialog create-private-chat",
-            megaChat: room.megaChat,
             chatRoom: room,
             onClose: function onClose() {
               self.setState({
@@ -16507,10 +16781,8 @@ function (_MegaRenderMixin3) {
         }
 
         sendContactDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].SelectContactDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           exclude: excludedContacts,
-          contacts: M.u,
           onClose: function onClose() {
             self.setState({
               'sendContactDialog': false
@@ -16530,7 +16802,6 @@ function (_MegaRenderMixin3) {
 
       if (self.state.confirmDeleteDialog === true) {
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[8004]),
           name: "delete-message",
@@ -16595,7 +16866,6 @@ function (_MegaRenderMixin3) {
 
       if (self.state.pasteImageConfirmDialog) {
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[20905]),
           name: "paste-image-chat",
@@ -16653,7 +16923,6 @@ function (_MegaRenderMixin3) {
 
       if (self.state.truncateDialog === true) {
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[8871]),
           name: "truncate-conversation",
@@ -16679,7 +16948,6 @@ function (_MegaRenderMixin3) {
 
       if (self.state.archiveDialog === true) {
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[19068]),
           name: "archive-conversation",
@@ -16704,7 +16972,6 @@ function (_MegaRenderMixin3) {
 
       if (self.state.unarchiveDialog === true) {
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ConfirmDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[19063]),
           name: "unarchive-conversation",
@@ -16742,7 +17009,6 @@ function (_MegaRenderMixin3) {
 
         var renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
         confirmDeleteDialog = external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
-          megaChat: room.megaChat,
           chatRoom: room,
           title: __(l[9080]),
           name: "rename-group",
@@ -16818,14 +17084,12 @@ function (_MegaRenderMixin3) {
           className: "txt small"
         }, (l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length))));
       } else {
-        var contacts = room.getParticipantsExceptMe();
-        var contactHandle = contacts[0];
-        var contact = M.u[contactHandle];
+        contactHandle = contacts[0];
+        contact = M.u[contactHandle];
         topicInfo = external_React_default.a.createElement(ui_contacts["ContactCard"], {
           className: "short",
           noContextButton: "true",
           contact: contact,
-          megaChat: self.props.chatRoom.megaChat,
           showLastGreen: true,
           key: contact.u
         });
@@ -16842,9 +17106,8 @@ function (_MegaRenderMixin3) {
       }, !room.megaChat.chatUIFlags['convPanelCollapse'] ? external_React_default.a.createElement(conversationpanel_ConversationRightArea, {
         isVisible: this.props.chatRoom.isCurrentlyActive,
         chatRoom: this.props.chatRoom,
+        roomFlags: this.props.chatRoom.flags,
         members: this.props.chatRoom.membersSetFromApi,
-        contacts: self.props.contacts,
-        megaChat: this.props.chatRoom.megaChat,
         messagesBuff: room.messagesBuff,
         onAttachFromComputerClicked: function onAttachFromComputerClicked() {
           self.uploadFromComputer();
@@ -16914,8 +17177,6 @@ function (_MegaRenderMixin3) {
         }
       }) : null, room.callManagerCall && room.callManagerCall.isStarted() ? external_React_default.a.createElement(conversationaudiovideopanel_ConversationAudioVideoPanel, {
         chatRoom: this.props.chatRoom,
-        contacts: self.props.contacts,
-        megaChat: this.props.chatRoom.megaChat,
         unreadCount: this.props.chatRoom.messagesBuff.getUnreadCount(),
         onMessagesToggle: function onMessagesToggle(isActive) {
           self.setState({
@@ -17006,7 +17267,7 @@ function (_MegaRenderMixin3) {
       }, external_React_default.a.createElement("div", {
         className: "messages content-area"
       }, external_React_default.a.createElement("div", {
-        className: "loading-spinner js-messages-loading light manual-management",
+        className: "loading-spinner js-messages-loading light manual-management" + (!self.loadingShown ? " hidden" : ""),
         key: "loadingSpinner",
         style: {
           top: "50%"
@@ -17148,7 +17409,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return ConversationPanel;
-}(Object(mixins["default"])(external_React_default.a.Component)), _class2.lastScrollPositionPerc = 1, _temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
+}(Object(mixins["default"])(external_React_default.a.Component)), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
 var conversationpanel_ConversationPanels =
 /*#__PURE__*/
@@ -17171,66 +17432,93 @@ function (_MegaRenderMixin4) {
       if (hadLoaded && getSitePath() === "/fm/chat") {
         // do we need to "activate" an conversation?
         var activeFound = false;
-        self.props.conversations.forEach(function (chatRoom) {
-          if (chatRoom.isCurrentlyActive) {
-            activeFound = true;
-          }
-        });
 
-        if (self.props.conversations.length > 0 && !activeFound) {
-          self.props.megaChat.showLastActive();
+        if (megaChat.currentlyOpenedChat && megaChat[megaChat.currentlyOpenedChat]) {
+          activeFound = true;
+        }
+
+        if (megaChat.chats.length > 0 && !activeFound) {
+          megaChat.showLastActive();
         }
       }
 
-      hadLoaded && self.props.conversations.forEach(function (chatRoom) {
-        var otherParticipants = chatRoom.getParticipantsExceptMe();
-        var contact;
+      if (!hadLoaded && !self._waitLoadingChats) {
+        self._waitLoadingChats = true;
+        megaChat.plugins.chatdIntegration.chatd.rebind('onMessagesHistoryDone.convUImain', function () {
+          if (anonymouschat || ChatdIntegration.allChatsHadLoaded.state() !== 'pending' && ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' && Object.keys(ChatdIntegration._loadingChats).length === 0) {
+            megaChat.plugins.chatdIntegration.chatd.unbind('onMessagesHistoryDone.convUImain');
+            Soon(function () {
+              self.safeForceUpdate();
 
-        if (otherParticipants && otherParticipants.length > 0) {
-          contact = M.u[otherParticipants[0]];
+              if (M.currentdirid === "chat") {
+                megaChat.showLastActive();
+              }
+            });
+          }
+        }); // also update immediately after chats had loaded, since there may be no history/chats to pull
+
+        var finishedLoadingInitial = function finishedLoadingInitial() {
+          if (megaChat.chats.length === 0) {
+            Soon(function () {
+              self.safeForceUpdate();
+            });
+          }
+        };
+
+        ChatdIntegration.allChatsHadLoaded.always(finishedLoadingInitial);
+        ChatdIntegration.mcfHasFinishedPromise.always(finishedLoadingInitial);
+      }
+
+      var now = Date.now();
+      hadLoaded && megaChat.chats.forEach(function (chatRoom) {
+        if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
+          conversations.push(external_React_default.a.createElement(conversationpanel_ConversationPanel, {
+            chatUIFlags: self.props.chatUIFlags,
+            isExpanded: chatRoom.megaChat.chatUIFlags['convPanelCollapse'],
+            chatRoom: chatRoom,
+            roomType: chatRoom.type,
+            isActive: chatRoom.isCurrentlyActive,
+            messagesBuff: chatRoom.messagesBuff,
+            key: chatRoom.roomId + "_" + chatRoom.instanceIndex
+          }));
         }
-
-        conversations.push(external_React_default.a.createElement(conversationpanel_ConversationPanel, {
-          chatUIFlags: self.props.chatUIFlags,
-          isExpanded: chatRoom.megaChat.chatUIFlags['convPanelCollapse'],
-          chatRoom: chatRoom,
-          isActive: chatRoom.isCurrentlyActive,
-          messagesBuff: chatRoom.messagesBuff,
-          contacts: M.u,
-          contact: contact,
-          key: chatRoom.roomId + "_" + chatRoom.instanceIndex
-        }));
       });
 
-      if (conversations.length === 0) {
+      if (megaChat.chats.length === 0) {
+        if (!self._MuChangeListener) {
+          self._MuChangeListener = M.u.addChangeListener(function () {
+            self.safeForceUpdate();
+          });
+        }
+
         var contactsList = [];
         var contactsListOffline = [];
 
         if (hadLoaded) {
-          self.props.contacts.forEach(function (contact) {
-            if (contact.u === u_handle) {
-              return;
-            }
+          var lim = Math.min(10, M.u.length);
+          var userHandles = M.u.keys();
 
-            if (contact.c === 1) {
-              var pres = self.props.megaChat.userPresenceToCssClass(contact.presence);
+          for (var i = 0; i < lim; i++) {
+            var contact = M.u[userHandles[i]];
+
+            if (contact.u !== u_handle && contact.c === 1) {
+              var pres = megaChat.userPresenceToCssClass(contact.presence);
               (pres === "offline" ? contactsListOffline : contactsList).push(external_React_default.a.createElement(ui_contacts["ContactCard"], {
                 contact: contact,
-                megaChat: self.props.megaChat,
                 key: contact.u
               }));
             }
-          });
+          }
         }
 
         var emptyMessage = hadLoaded ? l[8008] : l[7006];
-        return external_React_default.a.createElement("div", null, external_React_default.a.createElement("div", {
+        return external_React_default.a.createElement("div", null, hadLoaded ? external_React_default.a.createElement("div", {
           className: "chat-right-area"
         }, external_React_default.a.createElement("div", {
           className: "chat-right-area contacts-list-scroll"
         }, external_React_default.a.createElement("div", {
           className: "chat-right-pad"
-        }, contactsList, contactsListOffline))), external_React_default.a.createElement("div", {
+        }, contactsList, contactsListOffline))) : null, external_React_default.a.createElement("div", {
           className: "empty-block"
         }, external_React_default.a.createElement("div", {
           className: "empty-pad conversations"
@@ -17248,6 +17536,18 @@ function (_MegaRenderMixin4) {
           }
         }, l[20638]) : null)));
       } else {
+        if (self._MuChangeListener) {
+          M.u.removeChangeListener(self._MuChangeListener);
+          delete self._MuChangeListener;
+        }
+
+        if (M.currentdirid === "chat" && conversations.length === 0 && megaChat.chats.length !== 0 && hadLoaded) {
+          // initial load on /fm/chat. focring to show a room.
+          onIdle(function () {
+            megaChat.showLastActive();
+          });
+        }
+
         return external_React_default.a.createElement("div", {
           className: "conversation-panels " + self.props.className
         }, conversations);
@@ -17279,7 +17579,7 @@ module.exports = __webpack_require__(13);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -17301,11 +17601,12 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
     var roomOrUserHash = id.replace("chat/", "");
     var isPubLink = id !== "chat/archived" && id.substr(0, 5) === "chat/" && id.substr(6, 1) !== "/";
     var roomType = false;
-    megaChat.displayArchivedChats = false;
+    var displayArchivedChats = false;
 
     if (roomOrUserHash === "archived") {
       roomType = "archived";
-      megaChat.displayArchivedChats = true;
+      displayArchivedChats = true;
+      delete megaChat.lastOpenedChat;
     } else if (roomOrUserHash.substr(0, 2) === "g/" || roomOrUserHash.substr(0, 2) === "c/" || isPubLink) {
       roomType = isPubLink || roomOrUserHash.substr(0, 2) === "c/" ? "public" : "group";
       var publicChatHandle;
@@ -17327,8 +17628,6 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
       } else {
         roomOrUserHash = roomOrUserHash.substr(2, roomOrUserHash.length);
       }
-
-      megaChat.displayArchivedChats = false;
 
       if (publicChatId && megaChat.chats[publicChatId]) {
         megaChat.chats[publicChatId].show();
@@ -17381,8 +17680,6 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
         roomOrUserHash = roomOrUserHash.substr(2);
       }
 
-      megaChat.displayArchivedChats = false;
-
       if (!M.u[roomOrUserHash]) {
         setTimeout(function () {
           loadSubPage('fm/chat');
@@ -17399,6 +17696,11 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
     $('.fm-files-view-icon').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
     $('.files-grid-view').addClass('hidden');
+
+    if (megaChat.displayArchivedChats) {
+      $('.files-grid-view.archived-chat-view').removeClass('hidden');
+    }
+
     $('.fm-right-account-block').addClass('hidden');
     $('.contacts-details-block').addClass('hidden');
     $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
@@ -17419,10 +17721,6 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
         console.warn("openChat failed. Maybe tried to start a private chat with a non contact?", ex);
       });
     } else if (roomType === "group") {
-      if (megaChat.chats[roomOrUserHash].isArchived()) {
-        megaChat.chats[roomOrUserHash].showArchived = true;
-      }
-
       megaChat.chats[roomOrUserHash].show();
     } else if (roomType === "public") {
       if (megaChat.chats[roomOrUserHash] && id.indexOf('chat/') > -1) {
@@ -17445,6 +17743,11 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
     } else {
       console.error("Unknown room type.");
       return;
+    }
+
+    if (displayArchivedChats !== megaChat.displayArchivedChats) {
+      megaChat.displayArchivedChats = displayArchivedChats;
+      megaChat.safeForceUpdate();
     } // since .fm-chat-block is out of the scope of the CovnersationsApp, this should be done manually :(
 
 
@@ -17669,8 +17972,7 @@ Chat.prototype.init = function () {
     }
 
     self.$conversationsApp = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__["default"].ConversationsApp, {
-      megaChat: self,
-      contacts: M.u
+      megaChat: self
     });
     self.$conversationsAppInstance = react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(self.$conversationsApp, document.querySelector('.section.conversations'));
 
@@ -17775,7 +18077,12 @@ Chat.prototype.init = function () {
     var $notification = $('.tooltip');
     $notification.addClass('hidden').removeAttr('style');
   });
-  self.registerUploadListeners();
+  self.registerUploadListeners(); // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+
+  MegaDataObject.attachToExistingJSObject(this, {
+    "currentlyOpenedChat": null,
+    "displayArchivedChats": false
+  }, true);
   self.trigger("onInit");
 };
 /**
@@ -18582,6 +18889,7 @@ Chat.prototype.smartOpenChat = function () {
       var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
 
       if (chatRoom) {
+        chatRoom.show();
         return waitForReadyState(chatRoom, args[5]);
       }
     }
@@ -18682,7 +18990,7 @@ Chat.prototype.sendMessage = function (roomJid, val) {
     self.logger.warn("Queueing message for room: ", roomJid, val);
     createTimeoutPromise(function () {
       return !!self.chats[roomJid];
-    }, 100, self.options.delaySendMessageIfRoomNotAvailableTimeout).done(function () {
+    }, 500, self.options.delaySendMessageIfRoomNotAvailableTimeout).done(function () {
       self.chats[roomJid].sendMessage(val);
     });
   } else {
@@ -18755,10 +19063,12 @@ Chat.prototype.refreshConversations = function () {
     $('.section.conversations .fm-right-files-block').append(self.$container);
   }
 
+  self.$leftPane = self.$leftPane || $('.conversationsApp .fm-left-panel');
+
   if (anonymouschat) {
-    $('.conversationsApp .fm-left-panel').addClass('hidden');
+    self.$leftPane.addClass('hidden');
   } else {
-    $('.conversationsApp .fm-left-panel').removeClass('hidden');
+    self.$leftPane.removeClass('hidden');
   }
 };
 
@@ -18819,7 +19129,11 @@ Chat.prototype.renderListing = function () {
       return self.chats[self.lastOpenedChat];
     } else {
       if (self.chats.length > 0) {
-        return self.showLastActive();
+        if (!self.displayArchivedChats) {
+          return self.showLastActive();
+        } else {
+          return false;
+        }
       } else {
         $('.fm-empty-conversations').removeClass('hidden');
       }
@@ -19106,7 +19420,7 @@ Chat.prototype._doneLoadingImage = function (h) {
 Chat.prototype.showLastActive = function () {
   var self = this;
 
-  if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+  if (self.chats.length > 0 && self.allChatsHadInitialLoadedHistory()) {
     var sortedConversations = obj_values(self.chats.toJS());
     sortedConversations.sort(M.sortObjFn("lastActivity", -1));
     var index = 0; // find next active chat , it means a chat which is active or archived chat opened in the active chat list.
@@ -19140,6 +19454,21 @@ Chat.prototype.allChatsHadLoadedHistory = function () {
     var room = self.chats[chatIds[i]];
 
     if (room.isLoading()) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+Chat.prototype.allChatsHadInitialLoadedHistory = function () {
+  var self = this;
+  var chatIds = self.chats.keys();
+
+  for (var i = 0; i < chatIds.length; i++) {
+    var room = self.chats[chatIds[i]];
+
+    if (room.initialMessageHistLoaded.state() === 'pending') {
       return false;
     }
   }
@@ -19621,7 +19950,7 @@ Chat.prototype.getFrequentContacts = function () {
     if (r.isLoading()) {
       var promise = createTimeoutPromise(function () {
         return finishedLoadingChats[r.chatId] === true;
-      }, 300, 10000, undefined, undefined, r.roomId + "FrequentsLoading");
+      }, 500, 10000, undefined, undefined, r.roomId + "FrequentsLoading");
       finishedLoadingChats[r.chatId] = false;
       promises.push(promise);
       $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
@@ -19632,7 +19961,7 @@ Chat.prototype.getFrequentContacts = function () {
       $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
       var promise = createTimeoutPromise(function () {
         return finishedLoadingChats[r.chatId] === true;
-      }, 300, 15000);
+      }, 500, 15000);
       promises.push(promise);
       r.messagesBuff.retrieveChatHistory(false);
     } else {
@@ -19904,6 +20233,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     flags: 0x00,
     publicLink: null,
     archivedSelected: false,
+    showArchived: false,
     observers: 0
   }, true);
   this.roomId = roomId;
@@ -20042,13 +20372,74 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     } else {
       throw new Error("Not implemented");
     }
+  }); // onMembersUpdated core room data management
+
+  self.rebind('onMembersUpdated.coreRoomDataMngmt', function (e, eventData) {
+    if (self.state === ChatRoom.STATE.LEFT && eventData.priv >= 0 && eventData.priv < 255) {
+      // joining
+      self.membersLoaded = false;
+      self.setState(ChatRoom.STATE.JOINING, true);
+    }
+
+    var queuedMembersUpdatedEvent = false;
+
+    if (self.membersLoaded === false) {
+      if (eventData.priv >= 0 && eventData.priv < 255) {
+        var addParticipant = function addParticipant() {
+          // add group participant in strongvelope
+          self.protocolHandler.addParticipant(eventData.userId); // also add to our list
+
+          self.members[eventData.userId] = eventData.priv;
+
+          ChatdIntegration._ensureNamesAreLoaded([eventData.userId], self.publicChatHandle);
+
+          self.trigger('onMembersUpdatedUI', eventData);
+        };
+
+        ChatdIntegration._waitForProtocolHandler(self, addParticipant);
+
+        queuedMembersUpdatedEvent = true;
+      }
+    } else if (eventData.priv === 255 || eventData.priv === -1) {
+      var deleteParticipant = function deleteParticipant() {
+        if (eventData.userId === u_handle) {
+          // remove all participants from the room.
+          Object.keys(self.members).forEach(function (userId) {
+            // remove group participant in strongvelope
+            self.protocolHandler.removeParticipant(userId); // also remove from our list
+
+            delete self.members[userId];
+          });
+        } else {
+          // remove group participant in strongvelope
+          self.protocolHandler.removeParticipant(eventData.userId); // also remove from our list
+
+          delete self.members[eventData.userId];
+        }
+
+        self.trigger('onMembersUpdatedUI', eventData);
+      };
+
+      ChatdIntegration._waitForProtocolHandler(self, deleteParticipant);
+
+      queuedMembersUpdatedEvent = true;
+    }
+
+    if (eventData.userId === u_handle) {
+      self.membersLoaded = true;
+    }
+
+    if (!queuedMembersUpdatedEvent) {
+      self.members[eventData.userId] = eventData.priv;
+      self.trigger('onMembersUpdatedUI', eventData);
+    }
   });
   /**
    * Manually proxy contact related data change events, for more optimal UI rerendering.
    */
 
   var membersSnapshot = {};
-  self.rebind('onMembersUpdated.chatRoomMembersSync', function (e, eventData) {
+  self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function (e, eventData) {
     var roomRequiresUpdate = false;
 
     if (eventData.userId === u_handle) {
@@ -20085,7 +20476,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
 
       if (contact && contact.addChangeListener) {
         membersSnapshot[u_h] = contact.addChangeListener(function () {
-          self.trackDataChange();
+          self.trackDataChange.apply(self, arguments);
         });
       }
     });
@@ -20124,6 +20515,35 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   });
   self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
   self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+  self.initialMessageHistLoaded = new MegaPromise();
+  self._initialMessageHistLoadedTimer = null;
+  self.initialMessageHistLoaded.always(function () {
+    self.unbind('onMarkAsJoinRequested.initHist');
+    self.unbind('onHistoryDecrypted.initHist');
+    self.unbind('onMessagesHistoryDone.initHist');
+  });
+
+  var _historyIsAvailable = function _historyIsAvailable() {
+    if (self.initialMessageHistLoaded.state() === 'pending') {
+      self.initialMessageHistLoaded.resolve();
+
+      if (self._initialMessageHistLoadedTimer) {
+        clearTimeout(self._initialMessageHistLoadedTimer);
+      }
+    }
+  };
+
+  self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
+  self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
+  self.rebind('onMarkAsJoinRequested.initHist', function (e, eventData) {
+    self._initialMessageHistLoadedTimer = setTimeout(function () {
+      if (d) {
+        console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+      }
+
+      self.initialMessageHistLoaded.reject();
+    }, 5000);
+  });
   this.membersSetFromApi = new ChatRoom.MembersSet(this);
 
   if (publicChatHandle) {
@@ -20400,6 +20820,8 @@ ChatRoom.prototype.updateFlags = function (f, updateUI) {
       megaChat.safeForceUpdate();
     }
   }
+
+  this.trackDataChange();
 };
 /**
  * Convert state to text (helper function)
@@ -20778,6 +21200,7 @@ ChatRoom.prototype.show = function () {
 
   self.megaChat.hideAllChats();
   self.isCurrentlyActive = true;
+  self.lastShownInUI = Date.now();
   $('.files-grid-view').addClass('hidden');
   $('.fm-blocks-view').addClass('hidden');
   $('.contacts-grid-view').addClass('hidden');
@@ -20796,6 +21219,13 @@ ChatRoom.prototype.show = function () {
   M.onSectionUIOpen('conversations');
   self.megaChat.currentlyOpenedChat = self.roomId;
   self.megaChat.lastOpenedChat = self.roomId;
+
+  if (self.isArchived()) {
+    self.showArchived = true;
+  } else {
+    self.showArchived = false;
+  }
+
   self.megaChat.setAttachments(self.roomId);
   self.trigger('activity');
   self.trigger('onChatShown');
@@ -20807,10 +21237,28 @@ ChatRoom.prototype.show = function () {
   }
 
   Soon(function () {
-    if (megaChat.$conversationsAppInstance) {
-      megaChat.safeForceUpdate();
-    }
+    megaChat.chats.trackDataChange();
   });
+  $('.conversation-panel[data-room-id="' + self.chatId + '"]').removeClass('hidden');
+  $.tresizer();
+  self.scrollToChat();
+};
+
+ChatRoom.prototype.scrollToChat = function () {
+  if (megaChat.$chatTreePanePs) {
+    var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
+
+    if ($li && $li[0]) {
+      var pos = $li[0].offsetTop;
+
+      if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
+        megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+        this._scrollToOnUpdate = false;
+      }
+    } else {
+      this._scrollToOnUpdate = true;
+    }
+  }
 };
 /**
  * Returns true/false if the current room is currently active (e.g. visible)
@@ -20889,10 +21337,13 @@ ChatRoom.prototype.activateWindow = function () {
 ChatRoom.prototype.hide = function () {
   var self = this;
   self.isCurrentlyActive = false;
+  self.lastShownInUI = Date.now();
 
   if (self.megaChat.currentlyOpenedChat === self.roomId) {
     self.megaChat.currentlyOpenedChat = null;
   }
+
+  $('.conversation-panel[data-room-id="' + self.chatId + '"]').addClass('hidden');
 };
 /**
  * Append message to the UI of this room.
@@ -21509,7 +21960,7 @@ function extendActions(prefix, src, toBeAppended) {
 __webpack_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -21545,7 +21996,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -21764,7 +22215,7 @@ function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPro
 
 var startGroupChatWizard_React = __webpack_require__(0);
 
-var startGroupChatWizard_ReactDOM = __webpack_require__(3);
+var startGroupChatWizard_ReactDOM = __webpack_require__(4);
 
 
 
@@ -21785,11 +22236,10 @@ function (_MegaRenderMixin) {
 
     _this = startGroupChatWizard_possibleConstructorReturn(this, startGroupChatWizard_getPrototypeOf(StartGroupChatWizard).call(this, props));
     var haveContacts = false;
-
-    var keys = _this.props.contacts.keys();
+    var keys = M.u.keys();
 
     for (var i = 0; i < keys.length; i++) {
-      if (_this.props.contacts[keys[i]].c === 1) {
+      if (M.u[keys[i]].c === 1) {
         haveContacts = true;
         break;
       }
@@ -21849,7 +22299,7 @@ function (_MegaRenderMixin) {
     value: function render() {
       var self = this;
       var classes = "new-group-chat contrast small-footer " + self.props.className;
-      var contacts = self.props.contacts;
+      var contacts = M.u;
       var haveContacts = self.state.haveContacts;
       var buttons = [];
       var allowNext = false;
@@ -22025,9 +22475,8 @@ function (_MegaRenderMixin) {
         buttons: buttons
       }, chatInfoElements, startGroupChatWizard_React.makeElement(ui_contacts["ContactPickerWidget"], {
         changedHashProp: self.state.step,
-        megaChat: self.props.megaChat,
-        contacts: contacts,
         exclude: self.props.exclude,
+        contacts: contacts,
         selectableContacts: "true",
         onSelectDone: self.onSelectClicked,
         onSelected: self.onSelected,

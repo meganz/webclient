@@ -1376,7 +1376,24 @@ scparser.mcpc = scparser.mcc = function (a) {
         } else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
         } else if (Array.isArray(loadfm.chatmcf)) {
-            loadfm.chatmcf.push(a);
+            // Merge if exists.
+            // This can happen in case some data came from fmdb, but there were still queued ap's (mcpc for
+            // added/removed participants). If this doesn't merge the chatmcf entry, this would end up removing the
+            // 'ck', since mcpc doesn't contain 'ck' properties and the chat would render useless (no key).
+            var exists = false;
+            for (var i = 0; i < loadfm.chatmcf.length; i++) {
+                var entry = loadfm.chatmcf[i];
+                if (entry.id === a.id) {
+                    delete a.a;
+                    Object.assign(entry, a);
+                    exists = true;
+                    a = entry;
+                    break;
+                }
+            }
+            if (!exists) {
+                loadfm.chatmcf.push(a);
+            }
         } else {
             srvlog('@lp unable to parse mcc packet');
         }

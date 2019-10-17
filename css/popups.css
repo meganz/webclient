@@ -108,6 +108,7 @@ body.tl .dropdown.body.popup.contacts-search {
     margin-top: 8px;
     min-height: 288px;
     height: 80%;
+    max-height: 426px;
     overflow: hidden;
 }
 .contacts-search-scroll .jspPane {

@@ -315,7 +315,11 @@ MegaData.prototype.sortByOwner = function(d) {
         var userb = Object(M.d[b.su]);
 
         if (typeof usera.name === 'string' && typeof userb.name === 'string') {
-            return usera.name.localeCompare(userb.name) * d;
+
+            var namea = usera.name === userb.name ? usera.name + a.su : usera.name;
+            var nameb = usera.name === userb.name ? userb.name + b.su : userb.name;
+
+            return namea.localeCompare(nameb) * d;
         }
 
         return M.doFallbackSort(usera, userb, d);
@@ -487,15 +491,17 @@ MegaData.prototype.sortByInteraction = function(d) {
 };
 
 MegaData.prototype.doSort = function(n, d) {
-    $('.grid-table-header .arrow').removeClass('asc desc');
+    "use strict";
+    // don't touch the .arrow's in Archived chats.
+    $('.grid-table-header .arrow:not(.is-chat)').removeClass('asc desc');
     $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     n = String(n).replace(/\W/g, '');
     if (d > 0) {
-        $('.arrow.' + n).addClass('desc');
+        $('.arrow.' + n + ':not(.is-chat)').addClass('desc');
     }
     else {
-        $('.arrow.' + n).addClass('asc');
+        $('.arrow.' + n + ':not(.is-chat)').addClass('asc');
     }
 
     var sortClassinSubMenu = '.sort-' + n;

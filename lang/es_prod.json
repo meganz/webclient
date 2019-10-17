@@ -1047,7 +1047,7 @@
     "7744": "Correo electr\u00f3nico actual",
     "7745": "Nuevo correo electr\u00f3nico",
     "7747": "A continuaci\u00f3n, ve a tu bandeja de entrada y confirma el cambio de correo.",
-    "7754": "Carpetas compartidas",
+    "7754": "Elementos compartidos",
     "7869": "Este correo electr\u00f3nico ya est\u00e1 registrado. Por favor, elige un correo alternativo para proceder.",
     "7872": "Perder\u00e1s el acceso a las carpetas compartidas contigo por [X].",
     "7879": "El acceso a las carpetas compartidas por [X] ha sido eliminado.",
@@ -2460,7 +2460,7 @@
     "19505": "Recibida",
     "19506": "Enviada",
     "19507": "El nombre de la empresa es obligatorio, completa el campo del nombre de la empresa",
-    "19508": "An error occurred while trying to register the account, please try again later. If the problem persists please contact MEGA support at business@mega.nz",
+    "19508": "No se ha podido registrar la cuenta, vuelve a intentarlo m\u00e1s tarde. Si el problema persiste, ponte en contacto con el soporte de MEGA en business@mega.nz",
     "19509": "Configurar el pago mensual autom\u00e1tico para la suscripci\u00f3n de la cuenta Business",
     "19510": "Cuenta Business",
     "19511": "El pago no se ha realizado, int\u00e9ntalo de nuevo m\u00e1s tarde. Si el problema persiste, ponte en contacto con el soporte de MEGA https:\/\/mega.nz\/support",
@@ -3252,7 +3252,7 @@
     "20856": "Tu enlace ha caducado.",
     "20857": "Tu enlace no es v\u00e1lido.",
     "20858": "Ponte en contacto con support@mega.nz para obtener ayuda.",
-    "20859": "\u00bfEst\u00e1s seguro de que quieres revertir la contrase\u00f1a de la cuenta%1 a la anterior?",
+    "20859": "\u00bfEst\u00e1s seguro de que quieres revertir la contrase\u00f1a de la cuenta %1 a la anterior?",
     "20860": "Se ha revertido la contrase\u00f1a a la anterior.",
     "20890": "Alguien te ha enviado un mensaje de chat",
     "20891": "Aviso sobre los bonos",
@@ -3313,5 +3313,10 @@
     "22001": "Est\u00e1s conectado a una cuenta diferente a la que est\u00e1s intentando cancelar. Cierra sesi\u00f3n, vuelve a conectarte con la cuenta que deseas cancelar y haz clic de nuevo en el enlace de cancelaci\u00f3n de cuenta.",
     "22002": "Gratis para siempre",
     "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
-    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
+    "22083": "No se han podido migrar los datos debido a la falta de la clave de cifrado requerida para {0}. Es probable que esta cuenta a\u00fan no haya finalizado su registro; si no es ese el motivo, comun\u00edcate con el servicio de asistencia business@mega.nz",
+    "22094": "Tambi\u00e9n disponible para [S]Chrome[\/S] y [S]Opera[\/S] en tu ordenador",
+    "22095": "Las extensiones del navegador est\u00e1n disponibles para [S]Chrome[\/S], [S]Firefox[\/S] y [S]Opera[\/S] en tu ordenador",
+    "22114": "PRO account voucher",
+    "22117": "Congratulations! [BR]Your voucher has been redeemed.",
+    "22120": "Please login or create your free account to redeem."
 }

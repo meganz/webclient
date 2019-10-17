@@ -796,7 +796,7 @@
     "6783": "Approuver les authentifiants",
     "6787": "Aucun dossier n'est partag\u00e9 avec vous",
     "6788": "mois",
-    "6789": "Compte d\u00e9sactiv\u00e9",
+    "6789": "Le compte est d\u00e9sactiv\u00e9",
     "6802": "Bitcoin",
     "6803": "%1 mois",
     "6804": "Solde insufisant",
@@ -1109,7 +1109,7 @@
     "8441": "Si vous trouvez un bogue ou une vuln\u00e9rabilit\u00e9 informatique dans notre code, veuillez envoyer un courriel \u00e0 [A]bugs@mega.nz[\/A] en expliquant le probl\u00e8me. Notre programme de signalement des vuln\u00e9rabilit\u00e9s est bien r\u00e9tribu\u00e9 et ses crit\u00e8res d\u2019admissibilit\u00e9 sont expliqu\u00e9s [A2]ici[\/A2] (page en anglais).",
     "8512": "En apprendre davantage",
     "8521": "Avis de retrait",
-    "8522": "Votre partage public %1 (%2) a \u00e9t\u00e9 retir\u00e9.",
+    "8522": "Votre %1 (%2) partag\u00e9 publiquement a \u00e9t\u00e9 retir\u00e9.",
     "8523": "Votre %1 (%2) retir\u00e9 a \u00e9t\u00e9 r\u00e9tabli",
     "8524": "Retrait r\u00e9tabli",
     "8525": "Saisissez votre message ici",
@@ -3312,6 +3312,11 @@
     "21957": "Veuillez cocher la case pour confirmer que vous comprenez le danger de perdre votre mot de passe.",
     "22001": "Vous \u00eates connect\u00e9 dans un compte diff\u00e9rent de celui que vous tentez d\u2019annuler. Veuillez vous d\u00e9connecter, vous reconnecter avec le compte que vous souhaitez annuler, puis essayez de cliquer sur le m\u00eame lien d\u2019annulation de compte.",
     "22002": "toujours gratuit",
-    "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
-    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
+    "22074": "Cliquez sur [S]M\u2019ABONNER[\/S] quand vos options de paiement vous satisferont. Une nouvelle bo\u00eete de dialogue vous sera pr\u00e9sent\u00e9e ou vous serez redirig\u00e9 vers une nouvelle page pour terminer votre achat.",
+    "22083": "La migration des donn\u00e9es a \u00e9chou\u00e9, car la cl\u00e9 de chiffrement requise pour {0} manque. Il est probable que la configuration de ce compte n\u2019est pas termin\u00e9e. Si ce n\u2019est pas le cas, veuillez contacter l\u2019assistance \u00e0 business@mega.nz",
+    "22094": "Aussi propos\u00e9es pour [S]Chrome[\/S] et [S]Opera[\/S] sur ordinateur",
+    "22095": "Les extensions pour navigateurs sont propos\u00e9es pour [S]Chrome[\/S], [S]Firefox[\/S] et [S]Opera[\/S] sur ordinateur.",
+    "22114": "Bon de compte PRO",
+    "22117": "F\u00e9licitations\u2009! [BR]Votre coupon a \u00e9t\u00e9 valid\u00e9.",
+    "22120": "Please login or create your free account to redeem."
 }

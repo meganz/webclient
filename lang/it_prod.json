@@ -3313,5 +3313,10 @@
     "22001": "Hai effettuato il login con un account differente rispetto a quello che stai provando ad eliminare. Per favore, effettua il logout e fai nuovamente il login con l'account che desideri eliminare, e poi prova a cliccare di nuovo sullo stesso link di cancellazione dell'account.",
     "22002": "sempre gratis",
     "22074": "Clicca su [S]ABBONATI[\/S] quando avrai scelto le tue opzioni di pagamento. Ti verr\u00e0 mostrata una pagina di dialogo o verrai reindirizzato ad una nuova pagina per completare il tuo acquisto.",
-    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
+    "22083": "La migrazione dei dati \u00e8 fallita a causa della mancante chiave di criptazione per {0}. Questo account probabilmente non ha terminato il setup, altrimenti contatta cortesemente il supporto a business@mega.nz",
+    "22094": "Anche disponibile per desktop [S]Chrome[\/S] e [S]Opera[\/S]",
+    "22095": "Le estensioni per browser sono disponibili per [S]Chrome[\/S], [S]Firefox[\/S] and [S]Opera[\/S]",
+    "22114": "PRO account voucher",
+    "22117": "Congratulations! [BR]Your voucher has been redeemed.",
+    "22120": "Please login or create your free account to redeem."
 }

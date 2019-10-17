@@ -3313,5 +3313,10 @@
     "22001": "U bent aangemeld bij een ander account dan het account dat u probeert te annuleren. Meld u af, meld u opnieuw aan met het account dat u wilt annuleren en klik vervolgens opnieuw op dezelfde link om het account te annuleren.",
     "22002": "altijd gratis",
     "22074": "Klik [S] INSCHRIJVEN[\/S] wanneer u tevreden bent met uw betalingsopties. U krijgt een nieuw dialoog tevoorschijn of wordt doorverwezen naar een nieuwe pagina om uw aankoop te voltooien.",
-    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
+    "22083": "Gegevens migratie is mislukt doordat de benodigde coderings sleutel voor {0} ontbreekt. Dit account heeft de installatie  waarschijnlijk niet volledig voltooid, neem anders contact op met de ondersteuning via business@mega.nz",
+    "22094": "Ook beschikbaar voor desktop [S]Chrome[\/S] en [S]Opera[\/S]",
+    "22095": "Browswer extensies zijn beschikbaar voor desktop [S]Chrome[\/S]. [S]Firefox[\/S] en [S]Opera[\/S]",
+    "22114": "PRO account bon",
+    "22117": "Gefeliciteerd! [BR]Uw bon is verlost",
+    "22120": "Please login or create your free account to redeem."
 }

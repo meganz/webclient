@@ -1129,7 +1129,7 @@
     "8586": "Se decripteaz\u0103 datele folderului",
     "8589": "Nicio notificare",
     "8595": "Acest folder va fi decriptat de \u00eendat\u0103 ce cheia criptografic\u0103 devine disponibil\u0103 (c\u00e2nd creatorul partaj\u0103rii se autentific\u0103 din nou).",
-    "8596": "Planul pentru calitatea de membru PRO va expira \u00een termen de 1 zi.",
+    "8596": "Planul pentru calitatea de membru PRO va expira peste 1 zi.",
     "8597": "Planul pentru calitatea de membru PRO va expira \u00een %1 zile.",
     "8598": "Planul pentru calitatea de membru PRO expir\u0103 \u00een cur\u00e2nd",
     "8602": "Acest fi\u0219ier va fi decriptat de \u00eendat\u0103 ce cheia criptografic\u0103 devine disponibil\u0103 (c\u00e2nd creatorul partaj\u0103rii se autentific\u0103 din nou).",
@@ -3313,5 +3313,10 @@
     "22001": "E\u0219ti autentificat(\u0103) \u00eentr-un cont diferit de cel pe care \u00eencerci s\u0103 \u00eel anulezi. Te rug\u0103m s\u0103 te deconectezi, s\u0103 te autentifici din nou cu contul pe care dore\u0219ti s\u0103 \u00eel anulezi \u0219i apoi s\u0103 \u00eencerci s\u0103 faci clic din nou pe acela\u0219i link de anulare a contului",
     "22002": "\u00eentotdeauna gratuit",
     "22074": "D\u0103 clic pe [S]ABONEAZ\u0102-TE[\/S] c\u00e2nd e\u0219ti fericit cu op\u021biunile tale de plat\u0103. \u021ai se va afi\u0219a un dialog nou sau vei fi redirec\u021bionat pe o pagin\u0103 nou\u0103 pentru a \u00eencheia achizi\u021bia.",
-    "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz"
+    "22083": "Migrarea datelor a e\u0219uat din cauza lipsei cheii de criptare necesare pentru {0}. Probabil c\u0103 acest cont nu \u0219i-a finalizat \u00eenc\u0103 configurarea, \u00een caz contrar, te rug\u0103m s\u0103 contactezi asisten\u021ba la adresa business@mega.nz",
+    "22094": "Disponibil\u0103, de asemenea, pentru versiunile desktop ale  [S]Chrome[\/S] \u0219i [S]Opera[\/S]",
+    "22095": "Extensiile pentru browsere sunt disponibile pentru versiune desktop ale [S]Chrome[\/S], [S]Firefox[\/S] \u0219i [S]Opera[\/S]",
+    "22114": "PRO account voucher",
+    "22117": "Congratulations! [BR]Your voucher has been redeemed.",
+    "22120": "Please login or create your free account to redeem."
 }

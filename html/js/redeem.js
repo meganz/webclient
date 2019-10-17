@@ -664,7 +664,7 @@ var redeem = {
             });
         }
         else {
-            parsepage(pages['m_voucherinfo']);
+            parsepage(pages['mvoucherinfo']);
             infoFilling($);
         }
     },

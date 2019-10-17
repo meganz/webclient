@@ -615,6 +615,13 @@ var redeem = {
             $('.size-head.v-transfer', $dlg)
                 .text(bandwidthSizeRounded + ' ' + bandwidthFormatted.unit);
 
+            if (mega.voucher.proNum === 4) {
+                $('.voucher-logo', $dlg).addClass('pro-l');
+            }
+            else {
+                $('.voucher-logo', $dlg).removeClass('pro-l');
+            }
+
             $('.voucher-info-login', $dlg).off('click').on('click',
                 function() {
                     login_txt = l[7712];

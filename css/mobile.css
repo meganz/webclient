@@ -11754,9 +11754,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin-bottom: 26px;
     background-color: #EB4444;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+    border: 1px solid #d90007;
     border-radius: 4px 4px 4px 4px;
     text-align: initial;
     display: inline-block;
+}
+.voucher-info-redeem .voucher-logo.pro-l {
+    background-color: #FFAF00;
+    border: 1px solid #FD8116;
+    color: #fff;
 }
 .voucher-info-redeem .voucher-logo .voucher-head{
     border-radius: 4px 4px 0 0;

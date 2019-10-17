@@ -3314,8 +3314,6 @@
     "22002": "always free",
     "22074": "Click [S]SUBSCRIBE[\/S] when you are happy with your payment options. You will be shown a new dialog or redirected to a new page to complete your purchase.",
     "22083": "Data migration has failed due to missing the required encryption key for {0}. This account likely hasn't completed its setup yet, otherwise please contact support at business@mega.nz",
-    "22094": "Also available for desktop [S]Chrome[\/S] and [S]Opera[\/S]",
-    "22095": "Browser extensions are available for desktop [S]Chrome[\/S], [S]Firefox[\/S] and [S]Opera[\/S]",
     "22114": "PRO account voucher",
     "22117": "Congratulations! [BR]Your voucher has been redeemed.",
     "22120": "Please login or create your free account to redeem."

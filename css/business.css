@@ -78,9 +78,14 @@ i.medium-icon.business-sprite {
     box-sizing: border-box;
 }
 .business-page .bottom-page.top-bl {
+    max-height: 860px;
+    min-height: auto;
     height: 100%;
+}
+.business-page .bottom-page.top-bl {
     max-height: 820px;
     min-height: auto;
+    background-color: #FAFAFA;
 }
 .bottom-page.angle-bg {
     position: absolute;
@@ -89,7 +94,7 @@ i.medium-icon.business-sprite {
     content: '';
     left: 0;
     background-image: url(../images/mega/bottom-page/business-bg2@2x.png);
-    background-size: 100% 100%;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center top;
     background-color: #FAFAFA;
@@ -97,7 +102,7 @@ i.medium-icon.business-sprite {
 .bottom-page.angle-bg.light {
     background-image: url(../images/mega/bottom-page/business-bg1@2x.png);
     background-color: transparent;
-    background-size: 100% 100%;
+    background-size: auto 1343px;
     background-position: right top;
     height: 1343px;
 }

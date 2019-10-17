@@ -51,15 +51,7 @@ var browserspage = {
             $browserLinks.find('a').removeClass('mac linux').text('');
         }
 
-        if (is_ios) {
-            browser = browser + ' ios';
-        }
-        else if (is_android) {
-            browser = browser + ' android';
-        }
-    
-        $topBlock.removeClass('unsupported chrome firefox opera ios android')
-            .addClass(browser);
+        $topBlock.removeClass('unsupported chrome firefox opera').addClass(browser);
     },
 
     /**

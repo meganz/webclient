@@ -1997,6 +1997,9 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
     }
 
+    if (folderlink) {
+        $topHeader.find('.top-icon.notification').addClass('hidden');
+    }
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }

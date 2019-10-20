@@ -689,19 +689,23 @@ var redeem = {
             $input.attr('placeholder', l[20418]);
         }
 
-        $input.rebind('keyup.vib', function() {
+        $input.rebind('input.vib', function() {
             var value = $(this).val() || false;
 
             if (value.length > 11) {
-                $button.addClass('active');
+                $button.addClass('active').removeClass('disabled');
             }
             else {
-                $button.removeClass('active');
+                $button.removeClass('active').addClass('disabled');
             }
             $inputo.removeClass('error');
+            return false;
         });
 
         $button.rebind('click', function() {
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             loadingDialog.show();
 
             redeem.getVoucherData($input.val(), promoter)
@@ -714,6 +718,7 @@ var redeem = {
                     $input.val('');
                     $inputo.addClass('error');
                     loadingDialog.hide();
+                    $button.removeClass('active').addClass('disabled');
                 });
 
             return false;

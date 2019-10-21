@@ -85,6 +85,7 @@ body.rtl .fm-dialog.loginrequired-dialog,
 body.rtl .fm-dialog.pass-reminder,
 body.rtl .membership-st2-info .save-money,
 body.rtl .main-mid-pad.third-section .reg-st3-txt-localcurrencyprogram,
+body.rtl .mobile.main-block.park-account-change-password,
 body.rtl .rtl-block-if-rtl {
     direction: rtl;
 }

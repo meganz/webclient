@@ -160,4 +160,9 @@
             close();
         }
     });
+
+    mBroadcaster.addListener('mega:openfolder', function() {
+        $('.simpletip').first().trigger('mouseleave');
+    });
+
 })(jQuery);

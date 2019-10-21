@@ -29744,7 +29744,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: auto;
     bottom: 8px;
     left: 56px;
-    z-index: 21;
+    z-index: 121;
 }
 .transfer-progress-widget, .banner.transfer {
     position: relative;

@@ -11080,6 +11080,9 @@ table {
 .redeem-voucher.active {
     z-index: 2100;
 }
+.fm-account-plan .redeem-voucher.active {
+    z-index: 100;
+}
 .redeem-voucher .notification-arrow {
     display: none;
     z-index: 401;

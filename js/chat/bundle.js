@@ -17560,7 +17560,7 @@ function (_MegaRenderMixin4) {
 ;
 
 function isStartCallDisabled(room) {
-  return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
+  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0;
 }
 
 /***/ }),
@@ -19739,35 +19739,6 @@ Chat.prototype.getChatById = function (chatdId) {
   return found ? found : false;
 };
 /**
- * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
- * @param [chatIdBin] {String}
- * @returns {boolean}
- */
-
-
-Chat.prototype.haveAnyIncomingOrOutgoingCall = function (chatIdBin) {
-  if (chatIdBin) {
-    if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
-      return false;
-    } else if (this.rtc && this.rtc.calls) {
-      var callIds = Object.keys(this.rtc.calls);
-
-      for (var i = 0; i < callIds.length; i++) {
-        if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
-          return true;
-        }
-      } // didn't found any chat that doesn't match the current chatdIdBin
-
-
-      return false;
-    } else {
-      return false;
-    }
-  } else {
-    return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
-  }
-};
-/**
  * Returns true if there is a chat room with an active (started/starting) call.
  *
  * @returns {boolean}
@@ -20219,7 +20190,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     ctime: 0,
     lastActivity: 0,
     callRequest: null,
-    callIsActive: false,
     isCurrentlyActive: false,
     _messagesQueue: [],
     unreadCount: 0,
@@ -20251,7 +20221,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   this.ck = ck;
   this.scrolledToBottom = 1;
   this.callRequest = null;
-  this.callIsActive = false;
   this.shownMessages = {};
   self.members = {};
 
@@ -20685,6 +20654,16 @@ ChatRoom.prototype.isOnline = function () {
   return shard ? shard.isOnline() : false;
 };
 
+ChatRoom.prototype.isOnlineForCalls = function () {
+  var chatdChat = this.getChatIdMessages();
+
+  if (!chatdChat) {
+    return false;
+  }
+
+  return chatdChat.loginState() >= LoginState.HISTDONE;
+};
+
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
   'use strict';
 
@@ -20721,10 +20700,6 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
   });
   return $promise;
 };
-
-ChatRoom.prototype._resetCallStateNoCall = function () {};
-
-ChatRoom.prototype._resetCallStateInCall = function () {};
 /**
  * Check whether a chat is archived or not.
  *
@@ -21817,7 +21792,13 @@ ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
   var haveCallParticipants = self.getCallParticipants().length > 0;
 
-  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && haveCallParticipants) {
+  if (self.type !== "group" && self.type !== "public") {
+    return false;
+  }
+
+  var call = self.callManagerCall;
+
+  if (call && (call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
     return true;
   } else if (!self.callManagerCall && haveCallParticipants) {
     return true;
@@ -21825,14 +21806,21 @@ ChatRoom.prototype.havePendingGroupCall = function () {
     return false;
   }
 };
+/**
+ * Returns whether there is a call in the room that we can answer (1on1 or group) or join (group)
+ * This is used e.g. to determine whether to display a small handset icon in the notification area
+ * for the room in the LHP
+ */
+
 
 ChatRoom.prototype.havePendingCall = function () {
   var self = this;
+  var call = self.callManagerCall;
 
-  if (self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
-    return true;
+  if (call) {
+    return call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING;
   } else if (self.type === "group" || self.type === "public") {
-    return self.havePendingGroupCall();
+    return self.getCallParticipants().length > 0;
   } else {
     return false;
   }

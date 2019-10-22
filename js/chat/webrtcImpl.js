@@ -179,13 +179,6 @@
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
-            chatRoom.trigger(
-                'onCallParticipantsUpdated',
-                [
-                    base64urlencode(userid),
-                    base64urlencode(clientid)
-                ]
-            );
             chatRoom.trigger('onClientJoinedCall', {userId: userid, clientId: clientid});
         }
     };
@@ -194,18 +187,10 @@
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
-            chatRoom.trigger(
-                'onCallParticipantsUpdated',
-                [
-                    base64urlencode(userid),
-                    base64urlencode(clientid)
-                ]
-            );
             chatRoom.trigger('onClientLeftCall', {userId: userid, clientId: clientid});
         }
     };
     RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
-
     RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
         this.megaChat.networkQuality = quality;
         if (this.megaChat.activeCallManagerCall) {

@@ -15784,7 +15784,7 @@ function (_MegaRenderMixin2) {
       }), external_React_default.a.createElement("span", null, l[20623])), external_React_default.a.createElement("p", null, external_React_default.a.createElement("span", null, l[20454]))) : null, external_React_default.a.createElement("div", {
         className: "chat-button-seperator"
       }), external_React_default.a.createElement("div", {
-        className: "link-button light" + (!(room.members.hasOwnProperty(u_handle) && !anonymouschat) ? " disabled" : ""),
+        className: "link-button light" + (!((room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !anonymouschat) ? " disabled" : ""),
         onClick: function onClick(e) {
           if ($(e.target).closest('.disabled').length > 0) {
             return false;
@@ -15803,7 +15803,7 @@ function (_MegaRenderMixin2) {
       }, external_React_default.a.createElement("i", {
         className: "small-icon colorized " + (room.isArchived() ? "unarchive" : "archive")
       }), external_React_default.a.createElement("span", null, room.isArchived() ? __(l[19065]) : __(l[16689]))), room.type !== "private" ? external_React_default.a.createElement("div", {
-        className: "link-button light red " + (room.stateIsLeftOrLeaving() || !(room.type !== "private" && room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat) ? "disabled" : ""),
+        className: "link-button light red " + (room.type !== "private" && !anonymouschat && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 ? "" : "disabled"),
         onClick: function onClick(e) {
           if ($(e.target).closest('.disabled').length > 0) {
             return false;
@@ -15815,7 +15815,7 @@ function (_MegaRenderMixin2) {
         }
       }, external_React_default.a.createElement("i", {
         className: "small-icon rounded-stop colorized"
-      }), external_React_default.a.createElement("span", null, l[8633])) : null, room._closing !== true && (room.type === "group" || room.type === "public") && room.stateIsLeftOrLeaving() && !anonymouschat ? external_React_default.a.createElement("div", {
+      }), external_React_default.a.createElement("span", null, l[8633])) : null, room._closing !== true && room.type === "public" && !anonymouschat && (!room.membersSetFromApi.members.hasOwnProperty(u_handle) || room.membersSetFromApi.members[u_handle] === -1) ? external_React_default.a.createElement("div", {
         className: "link-button light red",
         onClick: function onClick() {
           if (self.props.onCloseClicked) {
@@ -17146,11 +17146,11 @@ function (_MegaRenderMixin3) {
         onLeaveClicked: function onLeaveClicked() {
           room.leave(true);
         },
-        onJoinViaPublicLinkClicked: function onJoinViaPublicLinkClicked() {
-          room.joinViaPublicHandle();
-        },
         onCloseClicked: function onCloseClicked() {
           room.destroy();
+        },
+        onJoinViaPublicLinkClicked: function onJoinViaPublicLinkClicked() {
+          room.joinViaPublicHandle();
         },
         onSwitchOffPublicMode: function onSwitchOffPublicMode(topic) {
           room.switchOffPublicMode(topic);

@@ -609,7 +609,7 @@ if (is_bot) {
 
 if (String(location.pathname).indexOf('%') > 0) {
     tmp = mURIDecode(location.pathname);
-    if (tmp.indexOf('%') < 0) {
+    if (tmp.indexOf('%') < 0 && !(/[^\x00-\x7f]/.test(tmp))) {
         location.assign(tmp);
     }
 }

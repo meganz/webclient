@@ -167,10 +167,11 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isE
     }
 
     Autolinker.link(textContents, {
-        truncate: 80,
         className: 'chatlink',
+        truncate: false,
         newWindow: true,
-        stripPrefix: true,
+        stripPrefix: false,
+        stripTrailingSlash: false,
         twitter: false,
         replaceFn : function(match) {
             switch (match.getType()) {

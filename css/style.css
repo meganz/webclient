@@ -11996,29 +11996,12 @@ table {
     background-repeat: no-repeat;
     margin-left: -13px;
 }
-.login-notification-icon {
-    width: 16px;
-    height: 16px;
-    background-image: url(../images/mega/top-login-sprite_v11.png);
-    background-position: 0 -1497px;
-    background-repeat: no-repeat;
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    cursor: pointer;
-}
-.login-notification-icon:hover {
-    background-position: 0 -1537px;
-}
 .top-login-forgot-pass-bl {
     padding: 3px 0 13px 0;
     margin: 0 0 0 0;
 }
 .top-login-bott-gray-block .default-white-button {
     margin-top: 7px;
-}
-.pro-login-dialog .login-notification-icon {
-    display: none;
 }
 .top-login-forgot-pass {
     font-size: 13px;

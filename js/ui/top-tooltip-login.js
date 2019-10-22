@@ -143,9 +143,8 @@ var tooltiplogin = {
         $inputs = $('.account.input-wrapper input',  $dialog);
         $button = $dialog.find('.big-red-button');
 
-        if (localStorage.hideloginwarning || is_extension) {
+        if (localStorage.hideloginwarning) {
             $dialog.find('.top-login-warning').addClass('hidden');
-            $dialog.find('.login-notification-icon').removeClass('hidden');
         }
 
         $('.top-login-full', $dialog).rebind('click', function() {
@@ -175,13 +174,6 @@ var tooltiplogin = {
                 localStorage.hideloginwarning = 1;
             }
             $('.top-login-warning', $dialog).removeClass('active');
-            $('.login-notification-icon', $dialog).removeClass('hidden');
-        });
-
-        $('.login-notification-icon', $dialog).rebind('click', function() {
-            $('.top-login-warning', $dialog).removeClass('hidden');
-            $('.top-login-warning', $dialog).addClass('active');
-            $(this).addClass('hidden');
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function() {

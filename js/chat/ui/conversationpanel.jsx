@@ -2424,15 +2424,16 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
         }
     }
 };
+
 function isStartCallDisabled(room) {
-    return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
         (
             room.callManagerCall &&
             room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
         )
-        || (megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) ||
-        (
+        || (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG
-        ));
+        )
+        || (room.getCallParticipants().length > 0);
 }

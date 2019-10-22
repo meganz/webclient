@@ -34,10 +34,11 @@ UrlFilter.prototype.processMessage = function(e, eventData) {
     }
 
     eventData.message.messageHtml = Autolinker.link(messageContents, {
-        truncate: 80,
         className: 'chatlink',
+        truncate: false,
         newWindow: true,
-        stripPrefix: true,
+        stripPrefix: false,
+        stripTrailingSlash: false,
         twitter: false,
         replaceFn : function(match) {
             switch (match.getType()) {

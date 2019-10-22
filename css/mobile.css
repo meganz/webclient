@@ -8582,6 +8582,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    width: 23px;
 }
 .mobile .improved-recovery-steps .check-sessions .checkboxOff {
     background-color: rgba(153, 153, 153, 0.25);

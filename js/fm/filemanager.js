@@ -1590,7 +1590,7 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-    $('.filter-block .close').rebind('click', function() {
+    $('.filter-block.body .close').rebind('click', function() {
         delete M.filterLabel[M.currentLabelType];
         $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
         $(this).parent().addClass('hidden')// Hide 'Filter:' DOM elements

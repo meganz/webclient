@@ -962,7 +962,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                 });
         }
         else {
-            this.props.megaChat.createAndShowGroupRoomFor(selected);
+            megaChat.createAndShowGroupRoomFor(selected);
         }
     }
     componentDidMount() {
@@ -1017,7 +1017,6 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
 
             var $target = $(e.target);
 
-            var megaChat = self.props.megaChat;
             if (megaChat.currentlyOpenedChat) {
                 // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
                 // is visible/active at the moment
@@ -1367,6 +1366,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     </div>
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
                         <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height"
+                                          chats={megaChat.chats}
                                           ref={function(ref) {
                             megaChat.$chatTreePanePs = ref;
                         }}>

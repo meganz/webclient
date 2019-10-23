@@ -517,7 +517,7 @@ FileManager.prototype.initFileManagerUI = function() {
     initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    onIdle(topmenuUI);
+    M.onFileManagerReady(topmenuUI);
 
     var thElm;
     var startOffset;

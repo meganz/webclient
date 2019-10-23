@@ -3746,7 +3746,7 @@ function loadfm_done(mDBload) {
             closeMsg();
         }
         clearInterval(mega.loadReport.aliveTimer);
-        mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
+        mega.state &= ~window.MEGAFLAG_LOADINGCLOUD;
 
         watchdog.notify('loadfm_done');
     };

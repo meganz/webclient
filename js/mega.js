@@ -3301,6 +3301,11 @@ function processMCF(mcfResponse, ignoreDB) {
 
     // reopen chats from the MCF response.
     if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
+        // sort by ctime DESC
+        mcfResponse.sort(function(a, b) {
+            return (a.ts < b.ts ? -1 : (a.ts > b.ts ? 1 : 0)) * -1;
+        });
+
         mcfResponse.forEach(function (chatRoomInfo) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });

@@ -2002,7 +2002,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            document.body.removeChild(constructor.domNode);
+            ReactDOM.unmountComponentAtNode(constructor.domNode);
             selected = [];
             closeDialog();
         },

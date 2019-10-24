@@ -695,7 +695,7 @@ pro.proplan = {
 function showLoginDialog(email, password) {
     'use strict';
     var $dialog = $('.pro-login-dialog');
-    var $inputs = $dialog.find('.account.input-wrapper input');
+    var $inputs = $dialog.find('input');
     var $button = $dialog.find('.big-red-button');
 
     var closeLoginDialog = function() {
@@ -746,11 +746,9 @@ var doProLogin = function($dialog) {
 
     loadingDialog.show();
 
-    var $emailContainer = $dialog.find('.account.input-wrapper.email');
-    var $passwordContainer = $dialog.find('.account.input-wrapper.password');
     var $formWrapper = $dialog.find('form');
-    var $emailInput = $emailContainer.find('input');
-    var $passwordInput = $passwordContainer.find('input');
+    var $emailInput = $dialog.find('input#login-name3');
+    var $passwordInput = $dialog.find('input#login-password3');
     var $rememberMeCheckbox = $dialog.find('.login-check input');
 
     var email = $emailInput.val();
@@ -759,16 +757,14 @@ var doProLogin = function($dialog) {
     var twoFactorPin = null;
 
     if (email === '' || !isValidEmail(email)) {
-        $emailContainer.addClass('incorrect');
-        $emailInput.val('');
-        $emailInput.focus();
+        $emailInput.megaInputsShowError(l[141]);
+        $emailInput.val('').focus();
         loadingDialog.hide();
 
         return false;
     }
     else if (password === '') {
-        $emailContainer.removeClass('incorrect');
-        $formWrapper.addClass('both-incorrect-inputs');
+        $passwordInput.megaInputsShowError(l[1791]);
         loadingDialog.hide();
 
         return false;
@@ -816,10 +812,8 @@ function completeProLogin(result) {
     'use strict';
 
     var $formWrapper = $('.pro-login-dialog form');
-    var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
-    var $emailField = $emailContainer.find('input');
-    var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
-    var $passwordField = $passwordContainer.find('input');
+    var $emailField = $formWrapper.find('input#login-name3');
+    var $passwordField = $formWrapper.find('input#login-password3');
 
     loadingDialog.hide();
 
@@ -832,8 +826,8 @@ function completeProLogin(result) {
     else if (result !== false && result >= 0) {
         passwordManager('#form_login_header');
 
-        $emailField.val('');
-        $passwordField.val('');
+        $emailField.val('').blur();
+        $passwordField.val('').blur();
 
         u_type = result;
 
@@ -852,10 +846,18 @@ function completeProLogin(result) {
     else {
         // Close the 2FA dialog for a generic error
         twofactor.loginDialog.closeDialog();
+        $emailField.megaInputsShowError();
+        $passwordField.megaInputsShowError(l[7431]);
 
-        $emailContainer.removeClass('incorrect');
-        $formWrapper.addClass('both-incorrect-inputs');
-        $passwordField.focus();
+        var $inputs = $emailField.add($passwordField);
+
+        $inputs.rebind('input.hideBothError', function() {
+
+            $emailField.megaInputsHideError();
+            $passwordField.megaInputsHideError();
+
+            $inputs.off('input.hideBothError');
+        });
     }
 }
 

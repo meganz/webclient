@@ -845,7 +845,7 @@ function init_page() {
 
                 init_login();
                 if (email) {
-                    $('#login-name2').val(email);
+                    $('#login-name2').val(email).blur();
                     $('.register-st2-button').addClass('active');
                     $('#login-name2').prop('readonly', true);
                 }

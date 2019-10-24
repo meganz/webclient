@@ -2253,6 +2253,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/qrcode.js', n: 'qrcode', j:1,w:2, g: 'vendor'});
     jsl.push({f:'js/ui/password-revert.js', n: 'password-revert', j:1});
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs.js', n: 'megainputs_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs-titleTop.js', n: 'megainputs_titletop_js', j:1,w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
     jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });
@@ -2394,7 +2396,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/txt.css', n: 'txt_css', j:2,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2509,6 +2510,7 @@ else if (!browserUpdate) {
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from

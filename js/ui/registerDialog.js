@@ -17,6 +17,7 @@
             $(window).off('resize.proregdialog');
             $('.fm-dialog-overlay').off('click.registerDialog');
             $('.fm-dialog-close', $dialog).off('click.registerDialog');
+            $('input', $dialog).val('');
 
             if (isUserTriggered && options.onDialogClosed) {
                 options.onDialogClosed($dialog);
@@ -103,12 +104,18 @@
                 hideOverlay();
                 // closeRegisterDialog($dialog, true);
                 $('.fm-dialog:visible').addClass('arrange-to-back');
-                msgDialog('warninga', l[1578], l[200], result === EEXIST ? l[1783] : api_strerror(result),
-                    function() {
+                if (result === EEXIST) {
+                    fm_hideoverlay();
+                    msgDialog('warninga', l[1578], l[7869]);
+                    options.$dialog.find('input.email').megaInputsShowError(l[1297]);
+                }
+                else {
+                    msgDialog('warninga', l[1578], l[200], api_strerror(result), function() {
                         if ($('.fm-dialog:visible').removeClass('arrange-to-back').length) {
                             fm_showoverlay();
                         }
                     });
+                }
             }
         };
 
@@ -133,10 +140,10 @@
          */
         var registeraccount = function() {
 
-            rv.password = $('.input-wrapper.first input', $dialog).val();
-            rv.first = $.trim($('.input-wrapper.name input.f-name', $dialog).val());
-            rv.last = $.trim($('.input-wrapper.name input.l-name', $dialog).val());
-            rv.email = $.trim($('.input-wrapper.email input', $dialog).val());
+            rv.password = $('input.pass', $dialog).val();
+            rv.first = $.trim($('input.f-name', $dialog).val());
+            rv.last = $.trim($('input.l-name', $dialog).val());
+            rv.email = $.trim($('input.email', $dialog).val());
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
@@ -158,11 +165,11 @@
 
         var err = false;
         var $formWrapper = $dialog.find('form');
-        var $firstName = $('.input-wrapper.name input.f-name', $formWrapper);
-        var $lastName = $('.input-wrapper.name input.l-name', $formWrapper);
-        var $email = $('.input-wrapper.email input', $formWrapper);
-        var $password = $('.input-wrapper.first input', $formWrapper);
-        var $confirmPassword = $('.input-wrapper.confirm input', $formWrapper);
+        var $firstName = $('input.f-name', $formWrapper);
+        var $lastName = $('input.l-name', $formWrapper);
+        var $email = $('input.email', $formWrapper);
+        var $password = $('input.pass', $formWrapper);
+        var $confirmPassword = $('input.confirm-pass', $formWrapper);
 
         var firstName = $.trim($firstName.val());
         var lastName = $.trim($lastName.val());
@@ -177,28 +184,55 @@
         if (passwordValidationResult !== true) {
 
             // Show error for password field, clear the value and refocus it
-            $password.parent().addClass('incorrect');
-            $password.parent().find('.account.password-status').removeClass('checked');
-            $password.parent().find('.account.input-tooltip').safeHTML(l[1102] + '<br>' + passwordValidationResult);
-            $password.val('');
+            $password.val('').trigger('input');
             $password.focus();
+            $password.megaInputsShowError(l[1102] + ' ' + passwordValidationResult);
 
             // Show error for confirm password field and clear the value
-            $confirmPassword.parent().addClass('incorrect');
             $confirmPassword.val('');
+            $confirmPassword.blur();
+            $confirmPassword.megaInputsShowError();
+
+            // Make These two error disappear together
+            $password.rebind('input.hideError', function() {
+                $confirmPassword.megaInputsHideError();
+                $password.off('input.hideError');
+                $confirmPassword.off('input.hideError');
+            });
+
+            $confirmPassword.rebind('input.hideError', function() {
+                $password.megaInputsHideError();
+                $password.off('input.hideError');
+                $confirmPassword.off('input.hideError');
+            });
 
             err = 1;
         }
 
         if (email === '' || !isValidEmail(email)) {
-            $email.parent().addClass('incorrect');
+            $email.megaInputsShowError(l[1100] + ' ' + l[1101]);
             $email.focus();
             err = 1;
         }
 
         if (firstName === '' || lastName === '') {
-            $firstName.parent().addClass('incorrect');
+            $firstName.megaInputsShowError(l[1098] + ' ' + l[1099]);
+            $lastName.megaInputsShowError();
             $firstName.focus();
+
+            // Make These two error disappear together
+            $firstName.rebind('input.hideError', function() {
+                $lastName.megaInputsHideError();
+                $firstName.off('input.hideError');
+                $lastName.off('input.hideError');
+            });
+
+            $lastName.rebind('input.hideError', function() {
+                $firstName.megaInputsHideError();
+                $firstName.off('input.hideError');
+                $lastName.off('input.hideError');
+            });
+
             err = 1;
         }
 
@@ -238,9 +272,9 @@
         }
         options = Object(opts);
         var $dialog = options.$wrapper || $('.fm-dialog.pro-register-dialog');
-        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $inputs = $dialog.find('input');
         var $button = $dialog.find('.button');
-        var $password = $dialog.find('.account.input-wrapper.password input');
+        var $password = $dialog.find('input[type="password"]');
 
         // Controls events, close button etc
         if (options.controls) {
@@ -320,36 +354,6 @@
         else {
             $('.register-side-pane.header-info', $dialog).safeHTML(l[20757]);
         }
-
-        var registerpwcheck = function() {
-            $('.account.password-status', $dialog)
-                .removeClass('good1 good2 good3 good4 good5 checked');
-
-            var $passwordInput = $('#register-password', $dialog);
-            var password = $.trim($passwordInput.val());
-
-            if (typeof zxcvbn === 'undefined'
-                    || $passwordInput.attr('type') === 'text'
-                    || password === '') {
-                return false;
-            }
-
-            classifyPassword(password, $dialog);
-        };
-
-        if (typeof zxcvbn === 'undefined') {
-            $('.account.input-wrapper.password', $dialog).addClass('loading');
-
-            M.require('zxcvbn_js')
-                .done(function() {
-                    $('.account.input-wrapper.password', $dialog).removeClass('loading');
-                    registerpwcheck();
-                });
-        }
-
-        $password.first().rebind('keyup.proRegister', function(e) {
-            registerpwcheck();
-        });
 
         $inputs.rebind('keydown.proRegister', function(e) {
             if (e.keyCode === 13) {

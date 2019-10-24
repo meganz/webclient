@@ -1662,95 +1662,44 @@
                         </div>
                     </div>
                 </div>
-
-
                 <div class="user-management-account-settings hidden">
                     <div class="auto-save hidden">
                         <div class="confirm-white-img icon"></div>
                         [$19633]
                     </div>
-
-
                     <div class="settings-menu-bar">
                         <div class="settings-menu-item selected suba-setting-profile">[$984]</div>
                         <div class="settings-menu-item suba-setting-inv">[$19282]</div>
-                        <!--<div class="settings-menu-item hidden">Settings</div>-->
                     </div>
                     <div class="border"></div>
-
-
                     <div class="profile">
                         <div class="setting-block">
                             <div class="title">
                                 <div class="company-icon48 icon48"></div>
                                 [$19523]
                             </div>
-
                             <div class="option-containers">
                                 <form autocomplete="disabled">
                                     <div class="bus-input-block">
-                                        <div class="bus-input ">
-                                            <div class="bus-input-title">[$19603]</div>
-                                            <div class="bus-reg-icon company-name"></div>
-                                            <input type="text" id="prof-cname" placeholder="[$19603]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input ">
-                                            <div class="bus-input-title">[$20003]</div>
-                                            <div class="bus-reg-icon email"></div>
-                                            <input type="email" id="prof-email" placeholder="[$20003]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input ">
-                                            <div class="bus-input-title">[$19152]</div>
-                                            <div class="bus-reg-icon phone"></div>
-                                            <input type="tel" id="prof-phone" placeholder="[$19152]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input note">
-                                            <div class="bus-input-title tax-code-name">[$19295]</div>
-                                            <div class="setting-icon24 vat"></div>
-                                            <input type="text" id="prof-vat" placeholder="[$19295]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                            <div class="note-message">*[$19632]</div>
-                                        </div>
+                                        <input class="titleTop required" type="text" id="prof-cname" placeholder="[$19603]" data-icon="bus-reg-icon company-name">    
+                                        <input class="titleTop required" type="email" id="prof-email" placeholder="[$20003]" data-icon="bus-reg-icon email">
+                                        <input class="titleTop required" type="tel" id="prof-phone" placeholder="[$19152]" data-icon="bus-reg-icon phone">
+                                        <input class="titleTop" type="text" id="prof-vat" placeholder="[$19295]" data-icon="setting-icon24 vat">
                                     </div>
-
                                     <div class="bus-input-block">
-                                        <div class="bus-input ">
-                                            <div class="bus-input-title">[$19629]</div>
-                                            <div class="setting-icon24 add"></div>
-                                            <input type="text" id="prof-addr1" placeholder="[$19629]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input short-input">
-                                            <div class="bus-input-title">[$19630]</div>
-                                            <input type="text" id="prof-addr2" placeholder="[$19630]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input short-input">
-                                            <div class="bus-input-title">[$565]</div>
-                                            <input type="text" id="prof-city" placeholder="[$565]">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input short-input">
-                                            <div class="bus-input-title">[$7352]</div>
-                                            <div class="bus-input-title zip"></div>
-                                            <input type="text" id="prof-state" placeholder="[$7352]" class="state">
-                                            <input type="text" id="prof-zip" placeholder="" class="zip">
-                                            <div class="error-message">is the error signal too red?</div>
-                                        </div>
-                                        <div class="bus-input short-input underline-dropdown-input">
-                                            <div class="bus-input-title">[$481]</div>
+                                        <input class="titleTop" type="text" id="prof-addr1" placeholder="[$19629]" data-icon="setting-icon24 add">
+                                        <input class="titleTop" type="text" id="prof-addr2" placeholder="[$19630]" data-wrapper-class="short-input">
+                                        <input class="titleTop" type="text" id="prof-city" placeholder="[$565]" data-wrapper-class="short-input">
+                                        <input class="titleTop halfSize-l state" type="text" id="prof-state" placeholder="[$7352]" data-wrapper-class="short-input">
+                                        <input class="titleTop halfSize-r zip" type="text" id="prof-zip" placeholder="" data-wrapper-class="short-input">
+                                        <div class="mega-input-title-ontop short-input underline-dropdown-input">
+                                            <div class="mega-input-title">[$481]</div>
                                             <div class="list-arrow"></div>
                                             <select id="cnt-ddl" name="prf-country" placeholder="[$481]">
                                                 <option value="New Zealand">New Zealand</option>
                                                 <option value="Syria">Syria</option>
                                                 <option value="Spain">Spain</option>
                                             </select>
-
-                                            <div class="error-message">is the error signal too red?</div>
-
                                         </div>
                                     </div>
                                     <div class="default-green-button-user-management saving-btn-profile">
@@ -2336,75 +2285,68 @@
                             </div>
                             <div class="settings-sub-section profile">
                                 <form autocomplete="disabled">
-                                    <div class="dialog-input-title-ontop">
-                                        <div class="title">[$1096]
-                                            <span class="red">*</span>
+                                    <input type="text" class="titleTop required" value="" title="[$1096]" name="account-firstname" id="account-firstname" maxlength="40" />
+                                    <input type="text" class="titleTop" value="" title="[$1097]" name="account-lastname" id="account-lastname" maxlength="40" />
+
+                                    <div class="mega-input-title-ontop birth ymd hidden">
+                                        <div class="mega-input-title">[$995]</div>
+                                        <input class="short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
                                         </div>
-                                        <input class="dialog-input" type="text" value="" name="account-firstname" id="account-firstname" maxlength="40" />
+                                        <input class="short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <div class="message-container"></div>
                                     </div>
-                                    <div class="dialog-input-title-ontop">
-                                        <div class="title">[$1097]</div>
-                                        <input class="dialog-input" type="text" value="" name="account-lastname" id="account-lastname" maxlength="40" />
+                                    <div class="mega-input-title-ontop birth dmy hidden">
+                                        <div class="mega-input-title">[$995]</div>
+                                        <input class="short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <input class="short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                        <div class="birth-arrow-container">
+                                            <div class="birth-arrow up-control"></div>
+                                            <div class="birth-arrow down-control"></div>
+                                        </div>
+                                        <div class="message-container"></div>
                                     </div>
-                                    <div class="dialog-input-title-ontop birth ymd hidden">
-                                        <div class="title">[$995]</div>
-                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
+                                    <div class="mega-input-title-ontop birth mdy hidden">
+                                        <div class="mega-input-title">[$995]</div>
+                                        <input class="short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
                                             <div class="birth-arrow up-control"></div>
                                             <div class="birth-arrow down-control"></div>
                                         </div>
-                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
+                                        <input class="short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
                                             <div class="birth-arrow up-control"></div>
                                             <div class="birth-arrow down-control"></div>
                                         </div>
-                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
+                                        <input class="short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
                                             <div class="birth-arrow up-control"></div>
                                             <div class="birth-arrow down-control"></div>
                                         </div>
-                                        <div class="error-message"></div>
+                                        <div class="message-container"></div>
                                     </div>
-                                    <div class="dialog-input-title-ontop birth dmy hidden">
-                                        <div class="title">[$995]</div>
-                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <div class="error-message"></div>
-                                    </div>
-                                    <div class="dialog-input-title-ontop birth mdy hidden">
-                                        <div class="title">[$995]</div>
-                                        <input class="dialog-input short-input bmonth" type="text" maxlength="2" placeholder="MM" min="1" max="12" data-title="Birth month">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <input class="dialog-input short-input bdate" type="text" maxlength="2" placeholder="DD" min="1" max="31" data-title="Birth date">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <input class="dialog-input short-input byear" type="text" maxlength="4" placeholder="YYYY" min="1900" data-title="Birth year">
-                                        <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
-                                        </div>
-                                        <div class="error-message"></div>
-                                    </div>
-                                    <div class="dialog-input-title-ontop underline-dropdown-input acc-setting-country-sec">
-                                        <div class="title">[$481]</div>
+                                    <div class="mega-input-title-ontop underline-dropdown-input acc-setting-country-sec">
+                                        <div class="mega-input-title">[$481]</div>
                                         <div class="list-arrow"></div>
                                         <div class="dialog-input default-select country" id="account-country">
                                             <span>[$996]</span>
@@ -2426,28 +2368,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="account data-block">
-                        <div class="settings-left-block">
-                            <div class="title-txt">Preference</div>
-                        </div>
-                        <div class="settings-right-block">
-                            <div class="settings-sub-section preference">
-                                <div class="dialog-input-title-ontop underline-dropdown-input">
-                                    <div class="title">[$670]</div>
-                                    <div class="list-arrow"></div>
-                                    <select id =" " name=" " placeholder="[$670]">
-                                        <option value="en">English</option>
-                                        <option value="sp">Spanish</option>
-                                        <option value="jp">Japanese</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="settings-sub-section button-container hidden save-block">
-                                <div class="default-green-button right fm-account-save">Save changes</div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="account data-block qr-settings">
                         <div class="settings-left-block slide-in-out">
                             <div class="title-txt">[$17754]</div>
@@ -2847,23 +2767,8 @@
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$717]</div>
-                                    <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-new-password" id="account-new-password" />
-                                    <div class="account-pass-lines">
-                                         <div class="register-pass-status-line1"></div>
-                                         <div class="register-pass-status-line2"></div>
-                                         <div class="register-pass-status-line3"></div>
-                                         <div class="register-pass-status-line4"></div>
-                                         <div class="register-pass-status-line5"></div>
-                                         <div class="clear"></div>
-                                    </div>
-                                </div>
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$718]</div>
-                                    <input class="dialog-input" type="password" value="" autocomplete="new-password" name="account-confirm-password" id="account-confirm-password" />
-                                    <div class="error-message"></div>
-                                </div>
+                                <input class="titleTop strengthChecker" autocomplete="new-password" type="password" name="account-new-password" id="account-new-password" placeholder="[$717]" />
+                                <input class="titleTop" autocomplete="new-password" type="password" name="account-confirm-password" id="account-confirm-password" placeholder="[$718]" />
                             </div>
                             <div class="settings-sub-section button-container slide-in-out closed">
                                 <div class="default-green-button right change-password-button slide-item">[$706]</div>
@@ -2878,15 +2783,8 @@
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
                                 <!-- this part need to be re-functioned -->
-                                <div class="dialog-input-title-ontop correctinput">
-                                    <div class="title">[$7744]</div>
-                                    <input class="dialog-input" type="text" value="" name="current-email" readonly id="current-email" maxlength="190" placeholder="[$7744]" />
-                                </div>
-                                <div class="dialog-input-title-ontop">
-                                    <div class="title">[$7745]</div>
-                                    <input class="dialog-input" type="text" value="" autocomplete="disabled" name="account-email" id="account-email" maxlength="190" />
-                                    <div class="error-message"></div>
-                                </div>
+                                <input class="titleTop" type="text" value="" name="current-email" readonly id="current-email" maxlength="190" placeholder="[$7744]" />
+                                <input class="titleTop" type="text" value="" autocomplete="disabled" name="account-email" id="account-email" maxlength="190" placeholder="[$7745]" />
                             </div>
                             <div class="fm-account-change-email" style="">
                                 [$19201] [$7747]

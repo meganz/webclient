@@ -78,7 +78,7 @@
 
     function showLoginDialog(aPromise, options) {
         var $dialog = $('.fm-dialog.pro-login-dialog');
-        var $inputs = $dialog.find('.account.input-wrapper input');
+        var $inputs = $dialog.find('input');
         var $button = $dialog.find('.big-red-button');
 
         if (typeof page !== 'undefined' && page === 'chat') {
@@ -131,6 +131,9 @@
         $inputs.val('');
 
         $inputs.rebind('keydown', function(e) {
+
+            $inputs.removeClass('errored').parent().removeClass('error');
+
             if (e.keyCode == 13) {
                 doLogin($dialog, aPromise);
             }
@@ -162,11 +165,9 @@
         // Save the promise for use in the completeLogin function
         completePromise = aPromise;
 
-        var $emailContainer = $dialog.find('.account.input-wrapper.email');
-        var $passwordContainer = $dialog.find('.account.input-wrapper.password');
         var $formWrapper = $dialog.find('form');
-        var $emailInput = $emailContainer.find('input');
-        var $passwordInput = $passwordContainer.find('input');
+        var $emailInput = $dialog.find('#login-name3');
+        var $passwordInput = $dialog.find('#login-password3');
         var $rememberMeCheckbox = $dialog.find('.login-check input');
 
         var email = $emailInput.val();
@@ -175,16 +176,14 @@
         var twoFactorPin = null;
 
         if (email === '' || !isValidEmail(email)) {
-            $emailContainer.addClass('incorrect');
-            $emailInput.val('');
+            $emailInput.megaInputsShowError(l[141]);
             $emailInput.focus();
             loadingDialog.hide();
 
             return false;
         }
         else if (password === '') {
-            $emailContainer.removeClass('incorrect');
-            $formWrapper.addClass('both-incorrect-inputs');
+            $passwordInput.megaInputsShowError(l[1791]);
             loadingDialog.hide();
 
             return false;
@@ -228,10 +227,8 @@
         'use strict';
 
         var $formWrapper = $('.pro-login-dialog form');
-        var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
-        var $emailField = $emailContainer.find('input');
-        var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
-        var $passwordField = $passwordContainer.find('input');
+        var $emailInput = $formWrapper.find('#login-name3');
+        var $passwordInput = $formWrapper.find('#login-password3');
 
         loadingDialog.hide();
 
@@ -264,16 +261,16 @@
                 completePromise.reject();
             }
 
-            $emailField.val('');
-            $passwordField.val('');
+            $emailInput.val('');
+            $passwordInput.val('');
         }
         else {
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
 
-            $emailContainer.removeClass('incorrect');
-            $formWrapper.addClass('both-incorrect-inputs');
-            $passwordField.focus();
+            $emailInput.megaInputsShowError();
+            $passwordInput.megaInputsShowError(l[7431]);
+            $passwordInput.focus();
         }
     }
 

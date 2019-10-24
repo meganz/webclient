@@ -4235,8 +4235,10 @@ li.token-input-token-invite .input-close {
     width: 594px;
 }
 
-.fm-dialog.sub-account-link-password.user-management-dialog .dialog-input-title-ontop {
-    margin:8px 172px;
+.fm-dialog.sub-account-link-password.user-management-dialog .mega-input-title-ontop {
+    width: 250px;
+    margin: 0 auto;
+    display: block;
 }
 
 .bus-welcome-dialog, .add-reassign-dialog {

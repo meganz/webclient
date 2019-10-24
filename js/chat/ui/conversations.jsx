@@ -1348,6 +1348,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                                             treesearch = e.target.value;
                                         }
                                    }}
+                                   autoComplete='disabled'
                                    value={self.state.quickSearchText}
                                    placeholder={l[7997]} />
                             <div className="small-icon thin-search-icon"></div>

@@ -3246,6 +3246,10 @@ function fm_resize_handler(force) {
     if (M.currentrootid === 'shares') {
         var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
 
+        if ($('.shared-details-block').parents('.fm-main').hasClass('fm-notification')) {
+            shared_block_height -= 24;
+        }
+
         if (shared_block_height > 0) {
             $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
                 'height': shared_block_height + "px",

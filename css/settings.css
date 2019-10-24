@@ -239,18 +239,8 @@
 .fm-account-main .white {
     color: #fff;
 }
-.title-txt {
-    font-size: 20px;
-    color: #333;
-    line-height: 24px;
-    display: inline-block;
-    transition: 0.3s;
-}
-.subtitle-txt {
-    font-size: 16px;
-    color: #333;
+.fm-account-sections .subtitle-txt {
     line-height: 22px;
-    display: inline-block;
     vertical-align: top;
     max-width: 370px;
     text-overflow: ellipsis;
@@ -541,141 +531,40 @@
     transform: none;
     max-height: 40px;
 }
-.dialog-input-title-ontop {
-    height: 56px;
-    position: relative;
-    width:222px;
-    margin:0px;
-    display: inline-block;
-    vertical-align: bottom;
-    margin-bottom: 16px;
-}
-.fm-right-account-block .dialog-input-title-ontop:nth-child(odd), .fm-right-account-block .dialog-input-title-ontop.birth {
+.fm-right-account-block .mega-input-title-ontop:nth-child(odd), .fm-right-account-block .mega-input-title-ontop.birth {
     margin-right: 32px;
 }
-.dialog-input-title-ontop::after {
-    content: " ";
-    width: 100%;
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.2);
-    position: absolute;
-    transition: background-color 0.2s linear;
+.fm-right-account-block .mega-input-title-ontop,
+.fm-voucher-popup .mega-input-title-ontop {
+    width: 222px;
 }
-.dialog-input-title-ontop:hover::after {
-    background-color: rgba(0,0,0,0.5);
+.fm-right-account-block .mega-input-title-ontop input, 
+.fm-voucher-popup .mega-input-title-ontop input {
+    width: 220px;
 }
-.dialog-input-title-ontop .title {
-    position: absolute;
-    left: 0px;
-    top: 30px;
-    font-size: 14px;
-    color: #888;
-    line-height: 18px;
-    -webkit-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    -moz-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-    z-index: 10;
-}
-.dialog-input-title-ontop input {
-    font-family: 'LatoWeb','source_sans_proregular', Arial;
-}
-.fm-right-account-block .dialog-input-title-ontop .dialog-input, .fm-voucher-popup .dialog-input-title-ontop .dialog-input {
-    border: none;
-    width: 210px;
-    height: 24px;
-    margin-top:24px;
-    margin-right: 0;
-    line-height: 24px;
-    color: #333;
-    font-family: 'LatoWeb','source_sans_proregular', Arial;
-    font-size: 17px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    background-color: rgba(255,255,255,0.1);
-    cursor: text;
-}
-.fm-right-account-block .dialog-input-title-ontop.underline-dropdown-input .dialog-input {
+.fm-right-account-block .mega-input-title-ontop.underline-dropdown-input .dialog-input.default-select {
     cursor: pointer;
-}
-.fm-right-account-block .dialog-input-title-ontop .dialog-input.default-select {
     box-shadow: none;
     padding: 0;
     background: transparent;
     min-width: auto;
     width: 100%;
 }
-.dialog-input-title-ontop .dialog-input::placeholder{
-    font-size: 14px;
-}
-.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input.byear {
-    width: calc(38% - 28px);
+.fm-right-account-block .mega-input-title-ontop input.short-input.byear {
+    width: calc(38% - 36px);
     display: inline-block;
     padding: 0;
 }
-.fm-right-account-block .dialog-input-title-ontop .dialog-input.short-input:not(.byear) {
-    width: calc(27% - 28px);
+.fm-right-account-block .mega-input-title-ontop input.short-input:not(.byear) {
+    width: calc(27% - 24px);
     display: inline-block;
-    padding: 0;
+    padding: 0 0 0 4px;
 }
-/* three extra status for the inputs: error, active, correctinput */
-.dialog-input-title-ontop.correctinput .title {
-    visibility: visible;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
+.mega-input-title-ontop.birth input {
+    vertical-align: top;
+}
+.mega-input-title-ontop.birth input::placeholder {
     opacity: 1;
-    top:0;
-}
-.dialog-input-title-ontop.active .title, .dialog-input-title-ontop.valued .title, .dialog-input-title-ontop.birth .title, .dialog-input-title-ontop.underline-dropdown-input .title {
-    top: 0;
-    color: #aaa;
-}
-.dialog-input-title-ontop:not(.birth).active input::placeholder{
-    opacity: 0;
-}
-.dialog-input-title-ontop.active::after{
-    background-color: rgba(0,0,0,0.6);
-}
-
-.dialog-input-title-ontop.error::after{
-    background-color: rgba(217,0,7,0.5);
-}
-.dialog-input-title-ontop.error input.dialog-input.errored{
-    color: rgba(217,0,7,1);
-}
-.dialog-input-title-ontop.error .title {
-    visibility: visible;
-    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    top:0;
-}
-.fm-right-account-block .dialog-input-title-ontop .error-message{
-    font-size: 13px;
-    padding: 4px 0 0 0px;
-    color: rgba(229,76,81,1);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    position: absolute;
-    top: 56px;
-    left: 0px;
-    width: -webkit-calc(100% - 40px);
-    width: -moz-calc(100% - 40px);
-    width: calc(100% - 40px);
-    display:none;
-}
-.dialog-input-title-ontop.error .error-message{
-    display: inline-block;
-}
-.dialog-input-title-ontop.active:not(.birth) input.dialog-input::placeholder,
-.dialog-input-title-ontop.correctinput:not(.birth) input.dialog-input::placeholder,
-.dialog-input-title-ontop.error:not(.birth) input.dialog-input::placeholder {
-    opacity: 0;
 }
 .fm-right-account-block .underline-dropdown-input .list-arrow {
     width: 16px;
@@ -687,16 +576,16 @@
     bottom:10px;
     position: absolute;
 }
-.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container {
+.fm-right-account-block .mega-input-title-ontop .birth-arrow-container {
     width: 24px;
     height: 32px;
     position: relative;
     display: inline-block;
-    bottom: -10px;
+    bottom: 4px;
     cursor: pointer;
     margin-right: 4px;
 }
-.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control {
+.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control {
     width: 24px;
     height: 16px;
     background-image: url(../images/mega/fm-main-sprite_v13.png);
@@ -709,7 +598,7 @@
     transform: rotate(180deg);
     transition: 0.3s;
 }
-.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control {
+.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control {
     width: 24px;
     height: 16px;
     background-image: url(../images/mega/fm-main-sprite_v13.png);
@@ -718,7 +607,7 @@
     opacity: 0.4;
     transition: 0.3s;
 }
-.fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .up-control:hover, .fm-right-account-block .dialog-input-title-ontop .birth-arrow-container .down-control:hover {
+.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control:hover, .fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control:hover {
     opacity: 1;
 }
 .fm-right-account-block .underline-dropdown-input select{
@@ -1064,24 +953,6 @@
 .fm-right-account-block .checkboxOff,
 .fm-right-account-block .checkboxOn {
     margin:0;
-}
-.fm-account-security .register-pass-status-line1,
-.fm-account-security .register-pass-status-line2,
-.fm-account-security .register-pass-status-line3,
-.fm-account-security .register-pass-status-line4,
-.fm-account-security .register-pass-status-line5 {
-    width: 41px;
-    height: 4px;
-    float: left;
-    margin-top: 6px;
-    margin-right: 4px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    transition: background-color 0.15s linear;
-}
-.fm-account-security .register-pass-status-line5 {
-    margin-right: 0px;
 }
 .fm-account-security .fm-browsers-icon img {
     margin: 4px 0 0 0;
@@ -1563,17 +1434,9 @@
 .fm-account-main.low-width .fm-account-sections.fm-account-sections .settings-right-block, .fm-account-main.low-width .fm-account-transfers.fm-account-sections .account.data-block.table-block {
     overflow: visible;
 }
-.fm-account-main.low-width .settings-right-block .dialog-input-title-ontop {
+.fm-account-main.low-width .settings-right-block .mega-input-title-ontop {
     width: 250px;
 }
-.fm-account-main.low-width .fm-account-security .register-pass-status-line1,
-.fm-account-main.low-width .fm-account-security .register-pass-status-line2,
-.fm-account-main.low-width .fm-account-security .register-pass-status-line3,
-.fm-account-main.low-width .fm-account-security .register-pass-status-line4,
-.fm-account-main.low-width .fm-account-security .register-pass-status-line5 {
-    width: 46px;
-}
-
 
 /* Small rounded chart */
 .tiny-chart .account.chart.body {

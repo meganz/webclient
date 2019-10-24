@@ -25,7 +25,8 @@ function BrowserCol({ id, className = '', label, sortBy, onClick }) {
 
 class BrowserEntries extends MegaRenderMixin(Component) {
     static defaultProps = {
-        'hideable': true
+        'hideable': true,
+        'requiresUpdateOnResize': true
     };
     constructor(props) {
         super(props);
@@ -512,6 +513,9 @@ class BrowserEntries extends MegaRenderMixin(Component) {
             self.props.onAttachClicked(self.state.selected);
         }
     }
+    componentSpecificIsComponentEventuallyVisible() {
+        return true;
+    }
     render() {
         var self = this;
 
@@ -862,6 +866,7 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
         else {
             newState['currentlyViewedEntry'] = M.RootID;
         }
+        newState['isLoading'] = false;
         this.setState(newState);
         this.onSelected([]);
         this.onHighlighted([]);
@@ -930,16 +935,21 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
 
                 dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise())
                     .done(function() {
-                        self.setState({'isLoading': false});
-                        self.setState({entries: self.getEntries()});
+                        self.setState({
+                            'isLoading': false,
+                            'entries': null
+                        });
                     });
+                return;
             }
             if (!M.d[handle] || (M.d[handle].t && !M.c[handle])) {
                 self.setState({'isLoading': true});
                 dbfetch.get(handle)
                     .always(function() {
-                        self.setState({'isLoading': false});
-                        self.setState({entries: self.getEntries()});
+                        self.setState({
+                            'isLoading': false,
+                            'entries': null
+                        });
                     });
                 return;
             }
@@ -956,9 +966,10 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
                 }
 
             }
+
+            this.setState({entries: null});
         }
 
-        this.setState({entries: null});
     }
     getEntries() {
         var self = this;

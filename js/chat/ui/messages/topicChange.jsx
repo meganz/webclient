@@ -39,11 +39,18 @@ class TopicChange extends ConversationMessageMixin {
 
         var topic = message.meta.topic;
 
+        var formattedTopic = this._formattedTopic;
+        if (this._oldTopic !== topic) {
+            this._oldTopic = topic;
+            formattedTopic = megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic));
+            this._formattedTopic = formattedTopic;
+        }
+
         var text = __(l[9081])
             .replace(
                 "%s",
                 '<strong className="dark-grey-txt">"' +
-                    megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(topic)) +
+                    formattedTopic +
                 '"</strong>'
             );
 

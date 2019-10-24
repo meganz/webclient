@@ -2005,7 +2005,8 @@ MegaData.prototype.labelFilterBlockUI = function() {
     $('.files-grid-view.fm .filter-block.body').addClass('hidden');
 
     if (M.currentLabelFilter) {
-        if (fmconfig.viewmodes[M.currentdirid]) {// Block view
+
+        if (M.viewmode) {// Block view
             if (type === 'shares') {
                 $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
             }
@@ -2148,7 +2149,7 @@ MegaData.prototype.applyLabelFilter = function (e) {
         $menuItems.filter('[data-label-id=' + labelId + ']').addClass('active');
         $filterBlock.find('.content').append(fltIndicator.replace('%1', M.getLabelClassFromId(labelId)));
 
-        if (fmconfig.viewmodes[M.currentdirid]) {
+        if (M.viewmode) {// Block view
             $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
         }
         else {

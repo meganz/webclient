@@ -2460,7 +2460,7 @@
     "19505": "Ontvangen",
     "19506": "Verstuurd",
     "19507": "Bedrijfsnaam is vereist, voer het bedrijfsnaam veld in",
-    "19508": "Een fout heeft opgetreden met het registreren van de account, probeer later nogmaals. Als het probleem aanhoud, neem dan contact op met MEGA ondersteuning bij support@mega.nz",
+    "19508": "Er is een fout opgetreden tijdens het registreren van het account. Probeer het later opnieuw. Als het probleem zich blijft voordoen, neem dan contact op met MEGA support via business@mega.nz",
     "19509": "Automatische maandelijkse betaling voor Zakelijke Account abonnement instellen",
     "19510": "Zakelijke Account",
     "19511": "De betalingsbewerking is mislukt, probeer het later opnieuw. Als het probleem zich blijft voordoen, neem dan contact op met de MEGA-ondersteuning op https:\/\/mega.nz\/support",
@@ -3311,5 +3311,10 @@
     "21956": "Bijna over tegoed waarschuwingen",
     "21957": "Vink het selectievakje aan om te bevestigen dat u het gevaar begrijpt als u uw wachtwoord verliest.",
     "22001": "U bent aangemeld bij een ander account dan het account dat u probeert te annuleren. Meld u af, meld u opnieuw aan met het account dat u wilt annuleren en klik vervolgens opnieuw op dezelfde link om het account te annuleren.",
-    "22002": "altijd gratis"
+    "22002": "altijd gratis",
+    "22074": "Klik [S] INSCHRIJVEN[\/S] wanneer u tevreden bent met uw betalingsopties. U krijgt een nieuw dialoog tevoorschijn of wordt doorverwezen naar een nieuwe pagina om uw aankoop te voltooien.",
+    "22083": "Gegevens migratie is mislukt doordat de benodigde coderings sleutel voor {0} ontbreekt. Dit account heeft de installatie  waarschijnlijk niet volledig voltooid, neem anders contact op met de ondersteuning via business@mega.nz",
+    "22114": "PRO account bon",
+    "22117": "Gefeliciteerd! [BR]Uw bon is verlost",
+    "22120": "Please login or create your free account to redeem."
 }

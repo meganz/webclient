@@ -2460,7 +2460,7 @@
     "19505": "Ricevuto",
     "19506": "Inviato",
     "19507": "Il nome della compagnia \u00e8 obbligatorio, per favore riempi il campo del nome della compagnia",
-    "19508": "Un errore \u00e8 stato riscontrato mentre avveniva la registrazione dell'account, per favore riprova pi\u00f9 tardi.Se il problema persiste, per favore contatta il supporto MEGA a business@mega.nz",
+    "19508": "Un errore \u00e8 stato riscontrato durante la registrazione dell'account, per favore riprova pi\u00f9 tardi. Se il problema persiste sei pregato di contattare il supporto di MEGA a business@mega.nz",
     "19509": "Imposta il pagamento automatico mensile per l'abbonamento all'account Business",
     "19510": "Account Business",
     "19511": "L'operazione di pagamento \u00e8 fallita, per favore riprova pi\u00f9 tardi. Se il problema persiste, per favore contatta il supporto di MEGA a https:\/\/mega.nz\/support",
@@ -3311,5 +3311,10 @@
     "21956": "Promemoria di quasi superamento della quota",
     "21957": "Per favore, spunta il box per dichiarare che capisci il pericolo di perdere la password del tuo account MEGA.",
     "22001": "Hai effettuato il login con un account differente rispetto a quello che stai provando ad eliminare. Per favore, effettua il logout e fai nuovamente il login con l'account che desideri eliminare, e poi prova a cliccare di nuovo sullo stesso link di cancellazione dell'account.",
-    "22002": "sempre gratis"
+    "22002": "sempre gratis",
+    "22074": "Clicca su [S]ABBONATI[\/S] quando avrai scelto le tue opzioni di pagamento. Ti verr\u00e0 mostrata una pagina di dialogo o verrai reindirizzato ad una nuova pagina per completare il tuo acquisto.",
+    "22083": "La migrazione dei dati \u00e8 fallita a causa della mancante chiave di criptazione per {0}. Questo account probabilmente non ha terminato il setup, altrimenti contatta cortesemente il supporto a business@mega.nz",
+    "22114": "PRO account voucher",
+    "22117": "Congratulations! [BR]Your voucher has been redeemed.",
+    "22120": "Please login or create your free account to redeem."
 }

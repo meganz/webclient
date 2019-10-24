@@ -606,25 +606,30 @@ BusinessAccountUI.prototype.isRedrawNeeded = function (subs, previousSubs) {
  * @param {String} invitationLink       sub-user invitation link
  */
 BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
+
     "use strict";
+
     var $dialog = $('.fm-dialog.sub-account-link-password');
     var prepareSubAccountLinkDialog = function () {
 
-        $('.decrypt-sub-user-link', $dialog).off('click');
-        $('.link-sub-user-pass input', $dialog).off('keydown');
+        var $passInput = $('input.sub-m', $dialog);
+        var megaPassInput = new mega.ui.MegaInputs($passInput);
 
-        $('.link-sub-user-pass input', $dialog).on('keydown', function (e) {
+        $('.decrypt-sub-user-link', $dialog).off('click');
+
+        $('.link-sub-user-pass input', $dialog).off('keydown').on('keydown', function (e) {
             $(this).parent().removeClass('error');
             if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
                 return $('.decrypt-sub-user-link', $dialog).trigger('click');
             }
             
         });
+
         $('.decrypt-sub-user-link', $dialog).on('click', function decryptOkBtnHandler() {
             var enteredPassword = $('.link-sub-user-pass input', $dialog).val();
             $('.link-sub-user-pass input', $dialog).val('');
             if (!enteredPassword.length) {
-                $('.link-sub-user-pass input', $dialog).parent().addClass('error');
+                $('.link-sub-user-pass input', $dialog).megaInputsShowError(l[6220]);
                 return false;
             }
             else {
@@ -1774,7 +1779,6 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
     var setPostCodeOnUI = function(countryCode) {
         var postCode = getPostCodeName(countryCode);
-        $profileContainer.find('.bus-input-title.zip').text(postCode);
         $profileContainer.find('input#prof-zip').prop('placeholder', postCode);
     };
 
@@ -1783,7 +1787,6 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var setTaxName = function(countryCode) {
         var taxName = mySelf.business.getTaxCodeName(countryCode);
         if (taxName) {
-            $('.tax-code-name', $profileContainer).text(taxName);
             $('input#prof-vat', $profileContainer).attr("placeholder", taxName);
         }
     };
@@ -1801,21 +1804,25 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $cCountryInput = $('select#cnt-ddl', $profileContainer).val(cCountry);
     var $cZipInput = $('input#prof-zip', $profileContainer).val(cZip);
 
+    var inputs = [$cNameInput, $cTelInput, $cEmailInput, $cVatInput, $cAddressInput,
+        $cAddress2Input, $cCityInput, $cStateInput, $cZipInput];
+
     var addCorrectValClass = function ($item) {
         $item.parent().removeClass('error');
         if ($item.val().trim()) {
             $item.parent().addClass('correctinput');
         }
     };
-    addCorrectValClass($cNameInput);
-    addCorrectValClass($cTelInput);
-    addCorrectValClass($cEmailInput);
-    addCorrectValClass($cVatInput);
-    addCorrectValClass($cAddressInput);
-    addCorrectValClass($cAddress2Input);
-    addCorrectValClass($cCityInput);
-    addCorrectValClass($cStateInput);
-    addCorrectValClass($cZipInput);
+
+    inputs.forEach(function($input) {
+        var megaInput = new mega.ui.MegaInputs($input);
+        addCorrectValClass($input);
+
+        // Update vat and zip title.
+        if (megaInput.updateTitle && ($input.is($cZipInput) || $input.is($cVatInput))) {
+            megaInput.updateTitle();
+        }
+    });
 
     $('.saving-btn-profile', $profileContainer).off('click.suba').on('click.suba',
         function companyProfileSaveButtonClick() {
@@ -1825,45 +1832,45 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
 
             if ($cNameInput.val().trim() !== cName) {
                 if (!$cNameInput.val().trim()) {
-                    $cNameInput.parent().addClass('error').find('.error-message').text(l[19507]);
+                    $cNameInput.megaInputsShowError(l[19507]);
                     $cNameInput.focus();
                     valid = false;
                 }
                 else {
-                    $cNameInput.parent().removeClass('error').addClass('correctinput');
+                    $cNameInput.megaInputsHideError();
                     attrsToChange.push({ key: '%name', val: $cNameInput.val().trim() });
                 }
             }
             if ($cTelInput.val().trim() !== cTel) {
                 if (!$cTelInput.val().trim()) {
-                    $cTelInput.parent().addClass('error').find('.error-message').text(l[8814]);
+                    $cTelInput.megaInputsShowError(l[8814]);
                     $cTelInput.focus();
                     valid = false;
                 }
                 else {
-                    $cTelInput.parent().removeClass('error').addClass('correctinput');
+                    $cTelInput.megaInputsHideError();
                     attrsToChange.push({ key: '%phone', val: $cTelInput.val().trim() });
                 }
             }
             if ($cEmailInput.val().trim() !== cEmail) {
                 if (!$cEmailInput.val().trim() || !isValidEmail($cEmailInput.val())) {
-                    $cEmailInput.parent().addClass('error').find('.error-message').text(l[7415]);
+                    $cEmailInput.megaInputsShowError(l[7415]);
                     $cEmailInput.focus();
                     valid = false;
                 }
                 else {
-                    $cEmailInput.parent().removeClass('error').addClass('correctinput');
+                    $cEmailInput.megaInputsHideError();
                     attrsToChange.push({ key: '%email', val: $cEmailInput.val().trim() });
                 }
             }
             if ($cVatInput.val().trim() !== cVat) {
                 if (!$cVatInput.val().trim()) {
-                    $cVatInput.parent().addClass('error').find('.error-message').text(l[20953]);
+                    $cVatInput.megaInputsShowError(l[20953]);
                     $cVatInput.focus();
                     valid = false;
                 }
                 else {
-                    $cVatInput.parent().removeClass('error').addClass('correctinput');
+                    $cVatInput.megaInputsHideError();
                     attrsToChange.push({ key: '%taxnum', val: $cVatInput.val().trim() });
                     isTaxChanged = true;
                 }
@@ -1977,25 +1984,6 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
             var $me = $(this);
             if ($me.hasClass('acc-home')) {
                 return mySelf.viewSubAccountListUI();
-            }
-        });
-
-    // event handler for input getting focus
-    $('.option-containers input', $profileContainer).off('focus.suba')
-        .on('focus.suba', function inputHasFocusHandler() {
-            $(this).parent().addClass('active');
-        });
-
-    // event handler for input losing focus
-    $('.option-containers input', $profileContainer).off('blur.suba')
-        .on('blur.suba', function inputHasFocusHandler() {
-            $(this).parent().removeClass('active');
-            if (this.value.trim()) {
-                var $me = $(this);
-                $me.parent().addClass('correctinput').removeClass('error');
-            }
-            else {
-                $(this).parent().removeClass('correctinput');
             }
         });
 
@@ -2472,10 +2460,11 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
     var $dialog = $('.user-management-add-user-dialog.user-management-dialog');
     var mySelf = this;
+    var $adduserContianer = $('.dialog-input-container', $dialog);
+    var $inputs = $('input', $adduserContianer);
 
     var clearDialog = function () {
-        var $adduserContianer = $('.dialog-input-container', $dialog);
-        $('input', $adduserContianer).val('');
+        $inputs.val('').blur();
         $adduserContianer.removeClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
@@ -2494,6 +2483,8 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
     };
 
     clearDialog(); // remove any previous data
+
+    var megaInputs = new mega.ui.MegaInputs($inputs);
 
     // checking if we are coming from landing page
     if (!result && callback) {
@@ -2593,37 +2584,6 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             }
         });
 
-    // event handler for input getting focus
-    $('.dialog-input-container input', $dialog).off('focus.suba')
-        .on('focus.suba', function inputHasFocusHandler() {
-            $(this).parent().addClass('active');
-        });
-
-    // event handler for input losing focus
-    $('.dialog-input-container input', $dialog).off('blur.suba')
-        .on('blur.suba', function inputHasFocusHandler() {
-            $(this).parent().removeClass('active');
-            if (this.value.trim()) {
-                var $me = $(this);
-                if (!$me.hasClass('sub-n') && !$me.hasClass('sub-n-l')) {
-                    $me.parent().addClass('correctinput').removeClass('error');
-                }
-                else {
-                    if ($('.dialog-input-container input.sub-n', $dialog).val().trim()
-                        && $('.dialog-input-container input.sub-n-l', $dialog).val().trim()) {
-                        $me.parent().addClass('correctinput').removeClass('error');
-                    }
-                    else {
-                        $me.parent().removeClass('correctinput');
-                    }
-                }
-            }
-            else {
-                $(this).parent().removeClass('correctinput');
-            }
-        });
-
-
     // event handler for adding sub-users
     $('.dialog-button-container .add-sub-user', $dialog).off('click.subuser')
         .on('click.subuser', function addSubUserClickHandler() {
@@ -2638,36 +2598,37 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 return;
             }
 
-            var $uName = $('.input-user input.sub-n', $dialog);
-            var $uLastName = $('.input-user input.sub-n-l', $dialog);
-            var $uEmail = $('.input-user input.sub-m', $dialog);
+            var $uName = $('input.sub-n', $dialog);
+            var $uLastName = $('input.sub-n-l', $dialog);
+            var $uEmail = $('input.sub-m', $dialog);
             var uNameTrimed = $uName.val().trim();
             var uLastNameTrimed = $uLastName.val().trim();
             var uEmailTrimed = $uEmail.val().trim();
 
-            if (!uNameTrimed.length) {
-                $uName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
+            if (!uNameTrimed.length || !uLastNameTrimed) {
+                $uName.megaInputsShowError(l[1098] + ' ' + l[1099]);
+                $uLastName.megaInputsShowError();
 
+                $uName.rebind('keydown.clearErrorsOnName', function() {
+                    $uLastName.megaInputsHideError();
+                });
+
+                $uLastName.rebind('keydown.clearErrorsOnName', function() {
+                    $uName.megaInputsHideError();
+                });
                 return;
             }
-            if (!uLastNameTrimed) {
-                $uLastName.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-n', $dialog).removeClass('hidden').text(l[1098]);
 
-                return;
-            }
             if (!isValidEmail(uEmailTrimed)) {
-                $uEmail.parent().addClass('error');
-                $('.dialog-input-container .error-message.er-sub-m', $dialog).removeClass('hidden').text(l[5705]);
+                $uEmail.megaInputsShowError(l[5705]);
 
                 return;
             }
 
-            var $uPosition = $('.input-user input.sub-p', $dialog);
-            var $uIdNumber = $('.input-user input.sub-id-nb', $dialog);
-            var $uPhone = $('.input-user input.sub-ph', $dialog);
-            var $uLocation = $('.input-user input.sub-lo', $dialog);
+            var $uPosition = $('input.sub-p', $dialog);
+            var $uIdNumber = $('input.sub-id-nb', $dialog);
+            var $uPhone = $('input.sub-ph', $dialog);
+            var $uLocation = $('input.sub-lo', $dialog);
 
             var addUserOptionals = Object.create(null);
             // check if optional section is visible, then collect fields values
@@ -2750,12 +2711,10 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 }
                 else {
                     if (res === -12) {
-                        $uEmail.parent().addClass('error');
-                        $('.dialog-input-container .error-message.er-sub-m', $dialog)
-                            .removeClass('hidden').text(l[1783]);
+                        $uEmail.megaInputsShowError(l[1783]);
                     }
                     else {
-                        $('.dialog-input-container .error-message', $dialog).removeClass('hidden').text(l[1679]);
+                        msgDialog('warninga', l[135], l[1679]);
                     }
                 }
 
@@ -2775,7 +2734,9 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
 
 BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
+
     "use strict";
+
     if (!subUserHandle) {
         return;
     }
@@ -2796,15 +2757,30 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var $locationInput = $('input.edit-sub-location', $usersContainer);
     var userAttrs = Object.create(null);
 
+    var nameMegaInput = new mega.ui.MegaInputs($nameInput);
+    var lnameMegaInput = new mega.ui.MegaInputs($lnameInput);
+    var emailMegaInput = new mega.ui.MegaInputs($emailInput);
+    var positionMegaInput = new mega.ui.MegaInputs($positionInput);
+    var subIDMegaInput = new mega.ui.MegaInputs($subIDInput);
+    var phoneMegaInput = new mega.ui.MegaInputs($phoneInput);
+    var locationMegaInput = new mega.ui.MegaInputs($locationInput);
+
     var clearDialog = function () {
-        $nameInput.val('');
-        $lnameInput.val('');
-        $emailInput.val('');
-        $positionInput.val('');
-        $subIDInput.val('');
-        $phoneInput.val('');
-        $locationInput.val('');
-        $dialog.find('.dialog-input-title-ontop').removeClass('correctinput error active');
+        $nameInput.val('').blur();
+        $lnameInput.val('').blur();
+        $emailInput.val('').blur();
+        $positionInput.val('').blur();
+        $subIDInput.val('').blur();
+        $phoneInput.val('').blur();
+        $locationInput.val('').blur();
+
+        nameMegaInput.hideError();
+        lnameMegaInput.hideError();
+        emailMegaInput.hideError();
+        positionMegaInput.hideError();
+        subIDMegaInput.hideError();
+        phoneMegaInput.hideError();
+        locationMegaInput.hideError();
     };
 
     clearDialog();
@@ -2814,27 +2790,28 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     userAttrs.fname = from8(base64urldecode(subUser.firstname));
     userAttrs.lname = from8(base64urldecode(subUser.lastname));
 
-    $nameInput.val(userAttrs.fname);
-    $lnameInput.val(userAttrs.lname);
-    $emailInput.val(subUser.e);
+    $nameInput.val(userAttrs.fname).blur();
+    $lnameInput.val(userAttrs.lname).blur();
+    $emailInput.val(subUser.e).blur();
+
     if (subUser.position) {
         userAttrs.position = from8(base64urldecode(subUser.position));
-        $positionInput.val(userAttrs.position);
+        $positionInput.val(userAttrs.position).blur();
         $positionInput.parent().addClass('correctinput');
     }
     if (subUser.idnum) {
         userAttrs.idnum = from8(base64urldecode(subUser.idnum));
-        $subIDInput.val(userAttrs.idnum);
+        $subIDInput.val(userAttrs.idnum).blur();
         $subIDInput.parent().addClass('correctinput');
     }
     if (subUser.phonenum) {
         userAttrs.phonenum = from8(base64urldecode(subUser.phonenum));
-        $phoneInput.val(userAttrs.phonenum);
+        $phoneInput.val(userAttrs.phonenum).blur();
         $phoneInput.parent().addClass('correctinput');
     }
     if (subUser.location) {
         userAttrs.location = from8(base64urldecode(subUser.location));
-        $locationInput.val(userAttrs.location);
+        $locationInput.val(userAttrs.location).blur();
         $locationInput.parent().addClass('correctinput');
     }
 
@@ -2925,9 +2902,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     // event handler for input getting focus
     $('.dialog-input-container input', $dialog).off('focus.suba')
         .on('focus.suba', function inputHasFocusHandler() {
-            var $me = $(this);
-            $me.parent().addClass('active');
-            if ($me.is($emailInput)) {
+            if ($(this).is($emailInput)) {
                 $('.top-login-warning.edit-email-warning', $dialog).addClass('active').removeClass('hidden');
             }
         });
@@ -2935,28 +2910,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     // event handler for input losing focus
     $('.dialog-input-container input', $dialog).off('blur.suba')
         .on('blur.suba', function inputHasFocusHandler() {
-            var $me = $(this);
-            var $meParent = $me.parent();
-            $meParent.removeClass('active');
-            $meParent.find('.top-login-warning.edit-email-warning').addClass('hidden').removeClass('active');
-            
-            if (this.value.trim()) {
-                if (!$me.hasClass('edit-sub-name') && !$me.hasClass('edit-sub-lname')) {
-                    $me.parent().addClass('correctinput').removeClass('error');
-                }
-                else {
-                    if ($('.dialog-input-container input.edit-sub-name', $dialog).val().trim()
-                        && $('.dialog-input-container input.edit-sub-lname', $dialog).val().trim()) {
-                        $me.parent().addClass('correctinput').removeClass('error');
-                    }
-                    else {
-                        $me.parent().removeClass('correctinput');
-                    }
-                }
-            }
-            else {
-                $me.parent().removeClass('correctinput');
-            }
+            $dialog.find('.top-login-warning.edit-email-warning').addClass('hidden').removeClass('active');
         });
 
     // close event handler
@@ -2972,21 +2926,17 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
             }
             else {
                 if ('fname' in changedVals && !changedVals.fname.length) {
-                    $nameInput.parent().addClass('error');
-                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
-                        .removeClass('hidden').text(l[1098]);
+                    $nameInput.megaInputsShowError(l[1098] + ' ' + l[1099]);
+                    $lnameInput.megaInputsShowError();
                     return;
                 }
                 if ('lname' in changedVals && !changedVals.lname.length) {
-                    $lnameInput.parent().addClass('error');
-                    $('.dialog-input-container .error-message.edit-er-sub-n', $dialog)
-                        .removeClass('hidden').text(l[1098]);
+                    $nameInput.megaInputsShowError(l[1098] + ' ' + l[1099]);
+                    $lnameInput.megaInputsShowError();
                     return;
                 }
                 if ('email' in changedVals && !isValidEmail(changedVals.email)) {
-                    $emailInput.parent().addClass('error');
-                    $('.dialog-input-container .error-message.edit-er-sub-m', $dialog)
-                        .removeClass('hidden').text(l[5705]);
+                    $emailInput.megaInputsShowError(l[5705]);
                     return;
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email,
@@ -3001,6 +2951,14 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                 editPromise.always(handleEditResult);
             }
         });
+
+    $($nameInput).rebind('input.nameErrors', function() {
+        $lnameInput.megaInputsHideError();
+    });
+
+    $($lnameInput).rebind('input.nameErrors', function() {
+        $nameInput.megaInputsHideError();
+    });
 
     M.safeShowDialog('sub-user-editting-dlg', function () {
         return $dialog;
@@ -3136,7 +3094,8 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                     if (d) {
                         console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
                     }
-                    return failing(l[19146]);
+                    var failMsg = l[22083].replace('{0}', '<b>' + subUser.e + '</b></br></br>');
+                    return failing(failMsg);
                 }
             );
 

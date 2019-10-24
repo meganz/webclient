@@ -80,6 +80,7 @@ var renderMessageSummary = function(lastMessage) {
         if (!lastMessage._contactChangeListener && author.addChangeListener) {
             lastMessage._contactChangeListener = author.addChangeListener(function() {
                 delete lastMessage.renderableSummary;
+                lastMessage.trackDataChange();
             });
         }
 
@@ -103,6 +104,7 @@ var renderMessageSummary = function(lastMessage) {
             }
         }
     }
+
     return renderableSummary;
 };
 var getRoomName = function(chatRoom) {
@@ -136,12 +138,34 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
         self.chatRoomChangeListener = function() {
             self.debouncedForceUpdate(750);
         };
+        self.props.chatRoom.rebind('onUnreadCountUpdate.convlistitem', function() {
+            delete self.lastMessageId;
+            self.safeForceUpdate();
+        });
         self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
     }
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
         self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
+        self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
+    }
+    componentDidMount() {
+        super.componentDidMount();
+        this.eventuallyScrollTo();
+    }
+    componentDidUpdate() {
+        super.componentDidUpdate();
+
+       this.eventuallyScrollTo();
+    }
+    eventuallyScrollTo() {
+        if (
+            this.props.chatRoom._scrollToOnUpdate &&
+            megaChat.currentlyOpenedChat === this.props.chatRoom.roomId
+        ) {
+            this.props.chatRoom.scrollToChat();
+        }
     }
     render() {
         var classString = "";
@@ -248,7 +272,17 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
 
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
-        if (lastMessage) {
+        if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
+            lastMsgDivClasses = this._lastMsgDivClassesCache;
+            lastMessageDiv = this._lastMessageDivCache;
+            lastMessageDatetimeDiv = this._lastMessageDatetimeDivCache;
+            lastMsgDivClasses += (isUnread ? " unread" : "");
+            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+                lastMsgDivClasses += " call";
+                classString += " call-exists";
+            }
+        }
+        else if (lastMessage) {
             lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
             // safe some CPU cycles...
             var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
@@ -346,6 +380,13 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
             }
             lastMessageDatetimeDiv = <div className="date-time">{l[19077].replace("%s1", curTimeMarker)}</div>;
         }
+
+        this.lastMessageId = lastMessage && lastMessage.messageId;
+        this._lastMsgDivClassesCache = lastMsgDivClasses
+            .replace(" call-exists", "")
+            .replace(" unread", "");
+        this._lastMessageDivCache = lastMessageDiv;
+        this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
 
         if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
             var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
@@ -559,10 +600,29 @@ class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
 };
 
 class ConversationsList extends MegaRenderMixin(React.Component) {
+    static defaultProps = {
+        'manualDataChangeTracking': true
+    }
+    attachRerenderCallbacks() {
+        var self = this;
+        self._megaChatsListener = megaChat.chats.addChangeListener(function() {
+            self.throttledOnPropOrStateUpdated();
+        })
+    }
+    detachRerenderCallbacks() {
+        if (super.detachRerenderCallbacks) {
+            super.detachRerenderCallbacks();
+        }
+        megaChat.chats.removeChangeListener(this._megaChatsListener);
+    }
     constructor (props) {
         super(props);
         this.currentCallClicked = this.currentCallClicked.bind(this);
         this.endCurrentCall = this.endCurrentCall.bind(this);
+    }
+    componentDidUpdate() {
+        super.componentDidUpdate && super.componentDidUpdate();
+        M.treeSearchUI();
     }
 
     conversationClicked(room, e) {
@@ -570,7 +630,7 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
         e.stopPropagation();
     }
     currentCallClicked(e) {
-        var activeCallSession = this.props.megaChat.activeCallSession;
+        var activeCallSession = megaChat.activeCallSession;
         if (activeCallSession) {
             this.conversationClicked(activeCallSession.room, e);
         }
@@ -580,7 +640,7 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
         e.stopPropagation();
     }
     endCurrentCall(e) {
-        var activeCallSession = this.props.megaChat.activeCallSession;
+        var activeCallSession = megaChat.activeCallSession;
         if (activeCallSession) {
             activeCallSession.endCall('hangup');
             this.conversationClicked(activeCallSession.room, e);
@@ -593,8 +653,6 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
             'className': "nw-conversations-item current-calling",
             'data-jid': ''
         };
-
-        var megaChat = this.props.megaChat;
 
         var activeCallSession = megaChat.activeCallSession;
         if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
@@ -621,7 +679,7 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
 
         var currConvsList = [];
 
-        var sortedConversations = obj_values(this.props.chats.toJS());
+        var sortedConversations = obj_values(megaChat.chats.toJS());
 
         sortedConversations.sort(M.sortObjFn(function(room) {
             return !room.lastActivity ? room.ctime : room.lastActivity;
@@ -706,11 +764,11 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
 
     getInitialState() {
         return {
-            'items':this.props.chats,
-            'orderby':'lastActivity',
-            'nameorder':1,
-            'timeorder':-1,
-            'confirmUnarchiveChat':null,
+            'items': megaChat.chats,
+            'orderby': 'lastActivity',
+            'nameorder': 1,
+            'timeorder': -1,
+            'confirmUnarchiveChat': null,
             'confirmUnarchiveDialogShown': false,
         };
     }
@@ -722,7 +780,7 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
     conversationSelected(room, e) {
         var self = this;
         var previousState = room.archivedSelected ? room.archivedSelected : false;
-        var sortedConversations = obj_values(this.props.chats.toJS());
+        var sortedConversations = obj_values(megaChat.chats.toJS());
         sortedConversations.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
@@ -764,12 +822,9 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
     }
     render() {
         var self = this;
-
-        var megaChat = this.props.megaChat;
-
         var currConvsList = [];
 
-        var sortedConversations = obj_values(this.props.chats.toJS());
+        var sortedConversations = obj_values(megaChat.chats.toJS());
         var orderValue = -1;
         var orderKey = "lastActivity";
 
@@ -824,7 +879,6 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
                     chatRoom={chatRoom}
                     contact={contact}
                     messages={chatRoom.messagesBuff}
-                    megaChat={megaChat}
                     onConversationClicked={(e) => {
                         self.conversationClicked(chatRoom, e);
                 }}
@@ -839,10 +893,9 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
 
         var confirmUnarchiveDialog = null;
         if (self.state.confirmUnarchiveDialogShown === true) {
-            var room = this.props.chats[self.state.confirmUnarchiveChat];
+            var room = megaChat.chats[self.state.confirmUnarchiveChat];
             if (room) {
             confirmUnarchiveDialog = <ModalDialogsUI.ConfirmDialog
-                            megaChat={room.megaChat}
                             chatRoom={room}
                             title={__(l[19063])}
                             name="unarchive-conversation"
@@ -870,10 +923,10 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
                     <tbody>
                         <tr>
                         <th className="calculated-width" onClick = {self.onSortNameClicked}>
-                            <div className={"arrow name " + nameOrderClass} >{__(l[86])}</div>
+                            <div className={"is-chat arrow name " + nameOrderClass} >{__(l[86])}</div>
                         </th>
                         <th width="330" onClick = {self.onSortTimeClicked}>
-                            <div className={"arrow interaction " + timerOrderClass}>{__(l[5904])}</div>
+                            <div className={"is-chat arrow interaction " + timerOrderClass}>{__(l[5904])}</div>
                         </th>
                         </tr>
                     </tbody>
@@ -928,7 +981,6 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                 return;
             }
 
-            var megaChat = self.props.megaChat;
             if (megaChat.currentlyOpenedChat) {
                 // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
                 // is visible/active at the moment
@@ -940,8 +992,8 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     e.keyCode === 17 /* ctrl+... */ ||
                     e.keyCode === 27 /* esc */ ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
-                    $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
-                    $('input:focus,textarea:focus,select:focus').length > 0
+                    $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') ||
+                    document.querySelector('textarea:focus,select:focus,input:focus')
                 ) {
                     return;
                 }
@@ -959,7 +1011,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
 
         $(document).rebind('mouseup.megaChatTextAreaFocus', function(e) {
             // prevent recursion!
-            if (e.megaChatHandled || slideshowid) {
+            if (!M.chat || e.megaChatHandled || slideshowid) {
                 return;
             }
 
@@ -973,8 +1025,8 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
                     $target.closest('.messages.scroll-area').length > 0 ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
-                    $('.fm-dialog:visible,.dropdown:visible').length > 0 ||
-                    $('input:focus,textarea:focus,select:focus').length > 0
+                    $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') ||
+                    document.querySelector('textarea:focus,select:focus,input:focus')
                 ) {
                     return;
                 }
@@ -992,7 +1044,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
 
         self.fmConfigThrottling = null;
         self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function() {
-            var lPane = $('.conversationsApp .fm-left-panel');
+            megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
             clearTimeout(self.fmConfigThrottling);
             self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
                 self.setState({
@@ -1001,24 +1053,24 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                 $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
                 $('.jScrollPaneContainer:visible').trigger('forceResize');
             }, 75);
-            lPane.width(mega.config.get('leftPaneWidth'));
-            $('.fm-tree-panel', lPane).width(mega.config.get('leftPaneWidth'));
+            megaChat.$leftPane.width(mega.config.get('leftPaneWidth'));
+            $('.fm-tree-panel', megaChat.$leftPane).width(mega.config.get('leftPaneWidth'));
         });
 
 
         var lPaneResizableInit = function() {
-            var lPane = $('.conversationsApp .fm-left-panel');
-            $.leftPaneResizableChat = new FMResizablePane(lPane, $.leftPaneResizable.options);
+            megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+            $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
 
             if (fmconfig.leftPaneWidth) {
-                lPane.width(Math.min(
+                megaChat.$leftPane.width(Math.min(
                     $.leftPaneResizableChat.options.maxWidth,
                     Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
                 ));
             }
 
             $($.leftPaneResizableChat).on('resize', function() {
-                var w = lPane.width();
+                var w = megaChat.$leftPane.width();
                 if (w >= $.leftPaneResizableChat.options.maxWidth) {
                     $('.left-pane-drag-handle').css('cursor', 'w-resize')
                 } else if (w <= $.leftPaneResizableChat.options.minWidth) {
@@ -1032,7 +1084,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
 
             $($.leftPaneResizableChat).on('resizestop', function() {
                 $('.fm-left-panel').width(
-                    lPane.width()
+                    megaChat.$leftPane.width()
                 );
 
                 $('.jScrollPaneContainer:visible').trigger('forceResize');
@@ -1053,11 +1105,12 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
 
         }
 
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
         if (anonymouschat) {
-            $('.conversationsApp .fm-left-panel').addClass('hidden');
+            megaChat.$leftPane.addClass('hidden');
         }
         else {
-            $('.conversationsApp .fm-left-panel').removeClass('hidden');
+            megaChat.$leftPane.removeClass('hidden');
         }
         this.handleWindowResize();
 
@@ -1066,7 +1119,11 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
             treesearch = false;
         });
 
-        M.treeSearchUI();
+        if (ChatdIntegration.allChatsHadLoaded.state() !== 'resolved') {
+            ChatdIntegration.allChatsHadLoaded.done(function() {
+                self.safeForceUpdate();
+            });
+        }
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -1076,7 +1133,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
     }
     componentDidUpdate() {
         this.handleWindowResize();
-        if (this.props.megaChat.displayArchivedChats === true) {
+        if (megaChat.displayArchivedChats === true) {
             this.initArchivedChatsScrolling();
         }
     }
@@ -1111,7 +1168,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
     }
     calcArchiveChats() {
         var count = 0;
-        this.props.megaChat.chats.forEach((chatRoom) => {
+        megaChat.chats.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
@@ -1156,6 +1213,25 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
         }
         return self._topButtonsContactsPicker;
     }
+    isWaitingForInitialLoadingToFinish() {
+        var self = this;
+        // since in big accounts, a lot chats may finish at the same moment, this requires to be throttled.
+        var forceUpdate = SoonFc(function(roomId) {
+            delete self._isWaitingChatsLoad[roomId];
+            self.safeForceUpdate();
+        }, 300);
+
+        self._isWaitingChatsLoad = self._isWaitingChatsLoad || {};
+        var roomIds = megaChat.chats.keys();
+        for (var i = 0; i < roomIds.length; i++) {
+            var roomId = roomIds[i];
+            var chatRoom = megaChat.chats[roomId];
+            if (!self._isWaitingChatsLoad[roomId] && chatRoom.initialMessageHistLoaded.state() === 'pending') {
+                self._isWaitingChatsLoad[roomId] = true;
+                chatRoom.initialMessageHistLoaded.always(forceUpdate.bind(undefined, roomId));
+            }
+        }
+    }
     render() {
         var self = this;
 
@@ -1163,9 +1239,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
         if (self.state.startGroupChatDialogShown === true) {
             startGroupChatDialog = <StartGroupChatWizard
                     name="start-group-chat"
-                    megaChat={self.props.megaChat}
                     flowType={self.startGroupChatFlow}
-                    contacts={M.u}
                     onClose={() => {
                         self.setState({'startGroupChatDialogShown': false});
                         delete self.startGroupChatFlow;
@@ -1185,9 +1259,10 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
         }
 
         var loadingOrEmpty = null;
-        var megaChat = this.props.megaChat;
+        var isLoading = false;
 
-        if (megaChat.chats.length === 0) {
+        var nonArchivedChats = megaChat.chats.map(function(r) { return !r.isArchived() ? r : undefined; });
+        if (nonArchivedChats.length === 0) {
             loadingOrEmpty = <div className="fm-empty-messages hidden">
                 <div className="fm-empty-pad">
                     <div className="fm-empty-messages-bg"></div>
@@ -1206,7 +1281,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
             </div>;
         }
         else if (
-            megaChat.allChatsHadLoadedHistory() === false &&
+            megaChat.allChatsHadInitialLoadedHistory() === false &&
             !megaChat.currentlyOpenedChat &&
             megaChat.displayArchivedChats !== true
         ) {
@@ -1220,27 +1295,33 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     }}></div>
                 </div>
             </div>;
+            self.isWaitingForInitialLoadingToFinish();
+            isLoading = true;
         }
 
-        var rightPane = null;
+        var rightPaneStyles = {};
+        if (anonymouschat) {
+            rightPaneStyles = {'marginLeft': 0};
+        }
 
-        rightPane = <div className="fm-right-files-block in-chat">
+        var rightPane = <div className="fm-right-files-block in-chat" style={rightPaneStyles}>
                 {loadingOrEmpty}
-
                 {
-                    megaChat.displayArchivedChats === true ?
-                        <ArchivedConversationsList chats={this.props.megaChat.chats} megaChat={this.props.megaChat}
-                                                   contacts={this.props.contacts} key={"archivedchats"}/>
+                    !isLoading && megaChat.displayArchivedChats === true ?
+                        <ArchivedConversationsList key={"archivedchats"}/>
                         :
                         null
                 }
-                <ConversationPanels
+            {!isLoading ? <ConversationPanels
                     {...this.props}
                     chatUIFlags={megaChat.chatUIFlags}
+                    displayArchivedChats={megaChat.displayArchivedChats}
                     className={megaChat.displayArchivedChats === true ? "hidden" : ""}
-                    conversations={this.props.megaChat.chats}
-                    />
+                    currentlyOpenedChat={megaChat.currentlyOpenedChat}
+                    chats={megaChat.chats}
+                    /> : null}
             </div>;
+
         var archivedChatsCount = this.calcArchiveChats();
         var arcBtnClass = megaChat.displayArchivedChats === true ?
                             "left-pane-button archived active" : "left-pane-button archived";
@@ -1253,8 +1334,9 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        <div className="nw-fm-tree-header conversations">
-                            <input type="text" className="chat-quick-search"
+                        <div className={"nw-fm-tree-header conversations" + (self.state.quickSearchText ?
+                            ' filled-input' : '')}>
+                            <input type="text" className={"chat-quick-search"}
                                    onChange={function(e) {
                                        if (e.target.value) {
                                            treesearch = e.target.value;
@@ -1262,11 +1344,11 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                                         self.setState({'quickSearchText': e.target.value});
                                    }}
                                    onBlur={function(e) {
-                                       if (e.target.value) {
-                                           treesearch = e.target.value;
-                                       }
-                                        self.setState({'quickSearchText': e.target.value});
+                                        if (e.target.value) {
+                                            treesearch = e.target.value;
+                                        }
                                    }}
+                                   autoComplete='disabled'
                                    value={self.state.quickSearchText}
                                    placeholder={l[7997]} />
                             <div className="small-icon thin-search-icon"></div>
@@ -1274,12 +1356,9 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                             <Button
                                 group="conversationsListing"
                                 icon="chat-with-plus"
-                                contacts={this.props.contacts}
                                 >
                                 <DropdownContactsSelector
                                     className="main-start-chat-dropdown"
-                                    contacts={this.props.contacts}
-                                    megaChat={this.props.megaChat}
                                     onSelectDone={this.startChatClicked.bind(this)}
                                     multiple={false}
                                     showTopButtons={self.getTopButtonsForContactsPicker()}
@@ -1288,16 +1367,17 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                         </div>
                     </div>
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
-                        <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height" >
+                        <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height"
+                                          ref={function(ref) {
+                            megaChat.$chatTreePanePs = ref;
+                        }}>
                             <div className={
                                 "content-panel conversations" + (
 
                                     getSitePath().indexOf("/chat") !== -1 ? " active" : ""
                                 )
                             }>
-                                <ConversationsList chats={this.props.megaChat.chats}
-                                                   megaChat={this.props.megaChat}
-                                                   contacts={this.props.contacts}
+                                <ConversationsList
                                                    quickSearchText={this.state.quickSearchText} />
                             </div>
                         </PerfectScrollbar>

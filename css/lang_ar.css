@@ -142,3 +142,100 @@ body.rtl .main-top-info-block .main-top-info-text {
     direction: rtl;
     text-align: left;
 }
+
+/* Mega input for Arabic */
+body.rtl .mega-input-title-ontop .mega-input-title {
+    left: auto;
+    right: 8px;
+}
+body.rtl .mega-input-title-ontop .message-container {
+    text-align: right;
+}
+body.rtl .mega-input-title-ontop.halfSize-l .message-container, body.rtl .account.half-sized-block.full-sized-error .message-container {
+    right: 4px;
+    left: auto;
+}
+body.rtl .mega-input-title-ontop.with-icon i {
+    position: absolute;
+    top: 24px;
+    left: 0;
+}
+body.rtl .mega-input-title-ontop input, body.rtl .mega-input-title-ontop .dialog-input {
+    right: 0;
+    direction: rtl;
+}
+body.rtl .mega-input-title-ontop input.strengthChecker {
+    padding-left: 80px;
+    width: 100%;
+}
+body.rtl .mega-input-title-ontop.strengthChecker .password-status {
+    right: auto;
+    left: 4px;
+}
+body.rtl .mega-input-title-ontop.strengthChecker.with-icon .password-status {
+    right: auto;
+    left: 38px;
+}
+body.rtl .mega-input-title-ontop.strengthChecker .password-status {
+    right: auto;
+    left: 4px;
+}
+body.rtl.mobile .mega-input-title-ontop input.strengthChecker {
+    width: 100%;
+    padding-right: 0;
+}
+body.rtl .mega-input-title-ontop {
+    text-align: right;
+}
+body.rtl .mega-input-title-ontop.with-icon .account-pass-lines {
+    margin-top: 10px;
+}
+body.rtl .mega-input-title-ontop.halfSize-l, body.rtl .half-sized-block.l {
+    float: right;
+}
+body.rtl .mega-input-title-ontop.halfSize-r, body.rtl .half-sized-block.r  {
+    float: left;
+}
+body.rtl .half-sized-block.l {
+    padding: 0 0 0 16px;
+}
+body.rtl .half-sized-block.r {
+    padding: 0 16px 0 0;
+}
+body.rtl .mega-input-title-ontop.halfSize-l.with-icon i {
+    left: -102%;
+}
+body.rtl .mega-input-title-ontop.halfSize-l.with-icon input {
+    width: 100%;
+}
+body.rtl .mega-input-title-ontop.halfSize-l.with-icon + .halfSize-r input {
+    width: calc(100% - 40px);
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+}
+body.rtl .settings-sub-section.profile form {
+    direction: rtl;
+}
+body.rtl .settings-sub-section.profile form .mega-input-title-ontop.birth {
+    padding-right: 8px;
+}
+body.rtl  .user-management-account-settings .profile form {
+    direction: rtl;
+}
+body.rtl  .user-management-account-settings .mega-input-title-ontop.short-input {
+    float: none;
+}
+body.rtl .user-management-account-settings .mega-input-title-ontop.short-input.halfSize-r {
+    margin-left: 36px;
+}
+body.rtl .user-management-account-settings .mega-input-title-ontop.short-input.halfSize-l {
+    margin-left: 0;
+}
+body.rtl .user-management-account-settings .mega-input-title-ontop.short-input select {
+    left: -22px;
+    right: auto;
+}
+body.rtl .user-management-account-settings .mega-input-title-ontop.short-input .list-arrow {
+    left: 8px;
+    right: auto;
+}

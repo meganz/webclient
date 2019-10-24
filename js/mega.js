@@ -1376,7 +1376,24 @@ scparser.mcpc = scparser.mcc = function (a) {
         } else if (typeof ChatdIntegration !== 'undefined') {
             ChatdIntegration._queuedChats[a.id] = a;
         } else if (Array.isArray(loadfm.chatmcf)) {
-            loadfm.chatmcf.push(a);
+            // Merge if exists.
+            // This can happen in case some data came from fmdb, but there were still queued ap's (mcpc for
+            // added/removed participants). If this doesn't merge the chatmcf entry, this would end up removing the
+            // 'ck', since mcpc doesn't contain 'ck' properties and the chat would render useless (no key).
+            var exists = false;
+            for (var i = 0; i < loadfm.chatmcf.length; i++) {
+                var entry = loadfm.chatmcf[i];
+                if (entry.id === a.id) {
+                    delete a.a;
+                    Object.assign(entry, a);
+                    exists = true;
+                    a = entry;
+                    break;
+                }
+            }
+            if (!exists) {
+                loadfm.chatmcf.push(a);
+            }
         } else {
             srvlog('@lp unable to parse mcc packet');
         }
@@ -3284,6 +3301,11 @@ function processMCF(mcfResponse, ignoreDB) {
 
     // reopen chats from the MCF response.
     if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
+        // sort by ctime DESC
+        mcfResponse.sort(function(a, b) {
+            return (a.ts < b.ts ? -1 : (a.ts > b.ts ? 1 : 0)) * -1;
+        });
+
         mcfResponse.forEach(function (chatRoomInfo) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
@@ -3729,7 +3751,7 @@ function loadfm_done(mDBload) {
             closeMsg();
         }
         clearInterval(mega.loadReport.aliveTimer);
-        mega.flags &= ~window.MEGAFLAG_LOADINGCLOUD;
+        mega.state &= ~window.MEGAFLAG_LOADINGCLOUD;
 
         watchdog.notify('loadfm_done');
     };

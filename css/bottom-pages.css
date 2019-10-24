@@ -187,9 +187,6 @@
 /* end of Old bottom pages stylinng */
 
 /* Bottom pages common styles*/
-.red {
-    color: #F0373B;
-}
 body.bottom-pages .fmholder {
     overflow: hidden;
     overflow-y: auto;
@@ -4176,7 +4173,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
     font-family: 'LatoWebBold';
-    color: #495057;
     font-size: 17px;
     line-height: 25px
 }
@@ -4189,7 +4185,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
     font-size: 14px;
-    color: #FDA416;
     margin-top: 4px;
     text-transform: uppercase;
     line-height: 20px;
@@ -5676,6 +5671,11 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 .bottom-page.unsub .button-container {
     padding-top: 40px;
 }
+.bottom-page.unsub .headline-txt {
+    padding: 24px 32px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 /*end of subscription page*/
-
-

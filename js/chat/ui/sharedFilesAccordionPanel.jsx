@@ -192,7 +192,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin(React.Component) {
                         var imgId = "sharedFiles!" + node.ch;
 
                         files.push(
-                            <SharedFileItem message={message} key={message.messageId} isLoading={self.isLoadingMore}
+                            <SharedFileItem message={message} key={node.h + "_" + message.messageId}
+                                            isLoading={self.isLoadingMore}
                                             node={node}
                                             icon={icon}
                                             imgId={imgId}

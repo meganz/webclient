@@ -845,7 +845,7 @@ function init_page() {
 
                 init_login();
                 if (email) {
-                    $('#login-name2').val(email);
+                    $('#login-name2').val(email).blur();
                     $('.register-st2-button').addClass('active');
                     $('#login-name2').prop('readonly', true);
                 }
@@ -1632,15 +1632,22 @@ function init_page() {
 
         // If not logged in, direct them to login or register first
         if (!u_type) {
-            if (u_wasloggedin()) {
-                login_txt = l[7712];
-                loadSubPage('login');
+            if (typeof redeem === 'undefined') {
+                // we have voucher directly
+                if (u_wasloggedin()) {
+                    login_txt = l[7712];
+                    loadSubPage('login');
+                }
+                else {
+                    register_txt = l[7712];
+                    loadSubPage('register');
+                }
+                return false;
             }
             else {
-                register_txt = l[7712];
-                loadSubPage('register');
+                // we are coming form redeem page
+                redeem.showVoucherInfoDialog();
             }
-            return false;
         }
         else if (u_type < 3) {
             // If their account is ephemeral and the email is not confirmed, then show them a dialog to warn them and
@@ -1990,6 +1997,9 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
     }
 
+    if (folderlink) {
+        $topHeader.find('.top-icon.notification').addClass('hidden');
+    }
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }

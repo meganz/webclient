@@ -8,6 +8,7 @@ var accountinputs = {
      * @param {Object} $formWrapper. DOM form wrapper.
      */
     init: function($formWrapper) {
+
         "use strict";
 
         if (!$formWrapper.length) {
@@ -15,37 +16,12 @@ var accountinputs = {
         }
 
         var $loginForm = $formWrapper.find('form');
-        var $inputs = $('.account.input-wrapper input',  $loginForm);
+        var $inputs = $('input',  $formWrapper);
         var $checkbox = $loginForm.find('.account.checkbox-block input');
         var $button = $loginForm.find('.button');
         var $tooltip  = $loginForm.find('.account.input-tooltip');
 
-        $loginForm.removeClass('both-incorrect-inputs');
-        $inputs.parent().removeClass('incorrect');
-
-        $tooltip.rebind('click.commonevent', function() {
-            $(this).parent().removeClass('incorrect');
-            $loginForm.removeClass('both-incorrect-inputs');
-            $(this).parent().find('input').first().focus();
-        });
-
-        $inputs.rebind('click.commonevent', function() {
-            $(this).parent().removeClass('incorrect');
-            $loginForm.removeClass('both-incorrect-inputs');
-        });
-
-        $inputs.rebind('focus.commonevent', function() {
-            $(this).parent().addClass('focused');
-        });
-
-        $inputs.rebind('blur.commonevent', function() {
-            $(this).parent().removeClass('focused');
-        });
-
-        $inputs.rebind('keydown.commonevent', function(e) {
-            $loginForm.removeClass('both-incorrect-inputs');
-            $inputs.parent().removeClass('incorrect');
-        });
+        var megaInputs = new mega.ui.MegaInputs($inputs);
 
         $checkbox.rebind('focus.commonevent', function() {
             $(this).parents('.checkbox-block').addClass('focused');
@@ -121,9 +97,6 @@ var tooltiplogin = {
         'use strict';
 
         var $dialog = $('.dropdown.top-login-popup');
-        var $inputs;
-        var $checkbox;
-        var $button;
 
         if (close) {
             $dialog.find('form').empty();
@@ -140,20 +113,14 @@ var tooltiplogin = {
 
         $dialog.find('form').replaceWith(getTemplate('top-login'));
 
-        $inputs = $('.account.input-wrapper input',  $dialog);
-        $button = $dialog.find('.big-red-button');
-
-        if (localStorage.hideloginwarning || is_extension) {
+        if (localStorage.hideloginwarning) {
             $dialog.find('.top-login-warning').addClass('hidden');
-            $dialog.find('.login-notification-icon').removeClass('hidden');
         }
 
-        $('.top-login-full', $dialog).rebind('click', function() {
-            tooltiplogin.init(1);
-            loadSubPage('login');
-        });
+        var $inputs = $('input',  $dialog);
+        var $button = $dialog.find('.big-red-button');
 
-        $inputs.rebind('keydown.loginpopup', function(e) {
+        $inputs.add($button).rebind('keydown.loginpopup', function(e) {
             if (e.keyCode === 13) {
                 tooltiplogin.startLogin();
                 return false;
@@ -164,10 +131,9 @@ var tooltiplogin = {
             tooltiplogin.startLogin();
         });
 
-        $button.rebind('keydown.loginpopup', function (e) {
-            if (e.keyCode === 13) {
-                tooltiplogin.startLogin();
-            }
+        $('.top-login-full', $dialog).rebind('click', function() {
+            tooltiplogin.init(1);
+            loadSubPage('login');
         });
 
         $('.top-login-warning-close', $dialog).rebind('click', function() {
@@ -175,13 +141,6 @@ var tooltiplogin = {
                 localStorage.hideloginwarning = 1;
             }
             $('.top-login-warning', $dialog).removeClass('active');
-            $('.login-notification-icon', $dialog).removeClass('hidden');
-        });
-
-        $('.login-notification-icon', $dialog).rebind('click', function() {
-            $('.top-login-warning', $dialog).removeClass('hidden');
-            $('.top-login-warning', $dialog).addClass('active');
-            $(this).addClass('hidden');
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function() {
@@ -218,7 +177,6 @@ var tooltiplogin = {
 
         var $topLoginPopup = $('.top-login-popup');
         var $loginForm = $topLoginPopup.find('.account.top-login-form');
-        var $emailContainer = $topLoginPopup.find('.account.input-wrapper.email');
         var $emailField = $topLoginPopup.find('#login-name');
         var $passwordField = $topLoginPopup.find('#login-password');
         var $loginButton = $topLoginPopup.find('.top-dialog-login-button');
@@ -231,13 +189,11 @@ var tooltiplogin = {
         var twoFactorPin = null;
 
         if (email === '' || !isValidEmail(email)) {
-            $emailContainer.addClass('incorrect');
-            $emailField.val('');
-            $emailField.trigger("focus");
+            $emailField.megaInputsShowError(l[141]);
+            $emailField.focus();
         }
         else if (password === '') {
-            $emailContainer.removeClass('incorrect');
-            $loginForm.addClass('both-incorrect-inputs');
+            $passwordField.megaInputsShowError(l[1791]);
             $passwordField.focus();
         }
         else {
@@ -303,13 +259,12 @@ var tooltiplogin = {
      * @param {Number} result If the result is negative there is an error, if positive it is the user type
      */
     completeLogin: function(result) {
+
         'use strict';
 
         var $topLoginPopup = $('.top-login-popup');
-        var $loginForm = $topLoginPopup.find('.account.top-login-form');
-        var $emailContainer = $topLoginPopup.find('.account.input-wrapper.email');
-        var $passwordContainer = $topLoginPopup.find('.account.input-wrapper.password');
-        var $passwordField = $passwordContainer.find('input');
+        var $emailField = $topLoginPopup.find('#login-name');
+        var $passwordField = $topLoginPopup.find('#login-password');
         var $button = $topLoginPopup.find('.top-dialog-login-button');
 
         // Remove loading spinner on the button
@@ -319,7 +274,6 @@ var tooltiplogin = {
         if (security.login.checkForCommonErrors(result, tooltiplogin.old.startLogin, tooltiplogin.new.startLogin)) {
             return false;
         }
-
 
         // close two-factor dialog if it was opened
         if (twofactor && twofactor.loginDialog) {
@@ -361,10 +315,20 @@ var tooltiplogin = {
         else {
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
-            $passwordField.focus();
-            $emailContainer.removeClass('incorrect');
-            $loginForm.addClass('both-incorrect-inputs');
-            $passwordField.select();
+
+            $emailField.megaInputsShowError();
+            $passwordField.megaInputsShowError(l[7431]);
+            $passwordField.focus().select();
+
+            var $inputs = $emailField.add($passwordField);
+
+            $inputs.rebind('keydown.hideBothError', function() {
+
+                $emailField.megaInputsHideError();
+                $passwordField.megaInputsHideError();
+
+                $inputs.off('keydown.hideBothError');
+            });
         }
     }
 };

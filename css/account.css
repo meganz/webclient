@@ -4,19 +4,57 @@
 .bottom-page.sign .register-st2-txt-block {
     padding-top: 94px;
 }
+.bottom-page.sign .main-left-block {
+    width: 456px;
+    padding:64px 0;
+}
+.account.register-form, .account.login-form {
+    width: 100%;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 8px;
+    padding: 4px 48px 0;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
+    text-align: center;
+}
+.account.register-form .pw-strength-wrap {
+    margin-top: -15px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+.account.register-form .checkbox-block {
+    margin-top: 4px;
+}
+.account.register-form .checkbox-block.pw-remind {
+    margin-top: 24px;
+}
+.account.register-form .checkbox-block.register {
+    padding:0 0 48px 0;
+}
+.account.register-form .radio-txt {
+    color: #666;
+    font-size: 13px;
+    text-align: left;
+    padding-right: 0;
+    padding-top: 4px;
+}
+.account.register-form .content-txt.pw-strength-note {
+    margin-top: 8px;
+    margin-left: 4px;
+    color: #aaa;
+}
 .account.top-header {
-    font-family: 'montserrat', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 36px;
+    font-family: 'montserrat_light', 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 32px;
     line-height: 44px;
-    color: black;
-    padding: 44px 0 64px 0;
+    color: #333;
+    padding: 40px 0 48px 0;
 }
 .fm-dialog-header .account.top-header {
     padding: 40px 0px 10px 40px;
     color: #333;
 }
-
-
 .fm-dialog-header .account.top-header.small {
     padding: 40px 0px 0px 40px;
     font-size: 26px;
@@ -48,16 +86,10 @@
 .account.small-header-txt a:hover {
     text-decoration: underline;
 }
-.account.half-sized-block {
-    width: 50%;
-    float: left;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 0 0 0 16px;
-}
-.account.half-sized-block:first-child, .account.half-sized-block.l {
-    padding: 0 16px 0 0;
+.account.half-sized-block.full-sized-error .message-container {
+    width: calc(200% + 24px);
+    width: -webkit-calc(200% + 24px);
+    width: -moz-calc(200% + 24px);
 }
 .account.input-wrapper {
     border-bottom: 1px solid rgba(0,0,0,0.2);
@@ -72,9 +104,6 @@
     -o-transition: border-color 200ms ease-in-out;
     -ms-transition: border-color 200ms ease-in-out;
     transition: border-color 200ms ease-in-out;
-}
-.register-side-pane .account.input-wrapper {
-    margin: 0 8px 24px 8px;
 }
 .account.input-wrapper.small {
     margin: 0 0 8px 0;
@@ -94,9 +123,6 @@
 }
 .account.input-wrapper.top-placeholder input:not(:placeholder-shown) + label, .account.input-wrapper.top-placeholder.selected label {
     display: block;
-}
-.fm-dialog.top-login-popup.sign .account.input-wrapper {
-    margin: 0 0 24px 0;
 }
 .account.input-wrapper.focused {
     border-color: rgba(0,0,0,0.4);
@@ -172,11 +198,6 @@
 }
 .account.input-wrapper:not(.small) input[type='number'] {
     font-size: 20px;
-}
-.account.input-wrapper.double input {
-    width: 50%;
-    display: inline-block;
-    padding-right: 15px;
 }
 .account.input-wrapper.incorrect input, .both-incorrect-inputs .account.input-wrapper input {
     color: #DA3135;
@@ -301,7 +322,7 @@ body.ar .sms-verification-number-input {
      margin: 0 20px 0 0;
 }
 .account.input-tooltip.mid {
-    top: 9px;
+    top: 26px;
     bottom: auto;
 }
 .incorrect .account.input-tooltip, .both-incorrect-inputs .both-input-tooltip {
@@ -354,31 +375,6 @@ body.ar .sms-verification-number-input {
 .business .big-red-button.register-button {
     margin-top: 30px;
 }
-.account.password-status {
-    font-size: 12px;
-    line-height: 24px;
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    position: absolute;
-    right: 0;
-    top: 9px;
-    display: none;
-    color: #ff2a0b;
-}
-.account.password-status.good2 {
-    color: #ffc926;
-}
-.account.password-status.good3 {
-    color: #7ab148;
-}
-.account.password-status.good4 {
-    color: #7dd016;
-}
-.account.password-status.good5 {
-    color: #1DA1E9;
-}
-.account.password-status.checked {
-    display: block;
-}
 .account.input-wrapper.password {
     padding-right: 80px;
 }
@@ -386,10 +382,15 @@ body.ar .sms-verification-number-input {
     padding-right: 0;
 }
 .sign .main-pad-block .big-red-button {
-    margin-bottom: 46px;
+    display: block;
+    margin: 0 0 48px 0;
 }
 .sign .big-red-button {
     min-width: 0;
+    text-align: left;
+}
+.sign .big-red-button i {
+    float: right;
 }
 .big-red-button span {
     display: inline-block;
@@ -595,10 +596,6 @@ body.ar .sms-verification-number-input {
     float: none;
     margin: 36px auto 0 auto;
     text-align: center;
-}
-.confirm .account.top-header {
-    width: 160%;
-    margin: 0 -30%;
 }
 .top-login-popup .account.checkbox-block {
     padding: 7px 0 16px 0;

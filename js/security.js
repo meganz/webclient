@@ -1239,6 +1239,7 @@ security.changePassword = {
     },
 
     isPasswordTheSame: function(newPassword, method) {
+        "use strict";
         var operation = new MegaPromise();
         // registration v2
         if (method === 2) {
@@ -1250,22 +1251,23 @@ security.changePassword = {
             var saltBytes = base64_to_ab(u_attr.aas);
             var passwordBytes = security.stringToByteArray($.trim(newPassword));
 
-            security.deriveKey(saltBytes, passwordBytes, security.numOfIterations, security.derivedKeyLengthInBits, function(derivedKeyBytes) {
+            security.deriveKey(saltBytes, passwordBytes, security.numOfIterations,
+                security.derivedKeyLengthInBits, function(derivedKeyBytes) {
 
-                // callback could be Promise based or not
-                var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
-                var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
-                var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
-                var encryptedMasterKeyArray32 = encrypt_key(cipherObject, u_k);
-                var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+                    // callback could be Promise based or not
+                    var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
+                    var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
+                    var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+                    var encryptedMasterKeyArray32 = encrypt_key(cipherObject, u_k);
+                    var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
 
-                if (u_attr.k === encryptedMasterKeyBase64) {
-                    return operation.reject(1);
-                }
-                else {
-                    return operation.resolve();
-                }
-            });
+                    if (u_attr.k === encryptedMasterKeyBase64) {
+                        return operation.reject(1);
+                    }
+                    else {
+                        return operation.resolve();
+                    }
+                });
             return operation;
         }
         else {

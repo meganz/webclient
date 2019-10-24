@@ -405,6 +405,8 @@ var mobile = {
 
         var $passwordStrengthBar = $page.find('.password-strength');
         var $passwordInput = $page.find('.estimator-password-input');
+        // Remove previous strength classes that were added
+        $passwordStrengthBar.removeClass('good1 good2 good3 good4 good5');
 
         // Add keyup event to the password text field
         $passwordInput.rebind('keyup.passwordstrengthcheck', function() {

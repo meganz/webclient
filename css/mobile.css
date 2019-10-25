@@ -4392,7 +4392,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 4px;
     background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
-    background-position: right -2354px;
+    background-position: right -2351px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -11365,8 +11365,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important;
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .mobile .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important; 
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {

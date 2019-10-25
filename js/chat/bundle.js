@@ -5954,7 +5954,7 @@ function (_MegaRenderMixin5) {
           room.setActive();
         });
       } else {
-        this.props.megaChat.createAndShowGroupRoomFor(selected);
+        megaChat.createAndShowGroupRoomFor(selected);
       }
     }
   }, {
@@ -6005,7 +6005,6 @@ function (_MegaRenderMixin5) {
         }
 
         var $target = $(e.target);
-        var megaChat = self.props.megaChat;
 
         if (megaChat.currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
@@ -6374,6 +6373,7 @@ function (_MegaRenderMixin5) {
       }, React.makeElement(PerfectScrollbar, {
         style: leftPanelStyles,
         className: "conversation-reduce-height",
+        chats: megaChat.chats,
         ref: function ref(_ref) {
           megaChat.$chatTreePanePs = _ref;
         }
@@ -17887,7 +17887,12 @@ var Chat = function Chat() {
   this.plugins = {};
   self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-  self._chatsAwaitingAps = {};
+  self._chatsAwaitingAps = {}; // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+
+  MegaDataObject.attachToExistingJSObject(this, {
+    "currentlyOpenedChat": null,
+    "displayArchivedChats": false
+  }, true);
   return this;
 };
 
@@ -18078,12 +18083,7 @@ Chat.prototype.init = function () {
     var $notification = $('.tooltip');
     $notification.addClass('hidden').removeAttr('style');
   });
-  self.registerUploadListeners(); // those, once changed, should trigger UI reupdate via MegaRenderMixin.
-
-  MegaDataObject.attachToExistingJSObject(this, {
-    "currentlyOpenedChat": null,
-    "displayArchivedChats": false
-  }, true);
+  self.registerUploadListeners();
   self.trigger("onInit");
 };
 /**

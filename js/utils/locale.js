@@ -573,7 +573,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l['472c'] = l[472].replace('[X]', 250);
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
-    l['208s'] = l[208].replace('[A]', '<span class="red">');
+    l['208s'] = l[208].replace('[A]', '<span class="red txt-bold">');
     l['208s'] = l['208s'].replace('[/A]', '</span>');
     l['208.g'] = l[208].replace('[A]', '<a class="green txt-bold">').replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
@@ -909,6 +909,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
         .replace('[A]', '<a href="/security" class="red txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
+    l[22094] = l[22094].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
+    l[22095] = l[22095].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

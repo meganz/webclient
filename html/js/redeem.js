@@ -664,7 +664,7 @@ var redeem = {
             });
         }
         else {
-            parsepage(pages['m_voucherinfo']);
+            parsepage(pages['mvoucherinfo']);
             infoFilling($);
         }
     },
@@ -678,8 +678,8 @@ var redeem = {
         var path = getSitePath();
         var $overlay = $('.main-pad-block.redeem-promo-page').removeClass('hidden');
         var $button = $('.redeem-voucher', $overlay);
-        var $inputo = $('.dialog-input-title-ontop', $overlay);
-        var $input = $('input', $inputo);
+        var $input = $('input', $overlay);
+        var megaInput = new mega.ui.MegaInputs($input);
 
         if (path.indexOf('computerbild') > 0) {
             promoter = 0;
@@ -689,19 +689,22 @@ var redeem = {
             $input.attr('placeholder', l[20418]);
         }
 
-        $input.rebind('keyup.vib', function() {
+        $input.rebind('input.vib', function() {
             var value = $(this).val() || false;
 
             if (value.length > 11) {
-                $button.addClass('active');
+                $button.addClass('active').removeClass('disabled');
             }
             else {
-                $button.removeClass('active');
+                $button.removeClass('active').addClass('disabled');
             }
-            $inputo.removeClass('error');
+            return false;
         });
 
         $button.rebind('click', function() {
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             loadingDialog.show();
 
             redeem.getVoucherData($input.val(), promoter)
@@ -712,8 +715,9 @@ var redeem = {
                 })
                 .catch(function() {
                     $input.val('');
-                    $inputo.addClass('error');
+                    megaInput.showError(l[20420]);
                     loadingDialog.hide();
+                    $button.removeClass('active').addClass('disabled');
                 });
 
             return false;

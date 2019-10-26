@@ -372,7 +372,7 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
             }
         }
     }
-    
+
     if (!dl_queue.some(isQueueActive)) {
         dl_queue = new DownloadQueue();
         dlmanager.isDownloading = false;
@@ -1028,17 +1028,24 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
             step++;
             var promises = [];
             promises.push(fmdb.drop());
-
             if (
                 typeof(megaChat) !== 'undefined' &&
                 megaChat.plugins.chatdIntegration &&
-                megaChat.plugins.chatdIntegration.chatd &&
-                megaChat.plugins.chatdIntegration.chatd.chatdPersist
+                megaChat.plugins.chatdIntegration.chatd
             ) {
-                promises.push(
-                    megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
-                );
+                var chatd = megaChat.plugins.chatdIntegration.chatd;
+                if (chatd.chatdPersist) {
+                    promises.push(
+                        chatd.chatdPersist.drop()
+                    );
+                }
+                if (chatd.messagesQueueKvStorage) {
+                    promises.push(
+                        chatd.messagesQueueKvStorage.clear()
+                    );
+                }
             }
+
             MegaPromise.allDone(promises).always(finishLogout);
         }
         if (!megaChatIsDisabled) {

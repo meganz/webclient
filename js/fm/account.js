@@ -107,8 +107,6 @@ accountUI.renderAccountPage = function(account) {
         case '/fm/account/security':
             $('.fm-account-security').removeClass('hidden');
             sectionClass = 'security';
-
-            M.require('zxcvbn_js');
             accountUI.security.init();
             break;
 
@@ -427,33 +425,7 @@ accountUI.inputs = {
             'use strict';
 
             var $inputs = $('.fm-account-main input').add('.fm-voucher-popup input');
-
-            $inputs.rebind('focus', function() {
-                $(this).parents('.dialog-input-title-ontop').addClass('active');
-            });
-
-            $inputs.rebind('blur', function() {
-
-                if ($(this).val()) {
-                    $(this).parents('.dialog-input-title-ontop').addClass('valued');
-                }
-                else {
-                    $(this).parents('.dialog-input-title-ontop').removeClass('valued');
-                }
-                $(this).parents('.dialog-input-title-ontop').removeClass('active');
-            });
-
-            $inputs.prev('.title').rebind('click', function() {
-
-                if (!$(this).parents('.dialog-input-title-ontop').hasClass('active')) {
-                    $(this).next('input').trigger('focus');
-                }
-            });
-
-            $inputs.prev('.title').noTransition(function() {
-
-                $(this).next('input').trigger('blur');
-            });
+            var megaInputs = new mega.ui.MegaInputs($inputs);
         }
     },
 
@@ -833,8 +805,8 @@ accountUI.account = {
             }
 
             // Display only date format that is correct with current locale.
-            $('.dialog-input-title-ontop.birth').addClass('hidden');
-            $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure']).removeClass('hidden');
+            $('.mega-input-title-ontop.birth').addClass('hidden');
+            $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure']).removeClass('hidden');
 
             this.renderBirthYear();
             this.renderBirthMonth();
@@ -846,7 +818,7 @@ accountUI.account = {
             'use strict';
 
             var i = new Date().getFullYear() - 16;
-            var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .byear')
+            var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .byear')
                 .attr('max', i);
 
             if (u_attr.birthyear) {
@@ -859,7 +831,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthmonth) {
-                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
+                var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
                 $input.val(u_attr.birthmonth);
                 this.zerofill($input[0]);
             }
@@ -870,7 +842,7 @@ accountUI.account = {
             'use strict';
 
             if (u_attr.birthday) {
-                var $input = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
+                var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
                 $input.val(u_attr.birthday);
                 this.zerofill($input[0]);
             }
@@ -976,7 +948,7 @@ accountUI.account = {
             // Cache selectors
             var self = this;
             var $personalInfoBlock = $('.profile-form');
-            var $birthdayBlock = $('.dialog-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
+            var $birthdayBlock = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
                 $personalInfoBlock);
             var $firstNameField = $personalInfoBlock.find('#account-firstname');
             var $saveBlock = $('.fm-account-sections .save-block');
@@ -1001,13 +973,13 @@ accountUI.account = {
                     if ($this.is('.byear, .bmonth, .bdate')) {
                         if (this.value > max) {
                             $this.addClass('errored');
-                            $parent.addClass('error').find('.error-message').text(errorMsg);
+                            $parent.addClass('error msg').find('.message-container').text(errorMsg);
                             $saveBlock.addClass('closed');
                             return false;
                         }
                         else if (this.value < min) {
                             $this.addClass('errored');
-                            $parent.addClass('error').find('.error-message').text(errorMsg);
+                            $parent.addClass('error msg').find('.message-container').text(errorMsg);
                             $saveBlock.addClass('closed');
                             return false;
                         }
@@ -1018,7 +990,7 @@ accountUI.account = {
                                 $($erroredInput[0]).trigger('change');
                             }
                             else {
-                                $parent.removeClass('error');
+                                $parent.removeClass('error msg');
                             }
                         }
                     }

@@ -907,30 +907,16 @@ RtcModule.prototype.onClientLeftCall = function(chat, userid, clientid) {
     }
     var chatid = chat.chatId;
     this._fire('onClientAvChange', chatid, userid, clientid, 0);
-
-    var isGroup;
-    var call = this.calls[chatid];
-    if (call) {
-        isGroup = call.isGroup;
-        call._onClientLeftCall(userid, clientid);
-    } else {
-        isGroup = this.handler.isGroupChat(chatid);
+    if (chat.callInfo.participantCount() === 0) {
+        this.logger.log("Notifying about last client leaving call");
     }
-    if (isGroup) {
-        if (chat.callInfo.participantCount() === 0) {
-            this.logger.log("Notifying about last client leaving call");
-        }
-        this._fire('onClientLeftCall', chatid, userid, clientid);
-    }
+    this._fire('onClientLeftCall', chatid, userid, clientid);
 };
 
 RtcModule.prototype.onClientJoinedCall = function(chat, userid, clientid) {
     var chatid = chat.chatId;
     var call = this.calls[chatid];
-    var isGroup = call ? call.isGroup : this.handler.isGroupChat(chatid);
-    if (isGroup) {
-        this._fire('onClientJoinedCall', chat.chatId, userid, clientid);
-    }
+    this._fire('onClientJoinedCall', chat.chatId, userid, clientid);
 };
 
 RtcModule.prototype.onShutdown = function() {

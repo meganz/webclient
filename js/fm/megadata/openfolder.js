@@ -45,7 +45,7 @@
 
         if (first) {
             fminitialized = true;
-            $('.top-search-bl').show();
+
             mBroadcaster.sendMessage('fm:initialized');
 
             if (d) {

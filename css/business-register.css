@@ -33,127 +33,13 @@
 	font-size: 24px;
 	margin:64px 0 24px 0;
 	color: #333;
-	height: 30px;
 	line-height: 30px;
 }
 
-.bus-reg-input {
-	height: 64px;
-	width: 100%;
-	position: relative;
-	display: inline-block;
-	margin-bottom: 12px;
-}
-
-.bus-reg-input::after {
-	content: " ";
-    width: 100%;
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0,0,0,0.2);
-    position: absolute;
-}
-
-.bus-reg-title {
-	font-size: 12px;
-	line-height: 15px;
-	color:#888;
-	position: absolute;
-	left: 42px;
-	top: 6px;
-}
-.bus-reg-input.num {
-	width: 100%;
-}
 .bus-reg-icon {
     background-image: url(../images/mega/top-sprite_v7.png);
     width: 24px;
     height: 24px;
-}
-.bus-reg-input .bus-reg-icon {
-	margin: 30px 12px 0 4px;
-	opacity: 0.5;
-	float: left;
-    display: inline-block;
-}
-.bus-reg-input input {
-	border: none;
-	width: -webkit-calc(100% - 60px);
-    width: -moz-calc(100% - 60px);
-    width: calc(100% - 60px);
-	margin-top:30px;
-	line-height: 22px;
-	color: #333;
-	font-size: 600;
-	font-size: 18px;
-	white-space: nowrap;
-    text-overflow: ellipsis;
-    background-color: rgba(255,255,255,0.01);
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-}
-.bus-reg-input input.fir-name {
-	width: 36%;
-	display: inline-block;
-}
-
-.bus-reg-input input.las-name {
-	width: 36%;
-	display: inline-block;
-}
-
-.bus-reg-input input::placeholder {
-	font-size: 13px;
-	color: #ccc;
-	font-family: 'LatoWeb','source_sans_proregular', Arial;
-}
-
-.bus-reg-input.num input {
-	width: 80%;
-}
-
-.bus-reg-input.pw-first input {
-	width: -webkit-calc(100% - 86px);
-    width: -moz-calc(100% - 86px);
-    width: calc(100% - 86px);
-    display: inline-block;
-}
-
-.bus-reg-input.pw-first .password-status-icon {
-	position: absolute;
-	right: 0;
-	top: 30px;
-}
-
-.bus-reg-input .error-message {
-    font-size: 13px;
-    padding:16px 0 0 4px;
-    color: rgba(229,76,81,1);
-    width:90%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display:none;
-}
-
-.bus-reg-input.error::after {
-    background-color: rgba(217,0,7,0.5);
-}
-
-.bus-reg-input.active::after {
-    background-color: #666;
-}
-
-.bus-reg-input.error input {
-	color: rgba(217,0,7,1);
-}
-
-.bus-reg-input.error .error-message {
-	display: inline-block;
-	font-weight: 600;
-}
-
-.bus-reg-body .new-registration .register-pass-status-line1, .bus-reg-body .new-registration .register-pass-status-line2, .bus-reg-body .new-registration .register-pass-status-line3, .bus-reg-body .new-registration .register-pass-status-line4, .bus-reg-body .new-registration .register-pass-status-line5 {
-	width: calc(20% - 5px);
 }
 
 .bus-reg-body .password-stutus-txt {
@@ -523,11 +409,6 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 .bus-confirm-body .bus-reg-header {
 	width: 100%;
 	text-align: center;
-}
-
-.bus-confirm-body .bus-reg-input {
-	margin-top: 48px;
-	margin-bottom: 12px;
 }
 
 .bus-confirm-body .bus-confirmImg {

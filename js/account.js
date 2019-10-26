@@ -433,7 +433,7 @@ function u_exportkey(action) {
     var key = a32_to_base64(window.u_k || '');
 
     if (action === true) {
-        M.saveAs(key, 'MEGA-RECOVERYKEY.txt');
+        M.saveAs(key, M.getSafeName(l[20830]) + '.txt');
     }
     else {
         if (page === 'backup') {

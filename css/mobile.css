@@ -139,7 +139,7 @@ ul, li {
 .txt-green {
     color: #00BFA5;
 }
-.mobile .semi-large-header {
+.mobile .headline-txt {
     font-size: 18px;
     line-height: 28px;
     color: #333;
@@ -169,19 +169,6 @@ ul, li {
 .mobile .content-txt.semi-larger-txt {
     font-size: 15px;
     line-height: 22px;
-}
-.mobile .underline-btn-txt {
-    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 14px;
-    line-height: 22px;
-    text-decoration: underline;
-    position: relative;
-    display: inline-block;
-    outline-color: none;
-}
-.mobile .underline-btn-txt.semi-larger-txt {
-    font-size: 16px;
-    line-height: 24px;
 }
 /*end of text for mobile*/
 .mobile.stop-inertia {
@@ -4405,7 +4392,7 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 4px;
     background-image: url(../images/mobile/mobile-sprite_v27.png);
     background-repeat: no-repeat;
-    background-position: right -2354px;
+    background-position: right -2351px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -5722,18 +5709,6 @@ div.checkboxOn, div.checkboxOff {
     top: 8px;
 }
 
-.user-management-account-settings .bus-input .note-message, .bus-reg-body .bus-reg-input .note-message {
-    font-size: 13px;
-    padding: 16px 0 0 4px;
-    color: #888;
-    width: 90%;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.bus-reg-body .bus-reg-input.num.error .note-message {
-    display: none;
-}
 /* Help centre header */
 .help-section.fm-header {
     background-color: #fff;
@@ -8582,6 +8557,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
+    width: 23px;
 }
 .mobile .improved-recovery-steps .check-sessions .checkboxOff {
     background-color: rgba(153, 153, 153, 0.25);
@@ -9645,15 +9621,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     display: none;
 }
 /* for business account */
-.bus-reg-body .bus-reg-title,
-.bus-reg-input.correctinput .bus-reg-title,
-.bus-reg-input.active .bus-reg-title,
-.bus-reg-input.error .bus-reg-title {
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    display: none;
-}
 .security-page-video-block .download.video-block {
     margin: 0 auto;
     height: 360px;
@@ -11398,8 +11365,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important;
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .mobile .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
+        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important; 
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -11737,7 +11704,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     min-width: 182px;
 }
 
-
 .voucher-info-redeem {
     padding-top: 50%;
     text-align: center;
@@ -11855,15 +11821,15 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     color: #fff;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+/* Mega Input Mobile */
+.mobile .mega-input-title-ontop input.strengthChecker {
+    width: 100%;
+}
+.mobile .mega-input-title-ontop.with-icon input.strengthChecker {
+    width: calc(100% - 40px);
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+}
+.mobile .mega-input-title-ontop.with-icon .account-pass-lines {
+    margin-top: 9px;
+}

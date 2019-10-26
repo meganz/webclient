@@ -69,20 +69,6 @@ function init_reset() {
         }
     });
 
-    if (typeof zxcvbn === 'undefined') {
-        $('.login-register-input.password').addClass('loading');
-
-        M.require('zxcvbn_js')
-            .done(function() {
-                $('.login-register-input.password').removeClass('loading');
-                reset_pwcheck();
-            });
-    }
-    else {
-        $('.login-register-input.password').removeClass('loading');
-        reset_pwcheck();
-    }
-
     $('.restore-verify-button').rebind('click', function(e) {
         if (!$(this).hasClass('active')) {
             return false;
@@ -235,95 +221,41 @@ function verify_key(key) {
     });
 }
 
-
-function reset_pwcheck() {
-
-    'use strict';
-
-    $('.login-register-input.password').removeClass('insufficient-strength meets-minimum-strength');
-    $('.account.password-status').removeClass('good1 good2 good3 good4 good5 checked');
-    $('.password-advice').empty();
-    $('.minimum-password-block .password-icon').removeClass('success');
-
-    if (typeof zxcvbn === 'undefined') {
-        return false;
-    }
-
-    var trimmedWithKeyPassword = $.trim($('#withkey-password').val());
-    var trimmedWithoutKeyPassword = $.trim($('#withoutkey-password').val());
-
-    if (trimmedWithKeyPassword !== '') {
-        classifyPassword(trimmedWithKeyPassword);
-    }
-    else if (trimmedWithoutKeyPassword !== '') {
-        classifyPassword(trimmedWithoutKeyPassword);
-    }
-    else {
-        return false;
-    }
-}
-
-
 function init_reset_pw() {
 
     'use strict';
 
-    var $passwords = $('#withkey-password,#withoutkey-password');
-    var $confirms = $('#withkey-password2,#withoutkey-password2');
+    var $passwords = $('#withkey-password, #withoutkey-password');
+    var $confirms = $('#withkey-password2, #withoutkey-password2');
 
-    var checkInput = function($input) {
+    var passwordsMegaInput = new mega.ui.MegaInputs($passwords);
+    var confirmsMegaInput = new mega.ui.MegaInputs($confirms);
+
+
+    var _checkInput = function($input) {
 
         var $contentWrapper = $input.parents('.content-wrapper');
-        var $firstInput = $contentWrapper.find('.first > input');
-        var $confirmInput = $contentWrapper.find('.confirm > input');
+        var $firstInput = $contentWrapper.find('input.first');
+        var $confirmInput = $contentWrapper.find('input.confirm');
         var $button = $contentWrapper.find('.restore-verify-button');
 
         if ($firstInput.val() && $confirmInput.val() && $firstInput.val().length >= security.minPasswordLength
             && $firstInput.val().length === $confirmInput.val().length) {
+
             $button.addClass('active').removeClass('disabled');
+
+            return true;
         }
         else {
             $button.removeClass('active').addClass('disabled');
+
+            return false;
         }
     };
 
-    $passwords.rebind('focus.initresetpw', function() {
-        var $parent = $(this).parent();
-        var $tooltip = $parent.find('.password-tooltip');
-        $parent.removeClass('incorrect').addClass('focused');
-        $tooltip.removeClass('hidden');
-        setTimeout(function() { // Waiting for hidden to be removed for animation
-            $tooltip.addClass('visible');
-        }, 10);
-    });
-
-    $passwords.rebind('blur.initresetpw', function() {
-        var $parent = $(this).parent();
-        var $tooltip = $parent.find('.password-tooltip');
-        $parent.removeClass('focused');
-        $tooltip.removeClass('visible');
-        setTimeout(function() { // Waiting for animation
-            $tooltip.addClass('hidden');
-        }, 200);
-    });
-
-    $confirms.rebind('focus.initresetpw', function() {
-        $(this).parent().removeClass('incorrect').addClass('focused');
-    });
-
-    $confirms.rebind('blur.initresetpw', function() {
-        $(this).parent().removeClass('focused');
-    });
-
-    $passwords.rebind('keyup.initresetpw', function() {
-        checkInput($(this));
-        reset_pwcheck();
-    });
-
-    // $('#withkey-password2').rebind('keyup.initresetpw', function(e) {
-    $confirms.rebind('keyup.initresetpw', function(e) {
-        checkInput($(this));
-        if (e.keyCode === 13) {
+    $passwords.add($confirms).rebind('keyup.initresetpw', function(e) {
+        var valid = _checkInput($(this));
+        if (e.keyCode === 13 && valid) {
             recovery_reset_pw();
         }
     });

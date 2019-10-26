@@ -5954,7 +5954,7 @@ function (_MegaRenderMixin5) {
           room.setActive();
         });
       } else {
-        this.props.megaChat.createAndShowGroupRoomFor(selected);
+        megaChat.createAndShowGroupRoomFor(selected);
       }
     }
   }, {
@@ -6005,7 +6005,6 @@ function (_MegaRenderMixin5) {
         }
 
         var $target = $(e.target);
-        var megaChat = self.props.megaChat;
 
         if (megaChat.currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
@@ -6341,6 +6340,7 @@ function (_MegaRenderMixin5) {
       }, React.makeElement("input", {
         type: "text",
         className: "chat-quick-search",
+        autoComplete: "disabled",
         onChange: function onChange(e) {
           if (e.target.value) {
             treesearch = e.target.value;
@@ -6373,6 +6373,7 @@ function (_MegaRenderMixin5) {
       }, React.makeElement(PerfectScrollbar, {
         style: leftPanelStyles,
         className: "conversation-reduce-height",
+        chats: megaChat.chats,
         ref: function ref(_ref) {
           megaChat.$chatTreePanePs = _ref;
         }
@@ -8553,6 +8554,7 @@ function (_MegaRenderMixin) {
 
       if (!self.loadingPromise) {
         self.loadingPromise = megaChat.getEmojiDataSet('emojis').done(function (emojis) {
+          self.data_emojis = emojis;
           Soon(function () {
             self.data_emojis = emojis;
             self.safeForceUpdate();
@@ -8741,6 +8743,11 @@ function (_MegaRenderMixin) {
       this.found = found;
 
       if (!found || found.length === 0) {
+        setTimeout(function () {
+          // onCancel may need to do a .setState on parent component, so need to run it in a separate
+          // thread/stack
+          self.props.onCancel();
+        }, 0);
         return null;
       }
 
@@ -15784,7 +15791,7 @@ function (_MegaRenderMixin2) {
       }), external_React_default.a.createElement("span", null, l[20623])), external_React_default.a.createElement("p", null, external_React_default.a.createElement("span", null, l[20454]))) : null, external_React_default.a.createElement("div", {
         className: "chat-button-seperator"
       }), external_React_default.a.createElement("div", {
-        className: "link-button light" + (!(room.members.hasOwnProperty(u_handle) && !anonymouschat) ? " disabled" : ""),
+        className: "link-button light" + (!((room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !anonymouschat) ? " disabled" : ""),
         onClick: function onClick(e) {
           if ($(e.target).closest('.disabled').length > 0) {
             return false;
@@ -15803,7 +15810,7 @@ function (_MegaRenderMixin2) {
       }, external_React_default.a.createElement("i", {
         className: "small-icon colorized " + (room.isArchived() ? "unarchive" : "archive")
       }), external_React_default.a.createElement("span", null, room.isArchived() ? __(l[19065]) : __(l[16689]))), room.type !== "private" ? external_React_default.a.createElement("div", {
-        className: "link-button light red " + (room.stateIsLeftOrLeaving() || !(room.type !== "private" && room.membersSetFromApi.members.hasOwnProperty(u_handle) && !anonymouschat) ? "disabled" : ""),
+        className: "link-button light red " + (room.type !== "private" && !anonymouschat && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 ? "" : "disabled"),
         onClick: function onClick(e) {
           if ($(e.target).closest('.disabled').length > 0) {
             return false;
@@ -15815,7 +15822,7 @@ function (_MegaRenderMixin2) {
         }
       }, external_React_default.a.createElement("i", {
         className: "small-icon rounded-stop colorized"
-      }), external_React_default.a.createElement("span", null, l[8633])) : null, room._closing !== true && (room.type === "group" || room.type === "public") && room.stateIsLeftOrLeaving() && !anonymouschat ? external_React_default.a.createElement("div", {
+      }), external_React_default.a.createElement("span", null, l[8633])) : null, room._closing !== true && room.type === "public" && !anonymouschat && (!room.membersSetFromApi.members.hasOwnProperty(u_handle) || room.membersSetFromApi.members[u_handle] === -1) ? external_React_default.a.createElement("div", {
         className: "link-button light red",
         onClick: function onClick() {
           if (self.props.onCloseClicked) {
@@ -17146,11 +17153,11 @@ function (_MegaRenderMixin3) {
         onLeaveClicked: function onLeaveClicked() {
           room.leave(true);
         },
-        onJoinViaPublicLinkClicked: function onJoinViaPublicLinkClicked() {
-          room.joinViaPublicHandle();
-        },
         onCloseClicked: function onCloseClicked() {
           room.destroy();
+        },
+        onJoinViaPublicLinkClicked: function onJoinViaPublicLinkClicked() {
+          room.joinViaPublicHandle();
         },
         onSwitchOffPublicMode: function onSwitchOffPublicMode(topic) {
           room.switchOffPublicMode(topic);
@@ -17560,7 +17567,7 @@ function (_MegaRenderMixin4) {
 ;
 
 function isStartCallDisabled(room) {
-  return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG;
+  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0;
 }
 
 /***/ }),
@@ -17886,7 +17893,12 @@ var Chat = function Chat() {
   this.plugins = {};
   self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-  self._chatsAwaitingAps = {};
+  self._chatsAwaitingAps = {}; // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+
+  MegaDataObject.attachToExistingJSObject(this, {
+    "currentlyOpenedChat": null,
+    "displayArchivedChats": false
+  }, true);
   return this;
 };
 
@@ -18077,12 +18089,7 @@ Chat.prototype.init = function () {
     var $notification = $('.tooltip');
     $notification.addClass('hidden').removeAttr('style');
   });
-  self.registerUploadListeners(); // those, once changed, should trigger UI reupdate via MegaRenderMixin.
-
-  MegaDataObject.attachToExistingJSObject(this, {
-    "currentlyOpenedChat": null,
-    "displayArchivedChats": false
-  }, true);
+  self.registerUploadListeners();
   self.trigger("onInit");
 };
 /**
@@ -19739,35 +19746,6 @@ Chat.prototype.getChatById = function (chatdId) {
   return found ? found : false;
 };
 /**
- * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
- * @param [chatIdBin] {String}
- * @returns {boolean}
- */
-
-
-Chat.prototype.haveAnyIncomingOrOutgoingCall = function (chatIdBin) {
-  if (chatIdBin) {
-    if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
-      return false;
-    } else if (this.rtc && this.rtc.calls) {
-      var callIds = Object.keys(this.rtc.calls);
-
-      for (var i = 0; i < callIds.length; i++) {
-        if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
-          return true;
-        }
-      } // didn't found any chat that doesn't match the current chatdIdBin
-
-
-      return false;
-    } else {
-      return false;
-    }
-  } else {
-    return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
-  }
-};
-/**
  * Returns true if there is a chat room with an active (started/starting) call.
  *
  * @returns {boolean}
@@ -20219,7 +20197,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     ctime: 0,
     lastActivity: 0,
     callRequest: null,
-    callIsActive: false,
     isCurrentlyActive: false,
     _messagesQueue: [],
     unreadCount: 0,
@@ -20251,7 +20228,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   this.ck = ck;
   this.scrolledToBottom = 1;
   this.callRequest = null;
-  this.callIsActive = false;
   this.shownMessages = {};
   self.members = {};
 
@@ -20685,6 +20661,16 @@ ChatRoom.prototype.isOnline = function () {
   return shard ? shard.isOnline() : false;
 };
 
+ChatRoom.prototype.isOnlineForCalls = function () {
+  var chatdChat = this.getChatIdMessages();
+
+  if (!chatdChat) {
+    return false;
+  }
+
+  return chatdChat.loginState() >= LoginState.HISTDONE;
+};
+
 ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
   'use strict';
 
@@ -20721,10 +20707,6 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
   });
   return $promise;
 };
-
-ChatRoom.prototype._resetCallStateNoCall = function () {};
-
-ChatRoom.prototype._resetCallStateInCall = function () {};
 /**
  * Check whether a chat is archived or not.
  *
@@ -21817,7 +21799,13 @@ ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
   var haveCallParticipants = self.getCallParticipants().length > 0;
 
-  if ((self.type === "group" || self.type === "public") && self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING) && haveCallParticipants) {
+  if (self.type !== "group" && self.type !== "public") {
+    return false;
+  }
+
+  var call = self.callManagerCall;
+
+  if (call && (call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
     return true;
   } else if (!self.callManagerCall && haveCallParticipants) {
     return true;
@@ -21825,14 +21813,21 @@ ChatRoom.prototype.havePendingGroupCall = function () {
     return false;
   }
 };
+/**
+ * Returns whether there is a call in the room that we can answer (1on1 or group) or join (group)
+ * This is used e.g. to determine whether to display a small handset icon in the notification area
+ * for the room in the LHP
+ */
+
 
 ChatRoom.prototype.havePendingCall = function () {
   var self = this;
+  var call = self.callManagerCall;
 
-  if (self.callManagerCall && (self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || self.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
-    return true;
+  if (call) {
+    return call.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || call.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING;
   } else if (self.type === "group" || self.type === "public") {
-    return self.havePendingGroupCall();
+    return self.getCallParticipants().length > 0;
   } else {
     return false;
   }

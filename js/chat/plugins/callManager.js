@@ -147,7 +147,6 @@ CallManager.prototype.startCall = function (chatRoom, mediaOptions) {
             return;
         }
         assert(callManagerCall && callManagerCall.rtcCall);
-        chatRoom._resetCallStateInCall();
         callManagerCall.setState(CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING);
 
         chatRoom.trigger('onOutgoingCall', [callManagerCall, mediaOptions]);
@@ -223,8 +222,6 @@ CallManager.prototype.joinCall = function (chatRoom, mediaOptions) {
             return;
         }
         assert(callManagerCall && callManagerCall.rtcCall);
-        chatRoom._resetCallStateInCall();
-
         callManagerCall.setState(CallManagerCall.STATE.STARTING);
 
         chatRoom.trigger('onCallStarting', [callManagerCall, mediaOptions]);
@@ -1139,7 +1136,6 @@ CallManagerCall.prototype.onCallTerminated = function () {
     if ($(document).fullScreen() && self.room.isCurrentlyActive) {
         $(document).fullScreen(false);
     }
-
     self.renderCallEndedState();
 
     self.room.trackDataChange();

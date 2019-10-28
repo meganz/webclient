@@ -6340,7 +6340,6 @@ function (_MegaRenderMixin5) {
       }, React.makeElement("input", {
         type: "text",
         className: "chat-quick-search",
-        autoComplete: "disabled",
         onChange: function onChange(e) {
           if (e.target.value) {
             treesearch = e.target.value;
@@ -6355,6 +6354,7 @@ function (_MegaRenderMixin5) {
             treesearch = e.target.value;
           }
         },
+        autoComplete: "disabled",
         value: self.state.quickSearchText,
         placeholder: l[7997]
       }), React.makeElement("div", {

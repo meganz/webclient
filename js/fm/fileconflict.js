@@ -640,7 +640,7 @@
 
             loadingDialog.pshow();
 
-            var resolveDup = function(duplicateEntries, keys, kIndex, type) {
+            var resolveDup = function(duplicateEntries, keys, kIndex, type, applyToAll) {
                 if (kIndex >= keys.length) {
                     operationsOrderPromise.resolve();
                     loadingDialog.phide();
@@ -649,98 +649,121 @@
 
                 var name = keys[kIndex];
 
-                fileconflict.prompt('dups', M.d[duplicateEntries[type][name][0]],
-                    M.d[duplicateEntries[type][name][1]], allDups - 1, target,
-                    duplicateEntries[type][name].length).always(
-                        function contuineResolving(file, fname, action, checked) {
 
-                            var olderNode = null;
-                            var newestTS = -1;
-                            var newestIndex = -1;
-                            var pauseRecusrion = false;
+                var contuineResolving = function(file, fname, action, checked) {
 
-                            if (duplicateEntries[type][name].length == 2) {
-                                olderNode = duplicateEntries[type][name][0];
-                                if (M.d[duplicateEntries[type][name][1]].ts < M.d[olderNode].ts) {
-                                    olderNode = duplicateEntries[type][name][1];
-                                }
+                    var olderNode = null;
+                    var newestTS = -1;
+                    var newestIndex = -1;
+                    var pauseRecusrion = false;
+
+                    if (duplicateEntries[type][name].length == 2) {
+                        olderNode = duplicateEntries[type][name][0];
+                        if (M.d[duplicateEntries[type][name][1]].ts < M.d[olderNode].ts) {
+                            olderNode = duplicateEntries[type][name][1];
+                        }
+                    }
+                    else {
+                        for (var k = 0; k < duplicateEntries[type][name].length; k++) {
+                            if (M.d[duplicateEntries[type][name][k]].ts > newestTS) {
+                                newestTS = M.d[duplicateEntries[type][name][k]].ts;
+                                newestIndex = k;
+                            }
+                        }
+                    }
+
+                    switch (action) {
+                        case ns.REPLACE:
+                            // rename old files
+
+                            var newName;
+                            if (olderNode) {
+                                newName = fileconflict.findNewName(name, target);
+                                M.rename(olderNode, newName);
                             }
                             else {
-                                for (var k = 0; k < duplicateEntries[type][name].length; k++) {
-                                    if (M.d[duplicateEntries[type][name][k]].ts > newestTS) {
-                                        newestTS = M.d[duplicateEntries[type][name][k]].ts;
-                                        newestIndex = k;
+                                for (var h = 0; h < duplicateEntries[type][name].length; h++) {
+                                    if (h === newestIndex) {
+                                        continue;
+                                    }
+                                    newName = fileconflict.findNewName(name, target);
+                                    M.rename(duplicateEntries[type][name][h], newName);
+                                }
+                            }
+                            break;
+                        case ns.KEEPBOTH:
+                            // merge
+
+                            break;
+                        case ns.DONTCOPY:
+                            // keep the newest
+                            if (type === 'files') {
+                                if (olderNode) {
+                                    M.safeRemoveNodes(olderNode);
+                                }
+                                else {
+                                    var nodeToRemove = duplicateEntries[type][name];
+                                    nodeToRemove.splice(newestIndex, 1);
+                                    M.safeRemoveNodes(nodeToRemove);
+                                }
+                                // hide bar
+                                $('.files-grid-view.fm').removeClass('duplication-found');
+                                $('.duplicated-items-found').addClass('hidden');
+                            }
+                            else {
+                                // merge
+                                if (olderNode) {
+                                    // 2 items
+                                    pauseRecusrion = true;
+
+                                    var originalParent = M.d[olderNode].p;
+
+                                    var mergeOperation = M.moveNodes([olderNode],
+                                        M.RubbishID, true);
+
+                                    mergeOperation.always(function() {
+
+                                        M.moveNodes([olderNode],
+                                            originalParent, true, fileconflict.REPLACE).always(
+                                                function() {
+                                                    // no need to updateUI,
+                                                    // for optimization we will only hide the bar
+                                                    $('.files-grid-view.fm').removeClass('duplication-found');
+                                                    $('.duplicated-items-found').addClass('hidden');
+                                                    resolveDup(duplicateEntries, keys, ++kIndex, type,
+                                                        (checked) ? action : null);
+                                                }
+                                            );
+                                    });
+
+                                }
+                                else {
+                                    // coming from apply to all
+                                    for (var z = 0; z < duplicateEntries[type][name].length; z++) {
+                                        if (z === newestIndex) {
+                                            continue;
+                                        }
+                                        var newFolderName = fileconflict.findNewName(name, target);
+                                        M.rename(duplicateEntries[type][name][z], newFolderName);
                                     }
                                 }
                             }
+                            break;
+                    }
 
-                            switch (action) {
-                                case ns.REPLACE:
-                                    // rename old files
+                    !pauseRecusrion && resolveDup(duplicateEntries, keys, ++kIndex, type, (checked) ? action : null);
+                };
 
-                                    var newName;
-                                    if (olderNode) {
-                                        newName = fileconflict.findNewName(name, target);
-                                        M.rename(olderNode, newName);
-                                    }
-                                    else {
-                                        for (var h = 0; h < duplicateEntries[type][name].length; h++) {
-                                            if (h === newestIndex) {
-                                                continue;
-                                            }
-                                            newName = fileconflict.findNewName(name, target);
-                                            M.rename(duplicateEntries[type][name][h], newName);
-                                        }
-                                    }
-                                    break;
-                                case ns.KEEPBOTH:
-                                    // merge
-
-                                    break;
-                                case ns.DONTCOPY:
-                                    // keep the newest
-                                    if (type === 'files') {
-                                        if (olderNode) {
-                                            M.safeRemoveNodes(olderNode);
-                                        }
-                                        else {
-                                            var nodeToRemove = duplicateEntries[type][name].splice(newestIndex, 1);
-                                            M.safeRemoveNodes(nodeToRemove);
-                                        }
-                                    }
-                                    else {
-                                        // merge
-                                        if (olderNode) {
-                                            // 2 items
-                                            pauseRecusrion = true;
-
-                                            var originalParent = M.d[olderNode].p;
-
-                                            var mergeOperation = M.moveNodes([olderNode],
-                                                M.RubbishID, true);
-
-                                            mergeOperation.always(function() {
-
-                                                M.moveNodes([olderNode],
-                                                    originalParent, true, fileconflict.REPLACE).always(
-                                                        function() {
-                                                            // no need to updateUI,
-                                                            // for optimization we will only hide the bar
-                                                            $('.files-grid-view.fm').removeClass('duplication-found');
-                                                            $('.duplicated-items-found').addClass('hidden');
-                                                            resolveDup(duplicateEntries, keys, ++kIndex, type);
-                                                        }
-                                                    );
-                                            });
-
-                                        }
-                                    }
-                                    break;
-                            }
-
-                            !pauseRecusrion && resolveDup(duplicateEntries, keys, ++kIndex, type);
-                        }
-                    );
+                if (applyToAll) {
+                    contuineResolving(null, null, applyToAll, applyToAll);
+                }
+                else {
+                    fileconflict.prompt('dups', M.d[duplicateEntries[type][name][0]],
+                        M.d[duplicateEntries[type][name][1]], allDups - 1, target,
+                        duplicateEntries[type][name].length).always(
+                            contuineResolving
+                        );
+                }
             };
 
             resolveDup(dups, dupsKeys, 0, 'files');

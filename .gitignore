@@ -221,6 +221,7 @@ doc/
 test-results.xml
 .jscpd/
 jscpd-report.xml
+.eslintcache
 .coverage
 .tox
 js/tests/coverage

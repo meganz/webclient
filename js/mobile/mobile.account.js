@@ -29,6 +29,7 @@ mobile.account = {
         mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
+        mobile.account.initNotificationButton($page);
         mobile.account.initTitleMenu();
 
         // Initialise the top menu
@@ -144,8 +145,8 @@ mobile.account = {
             true    // Force clear cache
         );
     },
-    
-    
+
+
     /**
      * Displays the user's avatar, name and email
      * @param {String} $page The jQuery selector for the current page
@@ -528,6 +529,19 @@ mobile.account = {
 
             // Load the Session History page
             loadSubPage('fm/account/email-and-pass');
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the notification settings button to navigate the user to the notification settings page.
+     * @param $page
+     */
+    initNotificationButton: function($page) {
+        'use strict';
+
+        $page.find('.account-notifications-block').off('tap').on('tap', function() {
+            loadSubPage('fm/account/notifications');
             return false;
         });
     },

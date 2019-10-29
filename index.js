@@ -983,6 +983,11 @@ function init_page() {
         mobile.account.changePassword.init();
         return false;
     }
+    else if (is_mobile && fminitialized && u_type && page === 'fm/account/notifications') {
+        mobile.initDOM();
+        mobile.account.notifications.init();
+        return false;
+    }
     else if (page === 'achievements') {
         loadSubPage('fm/account/achievements');
         return false;

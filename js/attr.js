@@ -1198,6 +1198,9 @@ var attribCache = false;
                 mBroadcaster.sendMessage('attr:rp');
             }
         };
+        uaPacketParserHandler['^!enotif'] = function() {
+            mega.enotif.handleAttributeUpdate();
+        };
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

@@ -121,7 +121,7 @@ mega.ui.MegaInputs.prototype.titleTop._bindEvent = function() {
         $(this).parent().addClass('active');
     });
 
-    $input.rebind('blur.titleTop', function() {
+    $input.rebind('blur.titleTop, change.titleTop', function() {
 
         var $this = $(this);
 

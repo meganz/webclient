@@ -730,7 +730,7 @@ else {
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
     (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
 
 /**

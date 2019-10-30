@@ -69,6 +69,12 @@ function init_blog_callback() {
 }
 
 function init_blog() {
+
+    // Remove early.
+    if (is_mobile) {
+        $('.blog-new-right').addClass('hidden');
+    }
+
     if (blogposts) {
         return init_blog_callback();
     }

@@ -11862,8 +11862,69 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 }
 /** //End Mobile Notifications Page **/
 
-/* 
- * Retina Sprite for mobile 
+/** Mobile Blog **/
+@media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
+    .mobile .blog-new-item p,
+    .mobile .blog-new-full p,
+    .mobile .blog-new-small,
+    .mobile.blog-new-full ul li,
+    .mobile .sync li,
+    .mobile .blog-new-full ol li {
+        font-size: 1.1em;
+    }
+}
+.blog-new h2, .blog-new .blog-h2 {
+    margin: 0;
+    font-size: 1.3em;
+    line-height: 1.5em;
+    color: #333333;
+    display: block;
+    font-weight: normal;
+    padding: 22px 0 2px 0;
+    font-family: 'source_sans_proregular', Arial;
+}
+.blog-new-full-img {
+    max-width: 100%;
+    margin: 20px auto 15px auto;
+    display: block;
+}
+.blog-new-small {
+    color: #999a9c;
+    float: left;
+    line-height: 30px;
+    font-size: 16px;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica;
+    margin: 0 0 0 0;
+}
+.blog-new-date-div {
+    width: 2px;
+    height: 20px;
+    float: left;
+    background-color: #e3e3e3;
+    margin: 4px 10px 0px 10px;
+}
+.mobile .main-mid-pad.new-bottom-pages.blog-new {
+    font-size: 96%;
+}
+.blog-new-full p.small-pad-paragraph {
+    padding-top: 0;
+    padding-bottom: 15px;
+}
+.blog-new-item p, .blog-new-full p {
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 16px 0 0 281px;
+    font-size: 16px;
+    line-height: 30px;
+    color: #333333;
+}
+.blog-new-full p {
+    color: #3F4646;
+    padding: 10px 0 15px 0;
+}
+
+/*
+ * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.
  * New style should comes above on this.
  */
@@ -11924,7 +11985,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     }
 }
 
-/* 
+/*
  * Retina Sprite for mobile Ends
  * Please no more new styling after this.
  */

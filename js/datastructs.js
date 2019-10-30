@@ -1429,3 +1429,13 @@ MegaIntBitMap.prototype.valueChanged = function() {
         }, self.autoSaveTimeout);
     }
 };
+
+/**
+ * Triggered when the attribute is updated, thus updating our internal value.
+ * @return {MegaPromise}
+ */
+MegaIntBitMap.prototype.handleAttributeUpdate = function() {
+    'use strict';
+    this.isReadyPromise = null;
+    return this.isReady();
+};

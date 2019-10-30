@@ -271,7 +271,11 @@ function reselect(n) {
         }
     }
 
-    if (n) {
+    if (n && is_mobile) {
+        if ($.selected.length) {
+            mobile.cloud.scrollToFile($.selected[0]);
+        }
+    } else if (n) {
         var el, jsp;
 
         if (M.viewmode) {

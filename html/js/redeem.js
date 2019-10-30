@@ -733,50 +733,40 @@ var redeem = {
     getVoucherData: function(code, promo) {
         'use strict';
 
-        var operation = new MegaPromise();
+        return new MegaPromise(function(resolve, reject) {
+            var parse = function(v) {
+                var b = v.promotional ? v.value : (v.balance + v.value);
+                var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
+                v.planId = p[0];
+                v.proNum = p[1];
+                v.storage = p[2];
+                v.bandwidth = p[3];
+                v.months = p[4];
+                v.price = p[5];
 
-        var parse = function(v) {
-            var b = v.promotional ? v.value : (v.balance + v.value);
-            var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
-            v.planId = p[0];
-            v.proNum = p[1];
-            v.storage = p[2];
-            v.bandwidth = p[3];
-            v.months = p[4];
-            v.price = p[5];
+                if (v.available && v.proNum) {
+                    return resolve(v);
+                }
+                reject(v);
+            };
 
-            if (v.available && v.proNum) {
-                return operation.resolve(v);
+            code = code || localStorage.voucher;
+            if (mega.voucher && mega.voucher.code === code) {
+                return parse(mega.voucher);
             }
-            return operation.reject(v);
-        };
 
-        code = code || localStorage.voucher;
-        if (mega.voucher && mega.voucher.code === code) {
-            return parse(mega.voucher);
-        }
+            var request = [
+                {a: 'uavq', f: 1, v: code},
+                {a: 'uq', pro: 1, gc: 1},
+                {a: 'utqa', nf: 1}
+            ];
 
-        var request = [
-            { a: 'uavq', f: 1, v: code },
-            { a: 'uq', pro: 1, gc: 1 },
-            { a: 'utqa', nf: 1 }
-        ];
-
-        if (promo === undefined) {
-            promo = localStorage[code];
-        }
-        if (promo !== undefined) {
-            request[0].p = promo;
-            request[0].a = 'epcq';
-        }
-
-        api_req(request, {
-            callback: function(res, ctx, rr, resF) {
-                if (res && typeof res === 'object') {
-                    var v = res;
-                    v.balance = parseFloat((((resF[1] || []).balance || [])[0] || [])[0]) || 0;
+            var callback = function(meh, ctx, rr, res) {
+                if (res && typeof res[0] === 'object') {
+                    var v = res[0];
+                    v.balance = parseFloat((((res[1] || []).balance || [])[0] || [])[0]) || 0;
                     v.value = parseFloat(v.value);
-                    v.plans = resF[2];
+                    v.plans = res[2];
                     v.code = code;
 
                     if (promo !== undefined) {
@@ -790,12 +780,21 @@ var redeem = {
                         return parse(v);
                     }
                 }
-                else {
-                    return operation.reject(ENOENT);
-                }
+
+                reject(ENOENT);
+            };
+
+            if (promo === undefined) {
+                promo = localStorage[code];
             }
+
+            if (promo !== undefined) {
+                request[0].p = promo;
+                request[0].a = 'epcq';
+            }
+
+            api_req(request, {callback: tryCatch(callback, reject)});
         });
-        return operation;
     },
 
     /**

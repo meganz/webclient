@@ -773,22 +773,23 @@ Call.prototype._getLocalVideo = function(screenCapture) {
             pms = RTC.getUserMedia({audio: false, video: vidOpts});
         }
         pms.then(function(stream) {
-            if (resolved) {
+            if (resolved || self.state >= CallState.kTerminating) {
                 RTC.stopMediaStream(stream);
                 return;
             }
             resolved = true;
-            if (self.state >= CallState.kTerminating) {
-                RTC.stopMediaStream(stream);
-                return;
-            }
             var track = stream.getVideoTracks()[0];
             if (!track) {
-                return Promise.reject("Can't get video stream");
+                RTC.stopMediaStream(stream);
+                return Promise.reject("Stream has no video track");
             }
-            self._fire('onLocalMediaObtained', stream);
 
-            self.gLocalStream.addTrack(track);
+            if (self.gLocalStream) {
+                self.gLocalStream.addTrack(track);
+            } else {
+                self.gLocalStream = stream;
+            }
+            self._fire('onLocalMediaObtained');
             resolve(self.gLocalStream);
         })
         .catch(function(err) {
@@ -1236,7 +1237,7 @@ Call.prototype.msgCallReqCancel = function(packet) {
         return;
     }
     if (this.state >= CallState.kCallInProgress) {
-        if (this.state === CallState.kCallInProress) {
+        if (this.state === CallState.kCallInProgress) {
             this.logger.warn("Ignoring unexpected CALL_REQ_CANCEL while call in progress");
         } else {
             this.logger.log("Ignoring CALL_REQ_CANCEL for an ended call in state ",
@@ -1944,8 +1945,7 @@ Call.prototype._startOrJoin = function(av) {
     }
     return pms
     .catch(function(err) {
-        self._destroy(Term.kErrLocalMedia, true, err);
-        return Promise.reject(err);
+        self.logger.warn("Couldn't get local stream, continuing as receive-only");
     })
     .then(function() {
         if (self.isJoiner) {
@@ -2292,6 +2292,7 @@ Call.prototype._notifySessionConnected = function(sess) {
 };
 
 Call.prototype.enableAudio = function(enable) {
+    // Tolerates both localStream === null and localStream not having an audio track
     var self = this;
     if (self.state >= CallState.kTerminating) {
         self.logger.warn("enableAudio: Call is terminating");
@@ -2299,10 +2300,6 @@ Call.prototype.enableAudio = function(enable) {
     }
     if (self._localMuteCompletePromise) {
         self.logger.warn("enableAudio: Local mute/unmute already in progress");
-        return;
-    }
-    var s = self.gLocalStream;
-    if (!s) {
         return;
     }
     var oldAv = self.localAv();
@@ -2318,10 +2315,10 @@ Call.prototype.enableAudio = function(enable) {
         return;
     }
     self._notifyLocalMuteInProgress();
-    Av.enableAudio(s, enable);
+    var success = Av.enableAudio(self.gLocalStream, enable);
     self._notifyLocalMuteComplete();
-    if (hadAudio === enable) {
-        self.logger.warn("Failed to enable/disable audio");
+    if (!success) {
+        self.logger.warn("Failed to enable audio: there is no local stream or no audio tracks in it");
         return;
     }
     self._bcastLocalAvChange();
@@ -2364,6 +2361,7 @@ Call.prototype._enableVideo = function(screen) {
         self.logger.warn(msg);
         return Promise.reject(msg);
     }
+
     self._isCapturingScreen = screen;
     self._notifyLocalMuteInProgress();
     var sessions = self.sessions;
@@ -3014,7 +3012,8 @@ Session.prototype._createRtcConn = function() {
         }
         // mLineIdx.1 midLen.1 mid.midLen candLen.2 cand.candLen
         var cand = event.candidate;
-        if (!cand) {
+        var candString;
+        if (!cand || (candString = cand.candidate).length === 0) {
             // Edge needs a null candidate to signal end of received candidates, but current clients
             // don't tolerate ICE_CANDATE packets without payload, so we introduce a new packet type
             // that will be simply ignored by older clients
@@ -3024,7 +3023,7 @@ Session.prototype._createRtcConn = function() {
         if (localStorage.forceRelay) {
         // "manual" match, in theory should not be needed, as we specify iceTransportPolicy=relay
         // but just in case iceTransportPolicy is not recognized
-            var m = cand.candidate.match(/typ\s([^\s]+)/);
+            var m = candString.match(/typ\s([^\s]+)/);
             if (m && (m.length > 1)) {
                 var ctype = m[1];
                 if (ctype !== 'relay') {
@@ -3042,8 +3041,8 @@ Session.prototype._createRtcConn = function() {
         } else {
             data += '\0';
         }
-        data += Chatd.pack16le(cand.candidate.length);
-        data += cand.candidate;
+        data += Chatd.pack16le(candString.length);
+        data += candString;
         self.cmd(RTCMD.ICE_CANDIDATE, data);
     };
     conn.onaddstream = function(event) {
@@ -3121,6 +3120,7 @@ Session.prototype._createRtcConn = function() {
         } else if (state === 'connected') {
             self._setState(SessState.kSessInProgress);
             self._tsIceConn = Date.now();
+            self._fire("onConnect");
             if (RTC.Stats) {
                 self._lostAudioPktAvg = 0;
                 self.statRecorder = new RTC.Stats.Recorder(conn, 5, self);
@@ -3561,6 +3561,8 @@ Session.prototype.msgIceCandidate = function(packet) {
 
     self.rtcConn.addIceCandidate(cand)
     .catch(function(err) {
+        self.logger.error("addIceCandidate() failed: " + (err.stack || err.message || err) +
+            "\ncand = " + cand);
         self.terminateAndDestroy(Term.kErrProtocol, err);
     });
 };
@@ -3574,6 +3576,7 @@ Session.prototype.msgEndIceCandidates = function(packet) {
     }
     self.rtcConn.addIceCandidate(null)
     .catch(function(err) {
+        self.logger.error("addIceCandidate(null) failed: " + err.stack || err.message || err);
         self.terminateAndDestroy(Term.kErrProtocol, err);
     });
 };
@@ -3848,19 +3851,22 @@ Av.toMediaOptions = function(av) {
 };
 
 Av.enableTracks = function(tracks, enable) {
-    if (!tracks) {
-        return;
+    if (!tracks || tracks.length === 0) {
+        return false;
     }
     var len = tracks.length;
     for (var i = 0; i < len; i++) {
         tracks[i].enabled = enable;
     }
+    return true;
 };
 
 Av.enableAudio = function(stream, enable) {
-    if (stream) {
-        Av.enableTracks(stream.getAudioTracks(), enable);
+    var ret = stream ? Av.enableTracks(stream.getAudioTracks(), enable) : false;
+    if (ret) {
+        return true;
     }
+    return enable ? false : true; // disable on null stream is considered successful
 };
 
 Av.applyToStream = function(stream, av) {

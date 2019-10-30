@@ -1313,7 +1313,7 @@ function processEmailChangeActionPacket(ap) {
                     mega.config.set('rubsched', undefined);
                 }
 
-                if (fminitialized) {
+                if (fminitialized && (!is_mobile || page !== 'fm/account/notifications')) {
                     var view = Object(fmconfig.viewmodes)[M.currentdirid];
                     var sort = Object(fmconfig.sortmodes)[M.currentdirid];
 
@@ -1366,9 +1366,11 @@ function processEmailChangeActionPacket(ap) {
             })
             .finally(function() {
                 // Initialize account notifications.
-                if (!is_mobile) {
-                    mega.notif.setup(fmconfig.anf);
-                    if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                mega.notif.setup(fmconfig.anf);
+                if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                    if (is_mobile && page === 'fm/account/notifications') {
+                        mobile.account.notifications.render();
+                    } else if (!is_mobile) {
                         accountUI.renderAccountPage(M.account);
                     }
                 }

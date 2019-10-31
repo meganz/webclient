@@ -5836,6 +5836,7 @@ select.mobile.dropdown-style {
     background-color: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
     border: 1px solid #D82928;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.11), inset 0 -7px 8px 0 rgba(241,6,6,0.40);
+    color: #fff;
 }
 .mobile.cta-button.green {
     border: 1px solid #00A58F;

@@ -1,4 +1,4 @@
-.user-management-dialog.bus-pw-reset .notification-label.nw-fm-dialog-title, .fm-dialog-title {
+.nw-fm-dialog-title, .fm-dialog-title {
     font-size: 20px;
     color: #333333;
     line-height: 30px;
@@ -13,7 +13,6 @@
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    line-height: 24px;
 }
 .fm-dialog-title.small {
     font-family: 'LatoWeb', 'source_sans_proregular';
@@ -5116,16 +5115,19 @@ body.en .register-side-pane.container.visible {
 }
 .user-management-dialog.bus-pw-reset .bus-pw-wrapper {
     padding: 0 8px;
+    margin-top: 40px;
 }
 .user-management-dialog.bus-pw-reset .dialog-subtitle {
-    margin: 0 auto 40px;
+    margin: 0 auto 16px;
 }
 .user-management-dialog.bus-pw-reset .notification-label {
     display: inline-block;
-    margin-bottom: 16px;
+    margin-bottom: 40px;
+    width: 500px;
+    text-align: left;
 }
-.user-management-dialog.bus-pw-reset .big-green-button {
-    margin-bottom: 48px;
+.user-management-dialog.bus-pw-reset .notification-cell {
+    vertical-align: top;
 }
 .user-management-dialog.bus-pw-reset .verification-container .icons-sprite.medium-icon {
     position: absolute;

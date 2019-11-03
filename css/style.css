@@ -585,7 +585,7 @@ label span.black {
     min-height: 28px;
     border:1px solid rgba(0,0,0,0.1);
     background: #fafafa;
-    padding:3px 11px;
+    padding: 4px 10px;
     box-sizing: border-box;
     border-radius: 4px;
 }
@@ -606,10 +606,17 @@ label span.black {
     border: 1px solid rgba(255,111,0,0.1);
     color: #FF6F00;
 }
+.notification-label.warning i {
+    background-position: -5px -1730px;
+    margin-top: 1px;
+}
 .notification-label.error {
     background-color: #FF333A;
     border: 1px solid rgba(0,0,0,0.1);
     color: #ffffff;
+}
+.notification-label.error i {
+    background-position: -110px -1770px;
 }
 /*End of common notification label*/
 .register-pass-status-block {
@@ -30593,7 +30600,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 /*temp code, will be removed after generic component.css is merged*/
 .context-txt {
     font-size: 14px;
-    line-height: 21px;
+    line-height: 20px;
     color: #999;
 }
 .context-txt.dark {

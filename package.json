@@ -54,7 +54,7 @@
     "prop-types": "15.7.2",
     "react-hot-loader": "4.12.15",
     "webpack": "4.41.2",
-    "webpack-cli": "3.3.9"
+    "webpack-cli": "3.3.10"
   },
   "devDependencies": {
     "babel-eslint": "10.0.3",
@@ -88,8 +88,6 @@
     "karma-sinon": "1.0.5",
     "mocha": "6.2.2",
     "phantomjs-prebuilt": "2.1.16",
-    "react": "16.11.0",
-    "react-dom": "16.11.0",
     "sinon": "7.5.0",
     "webpack-dev-server": "3.9.0"
   }

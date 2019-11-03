@@ -77,7 +77,7 @@
         "no-eval": 2,
         "no-extend-native": 2,
         "no-extra-bind": 2,
-        "no-extra-parens": [2, "all", {"conditionalAssign": false}],
+        "no-extra-parens": [1, "all", {"conditionalAssign": false}],
         "no-floating-decimal": 2,
         "no-global-assign": 2,
         "no-implicit-coercion": [2, { "allow": ["!!", "+"] } ],

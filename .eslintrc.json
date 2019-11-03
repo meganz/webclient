@@ -80,6 +80,7 @@
         "no-extra-parens": [2, "all", {"conditionalAssign": false}],
         "no-floating-decimal": 2,
         "no-global-assign": 2,
+        "no-implicit-coercion": [2, { "allow": ["!!", "+"] } ],
         "no-implied-eval": 2,
         "no-import-assign": 2,
         "no-invalid-this": 0,

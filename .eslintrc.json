@@ -169,6 +169,7 @@
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],
+        "sonarjs/no-duplicate-string": 1,
 
         "unicorn/catch-error-name": [2, {"name": "ex"}],
         "unicorn/consistent-function-scoping": 1,

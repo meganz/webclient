@@ -1760,38 +1760,113 @@ MegaUtils.prototype.readFileEntry = function(entry, meth) {
  * Helper function to quickly perform an IndexedDB (Dexie) operation
  * @param {String} name The database name
  * @param {Object} schema The database schema, Dexie-style
- * @param {MegaPromise} promise A promise to signal rejections
- * @param {Function} callback A function to invoke the required operation
+ * @returns {Promise}
  */
-MegaUtils.prototype.onDexieDB = function(name, schema, promise, callback) {
+MegaUtils.prototype.onDexieDB = promisify(function(resolve, reject, name, schema) {
     'use strict';
 
     var db = new Dexie(name);
     db.version(1).stores(schema);
-    db.open().then(function() {
-        callback(db)
-            .catch(function(e) {
-                promise.reject(e);
-            })
-            .finally(function() {
-                db.close();
-            });
-    }).catch(function(e) {
-        promise.reject(e);
-        db.close();
+    db.open().then(resolve.bind(null, db)).catch(function(ex) {
+        onIdle(db.close.bind(db));
+
+        if (ex && ex.name === 'InvalidStateError') {
+            // Firefox in PBM?
+            return resolve(null);
+        }
+
+        reject(ex);
     });
-};
+});
 
 /**
  * Wrapper around M.onDexieDB() for the persistent storage functions.
- * @param {MegaPromise} promise A promise to signal rejections
- * @param {Function} callback A function to invoke the required operation
+ * @param {String} [action] Pre-defined action to perform.
+ * @param {String} [key] action key.
+ * @param {String} [value] action key value.
+ * @returns {Promise}
  */
-MegaUtils.prototype.onPersistentDB = function(promise, callback) {
+MegaUtils.prototype.onPersistentDB = promisify(function(resolve, reject, action, key, value) {
     'use strict';
 
-    this.onDexieDB('$ps', {kv: '&k'}, promise, callback);
-};
+    this.onDexieDB('$ps', {kv: '&k'}).then(function(db) {
+        if (!action) {
+            // No pre-defined action given, the caller is responsible of db.close()'ing
+            resolve(db);
+        }
+        else if (db) {
+            var c = db.kv;
+            var r = action === 'get' ? c.get(key) : action === 'set' ? c.put({k: key, v: value}) : c.delete(key);
+
+            r.then(function(result) {
+                onIdle(db.close.bind(db));
+                resolve(action === 'get' ? result.v : null);
+            }).catch(reject);
+        }
+        else {
+            M.onPersistentDB.fallback.call(null, action, key, value).then(resolve, reject);
+        }
+    }, reject);
+});
+
+/**
+ * indexedDB persistence fallback.
+ * @param {String} action The fallback action being performed
+ * @param {String} key The storage key identifier
+ * @param {*} [value] The storage key value
+ * @returns {Promise}
+ */
+MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject, action, key, value) {
+    'use strict';
+    var pfx = '$ps!';
+    key = pfx + (key || '');
+
+    var getValue = function(key) {
+        var value = localStorage[key];
+        if (value) {
+            value = tryCatch(JSON.parse.bind(JSON))(value) || value;
+        }
+        return value;
+    };
+
+    if (action === 'set') {
+        value = tryCatch(JSON.stringify.bind(JSON))(value) || value;
+        if (d && String(value).length > 4096) {
+            console.warn('Storing more than 4KB...', key, [value]);
+        }
+        localStorage[key] = value;
+    }
+    else if (action === 'get') {
+        value = getValue(key);
+    }
+    else if (action === 'rem') {
+        value = localStorage[key];
+        delete localStorage[key];
+    }
+    else if (action === 'enum') {
+        var entries = Object.keys(localStorage)
+            .filter(function(k) {
+                return k.startsWith(key);
+            })
+            .map(function(k) {
+                return k.substr(pfx.length);
+            });
+        var result = entries;
+
+        if (value) {
+            // Read contents
+            result = Object.create(null);
+
+            for (var i = entries.length; i--;) {
+                result[entries[i]] = getValue(pfx + entries[i]);
+            }
+        }
+
+        value = result;
+    }
+
+    resolve(value);
+});
 
 // Get FileSystem storage ignoring polyfills.
 Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
@@ -1812,27 +1887,25 @@ Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
  * Get access to persistent FileSystem storage
  * @param {Boolean} [writeMode] Whether we want write access
  * @param {String|Number} [token] A token to store reusable fs instances
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.getFileSystemAccess = function(writeMode, token) {
+MegaUtils.prototype.getFileSystemAccess = promisify(function(resolve, reject, writeMode, token) {
     'use strict';
 
     var self = this;
-    var promise = new MegaPromise();
 
     if (Object(this.fscache[token]).ts + 7e6 > Date.now()) {
-        promise.resolve(this.fscache[token].fs);
+        resolve(this.fscache[token].fs);
     }
     else if (navigator.webkitPersistentStorage && M.requestFileSystem) {
-        var reject = promise.reject.bind(promise);
-        var resolve = function(fs) {
+        var success = function(fs) {
             if (token) {
                 self.fscache[token] = {ts: Date.now(), fs: fs};
             }
-            promise.resolve(fs);
+            resolve(fs);
         };
         var request = function(quota) {
-            M.requestFileSystem(1, quota, resolve, reject);
+            M.requestFileSystem(1, quota, success, reject);
         };
 
         delete this.fscache[token];
@@ -1849,83 +1922,65 @@ MegaUtils.prototype.getFileSystemAccess = function(writeMode, token) {
         }, reject);
     }
     else {
-        promise.reject(ENOENT);
+        reject(ENOENT);
     }
-
-    return promise;
-};
+});
 
 /**
  * Get access to an entry in persistent FileSystem storage
  * @param {String} filename The filename under data will be stored
  * @param {Boolean} [create] Whether the file(s) should be created
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.getFileSystemEntry = function(filename, create) {
+MegaUtils.prototype.getFileSystemEntry = promisify(function(resolve, reject, filename, create) {
     'use strict';
-
-    var promise = new MegaPromise();
-    var reject = promise.reject.bind(promise);
 
     create = create || false;
 
     this.getFileSystemAccess(create, seqno)
-        .tryCatch(function(fs) {
+        .then(function(fs) {
             if (String(filename).indexOf('/') < 0) {
                 filename += '.mega';
             }
-            fs.root.getFile(filename, {create: create},
-                function(entry) {
-                    promise.resolve(entry, fs);
-                }, reject);
+            fs.root.getFile(filename, {create: create}, resolve, reject);
         }, reject);
-
-    return promise;
-};
+});
 
 /**
  * Retrieve metadata for a filesystem entry
  * @param {FileEntry|String} entry A FileEntry instance or filename
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.getFileEntryMetadata = function(entry) {
+MegaUtils.prototype.getFileEntryMetadata = promisify(function(resolve, reject, entry) {
     'use strict';
 
-    var promise = new MegaPromise();
-    var reject = promise.reject.bind(promise);
     var getMetadata = function(entry) {
-        entry.getMetadata(promise.resolve.bind(promise), reject);
+        entry.getMetadata(resolve, reject);
     };
 
     if (String(entry) === '[object FileEntry]') {
         getMetadata(entry);
     }
     else {
-        this.getFileSystemEntry(entry).tryCatch(getMetadata, reject);
+        this.getFileSystemEntry(entry).then(getMetadata).catch(reject);
     }
-
-    return promise;
-
-};
+});
 
 /**
  * Retrieve all *root* entries in the FileSystem storage.
  * @param {String} [aPrefix] Returns entries matching with this prefix
  * @param {Boolean} [aMetaData] Whether metadata should be retrieved as well, default to true
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.getFileSystemEntries = function(aPrefix, aMetaData) {
+MegaUtils.prototype.getFileSystemEntries = promisify(function(resolve, reject, aPrefix, aMetaData) {
     'use strict';
 
-    var promise = new MegaPromise();
-    var reject = promise.reject.bind(promise);
-
     this.getFileSystemAccess(false, seqno)
-        .tryCatch(function(fs) {
+        .then(function(fs) {
             var entries = [];
             var reader = fs.root.createReader();
 
-            var resolve = function() {
+            var success = function() {
                 var mega = Object.create(null);
 
                 for (var i = entries.length; i--;) {
@@ -1935,7 +1990,7 @@ MegaUtils.prototype.getFileSystemEntries = function(aPrefix, aMetaData) {
                         mega[name.substr(0, name.length - 5)] = entries[i];
                     }
                 }
-                promise.resolve(mega, entries, fs);
+                resolve(mega);
             };
 
             var getMetadata = function(idx) {
@@ -1944,7 +1999,7 @@ MegaUtils.prototype.getFileSystemEntries = function(aPrefix, aMetaData) {
                 };
 
                 if (idx === entries.length) {
-                    resolve();
+                    success();
                 }
                 else if (entries[idx].isFile) {
                     entries[idx].getMetadata(function(metadata) {
@@ -1977,83 +2032,83 @@ MegaUtils.prototype.getFileSystemEntries = function(aPrefix, aMetaData) {
                         getMetadata(0);
                     }
                     else {
-                        resolve();
+                        success();
                     }
                 }, reject);
             })();
-
-        }, reject);
-
-    return promise;
-};
+        }).catch(reject);
+});
 
 /**
  * Retrieve data saved into persistent storage
  * @param {String} k The key identifying the data
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.getPersistentData = function(k) {
+MegaUtils.prototype.getPersistentData = promisify(function(resolve, reject, k) {
     'use strict';
 
     var self = this;
-    var promise = new MegaPromise();
+    var fallback = function() {
+        self.onPersistentDB('get', k).then(resolve, reject);
+    };
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k);
 
-        tmpPromise.done(function(entry) {
+        tmpPromise.then(function(entry) {
             tmpPromise = self.readFileEntry(entry, 'readAsText');
 
-            tmpPromise.done(function(data) {
+            tmpPromise.then(function(data) {
                 try {
-                    return promise.resolve(JSON.parse(data));
+                    return resolve(JSON.parse(data));
                 }
                 catch (_) {
                 }
 
-                promise.resolve(data);
+                resolve(data);
             });
 
-            promise.linkFailTo(tmpPromise);
+            tmpPromise.catch(reject);
+        }).catch(function(ex) {
+            if (ex && ex.name === 'SecurityError') {
+                // Running on Incognito mode?
+                return fallback();
+            }
+            reject(ex);
         });
-
-        promise.linkFailTo(tmpPromise);
     }
     else {
-        this.onPersistentDB(promise, function(db) {
-            return db.kv.get(k).then(function(store) {
-                promise.resolve(store.v);
-            });
-        });
+        fallback();
     }
-
-    return promise;
-};
+});
 
 /**
  * Save data into persistent storage
  * @param {String} k The key identifying the data to store
  * @param {*} v The value/data to store
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.setPersistentData = function(k, v) {
+MegaUtils.prototype.setPersistentData = promisify(function(resolve, reject, k, v) {
     'use strict';
 
-    var promise = new MegaPromise();
+    var self = this;
+    var fallback = function() {
+        self.onPersistentDB('set', k, v).then(resolve, reject);
+    };
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k, true);
 
-        tmpPromise.done(function(entry) {
+        tmpPromise.then(function(entry) {
             entry.createWriter(function(writer) {
 
                 writer.onwriteend = function() {
                     if (writer.readyState !== writer.DONE) {
-                        return promise.reject(EACCESS);
+                        return reject(EACCESS);
                     }
 
                     writer.onwriteend = function() {
-                        promise.resolve();
+                        resolve();
                     };
 
                     tmpPromise = M.toArrayBuffer(v)
@@ -2063,58 +2118,55 @@ MegaUtils.prototype.setPersistentData = function(k, v) {
                 };
 
                 writer.onerror = function(e) {
-                    promise.reject(e);
+                    reject(e);
                 };
 
                 writer.truncate(0);
 
-            }, function(e) {
-                promise.reject(e);
-            });
+            }, reject);
+        }).catch(function(ex) {
+            if (Object(ex).name === 'SecurityError') {
+                // Running on Incognito mode?
+                return fallback();
+            }
+            reject(ex);
         });
-
-        promise.linkFailTo(tmpPromise);
     }
     else {
-        this.onPersistentDB(promise, function(db) {
-            return db.kv.put({k: k, v: v}).then(function() {
-                promise.resolve();
-            });
-        });
+        fallback();
     }
-
-    return promise;
-};
+});
 
 /**
  * Remove previously stored persistent data
  * @param {String} k The key identifying the data
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.delPersistentData = function(k) {
+MegaUtils.prototype.delPersistentData = promisify(function(resolve, reject, k) {
     'use strict';
 
-    var promise = new MegaPromise();
+    var self = this;
+    var fallback = function() {
+        self.onPersistentDB('rem', k).then(resolve, reject);
+    };
 
     if (M.requestFileSystem) {
         var tmpPromise = this.getFileSystemEntry(k);
 
-        tmpPromise.done(function(entry) {
-            entry.remove(promise.resolve.bind(promise), promise.reject.bind(promise));
+        tmpPromise.then(function(entry) {
+            entry.remove(resolve, reject);
+        }).catch(function(ex) {
+            if (ex && ex.name === "SecurityError") {
+                // Running on Incognito mode?
+                return fallback();
+            }
+            reject(ex);
         });
-
-        promise.linkFailTo(tmpPromise);
     }
     else {
-        this.onPersistentDB(promise, function(db) {
-            return db.kv.delete(k).then(function() {
-                promise.resolve();
-            });
-        });
+        fallback();
     }
-
-    return promise;
-};
+});
 
 /**
  * Enumerates all persistent data entries
@@ -2122,21 +2174,50 @@ MegaUtils.prototype.delPersistentData = function(k) {
  * @param {Boolean} [aReadContents] Whether the contents must be read as well
  * @returns {MegaPromise}
  */
-MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) {
+MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, reject, aPrefix, aReadContents) {
     'use strict';
 
-    var promise = new MegaPromise();
+    var self = this;
+    var fallback = function() {
+        self.onPersistentDB().then(function(db) {
+            if (db) {
+                var dbc = db.kv;
+
+                if (aPrefix) {
+                    dbc = dbc.where('k').startsWith(aPrefix);
+                }
+                else {
+                    dbc = dbc.toCollection();
+                }
+
+                dbc[aReadContents ? 'toArray' : 'keys']()
+                    .then(function(entries) {
+                        onIdle(db.close.bind(db));
+
+                        if (!aReadContents) {
+                            return resolve(entries);
+                        }
+
+                        var result = Object.create(null);
+                        for (var i = entries.length; i--;) {
+                            result[entries[i].k] = entries[i].v;
+                        }
+                        resolve(result);
+                    });
+            }
+            else {
+                self.onPersistentDB.fallback('enum', aPrefix, aReadContents).then(resolve, reject);
+            }
+        }, reject);
+    };
 
     if (M.requestFileSystem) {
         this.getFileSystemEntries(aPrefix, false)
-            .fail(function() {
-                promise.reject.apply(promise, arguments);
-            })
-            .done(function(result) {
+            .then(function(result) {
                 var entries = Object.keys(result);
 
                 if (!aReadContents) {
-                    return promise.resolve(entries);
+                    return resolve(entries);
                 }
 
                 (function _readEntries(idx) {
@@ -2145,7 +2226,7 @@ MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) 
                     };
 
                     if (idx === entries.length) {
-                        promise.resolve(result);
+                        resolve(result);
                     }
                     else {
                         M.readFileEntry(result[entries[idx]], 'readAsText')
@@ -2162,35 +2243,18 @@ MegaUtils.prototype.getPersistentDataEntries = function(aPrefix, aReadContents) 
                             });
                     }
                 })(0);
+            }).catch(function(ex) {
+                if (Object(ex).name === "SecurityError") {
+                    // Running on Incognito mode?
+                    return fallback();
+                }
+                reject(ex);
             });
     }
     else {
-        this.onPersistentDB(promise, function(db) {
-            var dbc = db.kv;
-
-            if (aPrefix) {
-                dbc = dbc.where('k').startsWith(aPrefix);
-            }
-            else {
-                dbc = dbc.toCollection();
-            }
-
-            return dbc[aReadContents ? 'toArray' : 'keys']()
-                .then(function(entries) {
-                    if (!aReadContents) {
-                        return promise.resolve(entries);
-                    }
-                    var result = Object.create(null);
-                    for (var i = entries.length; i--;) {
-                        result[entries[i].k] = entries[i].v;
-                    }
-                    promise.resolve(result);
-                });
-        });
+        fallback();
     }
-
-    return promise;
-};
+});
 
 /**
  * Returns the name of a country given a country code in the users current language.

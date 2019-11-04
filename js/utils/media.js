@@ -1331,6 +1331,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
         s.abort = destroy;
 
+        if (!u_type) {
+            mBroadcaster.once('login', function() {
+                if (s.isOverQuota) {
+                    s.file.flushRetryQueue();
+                }
+            });
+        }
+
         s.on('inactivity', function(ev) {
             // Event invoked when the video becomes stalled, we'll show the loading/buffering spinner
             if (d) {

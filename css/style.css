@@ -4966,58 +4966,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: #fafafa;
     height: 35px;
 }
-.nw-fm-left-icon.rubbish-bin::after {
-    content: '';
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    width: 6px;
-    height: 6px;
-    background-color: rgba(19,224,60,1);
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-}
-.nw-fm-left-icon.rubbish-bin.filled::after {
-    -webkit-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -moz-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -o-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -ms-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    transition: opacity 0.2s, background-color 0.2s 0.8s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    background-color: rgba(19,224,60,0.5);
-}
-.nw-fm-left-icon.rubbish-bin.filled.glow::after {
-    -webkit-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -moz-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -o-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -ms-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    transition: background-color 0.2s, opacity 0.2s 0.8s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-    background-color: rgba(19,224,60,1);
-}
-.nw-fm-left-icon.rubbish-bin.filled:hover::after, .nw-fm-left-icon.rubbish-bin.filled.active::after {
-    -webkit-transition: background-color 0.2s, opacity 0.2s;
-    -moz-transition: background-color 0.2s, opacity 0.2s;
-    -o-transition: background-color 0.2s, opacity 0.2s;
-    -ms-transition: background-color 0.2s, opacity 0.2s;
-    transition: background-color 0.2s, opacity 0.2s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    background-color: rgba(19,224,60,1);
-}
 .nw-fm-left-icons-panel {
     background-color: #222222;
     width: 48px;

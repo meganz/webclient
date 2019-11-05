@@ -1228,8 +1228,6 @@ var addressDialog = {
         var numOfMonths;
         var monthsWording;
 
-        this.$dialog.find('.plan-icon .reg-st3-membership-icon').removeClass('hidden');
-
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
@@ -1258,12 +1256,10 @@ var addressDialog = {
             this.businessPlan.totalUsers = this.userInfo.nbOfUsers;
             numOfMonths = this.businessPlan.m;
 
-            this.$dialog.find('.plan-icon .reg-st3-membership-icon').addClass('hidden');
             // auto renew is mandatory in business
             this.$dialog.find('.payment-buy-now').text(l[6172]);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
-
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 bus-plan-icon64')

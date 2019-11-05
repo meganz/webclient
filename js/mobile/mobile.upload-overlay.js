@@ -138,17 +138,38 @@ mobile.uploadOverlay = {
                 file.id = '8001';
                 file.ownerId = u_attr.u;
 
-                // Start the upload, this happens automatically using the desktop code
-                ul_queue.push(file);
+                // Check for file conflicts.
+                fileconflict.check(
+                    [file],
+                    file.target,
+                    fileversioning.dvState ? 'replace' : 'upload',
+                    0
+                ).done(function(filesToUpload) {
+                    loadingDialog.hide();
+                    if (filesToUpload.length) {
 
-                // Set the start time
-                mobile.uploadOverlay.startTime = new Date().getTime();
+                        // Start the upload, this happens automatically using the desktop code
+                        ul_queue.push(file);
 
-                // Show progress bar
-                $pageBody.addClass('uploading');
+                        // Set the start time
+                        mobile.uploadOverlay.startTime = new Date().getTime();
 
-                // Add a class to make the progress block text grey and show text Starting...
-                $uploadProgressText.addClass('starting-upload').text(l[7022] + '...');
+                        // Upload filename incase it changed during conflict resolution.
+                        $('.filename', $overlay).text(file.name);
+
+                        // Show progress bar
+                        $pageBody.addClass('uploading');
+
+                        // Add a class to make the progress block text grey and show text Starting...
+                        $uploadProgressText.addClass('starting-upload').text(l[7022] + '...');
+                    }
+                    else {
+                        mobile.uploadOverlay.close();
+                    }
+                }).always(function() {
+                    // Set Flag
+                    ulmanager.isUploading = Boolean(ul_queue.length);
+                });
             }
             catch (exception) {
                 console.error('Upload error: ' + file.name, exception);
@@ -156,9 +177,6 @@ mobile.uploadOverlay = {
                 return false;
             }
         }
-
-        // Set flag
-        ulmanager.isUploading = Boolean(ul_queue.length);
     },
 
     /**
@@ -281,6 +299,9 @@ mobile.uploadOverlay = {
         // Show and initialise the Upload Another File button
         $uploadAnotherFileButton.removeClass('hidden').off('tap').on('tap', function() {
 
+            // Clear the file input enabling the user to select the same file again if they so wanted.
+            $fileInput.val(null);
+
             // Open the file picker
             $fileInput.trigger('click');
 
@@ -299,18 +320,30 @@ mobile.uploadOverlay = {
 
         'use strict';
 
+        var self = this;
         var $overlay = $('.mobile.upload-overlay');
         var $closeIcon = $overlay.find('.fm-dialog-close, .close-button' );
 
         // On tapping/clicking the Close icon
         $closeIcon.off('tap').on('tap', function() {
-
-            ulmanager.abort(null);
-            delete ulmanager.ulCompletingPhase['ul_8001'];
-
-            // Close the upload overlay
-            $overlay.addClass('hidden').removeClass('overlay');
+            self.close();
             return false;
         });
+    },
+
+    /**
+     * Close upload overlay.
+     * @return {void}
+     */
+    close: function() {
+        'use strict';
+
+        var $overlay = $('.mobile.upload-overlay');
+
+        ulmanager.abort(null);
+        delete ulmanager.ulCompletingPhase.ul_8001;
+
+        // Close the upload overlay
+        $overlay.addClass('hidden').removeClass('overlay');
     }
 };

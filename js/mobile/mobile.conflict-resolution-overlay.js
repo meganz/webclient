@@ -32,6 +32,8 @@ mobile.conflictResolutionDialog = {
         this.$useSameAction = this.$overlay.find(".repeat-action-control");
         this.$useSameAction.prop("checked", false);
 
+        this._renderActionText(op);
+
         var promise = new MegaPromise();
         var done = function(file, name, action) {
             mobile.conflictResolutionDialog.close();
@@ -40,18 +42,25 @@ mobile.conflictResolutionDialog = {
             promise.resolve(file, name, action, repeatAction);
         };
 
-        this.$overlay.find('.fm-dialog-close, .cancel').off('tap').on('tap', function() {
+        this.$overlay.find('.fm-dialog-close, .cancel').rebind('tap', function() {
             done(-0xBADF);
             return false;
         });
 
-        this.$overlay.find(".action-replace-item").off('tap').on('tap', function() {
+        this.$overlay.find(".action-replace-item").rebind('tap', function() {
             done(file, file.name, fileconflict.REPLACE);
             return false;
         });
 
-        this.$overlay.find(".action-skip-item").off('tap').on('tap', function() {
+        this.$overlay.find(".action-skip-item").rebind('tap', function() {
             done(file, 0, fileconflict.DONTCOPY);
+            return false;
+        });
+
+        // Manually emulate a button.
+        var $versioningHelpButton = this.$overlay.find('#versionhelp');
+        $versioningHelpButton.rebind('tap.mcr', function() {
+            window.open($versioningHelpButton.attr('href'), '_blank').focus();
             return false;
         });
 
@@ -71,7 +80,7 @@ mobile.conflictResolutionDialog = {
             var newFileName = fileconflict.findNewName(file.name, target);
             this.$overlay.find(".detail-new-item-name").text(newFileName);
 
-            this.$overlay.find(".action-rename-item").off('tap').on('tap', function() {
+            this.$overlay.find(".action-rename-item").rebind('tap', function() {
                 var newName = mobile.conflictResolutionDialog.$overlay.find(".detail-new-item-name").text();
                 done(file, newName, fileconflict.KEEPBOTH);
                 return false;
@@ -90,6 +99,53 @@ mobile.conflictResolutionDialog = {
         this.show();
 
         return promise;
+    },
+
+    _renderActionText: function(operation) {
+        'use strict';
+
+        var self = this;
+
+        // Select all the actions.
+        var $actions = [
+            '.action-replace-item',
+            '.action-skip-item',
+            '.action-rename-item'
+        ].map(function(selector) {
+            return {
+                $title: $(selector + ' .action-title', self.$overlay),
+                $description: $(selector + ' .action-description', self.$overlay),
+            };
+        });
+
+
+        // Update the option text based on the operation.
+        switch (operation) {
+            case 'replace':
+                $actions[0].$title.text(l[16488]);
+                $actions[0].$description.text(l[17602]);
+                $actions[1].$title.text(l[16490]);
+                $actions[1].$description.text(l[22127]);
+                $actions[2].$title.text(l[17094]);
+                $actions[2].$description.text(l[16493]);
+                break;
+            case 'upload':
+                $actions[0].$title.text(l[17093]);
+                $actions[0].$description.safeHTML(l[17097]);
+                $actions[1].$title.text(l[16490]);
+                $actions[1].$description.text(l[22127]);
+                $actions[2].$title.text(l[17094]);
+                $actions[2].$description.text(l[16493]);
+                break;
+            default:
+                $actions[0].$title.text(l[16495]);
+                $actions[0].$description.text(l[16497]);
+                $actions[1].$title.text(l[16499]);
+                $actions[1].$description.text(l[19784]);
+                $actions[2].$title.text(l[17096]);
+                $actions[2].$description.text(l[16514]);
+                break;
+        }
     },
 
 

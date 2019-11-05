@@ -554,14 +554,6 @@
 .improved-recovery-steps .nav-header-block:hover h2 {
     text-decoration: underline;
 }
-.improved-recovery-steps .recover-account-email-block .error-message{
-    margin-top: 16px;
-    color: #eb4444;
-    font-size: 12px;
-    margin-left: 0px;
-    max-width: 400px;
-    line-height: 1.6;
-}
 .improved-recovery-steps .recover-account-email-block {
     width: 360px;
     margin: 64px auto 32px;
@@ -745,25 +737,20 @@
 .improved-recovery-steps.withkey .recover-paste-block .recovery-key.account.input-wrapper .icon {
     margin-bottom: 4px;
 }
-/*.improved-recovery-steps .recover-paste-block .recovery-key.input-wrapper input{
-    width: calc(100% - 24px);
-    padding-left: 22px;
-    background-image: url(../images/mega/recover-account-sprite_v1.png);
-    background-size: 48px auto;
-    background-position: -172px -714px
-    background-repeat: no-repeat;
-}*/
 .improved-recovery-steps .upload-key.default-green-button, .improved-recovery-steps .paste-key.default-green-button {
     position: absolute;
     right: 24px;
     top: 50%;
     transform: translateY(-50%);
 }
-.improved-recovery-steps .account.input-wrapper {
-    width: 300px;
+.improved-recovery-steps .account.input-wrapper, .improved-recovery-steps .mega-input-title-ontop {
     margin: 0;
+    display: block;
 }
- .improved-recovery-steps .recover-block.success .account.input-wrapper {
+.improved-recovery-steps.withkey .mega-input-title-ontop, .improved-recovery-steps.withoutkey .mega-input-title-ontop {
+    width: 418px;
+}
+.improved-recovery-steps .recover-block.success .mega-input-title-ontop {
     margin: 20px auto 0;
 }
 .improved-recovery-steps .recovery-key.account.input-wrapper {
@@ -771,15 +758,17 @@
     border-bottom: 0px;
     margin-top: 8px;
     width: 260px;
+    height: auto;
+}
+.improved-recovery-steps .recovery-key.account.input-wrapper input {
+    margin-top: 0;
+}
+.improved-recovery-steps .recovery-key.account.input-wrapper:after {
+    height: 0;
 }
 .improved-recovery-steps.withkey .recovery-key.account.input-wrapper {
     border-bottom: 1px solid #ccc;
     line-height: 22px;
-}
-
-.improved-recovery-steps .account.input-wrapper #recover-input1 {
-    font-size: 14px;
-    letter-spacing: 0px;
 }
 .improved-recovery-steps strong, .improved-recovery-steps b {
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;

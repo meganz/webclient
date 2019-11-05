@@ -2,79 +2,6 @@
 (function(scope) {
     "use strict";
 
-
-    var RtcSessionEventHandler = function (callManagerCall, rtcSession) {
-        this.call = callManagerCall;
-        this.rtcSession = rtcSession;
-    };
-
-    /**
-     *
-     * @param {SessionState} sessionState
-     */
-    RtcSessionEventHandler.prototype.onStateChange = function (sessionState) {
-        // unused
-    };
-
-    RtcSessionEventHandler.prototype.onDestroy = function () {
-        // unused
-    };
-
-    RtcSessionEventHandler.prototype.onRemoteStreamAdded = function (stream) {
-        /* The peer will send a stream
-         to us on that stream object. You can obtain the stream URL via
-         window.URL.createObjectURL(stream) or you can attach the player via the
-         attachToStream() polyfill function
-         stream - the stream object to which a player should be attached
-         */
-        this.call.onRemoteStreamAdded(this.rtcSession, stream);
-    };
-
-    RtcSessionEventHandler.prototype.onRemoteStreamRemoved = function () {
-        //  The peer's stream is about to be removed.
-        this.call.onRemoteStreamRemoved(this.rtcSession);
-    };
-
-    RtcSessionEventHandler.prototype.onRemoteMute = function (stream) {
-        this.call.onRemoteMute();
-    };
-
-    /**
-     *  Called when network quality for this session changes.
-     *
-     * @param {Number} q
-     */
-    RtcSessionEventHandler.prototype.onPeerNetworkQualityChange = function(q) {
-        var sess = this.rtcSession;
-        var peerId = base64urlencode(sess.peer);
-        var clientId = base64urlencode(sess.peerClient);
-        var sid = base64urlencode(sess.sid);
-        var idx = peerId + ":" + clientId + ":" + sid;
-        var call = this.call;
-        if (call && (call.peerQuality[idx] !== q)) {
-            call.peerQuality[idx] = q;
-            call.room.trackDataChange();
-        }
-    };
-
-    /**
-     * Called on level change of the remote audio level.
-     *
-     * @param {Number} level 0-100
-     */
-    RtcSessionEventHandler.prototype.onAudioLevelChange = function(level) {
-        var sess = this.rtcSession;
-        var peerId = base64urlencode(sess.peer);
-        var clientId = base64urlencode(sess.peerClient);
-        var sid = base64urlencode(sess.sid);
-        var idx = peerId + ":" + clientId + ":" + sid;
-
-        if (this.call) {
-            // call ended?
-            call.trigger('onAudioLevelChange', [idx, level]);
-        }
-    };
-
     var RtcGlobalEventHandler = function (megaChat) {
         var self = this;
         self.megaChat = megaChat;
@@ -179,13 +106,6 @@
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
-            chatRoom.trigger(
-                'onCallParticipantsUpdated',
-                [
-                    base64urlencode(userid),
-                    base64urlencode(clientid)
-                ]
-            );
             chatRoom.trigger('onClientJoinedCall', {userId: userid, clientId: clientid});
         }
     };
@@ -194,18 +114,10 @@
         var self = this;
         var chatRoom = self.megaChat.getChatById(base64urlencode(chatId));
         if (chatRoom) {
-            chatRoom.trigger(
-                'onCallParticipantsUpdated',
-                [
-                    base64urlencode(userid),
-                    base64urlencode(clientid)
-                ]
-            );
             chatRoom.trigger('onClientLeftCall', {userId: userid, clientId: clientid});
         }
     };
     RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
-
     RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
         this.megaChat.networkQuality = quality;
         if (this.megaChat.activeCallManagerCall) {
@@ -222,5 +134,4 @@
 
 
     scope.RtcGlobalEventHandler = RtcGlobalEventHandler;
-    scope.RtcSessionEventHandler = RtcSessionEventHandler;
 })(window);

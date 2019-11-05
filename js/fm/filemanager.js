@@ -517,7 +517,7 @@ FileManager.prototype.initFileManagerUI = function() {
     initShareDialog();
     M.addTransferPanelUI();
     M.initUIKeyEvents();
-    onIdle(topmenuUI);
+    M.onFileManagerReady(topmenuUI);
 
     var thElm;
     var startOffset;
@@ -1590,7 +1590,7 @@ FileManager.prototype.initContextUI = function() {
         }
     });
 
-    $('.filter-block .close').rebind('click', function() {
+    $('.filter-block.body .close').rebind('click', function() {
         delete M.filterLabel[M.currentLabelType];
         $('.colour-sorting-menu .dropdown-colour-item').removeClass('active');
         $(this).parent().addClass('hidden')// Hide 'Filter:' DOM elements
@@ -2002,7 +2002,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            document.body.removeChild(constructor.domNode);
+            ReactDOM.unmountComponentAtNode(constructor.domNode);
             selected = [];
             closeDialog();
         },
@@ -3081,6 +3081,10 @@ FileManager.prototype.addGridUI = function(refresh) {
     });
 
     $('.grid-table-header .arrow').rebind('click', function(e) {
+        // this grid-table is used in the chat - in Archived chats. It won't work there, so - skip doing anything.
+        if (M.chat) {
+            return;
+        }
         var cls = $(this).attr('class');
         var dir = 1;
 
@@ -3650,6 +3654,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.nw-fm-tree-header.folder-link').hide();
     $('.nw-fm-left-icon.folder-link').removeClass('active');
 
+    // Prevent autofill prevent fake form to be submitted
+    $('#search-fake-form-2').rebind('submit', function () {
+        return false;
+    });
+
     if (folderlink) {
         // XXX: isValidShareLink won't work properly when navigating from/to a folderlink
         /*if (!isValidShareLink()) {
@@ -3848,6 +3857,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.section.' + String(id).replace(/[^\w-]/g, '')).removeClass('hidden');
         }
     }
+    {
+        if (id === 'contacts' || id === 'opc' || id === "opc") {
+            // ensure contacts sections are updated ON section change, instead of always updating in the background
+            // (and wasting CPU)
+            M.contacts();
+        }
+    }
 };
 
 /**
@@ -3860,7 +3876,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     var promise = new MegaPromise();
     var prevState = $('.fm-main').is('.almost-full, .full');
-    $('.fm-main').removeClass('almost-full full');
+    $('.fm-main').removeClass('fm-notification almost-full full');
 
     if (this.showOverStorageQuotaPromise) {
         promise = this.showOverStorageQuotaPromise;
@@ -3966,6 +3982,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         $('.fm-notification-block .fm-notification-close')
             .rebind('click', function() {
                 $('.fm-main').removeClass('fm-notification almost-full full');
+                $.tresizer();
             });
 
         mega.achievem.enabled()
@@ -3999,6 +4016,9 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
             promise.reject();
         }
     }
+
+    // On the banner appearance or disappearance, lets resize height of fm.
+    $.tresizer();
 
     return promise;
 };

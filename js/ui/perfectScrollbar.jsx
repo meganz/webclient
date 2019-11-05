@@ -293,7 +293,7 @@ export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
     }
     scrollToElement(element, skipReinitialised) {
         var $elem = this.get$Node();
-        if (!element || !element.offsetTop) {
+        if (!element || !element.offsetParent) {
             return;
         }
 
@@ -334,8 +334,10 @@ export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
             scrollPositionYPerc = undefined;
         }
 
-
         this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
+    }
+    inViewport(domNode) {
+        return verge.inViewport(domNode);
     }
     componentDidUpdate() {
         if (this.props.requiresUpdateOnResize) {

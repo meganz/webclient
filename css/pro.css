@@ -1951,8 +1951,9 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     width: 32px;
     position: absolute;
 }
+
 .onboarding-suggestions .pro1 .mobile.membership-icon {
-    background-position: -0px -1669px;
+    background-position: -0px -1670px;
 }
 .onboarding-suggestions .pro2 .mobile.membership-icon {
     background-position: -0px -1720px;
@@ -1960,42 +1961,19 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 .onboarding-suggestions .pro3 .mobile.membership-icon {
     background-position: -0px -1770px;
 }
-/* Promotion Voucher code, I will remove once I have more time */
-.redeem-promo-page .dialog-input-title-ontop .dialog-input {
-    border: none;
-   width: 320px;
-   height: 24px;
-   margin-top: 24px;
-   margin-right: 0;
-   line-height: 24px;
-   color: #333;
-   font-family: 'LatoWeb','source_sans_proregular', Arial;
-   font-size: 17px;
-   white-space: nowrap;
-   text-overflow: ellipsis;
-   background-color: none;
-   cursor: text;
+.onboarding-suggestions .pro4 .mobile.membership-icon {
+    background-position: -0px -1620px;
 }
-.redeem-promo-page .dialog-input-title-ontop {
+
+/* Promotion Voucher code, I will remove once I have more time */
+.redeem-promo-page .mega-input-title-ontop input {
+    text-transform: uppercase;
+}
+.redeem-promo-page .mega-input-title-ontop {
     width: 320px;
 }
-.redeem-promo-page .dialog-input-title-ontop.active .title {
-    top: 0;
-    color: #aaa;
-}
-.redeem-promo-page .dialog-input-title-ontop .title {
-   position: absolute;
-   left: 0px;
-   top: 30px;
-   font-size: 14px;
-   color: #888;
-   line-height: 18px;
-   -webkit-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-   -moz-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-   -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-   -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-   transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
-   z-index: 1129;
+body.mobile .redeem-promo-page .mega-input-title-ontop {
+    width: 100%;
 }
 .redeem-promo-page .onboard-image {
     background-image: url(../images/mega/onboarding_download_v2.png);
@@ -2039,8 +2017,8 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 }
 .redeem-promo-page .button-block {
     display: block;
-    margin-top: 40px;
 }
+
 /* three extra status for the inputs: error, active, correctinput */
 .dialog-input-title-ontop.correctinput .title {
    visibility: visible;
@@ -2057,7 +2035,7 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 .dialog-input-title-ontop:not(.birth).active input::placeholder{
    opacity: 0;
 }
-.dialog-input-title-ontop.active::after{
+/*.dialog-input-title-ontop.active::after{
    background-color: rgba(0,0,0,0.6);
 }
 
@@ -2074,8 +2052,8 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
    -khtml-opacity: 1;
    opacity: 1;
    top:0;
-}
-.dialog-input-title-ontop .error-message{
+}*/
+/*.dialog-input-title-ontop .message-container {
    font-size: 13px;
    padding: 4px 0 0 0px;
    color: rgba(229,76,81,1);
@@ -2087,7 +2065,7 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
    display:none;
    text-align: left;
 }
-.dialog-input-title-ontop.error .error-message{
+.dialog-input-title-ontop.error .message-container {
    display: inline-block;
 }
 .dialog-input-title-ontop.active:not(.birth) input.dialog-input::placeholder,
@@ -2097,7 +2075,7 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 }
 .dialog-input-title-ontop:hover::after {
    background-color: rgba(0,0,0,0.5);
-}
+}*/
 @media only screen and (max-width: 1133px) {
 .key .reg-st3-membership-bl {
     padding: 4px;

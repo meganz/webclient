@@ -77,6 +77,16 @@ var emailchange = (function() {
         if (response === EEXIST) {
             msgBody = l[7718]; // This email address has already been taken...
         }
+        else if (response === -9) {
+            msgBody = l[22128]; // invalid verify code
+        }
+        else if (response === -11) {
+            msgBody = l[22151]; // not logged in
+        }
+        else if (response === -2) {
+            msgBody = l[22152]; // code is for a different user
+        }
+
 
         context = null; // wipe variable
 

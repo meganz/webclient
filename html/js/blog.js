@@ -256,7 +256,7 @@ function blog_archive() {
             }
         }
     }
-    
+
     var blogarchive = '';
     for (mm in blogmonths) {
         if (blogmonths.hasOwnProperty(mm)) {
@@ -270,7 +270,7 @@ function blog_archive() {
             date = date.getTime() / 1000;
 
             blogarchive += '<a href="/blog_' + mm + '" class="blog-new-archive-lnk clickurl">'
-                + time2date(date, 3) + '<span class="blog-archive-number">' 
+                + time2date(date, 3) + '<span class="blog-archive-number">'
                 + escapeHTML(blogmonths[mm]) + '</span></a>';
         }
     }
@@ -282,6 +282,40 @@ function blog_archive() {
 function blog_more() {
     bloglimit = bloglimit + 5;
     blog_load();
+}
+
+/**
+ * This will attempt to load some valid page if the provided blog ID is invalid.
+ * @return {void}
+ */
+function handleInvalidBlogID() {
+    'use strict';
+    var newPage = '';
+
+    if (is_mobile) {
+        var ids = Object.keys(blogposts).map(function(id) {
+            return parseInt(id.replace('post_', ''));
+        }).filter(function(a) {
+            return a;
+        }).sort(function(a, b) {
+            return b - a;
+        });
+
+        if (ids.length > 0) {
+            newPage = 'blog_' + ids[0];
+        }
+    }
+    else {
+        newPage = 'blog';
+    }
+
+    // This function can be triggered by the normal boot or the legacy system (which does not have loadSubPage)
+    if (newPage && typeof loadSubPage === 'function') {
+        loadSubPage(newPage);
+    }
+    else {
+        window.location.replace('https://mega.nz/' + newPage);
+    }
 }
 
 
@@ -352,7 +386,7 @@ if (typeof mobileblog !== 'undefined') {
         var i = "post_" + blogid;
         var content = '';
         if (!blogposts[i]) {
-            window.location.replace('https://mega.nz');
+            handleInvalidBlogID();
             return;
         }
         if (blogposts[i].attaches.bimg) {

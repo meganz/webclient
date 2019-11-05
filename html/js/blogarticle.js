@@ -6,7 +6,7 @@ function init_blogarticle() {
 
     var post = blogposts['post_' + blogid];
     if (!post) {
-        return loadSubPage('blog');
+        handleInvalidBlogID();
     }
     for (var e in post.attaches) {
         if (post.attaches.hasOwnProperty(e)) {

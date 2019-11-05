@@ -187,9 +187,6 @@
 /* end of Old bottom pages stylinng */
 
 /* Bottom pages common styles*/
-.red {
-    color: #F0373B;
-}
 body.bottom-pages .fmholder {
     overflow: hidden;
     overflow-y: auto;
@@ -3581,6 +3578,12 @@ div.radioOn.green::after {
     margin-left:  auto;
     margin-right: auto;
 }
+.browsers .bottom-page.mid-icon-info a {
+    overflow: hidden;
+    max-width: 100%;
+    display: inline-block;
+    text-overflow: ellipsis;
+}
 /* end of Browser extensions page */
 
 /* Bird */
@@ -4195,7 +4198,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
     font-family: 'LatoWebBold';
-    color: #495057;
     font-size: 17px;
     line-height: 25px
 }
@@ -4208,7 +4210,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
     font-size: 14px;
-    color: #FDA416;
     margin-top: 4px;
     text-transform: uppercase;
     line-height: 20px;
@@ -4288,17 +4289,17 @@ a.opensource-icon-txt.coming-soon {
 /* Adaptive layout */
 @media only screen and (max-width: 1900px) {
 .bottom-page.angle-bg {
-    background-size: cover;
+    background-size: cover !important;
 }
 .bottom-page.grey-angle-bg {
-    background-size: cover;
+    background-size: cover !important;
     background-image: 
         linear-gradient(transparent, transparent),
-        url(../images/mega/bottom-page/grey-angle_v1.svg);
+        url(../images/mega/bottom-page/grey-angle_v1.svg) !important;
 }
 }
 .bottom-page.angle-bg.light {
-    background-size: auto 1343px;
+    background-size: auto 1343px !important;
 }
 }
 @media only screen and (max-height: 1385px) {
@@ -4543,8 +4544,6 @@ a.opensource-icon-txt.coming-soon {
     position: relative;
     margin-top: -30px;
 }
-}
-@media only screen and (max-width: 783px) {
 .mobile .extension.img-wrap {
     margin: 43px 0 0 0;
 }
@@ -4816,6 +4815,9 @@ a.opensource-icon-txt.coming-soon {
     width: 100%;
     display: table;
 }
+.browsers .bottom-page .inline-block.col-2 {
+    display: block;
+}
 .bottom-page.left-cell.right-txt-align {
     text-align: center;
 }
@@ -4836,6 +4838,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .privacy-company.new-bottom-pages {
     padding-bottom: 20px;
+}
+.bottom-page.horizontal-centered-bl {
+    display: block;
 }
 }
 @media only screen and (max-width: 783px) and (max-height: 640px) {
@@ -5274,6 +5279,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 }
 }
 @media only screen and (max-width: 545px) {
+.megasync .bottom-page.angle-bg {
+    bottom: -80px !important;
+}
 .bottom-page.nav-buttons-bl.contrast {
     display: none;
 }
@@ -5719,6 +5727,11 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 .bottom-page.unsub .button-container {
     padding-top: 40px;
 }
+.bottom-page.unsub .headline-txt {
+    padding: 24px 32px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 /*end of subscription page*/
-
-

@@ -130,14 +130,15 @@ var signin = {
         }
         else {
             // Show a failed login
-            $('.account.login-form').addClass('both-incorrect-inputs');
-            $('#login-password2').blur();
+            $('#login-name2').megaInputsShowError();
+            $('#login-password2').megaInputsShowError(l[7431]);
 
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
 
             msgDialog('warninga', l[135], l[7431] + '.', false, function() {
                 $('#login-password2').val('');
+                $('#login-password2').blur();
                 $('#login-name2').select();
             });
         }
@@ -201,9 +202,9 @@ function doConfirm(email, password, callback) {
                 $('.mobile.signin-register-block .signin-button').removeClass('loading');
             }
             else {
-                $('.account.input-wrapper.password input', $formWrapper).val('');
-                $('.account.input-wrapper', $formWrapper).removeClass('incorrect');
-                $('.account.login-form', $formWrapper).addClass('both-incorrect-inputs');
+                $('#login-password2', $formWrapper).val('');
+                $('#login-password2', $formWrapper).megaInputsHideError();
+                $('#login-name2', $formWrapper).megaInputsHideError();
                 msgDialog('warninga', l[135], l[201]);
             }
         }
@@ -233,19 +234,16 @@ function pagelogin() {
     'use strict';
 
     var $formWrapper = $('.main-mid-pad.login form');
-    var $emailContainer = $formWrapper.find('.account.input-wrapper.email');
-    var $email = $emailContainer.find('input');
-    var $passwordContainer = $formWrapper.find('.account.input-wrapper.password');
-    var $password = $passwordContainer.find('input');
+    var $email = $formWrapper.find('#login-name2');
+    var $password = $formWrapper.find('#login-password2');
     
     var e = $email.val();
     if (e === '' || !isValidEmail(e)) {
-        $emailContainer.addClass('incorrect');
+        $email.megaInputsShowError(l[141]);
         $email.focus();
     }
     else if ($('#login-password2').val() === '') {
-        $formWrapper.find('.account.input-wrapper').removeClass('incorrect');
-        $formWrapper.addClass('both-incorrect-inputs');
+        $('#login-password2').megaInputsShowError(l[1791]);
         $password.focus();
     }
     else {
@@ -276,7 +274,7 @@ function init_login() {
     'use strict';
 
     var $formWrapper = $('.main-mid-pad.login');
-    var $inputs = $formWrapper.find('.account.input-wrapper input');
+    var $inputs = $formWrapper.find('input');
     var $button = $formWrapper.find('.big-red-button');
 
     if (is_extension) {
@@ -311,6 +309,9 @@ function init_login() {
     }
 
     $inputs.rebind('keydown.initlogin', function(e) {
+
+        $inputs.removeClass('errored').parent().removeClass('error');
+
         if (e.keyCode === 13) {
             pagelogin();
         }

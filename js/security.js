@@ -519,13 +519,7 @@ security.register = {
             return localStorage.getItem('newRegistrationEnabled') === '1' ? true : false;
         }
 
-        // Otherwise check API to see if 'New Secure Registration Enabled' flag is set
-        else if (typeof mega.apiMiscFlags.nsre !== 'undefined') {
-            return (mega.apiMiscFlags.nsre === 1) ? true : false;
-        }
-
-        // Default is not enabled until all clients have been updated, also it's been enabled and stable for 2 weeks
-        return false;
+        return mega.flags.nsre;
     },
 
     /**

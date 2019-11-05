@@ -248,6 +248,61 @@ var mobile = {
     },
 
     /**
+     * Initialize a toggle switch in mobile web.
+     * @param $container
+     * @param startingValue
+     * @param onChange
+     */
+    initSwitch: function ($container, startingValue, onChange) {
+        'use strict';
+
+        var self = this;
+
+        // Set inital state.
+        this.setSwitch($container, startingValue);
+
+        // Handle change event.
+        $container.off('tap').on('tap', function () {
+            var newState = self.toggleSwitch($container);
+            if (typeof onChange === 'function') {
+                onChange(newState);
+            }
+            return false;
+        });
+    },
+
+    /**
+     * Toggle a feature toggle switch to the opposite state.
+     * @param $container
+     */
+    toggleSwitch: function($container) {
+        'use strict';
+
+        if ($container.hasClass('toggle-on')) {
+            $container.removeClass('toggle-on');
+            return 0;
+        } else {
+            $container.addClass('toggle-on');
+            return 1;
+        }
+    },
+
+    /**
+     * Set a feature toggle switch to a given state.
+     * @param $container
+     * @param state
+     */
+    setSwitch: function($container, state) {
+        'use strict';
+
+        if (state) {
+            $container.addClass('toggle-on');
+        } else {
+            $container.removeClass('toggle-on');
+        }
+    },
+
+    /**
      * Initialise the MEGA icon on various pages to go back to the homepage or cloud drive
      */
     initHeaderMegaIcon: function() {
@@ -638,7 +693,13 @@ var alarm = {
 
 function accountUI() {
     'use strict';
-    loadSubPage('fm/account');
+
+    if (fminitialized && u_type && page === 'fm/account/notifications') {
+        mobile.initDOM();
+        mobile.account.notifications.init();
+    } else {
+        loadSubPage('fm/account');
+    }
 }
 
 accountUI.session = {

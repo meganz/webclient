@@ -102,7 +102,7 @@ var crypt = (function() {
      *     Mega user handle.
      * @param keyType {string}
      *     Key type of pub key. Can be one of 'Ed25519', 'Cu25519' or 'RSA'.
-     * @param userData {string}
+     * @param [userData] {string}
      *     Optional argument, any provided data will be passed to the fullfiled promise.
      * @return {MegaPromise}
      *     A promise that is resolved when the original asynch code is settled.

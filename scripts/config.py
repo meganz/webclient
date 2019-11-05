@@ -12,15 +12,14 @@ here.
 import os
 
 # Checkers to run. Available options for checkers are:
-# "jshint", "jscs", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
-checkers = ['validator', 'htmlhint', 'jscs', 'jshint']
+# "eslint", "cppcheck", "nsiqcppstyle", "vera++", 'htmlhint'
+checkers = ['validator', 'htmlhint', 'eslint']
 
 # Extra options for designated checkers.
 # This configuration needs an entry for every encountered checker if the
 # `checkers` option above.
 extra_options = {
-    'jshint': {'norules': False},
-    'jscs': {'norules': False},
+    'eslint': {'norules': False},
     'htmlhint': {},
     'validator': {},
     'cppcheck': {},
@@ -29,15 +28,14 @@ extra_options = {
 }
 
 # Paths for the executables to use.
-JSHINT_BIN = 'node_modules/.bin/jshint'
-JSCS_BIN = 'node_modules/.bin/jscs'
+ESLINT_BIN = 'node_modules/.bin/eslint'
 JSCPD_BIN = 'node_modules/.bin/jscpd'
 HTMLHINT_BIN = 'node_modules/.bin/htmlhint'
 CPPCHECK_BIN = 'cppcheck'
 VERAPP_BIN = 'vera++'
 
 NSIQCPPSTYLE_BIN = '/usr/local/nsiqcppstyle/nsiqcppstyle.py'
-JSHINT_RULES = '--verbose'
+ESLINT_RULES = '-f compact'
 JSCS_RULES = ''
 JSCPD_RULES = '-l 13 -r console'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
@@ -56,8 +54,7 @@ VERAPP_RULES = ['F001', 'F002',
 
 
 # Command line configuration.
-JSHINT_COMMAND = '{binary} {rules} {files}'
-JSCS_COMMAND = '{binary} {rules} {files}'
+ESLINT_COMMAND = '{binary} {rules} {files}'
 HTMLHINT_COMMAND = '{binary} {rules} {files}'
 
 CPPCHECK_COMMAND = ("{command}"
@@ -77,15 +74,13 @@ VERAPP_COMMAND = ('vera++ --show-rule --summary'
 
 # Some attempts to "auto fix" stuff for Win.
 if os.name == 'nt':
-    JSHINT_BIN = '{}.cmd'.format(JSHINT_BIN).replace('/', '\\')
-    JSCS_BIN = '{}.cmd'.format(JSCS_BIN).replace('/', '\\')
+    ESLINT_BIN = '{}.cmd'.format(ESLINT_BIN).replace('/', '\\')
     JSCPD_BIN = '{}.cmd'.format(JSCPD_BIN).replace('/', '\\')
     HTMLHINT_BIN = '{}.cmd'.format(HTMLHINT_BIN).replace('/', '\\')
     CPPCHECK_BIN += '.exe'
     VERAPP_BIN += '.exe'
-    JSHINT_COMMAND = 'cmd /c {}'.format(JSHINT_COMMAND)
+    ESLINT_COMMAND = 'cmd /c {}'.format(ESLINT_COMMAND)
     HTMLHINT_COMMAND = 'cmd /c {}'.format(HTMLHINT_COMMAND)
-    JSCS_COMMAND = 'cmd /c {}'.format(JSCS_COMMAND)
     VALIDATOR_IGNORE_FILES = [x.replace('/', '\\') for x in VALIDATOR_IGNORE_FILES]
 
 # Overlay project-config with a potentially available local configuration.

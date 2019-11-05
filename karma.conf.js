@@ -117,6 +117,7 @@ module.exports = function(config) {
         'js/ui/feedbackDialog.js',
         'js/ui/credentialsWarningDialog.js',
         'js/ui/loginRequiredDialog.js',
+        'js/notifyConfig.js',
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',

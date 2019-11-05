@@ -549,8 +549,7 @@
         this.firstText = this.dialog.querySelector('.pass-reminder.info-txt');
 
         if (this.firstText) {
-            var link = "https://mega.nz/help/client/webclient/accounts-pro-accounts/"
-                + "i-have-forgotten-my-password-can-i-reset-it-576c763f886688e6028b4582";
+            var link = "https://mega.nz/help/s/576c763f886688e6028b4582";
 
             $(this.firstText).html(
                 escapeHTML(!this.isLogout ? l[16900] : l[20633])

@@ -20,6 +20,7 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         if (roomOrUserHash === "archived") {
             roomType = "archived";
              displayArchivedChats = true;
+             delete megaChat.lastOpenedChat;
         }
         else if (roomOrUserHash.substr(0, 2) === "g/" || roomOrUserHash.substr(0, 2) === "c/" || isPubLink) {
             roomType = (isPubLink || roomOrUserHash.substr(0, 2) === "c/") ? "public" : "group";
@@ -116,6 +117,9 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
         $('.fm-files-view-icon').addClass('hidden');
         $('.fm-blocks-view').addClass('hidden');
         $('.files-grid-view').addClass('hidden');
+        if (megaChat.displayArchivedChats) {
+            $('.files-grid-view.archived-chat-view').removeClass('hidden');
+        }
         $('.fm-right-account-block').addClass('hidden');
         $('.contacts-details-block').addClass('hidden');
 
@@ -144,9 +148,6 @@ var webSocketsSupport = typeof(WebSocket) !== 'undefined';
                 });
         }
         else if(roomType === "group") {
-            if (megaChat.chats[roomOrUserHash].isArchived()) {
-                megaChat.chats[roomOrUserHash].showArchived = true;
-            }
             megaChat.chats[roomOrUserHash].show();
         }
         else if(roomType === "public") {
@@ -338,6 +339,16 @@ var Chat = function() {
 
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
     self._chatsAwaitingAps = {};
+
+    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            "currentlyOpenedChat": null,
+            "displayArchivedChats": false,
+        },
+        true
+    );
 
     return this;
 };
@@ -548,6 +559,7 @@ Chat.prototype.init = function() {
 
 
     self.registerUploadListeners();
+
     self.trigger("onInit");
 };
 
@@ -1470,6 +1482,7 @@ Chat.prototype.smartOpenChat = function() {
         if (args[0].length === 2 && args[1] === 'private') {
             var chatRoom = self.chats[array.filterNonMatching(args[0], u_handle)[0]];
             if (chatRoom) {
+                chatRoom.show();
                 return waitForReadyState(chatRoom, args[5]);
             }
         }
@@ -1736,7 +1749,13 @@ Chat.prototype.renderListing = function() {
         }
         else {
             if (self.chats.length > 0) {
-                return self.showLastActive();
+                if (!self.displayArchivedChats) {
+                    return self.showLastActive();
+                }
+                else {
+                    return false;
+                }
+
             }
             else {
                 $('.fm-empty-conversations').removeClass('hidden');
@@ -2028,7 +2047,7 @@ Chat.prototype._doneLoadingImage = function(h) {
 Chat.prototype.showLastActive = function() {
     var self = this;
 
-    if (self.chats.length > 0 && self.allChatsHadLoadedHistory()) {
+    if (self.chats.length > 0 && self.allChatsHadInitialLoadedHistory()) {
         var sortedConversations = obj_values(self.chats.toJS());
 
         sortedConversations.sort(M.sortObjFn("lastActivity", -1));
@@ -2064,6 +2083,21 @@ Chat.prototype.allChatsHadLoadedHistory = function() {
     for (var i = 0; i < chatIds.length; i++) {
         var room = self.chats[chatIds[i]];
         if (room.isLoading()) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+Chat.prototype.allChatsHadInitialLoadedHistory = function() {
+    var self = this;
+
+    var chatIds = self.chats.keys();
+
+    for (var i = 0; i < chatIds.length; i++) {
+        var room = self.chats[chatIds[i]];
+        if (room.initialMessageHistLoaded.state() === 'pending') {
             return false;
         }
     }
@@ -2336,36 +2370,6 @@ Chat.prototype.getChatById = function(chatdId) {
         }
     });
     return found ? found : false;
-};
-
-
-/**
- * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
- * @param [chatIdBin] {String}
- * @returns {boolean}
- */
-Chat.prototype.haveAnyIncomingOrOutgoingCall = function(chatIdBin) {
-    if (chatIdBin) {
-        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
-            return false;
-        }
-        else if (this.rtc && this.rtc.calls) {
-            var callIds = Object.keys(this.rtc.calls);
-            for (var i = 0; i < callIds.length; i++) {
-                if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
-                    return true;
-                }
-            }
-            // didn't found any chat that doesn't match the current chatdIdBin
-            return false;
-        }
-        else {
-            return false
-        }
-    }
-    else {
-        return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
-    }
 };
 
 /**

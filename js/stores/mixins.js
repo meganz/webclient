@@ -535,6 +535,12 @@ export default superClass => class MegaRenderMixin extends superClass {
             // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
             if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
                 this._queueUpdateWhenVisible = true;
+                if (window.RENDER_DEBUG) {
+                    console.error(
+                        "shouldUpdate? No.", "F1.1", this.getElementName(), this.props, nextProps, this.state,
+                        nextState
+                    );
+                }
             }
             else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
                 delete this._queueUpdateWhenVisible;
@@ -551,6 +557,7 @@ export default superClass => class MegaRenderMixin extends superClass {
                         "shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState
                     );
                 }
+                this._requiresUpdateOnResize = true;
                 return false;
             }
             else if (r === true) {
@@ -564,6 +571,7 @@ export default superClass => class MegaRenderMixin extends superClass {
                     "shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState
                 );
             }
+            this._requiresUpdateOnResize = true;
             return false;
         }
 
@@ -729,6 +737,11 @@ export default superClass => class MegaRenderMixin extends superClass {
         });
     }
     addDataStructListenerForProperties(obj, properties) {
+        if (!obj) {
+            // this should not happen, but in rare cases it does...so we should just skip.
+            return;
+        }
+
         if (!this._dataStructListeners) {
             this._dataStructListeners = [];
         }

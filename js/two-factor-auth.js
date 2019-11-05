@@ -21,21 +21,7 @@ var twofactor = {
             return (localStorage.getItem('twoFactorAuthEnabled') === '1') ? true : false;
         }
 
-        // Otherwise if logged in, use the flag returned and set from the 'ug' request
-        else if (typeof u_attr !== 'undefined' && u_attr.flags.mfae) {
-            return (u_attr.flags.mfae === 1) ? true : false;
-        }
-
-        // Otherwise if not logged in, use the flag set by the 'gmf' request
-        // NB: Probably not needed as all 2FA enabling/disabling functions require the user to be logged in
-        else if (typeof u_attr === 'undefined' && typeof mega.apiMiscFlags.mfae !== 'undefined') {
-            return (mega.apiMiscFlags.mfae === 1) ? true : false;
-        }
-
-        // Otherwise default to disabled
-        else {
-            return false;
-        }
+        return mega.flags.mfae;
     },
 
     /**
@@ -52,7 +38,7 @@ var twofactor = {
         // Make Multi-Factor Auth Get request
         api_req({ a: 'mfag', e: u_attr.email }, {
             callback: function(result) {
-                
+
                 loadingDialog.hide();
 
                 // Pass the result to the callback

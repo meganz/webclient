@@ -23,7 +23,7 @@ var accountChangeEmail = {
         'use strict';
 
         // Reset change email fields after change
-        $('#current-email').val(u_attr.email);
+        $('#current-email').val(u_attr.email).blur();
         $('#account-email').val('');
         $('.fm-account-change-email').addClass('hidden');
     },
@@ -53,8 +53,6 @@ var accountChangeEmail = {
                 $emailInfoMessage.slideUp();
                 $changeEmailButton.parent().addClass('closed');
             }
-
-            $newEmail.parent().removeClass('error');
         });
     },
 
@@ -81,7 +79,7 @@ var accountChangeEmail = {
 
             // If not a valid email, show an error
             if (!isValidEmail(newEmail)) {
-                $newEmail.parent().addClass('error').find('.error-message').text(l[1513]);
+                $newEmail.megaInputsShowError(l[1513]);
                 return false;
             }
 

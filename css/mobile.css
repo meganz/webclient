@@ -1714,7 +1714,7 @@ ul, li {
     height: 100%;
     left: 0;
     top: 0;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -1728,7 +1728,7 @@ ul, li {
     height: 100%;
     left: 0;
     top: 0;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -3904,7 +3904,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.cancel-account-overlay {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     z-index: 1200;
@@ -8600,7 +8600,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     position: fixed;
     background-color: #fff;
 }
-body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
+body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mobile .main-block.my-account-page.no-scroll {
     overflow: hidden;
 }
 .mobile.upload-overlay .upload-another-file, .mobile.upload-progress.complete {

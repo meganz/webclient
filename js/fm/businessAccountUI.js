@@ -858,7 +858,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     }
     else {
         $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
-            + '.profile-button-container .resend-verification, .profile-button-container .disable-account' +
+            + '.profile-button-container .resend-verification, .profile-button-container .disable-account,' +
             '.profile-button-container .reset-sub-user-password').removeClass('disabled');
         $subAccountContainer.find('.admin-icon.role').addClass('hidden');
     }

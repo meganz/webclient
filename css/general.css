@@ -1,0 +1,400 @@
+/* 
+ * IMPORTANT! Please DO NOT change this file before confirmed with designers! 
+ */
+/*
+ *  This global css file includes components:
+ *  1. text
+ *  2. input
+ *  MORE TO COME
+ */
+
+/* Light mode */
+/* TEXT: */
+/* Common value */
+.txt-bold {
+     font-weight: 700;
+     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+}
+.txt-light {
+    font-weight: 300;
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+}
+.txt-green {
+    color: #00BFA5;
+}
+.txt-dark {
+    color: #333;
+}
+..underline-txt {
+    text-decoration: underline;
+    outline-color: none;
+}
+
+/* Colored text */
+.red, a.red, a.red:link, a.red:visited, a.red:hover, a.red:active {
+    color: #F0373B;
+}
+.required-red {
+    color: #F0373B !important;
+}
+a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
+    color: #00BFA5;
+}
+
+/* Body text */
+.page-title-txt, h1 {
+    font-size: 40px;
+    line-height: 60px;
+    color: #262F3B;
+}
+.hero-txt, h2 {
+    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-size: 32px;
+    line-height: 48px;
+    color: #262F3B;
+}
+.hero-txt.txt-light {
+    font-family: 'LatoWebLight', 'source_sans_proregular', Arial;
+}
+.headline-txt, h3 {
+    font-size: 28px;
+    line-height: 42px;
+    color: #333333;
+}
+.title-txt, h4 {
+    font-size: 20px;
+    color: #333;
+    line-height: 24px;
+    display: inline-block;
+}
+.subtitle-txt, h5 {
+    font-size: 16px;
+    color: #333;
+    line-height: 24px;
+    display: inline-block;
+}
+.content-txt {
+    font-size: 14px;
+    line-height: 20px;
+    color: #999;
+    padding:0;
+    position: relative;
+    display: inline-block;
+}
+.default-txt, h6 {
+    font-size: 14px;
+    line-height: 20px;
+    color: #333;
+    padding:0;
+    position: relative;
+    display: inline-block;
+}
+.default-txt-small {
+    font-size: 13px;
+    line-height: 20px;
+    color:#333;
+    position: relative;
+    display: inline-block;
+}
+.caption-txt {
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
+    position: relative;
+    display: inline-block;
+}
+/* transfers related text */
+/* End of text style */
+
+/* Form Blocks for layout */
+.half-sized-block {
+    width: 50%;
+    float: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 0 0 16px;
+    position: relative;
+}
+.half-sized-block:first-child, .half-sized-block.l {
+    padding: 0 16px 0 0;
+}
+
+/* INPUTS */
+/*
+ * Three input types across webclient:
+ * 1. no bordered input without icon
+ * 2. no bordered input with icon
+ * 3. bordered input with icon
+ * 4. selective input
+ */
+.mega-input-title-ontop {
+    height: 56px;
+    position: relative;
+    width:100%;
+    margin:0px; 
+    display: inline-block;
+    vertical-align: top;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    transition: margin 200ms ease-in-out;
+    padding-top: 24px;
+    text-align: left;
+}
+.mega-input-title-ontop .mega-input-title {
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 14px;
+    line-height: 20px;
+    color: #999;
+    display: inline-block;
+    position: absolute;
+    left: 4px;
+    top: 27px;
+    padding-top: 0px;
+    -webkit-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -moz-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -o-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    -ms-transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    transition: font-size 0.2s ease-in, color 0.2s ease-in, top 0.2s cubic-bezier(0.4, 0.0, 1, 1);
+    z-index: 10;
+}
+.mega-input-title-ontop.with-icon .mega-input-title {
+    left: 40px;
+}
+.mega-input-title-ontop.halfSize-l {
+    width: 49.5%;
+    float: left;
+}
+.mega-input-title-ontop.halfSize-r {
+    width: 49.5%;
+    float: right;
+}
+.mega-input-title-ontop input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px #FAFAFA inset;
+    -webkit-text-fill-color: #000000;
+}
+
+/* .mega-input is for selective input type */
+.mega-input-title-ontop input, .mega-input-title-ontop .dialog-input {
+    border: none;
+    font-size: 16px;
+    color: #333;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    height: 24px;
+    line-height: 24px;
+    width: 100%;
+    padding:0 8px 0 4px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background-color: rgba(255,255,255,0.1);
+    cursor: text;
+    position: relative;
+    z-index: 11;
+}
+.mega-input-title-ontop input.strengthChecker {
+    width: calc(100% - 80px);
+    width: -webkit-calc(100% - 80px);
+    width: -moz-calc(100% - 80px);
+}
+.mega-input-title-ontop.with-icon input, .mega-input-title-ontop.with-icon .dialog-input {
+    width: calc(100% - 40px);
+    width: -webkit-calc(100% - 40px);
+    width: -moz-calc(100% - 40px);
+}
+.mega-input-title-ontop.with-icon input.strengthChecker {
+    width: calc(100% - 120px);
+    width: -webkit-calc(100% - 120px);
+    width: -moz-calc(100% - 120px);
+}
+.mega-input-title-ontop input.default-select {
+    box-shadow: none;
+    padding: 0;
+    background: transparent;
+    min-width: auto;
+    width: 100%;
+}
+.mega-input-title-ontop input::placeholder {
+    font-size: 14px;
+    opacity: 0;
+}
+.mega-input-title-ontop input::-webkit-input-placeholder {
+    font-size: 14px;
+    opacity: 0;
+}
+.mega-input-title-ontop input:-moz-placeholder {
+    font-size: 14px;
+    opacity: 0;
+}
+.mega-input-title-ontop input::-moz-placeholder {
+    font-size: 14px;
+    opacity: 0;
+}
+.mega-input-title-ontop input:-ms-input-placeholder {
+    font-size: 14px;
+    opacity: 0;
+}
+
+/* three extra status for the inputs: error, active, valued */
+.mega-input-title-ontop.active .mega-input-title, 
+.mega-input-title-ontop.valued .mega-input-title,
+.mega-input-title-ontop.birth .mega-input-title, 
+.mega-input-title-ontop.underline-dropdown-input .mega-input-title {
+    top: 0;
+    color: #aaa;
+    font-size:13px;
+}
+.mega-input-title-ontop::after {
+    content: " ";
+    width: 100%;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.2);
+    position: absolute;
+    transition: background-color 0.2s linear;
+}
+.mega-input-title-ontop:hover::after {
+    background-color: rgba(0,0,0,0.3);
+}
+.mega-input-title-ontop.active::after {
+    background-color: rgba(0,0,0,0.4);
+}
+.mega-input-title-ontop.error::after {
+    background-color: rgba(217,0,7,0.5);
+}
+.mega-input-title-ontop.error input.errored {
+    color: rgba(217,0,7,1);
+}
+.mega-input-title-ontop.error .title {
+    visibility: visible;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+    -moz-opacity: 1;
+    -khtml-opacity: 1;
+    opacity: 1;
+}
+.mega-input-title-ontop .message-container {
+    font-size: 13px;
+    padding-top: 4px;
+    white-space: normal;
+    text-overflow: ellipsis;
+    position: absolute;
+    top: 56px;
+    left: 4px;
+    width: -webkit-calc(100% - 8px);
+    width: -moz-calc(100% - 8px);
+    width: calc(100% - 8px);
+    display: none;
+    text-align: left;
+    color: #888;
+}
+.mega-input-title-ontop.halfSize-l .message-container {
+    width: 202%;
+}
+.mega-input-title-ontop.error .message-container{
+    color: rgba(229,76,81,1);
+}
+.mega-input-title-ontop.msg .message-container {
+    display: inline-block;
+}
+.mega-input-title-ontop.msg.strengthChecker .message-container {
+    top: 60px;
+}
+.mega-input-title-ontop.with-icon i {
+    top: -2px;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    opacity: 0.6;
+    margin-left: 4px;
+    margin-right: 6px;
+}
+.mega-input-title-ontop.with-icon .account-pass-lines {
+    margin-top: 9px;
+}
+
+/* Password strength Checker - Bar */
+.account-pass-lines {
+   position: relative;
+   margin-top: 11px;
+}
+.register-pass-status-line1, .register-pass-status-line2, .register-pass-status-line3,
+.register-pass-status-line4, .register-pass-status-line5 {
+    width: calc(20% - 5px);
+    height: 3px;
+    background-color: rgba(0,0,0,0.1);
+    float: left;
+    margin-right: 6px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+}
+.register-pass-status-line5 {
+    margin: 0;
+}
+.good1 .register-pass-status-line1 {
+    background-color: #ff2a0b;
+}
+.good2 .register-pass-status-line1, .good2 .register-pass-status-line2 {
+    background-color: #ffc926;
+}
+.good3 .register-pass-status-line1, .good3 .register-pass-status-line2, .good3 .register-pass-status-line3 {
+    background-color: #7ab148;
+}
+.good4 .register-pass-status-line1, .good4 .register-pass-status-line2, .good4 .register-pass-status-line3,
+.good4 .register-pass-status-line4 {
+    background-color: #7dd016;
+}
+.good5 .register-pass-status-line1, .good5 .register-pass-status-line2, .good5 .register-pass-status-line3,
+.good5 .register-pass-status-line4, .good5 .register-pass-status-line5 {
+    background-color: #1DA1E9;
+}
+
+/* Password strength Checker - Text */
+.account.password-status {
+    font-size: 14px;
+    line-height: 24px;
+    font-family: 'LatoWebBlack', 'source_sans_proregular', Arial;
+    position: absolute;
+    right: 4px;
+    top: 24px;
+    display: none;
+    color: #ff2a0b;
+}
+.account.password-status.good2 {
+    color: #ffc926;
+}
+.account.password-status.good3 {
+    color: #7ab148;
+}
+.account.password-status.good4 {
+    color: #7dd016;
+}
+.account.password-status.good5 {
+    color: #1DA1E9;
+}
+.account.password-status.checked {
+    display: block;
+}
+
+/* Input loading */
+.register-loading-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10;
+    display: none;
+    background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
+    height: 16px;
+    width: 16px;
+}
+.mega-input-title-ontop .register-loading-icon {
+    top: 31px;
+}
+.loading .register-loading-icon {
+    display: block;
+}
+.register-loading-icon img {
+    width: 16px;
+}

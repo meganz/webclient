@@ -17,53 +17,17 @@ class ParticipantsList extends MegaRenderMixin(React.Component) {
         };
     }
     onUserScroll() {
-        var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
-        if (this.state.scrollPositionY !== scrollPosY) {
-            this.setState({
-                'scrollPositionY': scrollPosY
-            });
-        }
+        // var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
+        // if (this.state.scrollPositionY !== scrollPosY) {
+        //     this.setState({
+        //         'scrollPositionY': scrollPosY
+        //     });
+        // }
     }
     componentDidUpdate() {
         var self = this;
         if (!self.isMounted()) {
             return;
-        }
-        if (!self.refs.contactsListScroll) {
-            return null;
-        }
-
-        var $node = $(self.findDOMNode());
-
-        var scrollHeight;
-
-
-        var $elem = $(self.refs.contactsListScroll.findDOMNode());
-
-        var fitHeight = scrollHeight = $elem.outerHeight() - 4;
-        if (fitHeight === 0) {
-            // not visible at the moment.
-            return null;
-        }
-
-        var $parentContainer = $node.closest('.chat-right-pad');
-
-        if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(fitHeight /* margin! */, 53);
-        }
-
-        var $contactsList = $('.chat-contacts-list', $parentContainer);
-
-        if ($contactsList.height() !== fitHeight + 4) {
-            $('.chat-contacts-list', $parentContainer).height(
-                fitHeight + 4
-            );
-            self.refs.contactsListScroll.eventuallyReinitialise(true);
-        }
-
-
-        if (self.state.scrollHeight !== fitHeight) {
-            self.setState({'scrollHeight': fitHeight});
         }
         self.onUserScroll();
     }
@@ -88,24 +52,10 @@ class ParticipantsList extends MegaRenderMixin(React.Component) {
 
 
         return <div className="chat-contacts-list">
-            <PerfectScrollbar
-                chatRoom={room}
-                members={room.members}
-                ref="contactsListScroll"
+            <ParticipantsListInner
+                chatRoom={room} members={room.members}
                 disableCheckingVisibility={true}
-                onUserScroll={self.onUserScroll.bind(self)}
-                requiresUpdateOnResize={true}
-                onAnimationEnd={function() {
-                    self.safeForceUpdate();
-                }}
-            >
-                <ParticipantsListInner
-                    chatRoom={room} members={room.members}
-                    disableCheckingVisibility={true}
-                    scrollPositionY={self.state.scrollPositionY}
-                    scrollHeight={self.state.scrollHeight}
-                />
-            </PerfectScrollbar>
+            />
         </div>
     }
 };
@@ -145,10 +95,12 @@ function ParticipantsListInner({
     var contactsList = [];
 
 
-    const firstVisibleUserNum = Math.floor(scrollPositionY/contactCardHeight);
-    const visibleUsers = Math.ceil(scrollHeight/contactCardHeight);
-    const lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
+    // const firstVisibleUserNum = Math.floor(scrollPositionY/contactCardHeight);
+    // const visibleUsers = Math.ceil(scrollHeight/contactCardHeight);
+    // const lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
 
+    const firstVisibleUserNum = 0;
+    const lastVisibleUserNum = contacts.length;
     var contactListInnerStyles = {
         'height': contacts.length * contactCardHeight
     };
@@ -167,6 +119,7 @@ function ParticipantsListInner({
         var contact = M.u[contactHash];
 
         if (contact) {
+            // TODO: eventually re-implement "show on scroll" and dynamic rendering.
             if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
                 i++;
                 return;
@@ -270,7 +223,6 @@ function ParticipantsListInner({
                 <ContactsUI.ContactCard
                     key={contact.u}
                     contact={contact}
-                    megaChat={room.megaChat}
                     className="right-chat-contact-card"
                     dropdownPositionMy="left top"
                     dropdownPositionAt="left top"

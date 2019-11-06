@@ -21,9 +21,6 @@ BusinessRegister.prototype.initPage = function () {
 
     loadingDialog.show();
 
-    // we will need it to evaluate the password
-    M.require('zxcvbn_js');
-
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
@@ -35,15 +32,46 @@ BusinessRegister.prototype.initPage = function () {
     var $emailInput = $pageContainer.find('#business-email').val('');
     var $passInput = $pageContainer.find('#business-pass').val('');
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
-    $('.new-registration.suba', $pageContainer).removeClass('good1 good2 good3 good4 good5');
-    $('.password-stutus-txt', $pageContainer).addClass('hidden');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
     $pageContainer.find('.mega-terms.bus-reg-agreement .bus-reg-checkbox').removeClass('checkOn');
     $pageContainer.find('.ok-to-auto.bus-reg-agreement .bus-reg-checkbox').addClass('checkOn');
     $pageContainer.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
-    $pageContainer.find('.bus-reg-input').removeClass('error');
     $pageContainer.find('.bus-reg-plan .business-base-plan .left')
         .text(l[19503].replace('[0]', this.minUsers));
+
+    var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput, {
+        onHideError: function() {
+            $nbUsersInput.removeClass('errored');
+            $nbUsersInput.parent().removeClass('error');
+        }
+    });
+    nbUsersMegaInput.showMessage('*' + l[19501]);
+
+    var cnameMegaInput = new mega.ui.MegaInputs($cnameInput);
+    var telMegaInput = new mega.ui.MegaInputs($telInput);
+    var fnameMegaInput = new mega.ui.MegaInputs($fnameInput);
+    var lnameMegaInput = new mega.ui.MegaInputs($lnameInput);
+    var emailMegaInput = new mega.ui.MegaInputs($emailInput);
+    var passMegaInput = new mega.ui.MegaInputs($passInput);
+    var rPassMegaInput = new mega.ui.MegaInputs($rPassInput);
+
+    // Remove error on firstname and lastname at same time.
+    $fnameInput.rebind('input.hideErrorName', function() {
+        lnameMegaInput.hideError();
+    });
+
+    $lnameInput.rebind('input.hideErrorName', function() {
+        fnameMegaInput.hideError();
+    });
+
+    // Remove error on password and repeat password at same time.
+    $passInput.rebind('input.hideErrorPass', function() {
+        rPassMegaInput.hideError();
+    });
+
+    $rPassInput.rebind('input.hideErrorPass', function() {
+        passMegaInput.hideError();
+    });
 
     // hiding everything to get ready first
     $pageContainer.addClass('hidden');  // hiding the main sign-up part
@@ -77,19 +105,21 @@ BusinessRegister.prototype.initPage = function () {
         }
         $emailInput.val(u_attr['email']);
         $emailInput.prop('disabled', true);
+        $emailInput.blur();
         $fnameInput.val(u_attr['firstname']);
         if (u_attr['firstname']) {
             $fnameInput.prop('disabled', true);
+            $fnameInput.blur();
         }
         $lnameInput.val(u_attr['lastname']);
         if (u_attr['lastname']) {
             $lnameInput.prop('disabled', true);
+            $lnameInput.blur();
         }
 
         // hiding element we dont need for logged-in users
-        $pageContainer.find('.bus-reg-input.pass-1st').addClass('hidden');
-        $pageContainer.find('.bus-reg-input.pass-2nd').addClass('hidden');
-        $pageContainer.find('.new-registration.suba').addClass('hidden');
+        $passInput.parent().addClass('hidden');
+        $rPassInput.parent().addClass('hidden');
 
         this.isLoggedIn = true;
     }
@@ -214,96 +244,81 @@ BusinessRegister.prototype.initPage = function () {
      * @param {Object}  $element    the single element to validate, if not passed all will be validated
      * @returns {Boolean}   whether the validation passed or not*/
     var inputsValidator = function ($element) {
+        
         var passed = true;
-        if (!$element || $element.is($nbUsersInput)) {
-            var nbUsersTrimmed = $nbUsersInput.val().trim();
-            if (!nbUsersTrimmed || nbUsersTrimmed < mySelf.minUsers) {
-                $nbUsersInput.parent().addClass('error').find('.error-message').text(l[19501]);
-                $nbUsersInput.focus();
-                passed = false;
-            }
-            else if (nbUsersTrimmed && nbUsersTrimmed > mySelf.maxUsers) {
-                $nbUsersInput.parent().addClass('error').find('.error-message').text(l[20425]);
-                $nbUsersInput.focus();
-                passed = false;
-            }
-        }
-        if (!$element || $element.is($cnameInput)) {
-            if (!$cnameInput.val().trim()) {
-                $cnameInput.parent().addClass('error').find('.error-message').text(l[19507]);
-                $cnameInput.focus();
-                passed = false;
-            }
-        }
-        if (!$element || $element.is($telInput)) {
-            if (!$telInput.val().trim()) {
-                $telInput.parent().addClass('error').find('.error-message').text(l[8814]);
-                $telInput.focus();
-                passed = false;
+
+        if (mySelf.isLoggedIn === false) {
+            if (!$element || $element.is($passInput) || $element.is($rPassInput)) {
+
+                // Check if the entered passwords are valid or strong enough
+                var passwordValidationResult = security.isValidPassword($passInput.val(), $rPassInput.val());
+
+                // If bad result
+                if (passwordValidationResult !== true) {
+
+                    // Show error for password field, clear the value and refocus it
+                    $passInput.val('').focus().trigger('input');
+                    $passInput.megaInputsShowError(l[1102] + ' ' + passwordValidationResult);
+
+                    // Show error for confirm password field and clear the value
+                    $rPassInput.val('');
+                    $rPassInput.parent().addClass('error');
+
+                    passed = false;
+                }
             }
         }
-        if (!$element || $element.is($fnameInput)) {
-            if (!$fnameInput.val().trim()) {
-                $fnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
-                $fnameInput.focus();
+        if (!$element || $element.is($emailInput)) {
+            if (!$emailInput.val().trim() || !isValidEmail($emailInput.val())) {
+                emailMegaInput.showError(l[7415]);
+                $emailInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($lnameInput)) {
             if (!$lnameInput.val().trim()) {
-                $lnameInput.parent().addClass('error').find('.error-message').text(l[1098]);
+                fnameMegaInput.showError(l[1098] + ' ' + l[1099]);
+                lnameMegaInput.showError();
                 $lnameInput.focus();
                 passed = false;
             }
         }
-        if (!$element || $element.is($emailInput)) {
-            if (!$emailInput.val().trim() || !isValidEmail($emailInput.val())) {
-                $emailInput.parent().addClass('error').find('.error-message').text(l[7415]);
-                $emailInput.focus();
+        if (!$element || $element.is($fnameInput)) {
+            if (!$fnameInput.val().trim()) {
+                fnameMegaInput.showError(l[1098] + ' ' + l[1099]);
+                lnameMegaInput.showError();
+                $fnameInput.focus();
                 passed = false;
             }
         }
-        if (mySelf.isLoggedIn === false) {
-            if (!$element || $element.is($passInput)) {
-                if ($element && !$passInput.val()) {
-                    $('.password-stutus-txt', $pageContainer).addClass('hidden');
-                    $passInput.parent().removeClass('error');
-                    $('.new-registration.suba', $pageContainer).removeClass('good1 good2 good3 good4 good5');
-                }
-                else if (!$passInput.val()) {
-                    $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
-                    $('.password-stutus-txt', $pageContainer).removeClass('hidden');
-                    $passInput.focus();
-                    passed = false;
-                }
-                else if (typeof zxcvbn !== 'undefined') {
-                    passed = passed && mySelf.ratePasswordStrength($pageContainer, $passInput.val());
-                    if (!passed) {
-                        $passInput.parent().addClass('error').find('.error-message').text(l[1104]);
-                        $('.password-stutus-txt', $pageContainer).removeClass('hidden');
-                        $passInput.focus();
-                    }
-                }
-                else { // the possibility to get to this else is almost 0 ,
-                    // however it's added to eliminate any chances of problems
-                    M.require('zxcvbn_js').done(function () {
-                        inputsValidator($element); // recall me after loading
-                    });
-                }
-            }
-            if (!$element || $element.is($rPassInput)) {
-                if (!$rPassInput.val()) {
-                    $rPassInput.parent().addClass('error').find('.error-message').text(l[1104]);
-                    $rPassInput.focus();
-                    passed = false;
-                }
+        if (!$element || $element.is($telInput)) {
+            if (!$telInput.val().trim()) {
+                telMegaInput.showError(l[8814]);
+                $telInput.focus();
+                passed = false;
             }
         }
-        if (passed && !$element) {
-            if ($passInput.val() !== $rPassInput.val()) {
-                $rPassInput.parent().addClass('error').find('.error-message').text(l[1107]);
-                $rPassInput.focus();
+        if (!$element || $element.is($cnameInput)) {
+            if (!$cnameInput.val().trim()) {
+                cnameMegaInput.showError(l[19507]);
+                $cnameInput.focus();
                 passed = false;
+            }
+        }
+        if (!$element || $element.is($nbUsersInput)) {
+            var nbUsersTrimmed = $nbUsersInput.val().trim();
+            if (!nbUsersTrimmed || nbUsersTrimmed < mySelf.minUsers) {
+                nbUsersMegaInput.showError('*' + l[19501]);
+                $nbUsersInput.focus();
+                passed = false;
+            }
+            else if (nbUsersTrimmed && nbUsersTrimmed > mySelf.maxUsers) {
+                nbUsersMegaInput.showError(l[20425]);
+                $nbUsersInput.focus();
+                passed = false;
+            }
+            else {
+                nbUsersMegaInput.showMessage('*' + l[19501]);
             }
         }
 
@@ -316,7 +331,7 @@ BusinessRegister.prototype.initPage = function () {
         function nbOfUsersChangeEventHandler() {
             var $me = $(this);
             var valid = false;
-            if (inputsValidator($me)) {
+            if ($me.is($nbUsersInput) && inputsValidator($me)) {
                 $me.parent().removeClass('error');
                 valid = true;
             }
@@ -343,16 +358,6 @@ BusinessRegister.prototype.initPage = function () {
             mySelf.doRegister($nbUsersInput.val().trim(), $cnameInput.val().trim(),
                 $fnameInput.val().trim(), $lnameInput.val().trim(), $telInput.val().trim(), $emailInput.val().trim(),
                 $passInput.val());
-        }
-    );
-
-    // event handler for password key-up
-    $('#business-pass', $pageContainer).off('keyup.suba').on('keyup.suba',
-        function passwordFieldKeyupHandler() {
-            var $me = $(this);
-            if (inputsValidator($me)) {
-                $me.parent().removeClass('error');
-            }
         }
     );
 
@@ -406,7 +411,7 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
                     msgDialog('warninga', l[1578], l[7869], '', function () {
                         loadingDialog.hide();
                         var $emailInput = $('.bus-reg-body #business-email');
-                        $emailInput.parent().addClass('error').find('.error-message').text(l[1297]);
+                        $emailInput.megaInputsShowError(l[1297]);
                         $emailInput.focus();
                     });
                 }
@@ -518,65 +523,4 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
 
     payingPromise.always(finalizePayment);
 
-};
-
-/**
- * evaluate password strength and change ui elements on business register page
- * @param {Object} $container       jQuery page container
- * @param {String} password         password to evaluate
- */
-BusinessRegister.prototype.ratePasswordStrength = function ($container, password) {
-    "use strict";
-
-    var $passInputContianer = $('.bus-reg-input.pass-1st', $container).removeClass('weak-password strong-password');
-    var $passStrengthContainer = $('.new-registration.suba', $container).removeClass('good1 good2 good3 good4 good5');
-    var $passStrengthPad = $('.new-reg-status-pad', $passStrengthContainer);
-    var $passStrengthDesc = $('.new-reg-status-description', $passStrengthContainer);
-
-    var passwordScore = zxcvbn(password).score;
-    var passwordLength = password.length;
-
-    var overallResult = true;
-
-    if (passwordLength < security.minPasswordLength) {
-        $passInputContianer.addClass('weak-password');
-        $passStrengthContainer.addClass('good1');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[18700]);   // Too short
-        $passStrengthDesc.text(l[18701]);
-        overallResult = false;
-    }
-    else if (passwordScore >= 4) {
-        $passInputContianer.addClass('strong-password');
-        $passStrengthContainer.addClass('good5');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1128]); // Strong
-        $passStrengthDesc.text(l[1123]);
-    }
-    else if (passwordScore === 3) {
-        $passInputContianer.addClass('strong-password');
-        $passStrengthContainer.addClass('good4');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1127]); // Good
-        $passStrengthDesc.text(l[1122]);
-    }
-    else if (passwordScore === 2) {
-        $passInputContianer.addClass('strong-password');
-        $passStrengthContainer.addClass('good3');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1126]); // Medium
-        $passStrengthDesc.text(l[1121]);
-    }
-    else if (passwordScore === 1) {
-        $passStrengthContainer.addClass('good2');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1125]); // Weak
-        $passStrengthDesc.text(l[1120]);
-    }
-    else {
-        $passInputContianer.addClass('weak-password');
-        $passStrengthContainer.addClass('good1');
-        $passStrengthPad.safeHTML('<strong>@@</strong> @@', l[1105], l[1124]); // Very Weak
-        $passStrengthDesc.text(l[1119]);
-    }
-    if (passwordScore < security.minPasswordScore) {
-        overallResult = false;
-    }
-
-    return overallResult;
 };

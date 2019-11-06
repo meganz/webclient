@@ -47,23 +47,26 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
         if (this.props.active === true) {
             if (this.popupElement) {
                 var $element = $(this.popupElement);
-                var positionToElement = $('.button.active:visible');
+                var $positionToElement = $('.button.active:visible');
+                if ($positionToElement.length === 0) {
+                    return;
+                }
                 var offsetLeft = 0;
-                var $container = positionToElement.closest('.messages.scroll-area');
+                var $container = $positionToElement.closest('.messages.scroll-area');
 
-                if ($container.length == 0) {
+                if ($container.length === 0) {
                     $container = $(document.body);
                 }
 
                 $element.css('margin-left', '');
 
                 $element.position({
-                    of: positionToElement,
+                    of: $positionToElement,
                     my: self.props.positionMy ? self.props.positionMy : "center top",
                     at: self.props.positionAt ? self.props.positionAt : "center bottom",
                     collision: "flipfit",
                     within: $container,
-                    using: function (obj, info) {
+                    using: function(obj, info) {
                         var vertOffset = 0;
                         var horizOffset = 0;
 
@@ -73,18 +76,21 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
                             if (self.props.arrowHeight) {
                                 arrowHeight = self.props.arrowHeight;
                                 if (info.vertical !== "top") {
-                                    arrowHeight = arrowHeight * -1;
-                                } else {
+                                    arrowHeight *= -1;
+                                }
+                                else {
                                     arrowHeight = 0;
                                 }
-                            } else {
+                            }
+                            else {
                                 arrowHeight = $arrow.outerHeight();
                             }
                             if (info.vertical != "top") {
                                 $(this)
                                     .removeClass("up-arrow")
                                     .addClass("down-arrow");
-                            } else {
+                            }
+                            else {
                                 $(this)
                                     .removeClass("down-arrow")
                                     .addClass("up-arrow");
@@ -289,7 +295,7 @@ export class DropdownContactsSelector extends MegaRenderMixin(React.Component) {
                 <ContactPickerWidget
                     active={this.props.active}
                     className="popup contacts-search tooltip-blur small-footer"
-                    contacts={this.props.contacts}
+                    contacts={M.u}
                     selectFooter={this.props.selectFooter}
                     megaChat={this.props.megaChat}
                     exclude={this.props.exclude}

@@ -805,6 +805,12 @@ MegaData.prototype.syncContactEmail = function(userHash) {
 
     var eventuallyReorderContactsTreePane = function() {
         if (
+            (
+                M.currentdirid === "contacts" ||
+                M.currentdirid === "ipc" ||
+                M.currentdirid === "opc" ||
+                M.u[M.currentdirid]
+            ) &&
             typeof $.sortTreePanel !== 'undefined' &&
             typeof $.sortTreePanel.contacts !== 'undefined' &&
             $.sortTreePanel.contacts.by === 'status'
@@ -828,8 +834,9 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 else if (M.currentdirid === 'contacts') {
                     M.openFolder(M.currentdirid, true);
                 }
-
-                eventuallyReorderContactsTreePane();
+                if (M.u[contact.h] && M.u[contact.h].c) {
+                    eventuallyReorderContactsTreePane();
+                }
             }, 1000);
         }
     };
@@ -1203,3 +1210,205 @@ MegaData.prototype.findOutgoingPendingContactIdByEmail = function(email) {
         }
     }
 };
+
+MegaData.prototype.addContactUI = function() {
+    "use strict";
+
+    var $container = $('.contact-top-details');
+
+    $('.nw-contact-item').removeClass('selected');
+
+    var n = this.u[this.currentdirid];
+    if (n && n.u) {
+        var u_h = this.currentdirid;
+        var user = this.u[u_h];
+        var avatar = $(useravatar.contact(u_h, 'medium-avatar'));
+
+        var onlinestatus = this.onlineStatusClass(
+            megaChatIsReady &&
+            this.u[u_h] ? this.u[u_h].presence : "unavailable"
+        );
+
+        $container.find('.nw-contact-block-avatar').empty().append(avatar);
+        $container.find('.onlinestatus').removeClass('away offline online busy').addClass(onlinestatus[1]);
+        $container.find('.fm-chat-user-status').text(onlinestatus[0]);
+        $container.find('.contact-details-user-name').text(this.getNameByHandle(user.u));
+        $container.find('.contact-details-email').text(user.m);
+        $('.contact-share-notification').text(l[20435].replace('%1', this.getNameByHandle(user.u)));
+
+        // Display the current fingerpring
+        showAuthenticityCredentials(user, $container);
+
+        // Set authentication state of contact from authring.
+        // To be called on settled authring promise.
+        authring.onAuthringReady('contactUI').done(function _setVerifiedState() {
+
+            var handle = user.u || user;
+            var verificationState = u_authring.Ed25519[handle] || {};
+            var isVerified = (verificationState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
+
+            // Show the user is verified
+            if (isVerified) {
+                $('.fm-verify').addClass('verified').find('span').text(l[6776]);
+            }
+            else {
+                // Otherwise show the Verify... button.
+                enableVerifyFingerprintsButton(handle);
+            }
+        });
+
+        // Reset seen or verified fingerprints and re-enable the Verify button
+        $('.fm-reset-stored-fingerprint').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
+            authring.resetFingerprintsForUser(user.u);
+            enableVerifyFingerprintsButton(user.u);
+
+            // Refetch the key
+            showAuthenticityCredentials(user, $container);
+
+            // Trigger manual UI updates
+            if (M.u[user.u]) {
+                M.u[user.u].trackDataChange();
+            }
+        });
+
+        $('.fm-share-folders').rebind('click', function() {
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+            openCopyShareDialog(M.currentdirid);
+        });
+
+        // Initialise the Set nickname button on the contact details page
+        $('.fm-set-nickname').rebind('click', function() {
+
+            nicknames.setNicknameDialog.init(u_h);
+        });
+
+        // Remove contact button on contacts page
+        $('.fm-remove-contact').rebind('click', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
+            fmremove([M.currentdirid]);
+        });
+
+        if (!megaChatIsDisabled) {
+
+            // Bind the "Start conversation" button
+            $('.fm-start-conversation').rebind('click.megaChat', function() {
+                loadSubPage('fm/chat/p/' + u_h);
+                return false;
+            });
+        }
+
+        $('.nw-contact-item#contact_' + u_h).addClass('selected');
+    }
+};
+
+MegaData.prototype.contactsUI = function() {
+    "use strict";
+
+    var $container = $('.contacts-view');
+    var $contactBlocks = $container.find('.data-block-view, .contacts tr');
+    var $buttons = $contactBlocks.find('.default-white-button');
+
+    setContactLink();
+
+    mega.achievem.enabled()
+        .done(function() {
+            $container.find('.contact-green-info').text(l[19107]);
+            $('.fm-empty-contacts .fm-empty-description.small').text(l[19115]);
+        })
+        .fail(function() {
+            $container.find('.contact-green-info').text(l[19106]);
+            $('.fm-empty-contacts .fm-empty-description.small').text(l[19114]);
+        });
+
+    $('.contacts-tab-lnk').rebind('click', function() {
+        var $this = $(this);
+        var folder = escapeHTML($this.attr('data-folder'));
+
+        if (folder === "ipc") {
+            M.openFolder('ipc');
+        }
+        else if (folder === "opc") {
+            M.openFolder('opc');
+        }
+        else {
+            M.openFolder('contacts');
+        }
+    });
+
+    $contactBlocks.rebind('mouseover.contacts', function() {
+        var $this = $(this);
+
+        if (megaChatIsDisabled) {
+            $this.find('.contact-chat-buttons').addClass('hidden');
+        }
+        else {
+            $this.find('.contact-chat-buttons').removeClass('hidden');
+        }
+    });
+
+    $buttons.rebind('click.contacts', function() {
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            $.hideContextMenu();
+            M.showExpiredBusiness();
+            return;
+        }
+
+        var $this = $(this);
+        var user_handle = $this.closest('.data-block-view, tr').attr('id');
+
+        if ($this.hasClass('disabled') || !user_handle) {
+            return;
+        }
+
+        if ($this.hasClass('start-conversation')) {
+            loadSubPage("fm/chat/p/" + user_handle);
+        }
+        else if ($this.hasClass('start-audio-call')) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startAudioCall();
+                });
+        }
+        else if ($this.hasClass('start-video-call')) {
+            megaChat.createAndShowPrivateRoomFor(user_handle)
+                .then(function(room) {
+                    room.setActive();
+                    room.startVideoCall();
+                });
+        }
+    });
+
+    $('.fm-empty-contacts .fm-empty-button, .add-new-contact, .fm-add-user')
+        .rebind('mousedown.addcontact1', function(e) {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                $.hideContextMenu();
+                M.showExpiredBusiness();
+                return;
+            }
+
+            $.hideContextMenu();
+            contactAddDialog();
+            e.stopPropagation();
+        });
+
+};
+

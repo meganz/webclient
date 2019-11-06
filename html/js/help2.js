@@ -12,7 +12,6 @@ var Help = (function() {
     var $window = $(window);
     var $currentQuestion = null;
 
-
     function tagUri(tag) {
         return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
     }
@@ -75,7 +74,7 @@ var Help = (function() {
     }
 
     function url() {
-        return 'help/' + toArray.apply(null, arguments).join('/');
+        return 'help/' + toArray.apply(null, arguments).join('/').trim().replace(/\s/g, '+');
     }
 
     function selectMenuItem($element, $elements) {
@@ -434,7 +433,7 @@ var Help = (function() {
 
     var urls = {
         'search': function(args) {
-            var searchTerm = String(args[1]);
+            var searchTerm = String(args[1]).replace(/\+/g, ' ');
 
             if (searchTerm.indexOf('%25') >= 0) {
                 do {

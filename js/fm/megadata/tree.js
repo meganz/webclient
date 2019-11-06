@@ -521,7 +521,7 @@ MegaData.prototype.treeSearchUI = function() {
         }); // END left panel header click
 
         // Make a search
-        $('.nw-fm-search-icon').show().rebind('click', function() {
+        !M.chat && $('.nw-fm-search-icon').show().rebind('click', function() {
             var $self = $(this);
 
             treesearch = false;
@@ -847,9 +847,6 @@ MegaData.prototype.redrawTree = function(f) {
     else if (M.currentrootid === 'contacts' || M.currentrootid === 'opc' || M.currentrootid === 'ipc') {
         M.contacts();
     }
-    else if (M.currentrootid === 'chat') {
-        console.log('render the entire contact list filtered by search query into the conversations list');
-    }
     M.addTreeUI();
     $('.nw-fm-tree-item').noTransition(function() {
         M.onTreeUIOpen(M.currentdirid, false);
@@ -949,7 +946,7 @@ MegaData.prototype.getOutShareTree = function() {
 
 /**
  * Get t value of custom view trees
- * @return {Interger}
+ * @return {MegaNode} An ufs-node
  */
 MegaData.prototype.getTreeValue = function(n) {
 
@@ -969,4 +966,380 @@ MegaData.prototype.getTreeValue = function(n) {
         t |= M.IS_TAKENDOWN;
     }
     return t;
+};
+
+/**
+ * Initializes tree panel
+ */
+MegaData.prototype.addTreeUI = function() {
+    "use strict";
+
+    if (d) {
+        console.time('treeUI');
+    }
+    var $treePanel = $('.fm-tree-panel');
+    var $treeItem = $(folderlink ? '.nw-fm-tree-item' : '.nw-fm-tree-item:visible', $treePanel);
+
+    $treeItem.draggable(
+        {
+            revert: true,
+            containment: 'document',
+            revertDuration: 200,
+            distance: 10,
+            scroll: false,
+            cursorAt: {right: 88, bottom: 58},
+            helper: function(e, ui) {
+                $(this).draggable("option", "containment", [72, 42, $(window).width(), $(window).height()]);
+                return M.getDDhelper();
+            },
+            start: function(e, ui) {
+                $.treeDragging = true;
+                $.hideContextMenu(e);
+                var html = '';
+                var id = $(e.target).attr('id');
+                if (id) {
+                    id = id.replace(/treea_+|(os_|pl_)/g, '');
+                }
+                if (id && M.d[id]) {
+                    html = (
+                        '<div class="transfer-filetype-icon ' + fileIcon(M.d[id]) + '"></div>' +
+                        '<div class="tranfer-filetype-txt dragger-entry">' +
+                        str_mtrunc(htmlentities(M.d[id].name)) + '</div>'
+                    );
+                }
+                $('#draghelper .dragger-icon').remove();
+                $('#draghelper .dragger-content').html(html);
+                $('body').addClass('dragging');
+                $.draggerHeight = $('#draghelper .dragger-content').outerHeight();
+                $.draggerWidth = $('#draghelper .dragger-content').outerWidth();
+            },
+            drag: function(e, ui) {
+                //console.log('tree dragging',e);
+                if (ui.position.top + $.draggerHeight - 28 > $(window).height()) {
+                    ui.position.top = $(window).height() - $.draggerHeight + 26;
+                }
+                if (ui.position.left + $.draggerWidth - 58 > $(window).width()) {
+                    ui.position.left = $(window).width() - $.draggerWidth + 56;
+                }
+            },
+            stop: function(e, u) {
+                $.treeDragging = false;
+                $('body').removeClass('dragging').removeClassWith("dndc-");
+            }
+        });
+
+    $(
+        '.fm-tree-panel .nw-fm-tree-item,' +
+        '.rubbish-bin,' +
+        '.fm-breadcrumbs,' +
+        '.nw-fm-left-icons-panel .nw-fm-left-icon,' +
+        '.shared-with-me tr,' +
+        '.nw-conversations-item,' +
+        'ul.conversations-pane > li,' +
+        '.messages-block'
+    ).filter(":visible").droppable({
+        tolerance: 'pointer',
+        drop: function(e, ui) {
+            $.doDD(e, ui, 'drop', 1);
+        },
+        over: function(e, ui) {
+            $.doDD(e, ui, 'over', 1);
+        },
+        out: function(e, ui) {
+            $.doDD(e, ui, 'out', 1);
+        }
+    });
+
+    // disabling right click, default contextmenu.
+    $(document).rebind('contextmenu', function(e) {
+        var $target = $(e.target);
+
+        if (!is_fm() ||
+            $target.parents('#startholder').length ||
+            $target.is('input') ||
+            $target.is('textarea') ||
+            $target.is('#embed-code-field') ||
+            $target.is('.download.info-txt') ||
+            $target.closest('.multiple-input').length ||
+            $target.closest('.create-folder-input-bl').length ||
+            $target.closest('.content-panel.conversations').length ||
+            $target.closest('.messages.content-area').length ||
+            $target.closest('.chat-right-pad .user-card-data').length ||
+            $target.parents('.fm-account-main').length ||
+            $target.parents('.export-link-item').length ||
+            $target.parents('.contact-fingerprint-txt').length ||
+            $target.parents('.fm-breadcrumbs').length ||
+            $target.hasClass('contact-details-user-name') ||
+            $target.hasClass('contact-details-email') ||
+            $target.hasClass('nw-conversations-name')) {
+        }
+        else if (!localStorage.contextmenu) {
+            $.hideContextMenu();
+            return false;
+        }
+    });
+
+    $treeItem.rebind('click.treeUI, contextmenu.treeUI', function(e) {
+
+        var $this = $(this);
+        var id = $this.attr('id').replace('treea_', '');
+        var tmpId = id;
+        var cv = M.isCustomView(id);
+
+        id = cv ? cv.nodeID : id;
+
+        if (e.type === 'contextmenu') {
+            $('.nw-fm-tree-item').removeClass('dragover');
+            $this.addClass('dragover');
+
+            var $uls = $this.parents('ul').find('.selected');
+
+            if ($uls.length > 1) {
+                $.selected = $uls.attrs('id')
+                    .map(function(id) {
+                        return id.replace(/treea_+|(os_|pl_)/g, '');
+                    });
+            }
+            else {
+                $.selected = [id];
+
+                Soon(function() {
+                    $this.addClass('hovered');
+                });
+            }
+            return !!M.contextMenuUI(e, 1);
+        }
+
+        var $target = $(e.target);
+        if ($target.hasClass('nw-fm-arrow-icon')) {
+            M.onTreeUIExpand(tmpId);
+        }
+        else if (e.shiftKey) {
+            $this.addClass('selected');
+        }
+        else {
+            // plain click, remove all .selected from e.shiftKey
+            $('#treesub_' + M.currentrootid + ' .nw-fm-tree-item').removeClass('selected');
+            $this.addClass('selected');
+
+            if ($target.hasClass('opened')) {
+                M.onTreeUIExpand(tmpId);
+            }
+            if (e.ctrlKey) {
+                $.ofShowNoFolders = true;
+            }
+
+            id = cv ? cv.prefixPath + id : id;
+
+            M.openFolder(id, e.ctrlKey);
+        }
+
+        return false;
+    });
+
+    $('.nw-contact-item', $treePanel).rebind('contextmenu.treeUI', function(e) {
+        var $self = $(this);
+
+        if (!$self.hasClass('selected')) {
+            $('.content-panel.contacts .nw-contact-item.selected').removeClass('selected');
+            $self.addClass('selected');
+        }
+
+        $.selected = [$self.attr('id').replace('contact_', '')];
+        M.searchPath();
+        $.hideTopMenu();
+
+        return Boolean(M.contextMenuUI(e, 1));
+    });
+
+    /**
+     * Let's shoot two birds with a stone, when nodes are moved we need a resize
+     * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
+     */
+    $(window).trigger('resize');
+
+    if (d) {
+        console.timeEnd('treeUI');
+    }
+};
+
+/**
+ * Invokes debounced tree panel initialization.
+ */
+MegaData.prototype.addTreeUIDelayed = function() {
+    'use strict';
+
+    delay('treeUI', function() {
+        M.addTreeUI();
+    }, 30);
+};
+
+/**
+ * Handles expanding of tree panel elements.
+ * @param {String} id An ufs-node's handle
+ * @param {Boolean} [force]
+ */
+MegaData.prototype.onTreeUIExpand = function(id, force) {
+    "use strict";
+
+    this.buildtree({h: id});
+
+    var $tree = $('#treea_' + id);
+
+    if ($tree.hasClass('expanded') && !force) {
+        fmtreenode(id, false);
+        $('#treesub_' + id).removeClass('opened');
+        $tree.removeClass('expanded');
+    }
+    else if ($tree.hasClass('contains-folders')) {
+        fmtreenode(id, true);
+        $('#treesub_' + id).addClass('opened')
+            .find('.tree-item-on-search-hidden')
+            .removeClass('tree-item-on-search-hidden');
+        $tree.addClass('expanded');
+    }
+
+    M.addTreeUIDelayed();
+};
+
+/**
+ * Handles opening of tree panel elemement.
+ * @param {String} id An ufs-node's handle
+ * @param {Object} [event] Event triggering action
+ * @param {Boolean} [ignoreScroll] Whether scroll element into view.
+ */
+MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
+    "use strict";
+
+    id = String(id);
+    var id_r = this.getNodeRoot(id);
+    var id_s = id.split('/')[0];
+    var e, scrollTo = false, stickToTop = false;
+    if (d) {
+        console.log("treeUIopen", id);
+    }
+
+    if (id_r === 'shares') {
+        this.onSectionUIOpen('shared-with-me');
+    }
+    else if (id_r === 'out-shares') {
+        this.onSectionUIOpen('out-shares');
+    }
+    else if (id_r === 'public-links') {
+        this.onSectionUIOpen('public-links');
+    }
+    else if (this.InboxID && id_r === this.InboxID) {
+        this.onSectionUIOpen('inbox');
+    }
+    else if (id_r === this.RootID) {
+        this.onSectionUIOpen('cloud-drive');
+    }
+    else if (id_s === 'chat') {
+        this.onSectionUIOpen('conversations');
+    }
+    else if (id_r === 'contacts') {
+        this.onSectionUIOpen('contacts');
+    }
+    else if (id_r === 'ipc') {
+        this.onSectionUIOpen('ipc');
+    }
+    else if (id_r === 'opc') {
+        this.onSectionUIOpen('opc');
+    }
+    else if (id_s === 'user-management') {
+        this.onSectionUIOpen('user-management');
+    }
+    else if (id_r === 'account') {
+        this.onSectionUIOpen('account');
+    }
+    else if (id_r === 'dashboard') {
+        this.onSectionUIOpen('dashboard');
+    }
+    else if (this.RubbishID && id_r === this.RubbishID) {
+        this.onSectionUIOpen('rubbish-bin');
+    }
+    else if (id_s === 'transfers') {
+        this.onSectionUIOpen('transfers');
+    }
+    else if (id_s === 'recents') {
+        this.onSectionUIOpen('recents');
+    }
+
+    if (!fminitialized) {
+        return false;
+    }
+
+    if (!event) {
+        var ids = this.getPath(id);
+        var i = 1;
+        while (i < ids.length) {
+            if (this.d[ids[i]] && ids[i].length === 8) {
+                if (id_r === 'out-shares') {
+                    this.onTreeUIExpand('os_' + ids[i], 1);
+                }
+                else if (id_r === 'public-links') {
+                    this.onTreeUIExpand('pl_' + ids[i], 1);
+                }
+                else {
+                    this.onTreeUIExpand(ids[i], 1);
+                }
+            }
+            i++;
+        }
+        if (
+            (ids[0] === 'contacts')
+            && this.currentdirid
+            && (String(this.currentdirid).length === 11)
+            && (this.currentrootid === 'contacts')
+        ) {
+            this.onSectionUIOpen('contacts');
+        }
+        else if (ids[0] === 'contacts') {
+            // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
+            // UI tree -> Shared with me... its a bug from what i can see and i also don't see any points of automatic
+            // redirect in the UI when another user had sent me a shared folder.... its very bad UX. Plus, as a bonus
+            // sectionUIopen is already called with sectionUIopen('contacts') few lines before this (when this func
+            // is called by the renderNew()
+
+            // sectionUIopen('shared-with-me');
+        }
+        else if (ids[0] === this.RootID) {
+            this.onSectionUIOpen('cloud-drive');
+        }
+    }
+    if ($.hideContextMenu) {
+        $.hideContextMenu(event);
+    }
+
+    if (id_r === 'out-shares') {
+        e = $('#treea_os_' + id.split('/')[1]);
+    }
+    else if (id_r === 'public-links') {
+        e = $('#treea_pl_' + id.split('/')[1]);
+    }
+    else {
+        e = $('#treea_' + id_s);
+    }
+
+    $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected');
+    e.addClass('selected');
+
+    if (!ignoreScroll) {
+        if (id === this.RootID || id === 'shares' || id === 'contacts' || id === 'chat' || id === 'opc' || id === 'ipc') {
+            stickToTop = true;
+            scrollTo = $('.nw-tree-panel-header');
+        }
+        else if (e.length && !e.visible()) {
+            scrollTo = e;
+        }
+        // if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
+
+        var jsp = scrollTo && $('.fm-tree-panel').data('jsp');
+        if (jsp) {
+            setTimeout(function() {
+                jsp.scrollToElement(scrollTo, stickToTop);
+            }, 50);
+        }
+    }
+    this.addTreeUIDelayed();
 };

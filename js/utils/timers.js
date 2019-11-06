@@ -95,3 +95,35 @@ delay.cancel = function(aProcID) {
     }
     return false;
 };
+
+
+var _IDLE_OR_TIMEOUT = window.requestIdleCallback ? 1 : 2;
+
+/**
+ * Tries to use `requestIdleCallback` or fallback to `setTimeout` if not available
+ */
+var _onIdleOrTimeout = _IDLE_OR_TIMEOUT === 1 ? function(cb, interval) {
+        "use strict";
+        return window.requestIdleCallback(function () {
+            cb();
+        }, {
+            timeout: 5000
+        });
+    } :
+    function(cb, interval) {
+        return setTimeout(function() {
+            cb();
+        }, interval);
+    };
+
+
+/**
+ * Tries to use `cancelIdleCallback` or fallback to `clearTimeout` if not available
+ */
+var _cancelOnIdleOrTimeout = _IDLE_OR_TIMEOUT === 1 ? function(id) {
+        "use strict";
+        return window.cancelIdleCallback(id);
+    } :
+    function(id) {
+        return clearTimeout(id);
+    };

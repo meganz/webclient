@@ -258,11 +258,11 @@
                 self._msgActionsQueuePerChat[chatId].promise.reject();
             delete self._msgActionsQueuePerChat[chatId];
         }
-        self.db.transaction('rw', self.db.msgs, function(msgs, trans) {
+        self.db.transaction('rw', self.db.msgs, function() {
             self._encryptedWhere('msgs', {'chatId': chatId})
                 .done(function (results) {
                     results.forEach(function (r) {
-                        msgs.delete(r.id);
+                        self.db.msgs.delete(r.id);
                     });
                 });
         });

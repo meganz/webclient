@@ -181,7 +181,8 @@ function parseHTMLfmt2(markup) {
     $fn = obj = undefined;
 })($.fn, {
     'html': 'safeHTML',
-    'append': 'safeAppend'
+    'append': 'safeAppend',
+    'prepend': 'safePrepend'
 });
 
 /**

@@ -969,7 +969,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
                 }
             }
 
-            removeUInode(h, p);
+            // If user is on out-shares or public-link list page, move should not remove node from the list
+            if (M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links') {
+                removeUInode(h, p);
+            }
             M.nodeUpdated(n);
             newnodes.push(n);
 
@@ -2001,7 +2004,8 @@ MegaData.prototype.labelFilterBlockUI = function() {
     $('.files-grid-view.fm .filter-block.body').addClass('hidden');
 
     if (M.currentLabelFilter) {
-        if (fmconfig.viewmodes[M.currentdirid]) {// Block view
+
+        if (M.viewmode) {// Block view
             if (type === 'shares') {
                 $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
             }
@@ -2144,7 +2148,7 @@ MegaData.prototype.applyLabelFilter = function (e) {
         $menuItems.filter('[data-label-id=' + labelId + ']').addClass('active');
         $filterBlock.find('.content').append(fltIndicator.replace('%1', M.getLabelClassFromId(labelId)));
 
-        if (fmconfig.viewmodes[M.currentdirid]) {
+        if (M.viewmode) {// Block view
             $('.fm-right-header.fm .filter-block.' + type + '.body').removeClass('hidden');
         }
         else {

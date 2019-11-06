@@ -92,7 +92,7 @@
     line-height: 24px;
     letter-spacing: -0.1px;
     font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 22px 0 0 0;
+    padding: 21px 0 0 0;
     margin: 0;
     font-weight: normal;
 }
@@ -187,9 +187,6 @@
 /* end of Old bottom pages stylinng */
 
 /* Bottom pages common styles*/
-.red {
-    color: #F0373B;
-}
 body.bottom-pages .fmholder {
     overflow: hidden;
     overflow-y: auto;
@@ -262,6 +259,9 @@ html.gbot {
     max-height: 700px;
     min-height: 455px;
     table-layout: fixed;
+}
+.bottom-page.top-bl.light-grey {
+    background-color: #FAFAFA;
 }
 .bottom-page.top-bl .table {
     overflow: hidden;
@@ -2071,7 +2071,7 @@ bottom-page.top-title.uwp::before {
     color: white;
     font-size: 0;
     line-height: 0;
-    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -2150,11 +2150,10 @@ bottom-page.top-title.uwp::before {
     background-position: -186px -25px;
 }
 .unsupported .bottom-page.top-dark-button {
+    display: inline-block;
     height: 62px;
     min-width: 172px;
-    display: inline-block;
     padding: 10px 10px 0 10px;
-    margin: 22px 8px 14px 8px;
 }
 .unsupported .bottom-page.top-dark-button .label span {
     font-size: 13px;
@@ -2181,7 +2180,7 @@ bottom-page.top-title.uwp::before {
 .bottom-page.top-button-info a {
     text-decoration: none;
     color: #333333;
-    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     cursor: pointer;
 }
 .bottom-page.top-button-info a:hover {
@@ -2191,13 +2190,11 @@ bottom-page.top-title.uwp::before {
     font-size: 12px;
     line-height: 18px;
     color: rgba(51,51,51,0.7);
-    padding: 23px 0 0 0;
+    padding: 22px 0 0 0;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .bottom-page.top-copyrights.small-pad {
-    font-size: 13px;
-    padding: 0 0 0 0;
-    margin: -2px 0 0 0;
+    padding: 9px 0 13px 0;
 }
 .bottom-page.top-copyrights sup {
     top: 1px;
@@ -2205,27 +2202,42 @@ bottom-page.top-title.uwp::before {
 }
 .bottom-page.top-copyrights em {
     font-style: normal;
+    font-size: 16px;
+    color: #333;
 }
 .bottom-page.top-copyrights a {
     cursor: pointer;
     color: #F0373B;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+}
+.bottom-page.top-copyrights strong {
+    font-weight: normal;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
 }
 .mobile .browsers .bottom-page.top-copyrights a {
     color: inherit;
     cursor: default;
 }
 .bottom-page.top-copyrights .available {
-    display: block;
-    padding-bottom: 7px;
+    display: none;
+    padding-bottom: 8px;
+    font-size: 16px;
+    color: #333;
 }
-.bottom-page.top-copyrights .content, .unsupported .bottom-page.top-copyrights .available {
+.bottom-page.top-copyrights .available.desktop, .mobile .android .bottom-page.top-copyrights .available.android, .mobile .ios .bottom-page.top-copyrights .available.ios {
+     display: block;
+}
+.bottom-page.top-copyrights .content, .unsupported .bottom-page.top-copyrights .available, .mobile .ios .bottom-page.top-copyrights .available.desktop, .mobile .android .bottom-page.top-copyrights .available.desktop,  .mobile .ios  .bottom-page.top-copyrights.small-pad, .mobile .ios .bottom-page.top-dark-button.ff, .mobile .ios.firefox .bottom-page.top-copyrights .content.ff {
     display: none;
 }
 .chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .unsupported .bottom-page.top-copyrights .unsupported {
     display: block;
 }
-.unsupported .bottom-page.top-copyrights {
-    padding-bottom: 46px;
+.ios .bottom-page.top-copyrights  {
+    padding-top: 0;
+}
+.unsupported .bottom-page.top-copyrights:not(.small-pad) {
+    padding: 40px 0 46px 0;
 }
 .bottom-page.sides-pad {
     padding: 0 40px;
@@ -2463,6 +2475,11 @@ bottom-page.top-title.uwp::before {
     display: none;
 }
 /* UWP specifc styling */
+.uwp .bottom-page.top-dark-info.medium {
+    max-width: 990px;
+    margin-left: auto;
+    margin-right: auto;
+}
 .cropped-page .bottom-page.top-title {
     letter-spacing: 0;
     font-family: 'LatoWebBold';
@@ -2614,30 +2631,25 @@ bottom-page.top-title.uwp::before {
 .uwp .bottom-page.half-sized-cell {
     max-width: none;
 }
-.uwp .bottom-page.angle-bg, .megasync .bottom-page.angle-bg, .bottom-page.grey-angle-bg {
-    position: absolute;
-    width: 100%;
-    height: 634px;
-    content: '';
-    left: 0;
+.uwp .bottom-page.angle-bg, .megasync .bottom-page.angle-bg {
     background-image: url(../images/mega/bottom-page/gray-blue-angle_v1@2x.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-color: #fff;
     background-position: center top;
     margin-top: 4px;
+    bottom: 0 !important;
+}
+.megasync .bottom-page.angle-bg {
+	background-color: transparent;
 }
 .bottom-page.grey-angle-bg {
+    position: absolute;
+    width: 100%;
+    left: 0;
     background-image: url(../images/mega/bottom-page/grey-angle_v1.png);
-    background-image: 
-        linear-gradient(transparent, transparent),
-        url(../images/mega/bottom-page/grey-angle_v1.svg);
+    background-size: 100% 100%;
+    background-position: center top;
+    background-color: white;
     margin: 0;
     height: 1280px;
-}
-.megasync .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
-	background-color: transparent;
-	bottom: 0;
 }
 /* MEGAsync specific */
 .megasync .inline-block.mid-pad {
@@ -3326,7 +3338,6 @@ div.radioOn.green::after {
 .bottom-page.angle-bg.blue {
     background-image: url(../images/mega/bottom-page/business-bg3@2x.png);
     background-color: transparent;
-    background-size: cover;
     bottom: auto;
     height: 1343px;
     top: 0;
@@ -3336,7 +3347,6 @@ div.radioOn.green::after {
 .bottom-page.angle-bg.light-blue {
     background-image: url(../images/mega/bottom-page/light-blue-angle@2x.png);
     background-color: transparent;
-    background-size: cover;
     bottom: auto;
     height: 1119px;
     top: auto;
@@ -3568,6 +3578,12 @@ div.radioOn.green::after {
     margin-left:  auto;
     margin-right: auto;
 }
+.browsers .bottom-page.mid-icon-info a {
+    overflow: hidden;
+    max-width: 100%;
+    display: inline-block;
+    text-overflow: ellipsis;
+}
 /* end of Browser extensions page */
 
 /* Bird */
@@ -3575,6 +3591,12 @@ div.radioOn.green::after {
     max-width: 600px;
     width: 100%;
     margin: 28px 0 0 36px;
+}
+.bird .bottom-page.top-dark-button {
+    margin-top: 28px;
+    min-width: 280px;
+    display: inline-block;
+    border-radius: 8px;
 }
 .bird .bottom-page.top-copyrights {
     padding: 104px 40px 50px 40px;
@@ -3588,10 +3610,10 @@ div.radioOn.green::after {
     padding-top: 30px;
 }
 .bird .bottom-page.scroll-button.mid .scroll-icon {
-    margin-bottom: 16px;
+    margin-bottom: 60px;
 }
-.bird .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg.light-blue {
-    bottom: -262px;
+.bird .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -310px;
 }
 .bottom-page.img.bird-img2 {
     width: 100%;
@@ -3600,7 +3622,7 @@ div.radioOn.green::after {
     margin: 0 auto 10px auto;
 }
 .bird .bottom-page.top-dark-button {
-    margin: 28px 0 0 0;
+    margin: 28px -25px 0 -25px;
     min-width: 280px;
     display: inline-block;
     border-radius: 8px;
@@ -4176,7 +4198,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-amount, .onboarding-suggestions .transfer-amount {
     font-family: 'LatoWebBold';
-    color: #495057;
     font-size: 17px;
     line-height: 25px
 }
@@ -4189,7 +4210,6 @@ a.opensource-icon-txt.coming-soon {
 }
 .onboarding-suggestions .storage-text, .onboarding-suggestions .transfer-text {
     font-size: 14px;
-    color: #FDA416;
     margin-top: 4px;
     text-transform: uppercase;
     line-height: 20px;
@@ -4267,6 +4287,21 @@ a.opensource-icon-txt.coming-soon {
 
 
 /* Adaptive layout */
+@media only screen and (max-width: 1900px) {
+.bottom-page.angle-bg {
+    background-size: cover !important;
+}
+.bottom-page.grey-angle-bg {
+    background-size: cover !important;
+    background-image: 
+        linear-gradient(transparent, transparent),
+        url(../images/mega/bottom-page/grey-angle_v1.svg) !important;
+}
+}
+.bottom-page.angle-bg.light {
+    background-size: auto 1343px !important;
+}
+}
 @media only screen and (max-height: 1385px) {
 .bottom-page.img.mobile-top {
     width: 100%;
@@ -4509,8 +4544,6 @@ a.opensource-icon-txt.coming-soon {
     position: relative;
     margin-top: -30px;
 }
-}
-@media only screen and (max-width: 783px) {
 .mobile .extension.img-wrap {
     margin: 43px 0 0 0;
 }
@@ -4546,9 +4579,6 @@ a.opensource-icon-txt.coming-soon {
 .bottom-page.img.bird-top {
     margin: 50px 0 0 0;
     max-width: 580px;
-}
-.mobile .bottom-page.img.bird-top {
-    margin: 20px 0 0 0;
 }
 .bird .bottom-page.top-copyrights {
     padding: 43px 40px 150px 40px;
@@ -4688,9 +4718,6 @@ a.opensource-icon-txt.coming-soon {
     vertical-align: initial;
     display: block;
 }
-.mobile-apps-button.uwp {
-    margin: 40px auto 0;
-}
 .uwp .advertise-chat .mobile-apps-button.red {
     margin: 24px 12px 24px 0;
 }
@@ -4785,6 +4812,9 @@ a.opensource-icon-txt.coming-soon {
     width: 100%;
     display: table;
 }
+.browsers .bottom-page .inline-block.col-2 {
+    display: block;
+}
 .bottom-page.left-cell.right-txt-align {
     text-align: center;
 }
@@ -4805,6 +4835,9 @@ a.opensource-icon-txt.coming-soon {
 }
 .privacy-company.new-bottom-pages {
     padding-bottom: 20px;
+}
+.bottom-page.horizontal-centered-bl {
+    display: block;
 }
 }
 @media only screen and (max-width: 783px) and (max-height: 640px) {
@@ -5238,8 +5271,14 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .onboarding-suggestions .bottom-page.horizontal-centered-bl.resize {
     min-height: 640px;
 }
+.bird .bottom-page.top-dark-button {
+    min-width: auto;
+}
 }
 @media only screen and (max-width: 545px) {
+.megasync .bottom-page.angle-bg {
+    bottom: -80px !important;
+}
 .bottom-page.nav-buttons-bl.contrast {
     display: none;
 }
@@ -5287,7 +5326,6 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .uwp .bottom-page.horizontal-centered-bl.mid-wide {
     padding: 0 28px;
 }
-
 .bottom-page.top-title {
     line-height: 32px;
     margin-bottom: 0;
@@ -5390,6 +5428,10 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .onboarding-suggestions .onboard-image-wrapper .onboard-image.folder-select, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-progress, .onboarding-suggestions .onboard-image-wrapper .onboard-image.transfer-speed {
     display: none;
 }
+.bottom-page.top-dark-button {
+    margin-left: -15px;
+    margin-right: -15px;
+}
 }
 @media only screen and (max-width: 440px) {
     .megacmd .bottom-page.horizontal-centered-bl.wide, .megacmd .bottom-page.horizontal-centered-bl {
@@ -5428,6 +5470,9 @@ body:not(.en) .pages-nav.content-block .nav-button {
 .bottom-page.scroll-button.big span {
     font-size: 14px;
     line-height: 21px;
+}
+.bird .bottom-page.top-dark-button i {
+    margin-right: 5px;
 }
 }
 @media only screen and (max-width: 408px) {
@@ -5594,6 +5639,9 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
 .bottom-page.top-button-info {
     padding: 35px 0 0 0;
 }
+.bird .bottom-page.top-bl > .vertical-centered-cell .bottom-page.angle-bg {
+    bottom: -460px;
+}
 }
 @media only screen and (max-height: 685px) {
 .linux.megasync .button.download-megasync {
@@ -5676,6 +5724,11 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
 .bottom-page.unsub .button-container {
     padding-top: 40px;
 }
+.bottom-page.unsub .headline-txt {
+    padding: 24px 32px 16px;
+    margin: 0 auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 /*end of subscription page*/
-
-

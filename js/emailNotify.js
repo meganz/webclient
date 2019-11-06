@@ -64,7 +64,22 @@
              */
             setAllState: function(newState) {
                 return attribute.setValue(newState ? 1 : 0);
-            }
+            },
+
+            /**
+             * Trigger an attribute refetch.
+             */
+            handleAttributeUpdate: function() {
+                attribute.handleAttributeUpdate().then(function() {
+                    if (fminitialized && page === 'fm/account/notifications') {
+                        if (is_mobile) {
+                            mobile.account.notifications.init();
+                        } else {
+                            accountUI.notifications.render();
+                        }
+                    }
+                });
+            },
         })
     });
 })([

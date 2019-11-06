@@ -477,7 +477,9 @@
             // - the user had a textarea, input or select field focused
             // - there is a visible/active dialog
             var skipShowingDialog = !self.showIcon()
-                || $('textarea:focus, input:focus, select:focus, .dropdown:visible, .fm-dialog:visible').length > 0;
+                || $(
+                    'textarea:focus, input:focus, select:focus, .dropdown:visible:first, .fm-dialog:visible:first'
+                ).length > 0;
 
             if (
                 !skipShowingDialog &&
@@ -547,8 +549,7 @@
         this.firstText = this.dialog.querySelector('.pass-reminder.info-txt');
 
         if (this.firstText) {
-            var link = "https://mega.nz/help/client/webclient/accounts-pro-accounts/"
-                + "i-have-forgotten-my-password-can-i-reset-it-576c763f886688e6028b4582";
+            var link = "https://mega.nz/help/s/576c763f886688e6028b4582";
 
             $(this.firstText).html(
                 escapeHTML(!this.isLogout ? l[16900] : l[20633])

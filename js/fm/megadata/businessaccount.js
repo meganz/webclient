@@ -1408,6 +1408,10 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         num: businessPlan.totalUsers        // number of users
     };
 
+    if (mega.uaoref) {
+        request.uao = escapeHTML(mega.uaoref);
+    }
+
     var utcApiCallback = function(res) {
         if ($.isNumeric(res) && res < 0) {
             operationPromise.reject(0, res, 'API returned error');

@@ -37,9 +37,9 @@
      * Example:
      * ```<a href="#" data-simpletip="Hey! +/-20px offset for this tip." data-simpletipoffset="20">Mouse over me</a>```
      *
-     * D) Add any custom styling to tooltip by `data-simpletip-style='"max-width":"200px"'`
+     * D) Add any custom styling to tooltip by `data-simpletip-style='{"max-width":"200px"}'`
      * Example:
-     * ```<a href="#" data-simpletip="Hey! custom styling." data-simpletip-style='"width":"200px"'>Mouse over me</a>```
+     * ```<a href="#" data-simpletip="Hey! custom style." data-simpletip-style='{"width":"200px"}'>Mouse over me</a>```
      */
 
 

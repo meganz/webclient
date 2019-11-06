@@ -374,6 +374,8 @@ function start_counts() {
 
 start_APIcount_inflight = false;
 var start_APIcountdata;
+var start_countInterval;
+
 function start_APIcount() {
     "use strict";
 
@@ -389,8 +391,8 @@ function start_APIcount() {
             start_APIcountdata = res;
             start_APIcountdata.timestamp = Date.now();
             start_APIcount_inflight = false;
-            if (!start_countUpdate_inflight && page === 'start' || page === 'download') {
-                start_countUpdate();
+            if (!start_countUpdate_inflight && (page === 'start' || page === 'download')) {
+                start_countInterval = setInterval(start_countUpdate, 30);
             }
         }
     });
@@ -409,13 +411,16 @@ function start_countUpdate() {
     if (!start_countUpdate_inflight) {
         startCountRenderData = {
             'users': '',
-            'files': ''
+            'files': '',
+            'users_blocks': {},
+            'files_blocks': {},
         };
     }
     start_countUpdate_inflight = true;
     if (page !== 'start' && page !== 'download') {
         start_countdata = false;
         start_countUpdate_inflight = false;
+        clearInterval(start_countInterval);
         return false;
     }
     if (!start_Lcd.users) {
@@ -467,17 +472,19 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    $('#' + type + '_number_' + i).safeHTML(total[i]);
+                    startCountRenderData[type + '_blocks'][i].textContent = total[i];
                 }
             }
         }
         else {
             var html = '';
+            var $wrapper = $('.startpage.flip-wrapper.' + type);
             for (var k = 0, ln = total.length; k < ln; k++) {
                 html += '<div class="flip-block"><div class="flip-bg" id="'
                     + type + '_number_' + k + '">' + total[k] + '</div></div>';
             }
-            $('.startpage.flip-wrapper.' + type).html(html);
+            $wrapper.safeHTML(html);
+            startCountRenderData[type + '_blocks'] = $('.flip-bg', $wrapper);
         }
         startCountRenderData[type] = total;
     }
@@ -488,14 +495,9 @@ function start_countUpdate() {
 
     if ($.lastScrollTime + 100 < Date.now()) {
         if ($.lastScrollTime < Date.now() + 200) {
-            if ($('.startpage.flip-wrapper.users').visible()
+            $.counterVisible = $('.startpage.flip-wrapper.users').visible()
                 || $('.startpage.flip-wrapper.files').visible()
-                || $('.bottom-page.big-icon.registered-users').visible()) {
-                $.counterVisible = true;
-            }
-            else {
-                $.counterVisible = false;
-            }
+                || $('.bottom-page.big-icon.registered-users').visible();
         }
         if ($.counterVisible || !$.lastCounterRender || $.lastCounterRender + 2000 < Date.now()) {
             renderCounts(String(Math.round(start_Lcd.users)), 'users');
@@ -503,7 +505,7 @@ function start_countUpdate() {
             $.lastCounterRender = Date.now();
         }
     }
-    setTimeout(start_countUpdate, 30);
+
     if (start_APIcountdata.timestamp + 30000 < Date.now()) {
         start_APIcount();
     }

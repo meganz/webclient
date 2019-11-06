@@ -132,10 +132,10 @@ MegaData.prototype.drawReceivedContactRequests = function(ipc, clearGrid) {
                     '<span>' + l[5856] + '</span></div>' +
                     '<div class="contact-request-button default-white-button grey-txt inline ignore">' +
                     '<i class="small-icon icons-sprite stop dark"></i>' +
-                    '<span>' + l[5860] + '</span></div>' +
+                    '<span>' + l[20980] + '</span></div>' +
                     '<div class="contact-request-button default-white-button red-txt inline delete">' +
                     '<i class="small-icon icons-sprite tiny-red-cross"></i>' +
-                    '<span>' + l[5858] + '</span></div>' +
+                    '<span>' + l[20981] + '</span></div>' +
                     '<div class="contact-request-ignored"><span>' + l[5864] + '</span></div>' +
                     '<div class="clear"></div>' +
                     '</td>' +

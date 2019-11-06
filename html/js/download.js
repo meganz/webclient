@@ -807,6 +807,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.download.speed-block', $dowloadWrapper).removeClass('hidden');
     $('.download.eta-block', $dowloadWrapper).removeClass('hidden');
     $('.bar-table .progress-block', $dowloadWrapper).removeClass('hidden');
+    $('.download .pause-transfer', $dowloadWrapper).removeClass('hidden');
     $('.download.error-text', $dowloadWrapper).addClass('hidden');
     $('.download.main-transfer-error', $dowloadWrapper).addClass('hidden');
     $('.download.overquoata-error', $dowloadWrapper).addClass('hidden');
@@ -814,8 +815,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.see-our-plans, .get-more-bonuses, .create-account-button.inline', $dowloadWrapper).addClass('hidden');
 
     if (dl_queue[dl_queue_num]) {
-        if (!dl_queue[dl_queue_num].starttime) {
-            dl_queue[dl_queue_num].starttime = now - 100;
+        if (!dl_queue[dl_queue_num].st) {
+            dl_queue[dl_queue_num].st = now - 100;
         }
         dl_queue[dl_queue_num].loaded = bytesloaded;
     }
@@ -859,7 +860,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             $('.mobile .download-progress span').text(l[8579] + '...');
         }
     }
-    else if (bytesloaded && (now - (fdl_starttime || Object(dl_queue[dl_queue_num]).starttime)) / 1000) {
+    else if (bytesloaded && (now - (fdl_starttime || Object(dl_queue[dl_queue_num]).st)) / 1000) {
         var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
         var speed  = numOfBytes(bps, 1);

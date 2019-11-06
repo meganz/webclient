@@ -2674,84 +2674,79 @@ function invalidLinkError() {
 }
 
 /**
- * Classifies the strength of the password (used on the main Registration, Reset password (key or park) pages and
- * in the Pro Register dialog. The minimum allowed strength is 8 characters in length and password score of 1 (weak).
+ * Classifies the strength of the password (Mainly used on the MegaInputs)
+ * ZXCVBN library need to be inited before executing this function.
+ * The minimum allowed strength is 8 characters in length and password score of 1 (weak).
  * @param {String} password The user's password (should be trimmed for whitespace beforehand)
  */
-function classifyPassword(password, $wrapper) {
+function classifyPassword(password) {
 
     'use strict';
 
+    if (typeof zxcvbn !== 'function') {
+        console.error('zxcvbn is not inited');
+        return false;
+    }
+
     // Calculate the password score using the ZXCVBN library and its length
+    password = $.trim(password);
     var passwordScore = zxcvbn(password).score;
     var passwordLength = password.length;
-    var $passStatus = $wrapper ? $wrapper.find('.account.password-status')
-        : $('.account.password-status');
-    var className = '';
-    var string1 = '';
-    var string2 = '';
-    var statusClass = '';
+    var result = {};
 
-    if (passwordLength < security.minPasswordLength) {
-        string1 = l[18700];
-        string2 = l[18701];             // Your password needs to be at least 8 characters long
-        className = 'good1';            // Very weak
-        statusClass = 'insufficient-strength';
+    if (passwordLength === 0) {
+        return false;
+    }
+    else if (passwordLength < security.minPasswordLength) {
+        result = {
+            string1: l[18700],
+            string2: l[18701],                      // Your password needs to be at least 8 characters long
+            className: 'good1',                     // Very weak
+            statusClass: 'insufficient-strength'
+        };
     }
     else if (passwordScore === 4) {
-        string1 = l[1128];
-        string2 = l[1123];
-        className = 'good5';            // Strong
-        statusClass = 'meets-minimum-strength';
+        result = {
+            string1: l[1128],
+            string2: l[1123],
+            className: 'good5',                     // Strong
+            statusClass: 'meets-minimum-strength'
+        };
     }
     else if (passwordScore === 3) {
-        string1 = l[1127];
-        string2 = l[1122];
-        className = 'good4';            // Good
-        statusClass = 'meets-minimum-strength';
+        result = {
+            string1: l[1127],
+            string2: l[1122],
+            className: 'good4',                     // Good
+            statusClass: 'meets-minimum-strength'
+        };
     }
     else if (passwordScore === 2) {
-        string1 = l[1126];
-        string2 = l[1121];
-        className = 'good3';            // Medium
-        statusClass = 'meets-minimum-strength';
+        result = {
+            string1: l[1126],
+            string2: l[1121],
+            className: 'good3',                     // Medium
+            statusClass: 'meets-minimum-strength'
+        };
     }
     else if (passwordScore === 1) {
-        string1 = l[1125];
-        string2 = l[1120];
-        className = 'good2';            // Weak
-        statusClass = 'meets-minimum-strength';
+        result = {
+            string1: l[1125],
+            string2: l[1120],
+            className: 'good2',                     // Weak
+            statusClass: 'meets-minimum-strength'
+        };
     }
     else {
-        string1 = l[1124];
-        string2 = l[1119];
-        className = 'good1';            // Very weak
-        statusClass = 'insufficient-strength';
+        result = {
+            string1: l[1124],
+            string2: l[1119],
+            className: 'good1',                     // Very weak
+            statusClass: 'insufficient-strength'
+        };
     }
 
-    if ($('.login-register-input.password').length) {
-        $('.login-register-input.password').addClass(statusClass);
-        $('.new-registration').addClass(className);
-        $('.new-reg-status-pad').safeHTML('<strong>@@</strong> @@', l[1105], string1);   // Too short
-        $('.new-reg-status-description').text(string2);
-    }
-    else if ($passStatus.length) {
-        $passStatus.addClass(className + ' checked').text(string1);
-
-        if ($('.password-tooltip.visible').length && string2 !== l[18701]) {
-            $('.password-advice').text(string2);
-            $('.minimum-password-block .password-icon').addClass('success');
-        }
-        else {
-            $('.password-advice').empty();
-            $('.minimum-password-block .password-icon').removeClass('success');
-        }
-    }
-
-    $('.password-status-warning')
-        .safeHTML('<span class="password-warning-txt">@@</span> ' +
-            '@@<div class="password-tooltip-arrow"></div>', l[34], l[1129]);
-    $('.password-status-warning').css('margin-left', ($('.password-status-warning').width() / 2 * -1) - 13);
+    return result;
 }
 
 /**

@@ -168,26 +168,31 @@ var slideshowid;
             $favButton.removeClass('hidden');
 
             $favButton.rebind('click', function() {
+                var $button = $(this);
                 var newFavState = Number(!M.isFavourite(n.h));
 
                 M.favourite(n.h, newFavState);
 
                 if (newFavState) {
-                    $(this).find('i').removeClass('heart').addClass('red-heart');
+                    $button.attr('data-simpletip', l[5872]);
+                    $('i', $button).removeClass('heart').addClass('red-heart');
+                    $favButton.trigger('mouseenter');
                 }
                 else {
-                    $(this).find('i').removeClass('red-heart').addClass('heart');
+                    $button.attr('data-simpletip', l[5871]);
+                    $('i', $button).removeClass('red-heart').addClass('heart');
+                    $favButton.trigger('mouseenter');
                 }
             });
 
             // Change favourite icon
             if (M.isFavourite(n.h)) {
-                $overlay.find('.viewer-button.favourite i')
-                    .removeClass('heart').addClass('red-heart');
+                $('.viewer-button.favourite', $overlay).attr('data-simpletip',  l[5872]);
+                $('.viewer-button.favourite i', $overlay).removeClass('heart').addClass('red-heart');
             }
             else {
-                $overlay.find('.viewer-button.favourite i')
-                    .removeClass('red-heart').addClass('heart');
+                $('.viewer-button.favourite', $overlay).attr('data-simpletip', l[5871]);
+                $('.viewer-button.favourite i', $overlay).removeClass('red-heart').addClass('heart');
             }
         }
     }

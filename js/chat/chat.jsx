@@ -340,6 +340,16 @@ var Chat = function() {
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
     self._chatsAwaitingAps = {};
 
+    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            "currentlyOpenedChat": null,
+            "displayArchivedChats": false,
+        },
+        true
+    );
+
     return this;
 };
 
@@ -436,9 +446,7 @@ Chat.prototype.init = function() {
             console.time('chatReactUiInit');
         }
 
-        self.$conversationsApp = <ConversationsUI.ConversationsApp
-            megaChat={self}
-        />;
+        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
             self.$conversationsApp,
@@ -551,16 +559,6 @@ Chat.prototype.init = function() {
 
 
     self.registerUploadListeners();
-
-    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
-    MegaDataObject.attachToExistingJSObject(
-        this,
-        {
-            "currentlyOpenedChat": null,
-            "displayArchivedChats": false,
-        },
-        true
-    );
 
     self.trigger("onInit");
 };
@@ -2372,36 +2370,6 @@ Chat.prototype.getChatById = function(chatdId) {
         }
     });
     return found ? found : false;
-};
-
-
-/**
- * Returns true if a 'rtc call' is found in .rtc.calls that (optionally) matches chatIdBin
- * @param [chatIdBin] {String}
- * @returns {boolean}
- */
-Chat.prototype.haveAnyIncomingOrOutgoingCall = function(chatIdBin) {
-    if (chatIdBin) {
-        if (!this.rtc || !this.rtc.calls || Object.keys(this.rtc.calls).length === 0) {
-            return false;
-        }
-        else if (this.rtc && this.rtc.calls) {
-            var callIds = Object.keys(this.rtc.calls);
-            for (var i = 0; i < callIds.length; i++) {
-                if (this.rtc.calls[callIds[i]].chatid !== chatIdBin) {
-                    return true;
-                }
-            }
-            // didn't found any chat that doesn't match the current chatdIdBin
-            return false;
-        }
-        else {
-            return false
-        }
-    }
-    else {
-        return this.rtc && this.rtc.calls && Object.keys(this.rtc.calls).length > 0;
-    }
 };
 
 /**

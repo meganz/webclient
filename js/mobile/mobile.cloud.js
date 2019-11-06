@@ -224,7 +224,6 @@ mobile.cloud = {
             if (Array.isArray(preSelected) && preSelected.length > 0) {
                 $.selected = preSelected;
                 reselect(1);
-                mobile.cloud.scrollToFile($.selected[0]);
             }
             return false;
         });

@@ -436,7 +436,13 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                             <div className="chat-button-seperator"></div>
                             {
                                 <div className={"link-button light" + (
-                                    !(room.members.hasOwnProperty(u_handle) && !anonymouschat) ? " disabled" : ""
+                                    !(
+                                        (
+                                            room.members.hasOwnProperty(u_handle) ||
+                                            room.state === ChatRoom.STATE.LEFT
+                                        ) &&
+                                        !anonymouschat
+                                    ) ? " disabled" : ""
                                 )}
                                      onClick={(e) => {
                                          if ($(e.target).closest('.disabled').length > 0) {
@@ -460,12 +466,11 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                             {
                                 room.type !== "private" ? (
                                 <div className={"link-button light red " + (
-                                        (room.stateIsLeftOrLeaving() || !(
-                                            (
-                                                room.type !== "private" &&
-                                                room.membersSetFromApi.members.hasOwnProperty(u_handle)
-                                            ) && !anonymouschat
-                                        )) ? "disabled" : ""
+                                        (
+                                            room.type !== "private" && !anonymouschat &&
+                                            room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
+                                            room.membersSetFromApi.members[u_handle] !== -1
+                                        ) ? "" : "disabled"
                                     )}
                                     onClick={(e) => {
                                          if ($(e.target).closest('.disabled').length > 0) {
@@ -479,18 +484,22 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                                     <span>{l[8633]}</span>
                                 </div>) : null
                             }
-                            { room._closing !== true && (room.type === "group" || room.type === "public") &&
-                            room.stateIsLeftOrLeaving() && !anonymouschat ? (
-                                <div className="link-button light red" onClick={() => {
-                                    if (self.props.onCloseClicked) {
-                                        self.props.onCloseClicked();
-                                    }
-                                }}>
-                                    <i className="small-icon rounded-stop colorized"></i>
-                                    <span>{l[148]}</span>
-                                </div>
-                            ) : null
-                        }
+                            {
+                                room._closing !== true && room.type === "public" &&
+                                !anonymouschat && (
+                                    !room.membersSetFromApi.members.hasOwnProperty(u_handle) ||
+                                    room.membersSetFromApi.members[u_handle] === -1
+                                ) ? (
+                                    <div className="link-button light red" onClick={() => {
+                                        if (self.props.onCloseClicked) {
+                                            self.props.onCloseClicked();
+                                        }
+                                    }}>
+                                        <i className="small-icon rounded-stop colorized"></i>
+                                        <span>{l[148]}</span>
+                                    </div>
+                                ) : null
+                                }
                             </div>
                         </AccordionPanel>
                         <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}
@@ -1936,11 +1945,11 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         onLeaveClicked={function() {
                             room.leave(true);
                         }}
-                        onJoinViaPublicLinkClicked={function() {
-                            room.joinViaPublicHandle();
-                        }}
                         onCloseClicked={function() {
                             room.destroy();
+                        }}
+                        onJoinViaPublicLinkClicked={function() {
+                            room.joinViaPublicHandle();
                         }}
                         onSwitchOffPublicMode = {function(topic) {
                             room.switchOffPublicMode(topic);
@@ -2424,15 +2433,16 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
         }
     }
 };
+
 function isStartCallDisabled(room) {
-    return !room.isOnline() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
         (
             room.callManagerCall &&
             room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING
         )
-        || (megaChat.haveAnyIncomingOrOutgoingCall(room.chatIdBin) ||
-        (
+        || (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG
-        ));
+        )
+        || (room.getCallParticipants().length > 0);
 }

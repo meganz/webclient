@@ -52,6 +52,7 @@ describe("authring unit test", function() {
                                     method: ns.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED,
                                     confidence: ns.KEY_CONFIDENCE.UNSURE}};
 
+    var Mu = false;
     beforeEach(function() {
         mStub(attribCache, 'getItem').callsFake(function() {
             return MegaPromise.reject();
@@ -61,10 +62,25 @@ describe("authring unit test", function() {
                 nacl.sign.detached.verify.apply(this, arguments)
             );
         });
+        Mu = M.u;
+
+        M.u = {
+            'me3456789xw': {
+                'c': 2,
+                'h': 'me3456789xw',
+                'u': 'me3456789xw',
+            },
+            'you456789xw': {
+                'c': 1,
+                'h': 'you456789xw',
+                'u': 'you456789xw',
+            },
+        };
     });
 
     afterEach(function() {
         mStub.restore();
+        M.u = Mu;
     });
 
     describe('record en-/decoding', function() {
@@ -298,6 +314,16 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'RSA', RING_RSA);
                 mStub(mega.attr, 'set').returns('foo');
                 mStub(window, 'u_handle', 'Nxmg3MOw0CI');
+                // typically M.u is mocked so that user me3456789xw is === u_handle,
+                // but in this test, u_handle is set to Nxmg3MOw0CI, so, lets alter the M.u
+                // so that it make sense in this context
+                M.u['me3456789xw'].c = 1;
+                M.u['Nxmg3MOw0CI'] = {
+                    'u': 'Nxmg3MOw0CI',
+                    'h': 'Nxmg3MOw0CI',
+                    'c': 2
+                };
+                
                 var fakePromise = { done: sinon.stub(),
                     fail: function() {}};
                 mStub(fakePromise, 'fail').returns(fakePromise);

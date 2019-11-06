@@ -89,6 +89,16 @@ mega.utils = mega.utils || {};
             //     ];
             // }
 
+            // don't match for time-like strings, e.g. 14:52
+            if (
+                $.isNumeric(matchedWord.substr(1)) &&
+                startPos > 0 &&
+                $.isNumeric(currentContent[startPos - 1])
+            ) {
+                // found currentContent[-1 on start pos] to be numeric, so seems like a timestamp - skip showing auto
+                // complete.
+                return [false, false, false];
+            }
 
             return [
                 matchedWord,

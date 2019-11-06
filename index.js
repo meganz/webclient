@@ -845,7 +845,7 @@ function init_page() {
 
                 init_login();
                 if (email) {
-                    $('#login-name2').val(email);
+                    $('#login-name2').val(email).blur();
                     $('.register-st2-button').addClass('active');
                     $('#login-name2').prop('readonly', true);
                 }
@@ -981,6 +981,11 @@ function init_page() {
     else if (is_mobile && u_type && page === 'fm/account/email-and-pass') {
         parsepage(pages['mobile']);
         mobile.account.changePassword.init();
+        return false;
+    }
+    else if (is_mobile && fminitialized && u_type && page === 'fm/account/notifications') {
+        mobile.initDOM();
+        mobile.account.notifications.init();
         return false;
     }
     else if (page === 'achievements') {
@@ -1997,6 +2002,9 @@ function topmenuUI() {
         $topHeader.find('.top-icon.notification').addClass('hidden');
     }
 
+    if (folderlink) {
+        $topHeader.find('.top-icon.notification').addClass('hidden');
+    }
     if (page === 'download') {
         $topMenu.find('.top-menu-item.refresh-item').removeClass('hidden');
     }

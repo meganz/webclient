@@ -1331,6 +1331,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
         s.abort = destroy;
 
+        if (!u_type) {
+            mBroadcaster.once('login', function() {
+                if (s.isOverQuota) {
+                    s.file.flushRetryQueue();
+                }
+            });
+        }
+
         s.on('inactivity', function(ev) {
             // Event invoked when the video becomes stalled, we'll show the loading/buffering spinner
             if (d) {
@@ -1571,23 +1579,24 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $fn.attr('title', node.name + ' (' + c + ')');
                 }
 
+                var $video = $wrapper.find('video');
+                if (!$video.length) {
+                    return reject(new Error('No video element found...'));
+                }
+
+                getImage(node, 1).then(function(uri) {
+                    $video.attr('poster', uri);
+                }).catch(console.debug.bind(console));
+
                 if (!yup) {
                     if (String(node.fa).indexOf(':8*') > 0 && isMediaSourceSupported()) {
                         eventlog(99714, JSON.stringify([1, node.ph || node.h].concat(c)));
                     }
                     return resolve(false);
                 }
-                var $video = $wrapper.find('video');
-                if (!$video.length) {
-                    return reject(new Error('No video element found...'));
-                }
 
                 // Disable default video controls
                 $video.get(0).controls = false;
-
-                getImage(node, 1).then(function(uri) {
-                    $video.attr('poster', uri);
-                }).catch(console.debug.bind(console));
 
                 options = Object.assign({autoplay: false, preBuffer: true}, options);
 

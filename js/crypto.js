@@ -427,6 +427,15 @@ function api_setfolder(h) {
 function stopapi() {
     "use strict";
 
+    if (typeof M === 'object' && $.len(M._apiReqInflight)) {
+        if (d) {
+            console.warn('Aborting in-flight API requests...', M._apiReqInflight);
+        }
+
+        M._apiReqInflight = Object.create(null);
+        M._apiReqPollCache = Object.create(null);
+    }
+
     for (var i = apixs.length; i--;) {
         api_cancel(apixs[i]);
         apixs[i].cmdsQueue.clear();
@@ -820,7 +829,7 @@ function api_reqerror(q, e, status) {
         q.failhandler(q.c, e);
     }
 
-    if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+    if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
         if (status === true && e == EAGAIN) {
             mega.loadReport.EAGAINs++;
         }
@@ -1041,7 +1050,7 @@ function sc_residue(sc) {
         }
         waittimeout = setTimeout(waitsc, waitbackoff);
 
-        if ((mega.flags & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
+        if ((mega.state & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
             mega.loadReport.recvAPs = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
         }
@@ -1080,7 +1089,7 @@ function getsc(force) {
         api_ready(apixs[5]);
         api_req('sn=' + currsn, {}, 5);
 
-        if (mega.flags & window.MEGAFLAG_LOADINGCLOUD) {
+        if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
             mega.loadReport.scSent = Date.now();
         }
     }

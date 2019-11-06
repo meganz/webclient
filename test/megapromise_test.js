@@ -501,10 +501,10 @@ describe("MegaPromise Unit Test", function() {
         setTimeout(function() {
             assert(
                 JSON.stringify(callstack) === JSON.stringify(expected),
-                'Unexpected call order, expected ' + JSON.stringify(expected, null, '\t'), '\ngot: ' +
+                'Unexpected call order, expected ' + JSON.stringify(expected, null, '\t') + '\ngot: ' +
                 JSON.stringify(callstack, null, '\t')
             );
             done();
-        }, 80);
+        }, 300);
     })
 });

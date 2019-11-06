@@ -226,12 +226,7 @@
     <div class="dialog-subtitle">[$18772]</div>
     <div class="delete-img icon hidden"></div>
     <div class="dialog-input-container">
-        <div class="dialog-input-title-ontop link-sub-user-pass">
-            <div class="title"> </div>
-            <div class="bus-reg-icon pw"></div>
-            <input class="dialog-input placeholder sub-m" type="text" placeholder="[$18773]">
-            <div class="error-message er-sub-m">[$6220]</div>
-        </div>
+        <input class="sub-m titleTop withIcon" type="text" placeholder="[$18773]" data-wrapper-class="link-sub-user-pass" data-icon="bus-reg-icon pw">
     </div>
     <div class="dialog-button-container">
         <div class="default-green-button-user-management decrypt-sub-user-link">
@@ -869,11 +864,11 @@
                     <span class="file-settings-icon"><span></span></span>
                 </div>
                 <div class="properties-float-bl">
-                    <span class="properties-small-gray">[$87]:</span>
+                    <span class="properties-small-gray">[$87]</span>
                     <span class="propreties-dark-txt">100kb</span>
                 </div>
                 <div class="properties-float-bl second">
-                    <span class="properties-small-gray">Versions:</span>
+                    <span class="properties-small-gray">[$17150]</span>
                     <a class="propreties-dark-txt">10 versions</a>
                 </div>
                 <div class="properties-small-gray">[$86]</div>
@@ -1277,20 +1272,8 @@
     </div>
     <form class="account dialog-login-form">
         <div class="top-login-pad">
-            <div class="account input-wrapper email">
-                <div class="account input-tooltip mid">
-                    [$141]
-                </div>
-                <div class="account both-input-tooltip">
-                    [$1130]<br>[$969].
-                </div>
-                <i class="account-icon email"></i>
-                <input type="text" name="login-name3" id="login-name3" placeholder="[$195]" class="input-email" maxlength="190" />
-            </div>
-            <div class="account input-wrapper password">
-                <i class="account-icon lock"></i>
-                <input type="password" name="login-password3" id="login-password3" class="input-password" placeholder="[$909]" />
-            </div>
+            <input class="titleTop input-email" type="text" name="login-name3" id="login-name3" placeholder="[$195]" maxlength="190" />
+            <input class="titleTop input-password" type="password" name="login-password3" id="login-password3" placeholder="[$909]" />
             <div class="login-page-forgot-bl">
                 <a class="top-login-forgot-pass clickurl" href="/recovery" tabindex="-1">[$1934]</a>
                 <div class="clear"></div>
@@ -1332,45 +1315,18 @@
         <form class="account dialog-register-form">
             <div class="register-side-pane content">
                 <div class="account half-sized-block l">
-                    <div class="account input-wrapper name double">
-                        <div class="account input-tooltip bottom">
-                            [$1098]<br>[$1099]
-                        </div>
-                        <i class="account-icon person"></i>
-                        <input type="text" name="register-name" id="register-firstname" placeholder="[$1096]" maxlength="40" class="f-name" />
-                        <input type="text" name="register-familyname" id="register-lastname" placeholder="[$1097]" maxlength="40" class="l-name" />
-                    </div>
+                    <input class="titleTop f-name halfSize-l" type="text" name="register-name" id="register-firstname" placeholder="[$7342]" maxlength="40" />
+                    <input class="titleTop l-name halfSize-r" type="text" name="register-familyname" id="register-lastname" placeholder="[$7345]" maxlength="40" />
                 </div>
                 <div class="account half-sized-block r">
-                    <div class="account input-wrapper email">
-                        <div class="account input-tooltip bottom">
-                            [$1100]<br>[$1101].
-                        </div>
-                        <i class="account-icon email"></i>
-                        <input type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
-                    </div>
+                    <input class="titleTop email" type="text" name="rigister-email" id="register-email" placeholder="[$95]" maxlength="190" />
                 </div>
-                <div class="account half-sized-block l">
-                    <div class="account input-wrapper password first">
-                        <div class="account input-tooltip bottom">
-                            [$1102]<br>[$1104]
-                        </div>
-                        <div class="password-status-icon">
-                            <div class="password-status-warning hidden"> </div>
-                        </div>
-                        <div class="register-loading-icon"><img alt="" src="{staticpath}images/mega/ajax-loader-gray.gif" /></div>
-                        <i class="account-icon lock"></i>
-                        <input type="password" name="register-password" id="register-password" placeholder="[$909]" autocomplete="new-password" />
-                        <div class="account password-status hidden">
-                            [$1106]
-                        </div>
-                    </div>
+                <div class="clear"></div>
+                <div class="account half-sized-block l full-sized-error">
+                    <input class="titleTop strengthChecker pass" type="password" name="register-password" id="register-password" placeholder="[$909]" autocomplete="new-password" />
                 </div>
                 <div class="account half-sized-block r">
-                    <div class="account input-wrapper password confirm">
-                        <i class="account-icon lock"></i>
-                        <input type="password" name="register-password2" id="register-password2" placeholder="[$1114]" autocomplete="new-password" />
-                    </div>
+                    <input class="titleTop confirm-pass" type="password" name="register-password2" id="register-password2" placeholder="[$1114]" autocomplete="new-password" />
                 </div>
                 <div class="clear"></div>
                 <div class="account checkbox-block register">
@@ -3505,10 +3461,7 @@
     <div class="fm-picker-dialog-title">[$7160]</div>
     <div class="fm-dialog-close"></div>
     <div class="fm-voucher-body">
-        <div class="dialog-input-title-ontop">
-            <div class="title">[$487] </div>
-            <input class="dialog-input" type="text" value="" name="dialog-voucher" />
-        </div>
+        <input class="titleTop dialog-input" type="text" value="" name="dialog-voucher" placeholder="[$487]" />
         <div class="fm-voucher-button default-green-button semi-big right"><span>[$458]</span></div>
     </div>
     <div class="fm-notifications-bottom voucher-container">
@@ -3577,30 +3530,30 @@
         <div class="viewer-top-bl">
             <div class="viewer-filename"></div>
             <div class="viewer-images-num">
-                <div class="viewer-mid-button prev"></div>
+                <div class="viewer-mid-button simpletip prev" data-simpletip="[$18068]"></div>
                 <div class="viewer-counter-bl">
                     <span class="first">0</span>
                     [$5528]
                     <span class="last">0</span>
                 </div>
-                <div class="viewer-mid-button next"></div>
+                <div class="viewer-mid-button simpletip next" data-simpletip="[$556]"></div>
             </div>
-            <div class="viewer-button right close">
+            <div class="viewer-button simpletip right close" data-simpletip="[$148]">
                 <i class="medium-icon icons-img close"></i>
             </div>
-            <div class="viewer-button right getlink">
+            <div class="viewer-button simpletip right getlink" data-simpletip="[$59]">
                 <i class="medium-icon icons-img chain"></i>
             </div>
-            <div class="viewer-button right download">
+            <div class="viewer-button simpletip right download" data-simpletip="[$58]">
                 <i class="medium-icon icons-img arrow-in-circle"></i>
             </div>
-            <div class="viewer-button right info">
+            <div class="viewer-button simpletip right info" data-simpletip="[$6859]">
                 <i class="medium-icon icons-img i-in-circle"></i>
             </div>
-            <div class="viewer-button right favourite">
+            <div class="viewer-button simpletip right favourite" data-simpletip="[$5871]">
                 <i class="medium-icon icons-img heart"></i>
             </div>
-            <div class="viewer-button right remove">
+            <div class="viewer-button simpletip right remove" data-simpletip="[$83]">
                 <i class="medium-icon icons-img remove-to-bin"></i>
             </div>
             <div class="clear"></div>
@@ -3680,7 +3633,7 @@
                     <i class="medium-icon icons-img play"></i>
                     <span>[$17802]</span>
                 </div>
-                <div class="viewer-button inline fs">
+                <div class="viewer-button simpletip inline fs">
                     <i class="medium-icon icons-img fullscreen"></i>
                     <span>[$17803]</span>
                 </div>
@@ -4522,16 +4475,7 @@
             </div>
         </div>
         <div class="recover-account-email-block">
-            <div class="account input-wrapper email">
-                <div class="account input-tooltip mid left">
-                    [$141]
-                </div>
-                <div class="account both-input-tooltip left">
-                    [$7431]
-                </div>
-                <i class="account-icon email"></i>
-                <input autocomplete="disabled" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190">
-            </div>
+            <input class="titleTop withIcon" autocomplete="disabled" type="text" name="recover-input1" id="recover-input1-di" value="" placeholder="[$195]" maxlength="190" data-icon="account-icon email">
         </div>
     </div>
     <div class="fm-notifications-bottom">
@@ -4824,7 +4768,8 @@
                 <span class="js-body-text"></span>
                 <a class="green-lnk hidden" href="todo-waiting-for-help-center-link">[$8742]</a>
             </div>
-            <div class="account input-wrapper small top-placeholder select country verify-ph-country">
+            <div class="account input-wrapper with-icon small top-placeholder select country verify-ph-country">
+                <div class="title">[$481]</div>
                 <i class="account-icon globe"></i>
                 <select id="verify-dialog-countries" class="js-country-list" tabindex="1">
                     <option disabled selected>[$481]</option>
@@ -4834,6 +4779,7 @@
                 <i class="account-icon select-arrow"></i>
             </div>
             <div class="account input-wrapper small top-placeholder phone">
+                <div class="title">[$20214]</div>
                 <i class="account-icon mobile"></i>
                 <input class="js-phone-input" autocomplete="off" type="tel" name="verify-dialog-phone" value="" placeholder="[$20214]">
                 <label>[$20214]</label>
@@ -4952,7 +4898,6 @@
         <p class="skip-button top-pad">[$20190]</p>
     </div>
 </div>
-
 <!-- Recover Account (Display recover key) !-->
 <div class="fm-dialog recovery-key-info improved-recovery-steps hidden">
     <div class="content-wrapper">
@@ -4994,8 +4939,6 @@
             </div>
     </div>
 </div>
-
-
 <!-- user management dialog !-->
 <div class="user-management-add-user-dialog user-management-dialog fm-dialog hidden">
     <div class="mega-logo icon56 dialog-heading-img hidden"></div>
@@ -5005,60 +4948,36 @@
     <div class="dialog-subtitle">[$19117]</div>
     <div class="delete-img icon"></div>
     <div class="dialog-input-container hidden">
-        <div class="input-user">
-            <div class="indi-input">
-                <div class="dialog-input-title-ontop">
-                    <!-- add correctinput class to this to view titles-->
-                    <div class="title first-name">[$1096]</div>
-                    <div class="title last-name">[$1097]</div>
-                    <div class="bus-reg-icon number-of-user"></div>
-                    <input class="dialog-input placeholder sub-n" type="text" placeholder="[$1096]" autofocus>
-                    <input class="dialog-input placeholder sub-n-l" type="text" placeholder="[$1097]">
-                    <div class="error-message er-sub-n">Sorry,.....</div>
-                </div>
-
-                <div class="dialog-input-title-ontop">
-                    <div class="title">[$7434]</div>
-                    <div class="bus-reg-icon email"></div>
-                    <input class="dialog-input placeholder sub-m" type="text" placeholder="[$7434]">
-                    <div class="error-message er-sub-m">Sorry,.....</div>
-                </div>
-            <div class="toggle-optional-inputs-container">
-                <div class="default-white-button-user-management toggle-optional-inputs show opti-add-suba">
-                    [$19600]
-                    <div class="close-icon icon"></div>
-                </div>
-            </div>
-                <div class="optional-input-container hidden">
-                    <div class="dialog-input-title-ontop">
-                        <div class="title">[$19150]</div>
-                        <div class="bus-reg-icon number-of-user"></div>
-                        <input class="dialog-input placeholder sub-p" type="text" placeholder="[$19150]">
-                        <div class="error-message er-sub-p">Sorry,.....</div>
-                    </div>
-                    <div class="dialog-input-title-ontop">
-                        <div class="title">[$19151]</div>
-                        <div class="id-card-icon icon bus-reg-icon"></div>
-                        <input class="dialog-input placeholder sub-id-nb" type="text" placeholder="[$19151]">
-                        <div class="error-message er-sub-id-nb">Sorry,.....</div>
-                    </div>
-                    <div class="dialog-input-title-ontop">
-                        <div class="title">[$19152]</div>
-                        <div class="bus-reg-icon phone"></div>
-                        <input class="dialog-input placeholder sub-ph" type="text" placeholder="[$19152]">
-                        <div class="error-message er-sub-ph">Sorry,.....</div>
-                    </div>
-                    <div class="dialog-input-title-ontop">
-                        <div class="title">[$17818]</div>
-                        <div class="setting-icon24 add"></div>
-                        <input class="dialog-input placeholder sub-lo" type="text" placeholder="[$17818]">
-                        <div class="error-message er-sub-lo">Sorry,.....</div>
-                    </div>
-                </div>
+        <div class="account half-sized-block l">
+            <input class="titleTop halfSize-l sub-n" type="text" placeholder="[$1096]" autofocus data-icon="bus-reg-icon number-of-user">
+            <input class="titleTop halfSize-r sub-n-l" type="text" placeholder="[$1097]">
+        </div>
+        <div class="account half-sized-block r">
+            <input class="titleTop sub-m" type="text" placeholder="[$7434]" data-icon="bus-reg-icon email">
+        </div>
+        <div class="clear"></div>
+        <div class="toggle-optional-inputs-container">
+            <div class="default-white-button-user-management toggle-optional-inputs show opti-add-suba">
+                [$19600]
+                <div class="close-icon icon"></div>
             </div>
         </div>
+        <div class="optional-input-container hidden">
+            <div class="account half-sized-block l">
+                <input class="titleTop sub-p" type="text" placeholder="[$19150]" data-icon="bus-reg-icon number-of-user">
+            </div>
+            <div class="account half-sized-block r">
+                <input class="titleTop sub-id-nb" type="text" placeholder="[$19151]" data-icon="id-card-icon icon bus-reg-icon">
+            </div>
+            <div class="account half-sized-block l">
+                <input class="titleTop sub-ph" type="text" placeholder="[$19152]" data-icon="bus-reg-icon phone">
+            </div>
+            <div class="account half-sized-block r">
+                <input class="titleTop sub-lo" type="text" placeholder="[$17818]" data-icon="setting-icon24 add">
+            </div>
+            <div class="clear"></div>
+        </div>
     </div>
-
     <div class="verification-container">
         <div class="verification-user-info">
             <!--add class: single-line-->
@@ -5074,8 +4993,6 @@
                 <div class="dialog-feature-switch"></div>
             </div>
         </div>
-
-
         <div class="default-white-button-user-management hidden">
             [$16268]
         </div>
@@ -5087,8 +5004,6 @@
         5 (WAIT 4 API) sub account license used.
     </div>
 </div><!--END add user dialog-->
-
-
 <div class="user-management-edit-profile-dialog user-management-dialog fm-dialog hidden">
     <div class="user-management-subuser-avatars">
         <div class="user-management-subuser-image"></div>
@@ -5096,18 +5011,12 @@
     <div class="dialog-title left-version">[$16735]</div>
     <div class="delete-img icon"></div>
     <div class="dialog-input-container">
-        <div class="dialog-input-title-ontop correctinput">
-            <div class="title first-name">[$1096]</div>
-            <div class="title last-name">[$1097]</div>
-            <input class="dialog-input edit-sub-name" type="text" placeholder="[$1096]" autofocus>
-            <input class="dialog-input edit-sub-lname" type="text" placeholder="[$1097]">
-            <div class="error-message edit-er-sub-n"> </div>
+        <div class="account half-sized-block l">
+            <input class="dialog-input titleTop halfSize-l edit-sub-name" type="text" placeholder="[$1096]" autofocus>
+            <input class="dialog-input titleTop halfSize-r edit-sub-lname" type="text" placeholder="[$1097]">
         </div>
-
-        <div class="dialog-input-title-ontop email correctinput">
-            <div class="title">[$7434]</div>
-            <input class="dialog-input edit-sub-email" type="text" placeholder="[$9002]">
-            <div class="error-message edit-er-sub-m"> </div>
+        <div class="account half-sized-block r">
+            <input class="dialog-input titleTop edit-sub-email" type="text" placeholder="[$9002]">
             <div class="top-login-warning edit-email-warning">
                 <div class="top-login-warning-arrow"></div>
                 <div class="top-login-warning-close"></div>
@@ -5123,27 +5032,23 @@
                 </div>
             </div>
         </div>
-
+        <div class="clear"></div>
         <div class="pending-email-note active">
             <b>[$19604]:</b> <span class="pending-email-txt">kd@mega.co.nz</span>
         </div>
-
-        <div class="dialog-input-title-ontop">
-            <div class="title">[$19150]</div>
-            <input class="dialog-input edit-sub-position" type="text" placeholder="[$19150]">
+        <div class="account half-sized-block l">
+            <input class="dialog-input titleTop edit-sub-position" type="text" placeholder="[$19150]">
         </div>
-        <div class="dialog-input-title-ontop">
-            <div class="title">[$19151]</div>
-            <input class="dialog-input edit-sub-id-nb" type="text" placeholder="[$19151]">
+        <div class="account half-sized-block r">
+            <input class="dialog-input titleTop edit-sub-id-nb" type="text" placeholder="[$19151]">
         </div>
-        <div class="dialog-input-title-ontop">
-            <div class="title">[$19152]</div>
-            <input class="dialog-input edit-sub-phone" type="text" placeholder="[$19152]">
+        <div class="account half-sized-block l">
+            <input class="dialog-input titleTop edit-sub-phone" type="text" placeholder="[$19152]">
         </div>
-        <div class="dialog-input-title-ontop">
-            <div class="title">[$17818]</div>
-            <input class="dialog-input edit-sub-location" type="text" placeholder="[$17818]">
+        <div class="account half-sized-block r">
+            <input class="dialog-input titleTop edit-sub-location" type="text" placeholder="[$17818]">
         </div>
+        <div class="clear"></div>
     </div>
     <div class="dialog-button-container">
         <div class="default-green-button-user-management btn-edit-save">
@@ -5154,7 +5059,6 @@
         </div>
     </div>
 </div>
-
 <div class="user-management-able-user-dialog sub-en-dis user-management-dialog fm-dialog hidden">
     <div class="disable-large-icon icon64 dlg-suba-icon"></div>
     <div class="dialog-text-container">
@@ -5170,7 +5074,6 @@
         </div>
     </div>
 </div>
-
 <div class="user-management-able-user-dialog mig-success user-management-dialog fm-dialog hidden">
     <div class="re-enable-large-icon icon64 dlg-suba-icon"></div>
     <div class="dialog-text-container">
@@ -5183,7 +5086,6 @@
         </div>
     </div>
 </div>
-
 <div class="user-management-migrate-process-dialog user-management-dialog fm-dialog hidden">
     <div class="heading-text">[$19621]</div>
     <div class="center-container">
@@ -5207,7 +5109,6 @@
         <div class="process-percentage">80%</div>
     </div>
 </div>
-
 <div class="fm-dialog bus-welcome-dialog user-management-dialog hidden">
     <div class="bus-welcome-logo dialog-heading-img"></div>
     <div class="dialog-title">[$19805]</div>
@@ -5230,7 +5131,6 @@
         </div>
     </div>
 </div>
-
 <!-- business adding contact reassign dialog -->
 <div class="fm-dialog add-reassign-dialog user-management-dialog hidden">
     <div class="dialog-title long-name">[$20627]</div>

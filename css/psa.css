@@ -18,6 +18,9 @@
     box-sizing: border-box;
     border-top: 1px solid rgba(0,0,0,0.05);
 }
+.mobile.bottom-info.public-service-anouncement {
+    position: fixed;
+}
 .notification .bottom-info.body {
     display: table;
 }

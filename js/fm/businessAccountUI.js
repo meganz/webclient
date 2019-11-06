@@ -857,14 +857,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
     if (subUser.isAdmin) {
         $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
-            + '.profile-button-container .resend-verification, .profile-button-container .disable-account')
-            .addClass('disabled');
+            + '.profile-button-container .resend-verification, .profile-button-container .disable-account,' +
+            '.profile-button-container .reset-sub-user-password').addClass('disabled');
         $subAccountContainer.find('.admin-icon.role').removeClass('hidden');
     }
     else {
         $subAccountContainer.find('.profile-button-container .migrate-data, .profile-button-container .edit-profile, '
-            + '.profile-button-container .resend-verification, .profile-button-container .disable-account')
-            .removeClass('disabled');
+            + '.profile-button-container .resend-verification, .profile-button-container .disable-account,' +
+            '.profile-button-container .reset-sub-user-password').removeClass('disabled');
         $subAccountContainer.find('.admin-icon.role').addClass('hidden');
     }
 
@@ -876,8 +876,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     $subAccountContainer.find('.profile-button-container .edit-profile').text(l[16735]);
     $subAccountContainer.find('.profile-button-container .resend-verification').addClass('hidden');
     $subAccountContainer.find('.profile-button-container .migrate-data').addClass('hidden');
+    $subAccountContainer.find('.profile-button-container .reset-sub-user-password').addClass('hidden');
     if (subUser.s === 0) {
         $subAccountContainer.find('div.user-management-view-status').addClass('enabled');
+        $subAccountContainer.find('.profile-button-container .reset-sub-user-password').removeClass('hidden');
     }
     else if (subUser.s === 10) {
         $subAccountContainer.find('div.user-management-view-status').addClass('pending');
@@ -975,6 +977,16 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             }
             mySelf.showEditSubUserDialog(subUserHandle);
         });
+
+    // event handler for sub-user password reset
+    $subAccountContainer.find('.profile-button-container .reset-sub-user-password')
+        .off('click.subuser').on('click.subuser', function resetPasswordSubUserClickHandler() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+            mySelf.showResetPasswordSubUserDialog(subUserHandle);
+        });
+
 
 
     // event handler for re-send invitation
@@ -2731,6 +2743,128 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         return $dialog;
     });
 };
+
+
+BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHandle) {
+    "use strict";
+    if (!subUserHandle) {
+        return;
+    }
+    if (!M.suba[subUserHandle]) {
+        return;
+    }
+    var subUser = M.suba[subUserHandle];
+    var mySelf = this;
+
+    var $dialog = $('.user-management-dialog.bus-pw-reset');
+    var $generatedPassSection = $('.generated-pass-section', $dialog).addClass('hidden');
+    var $generatePassSection = $('.generate-pass-section', $dialog).removeClass('hidden');
+    var $confirmBtn = $('.btn.apply-reset', $dialog).addClass('disabled');
+    // var $confirmNote = $('.confirm-note', $dialog);
+    var $subTitle = $('.pass-reset-sub', $dialog);
+    var $generateButton = $('.generate-pass-btn', $dialog);
+    var $passVisibility = $('.pass-visibility', $generatedPassSection);
+    var $tempPass = $('.temp-pw', $generatedPassSection);
+    var $copyPassBtn = $('.copy-pass-reset', $dialog);
+
+    var fName = from8(base64urldecode(subUser.firstname));
+    var lName = from8(base64urldecode(subUser.lastname));
+
+    var subTitle = l[22077].replace('[S]', '<span class="green strong">')
+        .replace('[S]', '</span>').replace('{0}', escapeHTML(fName) + ' ' + escapeHTML(lName));
+
+    $subTitle.safeHTML(subTitle);
+
+    $('.close-dlg, .cancel-dlg', $dialog).off('click.subuser').on('click.subuser',
+        function closeResetSubUserPassword() {
+            closeDialog();
+        });
+
+    $generateButton.off('click.subuser').on('click.subuser',
+        function generatePasswordBtn() {
+            $generatePassSection.addClass('hidden');
+            $generatedPassSection.removeClass('hidden');
+
+            // 12 character pass
+            var randomTick;
+            var generatedPass = '';
+            for (var k = 0; k < 12; k++) {
+                randomTick = Math.floor(Math.random() * 93) + 33;
+                generatedPass += String.fromCharCode(randomTick);
+            }
+            mySelf.lastGeneratedPass = generatedPass;
+
+            if ($passVisibility.hasClass('show-pw')) {
+                $tempPass.text('*******');
+            }
+            else {
+                $tempPass.text(generatedPass);
+            }
+
+        });
+
+    $passVisibility.off('click.subuser').on('click.subuser',
+        function passVisibiltyChange() {
+            if ($passVisibility.hasClass('show-pw')) {
+                $passVisibility.removeClass('show-pw').addClass('hide-pw');
+                $tempPass.text(mySelf.lastGeneratedPass);
+            }
+            else {
+                $passVisibility.addClass('show-pw').removeClass('hide-pw');
+                $tempPass.text('*******');
+            }
+        });
+
+    var copyGeneratedPass = function() {
+        copyToClipboard(mySelf.lastGeneratedPass, l[19602]);
+        $confirmBtn.removeClass('disabled');
+    };
+
+    $copyPassBtn.off('click.subuser').on('click.subuser', copyGeneratedPass);
+    $tempPass.off('copy.subuser').on('copy.subuser', copyGeneratedPass);
+
+    var resetPasswordResultHandler = function(c, res, txt) {
+        if (c) {
+
+            M.safeShowDialog('pass-reset-success-subuser-dlg', function() {
+                var $resetDialog =
+                    $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+                $('.yes-answer', $resetDialog).off('click.suba').on('click.suba', closeDialog);
+                $resetDialog.find('.dialog-text-one')
+                    .safeHTML(l[22081].replace('{0}', '<b>' + subUser.e + '</b>'));
+
+                return $resetDialog;
+            });
+        }
+        else {
+            if (d) {
+                console.error(txt + ' ' + res);
+            }
+            msgDialog('info', '', l[22082]);
+        }
+
+    };
+
+    $confirmBtn.off('click.subuser').on('click.subuser',
+        function confirmResetPassBtn() {
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
+
+            closeDialog();
+
+            var resetPassOperation = mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass);
+
+            resetPassOperation.always(resetPasswordResultHandler);
+
+        });
+
+    M.safeShowDialog('sub-user-resetPass-dlg', function() {
+        return $dialog;
+    });
+
+};
+
 
 
 BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {

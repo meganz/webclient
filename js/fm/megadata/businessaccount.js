@@ -1715,6 +1715,80 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
 };
 
 
+BusinessAccount.prototype.resetSubUserPassword = function(subuserHandle, password) {
+    "use strict";
+    var operationPromise = new MegaPromise();
+
+    if (!subuserHandle) {
+        return operationPromise.reject(0, 11, 'Empty sub-user handle');
+    }
+    if (!password || password.length < 10) {
+        return operationPromise.reject(0, 60, 'Empty password/or not long enough');
+    }
+    if (!u_attr || !u_attr.b || !u_attr.b.bprivk) {
+        return operationPromise.reject(0, 62, 'Broken master account status');
+    }
+
+    var getmKey = this.getSubAccountMKey(subuserHandle);
+
+    getmKey.fail(
+        function(c, r, t) {
+            operationPromise.reject(c, r, t);
+        });
+
+    // // //
+    // // //
+    getmKey.done(
+        function resetSubPass(c, sub_key) {
+            var request = {
+                "a": "upsub",
+                "su": subuserHandle // user handle
+            };
+
+
+            var business_privk =
+                crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+
+            var _t = base64urldecode(sub_key.k);
+
+            var dKey = crypto_rsadecrypt(_t, business_privk);
+            var subUserKey = str_to_a32(dKey.substr(0, 16));
+
+
+            security.deriveKeysFromPassword(password, subUserKey,
+                function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+
+                    // Convert to Base64
+                    var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+                    var hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
+                    var clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+                    var saltBase64 = ab_to_base64(security.createSalt(clientRandomValueBytes));
+
+                    request.k = encryptedMasterKeyBase64;
+                    request.uh = hashedAuthenticationKeyBase64;
+                    request.crv = clientRandomValueBase64;
+
+                    // Send API request to change password
+                    api_req(request, {
+                        callback: function(result) {
+
+                            if (result) {
+                                operationPromise.resolve(1);
+                            }
+                            else {
+                                operationPromise.reject(0, 61, 'API refused password change');
+                            }
+                        }
+                    });
+                }
+            );
+
+        });
+
+    return operationPromise;
+};
+
+
 /** Create the master key for Business account
  * @returns {Array}     The key
  */

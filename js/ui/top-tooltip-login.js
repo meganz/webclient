@@ -17,7 +17,7 @@ var accountinputs = {
 
         var $loginForm = $formWrapper.find('form');
         var $inputs = $('input',  $formWrapper);
-        var $checkbox = $loginForm.find('.account.checkbox-block input');
+        var $checkbox = $('.account.checkbox-block input, .pw-remind.checkbox-block input', $loginForm);
         var $button = $loginForm.find('.button');
         var $tooltip  = $loginForm.find('.account.input-tooltip');
 
@@ -32,19 +32,14 @@ var accountinputs = {
         });
 
         $checkbox.rebind('keydown.commonevent', function (e) {
-            if (e.keyCode === 9) {
-                e.preventDefault();
-                $(this).blur();
-                $button.focus().addClass('focused');
-            }
-            else if (e.keyCode === 32) {
+            if (e.keyCode === 32) {
                 var $wrapper = $(this).parent().find('.checkbox');
 
                 if ($wrapper.hasClass('checkboxOn')) {
                     $wrapper.addClass('checkboxOff').removeClass('checkboxOn');
                 }
                 else {
-                    $wrapper .addClass('checkboxOn').removeClass('checkboxOff');
+                    $wrapper.addClass('checkboxOn').removeClass('checkboxOff');
                 }
             }
         });
@@ -56,8 +51,21 @@ var accountinputs = {
         $button.rebind('keydown.commonevent', function (e) {
             if (e.keyCode === 9) {
                 e.preventDefault();
-                $inputs.first().focus();
+                if (e.shiftKey) {
+                    $checkbox.last().focus();
+                }
+                else {
+                    $inputs.first().focus();
+                }
             }
+            else if (e.keyCode === 32) {
+                e.preventDefault();
+                $button.triggerHandler('click');
+            }
+        });
+
+        $button.rebind('focus.commonevent', function() {
+            $button.addClass('focused');
         });
 
         $button.rebind('blur.commonevent', function() {

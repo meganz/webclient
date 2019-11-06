@@ -26,6 +26,23 @@ var watchdog = Object.freeze({
         }
     },
 
+    /** Remove watchdog entries out of localStorage */
+    clear: function() {
+        'use strict';
+
+        var tag = this.eTag;
+        var entries = Object.keys(localStorage)
+            .filter(function(k) {
+                return k.startsWith(tag);
+            });
+
+        console.debug('Removing watchdog entries...', entries);
+
+        for (var i = entries.length; i--;) {
+            delete localStorage[entries[i]];
+        }
+    },
+
     /**
      * Notify watchdog event/message
      * @param {String} msg  The message
@@ -164,6 +181,7 @@ var watchdog = Object.freeze({
             else {
                 mBroadcaster.sendMessage("watchdog:" + msg, strg);
             }
+            delete localStorage[ev.key];
             return;
         }
 

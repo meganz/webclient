@@ -103,6 +103,10 @@ module.exports = {
                         context.report(node, 'Make sure you are not mixing Promise and MegaPromise instances, ' +
                             'they are not compatible with each other and may result in unexpected behaviours.');
                     }
+                    else if (obj === 'localStorage' && !/^test|[Dd]ebug/.test(prop)) {
+                        context.report(node, 'Do not abuse localStorage, ' +
+                            'consider using sessionStorage or M.setPersistentData() instead.');
+                    }
                 }
             };
         }

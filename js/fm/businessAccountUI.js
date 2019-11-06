@@ -2771,7 +2771,7 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
     var lName = from8(base64urldecode(subUser.lastname));
 
     var subTitle = l[22077].replace('[S]', '<span class="green strong">')
-        .replace('[S]', '</span>').replace('{0}', fName + ' ' + lName);
+        .replace('[S]', '</span>').replace('{0}', escapeHTML(fName) + ' ' + escapeHTML(lName));
 
     $subTitle.safeHTML(subTitle);
 

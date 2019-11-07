@@ -288,7 +288,6 @@ function dl_g(res) {
                 if (onMaxSizeKnown) {
                     onIdle(onMaxSizeKnown);
                 }
-                var sizeOnDisk = dlmanager.getFileSizeOnDisk(dlpage_ph, filename);
 
                 dlmanager.getResumeInfo(dlpage_ph, function(aResumeInfo) {
                     dlResumeInfo = aResumeInfo;
@@ -296,7 +295,7 @@ function dl_g(res) {
                     if (dlResumeInfo) {
                         maxDownloadSize += dlResumeInfo.byteOffset;
 
-                        sizeOnDisk.always(function(size) {
+                        dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
                             dlResumeInfo.byteLength = size;
 

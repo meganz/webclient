@@ -132,6 +132,6 @@ mBroadcaster.once('startMega', function() {
                             }
                         }
                     });
-            });
+            }, console.debug.bind(console, 'persistent storage not granted'));
     });
 });

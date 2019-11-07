@@ -63,6 +63,9 @@ function init_blog_callback() {
     if (page === 'blogarticle') {
         init_blogarticle();
     }
+    else if (is_mobile) {
+        handleInvalidBlogID();
+    }
     else {
         blog_load();
     }

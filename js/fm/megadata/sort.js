@@ -276,19 +276,14 @@ MegaData.prototype.getSortBySizeFn = function() {
     nameSort['-1'] = this.getSortByNameFn2(-1);
 
     return function(a, b, d) {
-        if (M.currentdirid === "shares" &&
-            a.tb !== undefined && b.tb !== undefined && a.tb !== b.tb) {
-            return (a.tb < b.tb ? -1 : 1) * d;
+
+        var aSize = a.s || a.tb || 0;
+        var bSize = b.s || b.tb || 0;
+        if (aSize === bSize) {
+            // zeros or equal in general
+            return nameSort[d](a, b);
         }
-        if (M.currentdirid === 'out-shares' &&
-            a.tb !== undefined && b.tb !== undefined && a.tb !== b.tb) {
-            return (a.tb + (a.tvb || 0) < b.tb + (b.tvb || 0) ? -1 : 1) * d;
-        }
-        if (a.s !== undefined && b.s !== undefined && a.s !== b.s) {
-            return (a.s < b.s ? -1 : 1) * d;
-        }
-        // fallback to sorting by name (folders)
-        return nameSort[d](a, b);
+        return (aSize < bSize ? -1 : 1) * d;
     };
 };
 

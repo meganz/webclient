@@ -874,6 +874,7 @@
                     props.type = l[1049];
                     props.icon = 'folder';
                     props.classNames.push('folder');
+                    props.size = bytesToSize(aNode.tb || 0);
                 }
                 else {
                     props.classNames.push('file');

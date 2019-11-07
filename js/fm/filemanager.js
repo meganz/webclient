@@ -519,8 +519,45 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
 
+    // disabling right click, default contextmenu.
+    var alwaysShowContextMenu = Boolean(localStorage.contextmenu);
+    $(document).rebind('contextmenu.doc', function(ev) {
+        var target = ev.target;
+        var ALLOWED_IDS = {'embed-code-field': 1};
+        var ALLOWED_NODES = {INPUT: 1, TEXTAREA: 1, VIDEO: 1};
+        var ALLOWED_CLASSES = [
+            'contact-details-user-name',
+            'contact-details-email',
+            'nw-conversations-name'
+        ];
+        var ALLOWED_PARENTS =
+            '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs';
+        var ALLOWED_CLOSEST =
+            '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
+            '.messages.content-area, .chat-right-pad .user-card-data';
+
+        if (ALLOWED_NODES[target.nodeName] || ALLOWED_IDS[target.id] || alwaysShowContextMenu) {
+            return;
+        }
+
+        for (var i = ALLOWED_CLASSES.length; i--;) {
+            if (target.classList.contains(ALLOWED_CLASSES[i])) {
+                return;
+            }
+        }
+
+        var $target = $(target);
+        if (!is_fm() || $target.parents(ALLOWED_PARENTS).length || $target.closest(ALLOWED_CLOSEST).length) {
+            return;
+        }
+
+        $.hideContextMenu();
+        return false;
+    });
+
     var thElm;
     var startOffset;
+    var $fmholder = $('#fmholder');
     $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
         var $me = $(this);
         var th = $me.closest('th');
@@ -528,7 +565,7 @@ FileManager.prototype.initFileManagerUI = function() {
         startOffset = th.outerWidth() - col.pageX;
     });
 
-    $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+    $fmholder.rebind('mousemove.colresize', function(col) {
         if (M.chat) {
             return;
         }
@@ -566,7 +603,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+    $fmholder.rebind('mouseup.colresize', function() {
         if (M.chat) {
             return;
         }
@@ -580,9 +617,8 @@ FileManager.prototype.initFileManagerUI = function() {
         $('#fmholder').css('cursor', '');
     });
 
-    $('#fmholder')
-        .off('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll')
-        .on('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
+    $fmholder
+        .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
                 console.warn(e);
@@ -678,7 +714,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).off('resize.ccmui');
     };
 
-    $('#fmholder').rebind('click.contextmenu', function(e) {
+    $fmholder.rebind('click.contextmenu', function(e) {
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
             $.hideTopMenu(e);

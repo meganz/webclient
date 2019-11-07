@@ -1220,7 +1220,9 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 }
 .free .reg-st3-bott-title span.period.free {
     color:#31B500;
-    margin-top: 16px;
+}
+.free.local-currency .reg-st3-bott-title span.period.free {
+    margin-top: 12px;
 }
 .pro4 .reg-st3-bott-title span.period {
     color: #FFA500;

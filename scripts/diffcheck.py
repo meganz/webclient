@@ -417,10 +417,12 @@ def inspecthtml(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check for hidden-less fm-dialogs
-    match = re.search(r'fm-dialog ', line)
+    match = re.search(r'fm-dialog[\s"\']', line)
     if match and not re.search(r'hidden[\'"\s]', line):
         fatal += 1
         result.append('{}:{}: {}\n{}^ Missing hidden class on fm-dialog.'.format(file, ln, line, indent))
+    if match and not re.search(r'=["\']fm-dialog', line):
+        result.append('{}:{}: {}\n{}^ for consistency, fm-dialog shall be placed as the first class.'.format(file, ln, line, indent))
 
     return fatal
 

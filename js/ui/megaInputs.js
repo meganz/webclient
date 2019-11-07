@@ -239,6 +239,8 @@ $.fn.megaInputsShowError = function(msg) {
             console.warn('MegaInputs: Sorry this is not MegaInput or the MegaInput is not initialized.', this);
         }
     }
+
+    return this;
 };
 
 /**

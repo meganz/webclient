@@ -26213,6 +26213,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .card-container.bus-repay .bus-reg-icon {
     margin: 0;
     float: none;
+    display: inline-block;
 }
 .user-management-account-settings .bus-input input,
 .user-management-dialog .dialog-input-title-ontop input {

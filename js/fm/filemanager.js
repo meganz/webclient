@@ -3117,7 +3117,7 @@ FileManager.prototype.addGridUI = function(refresh) {
                     M.doSort(sortBy, dir);
                     M.renderMain();
 
-                    if (scrollVal && M.megaRender && M.megaRender.megaList) {
+                    if (scrollVal) {
                         M.megaRender.megaList.scrollTo(0, scrollVal);
                         var tableHeader = $('.files-grid-view.fm .grid-table-header');
                         tableHeader.css('left', -1 * scrollVal);

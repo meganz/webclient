@@ -16,6 +16,9 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     if which gsed >/dev/null; then
         SED_BINARY="gsed"
+    # sed installed by non-brew way. 
+    elif which sed >/dev/null; then
+        SED_BINARY="sed"
     else
         echo "Found platform to be OSX, but gsed is missing. Please do install 'gsed'."
         exit 1;

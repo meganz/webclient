@@ -4718,6 +4718,9 @@ a.opensource-icon-txt.coming-soon {
     vertical-align: initial;
     display: block;
 }
+.uwp-windows-section .mobile-apps-button.uwp {
+    margin: 0 auto;
+}
 .uwp .advertise-chat .mobile-apps-button.red {
     margin: 24px 12px 24px 0;
 }

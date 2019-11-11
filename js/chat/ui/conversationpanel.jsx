@@ -2444,5 +2444,6 @@ function isStartCallDisabled(room) {
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG
         )
-        || (room.getCallParticipants().length > 0);
+        || (room.getCallParticipants().length > 0)
+        || (room.getParticipantsExceptMe() < 1);
 }

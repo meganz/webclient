@@ -17576,7 +17576,7 @@ function (_MegaRenderMixin4) {
 ;
 
 function isStartCallDisabled(room) {
-  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0;
+  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0 || room.getParticipantsExceptMe() < 1;
 }
 
 /***/ }),

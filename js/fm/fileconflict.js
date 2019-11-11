@@ -718,23 +718,32 @@
 
                                     var originalParent = M.d[olderNode].p;
 
-                                    var mergeOperation = M.moveNodes([olderNode],
-                                        M.RubbishID, true);
+                                    var f1 = M.getShareNodesSync(duplicateEntries[type][name][0]);
+                                    var f2 = M.getShareNodesSync(duplicateEntries[type][name][1]);
 
-                                    mergeOperation.always(function() {
+                                    if ((f1 && f1.length) || (f2 && f2.length)) {
+                                        loadingDialog.phide();
+                                        msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
+                                    }
+                                    else {
+                                        var mergeOperation = M.moveNodes([olderNode],
+                                            M.RubbishID, true);
 
-                                        M.moveNodes([olderNode],
-                                            originalParent, true, fileconflict.REPLACE).always(
-                                                function() {
-                                                    // no need to updateUI,
-                                                    // for optimization we will only hide the bar
-                                                    $('.files-grid-view.fm').removeClass('duplication-found');
-                                                    $('.duplicated-items-found').addClass('hidden');
-                                                    resolveDup(duplicateEntries, keys, ++kIndex, type,
-                                                        (checked) ? action : null);
-                                                }
-                                            );
-                                    });
+                                        mergeOperation.done(function() {
+
+                                            M.moveNodes([olderNode],
+                                                originalParent, true, fileconflict.REPLACE).done(
+                                                    function() {
+                                                        // no need to updateUI,
+                                                        // for optimization we will only hide the bar
+                                                        $('.files-grid-view.fm').removeClass('duplication-found');
+                                                        $('.duplicated-items-found').addClass('hidden');
+                                                        resolveDup(duplicateEntries, keys, ++kIndex, type,
+                                                            (checked) ? action : null);
+                                                    }
+                                                );
+                                        });
+                                    }
 
                                 }
                                 else {

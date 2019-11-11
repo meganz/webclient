@@ -681,7 +681,7 @@ var versiondialogid;
         }
 
         mega.attr.get(u_handle, 'dv', -2, true).done(function(r) {
-            fileversioning.dvState = r === "1";
+            fileversioning.dvState = r === "1" ? 1 : 0;
         });
 
         return 0xDEAD;

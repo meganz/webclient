@@ -799,7 +799,7 @@ var dlmanager = {
         }
 
         if (code === EBLOCKED) {
-            showToast('download', l[20228]);
+            showToast('download', l[20705]);
         }
 
         if (eekey) {

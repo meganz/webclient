@@ -744,6 +744,8 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[19];
             break;
         case EBLOCKED:
+            errorstr = l[20705];
+            break;
         case ETOOMANY:
         case EACCESS:
             errorstr = l[20228];

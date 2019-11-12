@@ -1523,9 +1523,9 @@ function siteLoadError(error, filename) {
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
 
-        // Only print stack trace if Error object
-        if (error instanceof Error) {
-            message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
+        var stack = String(error.stack).split('\n').splice(1, 4).join('\n');
+        if (stack) {
+            message.push('Stack trace: ' + stack);
         }
     }
 
@@ -1868,11 +1868,21 @@ else if (!browserUpdate) {
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if ((url || ln !== 1) && dump.m.indexOf('Error: Blocked') < 0) {
+                if (url || ln > 10) {
                     siteLoadError(dump.m, url + ':' + ln);
                 }
                 else {
                     console.error(dump.m, arguments);
+
+                    onIdle(function() {
+                        var xhr = getxhr();
+                        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+                        xhr.send(
+                            JSON.stringify(
+                                [{a: 'log', e: 99806, m: JSON.stringify([1, dump.m, url + ':' + ln])}]
+                            )
+                        );
+                    });
                 }
                 return;
             }

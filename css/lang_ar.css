@@ -144,6 +144,15 @@ body.rtl .main-top-info-block .main-top-info-text {
     text-align: left;
 }
 
+body.rtl .mobile .membership-st2-info .membership-st2-head,
+body.rtl .mobile .membership-st2-info .payment-method .provider-name,
+body.rtl .mobile .membership-st2-info .membership-radio-label,
+body.rtl .mobile .main-mid-pad.third-section .payment-instructions,
+body.rtl .mobile .main-top-info-block .main-top-info-text {
+    direction: rtl;
+    text-align: unset;
+}
+
 /* Mega input for Arabic */
 body.rtl .mega-input-title-ontop .mega-input-title {
     left: auto;

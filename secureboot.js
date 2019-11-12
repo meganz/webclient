@@ -730,7 +730,7 @@ else {
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' || page.substr(0, 4) === 'blog' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
     (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
 
 /**
@@ -1523,9 +1523,9 @@ function siteLoadError(error, filename) {
     else {
         message.push('Filename: ' + filename + "\nException: " + error);
 
-        // Only print stack trace if Error object
-        if (error instanceof Error) {
-            message.push('Stack trace: ' + String(error.stack).split('\n').splice(1, 4).join('\n'));
+        var stack = String(error.stack).split('\n').splice(1, 4).join('\n');
+        if (stack) {
+            message.push('Stack trace: ' + stack);
         }
     }
 
@@ -1868,11 +1868,21 @@ else if (!browserUpdate) {
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if ((url || ln !== 1) && dump.m.indexOf('Error: Blocked') < 0) {
+                if (url || ln > 10) {
                     siteLoadError(dump.m, url + ':' + ln);
                 }
                 else {
                     console.error(dump.m, arguments);
+
+                    onIdle(function() {
+                        var xhr = getxhr();
+                        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+                        xhr.send(
+                            JSON.stringify(
+                                [{a: 'log', e: 99806, m: JSON.stringify([1, dump.m, url + ':' + ln])}]
+                            )
+                        );
+                    });
                 }
                 return;
             }
@@ -2353,6 +2363,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/gdpr-download.js', n: 'gdpr_download', j:1});
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
 
+    // Notification setting controllers (mobile and desktop).
+    jsl.push({f:'js/notifyConfig.js', n: 'notify_config_js', j:1});
+    jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
+
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
@@ -2369,7 +2383,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
-        jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
@@ -2452,6 +2465,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});

@@ -77,7 +77,7 @@ mBroadcaster.once('startMega', function() {
 
         // automatically resume transfers on fm initialization
         M.getPersistentDataEntries(prefix)
-            .done(function(entries) {
+            .then(function(entries) {
                 entries = entries.map(function(entry) {
                     return entry.substr(prefix.length);
                 });
@@ -132,6 +132,6 @@ mBroadcaster.once('startMega', function() {
                             }
                         }
                     });
-            });
+            }, console.debug.bind(console, 'persistent storage not granted'));
     });
 });

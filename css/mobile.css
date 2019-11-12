@@ -216,7 +216,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -263,7 +263,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0;
@@ -279,7 +279,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -332,7 +332,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -473,12 +473,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v27.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v30.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v27.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v30.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -742,7 +742,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -1059,7 +1059,7 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -1226,6 +1226,12 @@ ul, li {
 .mobile.fm-icon.broken-heart {
     background-position: -50px -1667px
 }
+.mobile.fm-icon.notification {
+    background-position: 0 -3087px;
+    height: 30px;
+    transform: scale(1.1);
+    width: 30px;
+}
 .mobile.fm-icon.grid-icon {
     background-position: -150px -1787px
 }
@@ -1243,7 +1249,7 @@ ul, li {
     opacity: .9;
 }
 .mobile.fm-icon.device {
-    background-position: -148px -2209px;;
+    background-position: -148px -2209px;
 }
 .mobile.fm-icon.phone {
     background-position: -85px -2029px;
@@ -1363,7 +1369,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1486,7 +1492,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1693,7 +1699,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1708,7 +1714,7 @@ ul, li {
     height: 100%;
     left: 0;
     top: 0;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -1722,7 +1728,7 @@ ul, li {
     height: 100%;
     left: 0;
     top: 0;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;
@@ -1837,7 +1843,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1981,7 +1987,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
@@ -2232,7 +2238,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2529,7 +2535,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -3543,7 +3549,7 @@ div.checkboxOn, div.checkboxOff {
     background-position: 0 -3840px;
 }
 .provider-icon.voucher {
-    background-position: -94px -1077px;
+    background-position: -94px -1075px;
 }
 .provider-icon.ecp {
     background-position: 0 -3540px;
@@ -3612,7 +3618,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
 }
 .mobile.membership-step2 .provider-details .provider-icon {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     height: 32px;
     vertical-align: middle;
@@ -3898,7 +3904,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.cancel-account-overlay {
     width: 100%;
     height: 100%;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     z-index: 1200;
@@ -3937,7 +3943,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v27@2x.png);
+    background: url(../images/mobile/mobile-sprite_v30@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
@@ -4232,7 +4238,6 @@ div.checkboxOn, div.checkboxOff {
 }
 .payment-address-dialog-body {
     padding: 24px 20px;
-    margin-top: 24px;
 }
 .payment-address-dialog .container-box-title {
     margin: 12px 20px 24px 16px;
@@ -4390,9 +4395,9 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
-    background-position: right -2354px;
+    background-position: right -2351px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -4851,7 +4856,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -5011,7 +5016,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -5449,7 +5454,7 @@ div.checkboxOn, div.checkboxOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5496,7 +5501,7 @@ div.checkboxOn, div.checkboxOff {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite_v27.png);
+    background: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -81px -2275px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -5684,6 +5689,11 @@ div.checkboxOn, div.checkboxOff {
     left: 9px;
     top: 7px;
 }
+.mobile.my-account-page .account-notifications-block .fm-icon.notification {
+    position: absolute;
+    left: 13px;
+    top: 11px;
+}
 .mobile.my-account-page .fm-icon.right-arrow {
     right: 4px;
     position: absolute;
@@ -5811,7 +5821,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -5825,6 +5835,7 @@ select.mobile.dropdown-style {
     background-color: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
     border: 1px solid #D82928;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.11), inset 0 -7px 8px 0 rgba(241,6,6,0.40);
+    color: #fff;
 }
 .mobile.cta-button.green {
     border: 1px solid #00A58F;
@@ -6258,7 +6269,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -7473,7 +7484,7 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -236px -293px;
     background-repeat: no-repeat;
     background-size: 280px auto;
@@ -8417,7 +8428,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -8589,7 +8600,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     position: fixed;
     background-color: #fff;
 }
-body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
+body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mobile .main-block.my-account-page.no-scroll {
     overflow: hidden;
 }
 .mobile.upload-overlay .upload-another-file, .mobile.upload-progress.complete {
@@ -8973,7 +8984,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -9068,7 +9079,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     all: initial;
     display: inline-block;
     height: 32px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -9292,15 +9303,17 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     transition: opacity 200ms ease-in-out, bottom 200ms ease-in-out;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
 }
-.mobile.voucher-dialog .pro-plan-details {
+.mobile.voucher-dialog .pro-plan-details,
+.mobile.payment-address-dialog .pro-plan-details {
     position: relative;
     margin: 22px 15px 22px 8px;
 }
-.mobile.voucher-dialog .reg-st3-membership-icon {
+.mobile.voucher-dialog .reg-st3-membership-icon,
+.mobile.payment-address-dialog .reg-st3-membership-icon {
     all: initial;
     display: inline-block;
     height: 28px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-repeat: no-repeat;
     position: absolute;
     left: 10px;
@@ -9308,38 +9321,47 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: 28px;
     z-index: 2;
 }
-.mobile.voucher-dialog .free .reg-st3-membership-icon {
+.mobile.voucher-dialog .free .reg-st3-membership-icon,
+.mobile.payment-address-dialog .free .reg-st3-membership-icon {
     background-position: -73px -1576px;
 }
-.mobile.voucher-dialog .pro4 .reg-st3-membership-icon {
+.mobile.voucher-dialog .pro4 .reg-st3-membership-icon,
+.mobile.payment-address-dialog .pro4 .reg-st3-membership-icon {
     background-position: -118px -1576px;
 }
-.mobile.voucher-dialog .pro1 .reg-st3-membership-icon {
+.mobile.voucher-dialog .pro1 .reg-st3-membership-icon,
+.mobile.payment-address-dialog .pro1 .reg-st3-membership-icon {
     background-position: -162px -1576px;
 }
-.mobile.voucher-dialog .pro2 .reg-st3-membership-icon {
+.mobile.voucher-dialog .pro2 .reg-st3-membership-icon,
+.mobile.payment-address-dialog .pro2 .reg-st3-membership-icon {
     background-position: -206px -1576px;
 }
-.mobile.voucher-dialog .pro3 .reg-st3-membership-icon {
+.mobile.voucher-dialog .pro3 .reg-st3-membership-icon,
+.mobile.payment-address-dialog .pro3 .reg-st3-membership-icon {
     background-position: -250px -1576px;
 }
-.mobile.voucher-dialog .voucher-plan-info {
+.mobile.voucher-dialog .voucher-plan-info,
+.mobile.payment-address-dialog .payment-plan-info {
     margin-left: 64px;
     margin-right: 42px;
     z-index: 1;
 }
-.mobile.voucher-dialog .voucher-plan-title {
+.mobile.voucher-dialog .voucher-plan-title,
+.mobile.payment-address-dialog .payment-plan-title {
     color: #262f3b;
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
     font-size: 14px;
     line-height: 24px;
 }
-.mobile.voucher-dialog .voucher-plan-txt {
+.mobile.voucher-dialog .voucher-plan-txt,
+.mobile.payment-address-dialog .payment-plan-txt {
     color: #818993;
     font-size: 13px;
     line-height: 16px;
 }
-.mobile.voucher-dialog .voucher-plan-price {
+.mobile.voucher-dialog .voucher-plan-price,
+.mobile.payment-address-dialog .payment-plan-price {
     color: #242331;
     font-family: 'LatoWebBold', 'source_sans_prosemibold', sans-serif;
     font-size: 14px;
@@ -9349,10 +9371,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     top: 0;
     z-index: 2;
 }
-.mobile.voucher-dialog .separator-line {
+.mobile.voucher-dialog .separator-line,
+.mobile.payment-address-dialog .separator-line {
     background-color: #eee;
     height: 1px;
     margin-bottom: 11px;
+}
+.mobile.voucher-dialog .separator-line {
     margin-left: 78px;
 }
 .mobile.voucher-dialog .separator-line:last-of-type {
@@ -9540,7 +9565,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     bottom: 8px;
     height: 48px;
     display: block;
-    background-image: linear-gradient(-180deg, rgba(255,255,255,0.80) 0%, #FFFFFF 100%);
+    background-image: linear-gradient(0deg, #FFFFFF 60%, rgba(255,255,255,0) 100%);
     max-width: 540px;
     -moz-border-radius: 14px;
     -webkit-border-radius: 14px;
@@ -9552,7 +9577,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     right: 0;
     bottom: initial;
     top: 32px;
-    height: 32px;
+    height: 22px;
     z-index: 1200;
     margin: 0 auto;
     max-width: 540px;
@@ -9560,7 +9585,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     width: -webkit-calc(100% - 16px);
     width: -moz-calc(100% - 16px);
     width: calc(100% - 16px);
-    background-image: linear-gradient(0deg, rgba(255,255,255,0.80) 0%, #FFFFFF 100%);
+    background-image: linear-gradient(#FFFFFF 25%, rgba(255,255,255,0) 100%);
     -moz-border-radius: 14px;
     -webkit-border-radius: 14px;
     border-radius: 14px;
@@ -9917,7 +9942,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11337,8 +11362,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         margin-top: 120px;
     }
 }
-
-
 /* For screens with larger width than 400px e.g. iPhone 7S etc make the Pro page step 2 items show on the same line */
 @media only screen and (min-width: 400px) and (max-width: 500px) {
     .mobile .improved-recovery-steps .vert-container-aligner {
@@ -11352,66 +11375,6 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         min-height: initial;
     }
 }
-
-
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-    .mobile.video .play-video-button {
-        background-image: url(../images/mega/download-sprite_v10@2x.png);
-        background-size: 257px auto;
-    }
-    .mobile.tablet-img {
-        background-image: url(../images/mobile/ipad-big@2x.png);
-    }
-    .android .mobile.tablet-img {
-        background-image: url(../images/mobile/android@2x.png);
-    }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png) !important;
-        background-size: 280px auto;
-    }
-    .mobile.registration-confirm-email .email-icon {
-        background-image: url(../images/mega/register-big-sprite-v15@2x.png);
-        background-size: 200px auto;
-    }
-    .mobile .improved-recovery-steps .login-register-input, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
-        background-image: url(../images/mega/top-login-sprite_v11@2x.png);
-        background-size: 48px auto;
-    }
-    .mobile .improved-recovery-steps .feedback-logo {
-        background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
-        background-size: 250px auto;
-    }
-    .mobile .improved-recovery-steps .list-point b.megasync-logo {
-        background-image: url(../images/mega/top-sprite_v7@2x.png);
-        background-size: 38px auto;
-    }
-    .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
-        background-size: 280px auto;
-    }
-    .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
-        background-image: url(../images/mega/2fa-auth-apps@2x.png);
-        background-size: 72px auto;
-    }
-    .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
-        background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
-        background-size: 344px auto;
-    }
-    .membership-question-mark span {
-        background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
-        background-size: 755px auto;
-    }
-    .mobile .bus-reg-icon {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
-        background-size: 280px auto;
-    }
-    .mobile .card-container .dialog-heading-img {
-        background-image: url(../images/mobile/mobile-sprite_v27@2x.png);
-        background-size: 280px auto;
-    }
-}
-
-
 @media screen and (orientation:landscape) {
     .app-info-block .mobile.download-app {
         display: none;
@@ -11428,15 +11391,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
         max-width: 100px;
     }
 }
-
-
 @media screen and (orientation:portrait) {
     .mobile .improved-recovery-steps .main-right-block {
         display: none;
     }
 }
-
-
 @keyframes rotate-loading {
     0% {
         transform: rotate(0deg);
@@ -11657,7 +11616,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
     padding: 32px 0 0;
 }
 .mobile .bus-reg-icon {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
     width: 24px;
     height: 24px;
     opacity: 0.6;
@@ -11673,8 +11632,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .bus-reg-icon.number-of-user {
     background-position: -158px -3025px;
 }
+.mobile .payment-address-dialog .bus-plan-icon64 {
+    height: auto;
+    width: auto;
+    margin: 0;
+}
+.mobile .payment-address-dialog .bus-plan-icon64 .reg-st3-membership-icon {
+    background-position: -121px -3095px;
+}
 .mobile .card-container .dialog-heading-img {
-    background-image: url(../images/mobile/mobile-sprite_v27.png);
+    background-image: url(../images/mobile/mobile-sprite_v30.png);
 }
 .mobile .payment-reminder-logo {
     background-position: -56px -2946px;
@@ -11833,3 +11800,882 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll {
 .mobile .mega-input-title-ontop.with-icon .account-pass-lines {
     margin-top: 9px;
 }
+
+/** Mobile Notifications Page **/
+.mobile.account-notifications-page .section-block .block-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+.notification-setting-row {
+    line-height: 30px;
+    padding: 10px 20px;
+    border-bottom: 1px rgba(0,0,0,0.1) solid;
+    position: relative;
+}
+.mobile.account-notifications-page .fm-content .fm-scrolling {
+    max-height: 100vh;
+}
+.section-block .block-text {
+    font-size: 14px;
+    line-height: 21px;
+    margin: 0 10px 0 20px;
+}
+.notification-setting-row .dialog-feature-toggle {
+    border: solid 1px rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 40px;
+    cursor: pointer;
+    display: inline-block;
+    height: 22px;
+    width: 38px;
+    right: 10px;
+    top: calc(50% - 11px);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: absolute;
+}
+.notification-setting-row .content-txt {
+    margin-right: 40px;
+}
+.notification-setting-row .dialog-feature-toggle.toggle-on {
+    background-color: #00BFA5;
+    background: -moz-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+    background: -webkit-linear-gradient(180deg, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+    background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,172,148,1) 100%);
+}
+.notification-setting-row .dialog-feature-toggle.toggle-on  .dialog-feature-switch {
+    margin-left: 18px;
+}
+.notification-setting-row .dialog-feature-switch {
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    height: 14px;
+    margin-left: 2px;
+    margin-top: 2px;
+    width: 14px;
+    transition: margin 0.15s linear;
+}
+/** //End Mobile Notifications Page **/
+
+/** Mobile Blog **/
+@media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
+    .mobile .blog-new-item p,
+    .mobile .blog-new-full p,
+    .mobile .blog-new-small,
+    .mobile.blog-new-full ul li,
+    .mobile .blog-new-full ol li {
+        font-size: 1.1em;
+    }
+}
+.blog-new h2,
+.blog-new .blog-h2 {
+    margin: 0;
+    font-size: 1.3em;
+    line-height: 1.5em;
+    color: #333333;
+    display: block;
+    font-weight: normal;
+    padding: 22px 0 2px 0;
+    font-family: 'source_sans_proregular', Arial;
+}
+.blog-new-full-img {
+    max-width: 100%;
+    margin: 20px auto 15px auto;
+    display: block;
+}
+.blog-new-small {
+    color: #999a9c;
+    float: left;
+    line-height: 30px;
+    font-size: 16px;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica;
+    margin: 0 0 0 0;
+}
+.blog-new-date-div {
+    width: 2px;
+    height: 20px;
+    float: left;
+    background-color: #e3e3e3;
+    margin: 4px 10px 0px 10px;
+}
+.mobile .main-mid-pad.new-bottom-pages.blog-new {
+    font-size: 96%;
+}
+.blog-new-full p.small-pad-paragraph {
+    padding-top: 0;
+    padding-bottom: 15px;
+}
+.blog-new-item p,
+.blog-new-full p {
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 16px 0 0 281px;
+    font-size: 16px;
+    line-height: 30px;
+    color: #333333;
+}
+.blog-new-full p {
+    color: #3F4646;
+    padding: 10px 0 15px 0;
+}
+.blog-new-full ul li,
+.blog-new-full ol li {
+    margin: 0;
+    padding: 0 0 18px 20px;
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    line-height: 28px;
+    color: #3F4646;
+    text-align: left;
+    font-weight: normal;
+    list-style-type: none;
+    background-position: -15px -3px;
+    background-image: url(../images/mega/dev-point.png);
+    background-repeat: no-repeat;
+}
+@media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
+    .blog-left-image {
+        float: none;
+        width: auto;
+        max-width: 100%;
+        padding-bottom: 23px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+}
+
+.blog-button {
+    height: 32px;
+    line-height: 30px;
+    color: white;
+    display: block;
+    background-color: #6c6b6a;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+    padding: 0 17px 0 34px;
+    background-image: url(../images/mobile/mobile-page-sprite.png);
+    background-position: 10px 3px;
+    background-repeat: no-repeat;
+    margin: 14px 0 0 20px;
+    float: left;
+    font-size: 1.3em;
+}
+.blog .blog-button {
+    display: none;
+}
+.blog .top-logo {
+    width: 172px;
+    height: 30px;
+}
+.blog-new-item {
+    padding: 5px 20px 40px 20px;
+}
+.blog-new h2, .blog-new .blog-h2 {
+    margin: 0;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    color: #333333;
+    display: block;
+    font-weight: normal;
+    padding: 22px 0 2px 0;
+    font-family: 'source_sans_proregular', Arial;
+}
+.blog-new-small {
+    color: #999a9c;
+    float: left;
+    font-size: 1.3em;
+    line-height: 30px;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica;
+    margin: 0 0 0 0;
+}
+.blog-new-date-div {
+    width: 2px;
+    height: 20px;
+    float: left;
+    background-color: #e3e3e3;
+    margin: 4px 10px 0px 10px;
+}
+.blog-new-small span {
+    color: #727376;
+}
+.blog-new-item .img-link {
+    width: 250px;
+    float: left;
+    display: block;
+    margin-top: 16px;
+    line-height: 0;
+}
+.blog-new-item .img-link img {
+    width: 100%;
+}
+.blog-new-item p,
+.blog-new-full p {
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 16px 0 0 281px;
+    font-size: 1.3em;
+    line-height: 2em;
+    color: #333333;
+}
+.blog-new-item p a,
+.blog-new-full p a {
+    color: #D22400;
+    word-break: break-word;
+}
+.blog-new-full p img {
+    max-width: 100%;
+    height: auto !important;
+}
+.blog-new-item p span.blog-new-description {
+    display: block;
+    min-height: 110px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding-bottom: 12px;
+}
+.blog-new-item p span.quote {
+    display: inline;
+    font-style: italic;
+}
+p .blog-new-read-more,
+p a.blog-new-read-more {
+    display: block;
+    height: 30px;
+    background-color: #cccccc;
+    cursor: pointer;
+    float: left;
+    -moz-border-radius: 5px;
+    font-size: 0.9em;
+    line-height: 28px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 0 15px 0 15px;
+    color: white !important;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: 'source_sans_proregular', Arial;
+}
+p a.blog-new-read-more:active {
+    color: white !important;
+    background-color: #7f7f7f;
+}
+.blog-new-div {
+    height: 2px;
+    position: relative;
+    background-color: #eeeeee;
+}
+.mobile .blog-new-item p,
+.mobile .blog-new-full p,
+.mobile .blog-new-small,
+.mobile .blog-new-full ul li {
+    font-size: 1.3em;
+}
+.blog div.bottom-menu {
+    margin-top: 0;
+}
+.blog-new-full {
+    padding: 0 5px 0 5px;
+}
+.blog-new-forward,
+.blog-new-back {
+    display: none;
+}
+.blog-new-full-img {
+    max-width: 100%;
+    margin: 20px auto 15px auto;
+    display:block;
+}
+.blog-new-full-img.large {
+    width: 100%;
+    margin: 20px auto 15px auto;
+}
+.blog-new-full p {
+    color: #3F4646;
+    padding: 10px 0 15px 0
+}
+.blog-browser-logo {
+    float: left;
+    width: 63px;
+    padding-bottom:8px;
+}
+.blog-apps-icon {
+    float: left;
+    width: 60px;
+}
+.blog-browser-title, .blog-dev-titles {
+    margin-left: 83px;
+    font-size: 1.3em;
+    line-height: 2em;
+    padding-top: 18px;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
+    color: #737376;
+}
+.blog-dev-titles {
+    padding-top: 16px;
+}
+.blog-new-full-div {
+    background-color: #ededed;
+    height: 2px;
+    margin: 15px -20px 30px -20px;
+}
+.blog-new-full-div2 {
+    background-color: #ededed;
+    height: 2px;
+    margin: 5px -20px 35px -20px;
+}
+.blog-new-full p.conclusion {
+    margin: 0;
+    padding: 7px 0 33px 0;
+}
+.blog-new-full ul {
+    margin: 0;
+    padding: 20px 0 15px 0;
+}
+.blog-new-full ul li,
+.blog-new-full ol li {
+    margin: 0;
+    padding: 0 0 18px 20px;
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    font-size: 1.3em;
+    line-height: 28px;
+    color: #3F4646;
+    text-align: left;
+    font-weight: normal;
+    list-style-type: none;
+    background-position: -15px -3px;
+    background-image: url(../images/mega/dev-point.png);
+    background-repeat: no-repeat;
+}
+.blog-new-full p.strong-paragraph {
+    font-weight: normal;
+    font-family: 'source_sans_prosemibold', Arial;
+    color: #3F4646;
+    padding-top: 0;
+    padding-bottom: 20px;
+    padding-top:6px;
+}
+.blog-new-full p strong {
+    font-weight: normal;
+    font-family: 'source_sans_prosemibold', Arial;
+    color: #3F4646;
+}
+.blog-new-full p .italic-quote {
+    color: #919091;
+    font-style: italic;
+}
+.blog-new-full p.small-pad-paragraph {
+    padding-top: 0;
+    padding-bottom: 15px;
+}
+.blog-new-full ul.ul-small-pad {
+    padding-top: 0;
+}
+.blog-new-full .blog-dark {
+    color: #131313;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
+}
+.blog-new-number {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 2px solid #888787;
+    padding: 10px;
+    float: left;
+    display: block;
+    line-height: 20px;
+    color: #404646;
+    font-family: 'source_sans_proregular', Arial, Helvetica, sans-serif;
+    color: #3F4646;
+    font-weight: bold;
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    border-radius: 100%;
+    margin: 0;
+    padding: 0 0 0 0;
+    text-align: center;
+}
+.blog-plus-sign {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: 5px -248px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-minus-sign {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -41px -248px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-arrow {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -84px -248px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-positive {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -116px -248px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-negative {
+    width: 24px;
+    height: 24px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -151px -248px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-strong-recomend {
+    width: 26px;
+    height: 26px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -190px -246px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-recomend {
+    width: 26px;
+    height: 26px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -150px -206px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-not-recomend {
+    width: 26px;
+    height: 26px;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    float: left;
+    display: block;
+    background-position: -190px -206px;
+    background-image: url(../images/mega/blog-new-sprite.png);
+    background-repeat: no-repeat;
+}
+.blog-new-num-txt, .blog-new-num-txtpositive-negative-txt {
+    margin-left: 33px;
+    display: block;
+    line-height:25px;
+}
+.blog-new-full ul li a {
+    color: #d9290b;
+}
+.blog-new-full ul ul {
+    margin: 0 0 0 30px;
+    padding: 0;
+}
+.blog-new-full ul ul li {
+    background-image: url(../images/mega/dev-point-gray.png);
+}
+.blog-new-num-txt.strong-header {
+    padding: 0 0 20px 0;
+    color: #3F4646;
+    font-family: 'source_sans_prosemibold', Arial, Helvetica, sans-serif;
+}
+.blog-new-num-txt .dev-new-input-block {
+    margin: 10px 0 -15px 0;
+}
+.blog-new-num-txt .dev-new-input-block input {
+    color: #99999E;
+}
+.blog-left-image {
+    width: 220px;
+    float: left;
+    padding-bottom: 33px;
+    padding-top:10px;
+}
+p.blog-p-left-pad {
+    margin-left: 261px;
+    padding-top: 5px;
+}
+img.blog-new-logos {
+    width: 160px;
+    float: left;
+}
+.blog-browser-title.large {
+    margin-left: 191px;
+}
+.blog-new-num-txt.positive-negative-txt,
+.blog-new-num-txtpositive-negative-txt {
+    padding-bottom: 12px;
+}
+.blog-status {
+    display: block;
+    padding-top: 15px;
+}
+.blog-status .blog-new-num-txt.positive-negative-txt {
+    padding-top: 1px;
+}
+.blog-left-image.clouds {
+    width: 115px;
+}
+.blog-p-left-pad.clouds {
+    padding-top: 0;
+}
+.blog-apps-icon.news {
+    width: 68px;
+    padding-bottom: 30px;
+}
+.blog-browser-title.news {
+    padding-top: 4px;
+    margin-left: 98px;
+    padding-bottom: 30px;
+    padding-top: 3px;
+}
+.blog-paragraph-big-lines {
+    line-height: 32px;
+}
+.blog-jobs-icon {
+    padding: 7px 0 10px 40px;
+    background-image: url(../images/mega/blogs/jobs-sprite.png);
+    background-repeat: no-repeat;
+    background-size: 31px 438px;
+    font-weight: bold;
+    color: #727376;
+    margin-bottom: 15px;
+}
+.blog-jobs-icon.you {
+    background-position: left 1px;
+}
+.blog-jobs-icon.salary {
+    background-position: left -99px;
+}
+.blog-jobs-icon.location {
+    background-position: left -199px;
+}
+.blog-jobs-icon.server-side {
+    background-position: left -294px;
+}
+.blog-jobs-icon.client-side {
+    background-position: left -389px;
+}
+.blog-jobs-mega {
+    display: block;
+    width: 140px;
+    margin-bottom: 33px
+}
+.blog-article-divider {
+    height: 2px;
+}
+.blog-new-full h2.not-float {
+    float: none;
+    background-image: none;
+    padding: 42px 0 2px 0;
+}
+.blog-new-full p.strong-paragraph.new-blog-icon {
+    padding: 15px 0 15px 45px;
+    background-image: url(../images/mega/blogs/blog-post-sprite1.png);
+    background-repeat: no-repeat;
+    line-height: 26px;
+}
+.new-blog-icon.faster-loading-icon {
+    background-position: -2px 13px;
+}
+.new-blog-icon.new-user-interface {
+    background-position: 1px -120px;
+}
+.new-blog-icon.local-caching-icon {
+    background-position: -1px -279px;
+}
+.new-blog-icon.user-avatars-icon {
+    background-position: -1px -444px;
+}
+.new-blog-icon.contact-management-icon {
+    background-position: -1px -620px;
+}
+.new-blog-icon.new-tree-panel-icon {
+    background-position: -1px -785px;
+}
+.new-blog-icon.improved-transfers-icon {
+    background-position: -1px -961px;
+}
+.new-blog-icon.firefox-extension-icon {
+    background-position: -1px -1126px;
+}
+.new-blog-icon.new.mobile-icon {
+    background-position: -1px -1344px;
+}
+.blog-new-full p.strong-paragraph.new-blog-icon.new-sync-icon {
+    background-position: 0 -1530px;
+    padding-top: 20px;
+}
+.blog-new-full-img.middle-blog-img {
+    margin: 12px 0 38px 0;
+    max-width: 100%;
+    display: block;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #e5e5e5;
+}
+.blog-new-full-img.list-blog-img {
+    margin: 15px 0 20px 0;
+    max-width: 100%;
+    display: block;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #e5e5e5;
+}
+.middle-blog-img img,
+.list-blog-img img {
+    max-width: 100%;
+    border: 0;
+    display: block;
+}
+.blog-new-full ul.small-pad li {
+    padding-bottom: 0;
+    padding-left: 0;
+    background-image: none;
+}
+#blogarticle_post {
+    padding-top: 15px;
+}
+.blog-new-full-div {
+    margin: 0 -20px 30px -20px;
+}
+.blog-left-image {
+    float:none;
+    width:auto;
+    max-width:100%;
+    padding-bottom: 23px;
+    margin-left:auto;
+    margin-right:auto;
+    display:block;
+}
+p.blog-p-left-pad {
+    margin-left:0;
+}
+.mobile #blogarticle_post,
+.mobile #blogarticle_post {
+    padding-top: 10px;
+}
+.mobile .blog-new-full-img.middle-blog-img {
+    margin: 8px 0 30px 0;
+}
+.mobile .blog-new-full-img.list-blog-img {
+    margin: 10px 0 12px 0;
+}
+.mobile .blog-new h2,
+.mobile .blog-new .blog-h2 {
+    font-size: 1.3em;
+}
+.mobile .blog-new-item p,
+.mobile .blog-new-full p,
+.mobile .blog-new-small,
+.mobile .blog-new-full ul li,
+.blog-new-full ol li {
+    font-size: 1.1em;
+}
+.mobile .blog-new-item {
+    padding: 0 20px 25px 20px;
+}
+.mobile .blog-new-item p {
+    padding: 20px 0 0 0;
+}
+.blog-new-item .img-link {
+    width: 100%;
+    float: none;
+}
+.blog-new-item {
+    padding: 5px 20px 30px 20px;
+}
+.blog-new-item p {
+    padding: 25px 0 0 0;
+    font-size: 1.3em;
+    line-height: 2em;
+}
+.blog-new-item p span.blog-new-description {
+    min-height: 10px;
+    padding-bottom: 0;
+}
+p .blog-new-read-more,
+p a.blog-new-read-more {
+    display: none;
+}
+.mobile .blog-button {
+    height: 27px;
+    line-height: 25px;
+    padding: 0 11px 0 32px;
+    background-image: url(../images/mobile.mobile-mobile-page-sprite.png);
+    background-position: 10px 3px;
+    background-repeat: no-repeat;
+    background-size: auto;
+    margin: 11px 0 0 11px;
+    float: left;
+    font-size: 1.1em;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    .mobile .blog-button {
+        background-image: url(../images/mobile/mobile-page-sprite@2x.png);
+        background-size:350px auto;
+    }
+    .blog-new-full p.strong-paragraph.new-blog-icon {
+        background-image: url(../images/mega/blogs/blog-post-sprite1@2x.png);
+        background-size: 36px auto;
+    }
+    .blog-article li,
+    .blog-new-full ul li {
+        background-image: url(../images/mega/dev-point-new.png);
+        background-size: 39px auto;
+    }
+    .blog-new-search,
+    .blog-new-forward,
+    .blog-new-back,
+    .blog-plus-sign,
+    .blog-minus-sign,
+    .blog-new-arrow,
+    .blog-new-positive,
+    .blog-new-negative,
+    .blog-new-strong-recomend,
+    .blog-new-recomend,
+    .blog-new-not-recomend {
+        background-image: url(../images/mega/blog-new-sprite@2x.png);
+        background-size: 217px auto;
+    }
+}
+@media only screen and (max-width: 568px) and (-webkit-min-device-pixel-ratio: 1.5), only screen and (max-width: 568px) and (-o-min-device-pixel-ratio: 3/2), only screen and (max-width: 568px) and (min--moz-device-pixel-ratio: 1.5), only screen and (max-width: 568px) and (min-device-pixel-ratio: 1.5), (max-width: 800px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 1.5), only screen and (max-width: 800px) and (orientation: landscape) and (-o-min-device-pixel-ratio: 3/2), only screen and (max-width: 800px) and (orientation: landscape) and (min--moz-device-pixel-ratio: 1.5), only screen and (max-width: 800px) and (orientation: landscape) and (min-device-pixel-ratio: 1.5) {
+    .mobile .blog-button {
+        background-image: url(../images/mobile.mobile-mobile-page-sprite@2x.png);
+        background-size:350px auto;
+    }
+}
+.mobile .blog-new-right {
+    display: none;
+}
+
+/** End Mobile Blog **/
+.mobile .horizontal-plans .bottom-page .reg-st3-membership-bl.pro3 {
+    margin-right: 20px;
+}
+/*
+ * Retina Sprite for mobile
+ * Please leave it on the bottom to make sure it override on Retina.
+ * New style should comes above on this.
+ */
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    .mobile.video .play-video-button {
+        background-image: url(../images/mega/download-sprite_v10@2x.png);
+        background-size: 257px auto;
+    }
+    .mobile.tablet-img {
+        background-image: url(../images/mobile/ipad-big@2x.png);
+    }
+    .android .mobile.tablet-img {
+        background-image: url(../images/mobile/android@2x.png);
+    }
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon, .mobile .payment-address-dialog .reg-st3-membership-icon {
+        background-image: url(../images/mobile/mobile-sprite_v30@2x.png) !important;
+        background-size: 280px auto;
+    }
+    .mobile.registration-confirm-email .email-icon {
+        background-image: url(../images/mega/register-big-sprite-v15@2x.png);
+        background-size: 200px auto;
+    }
+    .mobile .improved-recovery-steps .login-register-input, .mobile .improved-recovery-steps .checkboxOn::after, .mobile .improved-recovery-steps .checkboxOff::after {
+        background-image: url(../images/mega/top-login-sprite_v11@2x.png);
+        background-size: 48px auto;
+    }
+    .mobile .improved-recovery-steps .feedback-logo {
+        background-image: url(../images/mega/help2/welcome_icons_v2@2x.png);
+        background-size: 250px auto;
+    }
+    .mobile .improved-recovery-steps .list-point b.megasync-logo {
+        background-image: url(../images/mega/top-sprite_v7@2x.png);
+        background-size: 38px auto;
+    }
+    .mobile.session-history-page .sh-round-button::before  {
+        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-size: 280px auto;
+    }
+    .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
+        background-image: url(../images/mega/2fa-auth-apps@2x.png);
+        background-size: 72px auto;
+    }
+    .mobile .improved-recovery-steps .recover-image, .mobile .improved-recovery-steps .session-image-block, .mobile .improved-recovery-steps .recover-button.yes::after, .mobile .improved-recovery-steps .recover-button.no::after   {
+        background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
+        background-size: 344px auto;
+    }
+    .membership-question-mark span {
+        background-image: url(../images/mega/pro-new-sprite-v8@2x.png);
+        background-size: 755px auto;
+    }
+    .mobile .bus-reg-icon {
+        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-size: 280px auto;
+    }
+    .mobile .card-container .dialog-heading-img {
+        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-size: 280px auto;
+    }
+}
+
+/*
+ * Retina Sprite for mobile Ends
+ * Please no more new styling after this.
+ */

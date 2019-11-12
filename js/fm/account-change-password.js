@@ -24,6 +24,7 @@ var accountChangePassword = {
 
         $('#account-new-password').val('').trigger('blur').trigger('input');
         $('#account-confirm-password').val('').trigger('blur');
+        $('.account-pass-lines').removeClass('good1 good2 good3 good4 good5');
     },
 
     /**
@@ -57,6 +58,8 @@ var accountChangePassword = {
 
         bindStrengthChecker();
     },
+
+
 
     /**
      * Initalise the change password button to verify the password (and 2FA if active) then change the password
@@ -179,16 +182,38 @@ var accountChangePassword = {
      * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
      */
     continueChangePassword: function(newPassword, twoFactorPin) {
-
         'use strict';
+        var self = this;
 
-        // If the account is registered with the new process (version 2), change password using the new method
-        if (u_attr.aav === 2) {
-            security.changePassword.newMethod(newPassword, twoFactorPin, accountChangePassword.completeChangePassword);
+        var failingAction = function(status) {
+            if (status === 1) {
+                msgDialog('info', '', l[22126]);
+            }
+            self.resetForm();
+        };
+
+        var registerationMethod = 1;
+
+        if (u_attr && u_attr.aav === 2) {
+            registerationMethod = 2;
         }
-        else {
-            security.changePassword.oldMethod(newPassword, twoFactorPin, accountChangePassword.completeChangePassword);
-        }
+
+        var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword),
+            registerationMethod);
+
+        checkPassPromise.fail(failingAction);
+
+        checkPassPromise.done(
+            function() {
+                if (registerationMethod === 2) {
+                    security.changePassword.newMethod
+                        (newPassword, twoFactorPin, accountChangePassword.completeChangePassword);
+                }
+                else {
+                    security.changePassword.oldMethod(newPassword, twoFactorPin,
+                        accountChangePassword.completeChangePassword);
+                }
+            });
     },
 
     /**

@@ -1156,6 +1156,10 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
         self.props.contacts.forEach(function(v, k) {
             !alreadyAdded[v.h] && self._eventuallyAddContact(v, contacts, selectableContacts);
         });
+        var sortFn = M.getSortByNameFn2(1);
+        contacts.sort(function(a, b) {
+            return sortFn(a.props.contact, b.props.contact);
+        });
 
         if (Object.keys(alreadyAdded).length === 0) {
             hideFrequents = true;

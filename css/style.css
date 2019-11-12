@@ -570,6 +570,46 @@ label span.black {
 .main_bg_image {
     padding-bottom: 160px;
 }
+/*Common notification label:*/
+.notification-label {
+    min-height: 28px;
+    border:1px solid rgba(0,0,0,0.1);
+    background: #fafafa;
+    padding: 4px 10px;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+.notification-cell {
+    display: table-cell;
+    vertical-align: middle;
+}
+.notification-cell.icon-cell {
+    padding-right: 8px;
+}
+.notification-label.info {
+    background-color: rgba(0,191,165,0.05);
+    border: 1px solid rgba(0,191,165,0.1);
+    color: #00BFA5;
+}
+.notification-label.warning {
+    background-color: rgba(255,111,0,0.05);
+    border: 1px solid rgba(255,111,0,0.1);
+    color: #FF6F00;
+}
+.notification-label.warning i {
+    background-position: -5px -1730px;
+    margin-top: 1px;
+}
+.notification-label.error {
+    background-color: #FF333A;
+    border: 1px solid rgba(0,0,0,0.1);
+    color: #ffffff;
+}
+.notification-label.error i {
+    background-position: -110px -1770px;
+}
+/*End of common notification label*/
+
 .progressbar {
     background-color: rgba(0,0,0,0.2);
     -webkit-border-radius: 12px;
@@ -4161,7 +4201,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .files-grid-view.fm .column-settings::before {
     content: "";
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -148px -1992px;
     display: inline-block;
     position: fixed;
@@ -4315,7 +4355,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-tree-panel-arrows {
     right: 7px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v30.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -88px -1992px;
     opacity: 0.8;
 }
@@ -4860,7 +4900,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -4965,58 +5005,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-left-menu.transfers {
     background-color: #fafafa;
     height: 35px;
-}
-.nw-fm-left-icon.rubbish-bin::after {
-    content: '';
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    width: 6px;
-    height: 6px;
-    background-color: rgba(19,224,60,1);
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-}
-.nw-fm-left-icon.rubbish-bin.filled::after {
-    -webkit-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -moz-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -o-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    -ms-transition: opacity 0.2s, background-color 0.2s 0.8s;
-    transition: opacity 0.2s, background-color 0.2s 0.8s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    background-color: rgba(19,224,60,0.5);
-}
-.nw-fm-left-icon.rubbish-bin.filled.glow::after {
-    -webkit-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -moz-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -o-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    -ms-transition: background-color 0.2s, opacity 0.2s 0.8s;
-    transition: background-color 0.2s, opacity 0.2s 0.8s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-    -moz-opacity: 0.5;
-    -khtml-opacity: 0.5;
-    opacity: 0.5;
-    background-color: rgba(19,224,60,1);
-}
-.nw-fm-left-icon.rubbish-bin.filled:hover::after, .nw-fm-left-icon.rubbish-bin.filled.active::after {
-    -webkit-transition: background-color 0.2s, opacity 0.2s;
-    -moz-transition: background-color 0.2s, opacity 0.2s;
-    -o-transition: background-color 0.2s, opacity 0.2s;
-    -ms-transition: background-color 0.2s, opacity 0.2s;
-    transition: background-color 0.2s, opacity 0.2s;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-    background-color: rgba(19,224,60,1);
 }
 .nw-fm-left-icons-panel {
     background-color: #222222;
@@ -5554,7 +5542,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6291,7 +6279,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7225,11 +7213,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -11217,7 +11205,7 @@ table {
     width: 100%;
     text-align: center;
     font-size: 15px;
-    font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #333;
     line-height: 18px;
     margin:8px 0 16px 0;
@@ -24168,11 +24156,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     vertical-align: top;
     margin-bottom: 8px;
 }
-.user-management-subuser-profile-container .default-red-button-user-management,
-.user-management-subuser-profile-container .default-green-button-user-management {
-    margin-right: 40px;
-    float:right;
-}
 .files-grid-view.user-management-view .user-management-view-data {
     width:100%;
     height: 580px;
@@ -25542,18 +25525,33 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     right: 16px;
 }
 
-.user-management-add-user-dialog .verification-container {
+.user-management-add-user-dialog .verification-container, .user-management-dialog.bus-pw-reset .verification-container {
     position: relative;
-    width: 532px;
     height: auto;
     background-color: rgba(250,250,250,1);
-    margin:32px;
-    padding:12px 16px;
     box-sizing: border-box;
     border-radius: 4px;
     border:1px solid rgba(0,0,0,0.1);
 }
-
+.user-management-add-user-dialog .verification-container {
+    width: 532px;
+    margin:32px;
+    padding: 8px 12px;
+}
+.user-management-dialog.bus-pw-reset .verification-container {
+    max-width: 410px;
+    min-width: 336px;
+    min-height: 40px;
+    padding: 8px 40px 8px 12px;
+    margin-right: 6px;
+    vertical-align: top;
+    display: inline-block;
+    text-align: left;
+}
+.user-management-dialog.bus-pw-reset .verification-container .context-txt {
+    display: inline-block;
+    user-select: text;
+}
 .user-management-add-user-dialog .verification-container .verification-user-info {
     width: auto;
     max-width: 340px;
@@ -26215,6 +26213,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .card-container.bus-repay .bus-reg-icon {
     margin: 0;
     float: none;
+    display: inline-block;
 }
 .user-management-account-settings .bus-input input,
 .user-management-dialog .dialog-input-title-ontop input {
@@ -28902,7 +28901,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .user-management-dialog .dialog-title.long-name {
     margin: 40px 32px;
-    line-height: 30px;
 }
 .dialog-subtitle {
     font-size: 14px;
@@ -29527,12 +29525,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #FC5401;
 }
 .transfer-progress-type.error.overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #F0373A;
     font-size: 14px;
 }
 .transfer-progress-type.error.almost-overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #FFA500;
     font-size: 14px;
 }
@@ -29585,7 +29583,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v31.png");
+    background-image: url("../images/mega/icons-sprite_v32.png");
     width: 24px;
     height: 24px;
     left: -1px;
@@ -29711,7 +29709,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     top: 0;
 }
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v31.png");
+    background-image: url("../images/mega/icons-sprite_v32.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29770,7 +29768,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v31.png");
+    background-image: url("../images/mega/icons-sprite_v32.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -29837,7 +29835,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v31.png");
+    background-image: url("../images/mega/icons-sprite_v32.png");
 }
 .transfer-task-actions {
     display: none;
@@ -30134,7 +30132,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     color: #F0373A;
 }
 .quota-info-pr-txt {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     font-size: 12px;
     color: #333;
     line-height: 18px;
@@ -30147,7 +30145,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: inline-block;
 }
 .right-section.upgrade-block .head-title {
-    font-family: 'LatoWebBold','source_sans_proregular', Arial;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     left: 0;
     top: 0;
     padding: 0;
@@ -30304,6 +30302,47 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .bottom-page.developer-settings .developer-setting {
     width: 100%;
+}
+/** End Developer Settings Page **/
+/*temp code, will be removed after generic component.css is merged*/
+.context-txt {
+    font-size: 14px;
+    line-height: 20px;
+    color: #999;
+}
+.context-txt.dark {
+    color: #333;
+}
+.context-txt.strong {
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
+}
+.context-txt.warning {
+    color: #FF6F00;
+}
+.context-txt.info, .context-txt.green {
+    color: #00BFA5;
+}
+.button-container.default {
+    width: 100%;
+    height: 64px;
+    padding:16px;
+    margin-top: 40px;
+    position: relative;
+    box-sizing: border-box;
+    text-align: right;
+}
+.button-container.default::before {
+    content: "";
+    width: 100%;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+}
+.button-container .btn {
+    display: inline-block;
+    margin-left: 16px;
 }
 /** End Developer Settings Page **/
 .duplicated-items-found {

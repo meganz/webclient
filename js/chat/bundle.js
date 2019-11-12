@@ -2184,6 +2184,10 @@ function (_MegaRenderMixin9) {
       self.props.contacts.forEach(function (v, k) {
         !alreadyAdded[v.h] && self._eventuallyAddContact(v, contacts, selectableContacts);
       });
+      var sortFn = M.getSortByNameFn2(1);
+      contacts.sort(function (a, b) {
+        return sortFn(a.props.contact, b.props.contact);
+      });
 
       if (Object.keys(alreadyAdded).length === 0) {
         hideFrequents = true;
@@ -2830,17 +2834,22 @@ function (_MegaRenderMixin) {
       if (this.props.active === true) {
         if (this.popupElement) {
           var $element = $(this.popupElement);
-          var positionToElement = $('.button.active:visible');
-          var offsetLeft = 0;
-          var $container = positionToElement.closest('.messages.scroll-area');
+          var $positionToElement = $('.button.active:visible');
 
-          if ($container.length == 0) {
+          if ($positionToElement.length === 0) {
+            return;
+          }
+
+          var offsetLeft = 0;
+          var $container = $positionToElement.closest('.messages.scroll-area');
+
+          if ($container.length === 0) {
             $container = $(document.body);
           }
 
           $element.css('margin-left', '');
           $element.position({
-            of: positionToElement,
+            of: $positionToElement,
             my: self.props.positionMy ? self.props.positionMy : "center top",
             at: self.props.positionAt ? self.props.positionAt : "center bottom",
             collision: "flipfit",
@@ -2857,7 +2866,7 @@ function (_MegaRenderMixin) {
                   arrowHeight = self.props.arrowHeight;
 
                   if (info.vertical !== "top") {
-                    arrowHeight = arrowHeight * -1;
+                    arrowHeight *= -1;
                   } else {
                     arrowHeight = 0;
                   }
@@ -5954,7 +5963,7 @@ function (_MegaRenderMixin5) {
           room.setActive();
         });
       } else {
-        this.props.megaChat.createAndShowGroupRoomFor(selected);
+        megaChat.createAndShowGroupRoomFor(selected);
       }
     }
   }, {
@@ -6005,7 +6014,6 @@ function (_MegaRenderMixin5) {
         }
 
         var $target = $(e.target);
-        var megaChat = self.props.megaChat;
 
         if (megaChat.currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
@@ -6341,7 +6349,6 @@ function (_MegaRenderMixin5) {
       }, React.makeElement("input", {
         type: "text",
         className: "chat-quick-search",
-        autoComplete: "disabled",
         onChange: function onChange(e) {
           if (e.target.value) {
             treesearch = e.target.value;
@@ -6356,6 +6363,7 @@ function (_MegaRenderMixin5) {
             treesearch = e.target.value;
           }
         },
+        autoComplete: "disabled",
         value: self.state.quickSearchText,
         placeholder: l[7997]
       }), React.makeElement("div", {
@@ -6374,6 +6382,7 @@ function (_MegaRenderMixin5) {
       }, React.makeElement(PerfectScrollbar, {
         style: leftPanelStyles,
         className: "conversation-reduce-height",
+        chats: megaChat.chats,
         ref: function ref(_ref) {
           megaChat.$chatTreePanePs = _ref;
         }
@@ -8554,6 +8563,7 @@ function (_MegaRenderMixin) {
 
       if (!self.loadingPromise) {
         self.loadingPromise = megaChat.getEmojiDataSet('emojis').done(function (emojis) {
+          self.data_emojis = emojis;
           Soon(function () {
             self.data_emojis = emojis;
             self.safeForceUpdate();
@@ -8742,6 +8752,11 @@ function (_MegaRenderMixin) {
       this.found = found;
 
       if (!found || found.length === 0) {
+        setTimeout(function () {
+          // onCancel may need to do a .setState on parent component, so need to run it in a separate
+          // thread/stack
+          self.props.onCancel();
+        }, 0);
         return null;
       }
 
@@ -9159,7 +9174,7 @@ function (_MegaRenderMixin) {
           return;
         }
 
-        var _char = String.fromCharCode(key);
+        var char = String.fromCharCode(key);
 
         if (self.prefillMode) {
           return; // halt next checks if its in prefill mode.
@@ -9185,7 +9200,7 @@ function (_MegaRenderMixin) {
         /* up */
         || key === 9
         /* tab */
-        || _char.match(self.validEmojiCharacters)) {
+        || char.match(self.validEmojiCharacters)) {
           var parsedResult = mega.utils.emojiCodeParser(currentContent, currentCursorPos);
           self.setState({
             'emojiSearchQuery': parsedResult[0],
@@ -10948,7 +10963,7 @@ function (_React$Component) {
         var result = audio.play();
 
         if (result instanceof Promise) {
-          result["catch"](function (e) {
+          result.catch(function (e) {
             console.error(e);
           });
         }
@@ -11231,7 +11246,7 @@ function (_React$Component) {
               loading: false
             };
           });
-        })["catch"](function (e) {
+        }).catch(function (e) {
           console.error(e);
         });
       }
@@ -11636,7 +11651,7 @@ function (_ConversationMessageM) {
                 console.warn('Unable to inject nodes... no longer existing?', res);
               }
             });
-          })["catch"](function () {
+          }).catch(function () {
             if (d) {
               console.error("Failed to allocate 'My chat files' folder.", arguments);
             }
@@ -17561,7 +17576,7 @@ function (_MegaRenderMixin4) {
 ;
 
 function isStartCallDisabled(room) {
-  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0;
+  return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0 || room.getParticipantsExceptMe() < 1;
 }
 
 /***/ }),
@@ -17718,7 +17733,7 @@ var webSocketsSupport = typeof WebSocket !== 'undefined';
       var userHandles = [u_handle, userHandle];
       megaChat.smartOpenChat(userHandles, "private", undefined, undefined, undefined, true).then(function (room) {
         room.show();
-      })["catch"](function (ex) {
+      }).catch(function (ex) {
         console.warn("openChat failed. Maybe tried to start a private chat with a non contact?", ex);
       });
     } else if (roomType === "group") {
@@ -17887,7 +17902,12 @@ var Chat = function Chat() {
   this.plugins = {};
   self.filePicker = null; // initialized on a later stage when the DOM is fully available.
 
-  self._chatsAwaitingAps = {};
+  self._chatsAwaitingAps = {}; // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+
+  MegaDataObject.attachToExistingJSObject(this, {
+    "currentlyOpenedChat": null,
+    "displayArchivedChats": false
+  }, true);
   return this;
 };
 
@@ -18078,12 +18098,7 @@ Chat.prototype.init = function () {
     var $notification = $('.tooltip');
     $notification.addClass('hidden').removeAttr('style');
   });
-  self.registerUploadListeners(); // those, once changed, should trigger UI reupdate via MegaRenderMixin.
-
-  MegaDataObject.attachToExistingJSObject(this, {
-    "currentlyOpenedChat": null,
-    "displayArchivedChats": false
-  }, true);
+  self.registerUploadListeners();
   self.trigger("onInit");
 };
 /**
@@ -18882,7 +18897,7 @@ Chat.prototype.smartOpenChat = function () {
         return ready();
       }
 
-      createTimeoutPromise(verify, 300, 3e4).then(ready)["catch"](reject);
+      createTimeoutPromise(verify, 300, 3e4).then(ready).catch(reject);
     }; // Check whether we can prevent the actual call to openChat()
 
 
@@ -18899,7 +18914,7 @@ Chat.prototype.smartOpenChat = function () {
 
     if (result instanceof MegaPromise) {
       // if an straight promise is returned, the operation got rejected
-      result.then(reject)["catch"](reject);
+      result.then(reject).catch(reject);
     } else if (!Array.isArray(result)) {
       // The function should return an array at all other times...
       reject(EINTERNAL);
@@ -18922,7 +18937,7 @@ Chat.prototype.smartOpenChat = function () {
         }
 
         waitForReadyState(aRoom);
-      })["catch"](reject);
+      }).catch(reject);
     }
   });
 };
@@ -19615,7 +19630,7 @@ Chat.prototype.getEmojiDataSet = function (name) {
       self._emojiData[name] = data;
       delete self._emojiDataLoading[name];
       promise.resolve(data);
-    })["catch"](function (ev, error) {
+    }).catch(function (ev, error) {
       if (d) {
         self.logger.warn('Failed to load emoji data "%s": %s', name, error, [ev]);
       }
@@ -19771,7 +19786,7 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
   this.smartOpenChat(user_handle).then(function (room) {
     room.setActive();
     $(room).trigger('openSendFilesDialog');
-  })["catch"](this.logger.error.bind(this.logger));
+  }).catch(this.logger.error.bind(this.logger));
 };
 /**
  * Wrapper around Chat.openChat and ChatRoom.attachNodes as a single helper function
@@ -19798,8 +19813,8 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
     var attachNodes = function attachNodes(roomId) {
       return new MegaPromise(function (resolve, reject) {
         self.smartOpenChat(roomId).then(function (room) {
-          room.attachNodes(nodes).then(resolve.bind(self, room))["catch"](reject);
-        })["catch"](function (ex) {
+          room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
+        }).catch(function (ex) {
           if (d) {
             self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
           }
@@ -20696,7 +20711,7 @@ ChatRoom.prototype._retrieveTurnServerFromLoadBalancer = function (timeout) {
     }
 
     $promise.resolve();
-  })["catch"](function () {
+  }).catch(function () {
     $promise.reject.apply($promise, arguments);
   });
   return $promise;
@@ -21512,10 +21527,10 @@ ChatRoom.prototype.attachNodes = function (ids) {
           } else {
             proxyPromise.reject();
           }
-        })["catch"](function (err) {
+        }).catch(function (err) {
           proxyPromise.reject(err);
         });
-      })["catch"](function (err) {
+      }).catch(function (err) {
         proxyPromise.reject(err);
       });
     } else {
@@ -21535,7 +21550,7 @@ ChatRoom.prototype.attachNodes = function (ids) {
 
         self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify(nodesMeta));
         proxyPromise.resolve([nodeId]);
-      })["catch"](function (r) {
+      }).catch(function (r) {
         proxyPromise.reject(r);
       });
     }

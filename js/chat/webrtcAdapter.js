@@ -71,18 +71,17 @@ function WebrtcApi() {
             elem.removeAttribute('src');
             elem.setAttribute('src', URL.createObjectURL(stream));
         }
-
-        if (HTMLMediaElement.prototype.setSinkId) {
-            elem.setSinkId('default')
-            .then(function() {
-                if (stream) {
-                    elem.play();
-                }
-            });
-        } else {
-            if (stream) {
-                // safari hack
-                if (self.isSafari) {
+        if (stream) {
+            var pms;
+            if (stream.getAudioTracks().length > 0) {
+                // setup audio playback
+                if (HTMLMediaElement.prototype.setSinkId) {
+                    pms = elem.setSinkId('default')
+                    .catch(function(err) {
+                        console.warn("attachMediaStream: setSinkId() failed:", err.message || err);
+                    });
+                } else if (self.isSafari) {
+                    // safari hack
                     elem.setAttribute('playsinline', "");
                     elem.setAttribute('autoplay', "");
                     elem.setAttribute("controls", true);
@@ -90,6 +89,12 @@ function WebrtcApi() {
                         elem.removeAttribute("controls");
                     });
                 }
+            }
+            if (pms) {
+                pms.then(function() {
+                    elem.play();
+                });
+            } else {
                 elem.play();
             }
         }

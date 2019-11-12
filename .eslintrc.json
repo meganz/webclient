@@ -1,0 +1,198 @@
+{
+    "env": {
+        "browser": true,
+        "jquery": true,
+        "mocha": true,
+        "phantomjs": true,
+        "worker": true
+    },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "plugins": [
+        "compat",
+        "dollar-sign",
+        "jquery",
+        "local-rules",
+        "no-unsanitized",
+        "optimize-regex",
+        "react",
+        "sonarjs",
+        "unicorn"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:no-unsanitized/DOM",
+        "plugin:react/recommended",
+        "plugin:sonarjs/recommended"
+    ],
+    "settings": {
+        "polyfills": [
+            // List of polyfills in place for eslint-plugin-compact to not complain about them
+            "Set",
+            "Number", // <- E.g. Number.isNaN, Number.parseFloat, etc are polyfilled on es6-shim.js
+            "Promise",
+            "TextEncoder",
+            "TextDecoder",
+            "Object.assign",
+            "Object.values"
+        ],
+        "react": {
+            "version": "detect"
+        }
+    },
+    "rules": {
+        "array-callback-return": 2,
+        "block-scoped-var": 2,
+        "brace-style": [2, "stroustrup"],
+        "comma-style": [2, "last"],
+        "complexity": [2, 12],
+        "consistent-this": [2, "self"],
+        "consistent-return": 0,
+        "curly": [2, "all"],
+        "default-param-last": 2,
+        "dot-notation": 2,
+        "eol-last": 2,
+        "eqeqeq": [2, "smart"],
+        "for-direction": 2,
+        "func-call-spacing": [2, "never"],
+        "function-call-argument-newline": [2, "consistent"],
+        "guard-for-in": 1,
+        "id-length": [2, {"min": 1, "max": 26}],
+        "keyword-spacing": [2, {}],
+        "linebreak-style": 2,
+        "max-classes-per-file": [2, 2],
+        "max-depth": [2, 5],
+        "max-len": [2, 120],
+        "max-params": [2, 7],
+        "no-alert": 2,
+        "no-caller": 2,
+        "no-console": 0,
+        "no-else-return": 2,
+        "no-empty": 0,
+        "no-empty-function": [2, { "allow": ["constructors"] }],
+        "no-eq-null": 2,
+        "no-eval": 2,
+        "no-extend-native": 2,
+        "no-extra-bind": 2,
+        "no-extra-parens": [1, "all", {"conditionalAssign": false}],
+        "no-floating-decimal": 2,
+        "no-global-assign": 2,
+        "no-implicit-coercion": [2, { "allow": ["!!", "+"] } ],
+        "no-implied-eval": 2,
+        "no-import-assign": 2,
+        "no-invalid-this": 0,
+        "no-irregular-whitespace": 2,
+        "no-lone-blocks": 2,
+        "no-lonely-if": 2,
+        "no-loop-func": 2,
+        "no-mixed-spaces-and-tabs": 2,
+        "no-multi-str": 2,
+        "no-negated-condition": 2,
+        "no-new": 2,
+        "no-new-func": 2,
+        "no-new-wrappers": 2,
+        "no-prototype-builtins": 0,
+        "no-restricted-properties": [2, {"property": "innerHTML"}, {"property": "outerHTML"}],
+        "no-return-assign": 2,
+        "no-script-url": 2,
+        "no-self-compare": 2,
+        "no-sequences": 2,
+        "no-shadow-restricted-names": 2,
+        "no-trailing-spaces": 2,
+        "no-throw-literal": 2,
+        "no-undef": 0,
+        "no-undef-init": 2,
+        "no-unmodified-loop-condition": 2,
+        "no-unneeded-ternary": 2,
+        "no-unused-expressions": 2,
+        "no-unused-vars": [2, {"vars": "local", "args": "after-used"}],
+        "no-useless-call": 2,
+        "no-useless-concat": 2,
+        "no-useless-return": 2,
+        "no-use-before-define": [2, {"functions": false}],
+        "no-void": 2,
+        "no-with": 2,
+        "no-whitespace-before-property": 2,
+        "one-var": [2, {"initialized": "never"}],
+        "operator-assignment": 2,
+        "prefer-regex-literals": 1,
+        "semi": [2, "always"],
+        "space-before-function-paren": [2, "never"],
+        "space-in-parens": [2, "never"],
+        "space-infix-ops": 2,
+        "space-unary-ops": [2, {"words": false, "nonwords": false}],
+        "spaced-comment": [2, "always"],
+        "strict": [2, "function"],
+        "switch-colon-spacing": 2,
+        "unicode-bom": 2,
+        "valid-jsdoc": 1,
+        "wrap-iife": [2, "inside", {"functionPrototypeMethods": true}],
+        "yoda": [2, "never"],
+
+        "indent": [2, 4, {
+            "SwitchCase": 1,
+            // "outerIIFEBody": 0,
+            "FunctionDeclaration": {"parameters": "first"},
+            "FunctionExpression": {"parameters": "first"},
+            "CallExpression": {"arguments": "first"},
+            "ArrayExpression": "first",
+            "ObjectExpression": "first"
+        }],
+
+        // ESLint plugins configuration follows
+
+        "compat/compat": 1,
+        "dollar-sign/dollar-sign": 2,
+
+        "jquery/no-ajax": 2,
+        "jquery/no-deferred": 2,
+        "jquery/no-each": 2,
+        "jquery/no-extend": 2,
+        "jquery/no-find": 2,
+        "jquery/no-global-eval": 2,
+        "jquery/no-in-array": 2,
+        "jquery/no-is-array": 2,
+        "jquery/no-is-function": 2,
+        "jquery/no-map": 2,
+        "jquery/no-merge": 2,
+        "jquery/no-parse-html": 2,
+        "jquery/no-proxy": 2,
+        "jquery/no-ready": 2,
+
+        "local-rules/hints": 2,
+        "local-rules/jquery-replacements": 2,
+        "local-rules/jquery-scopes": 1,
+        "local-rules/misc-warnings": 1,
+
+        "optimize-regex/optimize-regex": 2,
+        "sonarjs/cognitive-complexity": [1, 48],
+        "sonarjs/no-duplicate-string": 1,
+
+        "unicorn/catch-error-name": [2, {"name": "ex"}],
+        "unicorn/consistent-function-scoping": 1,
+        "unicorn/error-message": 2,
+        "unicorn/no-abusive-eslint-disable": 2,
+        "unicorn/no-array-instanceof": 2,
+        "unicorn/no-unsafe-regex": 2,
+        "unicorn/prefer-dataset": 2,
+        "unicorn/prefer-event-key": 1,
+        "unicorn/prefer-starts-ends-with": 2,
+        "unicorn/prefer-text-content": 2,
+        "unicorn/regex-shorthand": 2
+    },
+
+    "overrides": [
+        {
+            "files": ["*.jsx"],
+            "excludedFiles": "*.js",
+            "parser": "babel-eslint",
+            "parserOptions": {
+                "ecmaVersion": 6,
+                "sourceType": "module"
+            }
+        }
+    ]
+}

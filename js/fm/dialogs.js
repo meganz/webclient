@@ -45,7 +45,6 @@
                 for (i = targets.length; i--;) {
                     if (M.isCircular(n.h, targets[i])) {
                         s.circular = true;
-                        n = null;
                         break;
                     }
                 }
@@ -67,7 +66,7 @@
         if ($.moveDialog) {
             M.disableCircularTargets('#mctreea_');
         }
-        else if (!$.copyToUpload){
+        else if (!$.copyToUpload) {
             var sel = $.selected || [];
 
             for (var i = sel.length; i--;) {
@@ -91,7 +90,8 @@
             selectedNodes = selectedNodes || $.selected || [];
 
             for (var i = selectedNodes.length; i--;) {
-                if (!M.isCircular(selectedNodes[i], $.mcselected)) {
+                if (($.moveDialog && !M.isCircular(selectedNodes[i], $.mcselected)) ||
+                    selectedNodes[i] !== $.mcselected) {
                     r.push(selectedNodes[i]);
                 }
             }

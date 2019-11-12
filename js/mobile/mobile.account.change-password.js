@@ -131,18 +131,46 @@ mobile.account.changePassword = {
 
         'use strict';
 
-        // If the account is registered with the new process (version 2), change password using the new method
-        if (u_attr.aav === 2) {
-            security.changePassword.newMethod(
-                newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-            );
+        var self = this;
+        var $passwordField = this.$page.find('.password-input');
+        var $confirmPasswordField = this.$page.find('.password-confirm-input');
+
+        var failingAction = function(status) {
+            $passwordField.val('');
+            $confirmPasswordField.val('');
+            self.$page.find('.password-strength').removeClass('good1 good2 good3 good4 good5');
+
+
+            if (status === 1) {
+                mobile.messageOverlay.show(l[22126]);
+                $('#mobile-ui-error .text-button.cancel').addClass('hidden');
+            }
+        };
+
+        var registerationMethod = 1;
+
+        if (u_attr && u_attr.aav === 2) {
+            registerationMethod = 2;
         }
-        else {
-            // Otherwise change the user's password using the old method
-            security.changePassword.oldMethod(
-                newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-            );
-        }
+
+        var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword),
+            registerationMethod);
+
+        checkPassPromise.fail(failingAction);
+
+        checkPassPromise.done(
+            function() {
+                if (registerationMethod === 2) {
+                    security.changePassword.newMethod(
+                        newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
+                    );
+                }
+                else {
+                    security.changePassword.oldMethod(
+                        newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
+                    );
+                }
+            });
     },
 
     /**

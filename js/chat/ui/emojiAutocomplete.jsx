@@ -13,7 +13,7 @@ export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
         'maxEmojis': 12
     }
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             'selected': 0
         };
@@ -23,6 +23,7 @@ export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
         if (!self.loadingPromise) {
             self.loadingPromise = megaChat.getEmojiDataSet('emojis')
                 .done(function (emojis) {
+                    self.data_emojis = emojis;
                     Soon(function() {
                         self.data_emojis = emojis;
                         self.safeForceUpdate();
@@ -217,6 +218,11 @@ export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
         this.found = found;
 
         if (!found || found.length === 0) {
+            setTimeout(function() {
+                // onCancel may need to do a .setState on parent component, so need to run it in a separate
+                // thread/stack
+                self.props.onCancel();
+            }, 0);
             return null;
         }
 

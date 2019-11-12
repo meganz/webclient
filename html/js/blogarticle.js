@@ -2,11 +2,14 @@ function init_blogarticle() {
     if (blogposts === null) {
         return init_blog();
     }
-    blog_bind_search();
+
+    if (!is_mobile) {
+        blog_bind_search();
+    }
 
     var post = blogposts['post_' + blogid];
     if (!post) {
-        return loadSubPage('blog');
+        handleInvalidBlogID();
     }
     for (var e in post.attaches) {
         if (post.attaches.hasOwnProperty(e)) {
@@ -22,26 +25,31 @@ function render_blogarticle() {
     var by = 'Admin';
     var i = 'post_' + blogid;
 
-    if (blogposts['post_' + (parseInt(blogid) - 1)]) {
-        $('#blog_prev').attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) - 1)].id);
-        $('#blog_prev').fadeTo(0, 1);
-        $('#blog_prev').addClass('active');
+    if (!is_mobile) {
+        var $blogPrev = $('#blog_prev');
+        var $blogNext = $('#blog_next');
+        if (blogposts['post_' + (parseInt(blogid) - 1)]) {
+            $blogPrev.attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) - 1)].id);
+            $blogPrev.fadeTo(0, 1);
+            $blogPrev.addClass('active');
+        }
+        else {
+            $blogPrev.attr('href', '/blog_' + blogid);
+            $blogPrev.fadeTo(0, 0.4);
+            $blogPrev.removeClass('active');
+        }
+        if (blogposts['post_' + (parseInt(blogid) + 1)]) {
+            $blogNext.attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) + 1)].id);
+            $blogNext.fadeTo(0, 1);
+            $blogNext.addClass('active');
+        }
+        else {
+            $blogNext.attr('href', '/blog_' + blogid);
+            $blogNext.fadeTo(0, 0.4);
+            $blogNext.removeClass('active');
+        }
     }
-    else {
-        $('#blog_prev').attr('href', '/blog_' + blogid);
-        $('#blog_prev').fadeTo(0, 0.4);
-        $('#blog_prev').removeClass('active');
-    }
-    if (blogposts['post_' + (parseInt(blogid) + 1)]) {
-        $('#blog_next').attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) + 1)].id);
-        $('#blog_next').fadeTo(0, 1);
-        $('#blog_next').addClass('active');
-    }
-    else {
-        $('#blog_next').attr('href', '/blog_' + blogid);
-        $('#blog_next').fadeTo(0, 0.4);
-        $('#blog_next').removeClass('active');
-    }
+
     clickURLs();
     content = '';
     if (blogposts[i].attaches.bimg) {
@@ -70,7 +78,7 @@ function render_blogarticle() {
 
     $('#blogarticle_by').safeHTML('<span>by:</span> ' + escapeHTML(by));
 
-    if (!m) {
+    if (!m && !is_mobile) {
         blog_archive();
     }
 

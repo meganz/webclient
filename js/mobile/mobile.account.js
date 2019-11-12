@@ -29,6 +29,7 @@ mobile.account = {
         mobile.account.initSessionHistoryButton($page);
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
+        mobile.account.initNotificationButton($page);
         mobile.account.initTitleMenu();
 
         // Initialise the top menu
@@ -144,8 +145,8 @@ mobile.account = {
             true    // Force clear cache
         );
     },
-    
-    
+
+
     /**
      * Displays the user's avatar, name and email
      * @param {String} $page The jQuery selector for the current page
@@ -533,6 +534,19 @@ mobile.account = {
     },
 
     /**
+     * Initialise the notification settings button to navigate the user to the notification settings page.
+     * @param $page
+     */
+    initNotificationButton: function($page) {
+        'use strict';
+
+        $page.find('.account-notifications-block').off('tap').on('tap', function() {
+            loadSubPage('fm/account/notifications');
+            return false;
+        });
+    },
+
+    /**
      * Initialise the Cancel Account button to send the user an account cancellation confirmation email
      * @param {String} $page The jQuery selector for the current page
      */
@@ -671,6 +685,7 @@ mobile.account = {
                     $page.removeClass('hidden');
                     $verifyActionPage.addClass('hidden');
                     mobile.showEmailConfirmOverlay();
+                    $('#startholder').addClass('no-scroll');
                 }
                 else {
                     // Oops, something went wrong

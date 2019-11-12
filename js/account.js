@@ -128,7 +128,10 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
-        u_storage.attr = JSON.stringify(u_attr);
+        // We do not seem to need this here...
+        // u_storage.attr = JSON.stringify(u_attr);
+        delete localStorage.attr;
+
         u_storage.handle = u_handle = u_attr.u;
 
         init_storage(u_storage);
@@ -268,6 +271,9 @@ function u_logout(logout) {
 
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
+        }
+        else {
+            watchdog.clear();
         }
 
         if (typeof slideshow === 'function') {
@@ -1313,7 +1319,7 @@ function processEmailChangeActionPacket(ap) {
                     mega.config.set('rubsched', undefined);
                 }
 
-                if (fminitialized) {
+                if (fminitialized && (!is_mobile || page !== 'fm/account/notifications')) {
                     var view = Object(fmconfig.viewmodes)[M.currentdirid];
                     var sort = Object(fmconfig.sortmodes)[M.currentdirid];
 
@@ -1366,9 +1372,11 @@ function processEmailChangeActionPacket(ap) {
             })
             .finally(function() {
                 // Initialize account notifications.
-                if (!is_mobile) {
-                    mega.notif.setup(fmconfig.anf);
-                    if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                mega.notif.setup(fmconfig.anf);
+                if (fminitialized && page.indexOf('fm/account') > -1 && M.account) {
+                    if (is_mobile && page === 'fm/account/notifications') {
+                        mobile.account.notifications.render();
+                    } else if (!is_mobile) {
                         accountUI.renderAccountPage(M.account);
                     }
                 }
@@ -1424,6 +1432,10 @@ function processEmailChangeActionPacket(ap) {
 
         if (d) {
             logger.debug('Setting value for key "%s"', key, value);
+
+            if (String(tryCatch(JSON.stringify.bind(JSON))(value)).length > 1024) {
+                logger.warn('Attempting to store more than 1KB for %s...', key);
+            }
         }
 
         var push = function() {
@@ -1432,7 +1444,23 @@ function processEmailChangeActionPacket(ap) {
                 timer = delay('fmconfig:store', store, 3100);
             }
             else {
-                localStorage.fmconfig = JSON.stringify(fmconfig);
+                tryCatch(function(data) {
+                    data = JSON.stringify(data);
+                    if (data.length > 262144) {
+                        logger.warn('fmconfig became larger than 256KB', data.length);
+                    }
+                    localStorage.fmconfig = data;
+                }, function(ex) {
+                    if (ex.name === 'QuotaExceededError') {
+                        console.warn('WebStorage exhausted!', [fmconfig], JSON.stringify(localStorage).length);
+
+                        if (!u_type) {
+                            // The user is not logged/registered, let's just expunge it...
+                            console.info('Cleaning fmconfig... (%s bytes)', String(localStorage.fmconfig).length);
+                            delete localStorage.fmconfig;
+                        }
+                    }
+                })(fmconfig);
                 timer = null;
             }
         };

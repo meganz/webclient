@@ -885,15 +885,16 @@ var ulmanager = {
                 process_f(res.f);
                 M.updFileManagerUI();
 
-                // If on mobile, show that the upload has completed and allow them to upload another
-                if (is_mobile) {
-                    mobile.uploadOverlay.showUploadComplete(n);
-                }
-
                 if (M.viewmode) {
                     fm_thumbnails();
                 }
             }
+
+            // If on mobile, show that the upload has completed and allow them to upload another
+            if (is_mobile) {
+                mobile.uploadOverlay.showUploadComplete(n);
+            }
+
             onSuccess(n.h);
         }
         else if (res === 0) {

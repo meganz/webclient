@@ -107,8 +107,8 @@ describe("Mega Data Structs Test", function() {
                 expect(arr._dataChangeIndex).to.eql(2);
 
                 done();
-            }, TRACK_CHANGES_THROTTLING_MS + 1);
-        }, TRACK_CHANGES_THROTTLING_MS + 1);
+            }, TRACK_CHANGES_THROTTLING_MS + 50);
+        }, TRACK_CHANGES_THROTTLING_MS + 50);
 
     });
 
@@ -176,8 +176,8 @@ describe("Mega Data Structs Test", function() {
                 expect(objMap._dataChangeIndex).to.eql(2);
 
                 done();
-            }, TRACK_CHANGES_THROTTLING_MS + 1);
-        }, TRACK_CHANGES_THROTTLING_MS + 1);
+            }, TRACK_CHANGES_THROTTLING_MS + 50);
+        }, TRACK_CHANGES_THROTTLING_MS + 50);
     });
 
     it("MegaDataSortedMap", function(done) {

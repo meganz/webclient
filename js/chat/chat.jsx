@@ -340,6 +340,16 @@ var Chat = function() {
     self.filePicker = null; // initialized on a later stage when the DOM is fully available.
     self._chatsAwaitingAps = {};
 
+    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
+    MegaDataObject.attachToExistingJSObject(
+        this,
+        {
+            "currentlyOpenedChat": null,
+            "displayArchivedChats": false,
+        },
+        true
+    );
+
     return this;
 };
 
@@ -436,9 +446,7 @@ Chat.prototype.init = function() {
             console.time('chatReactUiInit');
         }
 
-        self.$conversationsApp = <ConversationsUI.ConversationsApp
-            megaChat={self}
-        />;
+        self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self} />;
 
         self.$conversationsAppInstance = ReactDOM.render(
             self.$conversationsApp,
@@ -551,16 +559,6 @@ Chat.prototype.init = function() {
 
 
     self.registerUploadListeners();
-
-    // those, once changed, should trigger UI reupdate via MegaRenderMixin.
-    MegaDataObject.attachToExistingJSObject(
-        this,
-        {
-            "currentlyOpenedChat": null,
-            "displayArchivedChats": false,
-        },
-        true
-    );
 
     self.trigger("onInit");
 };

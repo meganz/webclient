@@ -282,14 +282,14 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 
 .bus-reg-plan .business-plan-info {
-	width: 90%;
+	width: 94%;
 	height: 54px;
 	margin:0 auto;
 	background-color: #fff;
 }
 
 .bus-reg-plan .business-plan-info.grey {
-	width: 90%;
+	width: 94%;
 	height: 54px;
 	margin:0 auto;
 	background-color: rgba(0,0,0,0.03);
@@ -299,7 +299,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	font-size: 15px;
 	color: #333;
 	line-height: 54px;
-	padding: 0 16px;
+	padding: 0 13px;
 }
 
 .bus-reg-plan .business-plan-total {
@@ -321,8 +321,8 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	font-size: 24px;
 	color:#000;
 	line-height: 64px;
-	padding: 0 16px;
-	margin: 0 5%;
+	padding: 0 13px;
+	margin: 0 4%;
 }
 
 .bus-reg-bottom-page {
@@ -513,7 +513,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 }
 .main-mid-pad.bus-repay .row-wrapper .info-txt {
 	font-size: 14px;
-	line-height: 24px;
+	line-height: 25px;
 	color: #999;
 	padding-left: 12px;
 	display: inline-block;

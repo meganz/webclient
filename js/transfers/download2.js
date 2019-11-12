@@ -117,7 +117,7 @@ var dlmanager = {
         }
 
         if (typeof callback === 'function') {
-            promise.tryCatch(callback, callback.bind(null, false));
+            promise.then(callback).catch(callback.bind(null, false));
         }
 
         return promise;
@@ -215,10 +215,9 @@ var dlmanager = {
 
         if (dlMethod === FileSystemAPI) {
             M.getFileEntryMetadata('mega/' + handle)
-                .fail(reject)
-                .done(function(metadata) {
+                .then(function(metadata) {
                     promise.resolve(metadata.size);
-                });
+                }).catch(reject);
         }
         else if (is_chrome_firefox && typeof OS !== 'undefined') {
             try {
@@ -800,7 +799,7 @@ var dlmanager = {
         }
 
         if (code === EBLOCKED) {
-            showToast('download', l[20228]);
+            showToast('download', l[20705]);
         }
 
         if (eekey) {
@@ -1078,7 +1077,7 @@ var dlmanager = {
                 }
 
                 dlmanager.setResumeInfo(dl, dl.writer.pos)
-                    .finally(function() {
+                    .always(function() {
                         finish_write(task, done);
                     });
             };

@@ -1759,6 +1759,76 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
 
 
 /**
+ * Fire DOM updating when a folder node's size gets updated
+ * @param {MegaNode} node  node object to update in UI
+ */
+MegaData.prototype.onFolderSizeChangeUIUpdate = function(node) {
+    "use strict";
+    if (!node || !node.t) {
+        return;
+    }
+
+    var needCheck = false;
+
+    var currDir = M.currentdirid;
+
+    if (currDir.indexOf(node.p) > -1) {
+        needCheck = true;
+    }
+
+    if (!needCheck && (node.sk || node.shares || node.su)) {
+        currDir = currDir.replace('out-shares', '')
+            .replace('shares', '').replace('public-links', '').replace('/', '');
+
+        if (currDir) {
+            // we are not in sharing/out-share/public link
+            return;
+        }
+        needCheck = true;
+    }
+
+    if (!needCheck) {
+        return;
+    }
+
+    var reRender = false;
+    var dir = 1;
+
+    if (fmconfig && fmconfig.sortmodes && fmconfig.sortmodes[node.p] &&
+        fmconfig.sortmodes[node.p].n === 'size') {
+        reRender = true;
+        dir = fmconfig.sortmodes[node.p].d;
+    }
+    else if (fmconfig && this.fmsorting && fmconfig.sorting &&
+        fmconfig.sorting.n === 'size') {
+        reRender = true;
+        dir = fmconfig.sorting.n.d;
+    }
+
+    // in most cases, super fast update
+    if (!reRender) {
+        var sizeText = bytesToSize(node.tb);
+
+        $('.grid-table #' + node.h + ' .size').text(sizeText);
+        $('.grid-table #' + node.h + ' .shared-folder-size').text(sizeText);
+    }
+    else {
+        var scrollVal;
+        if (M.megaRender && M.megaRender.megaList) {
+            scrollVal = M.megaRender.megaList.getScrollLeft();
+        }
+        M.doSort('size', dir);
+        M.renderMain();
+        if (scrollVal) {
+            M.megaRender.megaList.scrollTo(0, scrollVal);
+            var $tableHeader = $('.files-grid-view.fm .grid-table-header');
+            $tableHeader.css('left', -1 * scrollVal);
+        }
+    }
+};
+
+
+/**
  * Fire DOM updating when a node gets a new name
  * @param {String} itemHandle  node's handle
  * @param {String} newItemName the new name

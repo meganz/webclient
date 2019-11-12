@@ -1,6 +1,7 @@
 .nw-fm-dialog-title, .fm-dialog-title {
     font-size: 20px;
-    line-height: 24px;
+    color: #333333;
+    line-height: 30px;
     color: #666;
     padding: 20px 48px 0 48px;
     text-align: center;
@@ -12,7 +13,6 @@
     white-space: nowrap;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    line-height: 24px;
 }
 .fm-dialog-title.small {
     font-family: 'LatoWeb', 'source_sans_proregular';
@@ -3050,7 +3050,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v31.png);
+    background-image: url(../images/mega/icons-sprite_v32.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -5196,3 +5196,53 @@ body.en .register-side-pane.container.visible {
 .pro-register-paypal-dialog .reg-success-icon.unionpay, .payment-confirmation .icon.unionpay {
     background-position: center -846px;
 }
+/*Business password change dialog*/
+.user-management-dialog.bus-pw-reset {
+    width: 560px;
+    left: 50%;
+    margin-left: -280px;
+    top: 50%;
+    margin-top: -170px;
+    text-align: center;
+}
+.user-management-dialog.bus-pw-reset .bus-pw-wrapper {
+    padding: 0 8px;
+    margin-top: 40px;
+}
+.user-management-dialog.bus-pw-reset .dialog-subtitle {
+    margin: 0 auto 16px;
+}
+.user-management-dialog.bus-pw-reset .notification-label {
+    display: inline-block;
+    margin-bottom: 40px;
+    width: 500px;
+    text-align: left;
+}
+.user-management-dialog.bus-pw-reset .notification-cell {
+    vertical-align: top;
+}
+.user-management-dialog.bus-pw-reset .verification-container .icons-sprite.medium-icon {
+    position: absolute;
+    right: 6px;
+    top: 4px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+.user-management-dialog.bus-pw-reset .verification-container .icons-sprite.medium-icon:hover {
+    opacity: 0.8;
+}
+.user-management-dialog.bus-pw-reset .verification-container .hide-pw {
+    background-position: 6px -1494px;
+}
+.user-management-dialog.bus-pw-reset .verification-container .show-pw {
+    background-position: 4px -457px;
+}
+.user-management-dialog.bus-pw-reset .default-green-button.semi-big {
+    display: inline-block;
+    height: 40px;
+    line-height: 39px;
+}
+.user-management-dialog.bus-pw-reset .verification-container .context-txt:first-child {
+    margin-right: 4px;
+}
+/* End of Business password change dialog */

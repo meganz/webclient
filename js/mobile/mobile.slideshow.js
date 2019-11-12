@@ -18,6 +18,12 @@ mobile.slideshow = {
     /** Cached jQuery object for the overlay */
     $overlay: null,
 
+    /** The flag for mobile landscape */
+    isLandscape: null,
+
+    /** The flag for hiding header and footer buttons */
+    hideHFFlag: false,
+
     /**
      * Initialise the preview slideshow
      * @param {String} nodeHandle The handle of the image to load first
@@ -30,6 +36,7 @@ mobile.slideshow = {
         mobile.slideshow.$overlay = $('.mobile.slideshow-image-previewer');
 
         // Initialise the rest of the functionality
+        mobile.slideshow.initLandscapeView(nodeHandle);
         mobile.slideshow.buildListOfImagesInDirectory();
         mobile.slideshow.hideOrShowNavigationButtons();
         mobile.slideshow.initPreviousImageFunctionality();
@@ -42,7 +49,42 @@ mobile.slideshow = {
     },
 
     /**
+     * Init the landscape mode and bind the related event listener
+     */
+    initLandscapeView: function(nodeHandle) {
+
+        'use strict';
+
+        mobile.slideshow.isLandscape = window.matchMedia("(orientation: landscape)").matches;
+        if (mobile.slideshow.isLandscape) {
+            mobile.slideshow.hideHFFlag = true;
+            mobile.slideshow.toggleForHeaderAndButtons();
+        }
+
+        $(window).rebind('orientationchange.slideshow', function() {
+            mobile.slideshow.isLandscape = !mobile.slideshow.isLandscape;
+            if (is_video(M.d[nodeHandle])) {
+                if (mobile.slideshow.isLandscape
+                    && $('.viewer-button.fs .icons-img', mobile.slideshow.$overlay).hasClass('fullscreen')
+                    && !mobile.slideshow.hideHFFlag) {
+                    mobile.slideshow.hideHFFlag = true;
+                }
+                else if (!mobile.slideshow.isLandscape
+                    && $('.viewer-button.fs .icons-img', mobile.slideshow.$overlay).hasClass('fullscreen')
+                    && mobile.slideshow.hideHFFlag) {
+                    mobile.slideshow.hideHFFlag = false;
+                }
+            }
+            else {
+                mobile.slideshow.hideHFFlag = mobile.slideshow.isLandscape;
+            }
+            mobile.slideshow.toggleForHeaderAndButtons();
+        });
+    },
+
+    /**
      * Show the loading animation for switching between slides
+     * @returns {void}
      */
     showLoadingAnimation: function() {
 
@@ -77,6 +119,7 @@ mobile.slideshow = {
         // On clicking the image or black background of the slideshow
         $slideShowBackground.off().on('tap', SoonFc(function() {
             if (!is_video(M.d[nodeHandle])) {
+                mobile.slideshow.hideHFFlag = !mobile.slideshow.hideHFFlag;
                 mobile.slideshow.toggleForHeaderAndButtons();
             }
         }));
@@ -93,16 +136,15 @@ mobile.slideshow = {
         var $slideShowFooterButtons = mobile.slideshow.$overlay.find('.slideshow-buttons');
         var $slideShowNavButtons = mobile.slideshow.$overlay.find('.slideshow-back-arrow, .slideshow-forward-arrow');
 
-        if ($slideShowHeader.hasClass('hidden')) {
-            $slideShowHeader.removeClass('hidden');
-            $slideShowFooterButtons.removeClass('hidden');
-            $slideShowNavButtons.removeClass('hidden');
-        }
-        else {
-            // Otherwise hide them
+        if (mobile.slideshow.hideHFFlag) { // Hide them
             $slideShowHeader.addClass('hidden');
             $slideShowFooterButtons.addClass('hidden');
             $slideShowNavButtons.addClass('hidden');
+        }
+        else { // Show them
+            $slideShowHeader.removeClass('hidden');
+            $slideShowFooterButtons.removeClass('hidden');
+            $slideShowNavButtons.removeClass('hidden');
         }
     },
 
@@ -218,7 +260,10 @@ mobile.slideshow = {
                         $('.video-block, .video-controls', mobile.slideshow.$overlay).removeClass('hidden');
                         $('.viewer-button.fs', mobile.slideshow.$overlay).rebind('tap.toggleHeader', function (e) {
                             e.stopPropagation();
-                            mobile.slideshow.toggleForHeaderAndButtons();
+                            if (!mobile.slideshow.isLandscape) {
+                                mobile.slideshow.hideHFFlag = !mobile.slideshow.hideHFFlag;
+                                mobile.slideshow.toggleForHeaderAndButtons();
+                            }
                             $(this).click();
                             return false;
                         });

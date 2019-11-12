@@ -685,6 +685,7 @@ mobile.account = {
                     $page.removeClass('hidden');
                     $verifyActionPage.addClass('hidden');
                     mobile.showEmailConfirmOverlay();
+                    $('#startholder').addClass('no-scroll');
                 }
                 else {
                     // Oops, something went wrong

@@ -2755,6 +2755,8 @@ function parsepage(pagehtml, pp) {
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
     var pagesmenu = pages['pagesmenu'];
+    var $scrollableEl = $('body, html, .bottom-pages .fmholder');
+
     if (is_chrome_web_ext || is_firefox_web_ext) {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
     }
@@ -2772,9 +2774,7 @@ function parsepage(pagehtml, pp) {
         .show();
 
     $('body').addClass('bottom-pages');
-    $('body, html, .bottom-pages .fmholder').stop().animate({
-        scrollTop: 0
-    }, 0);
+    $scrollableEl.stop(true, true).scrollTop(0);
     bottompage.init();
 
     if (typeof M.initUIKeyEvents === 'function') {

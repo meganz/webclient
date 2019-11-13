@@ -4201,7 +4201,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .files-grid-view.fm .column-settings::before {
     content: "";
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: -148px -1992px;
     display: inline-block;
     position: fixed;
@@ -4355,7 +4355,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-tree-panel-arrows {
     right: 7px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: -88px -1992px;
     opacity: 0.8;
 }
@@ -4900,7 +4900,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5542,7 +5542,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6279,7 +6279,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -7213,11 +7213,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v32.png);
+    background-image: url(../images/mega/icons-sprite_v33.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -29488,7 +29488,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .float-widget.transfer-prorgess {
     position: fixed;
     height: auto;
-    bottom: 8px;
+    bottom: 10px;
     left: 56px;
     z-index: 121;
 }
@@ -29502,7 +29502,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     box-shadow: 1px 1px 10px 0px rgba(0,0,0,0.2);
 }
 .transfer-progress-widget.collapse {
-    height: 44px;
     display: inline-block;
 }
 .transfer-progress-widget.expand {
@@ -29514,31 +29513,27 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     letter-spacing: 0.8px;
     color: #ddd;
     display: inline-block;
-    padding: 4px 0;
+    padding: 2px 0;
     vertical-align: top;
     margin-left: 6px;
 }
 .transfer-progress-type.overquota .transfer-progress-txt, .transfer-progress-type.almost-overquota .transfer-progress-txt {
-    margin-left: 12px;
+    margin-left: 8px;
 }
 .transfer-progress-type.error .transfer-progress-txt {
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #FC5401;
 }
 .transfer-progress-type.error.overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #F0373A;
-    font-size: 14px;
 }
 .transfer-progress-type.error.almost-overquota .transfer-progress-txt {
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
     color: #FFA500;
-    font-size: 14px;
 }
 /* Transfer tooltips - head */
 .transfer-progress-head {
     position: relative;
     width: auto;
-    min-width: 264px;
     -moz-border-radius: 4px 4px 0 0;
     -webkit-border-radius: 4px 4px 0 0;
     border-radius: 4px 4px 0 0;
@@ -29552,14 +29547,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     border-radius: 4px;
 }
 .transfer-progress-type {
-    margin: 10px 12px 10px 14px;
-    height: 28px;
+    margin: 12px 12px 12px 14px;
     display: inline-block;
 }
 .transfer-progress-type:nth-child(2) {
-    margin-right: 94px;
+    margin-right: 24px;
 }
-.transfer-progress-initial {
+/*.transfer-progress-initial {
     background-image: url("../images/mega/white-spinner-24px.svg");
     display: none;
     width: 24px;
@@ -29570,24 +29564,41 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.initial .transfer-progress-initial {
     display: inline-block;
-}
+}*/
 .status-indicator {
-    width: 28px;
-    height: 28px;
-    border-radius: 100%;
-    border: 3px solid rgba(255,255,255,0.2);
+    width: auto;
+    height: 24px;
+    border-radius: 12px;
     box-sizing: border-box;
     display: inline-block;
     position: relative;
     vertical-align: top;
 }
-.transfer-progress-type.download .status-indicator::before, .transfer-progress-type.upload .status-indicator::before {
+.transfer-progress-type.download .status-indicator {
+    background-color: #31B500;
+}
+.transfer-progress-type.upload .status-indicator {
+    background-color: #2BA6DE;
+}
+.transfer-progress-type.complete .status-indicator {
+    background-color: #2BA6DE;
+}
+.transfer-progress-type.error .status-indicator {
+    background-color: #FC5401;
+}
+.transfer-progress-type.error.almost-overquota .status-indicator {
+    background-color: #FFA500;
+}
+.transfer-progress-type.error.overquota .status-indicator {
+    background-color: #F0373A;
+}
+.transfer-progress-type.download .transfer-progress-pct::before, .transfer-progress-type.upload .transfer-progress-pct::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v32.png");
+    background-image: url("../images/mega/icons-sprite_v33.png");
     width: 24px;
     height: 24px;
-    left: -1px;
-    top: -1px;
+    left: 0px;
+    top: 0px;
     display: block;
     position: absolute;
     z-index: 11;
@@ -29595,86 +29606,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-type.overquota .status-indicator .transfer-progress-icon.overquota, .transfer-progress-type.almost-overquota .status-indicator .transfer-progress-icon.almost-overquota {
     position: absolute;
     display: inline-block;
-    left: 16px;
-    top: -8px;
+    right: -12px;
+    top: -12px;
     z-index: 12;
 }
 .status-indicator .transfer-progress-icon.overquota::before, .status-indicator .transfer-progress-icon.almost-overquota::before {
     content: "";
-    margin-top: 3px;
-    margin-left: 1px;
+    margin-top: 1px;
+    margin-left: 0px;
     z-index: 13;
-    border: 1px solid #5a5a5a;
+    border: 2px solid #5a5a5a;
     width: 18px;
     height: 18px;
     display: inline-block;
     border-radius: 100%;
-}
-.status-indicator-pct ul, .status-indicator-pct li, .status-indicator-pct p, .status-indicator-pct span {
-    height: 28px;
-    width: 28px;
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-}
-.status-indicator-pct .overlay {
-    width: 22px;
-    height: 22px;
-    background-color: #4B4B4B;
-    position: absolute;
-    display: block;
-    left: 0px;
-    top: 0px;
-    border-radius: 100%;
-    z-index: 10;
-}
-.status-indicator-pct ul li {
-    position: absolute;
-    left: -3px;
-    top: -3px;
-}
-.status-indicator-pct ul .right-c {
-    clip: rect(0, 28px, 28px, 14px);
-}
-.status-indicator-pct ul .left-c {
-    clip: rect(0, 14px, 28px, 0);
-}
-.status-indicator-pct ul .left-c p {
-    transform: rotate(60deg);
-}
-.status-indicator-pct ul .right-c p {
-    transform: rotate(180deg);
-}
-.status-indicator-pct ul li span {
-    width: 14px;
-    height: 28px;
-    display: block;
-}
-.status-indicator-pct ul li.right-c span {
-    -moz-border-radius-topleft: 14px;
-    -moz-border-radius-bottomleft: 14px;
-    -webkit-border-top-left-radius: 14px;
-    -webkit-border-bottom-left-radius: 14px;
-    border-top-left-radius: 14px;
-    border-bottom-left-radius: 14px;
-}
-.status-indicator-pct ul li.left-c span {
-    margin-left: 14px;
-    -moz-border-radius-topright: 14px;
-    -moz-border-radius-bottomright: 14px;
-    -webkit-border-top-right-radius: 14px;
-    -webkit-border-bottom-right-radius: 14px;
-    border-top-right-radius: 14px;
-    border-bottom-right-radius: 14px;
-}
-.transfer-progress-type.download .status-indicator-pct ul span {
-    background-color: #88FF5B;
-}
-.transfer-progress-type.upload .status-indicator-pct ul span {
-    background-color: #0EDCEE;
-}
-.transfer-progress-type.error .status-indicator-pct ul span {
-    background-color: #FC5401;
 }
 .transfer-progress-type .transfer-progress-icon {
     display: none;
@@ -29685,8 +29630,15 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-type.complete .transfer-progress-icon, .transfer-progress-type.error .transfer-progress-icon {
     display: inline-block;
     vertical-align: top;
-    margin-top: 2px;
-    margin-left: 2px;
+}
+.transfer-progress-pct {
+    color: #fff;
+    font-size: 13;
+    line-height: 24px;
+    padding-left: 20px;
+    padding-right: 8px;
+    position: relative;
+    display: inline-block;
 }
 .transfer-control-panel {
     position: absolute;
@@ -29708,8 +29660,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 0;
     top: 0;
 }
+.transfer-progress-widget.collapse .transfer-control-panel {
+    position: relative;
+    vertical-align: top;
+}
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v32.png");
+    background-image: url("../images/mega/icons-sprite_v33.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29768,7 +29724,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v32.png");
+    background-image: url("../images/mega/icons-sprite_v33.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -29783,7 +29739,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row .transfer-filetype-txt {
     display: inline-block;
     margin-left: 28px;
-    max-width: 160px;
+    max-width: 180px;
     font-size: 13px;
     line-height: 24px;
     color: #333;
@@ -29791,6 +29747,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.transfer-task-row.complete .transfer-filetype-txt {
+    max-width: 260px;
+}
+.transfer-task-row.error .transfer-filetype-txt, 
 .transfer-task-row .transfer-file-size {
     position: relative;
     display: inline-block;
@@ -29835,7 +29795,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v32.png");
+    background-image: url("../images/mega/icons-sprite_v33.png");
 }
 .transfer-task-actions {
     display: none;
@@ -29853,7 +29813,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-actions i {
     display: inline-block;
     margin-left: 12px;
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: pointer;
     position: relative;
 }
@@ -29874,11 +29834,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     border-radius: 4px;
     white-space: nowrap;
     right: 20px;
-    -webkit-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
-    -moz-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
-    -o-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
-    -ms-transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
-    transition: right 200ms ease-in-out 1s, opacity 200ms ease-in-out 1s, visibility 200ms ease-in;
+    -webkit-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -moz-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -o-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -ms-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -29932,9 +29892,20 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-complete-actions {
     display: none;
-    margin-left: 6px;
+    position: absolute;
+    right: 64px;
 }
-.transfer-task-row.complete .transfer-complete-actions {
+.transfer-complete-actions::before {
+    content: '';
+    width: 2px;
+    height: 12px;
+    display: block;
+    position: absolute;
+    right: -8px;
+    top: 6px;
+    background-color: rgba(0,0,0,0.2);
+}
+.transfer-task-row:hover .transfer-complete-actions {
     display: inline-block;
 }
 .transfer-complete-actions i {
@@ -29942,7 +29913,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
     margin: 0 6px;
     cursor: pointer;
-    opacity: 0.4;
+    opacity: 0.5;
 }
 .transfer-complete-actions i:hover {
     opacity: 1;
@@ -30045,20 +30016,17 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-progress-type.upload .status-indicator::before {
     background-position: -8px -1804px;
 }
-.transfer-progress-type.download .status-indicator::before {
-    background-position: -68px -1803px;
+.transfer-progress-type.download .transfer-progress-pct::before {
+    background-position: -186px -1803px;
 }
-.transfer-progress-type.upload.error .status-indicator::before {
-    background-position: -38px -1804px;
-}
-.transfer-progress-type.download.error .status-indicator::before {
-    background-position: -98px -1803px;
-}
-.transfer-task-row.upload::before {
-    background-position: -227px -1239px;
+.transfer-progress-type.upload .transfer-progress-pct::before {
+    background-position: -215px -1804px;
 }
 .transfer-task-row.download::before {
     background-position: -197px -1239px;
+}
+.transfer-task-row.upload::before {
+    background-position: -227px -1239px;
 }
 .transfer-task-row.complete .transfer-task-status::before {
     display: block;
@@ -30067,6 +30035,26 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row.error .transfer-task-status::before {
     display: block;
     background-position: -159px -1804px;
+}
+.transfer-section-button {
+    width: 100%;
+    height: 32px;
+    display: block;
+    text-align: center;
+    background-color: #fafafa;
+    color: #666;
+    font-size: 14px;
+    line-height: 32px;
+    cursor: pointer;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.transfer-section-button:hover {
+    background-color: rgba(245,245,245,1);
+    color:#666;
+}
+.transfer-progress-widget.collapse .transfer-section-button {
+    display: none;
 }
 /*overquota banner*/
 .float-widget.transfer-prorgess .banner {
@@ -30189,11 +30177,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     top: -5px;
     padding: 0;
     background: none;
-}
-.pro .status-indicator-pct li:not(.no-red-dot), .blog-new-full .status-indicator-pct ul li, .sync .status-indicator-pct li, .affiliate .status-indicator-pct li, .pro .status-indicator-pct li:not(.no-red-dot), .status-indicator-pct ul li {
-    padding: 0;
-    background: none;
-    background-position: unset;
 }
 .quota-info-pct-circle ul .right-c {
     clip: rect(0, 108px, 108px, 54px);

@@ -1000,16 +1000,15 @@ function str_mtrunc(str, len) {
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
 
-function percent_megatitle() {
+
+function getTransfersPercent() {
     var dl_r = 0;
     var dl_t = 0;
     var ul_r = 0;
     var ul_t = 0;
     var tp = $.transferprogress || {};
-    var dl_s = 0;
-    var ul_s = 0;
     var zips = {};
-    var t, i;
+    var i;
 
     for (i = dl_queue.length; i--;) {
         var q = dl_queue[i];
@@ -1022,27 +1021,23 @@ function percent_megatitle() {
                 if (q.zipid) {
                     zips[q.zipid] = 1;
                 }
-                dl_s += td[2];
             }
         }
         else {
             dl_t += q && q.size || 0;
         }
     }
-
     for (i = ul_queue.length; i--;) {
         var tu = tp['ul_' + ul_queue[i].id];
 
         if (tu) {
             ul_r += tu[0];
             ul_t += tu[1];
-            ul_s += tu[2];
         }
         else {
             ul_t += ul_queue[i].size || 0;
         }
     }
-
     if (dl_t) {
         dl_t += tp['dlc'] || 0;
         dl_r += tp['dlc'] || 0;
@@ -1052,20 +1047,31 @@ function percent_megatitle() {
         ul_r += tp['ulc'] || 0;
     }
 
-    var x_ul = Math.floor(ul_r / ul_t * 100) || 0;
-    var x_dl = Math.floor(dl_r / dl_t * 100) || 0;
+    return {
+        ul_total: ul_t,
+        ul_done: ul_r,
+        dl_total: dl_t,
+        dl_done: dl_r
+    };
+}
 
+function percent_megatitle() {
 
-    if (dl_t && ul_t) {
+    var transferStatus = getTransfersPercent();
+
+    var x_ul = Math.floor(transferStatus.ul_done / transferStatus.ul_total * 100) || 0;
+    var x_dl = Math.floor(transferStatus.dl_done / transferStatus.dl_total * 100) || 0;
+
+    if (transferStatus.dl_total && transferStatus.ul_total) {
         t = ' \u2193 ' + x_dl + '% \u2191 ' + x_ul + '%';
     }
-    else if (dl_t) {
+    else if (transferStatus.dl_total) {
         t = ' \u2193 ' + x_dl + '%';
     }
-    else if (ul_t) {
+    else if (transferStatus.ul_total) {
         t = ' \u2191 ' + x_ul + '%';
         if (mega.megadrop.isInit()) {
-            mega.megadrop.uiUpdateTotalProgress(ul_r, ul_t, x_ul);
+            mega.megadrop.uiUpdateTotalProgress(transferStatus.ul_done, transferStatus.ul_total, x_ul);
         }
     }
     else {

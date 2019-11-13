@@ -10,8 +10,8 @@ mega.tpw = new function TransferProgressWidget() {
     var FailedTimeToStay = 9e5; // 15 min
     var lastPokeTime = -1;
     var inactivityTimespanForClearance = 9e5; // 15 min
-    var maximumLength = 100; // maximum rows to draw in normal mode
-    var maximumLengthProgress = 200; // maximum rows to draw in urgent mode
+    var maximumLength = 200; // maximum rows to draw in normal mode
+    var maximumLengthProgress = 300; // maximum rows to draw in urgent mode
 
     var $widget;
     var $widgetWarnings;
@@ -156,6 +156,12 @@ mega.tpw = new function TransferProgressWidget() {
         $('.left-section.circle-dashboard', $overQuotaBanner).off('click').on('click',
             function overquota_bannerUpgrade() {
                 loadSubPage('dashboard');
+            });
+
+        // open section
+        $('.transfer-section-button', $widgetHeadAndBody).off('click').on('click',
+            function section_open() {
+                viewTransferSection($(this).hasClass('complete-list'));
             });
     };
 
@@ -467,20 +473,10 @@ mega.tpw = new function TransferProgressWidget() {
      */
     var setProgressCircle = function($headerSection, total, done) {
         var perc = done / total;
-        var deg = -1;
-        var currDeg = 0;
-        if (perc < 0.5) {
-            $headerSection.find('.status-indicator-pct li.left-c p').rotate(0);
-            deg = perc * 180 / 0.5;
-            currDeg = $headerSection.find('.status-indicator-pct li.right-c p').attr('prevD') || 0;
-            $headerSection.find('.status-indicator-pct li.right-c p').attr('prevD', deg).rotate(deg, currDeg);
-        }
-        else {
-            $headerSection.find('.status-indicator-pct li.right-c p').rotate(180, 180);
-            deg = (perc - 0.5) * 180 / 0.5;
-            currDeg = $headerSection.find('.status-indicator-pct li.left-c p').attr('prevD') || 0;
-            $headerSection.find('.status-indicator-pct li.left-c p').attr('prevD', deg).rotate(deg, currDeg);
-        }
+
+        perc = Math.round(perc * 100);
+
+        $headerSection.find('.transfer-progress-pct').text(perc + '%');
     };
 
 
@@ -521,6 +517,8 @@ mega.tpw = new function TransferProgressWidget() {
         var $downloadHeader = $rowsHeader.find('.transfer-progress-type.download');
         var $uploadHeader = $rowsHeader.find('.transfer-progress-type.upload');
 
+        var stats;
+
         if (!totalD) {
             $downloadHeader.addClass('hidden');
         }
@@ -528,7 +526,11 @@ mega.tpw = new function TransferProgressWidget() {
             remainD = totalD - doneD;
 
             if (remainD) {
-                $downloadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainD));
+                $downloadHeader.find('.transfer-progress-txt').text(l[20808]
+                    .replace('{0}', ((remainD > 999) ? '999+' : remainD)));
+
+                stats = getTransfersPercent();
+                setProgressCircle($downloadHeader, stats.dl_total, stats.dl_done);
             }
             else {
                 var initialDownloadHeadText = $downloadHeader.find('.transfer-progress-txt').text();
@@ -549,8 +551,9 @@ mega.tpw = new function TransferProgressWidget() {
                         }
                     }
                 }
+                setProgressCircle($downloadHeader, totalD, doneD);
             }
-            setProgressCircle($downloadHeader, totalD, doneD);
+
             $downloadHeader.removeClass('hidden');
             if (!dRows.filter('.error').length) {
                 $downloadHeader.removeClass('error overquota');
@@ -565,7 +568,11 @@ mega.tpw = new function TransferProgressWidget() {
             remainU = totalU - doneU;
 
             if (remainU) {
-                $uploadHeader.find('.transfer-progress-txt').text(l[20808].replace('{0}', remainU));
+                $uploadHeader.find('.transfer-progress-txt').text(l[20808]
+                    .replace('{0}', ((remainU > 999) ? '999+' : remainU)));
+                !stats && (stats = getTransfersPercent());
+
+                setProgressCircle($uploadHeader, stats.ul_total, stats.ul_done);
             }
             else {
                 var initialUploadHeadText = $uploadHeader.find('.transfer-progress-txt').text();
@@ -586,8 +593,9 @@ mega.tpw = new function TransferProgressWidget() {
                         }
                     }
                 }
+                setProgressCircle($uploadHeader, totalU, doneU);
             }
-            setProgressCircle($uploadHeader, totalU, doneU);
+
             $uploadHeader.removeClass('hidden');
             if (!uRows.filter('.error').length) {
                 $uploadHeader.removeClass('error overquota');
@@ -618,8 +626,82 @@ mega.tpw = new function TransferProgressWidget() {
                 $rowsContainer.find('i.transfer-progress-icon').off('click').on('click',
                     actionsOnRowEventHandler);
             }
+            // init sections
+            viewTransferSection();
         }
         return true;
+    };
+
+    /**
+     * Show a tab in Transfer progress widget
+     * @param {Number} section  1 = completed, 0 = on progress
+     */
+    var viewTransferSection = function(section) {
+        'use strict';
+        var $rows = $rowsContainer.find('.transfer-task-row');
+
+        // for enhanced performance, instead of using ".find" or ".filter" 2 times
+        // I will apply the calls on 1 go O(n).
+
+        var completedFound = false;
+        var progressFound = false;
+
+        for (var r = 0; r < $rows.length; r++) {
+            var $currRow = $($rows[r]);
+            if ($currRow.hasClass('complete')) {
+                if (section) {
+                    $currRow.removeClass('hidden');
+                }
+                else {
+                    $currRow.addClass('hidden');
+                }
+                completedFound = true;
+            } else {
+                if (section) {
+                    $currRow.addClass('hidden');
+                }
+                else {
+                    $currRow.removeClass('hidden');
+                }
+                progressFound = true;
+            }
+        }
+        if (completedFound && progressFound) {
+            if (section) {
+                $widgetHeadAndBody.find('.complete-list').addClass('hidden');
+                $widgetHeadAndBody.find('.process-list').removeClass('hidden');
+            }
+            else {
+                $widgetHeadAndBody.find('.process-list').addClass('hidden');
+                $widgetHeadAndBody.find('.complete-list').removeClass('hidden');
+            }
+        }
+        else {
+            $rows.removeClass('hidden');
+            $widgetHeadAndBody.find('.process-list').addClass('hidden');
+            $widgetHeadAndBody.find('.complete-list').addClass('hidden');
+        }
+        updateJSP();
+    };
+
+    var postPorcessComplete = function() {
+        var $allRows = $rowsContainer.find('.transfer-task-row');
+        var $completedRows = $allRows.filter('.complete');
+        if ($completedRows.length === $allRows.length) {
+            $allRows.removeClass('hidden');
+            $widgetHeadAndBody.find('.process-list').addClass('hidden');
+            $widgetHeadAndBody.find('.complete-list').addClass('hidden');
+        }
+        else {
+            // some optimization
+            var $tabCompleted = $widgetHeadAndBody.find('.complete-list');
+            var $tabProgress = $widgetHeadAndBody.find('.process-list');
+
+            if ($tabCompleted.hasClass('hidden') && $tabProgress.hasClass('hidden')) {
+                $tabCompleted.removeClass('hidden');
+            }
+        }
+        updateJSP();
     };
 
     /**
@@ -649,6 +731,15 @@ mega.tpw = new function TransferProgressWidget() {
         if (type === this.UPLOAD) {
             tempRowPos = entriesArray.length - 1;
             reverted = true;
+        }
+
+        var addAsHidden = $widgetHeadAndBody.find('.complete-list').hasClass('hidden');
+
+        if (addAsHidden && $widgetHeadAndBody.find('.process-list').hasClass('hidden')) {
+            // all done
+            addAsHidden = false;
+            $widgetHeadAndBody.find('.complete-list').removeClass('hidden');
+            $rowsContainer.find('.transfer-task-row').addClass('hidden');
         }
 
         for (var r = 0; r < entriesArray.length; r++) {
@@ -724,6 +815,13 @@ mega.tpw = new function TransferProgressWidget() {
                 $row.attr('zippo', 'y');
             }
 
+            if (addAsHidden) {
+                $row.addClass('hidden');
+            }
+            else {
+                $row.removeClass('hidden');
+            }
+
             setStatus($row, this.INITIALIZING);
             if (!reverted) {
                 $tempRows[tempRowPos++] = $row;
@@ -766,12 +864,22 @@ mega.tpw = new function TransferProgressWidget() {
 
         var prefix;
         var queue;
+        var $header;
+        var done_bytes;
+        var all_bytes;
+        var stats = getTransfersPercent();
+
         if (type === this.DOWNLOAD) {
             dId = id = id.split('_').pop();
             prefix = downloadRowPrefix;
             queue = dl_queue;
             pauseText = l[16183];
             cancelText = l[1196];
+
+            $header = $rowsHeader.find('.transfer-progress-type.download');
+
+            done_bytes = stats.dl_done;
+            all_bytes = stats.dl_total;
 
             if (queue[queue_num].zipid) {
                 dId = queue[queue_num].zipid;
@@ -783,6 +891,9 @@ mega.tpw = new function TransferProgressWidget() {
             queue = ul_queue;
             pauseText = l[16185];
             cancelText = l[1617];
+            $header = $rowsHeader.find('.transfer-progress-type.upload');
+            done_bytes = stats.ul_done;
+            all_bytes = stats.ul_total;
         }
 
         var $targetedRow = $rowsContainer.find('#' + prefix + dId);
@@ -827,6 +938,8 @@ mega.tpw = new function TransferProgressWidget() {
         var prog = perc * rowProgressWidth / 100;
         $targetedRow.find('.transfer-progress-bar-pct').width(prog);
         $targetedRow.find('.transfer-task-status').text(bytesToSize(speed) + '/s');
+
+        setProgressCircle($header, all_bytes, done_bytes);
     };
 
 
@@ -842,6 +955,9 @@ mega.tpw = new function TransferProgressWidget() {
 
         var dId = entry.id;
         var prefix;
+
+        var unHide = $widgetHeadAndBody.find('.complete-list').hasClass('hidden') &&
+            !$widgetHeadAndBody.find('.process-list').hasClass('hidden');
 
         if (type === this.DOWNLOAD) {
             if (entry.zipid) {
@@ -892,6 +1008,14 @@ mega.tpw = new function TransferProgressWidget() {
         $actionsRow.append($finishedAction);
 
         updateHeaderAndContent();
+
+        if (unHide) {
+            $targetedRow.removeClass('hidden');
+        }
+        else {
+            $targetedRow.addClass('hidden');
+        }
+        postPorcessComplete();
 
         var timerHandle = setTimeout(function() {
             $targetedRow.fadeOut(400, function() {
@@ -1151,7 +1275,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if ($tasks && $tasks.length) {
-            for (var r = 0; r < $tasks.length; r++) {
+            for (var r = 0; r < $tasks.length && r < maximumLength; r++) {
                 removeRow($($tasks[r]));
             }
         }

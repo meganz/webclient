@@ -22940,7 +22940,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: -34px -12245px;
     opacity: 0.8;
 }
-.content-panel.dashboard .small-icon.info-icon {
+.content-panel.dashboard .small-icon.info-icon, .export-links-dialog .small-icon.info-icon {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-repeat: no-repeat;
     background-position: -26px -12378px;
@@ -22951,6 +22951,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     transition: 0.3s;
     margin-left: 4px;
 }
+.export-links-dialog .small-icon.info-icon {
+    vertical-align: middle;
+    margin-top: -3px;
+}
+
 .content-panel.dashboard .small-icon.info-icon:hover {
     opacity: 0.8;
 }

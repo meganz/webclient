@@ -776,9 +776,10 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
  * @param {Array}   n       Array of node handles
  * @param {String}  t       Target folder node handle
  * @param {Boolean} [quiet] omit loading overlay
+ * @param {Number} folderDefaultConflictResolution pass a default conflict resolution {optional}
  * @returns {MegaPromise} Resolves with the number of moves
  */
-MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
+MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConflictResolution) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
     // check if this is a business expired account
@@ -1117,7 +1118,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet) {
         // If the target folder is not the Rubbish, check whether we have to handle conflicts.
         if (t !== M.RubbishID) {
             mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
-                fileconflict.check(n, t, 'move')
+                fileconflict.check(n, t, 'move', null, folderDefaultConflictResolution)
                     .always(function(files) {
                         if (files.length === 0) { // user refuse to move all file.
                             promise.reject(EBLOCKED);

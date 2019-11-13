@@ -31,6 +31,12 @@ MegaData.prototype.getFilterBy = function(f) {
  });
  };*/
 
+
+/**
+ * filter M.v by parent ID
+ * @param {String} id   handle of the parent
+ * @returns {Object} duplicates if found
+ */
 MegaData.prototype.filterByParent = function(id) {
     var i;
     var node;
@@ -89,11 +95,14 @@ MegaData.prototype.filterByParent = function(id) {
                 }
                 return true;
             });
+
+        return M.checkForDuplication(id);
     }
     else {
         this.filterBy(function(node) {
             return (node.p === id);
         });
+        return M.checkForDuplication(id);
     }
 };
 

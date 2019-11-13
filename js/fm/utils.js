@@ -1257,6 +1257,83 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
     });
 };
 
+
+/** check if the current M.v has any names duplicates.
+ * @param {String}      id              Handle of the current view's parent
+ * @returns {Object}    duplicates     if none was found it returns null
+ * */
+MegaUtils.prototype.checkForDuplication = function(id) {
+    'use strict';
+    if (M.getNodeRoot(id) === 'shares') {
+        if (M.getNodeRights(id) < 2) {
+            return;
+        }
+    }
+
+    // at this point we have V prepared.
+
+    var names = Object.create(null);
+
+    // count duplications O(n)
+    for (var k = 0; k < M.v.length; k++) {
+        if (!names[M.v[k].name]) {
+            names[M.v[k].name] = Object.create(null);
+            names[M.v[k].name][M.v[k].t] = Object.create(null);
+            names[M.v[k].name][M.v[k].t].total = 1;
+            names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
+        }
+        else {
+            if (!names[M.v[k].name][M.v[k].t]) {
+                names[M.v[k].name][M.v[k].t] = Object.create(null);
+                names[M.v[k].name][M.v[k].t].total = 1;
+                names[M.v[k].name][M.v[k].t].list = [M.v[k].h];
+            }
+            else {
+                names[M.v[k].name][M.v[k].t].total++;
+                names[M.v[k].name][M.v[k].t].list.push(M.v[k].h);
+            }
+        }
+    }
+
+    // extract duplication O(n), if we have any
+    // O(1) if we dont have any
+    var dups = Object.create(null);
+    var dupsFolders = Object.create(null);
+
+    if (M.v.length > Object.keys(names).length) {
+
+        var found = false;
+
+        for (var nodeName in names) {
+            found = false;
+
+            if (names[nodeName][0] && names[nodeName][0].total > 1) {
+                dups[nodeName] = names[nodeName][0].list;
+                found = true;
+            }
+            if (names[nodeName][1] && names[nodeName][1].total > 1) {
+                dupsFolders[nodeName] = names[nodeName][1].list;
+                found = true;
+            }
+
+            if (!found) {
+                names[nodeName] = null;
+            }
+        }
+
+        if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+            console.error("Strange case, no Duplications were found in the time when" +
+                "we have a mismatch in length " + id);
+        }
+
+        var resultObject = Object.create(null);
+        resultObject.files = dups;
+        resultObject.folders = dupsFolders;
+
+        return resultObject;
+    }
+};
+
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
  * and keep the user logged in at the same time

@@ -190,6 +190,10 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	transition: 0.2s;
 }
 
+.bus-reg-btn-2.disabled {
+    opacity: 0.5;
+}
+
 .bus-reg-btn:hover, .bus-reg-btn-2:hover {
 	background-color: rgba(223,29,32,1);
 }

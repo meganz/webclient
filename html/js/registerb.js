@@ -124,7 +124,7 @@ BusinessRegister.prototype.initPage = function () {
         this.isLoggedIn = true;
     }
 
-    $('.bus-reg-btn', $pageContainer).addClass('disabled');
+    $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
 
     var fillPaymentGateways = function (status, list) {
 
@@ -227,15 +227,15 @@ BusinessRegister.prototype.initPage = function () {
             var $me = $(this).find('.bus-reg-checkbox');
             if ($me.hasClass('checkOn')) {
                 $me.removeClass('checkOn').addClass('checkOff');
-                $('.bus-reg-btn', $pageContainer).addClass('disabled');
+                $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
             }
             else {
                 $me.removeClass('checkOff').addClass('checkOn');
                 if ($('.bus-reg-agreement .bus-reg-checkbox.checkOn', $pageContainer).length === 2) {
-                    $('.bus-reg-btn', $pageContainer).removeClass('disabled');
+                    $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).removeClass('disabled');
                 }
                 else {
-                    $('.bus-reg-btn', $pageContainer).addClass('disabled');
+                    $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
                 }
             }
         });

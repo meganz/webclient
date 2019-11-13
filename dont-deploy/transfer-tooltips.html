@@ -56,46 +56,17 @@
         <div class="transfer-progress-widget expand">
             <div class="transfer-progress-head">
                 <!-- add download/upload/error/complete/overquota/almost-overquota to transfer-progress-widget -->
-                <div class="transfer-progress-type download">
+                <div class="transfer-progress-type download complete">
                     <div class="status-indicator">
                         <div class="transfer-progress-icon overquota"></div>
-                        <div class="status-indicator-pct">
-                            <div class="overlay"></div>
-                            <ul>
-                                <li class="nw-fm-chart0 right-c">
-                                    <p>
-                                        <span></span>
-                                    </p>
-                                </li>
-                                <li class="nw-fm-chart0 left-c">
-                                    <p>
-                                        <span></span>
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="transfer-progress-pct">100%</div>
                     </div>
-                    <div class="transfer-progress-txt">11/44</div>
-                    <div class="transfer-progress-icon transfer-error-1"></div>
+                    <div class="transfer-progress-txt">completed</div>
                 </div>
-                <div class="transfer-progress-type upload error almost-overquota">
+                <div class="transfer-progress-type upload error overquota">
                     <div class="status-indicator">
-                        <div class="transfer-progress-icon almost-overquota"></div>
-                        <div class="status-indicator-pct">
-                            <div class="overlay"></div>
-                            <ul>
-                                <li class="nw-fm-chart0 right-c">
-                                    <p>
-                                        <span></span>
-                                    </p>
-                                </li>
-                                <li class="nw-fm-chart0 left-c">
-                                    <p>
-                                        <span></span>
-                                    </p>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="transfer-progress-icon overquota"></div>
+                         <div class="transfer-progress-pct">83%</div>
                     </div>
                     <div class="transfer-progress-txt">over transfer quota</div>
                     <div class="transfer-progress-icon transfer-error-1"></div>
@@ -133,6 +104,7 @@
                     <span class="transfer-filetype-icon image"></span>
                     <div class="transfer-filetype-txt">example image name looooo.png</div>
                     <div class="transfer-file-size">200 MB</div>
+                    <div class="transfer-task-status">Completed</div>
                     <div class="transfer-complete-actions">
                         <i class="transfer-progress-icon link">
                             <div class="tooltips">get link</div>
@@ -141,7 +113,6 @@
                             <div class="tooltips">open cloud folder</div>
                         </i>
                     </div>
-                    <div class="transfer-task-status">Completed</div>
                     <div class="transfer-task-actions">
                         <i class="transfer-progress-icon cancel">
                             <div class="tooltips">clear completed</div>

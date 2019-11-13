@@ -130,15 +130,13 @@ var signin = {
         }
         else {
             // Show a failed login
-            $('#login-name2').megaInputsShowError();
-            $('#login-password2').megaInputsShowError(l[7431]);
+            $('#login-name2').megaInputsShowError().blur();
+            $('#login-password2').megaInputsShowError(l[7431]).val('').blur();
 
             // Close the 2FA dialog for a generic error
             twofactor.loginDialog.closeDialog();
 
             msgDialog('warninga', l[135], l[7431] + '.', false, function() {
-                $('#login-password2').val('');
-                $('#login-password2').blur();
                 $('#login-name2').select();
             });
         }
@@ -236,7 +234,7 @@ function pagelogin() {
     var $formWrapper = $('.main-mid-pad.login form');
     var $email = $formWrapper.find('#login-name2');
     var $password = $formWrapper.find('#login-password2');
-    
+
     var e = $email.val();
     if (e === '' || !isValidEmail(e)) {
         $email.megaInputsShowError(l[141]);

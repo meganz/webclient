@@ -361,7 +361,10 @@ body.ar .sms-verification-number-input {
 .pro-login-dialog .account.checkbox-block{
     padding: 16px 0 16px 1px;
 }
-.account.checkbox-block.focused .checkboxOn::before, .account.checkbox-block.focused .checkboxOff::before {
+.account.checkbox-block.focused .checkboxOn::before,
+.account.checkbox-block.focused .checkboxOff::before,
+.pw-remind.checkbox-block.focused .checkboxOn::before,
+.pw-remind.checkbox-block.focused .checkboxOff::before {
     -webkit-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
     -moz-box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);
     box-shadow: 0 0 0 1px rgba(240, 55, 58, 0.5);

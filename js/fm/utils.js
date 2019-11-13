@@ -1187,6 +1187,9 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                             return true;
                         }
                     };
+                    var add = function(r) {
+                        return r[r.length - 1].ts + fill(r);
+                    };
 
                     onIdle(function _() {
                         var done = function(r) {
@@ -1195,11 +1198,24 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                             }
 
                             if (r.length) {
-                                ts = r[r.length - 1].ts + fill(r);
+                                ts = add(r);
 
                                 if (--max && r.length === options.limit) {
                                     return onIdle(_);
                                 }
+                            }
+
+                            if (ts >= 0) {
+                                ts = -1;
+                                max = 48;
+                                r = null;
+                                options.query = function(db) {
+                                    return db.where('t').belowOrEqual(ts);
+                                };
+                                add = function(r) {
+                                    return 1262304e3 - r[0].ts + -fill(r);
+                                };
+                                return onIdle(_);
                             }
 
                             resolve();

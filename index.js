@@ -2755,7 +2755,7 @@ function parsepage(pagehtml, pp) {
     var bmenu = pages['bottom'];
     var bmenu2 = pages['bottom2'];
     var pagesmenu = pages['pagesmenu'];
-    var $scrollableEl = $('body, html, .bottom-pages .fmholder');
+    var $scrollableEl;
 
     if (is_chrome_web_ext || is_firefox_web_ext) {
         bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
@@ -2774,6 +2774,7 @@ function parsepage(pagehtml, pp) {
         .show();
 
     $('body').addClass('bottom-pages');
+    $scrollableEl = $('body, html, .bottom-pages .fmholder');
     $scrollableEl.stop(true, true).scrollTop(0);
     bottompage.init();
 

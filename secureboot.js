@@ -3489,8 +3489,8 @@ else if (!browserUpdate) {
                     }
 
                     mBroadcaster.once('startMega', function() {
-                        if (typeof M.req === 'function') {
-                            setTimeout(function() {
+                        setTimeout(function() {
+                            if (typeof M.req === 'function') {
                                 M.req('gmf').always(function(result) {
                                     if (typeof result === 'object') {
                                         mega.apiMiscFlags = result;
@@ -3499,8 +3499,8 @@ else if (!browserUpdate) {
                                         console.error('Giving up retrieving API flags...');
                                     }
                                 });
-                            }, 700);
-                        }
+                            }
+                        }, 700);
                     });
                 }
                 gmf_res = false;

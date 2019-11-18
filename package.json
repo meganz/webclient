@@ -52,7 +52,7 @@
     "grunt-contrib-htmlmin": "3.1.0",
     "grunt-htmljson": "0.1.1",
     "prop-types": "15.7.2",
-    "react-hot-loader": "4.12.16",
+    "react-hot-loader": "4.12.18",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10"
   },
@@ -68,7 +68,7 @@
     "eslint-plugin-optimize-regex": "1.1.7",
     "eslint-plugin-react": "7.16.0",
     "eslint-plugin-sonarjs": "0.5.0",
-    "eslint-plugin-unicorn": "12.1.0",
+    "eslint-plugin-unicorn": "13.0.0",
     "htmlhint": "0.11.0",
     "istanbul": "0.4.5",
     "jscpd": "2.0.16",

@@ -1613,16 +1613,13 @@ var addressDialog = {
             addressDialog.closeDialog();
             // if we are coming from business plan, we need to reset registration
             if (mySelf.businessPlan && mySelf.userInfo) {
-                if (is_mobile) {
-                    parsepage(pages[page]);
-                }
                 if (page === 'registerb') {
-                    var businessReg = new BusinessRegister();
-                    businessReg.initPage();
+                    page = '';
+                    loadSubPage('registerb');
                 }
                 else if (page === 'repay') {
-                    var businessRepay = new RepayPage();
-                    businessRepay.initPage();
+                    page = '';
+                    loadSubPage('repay');
                 }
             }
         });

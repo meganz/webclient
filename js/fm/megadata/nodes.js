@@ -1764,14 +1764,13 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onFolderSizeChangeUIUpdate = function(node) {
     "use strict";
-    if (!node || !node.t) {
+    if (!node || !node.t || typeof M.currentdirid !== 'string') {
         return;
     }
 
     var needCheck = false;
 
     var currDir = M.currentdirid;
-
     if (currDir.indexOf(node.p) > -1) {
         needCheck = true;
     }

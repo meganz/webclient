@@ -1285,6 +1285,9 @@ MegaUtils.prototype.checkForDuplication = function(id) {
             return;
         }
     }
+    if (folderlink) {
+        return;
+    }
 
     // at this point we have V prepared.
 

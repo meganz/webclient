@@ -2402,6 +2402,8 @@ function topmenuUI() {
                 M.showRecoveryKeyDialog(2);
             }
             else if (subpage) {
+                // Clear login_next variable before load subpages each time
+                login_next = false;
                 loadSubPage(moveTo[subpage] || subpage);
             }
             else if (className.indexOf('feedback') > -1) {

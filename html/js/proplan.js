@@ -371,7 +371,7 @@ pro.proplan = {
                 var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
                 var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
                 var $euroPrice = $('.euro-price', $price);
-                var $currncyAbbrev = $('.local-currency-code', $price);
+                var $currncyAbbrev = $('.local-currency-code', $pricingBoxes);
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
                 var $planName;

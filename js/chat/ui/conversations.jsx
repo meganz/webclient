@@ -991,6 +991,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||
                     e.keyCode === 27 /* esc */ ||
+                    e.altKey ||  e.metaKey || e.ctrlKey || e.shiftKey ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') ||
                     document.querySelector('textarea:focus,select:focus,input:focus')

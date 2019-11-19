@@ -1091,7 +1091,16 @@ function init_page() {
             init_register();
         }
     }
-    else if ((page === 'registerb')) { // business register
+    else if ((page.substr(0, 9) === 'registerb')) { // business register
+        if (page.length > 9) {
+            var pageParams = page.substr(9);
+            if (pageParams.length > 14) {
+                var uaoParam = pageParams.indexOf('/uao=');
+                if (uaoParam > -1) {
+                    mega.uaoref = pageParams.substr(uaoParam + 5);
+                }
+            }
+        }
         parsepage(pages['registerb']);
         $('body').addClass('business');
         var regBusiness = new BusinessRegister();

@@ -21370,7 +21370,17 @@ ChatRoom.prototype.appendMessage = function (message) {
       if (!prevMsg) {
         self.logger.error('self.messages got out of sync...maybe there are some previous JS exceptions that caused that? ' + 'note that messages may be displayed OUT OF ORDER in the UI.');
       } else {
-        message.orderValue = prevMsg.orderValue + 0.1;
+        var nextVal = prevMsg.orderValue + 0.1;
+
+        if (!prevMsg.sent) {
+          var cid = megaChat.plugins.chatdIntegration.chatd.chatIdMessages[self.chatIdBin];
+
+          if (cid && cid.highnum) {
+            nextVal = ++cid.highnum;
+          }
+        }
+
+        message.orderValue = nextVal;
       }
     }
   }

@@ -3320,7 +3320,7 @@
     "22083": "A migra\u00e7\u00e3o de dados falhou devido \u00e0 falta da chave de criptografia necess\u00e1ria para {0}. \u00c9 prov\u00e1vel que esta conta ainda n\u00e3o tenha conclu\u00eddo a sua configura\u00e7\u00e3o. Caso contr\u00e1rio, entre em contato com o suporte em business@mega.nz",
     "22094": "Tamb\u00e9m dispon\u00edvel para [S]Chrome[\/S] e [S]Opera[\/S] no seu computador.",
     "22095": "As extens\u00f5es do navegador est\u00e3o dispon\u00edveis para [S]Chrome[\/S], [S]Firefox[\/S] e [S]Opera[\/S] no seu computador.",
-    "22101": "H\u00e1 itens duplicados nesta pasta",
+    "22101": "H\u00e1 itens com nomes repetidos nesta pasta",
     "22102": "Corrigir agora",
     "22103": "Selecione o que voc\u00ea quer fazer:",
     "22104": "J\u00e1 existem aqui v\u00e1rias pastas com o nome {0}.",

@@ -1815,7 +1815,7 @@
     "17593": "Download is queued in MEGAsync \u2026",
     "17594": "Download is paused in MEGAsync",
     "17595": "When file versioning is disabled, the current version will be replaced with the new version once a file is updated (and your changes to the file will no longer be recorded). Are you sure you want to disable file versioning?",
-    "17597": "You may still receive file versions from shared folders if your contacts have this enabled.",
+    "17597": "Disabling file versioning does not prevent your contacts from creating new versions in shared folders.",
     "17598": "Delete all older versions of my files",
     "17600": "All current files will remain. Only historic versions of your files will be deleted.",
     "17601": "Enabled",

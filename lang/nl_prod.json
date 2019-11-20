@@ -3320,7 +3320,7 @@
     "22083": "Gegevens migratie is mislukt doordat de benodigde coderings sleutel voor {0} ontbreekt. Dit account heeft de installatie  waarschijnlijk niet volledig voltooid, neem anders contact op met de ondersteuning via business@mega.nz",
     "22094": "Ook beschikbaar voor desktop [S]Chrome[\/S] en [S]Opera[\/S]",
     "22095": "Browswer extensies zijn beschikbaar voor desktop [S]Chrome[\/S]. [S]Firefox[\/S] en [S]Opera[\/S]",
-    "22101": "Er zijn duplicaten items in deze map",
+    "22101": "Er zijn items met duplicaten namen in deze map.",
     "22102": "Herstel nu",
     "22103": "Selecteer wat u wilt doen:",
     "22104": "Meerdere mappen met dezelfde naam {0} bestaan in deze locatie.",

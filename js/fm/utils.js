@@ -1280,10 +1280,9 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
  * */
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
-    if (M.getNodeRoot(id) === 'shares') {
-        if (M.getNodeRights(id) < 2) {
-            return;
-        }
+    if (M.currentrootid === M.RubbishID
+        || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+        return;
     }
     if (folderlink) {
         return;

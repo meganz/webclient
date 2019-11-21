@@ -699,12 +699,12 @@
                             // keep the newest
                             if (type === 'files') {
                                 if (olderNode) {
-                                    M.safeRemoveNodes(olderNode);
+                                    M.moveToRubbish(olderNode);
                                 }
                                 else {
                                     var nodeToRemove = duplicateEntries[type][name];
                                     nodeToRemove.splice(newestIndex, 1);
-                                    M.safeRemoveNodes(nodeToRemove);
+                                    M.moveToRubbish(nodeToRemove);
                                 }
                                 // hide bar
                                 $('.files-grid-view.fm').removeClass('duplication-found');

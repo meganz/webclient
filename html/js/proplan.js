@@ -238,6 +238,12 @@ pro.proplan = {
         pro.propay.preloadAnimation();
         pro.propay.hideLoadingOverlay();
 
+        /*
+        * Hide the successful payment modal dialog of cardDialog, voucherDialog and redeem
+        * if click back after making the payment successfully
+        * */
+        $('.payment-result.success', $(document.body)).addClass('hidden');
+
         // Load the membership plans
         pro.loadMembershipPlans(function() {
 

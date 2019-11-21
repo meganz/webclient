@@ -446,7 +446,7 @@
                     $('.file-name', $a2).text(name);
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
-                    if (dupsNB > 2) {
+                    if (dupsNB > 2 || M.currentrootid === 'shares') {
                         $a2.addClass('hidden');
                     }
                 }

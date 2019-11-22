@@ -1322,6 +1322,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         }
         var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
+        if (s.stream.constructor.name === 'AudioStream' && window.webkitAudioContext) {
+            s.stream._audioContext.resume();
+        }
 
         _initVideoControls($wrapper, s, node, options);
 
@@ -3180,6 +3183,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
 mBroadcaster.once('startMega', function isAudioContextSupported() {
     'use strict';
+
+    // Safari AudioContect polyfill for MP3 support
+    if (!window.AudioContext && window.webkitAudioContext) {
+        window.AudioContext = window.webkitAudioContext;
+    }
 
     if ('AudioContext' in window) {
         var ctx;

@@ -40,7 +40,7 @@
             "Object.values"
         ],
         "react": {
-            "version": "detect"
+            "version": "16.8.6"
         }
     },
     "rules": {
@@ -70,6 +70,8 @@
         "no-alert": 2,
         "no-caller": 2,
         "no-console": 0,
+        "no-constructor-return": 2,
+        "no-dupe-else-if": 2,
         "no-else-return": 2,
         "no-empty": 0,
         "no-empty-function": [2, { "allow": ["constructors"] }],
@@ -100,6 +102,7 @@
         "no-script-url": 2,
         "no-self-compare": 2,
         "no-sequences": 2,
+        "no-setter-return": 2,
         "no-shadow-restricted-names": 2,
         "no-trailing-spaces": 2,
         "no-throw-literal": 2,

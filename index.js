@@ -2306,7 +2306,7 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click', function (e) {
+    $('#pageholder, #startholder').rebind('click.hidetopmenu', function(e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }

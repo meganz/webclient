@@ -140,9 +140,9 @@ MegaData.prototype.sortByEmail = function(d) {
 MegaData.prototype.sortByModTime = function(d) {
     this.sortfn = function(a, b, d) {
 
-        // folder not having mtime, so sort by added time.
+        // folder not having mtime, so sort by Name.
         if (!a.mtime || !b.mtime) {
-            return M.getSortByDateTimeFn()(a, b, d);
+            return M.doFallbackSortWithName(a, b, d);
         }
 
         var time1 = a.mtime - a.mtime % 60;

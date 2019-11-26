@@ -651,7 +651,7 @@ pro.proplan = {
         if (!is_mobile) {
 
             var $plansBlock = $('.plans-block');
-            var $currPlan = $plansBlock.find('[data-payment="' + u_attr.p + '"]').addClass('current');
+            var $currPlan = $('[data-payment="' + data.utype + '"]', $plansBlock).addClass('current');
 
             // Current plan
             if (data.srenew) { // This is subscription plan

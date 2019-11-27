@@ -989,6 +989,11 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
         }
     }
 
+    // clear pending share history from M.su
+    if (M.su[pcrId] && M.su[pcrId][nodeId] === 2) {
+        delete M.su[pcrId][nodeId];
+    }
+
     if (fmdb && !pfkey) {
         fmdb.del('ps', nodeId + '*' + pcrId);
     }

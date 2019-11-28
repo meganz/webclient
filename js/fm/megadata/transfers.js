@@ -1983,8 +1983,8 @@ function fm_tfspause(gid, overquota) {
 
             if ($tr.hasClass('transfer-started')) {
                 $tr.find('.eta').text('').addClass('unknown');
-                $tr.find('.speed').text(l[1651]).addClass('unknown');
             }
+            $tr.find('.speed').text(l[1651]).addClass('unknown');
             $tr.addClass('transfer-paused');
             $tr.removeClass('transfer-started');
 

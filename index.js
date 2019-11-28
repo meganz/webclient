@@ -239,6 +239,12 @@ function init_page() {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
 
+    // Check if we should show browser update page.
+    if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
+        localStorage.prevPage = page;
+        window.location = (is_extension ? '' : '/') + 'update.html';
+    }
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
 

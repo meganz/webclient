@@ -294,11 +294,8 @@ var bottompage = {
             var topPos = $(this).scrollTop();
             var navTopPos;
 
-            if (topPos > 150) {
-                $topHeader.removeClass('expanded initial');
-            }
             if (topPos > 300) {
-                $topHeader.removeClass('expanded initial').addClass('floating');
+                $topHeader.addClass('floating');
                 topResize();
                 if (topPos > 600) {
                     $topHeader.addClass('activated');
@@ -311,7 +308,18 @@ var bottompage = {
                 $topHeader.removeClass('floating activated').css('width',  '');
             }
 
-            if ($navBar.length === 0 || page === 'download') {
+            // Download bar collapse/expand
+            if (page === 'download') {
+                if (topPos > 150 && $topHeader.is('.expanded')) {
+                    $topHeader.removeClass('expanded initial').addClass('auto');
+                }
+                else if (topPos < 50 && $topHeader.is('.video-theatre-mode.auto')) {
+                    expandDlBar();
+                }
+                return;
+            }
+
+            if ($navBar.length === 0) {
                 return;
             }
 

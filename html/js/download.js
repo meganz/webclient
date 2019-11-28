@@ -10,6 +10,29 @@ var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
+function expandDlBar() {
+    'use strict';
+
+    var $topBar = $('.download.top-bar');
+
+    $topBar.addClass('expanded');
+
+    (function _resizer() {
+        // Set height to  top  bar if it doesn't fit min height
+        if ($topBar.hasClass('expanded')) {
+            var contentHeight = $('.download.main-pad', $topBar).outerHeight(true);
+            if (contentHeight > $('.download-content', $topBar).outerHeight()) {
+                $topBar.css({
+                    'height': contentHeight +
+                        $('.download.bar-table', $topBar).outerHeight() +
+                        $('.pages-nav.content-block', $topBar).height()
+                });
+            }
+        }
+        $(window).rebind('resize.download-bar', _resizer);
+    })();
+}
+
 function dlinfo(ph,key,next)
 {
     $('.widget-block').addClass('hidden');
@@ -587,23 +610,11 @@ function dl_g(res) {
     }
     else {
         // Expand top bar
-        setTimeout(function _expand() {
-            var $topBar = $('.download.top-bar').addClass('expanded');
+        setTimeout(function() {
+            var $topBar = $('.download.top-bar');
 
-            (function _resizer() {
-                // Set height to  top  bar if it doesn't fit min height
-                if ($topBar.hasClass('expanded')) {
-                    var contentHeight = $topBar.find('.download.main-pad').outerHeight(true);
-                    if (contentHeight > $topBar.find('.download-content').outerHeight()) {
-                        $topBar.css({
-                            'height': contentHeight +
-                                $topBar.find('.download.bar-table').outerHeight() +
-                                $topBar.find('.pages-nav.content-block').height()
-                        });
-                    }
-                }
-                $(window).rebind('resize.download-bar', _resizer);
-            })();
+            // Expand Download Bar
+            expandDlBar();
 
             // Expand top bar if its clicked
             $topBar.rebind('click', function(e) {
@@ -613,17 +624,17 @@ function dl_g(res) {
                     && $target.not('.button') && !$target.closest('.button').length
                     && !$target.closest('.top-menu-popup').length) {
 
-                    _expand();
+                    expandDlBar();
                 }
             });
 
             // Collapse/Expand top bar events
             $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
                 if ($(this).hasClass('active')) {
-                    $topBar.removeClass('expanded initial').css('height', '');
+                    $topBar.removeClass('expanded initial auto').css('height', '');
                     return $(window).unbind('resize.download-bar');
                 }
-                _expand();
+                expandDlBar();
             });
 
             // Collapse top bar if user scrolls over it

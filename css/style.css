@@ -30128,6 +30128,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 6px;
     z-index: 11;
 }
+.quota-info-pr-txt.small-font {
+    font-size: 10px;
+}
 .right-section.upgrade-block {
     width: calc(100% - 136px);
     display: inline-block;

@@ -326,7 +326,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                     node.setAttribute('title', titleTooltip.map(escapeHTML).join("\n"));
                 }
 
-                if (folders[idx].lbl){
+                if (folders[idx].lbl) {
                     var labelClass = M.getLabelClassFromId(folders[idx].lbl);
 
                     if (!labelClass) {

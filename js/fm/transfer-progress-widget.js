@@ -994,7 +994,7 @@ mega.tpw = new function TransferProgressWidget() {
             var $finishedActionsRow = $actionsRow.clone();
             $targetedRow.find('.transfer-complete-actions').remove();
             $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
-            if (M.getNodeRoot(handle) !== 'shares') {
+            if (M.getNodeRoot(handle || dId) !== 'shares') {
                 $finishedAction.find('.tooltips').text(l[59]);
                 $finishedActionsRow.append($finishedAction);
             }

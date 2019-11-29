@@ -1272,7 +1272,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         roomId = chatId;
     }
 
-    if (type === "group" || type == "public") {
+    if (type === "group" || type === "public") {
         userHandles.forEach(function(contactHash) {
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1286,14 +1286,18 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                         'c': undefined
                     })
                 );
-                M.syncUsersFullname(contactHash);
+                if (type === "group") {
+                    M.syncUsersFullname(contactHash);
+                    M.syncContactEmail(contactHash);
+                }
                 self.processNewUser(contactHash, true);
-                M.syncContactEmail(contactHash);
             }
         });
 
-        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
+        if (type === "group") {
+            ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+        }
+        ChatdIntegration._ensureContactExists(userHandles, chatHandle);
     }
 
     if (!roomId && setAsActive) {

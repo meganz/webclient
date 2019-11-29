@@ -5,7 +5,7 @@ var ReactDOM = require("react-dom");
 import utils from './../../ui/utils.jsx';
 var getMessageString = require('./messages/utils.jsx').getMessageString;
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import ContactsUI  from './../ui/contacts.jsx';
@@ -111,7 +111,7 @@ var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
 
-class ConversationsListItem extends MegaRenderMixin(React.Component) {
+class ConversationsListItem extends MegaRenderMixin {
     specificShouldComponentUpdate() {
         if (
             this.loadingShown ||
@@ -457,7 +457,7 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
+class ArchivedConversationsListItem extends MegaRenderMixin {
     render() {
         var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
 
@@ -599,7 +599,7 @@ class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConversationsList extends MegaRenderMixin(React.Component) {
+class ConversationsList extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true
     }
@@ -753,7 +753,7 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
+class ArchivedConversationsList extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = this.getInitialState();
@@ -945,7 +945,7 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConversationsApp extends MegaRenderMixin(React.Component) {
+class ConversationsApp extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {

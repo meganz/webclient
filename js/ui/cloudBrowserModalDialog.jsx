@@ -1,6 +1,5 @@
-import { Component } from 'react';
 import utils from "./utils.jsx";
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 import ModalDialogsUI from './modalDialogs.jsx';
 import Tooltips from "./tooltips.jsx";
 
@@ -23,7 +22,7 @@ function BrowserCol({ id, className = '', label, sortBy, onClick }) {
     );
 };
 
-class BrowserEntries extends MegaRenderMixin(Component) {
+class BrowserEntries extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true,
         'requiresUpdateOnResize': true
@@ -769,7 +768,7 @@ class BrowserEntries extends MegaRenderMixin(Component) {
 };
 
 
-class CloudBrowserDialog extends MegaRenderMixin(Component) {
+class CloudBrowserDialog extends MegaRenderMixin {
     static defaultProps = {
         'selectLabel': __(l[8023]),
         'openLabel': __(l[1710]),

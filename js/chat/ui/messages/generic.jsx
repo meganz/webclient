@@ -709,10 +709,19 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar
+                            contact={contact}
+                            className="message avatar-wrapper small-rounded-avatar"
+                            chatRoom={self.props.chatRoom}
+                        />;
                         datetime = <div className="message date-time simpletip"
-                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            chatRoom={self.props.chatRoom}
+                            label={displayName}
+                        />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -793,11 +802,18 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
+                                        <Avatar
+                                            className="avatar-wrapper context-avatar"
+                                            chatRoom={self.props.chatRoom}
+                                            contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
-                                             <div className="name">
-                                                 {M.getNameByHandle(contact.u)}
-                                                 <ContactPresence className="small" contact={contact} />
+                                            <div className="name">
+                                                {
+                                                    self.isLoadingContactInfo() ?
+                                                        <em className="contact-name-loading" /> :
+                                                        M.getNameByHandle(contact.u)
+                                                }
+                                                <ContactPresence className="small" contact={contact} />
                                             </div>
                                             <div className="email">
                                                  {M.u[contact.u].m}
@@ -846,7 +862,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]}
+                                                chatRoom={self.props.chatRoom} />
                                         <div className="dropdown-user-name">
                                              <div className="name">
                                                  {M.getNameByHandle(contact.u)}
@@ -918,7 +935,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                                 null
                                         }
                                         {dropdown}
-                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]}
+                                                chatRoom={self.props.chatRoom} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -934,10 +952,16 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"
+                                         chatRoom={self.props.chatRoom} />;
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            label={displayName}
+                            chatRoom={self.props.chatRoom}
+                        />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -974,7 +998,12 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         );
                         datetime = <div className="message date-time simpletip"
                                         data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            label={displayName}
+                            chatRoom={self.props.chatRoom}
+                        />;
                     }
 
                     const attachmentMetadata = message.getAttachmentMeta() || [];
@@ -1200,10 +1229,16 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"
+                                     chatRoom={self.props.chatRoom} />;
                     datetime = <div className="message date-time simpletip"
                                     data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton
+                        contact={contact}
+                        className="message"
+                        label={displayName}
+                        chatRoom={self.props.chatRoom}
+                    />;
                 }
 
                 var messageDisplayBlock;
@@ -1366,9 +1401,15 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 }
                 else {
                     avatar = <Avatar contact={message.authorContact}
-                                                className="message avatar-wrapper small-rounded-avatar"/>;
+                                    className="message avatar-wrapper small-rounded-avatar"
+                                    chatRoom={self.props.chatRoom} />;
                     displayName = M.getNameByHandle(message.authorContact.u);
-                    name = <ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton
+                        contact={contact}
+                        className="message"
+                        label={displayName}
+                        chatRoom={self.props.chatRoom}
+                    />;
                 }
             }
 

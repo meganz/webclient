@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from './../../../stores/mixins.js';
+import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
@@ -21,7 +21,7 @@ class CloseOpenModeMessage extends ConversationMessageMixin {
 
 
         var datetime = <div className="message date-time"
-                                       title={time2date(timestampInt)}>{timestamp}</div>;
+            title={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {
@@ -36,9 +36,10 @@ class CloseOpenModeMessage extends ConversationMessageMixin {
             cssClasses += " grouped";
         }
         else {
-            avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"/>;
+            avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"
+                chatRoom={this.props.chatRoom} />;
             datetime = <div className="message date-time"
-                            title={time2date(timestampInt)}>{timestamp}</div>;
+                title={time2date(timestampInt)}>{timestamp}</div>;
         }
 
 

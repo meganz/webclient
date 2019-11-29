@@ -622,7 +622,7 @@
                     if (isValidGroupOrPubChat) {
                         var gNames = [];
                         if (!chatRoom.topic) {
-                            ChatdIntegration._ensureNamesAreLoaded(chatRoom.members);
+                            ChatdIntegration._ensureContactExists(chatRoom.members);
                             for (var grHandle in chatRoom.members) {
                                 if (grHandle !== u_handle) {
                                     gNames.push(M.getNameByHandle(grHandle));

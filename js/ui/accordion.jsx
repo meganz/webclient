@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 
-class AccordionPanel extends MegaRenderMixin(React.Component) {
+class AccordionPanel extends MegaRenderMixin {
     render() {
         var self = this;
         var contentClass = self.props.className ? self.props.className : '';
@@ -21,7 +21,7 @@ class AccordionPanel extends MegaRenderMixin(React.Component) {
     }
 };
 
-class Accordion extends MegaRenderMixin(React.Component) {
+class Accordion extends MegaRenderMixin {
     constructor(props) {
         super(props);
 

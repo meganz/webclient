@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from './../../../stores/mixins.js';
+import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 
 class MetaRichpreviewLoading extends ConversationMessageMixin {

@@ -1,11 +1,13 @@
 import React from 'react';
-import MegaRenderMixin from '../../stores/mixins.js';
+import PropTypes from 'prop-types';
+import {ContactAwareComponent} from '../../stores/mixins.js';
+import {MegaRenderMixin} from '../../stores/mixins.js';
 import utils from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
-export class ContactsListItem extends MegaRenderMixin(React.Component) {
+export class ContactsListItem extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -48,7 +50,11 @@ export class ContactsListItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactButton extends MegaRenderMixin(React.Component) {
+ContactsListItem.propTypes = {
+    chatRoom: PropTypes.object.isRequired
+};
+
+export class ContactButton extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -58,8 +64,13 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
             'name',
             'firstName',
             'lastName',
-            'nickname'
+            'nickname',
+            'm',
+            'avatar'
         ]);
+    }
+    componentSpecificIsComponentEventuallyVisible() {
+        return this.props.chatRoom.isCurrentlyActive;
     }
     render() {
         var self = this;
@@ -80,6 +91,9 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
             vertOffset = 25;
             horizOffset = 0;
         }
+        if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
+            label = <em className="contact-name-loading" />;
+        }
 
         if (!contact) {
             return null;
@@ -94,6 +108,7 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
             moreDropdowns.push(
                 <div className="dropdown-avatar rounded" key="mainContactInfo">
                     <Avatar className="avatar-wrapper context-avatar"
+                            chatRoom={this.props.chatRoom}
                             contact={contact} hideVerifiedBadge="true" onClick={() => {
                                 if (contact.c === 2) {
                                     loadSubPage('fm/account');
@@ -110,7 +125,7 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
                             loadSubPage('fm/' + contact.u);
                         }}}>
                          <div className="name">
-                            {username}
+                             {username}
                             <ContactPresence className="small" contact={contact} />
                         </div>
                         <span className="email">
@@ -301,11 +316,15 @@ export class ContactButton extends MegaRenderMixin(React.Component) {
             }
         }
 
-        return buttonComponent
+        return buttonComponent;
     }
 };
 
-export class ContactVerified extends MegaRenderMixin(React.Component) {
+ContactButton.propTypes = {
+    chatRoom: PropTypes.object.isRequired
+};
+
+export class ContactVerified extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -354,7 +373,7 @@ export class ContactVerified extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactPresence extends MegaRenderMixin(React.Component) {
+export class ContactPresence extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -385,7 +404,8 @@ export class ContactPresence extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactFingerprint extends MegaRenderMixin(React.Component) {
+
+export class ContactFingerprint extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -451,9 +471,8 @@ export class ContactFingerprint extends MegaRenderMixin(React.Component) {
     }
 };
 
-var _noAvatars = {};
 
-export class Avatar extends MegaRenderMixin(React.Component) {
+export class Avatar extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -493,17 +512,9 @@ export class Avatar extends MegaRenderMixin(React.Component) {
         var verifiedElement = null;
 
         if (!this.props.hideVerifiedBadge && !anonymouschat) {
-            verifiedElement = <ContactVerified contact={this.props.contact} className={this.props.verifiedClassName} />
-        }
-
-        if (!avatars[contact.u] && !_noAvatars[contact.u]) {
-            useravatar.loadAvatar(contact.u, pchandle)
-                .done(function() {
-                    self.safeForceUpdate();
-                })
-                .fail(function(e) {
-                    _noAvatars[contact.u] = true;
-                });
+            verifiedElement = <ContactVerified
+                contact={this.props.contact}
+                className={this.props.verifiedClassName} />;
         }
 
         var extraProps = {};
@@ -520,7 +531,8 @@ export class Avatar extends MegaRenderMixin(React.Component) {
                 extraProps['data-simpletipposition'] = this.props.simpletipPosition;
             }
         }
-        if(avatarMeta.type === "image") {
+
+        if (avatarMeta.type === "image") {
             displayedAvatar = <div className={classes} style={this.props.style}
                     {...extraProps}
                     onClick={self.props.onClick ? (e) => {
@@ -530,8 +542,13 @@ export class Avatar extends MegaRenderMixin(React.Component) {
                         {verifiedElement}
                         <img src={avatarMeta.avatar} style={this.props.imgStyles}/>
             </div>;
-        } else {
+        }
+        else {
             classes += " color" + avatarMeta.avatar.colorIndex;
+            var isLoading = self.isLoadingContactInfo();
+            if (isLoading) {
+                classes += " avatar-name-loading";
+            }
 
             displayedAvatar = <div className={classes} style={this.props.style}
                     {...extraProps}
@@ -541,7 +558,7 @@ export class Avatar extends MegaRenderMixin(React.Component) {
                     } : self.onClick}>
                         {verifiedElement}
                         <span>
-                            {avatarMeta.avatar.letters}
+                            {isLoading ? "" : avatarMeta.avatar.letters}
                         </span>
                 </div>;
 
@@ -551,7 +568,14 @@ export class Avatar extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactCard extends MegaRenderMixin(React.Component) {
+Avatar.propTypes = {
+    chatRoom: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.bool
+    ])
+};
+
+export class ContactCard extends ContactAwareComponent {
     static defaultProps = {
         'dropdownButtonClasses': "default-white-button tiny-button",
         'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
@@ -566,6 +590,7 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
             'firstName',
             'lastName',
             'nickname',
+            'm',
             'avatar'
         ]);
     }
@@ -620,10 +645,10 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
         }
 
         var pres = megaChat.userPresenceToCssClass(contact.presence);
-        var avatarMeta = generateAvatarMeta(contact.u);
-        var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+        var username = (this.props.namePrefix ? this.props.namePrefix : "") +
+            (M.getNameByHandle(contact.u) || contact.m);
 
-        if (contact.u == u_handle) {
+        if (contact.u === u_handle) {
             username += " (Me)";
         }
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
@@ -634,15 +659,16 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
         var usernameBlock;
         if (!noContextMenu) {
             usernameBlock = <ContactButton key="lnk" dropdowns={dropdowns}
-                    noContextMenu={noContextMenu}
-                    contact={contact}
-                    className="light"
-                    label={username}
-                    dropdownRemoveButton={dropdownRemoveButton}
-            />
+                noContextMenu={noContextMenu}
+                contact={contact}
+                className="light"
+                label={username}
+                chatRoom={this.props.chatRoom}
+                dropdownRemoveButton={dropdownRemoveButton}
+            />;
         }
         else {
-            usernameBlock = <div className="user-card-name light">{username}</div>
+            usernameBlock = <div className="user-card-name light">{username}</div>;
         }
 
         var userCard = null;
@@ -709,18 +735,22 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
                     }}
                     style={self.props.style}
                     >
-                <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" />
+                <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar"
+                        chatRoom={this.props.chatRoom} />
 
                 {
                     anonymouschat || noContextButton ? null :
-                        <ContactButton key="button"
-                             dropdowns={dropdowns}
-                             dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
-                             disabled={self.props.dropdownDisabled}
-                             noContextMenu={noContextMenu}
-                             contact={contact}
-                             className={self.props.dropdownButtonClasses}
-                             dropdownRemoveButton={dropdownRemoveButton}
+                        <ContactButton
+                            key="button"
+                            dropdowns={dropdowns}
+                            dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
+                            disabled={self.props.dropdownDisabled}
+                            noContextMenu={noContextMenu}
+                            contact={contact}
+                            className={self.props.dropdownButtonClasses}
+                            dropdownRemoveButton={dropdownRemoveButton}
+                            noLoading={self.props.noLoading}
+                            chatRoom={self.props.chatRoom}
                         />
                 }
                 {selectionTick}
@@ -729,7 +759,14 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ContactItem extends MegaRenderMixin(React.Component) {
+ContactCard.propTypes = {
+    chatRoom: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.bool
+    ])
+};
+
+export class ContactItem extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
@@ -762,15 +799,22 @@ export class ContactItem extends MegaRenderMixin(React.Component) {
                     }}>
                 <i className="tiny-icon small-cross"></i>
             </div>
-            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true} />
+            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true}
+                    chatRoom={this.props.chatRoom} />
             <div className="user-card-data">
-                    <ContactButton contact={contact} className="light" label={username} />
+                    <ContactButton contact={contact} className="light"
+                                   label={username} chatRoom={this.props.chatRoom} />
             </div>
         </div>;
     }
 };
 
-export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
+
+ContactItem.propTypes = {
+    chatRoom: PropTypes.object.isRequired
+};
+
+export class ContactPickerWidget extends MegaRenderMixin {
     static defaultProps = {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
@@ -804,6 +848,10 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
         setContactLink();
     }
     componentWillMount() {
+        if (super.componentWillMount) {
+            super.componentWillMount();
+        }
+
         var self = this;
 
         if (self.props.multiple) {
@@ -906,6 +954,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
             <ContactCard
                 disabled={isDisabled}
                 contact={v}
+                chatRoom={false}
                 className={"contacts-search short " + selectedClass + (isDisabled ? " disabled" : "")}
                 noContextButton="true"
                 selectable={selectableContacts}
@@ -989,7 +1038,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
 
         if (self.props.readOnly) {
             (self.state.selected || []).forEach(function (v, k) {
-                contactsSelected.push(<ContactItem contact={M.u[v]} key={v} />);
+                contactsSelected.push(<ContactItem contact={M.u[v]} key={v} chatRoom={self.props.chatRoom} />);
             });
         }
         else if (self.props.multiple) {
@@ -1068,6 +1117,7 @@ export class ContactPickerWidget extends MegaRenderMixin(React.Component) {
                 (self.state.selected || []).forEach(function (v, k) {
                     contactsSelected.push(<ContactItem contact={M.u[v]}
                                                        onClick={onContactSelectDoneCb}
+                                                       chatRoom={self.props.chatRoom}
                                                        key={v}
                     />);
                 });

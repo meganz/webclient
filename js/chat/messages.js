@@ -2125,8 +2125,8 @@ MessagesBuff.prototype.restoreMessage = function(msgObject) {
     );
 
     if (msgObject.dialogType === "alterParticipants" && msgObject.meta) {
-        ChatdIntegration._ensureNamesAreLoaded(msgObject.meta.included);
-        ChatdIntegration._ensureNamesAreLoaded(msgObject.meta.excluded);
+        ChatdIntegration._ensureContactExists(msgObject.meta.included);
+        ChatdIntegration._ensureContactExists(msgObject.meta.excluded);
     }
     self.haveMessages = true;
 

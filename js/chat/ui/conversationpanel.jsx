@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import utils from './../../ui/utils.jsx';
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
@@ -26,8 +26,9 @@ import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
 import { ConversationAudioVideoPanel } from './conversationaudiovideopanel.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
+var MAX_USERS_CHAT_PRIVATE_AND_ADD = 100;
 
-export class JoinCallNotification extends MegaRenderMixin(React.Component) {
+export class JoinCallNotification extends MegaRenderMixin {
     componentDidUpdate() {
         var $node = $(this.findDOMNode());
         var room = this.props.chatRoom;
@@ -60,7 +61,7 @@ export class JoinCallNotification extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ConversationRightArea extends MegaRenderMixin(React.Component) {
+export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
     }
@@ -234,6 +235,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                     icon="rounded-plus colorized"
                     label={__(l[8007])}
                     disabled={
+                        Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ||
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
                             !self.allContactsInChat(excludedParticipants) &&
@@ -416,9 +418,17 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                                     (
                                         <div className="chat-enable-key-rotation-paragraph">
                                             <div className="chat-button-seperator"></div>
-                                            <div className="link-button light"
+                                            <div className={
+                                                "link-button light " +
+                                                (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ?
+                                                    " disabled" : "")
+                                            }
                                                  onClick={(e) => {
-                                                     if ($(e.target).closest('.disabled').length > 0) {
+                                                     if (
+                                                         Object.keys(room.members).length >
+                                                         MAX_USERS_CHAT_PRIVATE_AND_ADD ||
+                                                         $(e.target).closest('.disabled').length > 0
+                                                     ) {
                                                          return false;
                                                      }
                                                      self.props.onMakePrivateClicked();
@@ -515,7 +525,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
     }
 }
 
-export class ConversationPanel extends MegaRenderMixin(React.Component) {
+export class ConversationPanel extends MegaRenderMixin {
     static lastScrollPositionPerc = 1;
     constructor(props) {
         super(props);
@@ -1252,6 +1262,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'truncated') {
                         messageInstance = <TruncatedMessage
@@ -1259,6 +1270,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'privilegeChange') {
                         messageInstance = <PrivilegeChange
@@ -1266,6 +1278,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'topicChange') {
                         messageInstance = <TopicChange
@@ -1273,6 +1286,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'openModeClosed') {
                         messageInstance = <CloseOpenModeMessage
@@ -1280,6 +1294,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'chatHandleUpdate') {
                         messageInstance = <ChatHandleMessage
@@ -1287,6 +1302,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     }
                     messagesList.push(messageInstance);
@@ -1313,6 +1329,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                 self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
+                            chatRoom={room}
                             onEditDone={(messageContents) => {
                                 self.props.chatRoom.scrolledToBottom = true;
                                 self.editDomElement = null;
@@ -1647,6 +1664,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         hideActionButtons={true}
                         initTextScrolling={true}
                         dialog={true}
+                        chatRoom={self.props.chatRoom}
                     />
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1897,10 +1915,11 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
             topicInfo = <ContactCard
                 className="short"
+                chatRoom={room}
                 noContextButton="true"
                 contact={contact}
                 showLastGreen={true}
-                key={contact.u}/>
+                key={contact.u} />
         }
 
         var startCallDisabled = isStartCallDisabled(room);
@@ -2288,7 +2307,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ConversationPanels extends MegaRenderMixin(React.Component) {
+export class ConversationPanels extends MegaRenderMixin {
     render() {
         var self = this;
 
@@ -2378,7 +2397,7 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
                         var pres = megaChat.userPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactCard contact={contact} key={contact.u}/>
+                            <ContactCard contact={contact} key={contact.u} chatRoom={false} />
                         );
                     }
                 }
@@ -2435,6 +2454,9 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
 };
 
 function isStartCallDisabled(room) {
+    if (Object.keys(room.members).length > 20) {
+        return true;
+    }
     return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
         (
             room.callManagerCall &&

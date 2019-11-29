@@ -1,8 +1,8 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../../stores/mixins.js";
+import {MegaRenderMixin} from "../../stores/mixins.js";
 
-class SharedFolderItem extends MegaRenderMixin(React.Component) {
+class SharedFolderItem extends MegaRenderMixin {
     render() {
         var self = this;
         var node = this.props.node;
@@ -24,7 +24,7 @@ class SharedFolderItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
+class IncomingSharesAccordionPanel extends MegaRenderMixin {
     componentWillMount() {
         this.hadLoaded = false;
     }

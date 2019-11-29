@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 
-class Checkbox extends MegaRenderMixin(React.Component) {
+class Checkbox extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {

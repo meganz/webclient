@@ -66,7 +66,8 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">
                             <ContactPresence className="small" contact={contact} />
-                            <Avatar className="avatar-wrapper medium-avatar" contact={contact} />
+                            <Avatar className="avatar-wrapper medium-avatar" contact={contact}
+                                    chatRoom={chatRoom} />
                         </div>
                         <div className="clear"></div>
                     </div>

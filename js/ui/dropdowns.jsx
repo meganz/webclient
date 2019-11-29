@@ -1,48 +1,51 @@
 var React = require("react");
 import utils from './utils.jsx';
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 import {ContactPickerWidget} from './../chat/ui/contacts.jsx';
 
-export class Dropdown extends MegaRenderMixin(React.Component) {
+export class Dropdown extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true,
     };
 
-    constructor (props) {
+    constructor(props) {
         super(props);
         this.onActiveChange = this.onActiveChange.bind(this);
         this.onResized = this.onResized.bind(this);
     }
 
-    componentWillUpdate (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             this.onActiveChange(nextProps.active)
         }
     }
 
-    specificShouldComponentUpdate (nextProps, nextState) {
+    specificShouldComponentUpdate(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             if (this.props.onBeforeActiveChange) {
                 this.props.onBeforeActiveChange(nextProps.active);
             }
             return true;
-        } else if (this.props.focused != nextProps.focused) {
+        }
+        else if (this.props.focused != nextProps.focused) {
             return true;
-        } else if (this.state && this.state.active != nextState.active) {
+        }
+        else if (this.state && this.state.active != nextState.active) {
             return true;
-        } else {
+        }
+        else {
             // not sure, leave to the render mixing to decide.
             return undefined;
         }
     }
 
-    onActiveChange (newVal) {
+    onActiveChange(newVal) {
         if (this.props.onActiveChange) {
             this.props.onActiveChange(newVal);
         }
     }
 
-    onResized () {
+    onResized() {
         var self = this;
         if (this.props.active === true) {
             if (this.popupElement) {
@@ -97,7 +100,7 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
                             }
 
                             vertOffset += (
-                                info.vertical == "top" ? arrowHeight : 0
+                                info.vertical === "top" ? arrowHeight : 0
                             );
                         }
 
@@ -121,7 +124,7 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
         }
     }
 
-    componentDidMount () {
+    componentDidMount() {
         super.componentDidMount();
         $(window).rebind('resize.drpdwn' + this.getUniqueId(), this.onResized);
         this.onResized();
@@ -135,11 +138,11 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
         });
     }
 
-    componentDidUpdate () {
+    componentDidUpdate() {
         this.onResized();
     }
 
-    componentWillUnmount () {
+    componentWillUnmount() {
         super.componentWillUnmount();
         $(document.body).unbind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId());
         if (this.props.active) {
@@ -150,21 +153,21 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
         $(window).unbind('resize.drpdwn' + this.getUniqueId());
     }
 
-    doRerender () {
+    doRerender() {
         var self = this;
 
-        setTimeout(function () {
+        setTimeout(function() {
             self.safeForceUpdate();
         }, 100);
 
         // idb + DOM updates = delayed update so .onResized won't properly reposition the DOM node using $.position,
         // so we need to manually call this
-        setTimeout(function () {
+        setTimeout(function() {
             self.onResized();
         }, 200);
     }
 
-    renderChildren () {
+    renderChildren() {
         var self = this;
 
         return React.Children.map(this.props.children, function (child) {
@@ -181,7 +184,7 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
         }.bind(this))
     }
 
-    render () {
+    render() {
         if (this.props.active !== true) {
             return null;
         } else {
@@ -212,7 +215,7 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
 
             if (!child && !this.props.forceShowWhenEmpty) {
                 if (this.props.active !== false) {
-                    (window.setImmediate || window.setTimeout)(function () {
+                    (window.setImmediate || window.setTimeout)(function() {
                         self.onActiveChange(false);
                     });
                 }
@@ -239,7 +242,7 @@ export class Dropdown extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class DropdownContactsSelector extends MegaRenderMixin(React.Component) {
+export class DropdownContactsSelector extends MegaRenderMixin {
     static defaultProps = {
         requiresUpdateOnResize: true
     };
@@ -311,7 +314,7 @@ export class DropdownContactsSelector extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class DropdownItem extends MegaRenderMixin(React.Component) {
+export class DropdownItem extends MegaRenderMixin {
     static defaultProps = {
         requiresUpdateOnResize: true
     };

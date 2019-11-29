@@ -1,13 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 var x = 0;
 /**
  * perfect-scrollbar React helper
  * @type {*|Function}
  */
-export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
+export class PerfectScrollbar extends MegaRenderMixin {
     static isUserScroll = true;
     static scrollEventIncId = 0;
     static defaultProps = {

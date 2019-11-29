@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Avatar} from './../ui/contacts.jsx';
 import utils from './../../ui/utils.jsx';
 
@@ -15,7 +15,7 @@ var VIEW_MODES = {
     "CAROUSEL": 2,
 };
 
-class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
+class ConversationAudioVideoPanel extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
@@ -690,6 +690,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
 
                         }
                         <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
+                                           chatRoom={self.props.chatRoom}
                                            simpletipWrapper="#call-block"
                                            simpletipOffset={8}
                                            simpletipPosition="top"
@@ -763,6 +764,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                         }
                         <Avatar
                             contact={M.u[u_handle]}
+                            chatRoom={this.props.chatRoom}
                             className={
                                 "call avatar-wrapper is-avatar " +
                                 (this.state.localMediaDisplay ? "" : "hidden")
@@ -831,6 +833,7 @@ class ConversationAudioVideoPanel extends MegaRenderMixin(React.Component) {
                         }
                         <Avatar
                             contact={M.u[u_handle]} className="call avatar-wrapper"
+                            chatRoom={this.props.chatRoom}
                             hideVerifiedBadge={true}
                         />
                     </div>

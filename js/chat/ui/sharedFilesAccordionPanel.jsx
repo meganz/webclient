@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../../stores/mixins.js";
+import {MegaRenderMixin} from "../../stores/mixins.js";
 import utils from './../../ui/utils.jsx';
 
-class SharedFileItem extends MegaRenderMixin(React.Component) {
+class SharedFileItem extends MegaRenderMixin {
     render() {
         var self = this;
         var message = this.props.message;
@@ -41,7 +41,7 @@ class SharedFileItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class SharedFilesAccordionPanel extends MegaRenderMixin(React.Component) {
+class SharedFilesAccordionPanel extends MegaRenderMixin {
     @utils.SoonFcWrap(350)
     eventuallyRenderThumbnails() {
         if (this.allShownNodes) {

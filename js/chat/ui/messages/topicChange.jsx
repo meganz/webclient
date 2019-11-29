@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from './../../../stores/mixins.js';
+import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 var getMessageString = require('./utils.jsx').getMessageString;
@@ -35,7 +35,8 @@ class TopicChange extends ConversationMessageMixin {
 
 
         var avatar = <ContactsUI.Avatar contact={contact}
-                                        className="message avatar-wrapper small-rounded-avatar"/>;
+            chatRoom={chatRoom}
+            className="message avatar-wrapper small-rounded-avatar"/>;
 
         var topic = message.meta.topic;
 
@@ -60,7 +61,12 @@ class TopicChange extends ConversationMessageMixin {
                 {avatar}
 
                 <div className="message content-area small-info-txt">
-                    <ContactsUI.ContactButton contact={contact} className="message" label={displayName} />
+                    <ContactsUI.ContactButton
+                        contact={contact}
+                        className="message"
+                        label={displayName}
+                        chatRoom={chatRoom}
+                    />
                     {datetime}
 
                     <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>

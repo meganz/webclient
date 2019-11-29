@@ -81,6 +81,7 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact}
+                                            chatRoom={self.props.chatRoom}
                                             className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
@@ -97,7 +98,8 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
+                                                  chatRoom={self.props.chatRoom}/>
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
@@ -114,6 +116,7 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact}
+                                            chatRoom={self.props.chatRoom}
                                             className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
@@ -135,7 +138,8 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
+                                                  chatRoom={self.props.chatRoom} />
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>

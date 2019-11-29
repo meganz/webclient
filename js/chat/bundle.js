@@ -97,6 +97,8 @@ module.exports = React;
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MegaRenderMixin", function() { return MegaRenderMixin; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactAwareComponent", function() { return ContactAwareComponent; });
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
@@ -124,7 +126,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
- // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
+
+var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined'; // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
 // adapted to be a bit more optimal for functions...
 
 function shallowEqual(objA, objB) {
@@ -191,698 +194,819 @@ if (localStorageProfileRenderFns) {
 }
 
 var ID_CURRENT = 0;
-/* harmony default export */ __webpack_exports__["default"] = (function (superClass) {
-  return (
-    /*#__PURE__*/
-    function (_superClass) {
-      _inherits(MegaRenderMixin, _superClass);
+var MegaRenderMixin =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(MegaRenderMixin, _React$Component);
 
-      function MegaRenderMixin(props) {
-        var _this;
+  function MegaRenderMixin(props) {
+    var _this;
 
-        _classCallCheck(this, MegaRenderMixin);
+    _classCallCheck(this, MegaRenderMixin);
 
-        _this = _possibleConstructorReturn(this, _getPrototypeOf(MegaRenderMixin).call(this, props));
-        _this.__intersectionObserver = _this.__intersectionObserver.bind(_assertThisInitialized(_this));
-        return _this;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(MegaRenderMixin).call(this, props));
+    _this.__intersectionObserver = _this.__intersectionObserver.bind(_assertThisInitialized(_this));
+    return _this;
+  }
+
+  _createClass(MegaRenderMixin, [{
+    key: "isMounted",
+    value: function isMounted() {
+      return !!this.__isMounted;
+    }
+  }, {
+    key: "ensurePromiseLoaded",
+    value: function ensurePromiseLoaded(cb, args, ctx, failCb) {
+      var self = this;
+      self._loadingPromise = self._loadingPromise || 0;
+
+      var executePromisesCbs = function executePromisesCbs() {
+        if (!self._loadingPromise) {
+          var promises = [];
+
+          if (Array.isArray(cb) && !args && !ctx) {
+            var calls = cb;
+
+            for (var i = 0; i < cb.length; i++) {
+              var _cb = cb[i][0];
+              var _args = cb[i][1];
+              var _ctx = cb[i][2];
+
+              var promiseReq = _cb.apply(_ctx, _args);
+
+              if (failCb) {
+                promiseReq.fail(failCb);
+              }
+
+              promises.push(promiseReq);
+            }
+          } else {
+            var promiseReq2 = cb.apply(ctx, args);
+
+            if (failCb) {
+              promiseReq2.fail(failCb);
+            }
+
+            promises.push(promiseReq2);
+          }
+
+          self._loadingPromise = MegaPromise.allDone(promises);
+
+          self._loadingPromise.always(function () {
+            if (self.isMounted()) {
+              self.debouncedForceUpdate();
+            }
+          });
+        }
+      };
+
+      this._ensurePromiseLoadedTimeout = setTimeout(executePromisesCbs, 100);
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      if (_get(_getPrototypeOf(MegaRenderMixin.prototype), "componentWillUnmount", this)) {
+        _get(_getPrototypeOf(MegaRenderMixin.prototype), "componentWillUnmount", this).call(this);
       }
 
-      _createClass(MegaRenderMixin, [{
-        key: "isMounted",
-        value: function isMounted() {
-          return !!this.__isMounted;
-        }
-      }, {
-        key: "componentWillUnmount",
-        value: function componentWillUnmount() {
-          if (_get(_getPrototypeOf(MegaRenderMixin.prototype), "componentWillUnmount", this)) {
-            _get(_getPrototypeOf(MegaRenderMixin.prototype), "componentWillUnmount", this).call(this);
-          }
+      this.__isMounted = false;
+      $(window).off('resize.megaRenderMixing' + this.getUniqueId());
+      $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+      window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
 
-          this.__isMounted = false;
-          $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-          $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
-          window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+      if (typeof this.__intersectionVisibility !== 'undefined' && this.__intersectionObserverInstance && this.__intersectionObserverInstance.unobserve) {
+        var node = this.findDOMNode();
+        node && this.__intersectionObserverInstance.unobserve(node);
 
-          if (typeof this.__intersectionVisibility !== 'undefined' && this.__intersectionObserver && this.__intersectionObserver.unobserve) {
-            this.__intersectionObserver.disconnect();
+        this.__intersectionObserverInstance.disconnect();
 
-            delete this.__intersectionObserver;
-            this.__intersectionVisibility = undefined;
-          }
+        delete this.__intersectionObserver;
+        this.__intersectionVisibility = undefined;
+      }
 
-          if (this._dataStructListeners) {
-            this._internalDetachRenderCallbacks();
-          }
+      if (this._dataStructListeners) {
+        this._internalDetachRenderCallbacks();
+      }
 
-          if (this.detachRerenderCallbacks) {
-            this.detachRerenderCallbacks();
-          }
-        }
-      }, {
-        key: "getReactId",
-        value: function getReactId() {
-          // Since react dropped their _rootNodeId's, we would use some hacky locally generated id
-          if (!this._id) {
-            this._id = this._reactInternalFiber.type.name + new String(ID_CURRENT++);
-          }
+      if (this.detachRerenderCallbacks) {
+        this.detachRerenderCallbacks();
+      }
 
-          return this._id;
-        }
-      }, {
-        key: "getUniqueId",
-        value: function getUniqueId() {
-          if (!this._reactInternalFiber) {
-            assert(this._uniqueId, 'missing unique id.');
-            return this._uniqueId;
-          }
+      if (this._ensurePromiseLoadedTimeout) {
+        clearTimeout(this._ensurePromiseLoadedTimeout);
+        delete this._ensurePromiseLoadedTimeout;
+      }
+    }
+  }, {
+    key: "getReactId",
+    value: function getReactId() {
+      // Since react dropped their _rootNodeId's, we would use some hacky locally generated id
+      if (!this._id) {
+        this._id = this._reactInternalFiber.type.name + new String(ID_CURRENT++);
+      }
 
-          this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
-          return this._uniqueId;
-        }
-      }, {
-        key: "debouncedForceUpdate",
-        value: function debouncedForceUpdate(timeout) {
-          var self = this;
+      return this._id;
+    }
+  }, {
+    key: "getUniqueId",
+    value: function getUniqueId() {
+      if (!this._reactInternalFiber) {
+        assert(this._uniqueId, 'missing unique id.');
+        return this._uniqueId;
+      }
 
-          if (typeof self.skippedUpdates === 'undefined') {
-            self.skippedUpdates = 0;
-          }
+      this._uniqueId = this.getReactId().replace(/[^a-zA-Z0-9]/g, "");
+      return this._uniqueId;
+    }
+  }, {
+    key: "debouncedForceUpdate",
+    value: function debouncedForceUpdate(timeout) {
+      var self = this;
 
-          if (self.debounceTimer) {
-            clearTimeout(self.debounceTimer); // console.error(self.getUniqueId(), self.skippedUpdates + 1);
+      if (typeof self.skippedUpdates === 'undefined') {
+        self.skippedUpdates = 0;
+      }
 
-            self.skippedUpdates++;
-          }
+      if (self.debounceTimer) {
+        clearTimeout(self.debounceTimer); // console.error(self.getUniqueId(), self.skippedUpdates + 1);
 
-          var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
+        self.skippedUpdates++;
+      }
 
-          if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
-            TIMEOUT_VAL = 0;
-          }
+      var TIMEOUT_VAL = timeout || DEBOUNCED_UPDATE_TIMEOUT;
 
-          self.debounceTimer = setTimeout(function () {
-            self.eventuallyUpdate();
-            self.debounceTimer = null;
-            self.skippedUpdates = 0;
-          }, TIMEOUT_VAL);
-        }
-      }, {
-        key: "__intersectionObserver",
-        value: function __intersectionObserver(entries) {
-          if (entries[0].intersectionRatio <= 0) {
-            this.__intersectionVisibility = false;
-          } else {
-            this.__intersectionVisibility = true;
-          }
-        }
-      }, {
-        key: "componentDidMount",
-        value: function componentDidMount() {
-          if (_get(_getPrototypeOf(MegaRenderMixin.prototype), "componentDidMount", this)) {
-            _get(_getPrototypeOf(MegaRenderMixin.prototype), "componentDidMount", this).call(this);
-          }
+      if (self.skippedUpdates > MAX_ALLOWED_DEBOUNCED_UPDATES) {
+        TIMEOUT_VAL = 0;
+      }
 
-          this.__isMounted = true;
+      self.debounceTimer = setTimeout(function () {
+        self.eventuallyUpdate();
+        self.debounceTimer = null;
+        self.skippedUpdates = 0;
+      }, TIMEOUT_VAL);
+    }
+  }, {
+    key: "__intersectionObserver",
+    value: function __intersectionObserver(entries) {
+      if (entries[0].intersectionRatio <= 0 && !entries[0].isIntersecting) {
+        this.__intersectionVisibility = false;
+      } else {
+        this.__intersectionVisibility = true;
 
-          if (this.props.requiresUpdateOnResize) {
-            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
-          }
-
-          if (!this.props.skipQueuedUpdatesOnResize) {
-            $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
-          }
-
-          window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this)); // init on data structure change events
-
-          if (this.props) {
-            this._recurseAddListenersIfNeeded("p", this.props);
-          }
-
-          if (this.state) {
-            this._recurseAddListenersIfNeeded("s", this.state);
-          } //$(window).rebind(
-          //    'DOMContentLoaded.lazyRenderer' + this.getUniqueId() + ' ' +
-          //    'load.lazyRenderer' + this.getUniqueId() + ' ' +
-          //    'resize.lazyRenderer' + this.getUniqueId() + ' ' +
-          //    'hashchange.lazyRenderer' + this.getUniqueId() + ' ' +
-          //    'scroll.lazyRenderer' + this.getUniqueId(),
-          //    this.requiresLazyRendering
-          //);
-          //
-          //this.requiresLazyRendering();
-
-
-          if (typeof IntersectionObserver !== 'undefined') {
-            var node = this.findDOMNode();
-
-            if (node) {
-              this.__intersectionVisibility = false;
-              this.__intersectionObserver = new IntersectionObserver(this.__intersectionObserver);
-
-              this.__intersectionObserver.observe(node);
-            }
-          }
-
-          if (this.attachRerenderCallbacks) {
-            this.attachRerenderCallbacks();
-          }
-        }
-      }, {
-        key: "findDOMNode",
-        value: function findDOMNode() {
-          if (this.domNode) {
-            // injected by RenderTo and ModalDialogs
-            return this.domNode;
-          }
-
-          return react_dom__WEBPACK_IMPORTED_MODULE_0___default.a.findDOMNode(this);
-        }
-      }, {
-        key: "isComponentVisible",
-        value: function isComponentVisible() {
-          var domNode = $(this.findDOMNode()); // .__isMounted is faster then .isMounted() or any other operation
-
-          if (!this.__isMounted) {
-            return false;
-          }
-
-          if (this.__intersectionVisibility === false) {
-            return false;
-          } else {
-            return true;
-          } // offsetParent should NOT trigger a reflow/repaint
-
-
-          if (!this.props.hideable && (!domNode || domNode[0].offsetParent === null)) {
-            return false;
-          }
-
-          if (!domNode.is(":visible")) {
-            return false;
-          }
-
-          if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
-            return false;
-          }
-
-          return true;
-        }
-        /**
-         * Lightweight version of .isComponentVisible
-         * @returns {bool}
-         */
-
-      }, {
-        key: "isComponentEventuallyVisible",
-        value: function isComponentEventuallyVisible() {
-          var domNode = this.findDOMNode();
-
-          if (this.componentSpecificIsComponentEventuallyVisible) {
-            return this.componentSpecificIsComponentEventuallyVisible();
-          } // .__isMounted is faster then .isMounted() or any other operation
-
-
-          if (!this.__isMounted) {
-            return false;
-          }
-
-          if (this.props.isVisible) {
-            return true;
-          }
-
-          if (this.__intersectionVisibility === false) {
-            return false;
-          } else {
-            return true;
-          } // offsetParent should NOT trigger a reflow/repaint
-
-
-          if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
-            return false;
-          }
-
-          return true;
-        }
-      }, {
-        key: "eventuallyUpdate",
-        value: function eventuallyUpdate() {
-          var self = this;
-
-          if (self._updatesDisabled === true) {
-            return;
-          }
-
-          if (!self._wasRendered || self._wasRendered && !self.isMounted()) {
-            return;
-          }
-
-          if (!self.__isMounted) {
-            return;
-          }
-
-          if (!self.isComponentEventuallyVisible()) {
-            this._requiresUpdateOnResize = true;
-            return;
-          }
-
-          self.safeForceUpdate();
-        }
-      }, {
-        key: "tempDisableUpdates",
-        value: function tempDisableUpdates(forHowLong) {
-          var self = this;
-          self._updatesDisabled = true;
-
-          if (self._updatesReenableTimer) {
-            clearTimeout(self._updatesReenableTimer);
-          }
-
-          var timeout = forHowLong ? forHowLong : self.REENABLE_UPDATES_AFTER_TIMEOUT ? self.REENABLE_UPDATES_AFTER_TIMEOUT : REENABLE_UPDATES_AFTER_TIMEOUT;
-          self._updatesReenableTimer = setTimeout(function () {
-            self.tempEnableUpdates();
-          }, timeout);
-        }
-      }, {
-        key: "tempEnableUpdates",
-        value: function tempEnableUpdates() {
-          clearTimeout(this._updatesReenableTimer);
-          this._updatesDisabled = false;
+        if (this._requiresUpdateOnResize) {
           this.eventuallyUpdate();
         }
-      }, {
-        key: "queuedUpdateOnResize",
-        value: function queuedUpdateOnResize() {
-          if (this._requiresUpdateOnResize && this.isMounted() && this.isComponentEventuallyVisible()) {
-            this._requiresUpdateOnResize = false;
-            this.eventuallyUpdate();
-          }
-        }
-      }, {
-        key: "onResizeDoUpdate",
-        value: function onResizeDoUpdate() {
-          if (!this.isMounted() || this._pendingForceUpdate === true) {
-            return;
-          }
+      }
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      if (_get(_getPrototypeOf(MegaRenderMixin.prototype), "componentDidMount", this)) {
+        _get(_getPrototypeOf(MegaRenderMixin.prototype), "componentDidMount", this).call(this);
+      }
 
-          this.eventuallyUpdate();
-        } // onHashChangeDoUpdate() {
-        //     if (!this.isMounted() || this._pendingForceUpdate === true) {
-        //         return;
-        //     }
-        //
-        //     this.eventuallyUpdate();
-        // }
+      this.__isMounted = true;
+      this._wasRendered = true;
 
-      }, {
-        key: "_recurseAddListenersIfNeeded",
-        value: function _recurseAddListenersIfNeeded(idx, map, depth) {
+      if (this.props.requiresUpdateOnResize) {
+        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+      }
+
+      if (!this.props.skipQueuedUpdatesOnResize) {
+        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+      }
+
+      window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this)); // init on data structure change events
+
+      if (this.props) {
+        this._recurseAddListenersIfNeeded("p", this.props);
+      }
+
+      if (this.state) {
+        this._recurseAddListenersIfNeeded("s", this.state);
+      } //$(window).rebind(
+      //    'DOMContentLoaded.lazyRenderer' + this.getUniqueId() + ' ' +
+      //    'load.lazyRenderer' + this.getUniqueId() + ' ' +
+      //    'resize.lazyRenderer' + this.getUniqueId() + ' ' +
+      //    'hashchange.lazyRenderer' + this.getUniqueId() + ' ' +
+      //    'scroll.lazyRenderer' + this.getUniqueId(),
+      //    this.requiresLazyRendering
+      //);
+      //
+      //this.requiresLazyRendering();
+
+
+      if (INTERSECTION_OBSERVER_AVAILABLE && !this.componentSpecificIsComponentEventuallyVisible) {
+        var node = this.findDOMNode();
+
+        if (node) {
+          this.__intersectionVisibility = false;
+          var opts = {
+            threshold: 0.1
+          };
           var self = this;
-          depth = depth ? depth : 0;
+          setTimeout(function () {
+            // bug in IntersectionObserver
+            self.__intersectionObserverInstance = new IntersectionObserver(self.__intersectionObserver, opts);
 
-          if (typeof map._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
-
-            if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
-              _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
-                self.throttledOnPropOrStateUpdated(map, idx);
-              });
-            }
-          }
-
-          if (depth + 1 > MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            return;
-          }
-
-          if (!self.props.manualDataChangeTracking) {
-            var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
-
-            for (var i = 0; i < mapKeys.length; i++) {
-              var k = mapKeys[i];
-
-              if (map[k]) {
-                self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
-              }
-            }
-          }
+            self.__intersectionObserverInstance.observe(node);
+          }, 150);
         }
-      }, {
-        key: "_checkDataStructForChanges",
-        value: function _checkDataStructForChanges(idx, valA, valB, depth) {
-          var self = this;
-          var foundChanges = false;
-          var v = valA;
-          var rv = valB; // alias
+      }
 
-          var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
+      if (this.attachRerenderCallbacks) {
+        this.attachRerenderCallbacks();
+      }
+    }
+  }, {
+    key: "findDOMNode",
+    value: function findDOMNode() {
+      if (this.domNode) {
+        // injected by RenderTo and ModalDialogs
+        return this.domNode;
+      }
 
-          if (!v && v === rv) {
-            // null, undefined, false is ok
-            // console.error('r === rv, !v', k, referenceMap, map);
-            return false; // continue/skip
-          }
+      return react_dom__WEBPACK_IMPORTED_MODULE_0___default.a.findDOMNode(this);
+    }
+  }, {
+    key: "isComponentVisible",
+    value: function isComponentVisible() {
+      var domNode = $(this.findDOMNode()); // .__isMounted is faster then .isMounted() or any other operation
 
-          if (!rv && v) {
-            // null, undefined, false is ok
-            return true;
-          }
+      if (!this.__isMounted) {
+        return false;
+      }
 
-          if (v === null && rv !== null) {
-            return true;
-          } else if (v === null && rv === null) {
-            return false;
-          }
+      if (this.componentSpecificIsComponentEventuallyVisible) {
+        return this.componentSpecificIsComponentEventuallyVisible();
+      }
 
-          if (typeof v._dataChangeIndex !== "undefined") {
-            var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
-
-            if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
-              if (window.RENDER_DEBUG) {
-                console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
-              }
-
-              foundChanges = true;
-              dataChangeHistory[cacheKey] = v._dataChangeIndex;
-            } else {// console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
-            }
-          } else if (!(v instanceof Uint8Array) && _typeof(v) === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
-              foundChanges = true;
-            } else {// console.error("NOT (recursive) changed: ", k, v);
-            }
-          } else if (!(v instanceof Uint8Array) && v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
-            v.forEach(function (v, k) {
-              if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
-                foundChanges = true;
-                return false; // break
-              }
-            });
-          } else {// console.error("NOT tracked/changed: ", k, v);
-          }
-
-          return foundChanges;
-        }
-      }, {
-        key: "_recursiveSearchForDataChanges",
-        value: function _recursiveSearchForDataChanges(idx, map, referenceMap, depth) {
-          var self = this;
-          depth = depth || 0;
-
-          if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
-            return;
-          }
-
-          if (!this._wasRendered) {
-            if (window.RENDER_DEBUG) console.error("First time render", self.getElementName(), map, referenceMap);
-            this._wasRendered = true;
-            return true; // first time render, always render the first time
-          } // quick lookup for children
+      if (this.__intersectionVisibility === false) {
+        return false;
+      } else if (this.__intersectionVisibility === true) {
+        return true;
+      } // offsetParent should NOT trigger a reflow/repaint
 
 
-          if (idx === "p_children") {
-            // found a list of children nodes
-            if (map.map && referenceMap.map) {
-              var oldKeys = map.map(function (child) {
-                return child ? child.key : child;
-              });
-              var newKeys = referenceMap.map(function (child) {
-                return child ? child.key : child;
-              });
+      if (!this.props.hideable && (!domNode || domNode[0].offsetParent === null)) {
+        return false;
+      }
 
-              if (!shallowEqual(oldKeys, newKeys)) {
-                return true;
-              }
-            } else if (!map && referenceMap || map && !referenceMap) {
-              return true;
-            } else if (map.$$typeof && referenceMap.$$typeof) {
-              if (!shallowEqual(map.props, referenceMap.props) || !shallowEqual(map.state, referenceMap.state)) {
-                return true;
-              }
-            } // found a single node
+      if (!domNode.is(":visible")) {
+        return false;
+      }
 
-          } else if (map && !referenceMap || !map && referenceMap || map && referenceMap && !shallowEqual(map, referenceMap)) {
-            return true;
-          }
+      if (!verge.inX(domNode[0]) && !verge.inY(domNode[0])) {
+        return false;
+      }
 
-          var mapKeys = map._dataChangeIndex ? map.keys() : Object.keys(map);
-          var foundChanges = false;
-          mapKeys.forEach(function (k) {
-            if (foundChanges === true) {
-              return false; // break
-            }
+      return true;
+    }
+    /**
+     * Lightweight version of .isComponentVisible
+     * @returns {bool}
+     */
 
-            foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
+  }, {
+    key: "isComponentEventuallyVisible",
+    value: function isComponentEventuallyVisible() {
+      var domNode = this.findDOMNode(); // .__isMounted is faster then .isMounted() or any other operation
+
+      if (!this.__isMounted) {
+        return false;
+      }
+
+      if (this.componentSpecificIsComponentEventuallyVisible) {
+        return this.componentSpecificIsComponentEventuallyVisible();
+      }
+
+      if (this.props.isVisible) {
+        return true;
+      }
+
+      if (this.__intersectionVisibility === false) {
+        return false;
+      } else {
+        return true;
+      } // offsetParent should NOT trigger a reflow/repaint
+
+
+      if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
+        return false;
+      }
+
+      return true;
+    }
+  }, {
+    key: "eventuallyUpdate",
+    value: function eventuallyUpdate(debounced) {
+      var self = this;
+
+      if (self._updatesDisabled === true) {
+        return;
+      }
+
+      if (!self._wasRendered || self._wasRendered && !self.isMounted()) {
+        return;
+      }
+
+      if (!self.__isMounted) {
+        return;
+      }
+
+      if (!self.isComponentEventuallyVisible()) {
+        this._requiresUpdateOnResize = true;
+        return;
+      }
+
+      self.safeForceUpdate();
+    }
+  }, {
+    key: "tempDisableUpdates",
+    value: function tempDisableUpdates(forHowLong) {
+      var self = this;
+      self._updatesDisabled = true;
+
+      if (self._updatesReenableTimer) {
+        clearTimeout(self._updatesReenableTimer);
+      }
+
+      var timeout = forHowLong ? forHowLong : self.REENABLE_UPDATES_AFTER_TIMEOUT ? self.REENABLE_UPDATES_AFTER_TIMEOUT : REENABLE_UPDATES_AFTER_TIMEOUT;
+      self._updatesReenableTimer = setTimeout(function () {
+        self.tempEnableUpdates();
+      }, timeout);
+    }
+  }, {
+    key: "tempEnableUpdates",
+    value: function tempEnableUpdates() {
+      clearTimeout(this._updatesReenableTimer);
+      this._updatesDisabled = false;
+      this.eventuallyUpdate();
+    }
+  }, {
+    key: "queuedUpdateOnResize",
+    value: function queuedUpdateOnResize() {
+      if (this._requiresUpdateOnResize && this.isMounted() && this.isComponentEventuallyVisible()) {
+        this._requiresUpdateOnResize = false;
+        this.eventuallyUpdate();
+      }
+    }
+  }, {
+    key: "onResizeDoUpdate",
+    value: function onResizeDoUpdate() {
+      if (!this.isMounted() || this._pendingForceUpdate === true) {
+        return;
+      }
+
+      this.eventuallyUpdate();
+    } // onHashChangeDoUpdate() {
+    //     if (!this.isMounted() || this._pendingForceUpdate === true) {
+    //         return;
+    //     }
+    //
+    //     this.eventuallyUpdate();
+    // }
+
+  }, {
+    key: "_recurseAddListenersIfNeeded",
+    value: function _recurseAddListenersIfNeeded(idx, map, depth) {
+      var self = this;
+      depth = depth ? depth : 0;
+
+      if (typeof map._dataChangeIndex !== "undefined") {
+        var cacheKey = this.getReactId() + "_" + map._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+
+        if (map.addChangeListener && !_propertyTrackChangesVars._listenersMap[cacheKey]) {
+          _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
+            self.throttledOnPropOrStateUpdated(map, idx);
           });
-          return foundChanges;
         }
-      }, {
-        key: "shouldComponentUpdate",
-        value: function shouldComponentUpdate(nextProps, nextState) {
-          var shouldRerender = false;
+      }
 
-          if (megaChat && megaChat.isLoggingOut) {
-            return false;
+      if (depth + 1 > MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        return;
+      }
+
+      if (!self.props.manualDataChangeTracking) {
+        var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+
+        for (var i = 0; i < mapKeys.length; i++) {
+          var k = mapKeys[i];
+
+          if (map[k]) {
+            self._recurseAddListenersIfNeeded(idx + "_" + k, map[k], depth + 1);
+          }
+        }
+      }
+    }
+  }, {
+    key: "_checkDataStructForChanges",
+    value: function _checkDataStructForChanges(idx, valA, valB, depth) {
+      var self = this;
+      var foundChanges = false;
+      var v = valA;
+      var rv = valB; // alias
+
+      var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
+
+      if (!v && v === rv) {
+        // null, undefined, false is ok
+        // console.error('r === rv, !v', k, referenceMap, map);
+        return false; // continue/skip
+      }
+
+      if (!rv && v) {
+        // null, undefined, false is ok
+        return true;
+      }
+
+      if (v === null && rv !== null) {
+        return true;
+      } else if (v === null && rv === null) {
+        return false;
+      }
+
+      if (typeof v._dataChangeIndex !== "undefined") {
+        var cacheKey = this.getReactId() + "_" + v._dataChangeTrackedId + "_" + "_" + this.getElementName() + "_" + idx;
+
+        if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
+          if (window.RENDER_DEBUG) {
+            console.error("changed: ", self.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
           }
 
-          if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
-            if (window.RENDER_DEBUG) {
-              console.error("shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState);
-            }
-
-            return false;
+          foundChanges = true;
+          dataChangeHistory[cacheKey] = v._dataChangeIndex;
+        } else {// console.error("NOT changed: ", k, v._dataChangeTrackedId, v._dataChangeIndex, v);
+        }
+      } else if (!(v instanceof Uint8Array) && _typeof(v) === "object" && v !== null && depth <= MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        if (self._recursiveSearchForDataChanges(idx, v, rv, depth + 1) === true) {
+          foundChanges = true;
+        } else {// console.error("NOT (recursive) changed: ", k, v);
+        }
+      } else if (!(v instanceof Uint8Array) && v && v.forEach && depth < MAX_TRACK_CHANGES_RECURSIVE_DEPTH) {
+        v.forEach(function (v, k) {
+          if (self._recursiveSearchForDataChanges(idx, v[k], rv[k], depth + 1) === true) {
+            foundChanges = true;
+            return false; // break
           }
+        });
+      } else {// console.error("NOT tracked/changed: ", k, v);
+      }
 
-          if (this.componentSpecificIsComponentEventuallyVisible) {
-            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
-            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
-              this._queueUpdateWhenVisible = true;
+      return foundChanges;
+    }
+  }, {
+    key: "_recursiveSearchForDataChanges",
+    value: function _recursiveSearchForDataChanges(idx, map, referenceMap, depth) {
+      var self = this;
+      depth = depth || 0;
 
-              if (window.RENDER_DEBUG) {
-                console.error("shouldUpdate? No.", "F1.1", this.getElementName(), this.props, nextProps, this.state, nextState);
-              }
-            } else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
-              delete this._queueUpdateWhenVisible;
-              return true;
-            }
-          } // component specific control of the React lifecycle
+      if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+        return;
+      }
+
+      if (!this._wasRendered) {
+        if (window.RENDER_DEBUG) console.error("First time render", self.getElementName(), map, referenceMap);
+        this._wasRendered = true;
+        return true; // first time render, always render the first time
+      } // quick lookup for children
 
 
-          if (this.specificShouldComponentUpdate) {
-            var r = this.specificShouldComponentUpdate(nextProps, nextState);
+      if (idx === "p_children") {
+        // found a list of children nodes
+        if (map.map && referenceMap.map) {
+          var oldKeys = map.map(function (child) {
+            return child ? child.key : child;
+          });
+          var newKeys = referenceMap.map(function (child) {
+            return child ? child.key : child;
+          });
 
-            if (r === false) {
-              if (window.RENDER_DEBUG) {
-                console.error("shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState);
-              }
-
-              this._requiresUpdateOnResize = true;
-              return false;
-            } else if (r === true) {
-              return true;
-            }
+          if (!shallowEqual(oldKeys, newKeys)) {
+            return true;
           }
-
-          if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
-            if (window.RENDER_DEBUG) {
-              console.error("shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState);
-            }
-
-            this._requiresUpdateOnResize = true;
-            return false;
+        } else if (!map && referenceMap || map && !referenceMap) {
+          return true;
+        } else if (map.$$typeof && referenceMap.$$typeof) {
+          if (!shallowEqual(map.props, referenceMap.props) || !shallowEqual(map.state, referenceMap.state)) {
+            return true;
           }
+        } // found a single node
 
-          if (this.props !== null) {
-            shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
-          }
+      } else if (map && !referenceMap || !map && referenceMap || map && referenceMap && !shallowEqual(map, referenceMap)) {
+        return true;
+      }
 
-          if (shouldRerender === false) {
-            if (window.RENDER_DEBUG) {
-              console.error("shouldUpdate? No.", "F3", this.getElementName(), this.props, nextProps, this.state, nextState);
-            }
-          }
+      var mapKeys = map._dataChangeIndex ? map.keys() : Object.keys(map);
+      var foundChanges = false;
+      mapKeys.forEach(function (k) {
+        if (foundChanges === true) {
+          return false; // break
+        }
 
-          if (shouldRerender === false && this.state !== null) {
-            shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
-          }
+        foundChanges = self._checkDataStructForChanges(idx + "_" + k, map[k], referenceMap[k], depth);
+      });
+      return foundChanges;
+    }
+  }, {
+    key: "shouldComponentUpdate",
+    value: function shouldComponentUpdate(nextProps, nextState) {
+      var shouldRerender = false;
+
+      if (megaChat && megaChat.isLoggingOut) {
+        return false;
+      }
+
+      if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+        if (window.RENDER_DEBUG) {
+          console.error("shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState);
+        }
+
+        return false;
+      }
+
+      if (this.componentSpecificIsComponentEventuallyVisible) {
+        // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
+        if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+          this._queueUpdateWhenVisible = true;
 
           if (window.RENDER_DEBUG) {
-            if (shouldRerender) {// debugger;
-            }
-
-            console.error("shouldRerender?", shouldRerender, "rendered: ", this.getElementName(), "props:", this.props, "nextProps:", this.props, "state:", this.state);
+            console.error("shouldUpdate? No.", "F1.1", this.getElementName(), this.props, nextProps, this.state, nextState);
           }
-
-          if (shouldRerender === true) {
-            // (eventually) add listeners to newly added data structures
-            if (this.props) {
-              this._recurseAddListenersIfNeeded("p", this.props);
-            }
-
-            if (this.state) {
-              this._recurseAddListenersIfNeeded("s", this.state);
-            }
-          } else {
-            if (window.RENDER_DEBUG) {
-              console.error("shouldUpdate? No.", "F4", this.getElementName(), this.props, nextProps, this.state, nextState);
-            }
-          }
-
-          return shouldRerender;
+        } else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+          delete this._queueUpdateWhenVisible;
+          return true;
         }
-      }, {
-        key: "onPropOrStateUpdated",
-        value: function onPropOrStateUpdated() {
-          if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
+      } // component specific control of the React lifecycle
 
-          if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
-            return;
+
+      if (this.specificShouldComponentUpdate) {
+        var r = this.specificShouldComponentUpdate(nextProps, nextState);
+
+        if (r === false) {
+          if (window.RENDER_DEBUG) {
+            console.error("shouldUpdate? No.", "F2", this.getElementName(), this.props, nextProps, this.state, nextState);
           }
 
-          if (megaChat && megaChat.isLoggingOut) {
-            return false;
-          }
+          this._requiresUpdateOnResize = true;
+          return false;
+        } else if (r === true) {
+          return true;
+        }
+      }
 
+      if (!this.props.disableCheckingVisibility && !this.isComponentEventuallyVisible()) {
+        if (window.RENDER_DEBUG) {
+          console.error("shouldUpdate? No.", "FVis", this.getElementName(), this.props, nextProps, this.state, nextState);
+        }
+
+        this._requiresUpdateOnResize = true;
+        return false;
+      }
+
+      if (this.props !== null) {
+        shouldRerender = this._recursiveSearchForDataChanges("p", nextProps, this.props);
+      }
+
+      if (shouldRerender === false) {
+        if (window.RENDER_DEBUG) {
+          console.error("shouldUpdate? No.", "F3", this.getElementName(), this.props, nextProps, this.state, nextState);
+        }
+      }
+
+      if (shouldRerender === false && this.state !== null) {
+        shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
+      }
+
+      if (window.RENDER_DEBUG) {
+        if (shouldRerender) {// debugger;
+        }
+
+        console.error("shouldRerender?", shouldRerender, "rendered: ", this.getElementName(), "props:", this.props, "nextProps:", this.props, "state:", this.state);
+      }
+
+      if (shouldRerender === true) {
+        // (eventually) add listeners to newly added data structures
+        if (this.props) {
+          this._recurseAddListenersIfNeeded("p", this.props);
+        }
+
+        if (this.state) {
+          this._recurseAddListenersIfNeeded("s", this.state);
+        }
+      } else {
+        if (window.RENDER_DEBUG) {
+          console.error("shouldUpdate? No.", "F4", this.getElementName(), this.props, nextProps, this.state, nextState);
+        }
+      }
+
+      return shouldRerender;
+    }
+  }, {
+    key: "onPropOrStateUpdated",
+    value: function onPropOrStateUpdated() {
+      if (window.RENDER_DEBUG) console.error("onPropOrStateUpdated", this, this.getElementName(), arguments);
+
+      if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+        return;
+      }
+
+      if (megaChat && megaChat.isLoggingOut) {
+        return false;
+      }
+
+      this.forceUpdate();
+    }
+  }, {
+    key: "getElementName",
+    value: function getElementName() {
+      return this._reactInternalFiber.elementType.name;
+    }
+  }, {
+    key: "safeForceUpdate",
+    value: function safeForceUpdate() {
+      try {
+        if (this.__isMounted) {
           this.forceUpdate();
         }
-      }, {
-        key: "getElementName",
-        value: function getElementName() {
-          return this._reactInternalFiber.elementType.name;
-        }
-      }, {
-        key: "safeForceUpdate",
-        value: function safeForceUpdate() {
-          try {
-            if (this.__isMounted) {
-              this.forceUpdate();
-            }
-          } catch (e) {
-            console.error("safeForceUpdate: ", e);
-          }
-        }
-        /* RenderDebug mixin */
+      } catch (e) {
+        console.error("safeForceUpdate: ", e);
+      }
+    }
+    /* RenderDebug mixin */
 
-      }, {
-        key: "componentDidUpdate",
-        value: function componentDidUpdate() {
-          if (window.RENDER_DEBUG) {
-            var self = this;
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      if (window.RENDER_DEBUG) {
+        var self = this;
 
-            var getElementName = function getElementName() {
-              if (!self.constructor) {
-                return "unknown";
-              }
-
-              return self.constructor.name;
-            };
-
-            console.error("renderedX: ", getElementName(), "props:", this.props, "state:", this.state);
-          }
-        }
-      }, {
-        key: "componentWillReceiveProps",
-        value: function componentWillReceiveProps(nextProps, nextContext) {
-          if (localStorageProfileRenderFns) {
-            // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for
-            // performance logging
-            var self = this;
-            var componentName = self.constructor ? self.constructor.name : "unknown";
-
-            if (!this._wrappedRender) {
-              FUNCTIONS.forEach(function (fnName) {
-                var _origFn = self[fnName];
-
-                if (_origFn) {
-                  self[fnName] = function () {
-                    var start = performance.now();
-
-                    var res = _origFn.apply(this, arguments);
-
-                    REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[componentName + "." + fnName] || 0;
-                    REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
-                    return res;
-                  };
-                }
-              });
-              self._wrappedRender = true;
-            }
-
-            REACT_RENDER_CALLS.sorted = function () {
-              var sorted = [];
-              Object.keys(REACT_RENDER_CALLS).sort(function (a, b) {
-                if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
-                  return 1;
-                } else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
-                  return -1;
-                } else {
-                  return 0;
-                }
-              }).forEach(function (k) {
-                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
-                  sorted.push([k, REACT_RENDER_CALLS[k]]);
-                }
-              });
-              return sorted;
-            };
-
-            REACT_RENDER_CALLS.clear = function () {
-              Object.keys(REACT_RENDER_CALLS).forEach(function (k) {
-                if (typeof REACT_RENDER_CALLS[k] !== 'function') {
-                  delete REACT_RENDER_CALLS[k];
-                }
-              });
-            };
-          }
-        }
-      }, {
-        key: "throttledOnPropOrStateUpdated",
-        value: function throttledOnPropOrStateUpdated() {
-          if (this.throttledOnPropOrStateUpdatedHandler) {
-            _cancelOnIdleOrTimeout(this.throttledOnPropOrStateUpdatedHandler);
+        var getElementName = function getElementName() {
+          if (!self.constructor) {
+            return "unknown";
           }
 
-          _onIdleOrTimeout(this.onPropOrStateUpdated.bind(this), 300);
-        }
-      }, {
-        key: "_internalDetachRenderCallbacks",
-        value: function _internalDetachRenderCallbacks() {
-          if (!this._dataStructListeners) {
-            return;
-          }
+          return self.constructor.name;
+        };
 
-          this._dataStructListeners.forEach(function (row) {
-            if (row[0] === 'dsprops') {
-              row[2].removeChangeListener(row[1]);
+        console.error("renderedX: ", getElementName(), "props:", this.props, "state:", this.state);
+      }
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(nextProps, nextContext) {
+      if (localStorageProfileRenderFns) {
+        // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for
+        // performance logging
+        var self = this;
+        var componentName = self.constructor ? self.constructor.name : "unknown";
+
+        if (!this._wrappedRender) {
+          FUNCTIONS.forEach(function (fnName) {
+            var _origFn = self[fnName];
+
+            if (_origFn) {
+              self[fnName] = function () {
+                var start = performance.now();
+
+                var res = _origFn.apply(this, arguments);
+
+                REACT_RENDER_CALLS[componentName + "." + fnName] = REACT_RENDER_CALLS[componentName + "." + fnName] || 0;
+                REACT_RENDER_CALLS[componentName + "." + fnName] += performance.now() - start;
+                return res;
+              };
             }
           });
+          self._wrappedRender = true;
         }
-      }, {
-        key: "addDataStructListenerForProperties",
-        value: function addDataStructListenerForProperties(obj, properties) {
-          if (!obj) {
-            // this should not happen, but in rare cases it does...so we should just skip.
-            return;
-          }
 
-          if (!this._dataStructListeners) {
-            this._dataStructListeners = [];
-          }
-
-          var self = this;
-          var id = obj.addChangeListener(function (obj, data, k) {
-            if (properties.indexOf(k) > -1) {
-              self.throttledOnPropOrStateUpdated();
+        REACT_RENDER_CALLS.sorted = function () {
+          var sorted = [];
+          Object.keys(REACT_RENDER_CALLS).sort(function (a, b) {
+            if (REACT_RENDER_CALLS[a] < REACT_RENDER_CALLS[b]) {
+              return 1;
+            } else if (REACT_RENDER_CALLS[a] > REACT_RENDER_CALLS[b]) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }).forEach(function (k) {
+            if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+              sorted.push([k, REACT_RENDER_CALLS[k]]);
             }
           });
+          return sorted;
+        };
 
-          this._dataStructListeners.push(['dsprops', id, obj]);
+        REACT_RENDER_CALLS.clear = function () {
+          Object.keys(REACT_RENDER_CALLS).forEach(function (k) {
+            if (typeof REACT_RENDER_CALLS[k] !== 'function') {
+              delete REACT_RENDER_CALLS[k];
+            }
+          });
+        };
+      }
+    }
+  }, {
+    key: "throttledOnPropOrStateUpdated",
+    value: function throttledOnPropOrStateUpdated() {
+      if (this.throttledOnPropOrStateUpdatedHandler) {
+        _cancelOnIdleOrTimeout(this.throttledOnPropOrStateUpdatedHandler);
+      }
+
+      _onIdleOrTimeout(this.onPropOrStateUpdated.bind(this), 300);
+    }
+  }, {
+    key: "_internalDetachRenderCallbacks",
+    value: function _internalDetachRenderCallbacks() {
+      if (!this._dataStructListeners) {
+        return;
+      }
+
+      this._dataStructListeners.forEach(function (row) {
+        if (row[0] === 'dsprops') {
+          row[2].removeChangeListener(row[1]);
         }
-      }]);
+      });
+    }
+  }, {
+    key: "addDataStructListenerForProperties",
+    value: function addDataStructListenerForProperties(obj, properties) {
+      if (!obj) {
+        // this should not happen, but in rare cases it does...so we should just skip.
+        return;
+      }
 
-      return MegaRenderMixin;
-    }(superClass)
-  );
-});
+      if (!this._dataStructListeners) {
+        this._dataStructListeners = [];
+      }
+
+      var self = this;
+      var id = obj.addChangeListener(function (obj, data, k) {
+        if (properties.indexOf(k) > -1) {
+          self.throttledOnPropOrStateUpdated();
+        }
+      });
+
+      this._dataStructListeners.push(['dsprops', id, obj]);
+    }
+  }]);
+
+  return MegaRenderMixin;
+}(react__WEBPACK_IMPORTED_MODULE_1___default.a.Component);
+;
+var _noAvatars = {};
+var ContactAwareComponent =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
+  _inherits(ContactAwareComponent, _MegaRenderMixin);
+
+  function ContactAwareComponent(props) {
+    var _this2;
+
+    _classCallCheck(this, ContactAwareComponent);
+
+    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ContactAwareComponent).call(this, props));
+    var contact = _this2.props.contact;
+    var promises = [];
+    var chatHandle = pchandle || (_this2.props.chatRoom ? _this2.props.chatRoom.publicChatHandle : undefined);
+
+    if (contact && contact.h) {
+      if (!contact.firstName && !contact.lastName) {
+        promises.push([M.syncUsersFullname, [_this2.props.contact.h, chatHandle], M]);
+      }
+
+      if (!contact.m && !anonymouschat) {
+        promises.push([M.syncContactEmail, [_this2.props.contact.h], M]);
+      }
+
+      if (!avatars[contact.u] && !_noAvatars[contact.u]) {
+        promises.push([useravatar.loadAvatar, [contact.u, chatHandle], useravatar, function (e) {
+          _noAvatars[contact.u] = true;
+        }]);
+      } // force stuck in "Loading" state
+      // promises.push([function() { return new MegaPromise(); }]);
+
+
+      if (promises.length > 0) {
+        _this2.ensurePromiseLoaded(promises);
+      }
+    }
+
+    return _this2;
+  }
+
+  _createClass(ContactAwareComponent, [{
+    key: "isLoadingContactInfo",
+    value: function isLoadingContactInfo() {
+      // this._loadingPromise can be 0 in case its throttled in that moment.
+      return this._loadingPromise && this._loadingPromise.state() === 'pending' || this._loadingPromise === 0;
+    }
+  }]);
+
+  return ContactAwareComponent;
+}(MegaRenderMixin);
+;
 
 /***/ }),
 /* 2 */
@@ -901,11 +1025,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactPickerWidget", function() { return ContactPickerWidget; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(3);
-/* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(11);
-/* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(7);
-/* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(5);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
+/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
+/* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(11);
+/* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
+/* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(5);
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
@@ -936,10 +1062,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
+
 var ContactsListItem =
 /*#__PURE__*/
-function (_MegaRenderMixin) {
-  _inherits(ContactsListItem, _MegaRenderMixin);
+function (_ContactAwareComponen) {
+  _inherits(ContactsListItem, _ContactAwareComponen);
 
   function ContactsListItem() {
     _classCallCheck(this, ContactsListItem);
@@ -977,16 +1105,19 @@ function (_MegaRenderMixin) {
   }]);
 
   return ContactsListItem;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 ContactsListItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
 ;
+ContactsListItem.propTypes = {
+  chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
+};
 var ContactButton =
 /*#__PURE__*/
-function (_MegaRenderMixin2) {
-  _inherits(ContactButton, _MegaRenderMixin2);
+function (_ContactAwareComponen2) {
+  _inherits(ContactButton, _ContactAwareComponen2);
 
   function ContactButton() {
     _classCallCheck(this, ContactButton);
@@ -997,7 +1128,12 @@ function (_MegaRenderMixin2) {
   _createClass(ContactButton, [{
     key: "attachRerenderCallbacks",
     value: function attachRerenderCallbacks() {
-      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname']);
+      this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
+    }
+  }, {
+    key: "componentSpecificIsComponentEventuallyVisible",
+    value: function componentSpecificIsComponentEventuallyVisible() {
+      return this.props.chatRoom.isCurrentlyActive;
     }
   }, {
     key: "render",
@@ -1020,6 +1156,12 @@ function (_MegaRenderMixin2) {
         horizOffset = 0;
       }
 
+      if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
+        label = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("em", {
+          className: "contact-name-loading"
+        });
+      }
+
       if (!contact) {
         return null;
       }
@@ -1034,6 +1176,7 @@ function (_MegaRenderMixin2) {
           key: "mainContactInfo"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Avatar, {
           className: "avatar-wrapper context-avatar",
+          chatRoom: this.props.chatRoom,
           contact: contact,
           hideVerifiedBadge: "true",
           onClick: function onClick() {
@@ -1077,7 +1220,7 @@ function (_MegaRenderMixin2) {
         }
 
         if (contact.c === 2) {
-          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "view0",
             icon: "human-profile",
             label: __(l[187]),
@@ -1089,7 +1232,7 @@ function (_MegaRenderMixin2) {
 
         if (contact.c === 1) {
           if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-            moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+            moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
               key: "startCall",
               className: "contains-submenu",
               icon: "context handset",
@@ -1104,7 +1247,7 @@ function (_MegaRenderMixin2) {
             moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
               className: "dropdown body submenu",
               key: "dropdownGroup"
-            }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+            }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
               key: "startAudio",
               icon: "context handset",
               label: __(l[1565]),
@@ -1114,7 +1257,7 @@ function (_MegaRenderMixin2) {
                   room.startAudioCall();
                 });
               }
-            })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+            })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
               key: "startVideo",
               icon: "context videocam",
               label: __(l[1566]),
@@ -1126,7 +1269,7 @@ function (_MegaRenderMixin2) {
               }
             }))));
           } else {
-            moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+            moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
               key: "startChat",
               icon: "context conversation",
               label: __(l[5885]),
@@ -1139,7 +1282,7 @@ function (_MegaRenderMixin2) {
           moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
             key: "files-separator"
           }));
-          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "send-files-item",
             icon: "context arrow-in-circle",
             label: __(l[6834]),
@@ -1147,7 +1290,7 @@ function (_MegaRenderMixin2) {
               megaChat.openChatAndSendFilesDialog(contact.u);
             }
           }));
-          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "share-item",
             icon: "context share-folder",
             label: __(l[6775]),
@@ -1156,7 +1299,7 @@ function (_MegaRenderMixin2) {
             }
           }));
         } else if (!contact.c) {
-          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "view2",
             icon: "small-icon icons-sprite grey-plus",
             label: __(l[101]),
@@ -1210,7 +1353,7 @@ function (_MegaRenderMixin2) {
           moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
             key: "nicknames-separator"
           }));
-          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["DropdownItem"], {
+          moreDropdowns.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "set-nickname",
             icon: "small-icon context writing-pen",
             label: __(l[20828]),
@@ -1228,12 +1371,12 @@ function (_MegaRenderMixin2) {
         }
 
         if (moreDropdowns.length > 0) {
-          buttonComponent = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+          buttonComponent = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__["Button"], {
             className: classes,
             icon: icon,
             disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled,
             label: label
-          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_5__["Dropdown"], {
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["Dropdown"], {
             className: "contact-card-dropdown",
             positionMy: dropdownPosition,
             positionAt: dropdownPosition,
@@ -1249,16 +1392,19 @@ function (_MegaRenderMixin2) {
   }]);
 
   return ContactButton;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 ContactButton.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
 ;
+ContactButton.propTypes = {
+  chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
+};
 var ContactVerified =
 /*#__PURE__*/
-function (_MegaRenderMixin3) {
-  _inherits(ContactVerified, _MegaRenderMixin3);
+function (_MegaRenderMixin) {
+  _inherits(ContactVerified, _MegaRenderMixin);
 
   function ContactVerified() {
     _classCallCheck(this, ContactVerified);
@@ -1308,7 +1454,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return ContactVerified;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["MegaRenderMixin"]);
 ContactVerified.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
@@ -1316,8 +1462,8 @@ ContactVerified.defaultProps = {
 ;
 var ContactPresence =
 /*#__PURE__*/
-function (_MegaRenderMixin4) {
-  _inherits(ContactPresence, _MegaRenderMixin4);
+function (_MegaRenderMixin2) {
+  _inherits(ContactPresence, _MegaRenderMixin2);
 
   function ContactPresence() {
     _classCallCheck(this, ContactPresence);
@@ -1348,7 +1494,7 @@ function (_MegaRenderMixin4) {
   }]);
 
   return ContactPresence;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["MegaRenderMixin"]);
 ContactPresence.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
@@ -1356,8 +1502,8 @@ ContactPresence.defaultProps = {
 ;
 var ContactFingerprint =
 /*#__PURE__*/
-function (_MegaRenderMixin5) {
-  _inherits(ContactFingerprint, _MegaRenderMixin5);
+function (_MegaRenderMixin3) {
+  _inherits(ContactFingerprint, _MegaRenderMixin3);
 
   function ContactFingerprint() {
     _classCallCheck(this, ContactFingerprint);
@@ -1394,7 +1540,7 @@ function (_MegaRenderMixin5) {
         var verifyState = u_authring.Ed25519[contact.u] || {};
 
         if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-          verifyButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_4__["Button"], {
+          verifyButton = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__["Button"], {
             className: "dropdown-verify active",
             label: __(l[7692]),
             icon: "grey-key",
@@ -1425,17 +1571,16 @@ function (_MegaRenderMixin5) {
   }]);
 
   return ContactFingerprint;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["MegaRenderMixin"]);
 ContactFingerprint.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var _noAvatars = {};
 var Avatar =
 /*#__PURE__*/
-function (_MegaRenderMixin6) {
-  _inherits(Avatar, _MegaRenderMixin6);
+function (_ContactAwareComponen3) {
+  _inherits(Avatar, _ContactAwareComponen3);
 
   function Avatar() {
     _classCallCheck(this, Avatar);
@@ -1475,14 +1620,6 @@ function (_MegaRenderMixin6) {
         });
       }
 
-      if (!avatars[contact.u] && !_noAvatars[contact.u]) {
-        useravatar.loadAvatar(contact.u, pchandle).done(function () {
-          self.safeForceUpdate();
-        }).fail(function (e) {
-          _noAvatars[contact.u] = true;
-        });
-      }
-
       var extraProps = {};
 
       if (this.props.simpletip) {
@@ -1517,6 +1654,12 @@ function (_MegaRenderMixin6) {
         }));
       } else {
         classes += " color" + avatarMeta.avatar.colorIndex;
+        var isLoading = self.isLoadingContactInfo();
+
+        if (isLoading) {
+          classes += " avatar-name-loading";
+        }
+
         displayedAvatar = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
           className: classes,
           style: this.props.style
@@ -1525,7 +1668,7 @@ function (_MegaRenderMixin6) {
             $(document).trigger('closeDropdowns');
             self.props.onClick(e);
           } : self.onClick
-        }), verifiedElement, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, avatarMeta.avatar.letters));
+        }), verifiedElement, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, isLoading ? "" : avatarMeta.avatar.letters));
       }
 
       return displayedAvatar;
@@ -1533,16 +1676,19 @@ function (_MegaRenderMixin6) {
   }]);
 
   return Avatar;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 Avatar.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
 ;
+Avatar.propTypes = {
+  chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
+};
 var ContactCard =
 /*#__PURE__*/
-function (_MegaRenderMixin7) {
-  _inherits(ContactCard, _MegaRenderMixin7);
+function (_ContactAwareComponen4) {
+  _inherits(ContactCard, _ContactAwareComponen4);
 
   function ContactCard() {
     _classCallCheck(this, ContactCard);
@@ -1553,7 +1699,7 @@ function (_MegaRenderMixin7) {
   _createClass(ContactCard, [{
     key: "attachRerenderCallbacks",
     value: function attachRerenderCallbacks() {
-      this.addDataStructListenerForProperties(this.props.contact, ['presence', 'name', 'firstName', 'lastName', 'nickname', 'avatar']);
+      this.addDataStructListenerForProperties(this.props.contact, ['presence', 'name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
     }
   }, {
     key: "specificShouldComponentUpdate",
@@ -1614,10 +1760,9 @@ function (_MegaRenderMixin7) {
       }
 
       var pres = megaChat.userPresenceToCssClass(contact.presence);
-      var avatarMeta = generateAvatarMeta(contact.u);
-      var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
+      var username = (this.props.namePrefix ? this.props.namePrefix : "") + (M.getNameByHandle(contact.u) || contact.m);
 
-      if (contact.u == u_handle) {
+      if (contact.u === u_handle) {
         username += " (Me)";
       }
 
@@ -1635,6 +1780,7 @@ function (_MegaRenderMixin7) {
           contact: contact,
           className: "light",
           label: username,
+          chatRoom: this.props.chatRoom,
           dropdownRemoveButton: dropdownRemoveButton
         });
       } else {
@@ -1704,7 +1850,8 @@ function (_MegaRenderMixin7) {
         style: self.props.style
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Avatar, {
         contact: contact,
-        className: "avatar-wrapper small-rounded-avatar"
+        className: "avatar-wrapper small-rounded-avatar",
+        chatRoom: this.props.chatRoom
       }), anonymouschat || noContextButton ? null : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactButton, {
         key: "button",
         dropdowns: dropdowns,
@@ -1713,13 +1860,15 @@ function (_MegaRenderMixin7) {
         noContextMenu: noContextMenu,
         contact: contact,
         className: self.props.dropdownButtonClasses,
-        dropdownRemoveButton: dropdownRemoveButton
+        dropdownRemoveButton: dropdownRemoveButton,
+        noLoading: self.props.noLoading,
+        chatRoom: self.props.chatRoom
       }), selectionTick, userCard);
     }
   }]);
 
   return ContactCard;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 ContactCard.defaultProps = {
   'dropdownButtonClasses': "default-white-button tiny-button",
   'dropdownIconClasses': "tiny-icon icons-sprite grey-dots",
@@ -1728,10 +1877,13 @@ ContactCard.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
+ContactCard.propTypes = {
+  chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
+};
 var ContactItem =
 /*#__PURE__*/
-function (_MegaRenderMixin8) {
-  _inherits(ContactItem, _MegaRenderMixin8);
+function (_ContactAwareComponen5) {
+  _inherits(ContactItem, _ContactAwareComponen5);
 
   function ContactItem() {
     _classCallCheck(this, ContactItem);
@@ -1770,28 +1922,33 @@ function (_MegaRenderMixin8) {
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Avatar, {
         contact: contact,
         className: "avatar-wrapper small-rounded-avatar",
-        hideVerifiedBadge: true
+        hideVerifiedBadge: true,
+        chatRoom: this.props.chatRoom
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "user-card-data"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactButton, {
         contact: contact,
         className: "light",
-        label: username
+        label: username,
+        chatRoom: this.props.chatRoom
       })));
     }
   }]);
 
   return ContactItem;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 ContactItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
 ;
+ContactItem.propTypes = {
+  chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
+};
 var ContactPickerWidget =
 /*#__PURE__*/
-function (_MegaRenderMixin9) {
-  _inherits(ContactPickerWidget, _MegaRenderMixin9);
+function (_MegaRenderMixin4) {
+  _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
   function ContactPickerWidget(props) {
     var _this;
@@ -1837,6 +1994,10 @@ function (_MegaRenderMixin9) {
   }, {
     key: "componentWillMount",
     value: function componentWillMount() {
+      if (_get(_getPrototypeOf(ContactPickerWidget.prototype), "componentWillMount", this)) {
+        _get(_getPrototypeOf(ContactPickerWidget.prototype), "componentWillMount", this).call(this);
+      }
+
       var self = this;
 
       if (self.props.multiple) {
@@ -1940,6 +2101,7 @@ function (_MegaRenderMixin9) {
       contacts.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactCard, {
         disabled: isDisabled,
         contact: v,
+        chatRoom: false,
         className: "contacts-search short " + selectedClass + (isDisabled ? " disabled" : ""),
         noContextButton: "true",
         selectable: selectableContacts,
@@ -2023,7 +2185,8 @@ function (_MegaRenderMixin9) {
         (self.state.selected || []).forEach(function (v, k) {
           contactsSelected.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactItem, {
             contact: M.u[v],
-            key: v
+            key: v,
+            chatRoom: self.props.chatRoom
           }));
         });
       } else if (self.props.multiple) {
@@ -2101,12 +2264,13 @@ function (_MegaRenderMixin9) {
             contactsSelected.push(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactItem, {
               contact: M.u[v],
               onClick: onContactSelectDoneCb,
+              chatRoom: self.props.chatRoom,
               key: v
             }));
           });
           multipleContacts = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
             className: "horizontal-contacts-list"
-          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_3__["PerfectScrollbar"], {
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_4__["PerfectScrollbar"], {
             className: "perfectScrollbarContainer selected-contact-block horizontal-only",
             selected: this.state.selected,
             ref: function ref(psSelected) {
@@ -2236,7 +2400,7 @@ function (_MegaRenderMixin9) {
             className: "fm-empty-description small"
           }, l[19115]));
         } else {
-          contactsList = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_utils_jsx__WEBPACK_IMPORTED_MODULE_2__["default"].JScrollPane, {
+          contactsList = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_utils_jsx__WEBPACK_IMPORTED_MODULE_3__["default"].JScrollPane, {
             className: "contacts-search-scroll",
             selected: this.state.selected,
             changedHashProp: this.props.changedHashProp,
@@ -2320,7 +2484,7 @@ function (_MegaRenderMixin9) {
   }]);
 
   return ContactPickerWidget;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["MegaRenderMixin"]);
 ContactPickerWidget.defaultProps = {
   multipleSelectedButtonLabel: false,
   singleSelectedButtonLabel: false,
@@ -2558,7 +2722,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return JScrollPane;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 
 JScrollPane.defaultProps = {
   className: "jScrollPaneContainer",
@@ -2880,7 +3044,7 @@ function (_MegaRenderMixin) {
                   $(this).removeClass("down-arrow").addClass("up-arrow");
                 }
 
-                vertOffset += info.vertical == "top" ? arrowHeight : 0;
+                vertOffset += info.vertical === "top" ? arrowHeight : 0;
               }
 
               if (self.props.vertOffset) {
@@ -3024,7 +3188,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return Dropdown;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
@@ -3114,7 +3278,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return DropdownContactsSelector;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
@@ -3226,7 +3390,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return DropdownItem;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 DropdownItem.defaultProps = {
   requiresUpdateOnResize: true
 };
@@ -3234,6 +3398,24 @@ DropdownItem.defaultProps = {
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+if (false) { var throwOnDirectAccess, ReactIs; } else {
+  // By explicitly using `prop-types` you are opting into new production behavior.
+  // http://fb.me/prop-types-in-prod
+  module.exports = __webpack_require__(19)();
+}
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3293,7 +3475,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return ExtraFooterElement;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ;
 
@@ -3443,7 +3625,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return ModalDialog;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ModalDialog.defaultProps = {
   'hideable': true
@@ -3538,7 +3720,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return SelectContactDialog;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 SelectContactDialog.clickTime = 0;
 SelectContactDialog.defaultProps = {
@@ -3688,7 +3870,7 @@ function (_MegaRenderMixin4) {
   }]);
 
   return ConfirmDialog;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ConfirmDialog.defaultProps = {
   'confirmLabel': __(l[6826]),
@@ -3705,7 +3887,7 @@ ConfirmDialog.defaultProps = {
 });
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3959,11 +4141,11 @@ function (_MegaRenderMixin) {
   }]);
 
   return Button;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 ;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3994,14 +4176,12 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 var React = __webpack_require__(0);
 
-var utils = __webpack_require__(3);
-
 
 
 var ConversationMessageMixin =
 /*#__PURE__*/
-function (_MegaRenderMixin) {
-  _inherits(ConversationMessageMixin, _MegaRenderMixin);
+function (_ContactAwareComponen) {
+  _inherits(ConversationMessageMixin, _ContactAwareComponen);
 
   function ConversationMessageMixin(props) {
     var _this;
@@ -4016,12 +4196,14 @@ function (_MegaRenderMixin) {
   _createClass(ConversationMessageMixin, [{
     key: "componentWillMount",
     value: function componentWillMount() {
+      if (_get(_getPrototypeOf(ConversationMessageMixin.prototype), "componentWillMount", this)) {
+        _get(_getPrototypeOf(ConversationMessageMixin.prototype), "componentWillMount", this).call(this);
+      }
+
       var self = this;
-      var chatRoom = self.props.message.chatRoom;
-      var megaChat = chatRoom.megaChat;
       var contact = self.getContact();
 
-      var changedCb = function changedCb(contact, oldData, k, v) {
+      var changedCb = function changedCb(contact, oldData, k) {
         if (k === "ts" || k === "ats") {
           // no updates needed in case of 'ts' change
           // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
@@ -4137,27 +4319,9 @@ function (_MegaRenderMixin) {
   }]);
 
   return ConversationMessageMixin;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["ContactAwareComponent"]);
 
 ;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-if (false) { var throwOnDirectAccess, ReactIs; } else {
-  // By explicitly using `prop-types` you are opting into new production behavior.
-  // http://fb.me/prop-types-in-prod
-  module.exports = __webpack_require__(19)();
-}
 
 
 /***/ }),
@@ -4667,7 +4831,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return PerfectScrollbar;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 PerfectScrollbar.isUserScroll = true;
 PerfectScrollbar.scrollEventIncId = 0;
 PerfectScrollbar.defaultProps = {
@@ -4733,7 +4897,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return Handler;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 
 Handler.defaultProps = {
   'hideable': true
@@ -4770,7 +4934,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return Contents;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 
 Contents.defaultProps = {
   'hideable': true
@@ -4922,7 +5086,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return Tooltip;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 
 Tooltip.defaultProps = {
   'hideable': true
@@ -4942,11 +5106,11 @@ Tooltip.defaultProps = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7);
+/* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(5);
 /* harmony import */ var _ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2);
 /* harmony import */ var _ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
-/* harmony import */ var _ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
+/* harmony import */ var _ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -5387,7 +5551,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return ConversationsListItem;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ;
 
@@ -5529,7 +5693,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return ArchivedConversationsListItem;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ;
 
@@ -5706,7 +5870,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return ConversationsList;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ConversationsList.defaultProps = {
   'manualDataChangeTracking': true
@@ -5932,7 +6096,7 @@ function (_MegaRenderMixin4) {
   }]);
 
   return ArchivedConversationsList;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ;
 
@@ -6417,7 +6581,7 @@ function (_MegaRenderMixin5) {
   }]);
 
   return ConversationsApp;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 
 ;
 
@@ -6525,7 +6689,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return Checkbox;
-}(Object(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["default"])(React.Component));
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
 
 ;
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -6566,7 +6730,7 @@ var utils = __webpack_require__(3);
 
 
 
-var ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var MetaRichpreviewLoading =
 /*#__PURE__*/
@@ -6618,10 +6782,10 @@ var utils = __webpack_require__(3);
 var mixins = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var ui_buttons = __webpack_require__(7);
+var ui_buttons = __webpack_require__(8);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(6);
+var modalDialogs = __webpack_require__(7);
 
 // EXTERNAL MODULE: ./js/ui/tooltips.jsx
 var tooltips = __webpack_require__(12);
@@ -6648,7 +6812,6 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
 
 
 
@@ -7385,7 +7548,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return BrowserEntries;
-}(Object(mixins["default"])(external_React_["Component"]));
+}(mixins["MegaRenderMixin"]);
 
 cloudBrowserModalDialog_BrowserEntries.defaultProps = {
   'hideable': true,
@@ -7939,7 +8102,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return CloudBrowserDialog;
-}(Object(mixins["default"])(external_React_["Component"]));
+}(mixins["MegaRenderMixin"]);
 
 cloudBrowserModalDialog_CloudBrowserDialog.defaultProps = {
   'selectLabel': __(l[8023]),
@@ -8502,7 +8665,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return DropdownEmojiSelector;
-}(Object(mixins["default"])(emojiDropdown_React.Component));
+}(mixins["MegaRenderMixin"]);
 DropdownEmojiSelector.defaultProps = {
   'requiresUpdateOnResize': true,
   'hideable': true
@@ -8537,7 +8700,7 @@ var ReactDOM = __webpack_require__(4);
 
 
 
-var ButtonsUI = __webpack_require__(7);
+var ButtonsUI = __webpack_require__(8);
 
 var EmojiAutocomplete =
 /*#__PURE__*/
@@ -8809,7 +8972,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return EmojiAutocomplete;
-}(Object(mixins["default"])(emojiAutocomplete_React.Component));
+}(mixins["MegaRenderMixin"]);
 EmojiAutocomplete.data_emojis = null;
 EmojiAutocomplete.defaultProps = {
   'requiresUpdateOnResize': true,
@@ -9771,7 +9934,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return TypingArea;
-}(Object(mixins["default"])(typingArea_React.Component)), _class2.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi"), _class2.defaultProps = {
+}(mixins["MegaRenderMixin"]), _class2.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi"), _class2.defaultProps = {
   'textareaMaxHeight': "40%"
 }, _temp), (_applyDecoratedDescriptor(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype)), _class));
 ;
@@ -9953,7 +10116,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return WhosTyping;
-}(Object(mixins["default"])(whosTyping_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -10023,7 +10186,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return AccordionPanel;
-}(Object(mixins["default"])(accordion_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -10128,7 +10291,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return Accordion;
-}(Object(mixins["default"])(accordion_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -10180,12 +10343,14 @@ function (_MegaRenderMixin) {
 
   participantsList_createClass(ParticipantsList, [{
     key: "onUserScroll",
-    value: function onUserScroll() {// var scrollPosY = this.refs.contactsListScroll.getScrollPositionY();
-      // if (this.state.scrollPositionY !== scrollPosY) {
-      //     this.setState({
-      //         'scrollPositionY': scrollPosY
-      //     });
-      // }
+    value: function onUserScroll() {
+      var scrollPosY = this.contactsListScroll.getScrollPositionY();
+
+      if (this.state.scrollPositionY !== scrollPosY) {
+        this.setState({
+          'scrollPositionY': scrollPosY
+        });
+      }
     }
   }, {
     key: "componentDidUpdate",
@@ -10194,6 +10359,45 @@ function (_MegaRenderMixin) {
 
       if (!self.isMounted()) {
         return;
+      }
+
+      var $node = $(self.findDOMNode());
+
+      if (!self.contactsListScroll) {
+        return null;
+      }
+
+      var scrollHeight = self.contactsListScroll.getContentHeight();
+      var fitHeight = scrollHeight;
+
+      if (fitHeight === 0) {
+        // not visible at the moment.
+        return null;
+      }
+
+      var $parentContainer = $node.closest('.chat-right-pad');
+      var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) - $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
+
+      if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
+        fitHeight = Math.max(fitHeight
+        /* margin! */
+        , 53);
+      } else if (maxHeight < fitHeight) {
+        fitHeight = Math.max(maxHeight, 53);
+      }
+
+      fitHeight = Math.min(200, fitHeight);
+      var $contactsList = $('.chat-contacts-list', $parentContainer);
+
+      if ($contactsList.height() !== fitHeight + 4) {
+        $('.chat-contacts-list', $parentContainer).height(fitHeight + 4);
+        self.contactsListScroll.eventuallyReinitialise(true);
+      }
+
+      if (self.state.scrollHeight !== fitHeight) {
+        self.setState({
+          'scrollHeight': fitHeight
+        });
       }
 
       self.onUserScroll();
@@ -10222,16 +10426,30 @@ function (_MegaRenderMixin) {
 
       return external_React_default.a.createElement("div", {
         className: "chat-contacts-list"
-      }, external_React_default.a.createElement(ParticipantsListInner, {
+      }, external_React_default.a.createElement(participantsList_PerfectScrollbar, {
         chatRoom: room,
         members: room.members,
+        ref: function ref(_ref) {
+          self.contactsListScroll = _ref;
+        },
+        disableCheckingVisibility: true,
+        onUserScroll: SoonFc(self.onUserScroll.bind(self), 76),
+        requiresUpdateOnResize: true,
+        onAnimationEnd: function onAnimationEnd() {
+          self.safeForceUpdate();
+        }
+      }, external_React_default.a.createElement(participantsList_ParticipantsListInner, {
+        chatRoom: room,
+        members: room.members,
+        scrollPositionY: self.state.scrollPositionY,
+        scrollHeight: self.state.scrollHeight,
         disableCheckingVisibility: true
-      }));
+      })));
     }
   }]);
 
   return ParticipantsList;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 
 participantsList_ParticipantsList.defaultProps = {
   'requiresUpdateOnResize': true,
@@ -10239,177 +10457,201 @@ participantsList_ParticipantsList.defaultProps = {
 };
 ;
 
-function ParticipantsListInner(_ref) {
-  var _ref$requiresUpdateOn = _ref.requiresUpdateOnResize,
-      requiresUpdateOnResize = _ref$requiresUpdateOn === void 0 ? true : _ref$requiresUpdateOn,
-      _ref$contactCardHeigh = _ref.contactCardHeight,
-      contactCardHeight = _ref$contactCardHeigh === void 0 ? 32 : _ref$contactCardHeigh,
-      _ref$scrollPositionY = _ref.scrollPositionY,
-      scrollPositionY = _ref$scrollPositionY === void 0 ? 0 : _ref$scrollPositionY,
-      _ref$scrollHeight = _ref.scrollHeight,
-      scrollHeight = _ref$scrollHeight === void 0 ? 128 : _ref$scrollHeight,
-      room = _ref.chatRoom;
-  var _ChatRoom$MembersSet$ = ChatRoom.MembersSet.PRIVILEGE_STATE,
-      FULL = _ChatRoom$MembersSet$.FULL,
-      OPERATOR = _ChatRoom$MembersSet$.OPERATOR,
-      READONLY = _ChatRoom$MembersSet$.READONLY;
+var participantsList_ParticipantsListInner =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
+  participantsList_inherits(ParticipantsListInner, _MegaRenderMixin2);
 
-  if (!room) {
-    // destroyed
-    return null;
+  function ParticipantsListInner() {
+    participantsList_classCallCheck(this, ParticipantsListInner);
+
+    return participantsList_possibleConstructorReturn(this, participantsList_getPrototypeOf(ParticipantsListInner).apply(this, arguments));
   }
 
-  if (!room.isCurrentlyActive && room._leaving !== true) {
-    // save some memory/DOM
-    return false;
-  }
+  participantsList_createClass(ParticipantsListInner, [{
+    key: "render",
+    value: function render() {
+      var room = this.props.chatRoom;
+      var contactCardHeight = this.props.contactCardHeight;
+      var scrollPositionY = this.props.scrollPositionY;
+      var scrollHeight = this.props.scrollHeight;
+      var _ChatRoom$MembersSet$ = ChatRoom.MembersSet.PRIVILEGE_STATE,
+          FULL = _ChatRoom$MembersSet$.FULL,
+          OPERATOR = _ChatRoom$MembersSet$.OPERATOR,
+          READONLY = _ChatRoom$MembersSet$.READONLY;
 
-  var contactHandle;
-  var contact;
-  var contacts = room.getParticipantsExceptMe();
-
-  if (contacts && contacts.length > 0) {
-    contactHandle = contacts[0];
-    contact = M.u[contactHandle];
-  } else {
-    contact = {};
-  }
-
-  var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
-  var contactsList = []; // const firstVisibleUserNum = Math.floor(scrollPositionY/contactCardHeight);
-  // const visibleUsers = Math.ceil(scrollHeight/contactCardHeight);
-  // const lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
-
-  var firstVisibleUserNum = 0;
-  var lastVisibleUserNum = contacts.length;
-  var contactListInnerStyles = {
-    'height': contacts.length * contactCardHeight
-  }; // slice and only add a specific number of contacts to the list
-
-  if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving() && room.members.hasOwnProperty(u_handle)) {
-    contacts.unshift(u_handle);
-    contactListInnerStyles.height += contactCardHeight;
-  }
-
-  var i = 0;
-  contacts.forEach(function (contactHash) {
-    var contact = M.u[contactHash];
-
-    if (contact) {
-      // TODO: eventually re-implement "show on scroll" and dynamic rendering.
-      if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
-        i++;
-        return;
+      if (!room) {
+        // destroyed
+        return null;
       }
 
-      var dropdowns = [];
-      var privilege = null;
-      var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
-
-      if (room.type === "public" || room.type === "group" && room.members) {
-        var dropdownRemoveButton = [];
-
-        if (room.iAmOperator() && contactHash !== u_handle) {
-          dropdownRemoveButton.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
-            className: "red",
-            key: "remove",
-            icon: "rounded-stop",
-            label: __(l[8867]),
-            onClick: function onClick() {
-              $(room).trigger('onRemoveUserRequest', [contactHash]);
-            }
-          }));
-        }
-
-        if (room.iAmOperator() || contactHash === u_handle) {
-          // operator
-          dropdowns.push(external_React_default.a.createElement("div", {
-            key: "setPermLabel",
-            className: "dropdown-items-info"
-          }, __(l[8868])));
-          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
-            key: "privOperator",
-            icon: "gentleman",
-            label: __(l[8875]),
-            className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
-            disabled: contactHash === u_handle,
-            onClick: function onClick() {
-              if (room.members[contactHash] !== FULL) {
-                $(room).trigger('alterUserPrivilege', [contactHash, FULL]);
-              }
-            }
-          }));
-          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
-            key: "privFullAcc",
-            icon: "conversation-icon",
-            className: "tick-item " + (room.members[contactHash] === OPERATOR ? "active" : ""),
-            disabled: contactHash === u_handle,
-            label: __(l[8874]),
-            onClick: function onClick() {
-              if (room.members[contactHash] !== OPERATOR) {
-                $(room).trigger('alterUserPrivilege', [contactHash, OPERATOR]);
-              }
-            }
-          }));
-          dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
-            key: "privReadOnly",
-            icon: "eye-icon",
-            className: "tick-item " + (room.members[contactHash] === READONLY ? "active" : ""),
-            disabled: contactHash === u_handle,
-            label: __(l[8873]),
-            onClick: function onClick() {
-              if (room.members[contactHash] !== READONLY) {
-                $(room).trigger('alterUserPrivilege', [contactHash, READONLY]);
-              }
-            }
-          }));
-        } else if (room.members[u_handle] === OPERATOR) {// full access
-        } else if (room.members[u_handle] === 1) {// read write
-          // should not happen.
-        } else if (room.isReadOnly()) {// read only
-        } else {} // should not happen.
-          // other user privilege
-
-
-        if (room.members[contactHash] === FULL) {
-          dropdownIconClasses = "small-icon gentleman";
-        } else if (room.members[contactHash] === OPERATOR) {
-          dropdownIconClasses = "small-icon conversation-icon";
-        } else if (room.members[contactHash] === READONLY) {
-          dropdownIconClasses = "small-icon eye-icon";
-        } else {// should not happen.
-        }
+      if (!room.isCurrentlyActive && room._leaving !== true) {
+        // save some memory/DOM
+        return false;
       }
 
-      contactsList.push(external_React_default.a.createElement(ContactsUI.ContactCard, {
-        key: contact.u,
-        contact: contact,
-        className: "right-chat-contact-card",
-        dropdownPositionMy: "left top",
-        dropdownPositionAt: "left top",
-        dropdowns: dropdowns,
-        dropdownDisabled: contactHash === u_handle || anonymouschat,
-        dropdownButtonClasses: (room.type == "group" || room.type === "public") && myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown",
-        dropdownRemoveButton: dropdownRemoveButton,
-        dropdownIconClasses: dropdownIconClasses,
-        isInCall: room.uniqueCallParts && room.uniqueCallParts[contactHash]
-      }));
-      i++;
+      var contactHandle;
+      var contact;
+      var contacts = room.getParticipantsExceptMe();
+
+      if (contacts && contacts.length > 0) {
+        contactHandle = contacts[0];
+        contact = M.u[contactHandle];
+      } else {
+        contact = {};
+      }
+
+      var myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
+      var contactsList = [];
+      var extraItems = 16;
+      var firstVisibleUserNum = Math.floor(scrollPositionY / contactCardHeight);
+      var visibleUsers = Math.ceil(scrollHeight / contactCardHeight);
+      var lastVisibleUserNum = firstVisibleUserNum + visibleUsers; // const firstVisibleUserNum = 0;
+      // const lastVisibleUserNum = contacts.length;
+
+      var contactListInnerStyles = {
+        'height': contacts.length * contactCardHeight
+      }; // slice and only add a specific number of contacts to the list
+
+      if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving() && room.members.hasOwnProperty(u_handle)) {
+        contacts.unshift(u_handle);
+        contactListInnerStyles.height += contactCardHeight;
+      }
+
+      var i = 0;
+      contacts.forEach(function (contactHash) {
+        var contact = M.u[contactHash];
+
+        if (contact) {
+          if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
+            i++;
+            return;
+          }
+
+          var dropdowns = [];
+          var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
+
+          if (room.type === "public" || room.type === "group" && room.members) {
+            var dropdownRemoveButton = [];
+
+            if (room.iAmOperator() && contactHash !== u_handle) {
+              dropdownRemoveButton.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+                className: "red",
+                key: "remove",
+                icon: "rounded-stop",
+                label: __(l[8867]),
+                onClick: function onClick() {
+                  $(room).trigger('onRemoveUserRequest', [contactHash]);
+                }
+              }));
+            }
+
+            if (room.iAmOperator() || contactHash === u_handle) {
+              // operator
+              dropdowns.push(external_React_default.a.createElement("div", {
+                key: "setPermLabel",
+                className: "dropdown-items-info"
+              }, __(l[8868])));
+              dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+                key: "privOperator",
+                icon: "gentleman",
+                label: __(l[8875]),
+                className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
+                disabled: contactHash === u_handle,
+                onClick: function onClick() {
+                  if (room.members[contactHash] !== FULL) {
+                    $(room).trigger('alterUserPrivilege', [contactHash, FULL]);
+                  }
+                }
+              }));
+              dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+                key: "privFullAcc",
+                icon: "conversation-icon",
+                className: "tick-item " + (room.members[contactHash] === OPERATOR ? "active" : ""),
+                disabled: contactHash === u_handle,
+                label: __(l[8874]),
+                onClick: function onClick() {
+                  if (room.members[contactHash] !== OPERATOR) {
+                    $(room).trigger('alterUserPrivilege', [contactHash, OPERATOR]);
+                  }
+                }
+              }));
+              dropdowns.push(external_React_default.a.createElement(participantsList_DropdownsUI.DropdownItem, {
+                key: "privReadOnly",
+                icon: "eye-icon",
+                className: "tick-item " + (room.members[contactHash] === READONLY ? "active" : ""),
+                disabled: contactHash === u_handle,
+                label: __(l[8873]),
+                onClick: function onClick() {
+                  if (room.members[contactHash] !== READONLY) {
+                    $(room).trigger('alterUserPrivilege', [contactHash, READONLY]);
+                  }
+                }
+              }));
+            } else if (room.members[u_handle] === OPERATOR) {// full access
+            } else if (room.members[u_handle] === 1) {// read write
+              // should not happen.
+            } else if (room.isReadOnly()) {// read only
+            } else {} // should not happen.
+              // other user privilege
+
+
+            if (room.members[contactHash] === FULL) {
+              dropdownIconClasses = "small-icon gentleman";
+            } else if (room.members[contactHash] === OPERATOR) {
+              dropdownIconClasses = "small-icon conversation-icon";
+            } else if (room.members[contactHash] === READONLY) {
+              dropdownIconClasses = "small-icon eye-icon";
+            } else {// should not happen.
+            }
+          }
+
+          contactsList.push(external_React_default.a.createElement(ContactsUI.ContactCard, {
+            key: contact.u,
+            contact: contact,
+            chatRoom: room,
+            className: "right-chat-contact-card",
+            dropdownPositionMy: "left top",
+            dropdownPositionAt: "left top",
+            dropdowns: dropdowns,
+            dropdownDisabled: contactHash === u_handle || anonymouschat,
+            dropdownButtonClasses: (room.type === "group" || room.type === "public") && myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown",
+            dropdownRemoveButton: dropdownRemoveButton,
+            dropdownIconClasses: dropdownIconClasses,
+            noLoading: true,
+            isInCall: room.uniqueCallParts && room.uniqueCallParts[contactHash],
+            style: {
+              width: 234,
+              position: 'absolute',
+              top: i * contactCardHeight
+            }
+          }));
+          i++;
+        }
+      });
+      return external_React_default.a.createElement("div", {
+        className: "chat-contacts-list-inner",
+        style: contactListInnerStyles
+      }, contactsList);
     }
-  });
-  return external_React_default.a.createElement("div", {
-    className: "chat-contacts-list-inner",
-    style: contactListInnerStyles
-  }, contactsList);
-}
+  }]);
 
-;
+  return ParticipantsListInner;
+}(mixins["MegaRenderMixin"]);
+
+participantsList_ParticipantsListInner.defaultProps = {
+  'requiresUpdateOnResize': true,
+  'contactCardHeight': 32,
+  'scrollPositionY': 0,
+  'scrollHeight': 128,
+  'chatRoom': undefined
+};
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/utils.jsx
 var messages_utils = __webpack_require__(10);
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
-var mixin = __webpack_require__(8);
+var mixin = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/metaRichpreview.jsx
 function metaRichpreview_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreview_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreview_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreview_typeof(obj); }
@@ -10440,7 +10682,7 @@ var metaRichpreview_utils = __webpack_require__(3);
 
 var metaRichpreview_ContactsUI = __webpack_require__(2);
 
-var ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var getMessageString = __webpack_require__(10).getMessageString;
 
@@ -10596,7 +10838,7 @@ var metaRichpreviewConfirmation_utils = __webpack_require__(3);
 
 var metaRichpreviewConfirmation_ContactsUI = __webpack_require__(2);
 
-var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var metaRichpreviewConfirmation_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -10818,7 +11060,8 @@ function (_ConversationMessageM) {
             contact: contact
           }), external_React_default.a.createElement(ui_contacts["Avatar"], {
             className: "avatar-wrapper medium-avatar",
-            contact: contact
+            contact: contact,
+            chatRoom: chatRoom
           })), external_React_default.a.createElement("div", {
             className: "clear"
           })));
@@ -10901,7 +11144,7 @@ function (_ConversationMessageM) {
 ;
 
 // EXTERNAL MODULE: ./node_modules/prop-types/index.js
-var prop_types = __webpack_require__(9);
+var prop_types = __webpack_require__(6);
 var prop_types_default = /*#__PURE__*/__webpack_require__.n(prop_types);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/AudioPlayer.jsx
@@ -11379,7 +11622,7 @@ function generic_setPrototypeOf(o, p) { generic_setPrototypeOf = Object.setProto
 
 var generic_DropdownsUI = __webpack_require__(5);
 
-var generic_ButtonsUI = __webpack_require__(7);
+var generic_ButtonsUI = __webpack_require__(8);
 /* 1h as confirmed by Mathias */
 
 
@@ -12059,7 +12302,8 @@ function (_ConversationMessageM) {
             } else {
               avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
                 contact: contact,
-                className: "message avatar-wrapper small-rounded-avatar"
+                className: "message avatar-wrapper small-rounded-avatar",
+                chatRoom: self.props.chatRoom
               });
               datetime = external_React_default.a.createElement("div", {
                 className: "message date-time simpletip",
@@ -12068,6 +12312,7 @@ function (_ConversationMessageM) {
               name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
                 contact: contact,
                 className: "message",
+                chatRoom: self.props.chatRoom,
                 label: displayName
               });
             }
@@ -12141,12 +12386,15 @@ function (_ConversationMessageM) {
                   className: "dropdown-avatar rounded"
                 }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
+                  chatRoom: self.props.chatRoom,
                   contact: M.u[contact.u]
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
                 }, external_React_default.a.createElement("div", {
                   className: "name"
-                }, M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
+                }, self.isLoadingContactInfo() ? external_React_default.a.createElement("em", {
+                  className: "contact-name-loading"
+                }) : M.getNameByHandle(contact.u), external_React_default.a.createElement(ui_contacts["ContactPresence"], {
                   className: "small",
                   contact: contact
                 })), external_React_default.a.createElement("div", {
@@ -12188,7 +12436,8 @@ function (_ConversationMessageM) {
                   className: "dropdown-avatar rounded"
                 }, external_React_default.a.createElement(ui_contacts["Avatar"], {
                   className: "avatar-wrapper context-avatar",
-                  contact: M.u[contact.u]
+                  contact: M.u[contact.u],
+                  chatRoom: self.props.chatRoom
                 }), external_React_default.a.createElement("div", {
                   className: "dropdown-user-name"
                 }, external_React_default.a.createElement("div", {
@@ -12247,7 +12496,8 @@ function (_ConversationMessageM) {
                 contact: M.u[contact.u]
               }) : null, dropdown, external_React_default.a.createElement(ui_contacts["Avatar"], {
                 className: "avatar-wrapper medium-avatar",
-                contact: M.u[contact.u]
+                contact: M.u[contact.u],
+                chatRoom: self.props.chatRoom
               })), external_React_default.a.createElement("div", {
                 className: "clear"
               }))));
@@ -12261,7 +12511,8 @@ function (_ConversationMessageM) {
             } else {
               avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
                 contact: contact,
-                className: "message avatar-wrapper small-rounded-avatar"
+                className: "message avatar-wrapper small-rounded-avatar",
+                chatRoom: self.props.chatRoom
               });
               datetime = external_React_default.a.createElement("div", {
                 className: "message date-time simpletip",
@@ -12270,7 +12521,8 @@ function (_ConversationMessageM) {
               name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
                 contact: contact,
                 className: "message",
-                label: displayName
+                label: displayName,
+                chatRoom: self.props.chatRoom
               });
             }
 
@@ -12302,7 +12554,8 @@ function (_ConversationMessageM) {
               name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
                 contact: contact,
                 className: "message",
-                label: displayName
+                label: displayName,
+                chatRoom: self.props.chatRoom
               });
             }
 
@@ -12489,7 +12742,8 @@ function (_ConversationMessageM) {
           } else {
             avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
               contact: contact,
-              className: "message avatar-wrapper small-rounded-avatar"
+              className: "message avatar-wrapper small-rounded-avatar",
+              chatRoom: self.props.chatRoom
             });
             datetime = external_React_default.a.createElement("div", {
               className: "message date-time simpletip",
@@ -12498,7 +12752,8 @@ function (_ConversationMessageM) {
             name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
               contact: contact,
               className: "message",
-              label: displayName
+              label: displayName,
+              chatRoom: self.props.chatRoom
             });
           }
 
@@ -12634,13 +12889,15 @@ function (_ConversationMessageM) {
             } else {
               avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
                 contact: message.authorContact,
-                className: "message avatar-wrapper small-rounded-avatar"
+                className: "message avatar-wrapper small-rounded-avatar",
+                chatRoom: self.props.chatRoom
               });
               displayName = M.getNameByHandle(message.authorContact.u);
               name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
                 contact: contact,
                 className: "message",
-                label: displayName
+                label: displayName,
+                chatRoom: self.props.chatRoom
               });
             }
           }
@@ -12810,7 +13067,7 @@ var alterParticipants_utils = __webpack_require__(3);
 
 var alterParticipants_ContactsUI = __webpack_require__(2);
 
-var alterParticipants_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var alterParticipants_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var alterParticipants_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -12898,6 +13155,7 @@ function (_ConversationMessageM) {
         };
         var avatar = alterParticipants_React.makeElement(alterParticipants_ContactsUI.Avatar, {
           contact: otherContact,
+          chatRoom: self.props.chatRoom,
           className: "message avatar-wrapper small-rounded-avatar"
         });
         var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
@@ -12914,7 +13172,8 @@ function (_ConversationMessageM) {
         }, alterParticipants_React.makeElement(alterParticipants_ContactsUI.ContactButton, {
           contact: otherContact,
           className: "message",
-          label: otherDisplayName
+          label: otherDisplayName,
+          chatRoom: self.props.chatRoom
         }), datetime, alterParticipants_React.makeElement("div", {
           className: "message text-block",
           dangerouslySetInnerHTML: {
@@ -12930,6 +13189,7 @@ function (_ConversationMessageM) {
         };
         var avatar = alterParticipants_React.makeElement(alterParticipants_ContactsUI.Avatar, {
           contact: otherContact,
+          chatRoom: self.props.chatRoom,
           className: "message avatar-wrapper small-rounded-avatar"
         });
         var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
@@ -12953,7 +13213,8 @@ function (_ConversationMessageM) {
         }, alterParticipants_React.makeElement(alterParticipants_ContactsUI.ContactButton, {
           contact: otherContact,
           className: "message",
-          label: otherDisplayName
+          label: otherDisplayName,
+          chatRoom: self.props.chatRoom
         }), datetime, alterParticipants_React.makeElement("div", {
           className: "message text-block",
           dangerouslySetInnerHTML: {
@@ -12999,7 +13260,7 @@ var truncated_utils = __webpack_require__(3);
 
 var truncated_ContactsUI = __webpack_require__(2);
 
-var truncated_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var truncated_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var truncated_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -13044,7 +13305,8 @@ function (_ConversationMessageM) {
       } else {
         avatar = truncated_React.makeElement(truncated_ContactsUI.Avatar, {
           contact: contact,
-          className: "message avatar-wrapper small-rounded-avatar"
+          className: "message avatar-wrapper small-rounded-avatar",
+          chatRoom: chatRoom
         });
         datetime = truncated_React.makeElement("div", {
           className: "message date-time simpletip",
@@ -13061,7 +13323,8 @@ function (_ConversationMessageM) {
       }, truncated_React.makeElement(truncated_ContactsUI.ContactButton, {
         contact: contact,
         className: "message",
-        label: displayName
+        label: displayName,
+        chatRoom: chatRoom
       }), datetime, truncated_React.makeElement("div", {
         className: "message text-block"
       }, __(l[8905]))));
@@ -13102,7 +13365,7 @@ var privilegeChange_utils = __webpack_require__(3);
 
 var privilegeChange_ContactsUI = __webpack_require__(2);
 
-var privilegeChange_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var privilegeChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var privilegeChange_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -13138,7 +13401,6 @@ function (_ConversationMessageM) {
       var self = this;
       var cssClasses = "message body";
       var message = this.props.message;
-      var megaChat = this.props.message.chatRoom.megaChat;
       var chatRoom = this.props.message.chatRoom;
       var contact = self.getContact();
       var timestampInt = self.getTimestamp();
@@ -13163,7 +13425,8 @@ function (_ConversationMessageM) {
       };
       var avatar = privilegeChange_React.makeElement(privilegeChange_ContactsUI.Avatar, {
         contact: otherContact,
-        className: "message avatar-wrapper small-rounded-avatar"
+        className: "message avatar-wrapper small-rounded-avatar",
+        chatRoom: chatRoom
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
       var newPrivilegeText = "";
@@ -13187,7 +13450,8 @@ function (_ConversationMessageM) {
       }, privilegeChange_React.makeElement(privilegeChange_ContactsUI.ContactButton, {
         contact: otherContact,
         className: "message",
-        label: otherDisplayName
+        label: otherDisplayName,
+        chatRoom: self.props.chatRoom
       }), datetime, privilegeChange_React.makeElement("div", {
         className: "message text-block",
         dangerouslySetInnerHTML: {
@@ -13232,7 +13496,7 @@ var topicChange_utils = __webpack_require__(3);
 
 var topicChange_ContactsUI = __webpack_require__(2);
 
-var topicChange_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var topicChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var topicChange_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -13273,6 +13537,7 @@ function (_ConversationMessageM) {
       var messages = [];
       var avatar = topicChange_React.makeElement(topicChange_ContactsUI.Avatar, {
         contact: contact,
+        chatRoom: chatRoom,
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var topic = message.meta.topic;
@@ -13295,7 +13560,8 @@ function (_ConversationMessageM) {
       }, topicChange_React.makeElement(topicChange_ContactsUI.ContactButton, {
         contact: contact,
         className: "message",
-        label: displayName
+        label: displayName,
+        chatRoom: chatRoom
       }), datetime, topicChange_React.makeElement("div", {
         className: "message text-block",
         dangerouslySetInnerHTML: {
@@ -13402,7 +13668,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return SharedFileItem;
-}(Object(mixins["default"])(sharedFilesAccordionPanel_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class =
@@ -13644,7 +13910,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return SharedFilesAccordionPanel;
-}(Object(mixins["default"])(sharedFilesAccordionPanel_React.Component)), (sharedFilesAccordionPanel_applyDecoratedDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails", [sharedFilesAccordionPanel_dec], Object.getOwnPropertyDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails"), sharedFilesAccordionPanel_class.prototype)), sharedFilesAccordionPanel_class));
+}(mixins["MegaRenderMixin"]), (sharedFilesAccordionPanel_applyDecoratedDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails", [sharedFilesAccordionPanel_dec], Object.getOwnPropertyDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails"), sharedFilesAccordionPanel_class.prototype)), sharedFilesAccordionPanel_class));
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
@@ -13710,7 +13976,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return SharedFolderItem;
-}(Object(mixins["default"])(incomingSharesAccordionPanel_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -13845,7 +14111,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return IncomingSharesAccordionPanel;
-}(Object(mixins["default"])(incomingSharesAccordionPanel_React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -13878,7 +14144,7 @@ var closeOpenMode_utils = __webpack_require__(3);
 
 var closeOpenMode_ContactsUI = __webpack_require__(2);
 
-var closeOpenMode_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var closeOpenMode_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var closeOpenMode_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -13923,7 +14189,8 @@ function (_ConversationMessageM) {
       } else {
         avatar = closeOpenMode_React.makeElement(closeOpenMode_ContactsUI.Avatar, {
           contact: contact,
-          className: "message  avatar-wrapper small-rounded-avatar"
+          className: "message  avatar-wrapper small-rounded-avatar",
+          chatRoom: this.props.chatRoom
         });
         datetime = closeOpenMode_React.makeElement("div", {
           className: "message date-time",
@@ -13977,7 +14244,7 @@ var chatHandle_utils = __webpack_require__(3);
 
 var chatHandle_ContactsUI = __webpack_require__(2);
 
-var chatHandle_ConversationMessageMixin = __webpack_require__(8).ConversationMessageMixin;
+var chatHandle_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var chatHandle_getMessageString = __webpack_require__(10).getMessageString;
 
@@ -14022,7 +14289,8 @@ function (_ConversationMessageM) {
       } else {
         avatar = chatHandle_React.makeElement(chatHandle_ContactsUI.Avatar, {
           contact: contact,
-          className: "message  avatar-wrapper small-rounded-avatar"
+          className: "message  avatar-wrapper small-rounded-avatar",
+          chatRoom: this.props.chatRoom
         });
         datetime = chatHandle_React.makeElement("div", {
           className: "message date-time",
@@ -14277,7 +14545,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return ChatlinkDialog;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 
 chatlinkDialog_ChatlinkDialog.defaultProps = {
   'requiresUpdateOnResize': true,
@@ -14948,6 +15216,7 @@ function (_MegaRenderMixin) {
             contact: contact,
             className: "avatar-wrapper",
             simpletip: contact.name,
+            chatRoom: self.props.chatRoom,
             simpletipWrapper: "#call-block",
             simpletipOffset: 8,
             simpletipPosition: "top",
@@ -15010,6 +15279,7 @@ function (_MegaRenderMixin) {
             className: "small-icon icon-audio-muted hidden"
           }), external_React_default.a.createElement(ui_contacts["Avatar"], {
             contact: M.u[u_handle],
+            chatRoom: this.props.chatRoom,
             className: "call avatar-wrapper is-avatar " + (this.state.localMediaDisplay ? "" : "hidden"),
             hideVerifiedBadge: true
           })));
@@ -15061,6 +15331,7 @@ function (_MegaRenderMixin) {
           }), external_React_default.a.createElement(ui_contacts["Avatar"], {
             contact: M.u[u_handle],
             className: "call avatar-wrapper",
+            chatRoom: this.props.chatRoom,
             hideVerifiedBadge: true
           })));
           remotePlayerElement.push(localPlayer);
@@ -15352,7 +15623,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return ConversationAudioVideoPanel;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -15414,6 +15685,7 @@ function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototype
 
 
 var ENABLE_GROUP_CALLING_FLAG = true;
+var MAX_USERS_CHAT_PRIVATE_AND_ADD = 100;
 var conversationpanel_JoinCallNotification =
 /*#__PURE__*/
 function (_MegaRenderMixin) {
@@ -15464,7 +15736,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return JoinCallNotification;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 ;
 var conversationpanel_ConversationRightArea =
 /*#__PURE__*/
@@ -15644,7 +15916,7 @@ function (_MegaRenderMixin2) {
         className: "link-button green light",
         icon: "rounded-plus colorized",
         label: __(l[8007]),
-        disabled:
+        disabled: Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ||
         /* Disable in case I don't have any more contacts to add ... */
         !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
       }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
@@ -15787,9 +16059,9 @@ function (_MegaRenderMixin2) {
       }, external_React_default.a.createElement("div", {
         className: "chat-button-seperator"
       }), external_React_default.a.createElement("div", {
-        className: "link-button light",
+        className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ? " disabled" : ""),
         onClick: function onClick(e) {
-          if ($(e.target).closest('.disabled').length > 0) {
+          if (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD || $(e.target).closest('.disabled').length > 0) {
             return false;
           }
 
@@ -15854,7 +16126,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return ConversationRightArea;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
@@ -16508,42 +16780,48 @@ function (_MegaRenderMixin3) {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             } else if (v.dialogType === 'truncated') {
               messageInstance = external_React_default.a.createElement(TruncatedMessage, {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             } else if (v.dialogType === 'privilegeChange') {
               messageInstance = external_React_default.a.createElement(PrivilegeChange, {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             } else if (v.dialogType === 'topicChange') {
               messageInstance = external_React_default.a.createElement(TopicChange, {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             } else if (v.dialogType === 'openModeClosed') {
               messageInstance = external_React_default.a.createElement(CloseOpenModeMessage, {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             } else if (v.dialogType === 'chatHandleUpdate') {
               messageInstance = external_React_default.a.createElement(ChatHandleMessage, {
                 message: v,
                 key: v.messageId,
                 contact: Message.getContactForMessage(v),
-                grouped: grouped
+                grouped: grouped,
+                chatRoom: room
               });
             }
 
@@ -16572,6 +16850,7 @@ function (_MegaRenderMixin3) {
                 });
                 self.forceUpdate();
               },
+              chatRoom: room,
               onEditDone: function onEditDone(messageContents) {
                 self.props.chatRoom.scrolledToBottom = true;
                 self.editDomElement = null;
@@ -16874,7 +17153,8 @@ function (_MegaRenderMixin3) {
           message: self.state.messageToBeDeleted,
           hideActionButtons: true,
           initTextScrolling: true,
-          dialog: true
+          dialog: true,
+          chatRoom: self.props.chatRoom
         })));
       }
 
@@ -17104,6 +17384,7 @@ function (_MegaRenderMixin3) {
         contact = M.u[contactHandle];
         topicInfo = external_React_default.a.createElement(ui_contacts["ContactCard"], {
           className: "short",
+          chatRoom: room,
           noContextButton: "true",
           contact: contact,
           showLastGreen: true,
@@ -17425,7 +17706,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return ConversationPanel;
-}(Object(mixins["default"])(external_React_default.a.Component)), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
+}(mixins["MegaRenderMixin"]), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
 var conversationpanel_ConversationPanels =
 /*#__PURE__*/
@@ -17521,7 +17802,8 @@ function (_MegaRenderMixin4) {
               var pres = megaChat.userPresenceToCssClass(contact.presence);
               (pres === "offline" ? contactsListOffline : contactsList).push(external_React_default.a.createElement(ui_contacts["ContactCard"], {
                 contact: contact,
-                key: contact.u
+                key: contact.u,
+                chatRoom: false
               }));
             }
           }
@@ -17572,10 +17854,14 @@ function (_MegaRenderMixin4) {
   }]);
 
   return ConversationPanels;
-}(Object(mixins["default"])(external_React_default.a.Component));
+}(mixins["MegaRenderMixin"]);
 ;
 
 function isStartCallDisabled(room) {
+  if (Object.keys(room.members).length > 20) {
+    return true;
+  }
+
   return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId || room.callManagerCall && room.callManagerCall.state !== CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || (room.type === "group" || room.type === "public") && !ENABLE_GROUP_CALLING_FLAG || room.getCallParticipants().length > 0 || room.getParticipantsExceptMe() < 1;
 }
 
@@ -18744,7 +19030,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     roomId = chatId;
   }
 
-  if (type === "group" || type == "public") {
+  if (type === "group" || type === "public") {
     userHandles.forEach(function (contactHash) {
       assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -18755,15 +19041,21 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
           'm': '',
           'c': undefined
         }));
-        M.syncUsersFullname(contactHash);
+
+        if (type === "group") {
+          M.syncUsersFullname(contactHash);
+          M.syncContactEmail(contactHash);
+        }
+
         self.processNewUser(contactHash, true);
-        M.syncContactEmail(contactHash);
       }
     });
 
-    ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+    if (type === "group") {
+      ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+    }
 
-    ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
+    ChatdIntegration._ensureContactExists(userHandles, chatHandle);
   }
 
   if (!roomId && setAsActive) {
@@ -20281,11 +20573,15 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   }
 
   self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
-    if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-      if (self.chatd && self.isOnline() && self.chatIdBin) {
-        // this should never happen, but just in case...
-        self.getChatIdMessages().resend();
+    if (newState === ChatRoom.STATE.READY) {
+      if (!self.isReadOnly()) {
+        if (self.chatd && self.isOnline() && self.chatIdBin) {
+          // this should never happen, but just in case...
+          self.getChatIdMessages().resend();
+        }
       }
+
+      self.loadContactNames();
     }
   }); // activity on a specific room (show, hidden, got new message, etc)
 
@@ -20376,7 +20672,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
 
           self.members[eventData.userId] = eventData.priv;
 
-          ChatdIntegration._ensureNamesAreLoaded([eventData.userId], self.publicChatHandle);
+          ChatdIntegration._ensureContactExists([eventData.userId]);
 
           self.trigger('onMembersUpdatedUI', eventData);
         };
@@ -20446,20 +20742,16 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     Object.keys(membersSnapshot).forEach(function (u_h) {
       var contact = M.u[u_h];
 
-      if (contact) {
+      if (!contact || typeof self.members[u_h] === 'undefined') {
+        roomRequiresUpdate = true;
         contact.removeChangeListener(membersSnapshot[u_h]);
-
-        if (!self.members[u_h]) {
-          roomRequiresUpdate = true;
-        }
+        delete membersSnapshot[u_h];
       }
-
-      delete membersSnapshot[u_h];
     });
     Object.keys(self.members).forEach(function (u_h) {
       var contact = M.u[u_h];
 
-      if (contact && contact.addChangeListener) {
+      if (contact && contact.addChangeListener && !membersSnapshot[u_h]) {
         membersSnapshot[u_h] = contact.addChangeListener(function () {
           self.trackDataChange.apply(self, arguments);
         });
@@ -20930,29 +21222,43 @@ ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
 /**
  * Get room title
  *
+ * @param [ignoreTopic] {Boolean}
+ * @param [encapsTopicInQuotes] {Boolean}
  * @returns {string}
  */
 
 
 ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
   var self = this;
+  var participants;
 
   if (self.type === "private") {
-    var participants = self.getParticipantsExceptMe();
+    participants = self.getParticipantsExceptMe();
     return M.getNameByHandle(participants[0]) || "";
   } else {
     if (!ignoreTopic && self.topic && self.topic.substr) {
       return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
     }
 
-    var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
+    participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
     var names = [];
-    participants.forEach(function (contactHash) {
+
+    for (var i = 0; i < Math.min(participants.length, 5); i++) {
+      var contactHash = participants[i];
+
       if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
-        names.push(M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact");
+        var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
+        names.push(name);
       }
-    });
-    return names.length > 0 ? names.join(", ") : __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+    }
+
+    var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+
+    if (names.length === 0) {
+      return def;
+    }
+
+    return names.length > 0 ? names.join(", ") : def;
   }
 };
 /**
@@ -21929,6 +22235,26 @@ ChatRoom.prototype.onPublicChatRoomInitialized = function () {
   }
 };
 
+ChatRoom.prototype.loadContactNames = function () {
+  var contacts = this.getParticipantsExceptMe();
+
+  for (var i = 0; i < Math.min(5, contacts.length); i++) {
+    var handle = contacts[i];
+
+    if (!M.u[handle]) {
+      continue;
+    }
+
+    if (!M.u[handle].name) {
+      M.syncUsersFullname(handle, this.publicChatHandle);
+    }
+
+    if (!M.u[handle].m && !anonymouschat) {
+      M.syncContactEmail(handle);
+    }
+  }
+};
+
 window.ChatRoom = ChatRoom;
 /* harmony default export */ __webpack_exports__["default"] = ({
   'ChatRoom': ChatRoom
@@ -22061,7 +22387,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return ToggleCheckbox;
-}(Object(mixins["default"])(React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -22125,7 +22451,7 @@ function (_MegaRenderMixin2) {
   }]);
 
   return Checkbox;
-}(Object(mixins["default"])(React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 
@@ -22193,7 +22519,7 @@ function (_MegaRenderMixin3) {
   }]);
 
   return IntermediateCheckbox;
-}(Object(mixins["default"])(React.Component));
+}(mixins["MegaRenderMixin"]);
 
 ;
 /* harmony default export */ var miniui = ({
@@ -22205,7 +22531,7 @@ function (_MegaRenderMixin3) {
 var ui_contacts = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(6);
+var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
@@ -22505,7 +22831,7 @@ function (_MegaRenderMixin) {
   }]);
 
   return StartGroupChatWizard;
-}(Object(mixins["default"])(startGroupChatWizard_React.Component));
+}(mixins["MegaRenderMixin"]);
 startGroupChatWizard_StartGroupChatWizard.clickTime = 0;
 startGroupChatWizard_StartGroupChatWizard.defaultProps = {
   'selectLabel': __(l[1940]),

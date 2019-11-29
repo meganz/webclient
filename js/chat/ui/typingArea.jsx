@@ -1,13 +1,13 @@
 // libs
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
 import { Button } from './../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
 import utils from './../../ui/utils.jsx';
 
-export class TypingArea extends MegaRenderMixin(React.Component) {
+export class TypingArea extends MegaRenderMixin {
     static validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
     static defaultProps = {
         'textareaMaxHeight': "40%"

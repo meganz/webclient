@@ -2826,6 +2826,117 @@ function createFolderDialog(close) {
     });
 }
 
+function createFileDialog(close) {
+    "use strict";
+
+    var $dialog = $('.fm-dialog.create-file-dialog');
+    var $input = $('input', $dialog);
+    $input.val('');
+
+    if (close) {
+        if ($.cftarget) {
+            delete $.cftarget;
+        }
+        closeDialog();
+        return true;
+
+    }
+    var doCreateFile = function(v) {
+        var target = $.cftarget = $.cftarget || M.currentdirid;
+
+        if (!M.isSafeName(v)) {
+            $dialog.removeClass('active');
+            $input.addClass('error');
+            return;
+        }
+        else {
+
+            if (duplicated(0, v, target)) {
+                $dialog.addClass('duplicate');
+                $input.addClass('error');
+
+                setTimeout(function() {
+                    $dialog.removeClass('duplicate');
+                    $input.removeClass('error');
+
+                    $input.focus();
+                }, 2000);
+
+                return;
+            }
+        }
+        createFileDialog(1);
+        loadingDialog.pshow();
+        M.addNewFile(v, target)
+            .done(function() {
+                if (d) {
+                    console.log('Created new file %s->%s', target, v);
+                }
+                loadingDialog.phide();
+
+            })
+            .fail(function(error) {
+                loadingDialog.phide();
+                msgDialog('warninga', l[135], l[47], api_strerror(error));
+            });
+    };
+
+
+    $input.rebind('focus', function() {
+        if ($(this).val() === l[17506]) {
+            $input.val('');
+        }
+        $dialog.addClass('focused');
+    });
+
+    $input.rebind('blur', function() {
+        $dialog.removeClass('focused');
+    });
+
+    $input.rebind('keyup', function() {
+        if ($input.val() === '' || $input.val() === l[17506]) {
+            $dialog.removeClass('active');
+        }
+        else {
+            $dialog.addClass('active');
+            $input.removeClass('error');
+        }
+    });
+
+    $input.rebind('keypress', function(e) {
+
+        if (e.which === 13 && $(this).val() !== '') {
+            doCreateFile($(this).val());
+        }
+    });
+
+    $('.fm-dialog-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
+
+    $('.fm-dialog-input-clear', $dialog).rebind('click', function() {
+        $input.val('');
+        $dialog.removeClass('active');
+    });
+
+    $('.fm-dialog-new-folder-button', $dialog).rebind('click', function() {
+        var v = $input.val();
+
+        if (v === '' || v === l[17506]) {
+            alert(l[8566]);
+        }
+        else {
+            doCreateFile(v);
+        }
+    });
+
+    M.safeShowDialog('createfile', function() {
+        $dialog.removeClass('hidden');
+        $('.create-folder-input-bl input', $dialog).focus();
+        $dialog.removeClass('active');
+        return $dialog;
+    });
+}
+
+
 function chromeDialog(close) {
     'use strict';
 

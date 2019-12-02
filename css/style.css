@@ -8772,6 +8772,17 @@ body:not(.en) .warning-dialog-a.wide {
 .qr-dialog .disabled {
     pointer-events: none;
 }
+.fm-dialog.file-edit-dialog {
+    width: 800px;
+    left: 25%;
+    top: 25%;
+}
+
+.file-edit-dialog iframe {
+    width: 741px;
+    margin-left: 20px;
+}
+
 .fm-dialog.browsers-dialog {
     width: 624px;
     min-height: 520px;
@@ -30354,4 +30365,16 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: -webkit-calc(100% - 110px);
     height: -moz-calc(100% - 110px);
     height: calc(100% - 110px);
+}
+
+.txt-editor-frame {
+    z-index: 1000000;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /*background: rgba(0,0,0,0.5);*/
+}
+.txt-editor-frame iframe{
+    width: 100%;
+    height: 100%;
 }

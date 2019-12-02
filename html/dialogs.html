@@ -190,10 +190,34 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="fm-dialog-new-folder-button default-green-button button right"><span>[$455]</span></div>
-         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+        <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
+
+<div class="fm-dialog create-file-dialog filled-input hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title">[$17505]</div>
+    <div class="create-folder-size-icon short-size">
+    </div>
+    <div class="create-folder-pad">
+        <div class="create-folder-input-bl">
+            <div class="transfer-filetype-icon text">
+                <div class="duplicated-input-warning">
+                    <div class="arrow"></div>
+                    <span>[$17578]</span>
+                </div>
+            </div>
+            <input name="dialog-new-folder" type="text" value="" placeholder="[$17506]" autofocus />
+        </div>
+        <div class="create-folder-bottom">
+            <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
+            <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
 
 <div class="fm-dialog dlkey-dialog hidden">
     <div class="fm-dialog-header">
@@ -627,8 +651,8 @@
                 </div>
                 <div class="expiry-date-select-container default-select hidden">
                     <input type="text" id="link-expiry-datepicker"
-                        class="fm-dialogs-select expiry-date-select"
-                        value="" placeholder="[$17697]-[$17698]-[$17699]" />
+                           class="fm-dialogs-select expiry-date-select"
+                           value="" placeholder="[$17697]-[$17698]-[$17699]" />
                 </div>
                 <div class="disabled-overlay hidden"></div>
             </div>
@@ -1006,7 +1030,7 @@
             <span>[$17579]</span><!--  -->
         </div>
     </div>
-     <div class="fm-notifications-bottom">
+    <div class="fm-notifications-bottom">
         <div class="create-folder-button default-green-button button right"><span>[$455]</span></div>
         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
@@ -2873,7 +2897,8 @@
                 <div class="big-icon achievements-icon"></div>
                 <div class="fm-account-header">
                     <span>[$20186]</span>
-                    <div class="medium-icon new-dialog-icon"></div></div>
+                    <div class="medium-icon new-dialog-icon"></div>
+                </div>
                 <span class="quota-txt">0</span>
             </div>
         </div>
@@ -3562,6 +3587,9 @@
     </div>
 </div>
 
+<div class="txt-editor-frame hidden">
+    <iframe id="txt-editor-iframe" src="../dont-deploy/txtEditor.html" allowtransparency="true"/>
+</div>
 <div class="viewer-overlay hidden">
     <div class="viewer-body">
         <div class="viewer-top-bl">
@@ -4329,8 +4357,8 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="button default-white-button left preview-widget">
-                    <span>[$17409]</span>
-                </div>
+            <span>[$17409]</span>
+        </div>
         <div class="button default-green-button right copy-widget-code url">
             <span>[$17835]</span>
         </div>
@@ -4834,7 +4862,7 @@
         </form>
 
         <!-- Step 2 - Verify Code (from SMS) -->
-        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off" >
+        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off">
             <div class="verify-ph-info long">
                 <span>[$20217]</span>
                 <span class="phone-num js-user-phone-number"></span>
@@ -4881,7 +4909,7 @@
                     <div class="icon56 achievements-icon bonus-image"></div>
                     <div class="verify-ph-bonus-intro-wrapper">
                         <div class="big-num js-transfer-quota"></div>
-                         <div class="body-txt">[$20406]</div>
+                        <div class="body-txt">[$20406]</div>
                     </div>
                 </div>
             </div>
@@ -4917,7 +4945,7 @@
         <p class="first-paragraph">[$19853]</p>
         <p class="first-paragraph post-register">[$20188]</p>
         <p class="second-paragraph">[$19854]</p>
-        <p class="second-paragraph post-register">[$20189]<br/><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
+        <p class="second-paragraph post-register">[$20189]<br /><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
         <div class="recover-paste-block">
             <div class="left-section">
                 <h5 class="main-italic-header">[$8963]</h5>
@@ -4971,9 +4999,9 @@
             </div>
         </div>
         <div class="clear"></div>
-            <div class="default-green-button height-48 close-dialog">
-                <span class="label">[$81]</span>
-            </div>
+        <div class="default-green-button height-48 close-dialog">
+            <span class="label">[$81]</span>
+        </div>
     </div>
 </div>
 <!-- user management dialog !-->
@@ -5025,7 +5053,7 @@
     </div><!-- END folder container -->
     <div class="dialog-button-container white-bg">
         <div class="invite-link-option">
-            <div class="enable-pw-txt" >[$19599]</div>
+            <div class="enable-pw-txt">[$19599]</div>
             <div class="dialog-feature-toggle">
                 <div class="dialog-feature-switch"></div>
             </div>

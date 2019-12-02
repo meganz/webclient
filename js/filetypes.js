@@ -508,12 +508,20 @@ function filemime(n, def) {
     return extmime[fext] || def || 'application/octet-stream';
 }
 
-function filetype(n) {
+/**
+ * Get file type
+ * @param {Object} n            Node
+ * @param {Boolean} getFullType     Optional to return full detailed array of the type
+ */
+function filetype(n, getFullType) {
     if (typeof n === 'object') {
         n = n.name;
     }
     var fext = fileext(String(n));
     if (ext[fext]) {
+        if (getFullType) {
+            return ext[fext];
+        }
         return ext[fext][1];
     }
     else if (fext && fext.length > 1) {

@@ -1351,6 +1351,9 @@ FileManager.prototype.initContextUI = function() {
         }
         createFolderDialog();
     });
+    $(c + '.newfile-item').rebind('click', function() {
+        createFileDialog();
+    });
 
     $(c + '.fileupload-item').rebind('click', function() {
         // check if this is a business expired account
@@ -1520,6 +1523,30 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.properties-item').rebind('click', function() {
         propertiesDialog();
+    });
+
+    $(c + '.edit-file-item').rebind('click', function() {
+        var nodeHandle = $.selected && $.selected[0];
+        if (!nodeHandle) {
+            return;
+        }
+
+        loadingDialog.show();
+
+        mega.filesEditor.getFile(nodeHandle).done(
+            function(data) {
+                loadingDialog.hide();
+                var txtEditorFrame = $('.txt-editor-frame').removeClass('hidden');
+                var txtEditoriFrame = txtEditorFrame.find('#txt-editor-iframe');
+
+                txtEditoriFrame[0].contentWindow.setupEditor(M.d[nodeHandle].name, data, txtEditorFrame,
+                    mega.filesEditor.setFile, nodeHandle, mega.filesEditor.removeOldVersion);
+            }
+        ).fail(function() {
+            loadingDialog.hide();
+        });
+
+        
     });
 
     $(c + '.properties-versions').rebind('click', function() {

@@ -391,7 +391,9 @@ var ulmanager = {
                 else {
                     errorstr = reason.substr(0, 50) + '...';
                 }
-                $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
+                if (!file.isCreateFile) {
+                    $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
+                }
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
@@ -1538,7 +1540,7 @@ FileUpload.prototype.run = function(done) {
     file.ul_lastreason = file.ul_lastreason || 0;
 
     var domNode = document.getElementById('ul_' + file.id);
-    if (ulmanager.ulStartingPhase || !domNode) {
+    if (ulmanager.ulStartingPhase || (!domNode && !file.isCreateFile)) {
         done();
         ASSERT(0, "This shouldn't happen");
         return ulQueue.pushFirst(this);
@@ -1551,9 +1553,10 @@ FileUpload.prototype.run = function(done) {
     if (d) {
         ulmanager.logger.info(file.name, "starting upload", file.id);
     }
-
-    domNode.classList.add('transfer-initiliazing');
-    domNode.querySelector('.transfer-status').textContent = (l[1042]);
+    if (!file.isCreateFile) {
+        domNode.classList.add('transfer-initiliazing');
+        domNode.querySelector('.transfer-status').textContent = (l[1042]);
+    }
 
     ulmanager.ulSize += file.size;
     // ulmanager.ulStartingPhase = true;
@@ -1679,6 +1682,10 @@ ulQueue.poke = function(file, meth) {
     }
 
     if (meth !== 0xdead) {
+        if (!meth && file.isCreateFile && file.size === 0) {
+            meth = 'pushFirst';
+        }
+
         file.sent = 0;
         file.progress = Object.create(null);
         file.owner = new FileUpload(file);
@@ -1695,7 +1702,7 @@ ulQueue.validateTask = function(pzTask) {
 
     if (pzTask instanceof FileUpload
         && !ulmanager.ulStartingPhase
-        && document.getElementById('ul_' + pzTask.file.id)) {
+        && (document.getElementById('ul_' + pzTask.file.id) || pzTask.file.isCreateFile)) {
 
         return true;
     }

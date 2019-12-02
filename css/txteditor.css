@@ -1,0 +1,252 @@
+#mega-text-editor {
+    width: 100%;
+    height: 100%;
+    /*background-color: #D5DADC;*/
+    background-color: rgba(213,218,220,0.95);
+    /*opacity: 0.9;*/
+    min-width: 1000px;
+}
+#mega-text-editor .editor-textarea-container{
+    width: 60%;
+    height: 99%;
+    margin-left: 20%;
+}
+/*#txtar {
+    width: 60%;
+    height: 90%;
+    margin-left: 20%;
+}*/
+#mega-text-editor .CodeMirror {
+    height: 95%;
+    font-family: 'Source Code Pro', monospace;
+}
+#mega-text-editor .editor-textarea-container .editor-btn-container{
+    background-color:#FAFAFA;
+    height: 48px;
+}
+#mega-text-editor .CodeMirror-gutters{
+    background-color:white;
+    border-color: white;
+}
+#mega-text-editor .CodeMirror-linenumber {
+    color: #2BA6DE;
+    font-size: 12px;
+    font-family: 'source_code_proregular';
+}
+.CodeMirror-line::selection{
+    background: #D6F1CC;
+}
+
+#mega-text-editor .CodeMirror-selected {
+    background: #D6F1CC;
+}
+#mega-text-editor .CodeMirror-focused .CodeMirror-selected {
+    background: #D6F1CC;
+}
+#mega-text-editor .CodeMirror-line::selection,
+#mega-text-editor .CodeMirror-line > span::selection,
+#mega-text-editor .CodeMirror-line > span > span::selection {
+    background: #D6F1CC;
+}
+#mega-text-editor .CodeMirror-line::-moz-selection,
+#mega-text-editor .CodeMirror-line > span::-moz-selection,
+#mega-text-editor .CodeMirror-line > span > span::-moz-selection {
+    background: #D6F1CC;
+}
+#mega-text-editor .CodeMirror-line {
+    /*padding-left: 40px;*/
+    /*margin-left: 26px;*/
+}
+#mega-text-editor .CodeMirror-lines {
+    /*line-height: 24px;
+    padding-right: 65px;*/
+}
+#mega-text-editor .editor-btn-container {
+    border: solid;
+    border-color: rgba(0,0,0,0.1);
+    border-width: 1px;
+}
+#mega-text-editor .txt-editor-menu {
+    background-position: -6px -60px;
+    opacity: 0.7;
+    background-image: url(../images/mega/top-sprite_v7@2x.png);
+    background-size: 38px auto;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin-left: 12px;
+    margin-top: 12px;
+    display:inline-block;
+    cursor:pointer;
+}
+#mega-text-editor .editor-file-name-title {
+    display: inline-block;
+    height: 24px;
+    /* width: 50px; */
+    margin-left: calc(50% - 300px);
+    width: 408px;
+    text-align: center;
+}
+#mega-text-editor .transfer-filetype-icon {
+    position: initial;
+    display: inline-block;
+}
+#mega-text-editor .txt-editor-file-name span {
+    user-select: text;
+}
+#mega-text-editor .txt-editor-file-name {
+    display: inline-block;
+    height: 24px;
+    vertical-align: middle;
+    padding-bottom: 6px;
+    font-family: 'source_code_proregular';
+    width: 350px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+#mega-text-editor .txt-editor-opened-f-name {
+    display: inline-block;
+    height: 24px;
+    vertical-align: middle;
+    padding-bottom: 6px;
+    font-family: 'source_code_proregular';
+    /*width: 350px;*/
+    max-width:350px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+#mega-text-editor .default-green-button {
+    display: inline-block;
+    position: unset;
+    vertical-align: bottom;
+    border: 1px solid #009985;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    min-width:unset;
+    margin-left:11px;
+}
+#mega-text-editor .default-green-button:hover {
+    /*-webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);*/
+    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
+}
+#mega-text-editor .default-white-button {
+    display: inline-block;
+    position: unset;
+    vertical-align: bottom;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
+    min-width: unset;
+}
+#mega-text-editor .default-white-button:hover {
+    /*-webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);*/
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
+}
+#mega-text-editor .txt-editor-btn:before {
+    content:none;
+}
+#mega-text-editor .txt-editor-btn:after {
+    content: none;
+}
+#mega-text-editor .buttons-holder {
+    display: inline-block;
+    float: right;
+    margin-right: 9px;
+    margin-top: 8px;
+}
+.CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
+    position: absolute;
+    background: #ccc;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+}
+.CodeMirror-simplescroll-horizontal, .CodeMirror-simplescroll-vertical {
+    position: absolute;
+    z-index: 6;
+    background: #eee;
+}
+.CodeMirror-simplescroll-horizontal {
+    bottom: 0; left: 0;
+    height: 8px;
+}
+.CodeMirror-simplescroll-horizontal div {
+    bottom: 0;
+    height: 100%;
+}
+.CodeMirror-simplescroll-vertical {
+    right: 0; top: 0;
+    width: 8px;
+}
+.CodeMirror-simplescroll-vertical div {
+    right: 0;
+    width: 100%;
+}
+.CodeMirror-overlayscroll .CodeMirror-scrollbar-filler, .CodeMirror-overlayscroll .CodeMirror-gutter-filler {
+    display: none;
+}
+.CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div {
+    position: absolute;
+    background: #666666;
+    border-radius: 3px;
+}
+.CodeMirror-overlayscroll-horizontal, .CodeMirror-overlayscroll-vertical {
+    position: absolute;
+    z-index: 6;
+}
+.CodeMirror-overlayscroll-horizontal {
+    bottom: 0;
+    left: 0;
+    height: 6px;
+}
+.CodeMirror-overlayscroll-horizontal div {
+    bottom: 0;
+    height: 100%;
+    cursor:pointer;
+}
+.CodeMirror-overlayscroll-vertical {
+    right: 0;
+    top: 0;
+    margin-right: 37px;
+    width: 6px;
+}
+.CodeMirror-overlayscroll-vertical div {
+    right: 0;
+    width: 100%;
+    cursor:pointer;
+}
+.CodeMirror-overlayscroll-vertical div:hover {
+    width: 130%;
+}
+.CodeMirror-overlayscroll-horizontal div:hover {
+    height: 130%;
+}
+#mega-text-editor .top-menu-popup {
+    right: unset;
+    top: 8px;
+    margin-left: 8px;
+    height: unset;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
+    transition: left 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
+    display:none;
+    width:190px;
+}
+#mega-text-editor .top-menu-popup .txt-editor-sp-menu {
+    height: 1px;
+    opacity: 0.1;
+    background-color: #000000;
+    position: relative;
+    top: 12px;
+}
+#mega-text-editor .CodeMirror-sizer {
+    /*padding-left: 10px;*/
+}
+

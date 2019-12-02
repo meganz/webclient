@@ -1966,7 +1966,8 @@ li.token-input-token-invite .input-close {
 }
 /* End of Invitation status dialog */
 
-.fm-dialog.create-folder-dialog {
+.fm-dialog.create-folder-dialog,
+.fm-dialog.create-file-dialog {
     width: 402px;
     margin: -96px 0 0 -201px;
 }

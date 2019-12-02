@@ -29,7 +29,7 @@
 
 <body id="body-txt-editor" style="background-color: initial !important;">
     <div id="mega-text-editor">
-        
+        <div class="disability-overlay hidden"></div>
         <div class="editor-textarea-container">
             <div class="editor-btn-container">
                 <div class="txt-editor-menu">
@@ -106,18 +106,27 @@
                 return false;
             });
 
+        function bindChangeListner() {
+            var changeListner = function() {
+                $('#mega-text-editor .buttons-holder .save-btn').removeClass('disabled');
+                editor.off('change', changeListner);
+            };
+
+            editor.on('change', changeListner);
+        }
+
         function setupEditor(fName, txt, container, setterFunction, handle, removeFunction) {
             // myTextarea.text(txt);
             $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
             if (editor) {
                 editor.setValue(txt);
+                bindChangeListner();
+                //var changeListner = function() {
+                //    $('#mega-text-editor .buttons-holder .save-btn').removeClass('disabled');
+                //    editor.off('change', changeListner);
+                //};
 
-                var changeListner = function() {
-                    $('#mega-text-editor .buttons-holder .save-btn').removeClass('disabled');
-                    editor.off('change', changeListner);
-                };
-
-                editor.on('change', changeListner);
+                //editor.on('change', changeListner);
             }
 
             $('#mega-text-editor .txt-editor-opened-f-name').text(fName);
@@ -153,11 +162,17 @@
                     return false;
                 }
                 if (setFunction && editor) {
-                    setFunction(fileHandle, editor.getValue()).done(function(fh) {
+                    $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
+                    $('#mega-text-editor .disability-overlay').removeClass('hidden');
+
+                    setFunction(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
                             remFunction(versionHandle);
                         }
                         versionHandle = fh;
+                        
+                        bindChangeListner();
+                        $('#mega-text-editor .disability-overlay').addClass('hidden');
                     });
                 }
             });

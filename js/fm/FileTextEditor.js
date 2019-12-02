@@ -107,12 +107,19 @@ mega.filesEditor = new function FileTextEditor() {
         nFile._replaces = handle;
         nFile.promiseToInvoke = operationPromise;
 
+        operationPromise.done(function(vHandle) {
+            // no need to clear here, since we are adding + removing
+            filesDataMap[handle] = null;
+            delete filesDataMap[handle];
+            filesDataMap[vHandle] = content;
+        });
+
         ul_queue.push(nFile);
         return operationPromise;
     };
 
     this.removeOldVersion = function(handle) {
-        api_req({ a: 'd', n: handle });
+        api_req({ a: 'd', n: handle, v: 1 });
     };
 
     this.clearCachedFileData = function(handle) {

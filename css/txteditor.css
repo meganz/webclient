@@ -11,6 +11,13 @@
     height: 99%;
     margin-left: 20%;
 }
+#mega-text-editor .disability-overlay{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    position: absolute;
+    z-index: 10000;
+}
 /*#txtar {
     width: 60%;
     height: 90%;

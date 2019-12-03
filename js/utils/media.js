@@ -852,6 +852,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
+        // Special audio volume control for Safari
+        var _setVolumeForSafari = function(v) {
+            // If this is Safari and audio playing
+            if (window.webkitAudioContext && streamer.stream._audioSource) {
+                streamer.stream._audioSource.gain.value = v;
+            }
+        };
+
         // Increase/decrease video volume.
         var setVideoVolume = function(v) {
             if (videoElement.muted) {
@@ -860,6 +868,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
             $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+
+            _setVolumeForSafari(videoElement.volume);
         };
 
         // Increase/decrease color filter
@@ -1052,6 +1062,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 $this.find('span').css('height', percentage + '%');
                 videoElement.volume = percentage / 100;
+
+                _setVolumeForSafari(videoElement.volume);
             }
             else {
                 if (!videoElement.muted) {
@@ -1071,6 +1083,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 videoElement.muted = !videoElement.muted;
                 changeButtonState('mute');
                 updateVolumeBar();
+                _setVolumeForSafari(!videoElement.muted);
             }
             return false;
         });

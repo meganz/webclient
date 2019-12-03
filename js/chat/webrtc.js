@@ -625,6 +625,11 @@ Call.prototype._initialGetLocalStream = function(av) {
     }, 2000);
 
     var pms;
+    var gumErrorDevices = 0;
+    function addGumError(msg, what) {
+        gumErrorDevices |= what;
+        self.logger.warn(msg);
+    }
     // We always get audio, and then mute it if we don't need it
     if (needVideo) {
         if (av & Av.Screen) {
@@ -633,7 +638,7 @@ Call.prototype._initialGetLocalStream = function(av) {
             // from different APIs
             var pmsAudio = RTC.getUserMedia({audio: true})
             .catch(function(err) {
-                self.logger.warn("Error getting audio:", err);
+                addGumError("Error getting audio: " + err, Av.Audio);
                 return null;
             });
             var pmsScreen = RTC.getDisplayMedia({
@@ -643,7 +648,7 @@ Call.prototype._initialGetLocalStream = function(av) {
                 }
             })
             .catch(function(err) {
-                self.logger.warn("Error getting screen:", err);
+                addGumError("Error getting screen: " + err, Av.Screen);
                 return null;
             });
             pms = Promise.all([pmsAudio, pmsScreen])
@@ -676,24 +681,38 @@ Call.prototype._initialGetLocalStream = function(av) {
             });
         } else {
             var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            var bothFailed = false;
             pms = RTC.getUserMedia({audio: true, video: vidOpts})
             .catch(function(error) {
-                self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
+                bothFailed = true;
+                addGumError("Failed to get audio+video, trying audio-only...", Av.Audio | Av.Video);
                 return RTC.getUserMedia({audio: true, video: false});
             })
             .catch(function(error) {
-                self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
+                addGumError("Failed to get audio-only, trying video-only...", Av.Audio);
                 return RTC.getUserMedia({audio: false, video: vidOpts});
+            })
+            .catch(function(error) {
+                addGumError("Failed to get video-only", Av.Video);
+                return Promise.reject(error);
+            })
+            .then(function(stream) {
+                if (bothFailed) {
+                    var succeededAv = Av.fromStream(stream);
+                    if (succeededAv) {
+                        gumErrorDevices &= ~succeededAv;
+                    }
+                }
+                return stream;
             });
         }
     } else { // need only audio
-        pms = RTC.getUserMedia({audio: true, video: false});
+        pms = RTC.getUserMedia({audio: true, video: false})
+        .catch(function(err) {
+            addGumError("Failed to get audio-only", Av.Audio);
+            return Promise.reject(err);
+        });
     }
-    pms = pms.catch(function(error) {
-        var msg = RtcModule.gumErrorToString(error);
-        self.logger.warn("getUserMedia failed:", msg);
-        return Promise.reject(msg);
-    });
 
     return new Promise(function(resolve, reject) {
         pms.then(function(stream) {
@@ -710,6 +729,9 @@ Call.prototype._initialGetLocalStream = function(av) {
             if (!needAudio) {
                 Av.enableAudio(stream, false);
             }
+            if (gumErrorDevices) {
+                self._fire("onLocalMediaFail", gumErrorDevices);
+            }
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
             self._fire('onLocalMediaObtained', stream);
@@ -718,14 +740,16 @@ Call.prototype._initialGetLocalStream = function(av) {
                 if (!self._audioMutedChecker) {
                     self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
                 }
-                if (needAudio) {
+                if (needAudio && stream.getAudioTracks().length) {
                     self._audioMutedChecker.start(stream);
                 } // otherwise it should be started when user unmutes audio
             }
             delete self._obtainingLocalStream;
             resolve(stream);
-        }).catch(function(err) { // silence DOMException logging
+        })
+        .catch(function(err) { // silence DOMException logging
         });
+
         pms.catch(function(err) {
             resolved = true;
             reject(err);
@@ -738,9 +762,7 @@ Call.prototype._initialGetLocalStream = function(av) {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        if (notified) {
-            self._fire('onLocalMediaFail', err);
-        }
+        self._fire('onLocalMediaFail', gumErrorDevices, err);
         delete self._obtainingLocalStream;
         return Promise.reject(err);
     });
@@ -806,7 +828,7 @@ Call.prototype._getLocalVideo = function(screenCapture) {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        self._fire('onLocalMediaFail', err);
+        self._fire('onLocalMediaFail', Av.Video, err);
         return Promise.reject(err);
     });
 };
@@ -2319,6 +2341,7 @@ Call.prototype.enableAudio = function(enable) {
     self._notifyLocalMuteComplete();
     if (!success) {
         self.logger.warn("Failed to enable audio: there is no local stream or no audio tracks in it");
+        self._fire('onLocalMediaFail', Av.Audio);
         return;
     }
     self._bcastLocalAvChange();
@@ -3325,7 +3348,7 @@ Session.prototype._setRemoteAnswerSdp = function(packet) {
     .catch(function(err) {
         var msg = "Error setting SDP answer: " + err;
         self.terminateAndDestroy(self._streamRenegTimer ? Term.kErrStreamReneg : Term.kErrSdp, msg);
-        return err;
+        return Promise.reject(err);
     });
 };
 

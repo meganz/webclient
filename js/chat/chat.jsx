@@ -1090,7 +1090,7 @@ Chat.prototype.userPresenceToCssClass = function(presence) {
 /**
  * Used to re-render my own presence/status
  */
-Chat.prototype.renderMyStatus = function() {
+Chat.prototype.renderMyStatus = SoonFc(function() {
     var self = this;
     if (!self.is_initialized) {
         return;
@@ -1165,7 +1165,7 @@ Chat.prototype.renderMyStatus = function() {
             .removeClass("fadeinout");
     }
 
-};
+}, 100);
 
 
 /**
@@ -1615,7 +1615,7 @@ Chat.prototype.processNewUser = function(u, isNewChat) {
 
     self.logger.debug("added: ", u);
 
-    if (self.plugins.presencedIntegration) {
+    if (M.u[u] && M.u[u].c !== 1 && self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.addContact(u, isNewChat);
     }
     self.chats.forEach(function(chatRoom) {

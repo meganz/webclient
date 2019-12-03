@@ -29750,7 +29750,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row.complete .transfer-filetype-txt {
     max-width: 260px;
 }
-.transfer-task-row.error .transfer-filetype-txt, 
+.transfer-task-row.error .transfer-filetype-txt,
 .transfer-task-row .transfer-file-size {
     position: relative;
     display: inline-block;

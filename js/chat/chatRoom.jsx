@@ -282,7 +282,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     /**
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
-    var membersSnapshot = {};
     self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function(e, eventData) {
         var roomRequiresUpdate = false;
 
@@ -300,24 +299,25 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             }
             roomRequiresUpdate = true;
         }
-
-        Object.keys(membersSnapshot).forEach(function(u_h) {
-            var contact = M.u[u_h];
-            if (!contact || typeof self.members[u_h] === 'undefined') {
-                roomRequiresUpdate = true;
-                contact.removeChangeListener(membersSnapshot[u_h]);
-                delete membersSnapshot[u_h];
+        else {
+            var contact = M.u[eventData.userId];
+            if (contact && contact.addChangeListener && contact.removeChangeListener) {
+                if (eventData.priv === 255 || eventData.priv === -1) {
+                    if (contact._onMembUpdUIListener) {
+                        contact._onMembUpdUIListener.removeChangeListener(contact._onMembUpdUIListener);
+                        roomRequiresUpdate = true;
+                    }
+                }
+                else {
+                    if (!contact._onMembUpdUIListener) {
+                        contact._onMembUpdUIListener = contact.addChangeListener(function() {
+                            self.trackDataChange.apply(self, arguments);
+                        });
+                        roomRequiresUpdate = true;
+                    }
+                }
             }
-        });
-
-        Object.keys(self.members).forEach(function(u_h) {
-            var contact = M.u[u_h];
-            if (contact && contact.addChangeListener && !membersSnapshot[u_h]) {
-                membersSnapshot[u_h] = contact.addChangeListener(function() {
-                    self.trackDataChange.apply(self, arguments);
-                });
-            }
-        });
+        }
 
         if (roomRequiresUpdate) {
             self.trackDataChange();
@@ -327,7 +327,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {
         var contact = M.u[userHandle];
-        if (contact) {
+        if (contact && contact.c) {
             getLastInteractionWith(contact.u);
         }
     });
@@ -1721,14 +1721,14 @@ ChatRoom.prototype.didInteraction = function(user_handle, ts) {
     if (user_handle === u_handle) {
         Object.keys(self.members).forEach(function (user_handle) {
             var contact = M.u[user_handle];
-            if (contact && user_handle !== u_handle) {
+            if (contact && user_handle !== u_handle && contact.c === 1) {
                 setLastInteractionWith(contact.u, "1:" + newTs);
             }
         });
     }
     else {
         var contact = M.u[user_handle];
-        if (contact && user_handle !== u_handle) {
+        if (contact && user_handle !== u_handle && contact.c === 1) {
             setLastInteractionWith(contact.u, "1:" + newTs);
         }
     }

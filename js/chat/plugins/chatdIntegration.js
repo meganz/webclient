@@ -1893,19 +1893,20 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
     var tmpPromise = new MegaPromise();
 
     var promises = [];
-    var participants = chatRoom.getParticipantsExceptMe();
-    if (participants.length === 0 && chatRoom.type === "private") {
-        return;
-    }
-    else {
-        participants.forEach(function(v, k) {
-            participants[k] = v;
-        });
-    }
+    if (chatRoom.type !== "public") {
+        var participants = chatRoom.getParticipantsExceptMe();
+        if (participants.length === 0 && chatRoom.type === "private") {
+            return;
+        } else {
+            participants.forEach(function (v, k) {
+                participants[k] = v;
+            });
+        }
 
-    promises.push(
-        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-    );
+        promises.push(
+            ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+        );
+    }
 
     var refs = self.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));
     var refids = [];

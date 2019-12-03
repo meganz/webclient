@@ -4509,7 +4509,8 @@ function (_MegaRenderMixin) {
       var $elem = self.get$Node();
       $elem.height('100%');
       var options = $.extend({}, {
-        'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection']
+        'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+        'minScrollbarLength': 20
       }, self.props.options);
       Ps.initialize($elem[0], options);
 
@@ -18882,7 +18883,7 @@ Chat.prototype.userPresenceToCssClass = function (presence) {
  */
 
 
-Chat.prototype.renderMyStatus = function () {
+Chat.prototype.renderMyStatus = SoonFc(function () {
   var self = this;
 
   if (!self.is_initialized) {
@@ -18928,12 +18929,11 @@ Chat.prototype.renderMyStatus = function () {
   } else {
     $status.parent().removeClass("fadeinout");
   }
-};
+}, 100);
 /**
  * Reorders the contact tree by last activity (THIS is going to just move DOM nodes, it will NOT recreate them from
  * scratch, the main goal is to be fast and clever.)
  */
-
 
 Chat.prototype.reorderContactTree = function () {
   var self = this;
@@ -19318,7 +19318,7 @@ Chat.prototype.processNewUser = function (u, isNewChat) {
   var self = this;
   self.logger.debug("added: ", u);
 
-  if (self.plugins.presencedIntegration) {
+  if (M.u[u] && M.u[u].c !== 1 && self.plugins.presencedIntegration) {
     self.plugins.presencedIntegration.addContact(u, isNewChat);
   }
 
@@ -20719,7 +20719,6 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
    * Manually proxy contact related data change events, for more optimal UI rerendering.
    */
 
-  var membersSnapshot = {};
   self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function (e, eventData) {
     var roomRequiresUpdate = false;
 
@@ -20737,26 +20736,26 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
       }
 
       roomRequiresUpdate = true;
+    } else {
+      var contact = M.u[eventData.userId];
+
+      if (contact && contact.addChangeListener && contact.removeChangeListener) {
+        if (eventData.priv === 255 || eventData.priv === -1) {
+          if (contact._onMembUpdUIListener) {
+            contact._onMembUpdUIListener.removeChangeListener(contact._onMembUpdUIListener);
+
+            roomRequiresUpdate = true;
+          }
+        } else {
+          if (!contact._onMembUpdUIListener) {
+            contact._onMembUpdUIListener = contact.addChangeListener(function () {
+              self.trackDataChange.apply(self, arguments);
+            });
+            roomRequiresUpdate = true;
+          }
+        }
+      }
     }
-
-    Object.keys(membersSnapshot).forEach(function (u_h) {
-      var contact = M.u[u_h];
-
-      if (!contact || typeof self.members[u_h] === 'undefined') {
-        roomRequiresUpdate = true;
-        contact.removeChangeListener(membersSnapshot[u_h]);
-        delete membersSnapshot[u_h];
-      }
-    });
-    Object.keys(self.members).forEach(function (u_h) {
-      var contact = M.u[u_h];
-
-      if (contact && contact.addChangeListener && !membersSnapshot[u_h]) {
-        membersSnapshot[u_h] = contact.addChangeListener(function () {
-          self.trackDataChange.apply(self, arguments);
-        });
-      }
-    });
 
     if (roomRequiresUpdate) {
       self.trackDataChange();
@@ -20765,7 +20764,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   self.getParticipantsExceptMe().forEach(function (userHandle) {
     var contact = M.u[userHandle];
 
-    if (contact) {
+    if (contact && contact.c) {
       getLastInteractionWith(contact.u);
     }
   }); // This line of code should always be called, no matter what. Plugins rely on onRoomCreated
@@ -22061,14 +22060,14 @@ ChatRoom.prototype.didInteraction = function (user_handle, ts) {
     Object.keys(self.members).forEach(function (user_handle) {
       var contact = M.u[user_handle];
 
-      if (contact && user_handle !== u_handle) {
+      if (contact && user_handle !== u_handle && contact.c === 1) {
         setLastInteractionWith(contact.u, "1:" + newTs);
       }
     });
   } else {
     var contact = M.u[user_handle];
 
-    if (contact && user_handle !== u_handle) {
+    if (contact && user_handle !== u_handle && contact.c === 1) {
       setLastInteractionWith(contact.u, "1:" + newTs);
     }
   }

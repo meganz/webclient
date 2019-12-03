@@ -39,6 +39,7 @@
     color: #2BA6DE;
     font-size: 12px;
     font-family: 'source_code_proregular';
+    padding: 1px 8px 0 5px;
 }
 .CodeMirror-line::selection{
     background: #D6F1CC;

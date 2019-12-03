@@ -13,8 +13,6 @@ mega.filesEditor = new function FileTextEditor() {
     var slotsMap = [null, null, null, null, null];
 
 
-
-
     /**
      * store data in memory
      * @param {String} handle       Node handle
@@ -128,4 +126,8 @@ mega.filesEditor = new function FileTextEditor() {
             delete filesDataMap[handle];
         }
     };
+
+    this.prepareTextEditoFrame = function(iframe) {
+        var iframeHtml = window['txtEditor'];
+    }
 };

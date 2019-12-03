@@ -1531,13 +1531,19 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
 
+        var txtEditorFrame = $('.txt-editor-frame');
+        var txtEditoriFrame = txtEditorFrame.find('#txt-editor-iframe');
+        if (!txtEditoriFrame.attr('src')) {
+            txtEditoriFrame.attr('src', '../dont-deploy/txtEditor.html');
+        }
+
         loadingDialog.show();
 
         mega.filesEditor.getFile(nodeHandle).done(
             function(data) {
                 loadingDialog.hide();
-                var txtEditorFrame = $('.txt-editor-frame').removeClass('hidden');
-                var txtEditoriFrame = txtEditorFrame.find('#txt-editor-iframe');
+                txtEditorFrame.removeClass('hidden');
+                
 
                 txtEditoriFrame[0].contentWindow.setupEditor(M.d[nodeHandle].name, data, txtEditorFrame,
                     mega.filesEditor.setFile, nodeHandle, mega.filesEditor.removeOldVersion);
@@ -2015,6 +2021,18 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
             classes: 'no-incoming', // Hide incoming share tab
             selectLabel: l[1523],
             folderSelectable: true, // Can select folder(s)
+            onAttach: function() {
+                closeDialog();
+                $.selected = selected;
+                M.getLinkAction();
+            }
+        },
+        'openFile': {
+            title: l[22666],
+            classes: 'no-incoming', // Hide incoming share tab
+            selectLabel: l[1523],
+            folderSelectNotAllowed: true,
+            folderSelectable: false, // Can select folder(s)
             onAttach: function() {
                 closeDialog();
                 $.selected = selected;

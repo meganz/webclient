@@ -28,9 +28,6 @@ function WebrtcApi() {
     else if (window.webkitAudioContext) { // Safari
         this.browser = 'safari';
         this.isSafari = true;
-        if (!window.AudioContext) {
-            window.AudioContext = window.webkitAudioContext;
-        }
     }
 /*  else if (navigator.userAgent.indexOf("Edge") > -1) {
         this.browser = 'edge';

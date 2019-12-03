@@ -46,6 +46,7 @@
     display: block;
 }
 .viewer-bottom-bl {
+    transform: translateZ(0);
     top: auto;
     bottom: 0;
     padding: 8px 11px;

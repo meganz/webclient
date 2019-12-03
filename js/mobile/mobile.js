@@ -211,13 +211,13 @@ var mobile = {
 
     /**
      * Initialise checkbox on click/tap functionality which has special styling and requires extra code
-     * @param {String} className The container class name which contains the checkbox input and label
+     * @param {String|jQuery} container The container class name which contains the checkbox input and label
      */
-    initCheckbox: function(className) {
+    initCheckbox: function(container) {
 
         'use strict';
 
-        var $container = $('.mobile.' + className);
+        var $container = container instanceof jQuery ? container : $('.mobile.' + container);
         var $checkboxWrapper = $container.find('.square');
         var $checkboxInput = $checkboxWrapper.find('.checkbox');
 

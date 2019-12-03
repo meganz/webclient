@@ -2644,8 +2644,11 @@ function topmenuUI() {
         notify.init();
     }
 
-    if (!is_mobile && u_type === 3) {
-        if (mega.ui.passwordReminderDialog) {
+    if (u_type === 3 && mega.ui.passwordReminderDialog) {
+        if (is_mobile) {
+            mega.ui.passwordReminderDialog.prepare();
+        }
+        else {
             mega.ui.passwordReminderDialog.onTopmenuReinit();
         }
     }

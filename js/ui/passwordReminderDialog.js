@@ -1,24 +1,28 @@
 (function(scope) {
     "use strict";
 
-    var DEBUG = false;
+    var DEBUG = localStorage.debugPasswordReminderDialog || false;
 
     // all values are in seconds.
-    var SHOW_AFTER_LASTLOGIN = 14 * 24 * 60 * 60;
-    var SHOW_AFTER_LASTSKIP = 3 * 30 * 24 * 60 * 60;
-    var SHOW_AFTER_LASTSKIP_LOGOUT = 1 * 30 * 24 * 60 * 60;
-    var SHOW_AFTER_ACCOUNT_AGE = 7 * 24 * 60 * 60;
-    var SHOW_AFTER_LASTSUCCESS = 3 * 30 * 24 * 60 * 60;
+    var DAY = 86400;
+    var SHOW_AFTER_LASTLOGIN = 14 * DAY;
+    var SHOW_AFTER_LASTSKIP = 90 * DAY;
+    // var SHOW_AFTER_LASTSKIP_LOGOUT = 30 * DAY;
+    var SHOW_AFTER_ACCOUNT_AGE = 7 * DAY;
+    var SHOW_AFTER_LASTSUCCESS = 90 * DAY;
     var RECHECK_INTERVAL = 15 * 60;
 
     if (DEBUG) {
         SHOW_AFTER_LASTLOGIN = 15;
         SHOW_AFTER_LASTSKIP = 30;
-        SHOW_AFTER_LASTSKIP_LOGOUT = 5;
+        // SHOW_AFTER_LASTSKIP_LOGOUT = 5;
         SHOW_AFTER_LASTSUCCESS = 45;
-        SHOW_AFTER_ACCOUNT_AGE = 1 * 24 * 60 * 60;
+        SHOW_AFTER_ACCOUNT_AGE = DAY;
         RECHECK_INTERVAL = 15;
     }
+
+    /** bindable events **/
+    var MouseDownEvent = 'mousedown.prd';
 
     var PasswordReminderAttribute = function(dialog, changedCb, str) {
         var self = this;
@@ -204,7 +208,10 @@
 
         $(window).rebind('resize.prd', self.repositionDialog.bind(self));
 
-        $(this.dialog.querySelectorAll('.default-white-button, .default-big-button')).rebind('click.prd', function(e) {
+        $(this.dialog.querySelectorAll(is_mobile
+            ? '.button-prd-confirm, .button-prd-skip, .change-password-button, .button-prd-backup'
+            : '.default-white-button, .default-big-button'
+        )).rebind('click.prd', function(e) {
             self.onButtonClicked(this, e);
         });
 
@@ -216,12 +223,15 @@
         });
 
         $(self.dialog.querySelector('.fm-dialog-close')).rebind('click.prd', function() {
-            self.onSkipClicked();
+            self.hide();
+            if (self._dialogActionPromise && self._dialogActionPromise.state() === 'pending') {
+                self._dialogActionPromise.reject();
+            }
             return false;
         });
 
         uiCheckboxes(
-            $(this.dialog.querySelector('.content-block')),
+            $(this.dialog.querySelector(is_mobile ? '.content-cell' : '.content-block')),
             undefined,
             function(newState) {
                 if (newState === true) {
@@ -303,6 +313,11 @@
                 this.passwordField.value = "";
                 $(this.passwordField).focus();
             }
+
+            if (is_mobile) {
+                this.exportButton.classList.remove('green-button');
+                this.exportButton.classList.add('red-button');
+            }
         }
     };
 
@@ -381,7 +396,7 @@
 
         delete $.dialog;
 
-        loadSubPage('/fm/account/security');
+        loadSubPage(is_mobile ? '/fm/account/email-and-pass' : '/fm/account/security');
     };
 
     PasswordReminderDialog.prototype.init = function() {
@@ -411,13 +426,21 @@
             this.wrongLabel = null;
             this.correctLabel = null;
         }
-        if (!this.initialised) {
-            this.init();
-        }
-        else {
+        this.prepare();
+        this.repositionDialog();
+    };
+
+    /**
+     * Prepare the PRD.
+     * @returns {void}
+     */
+    PasswordReminderDialog.prototype.prepare = function() {
+        if (this.initialised) {
             this.resetUI();
         }
-        this.repositionDialog();
+        else {
+            this.init();
+        }
     };
 
     PasswordReminderDialog.prototype._initFromString = function(str) {
@@ -527,7 +550,10 @@
     };
 
     PasswordReminderDialog.prototype._initInternals = function() {
-        this.dialog = document.querySelector('.dropdown.body.pass-reminder');
+        this.dialog = document.querySelector(is_mobile
+            ? '.mobile.password-reminder-overlay'
+            : '.dropdown.body.pass-reminder'
+        );
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
         $(this.passwordField).rebind('focus.hack', function() {
@@ -545,6 +571,8 @@
 
         this.wrongLabel = this.dialog.querySelector('.pass-reminder.wrong');
         this.correctLabel = this.dialog.querySelector('.pass-reminder.accepted');
+
+        this.exportButton = this.dialog.querySelector('.button-prd-backup');
 
         this.firstText = this.dialog.querySelector('.pass-reminder.info-txt');
 
@@ -571,13 +599,18 @@
 
         this._initInternals();
 
-        assert(this.topIcon, 'topIcon not defined.');
         assert(this.dialog, 'dialog not defined.');
 
-        this.dialog.classList.remove('hidden');
+        if (is_mobile) {
+            this.dialog.classList.add('overlay');
+        }
+        else {
+            assert(this.topIcon, 'topIcon not defined.');
+            this.repositionDialog();
+            $(document.body).rebind(MouseDownEvent, this.onGenericClick.bind(this));
+        }
 
-        $(document.body).rebind('mousedown.prd', this.onGenericClick.bind(this));
-        this.repositionDialog();
+        this.dialog.classList.remove('hidden');
     };
 
 
@@ -590,6 +623,11 @@
         }
         if (this.correctLabel) {
             this.correctLabel.classList.add('hidden');
+        }
+
+        if (this.exportButton) {
+            this.exportButton.classList.remove('red-button');
+            this.exportButton.classList.add('green-button');
         }
     };
 
@@ -621,7 +659,7 @@
         this.dialog.classList.add('hidden');
 
         $(window).off('resize.prd');
-        $(document.body).off('mousedown.prd');
+        $(document.body).off(MouseDownEvent);
     };
 
     PasswordReminderDialog.prototype.onGenericClick = function(e) {
@@ -659,19 +697,22 @@
 
         this._initInternals();
 
-        fm_showoverlay();
+        if (is_mobile) {
+            this.dialog.classList.add('overlay');
+        }
+        else {
+            fm_showoverlay();
+            this.dialog.classList.add('fm-dialog');
+        }
 
         this.dialog.classList.remove('hidden');
-        this.dialog.classList.add('fm-dialog');
-
-        var skipButton = this.dialog.querySelector('.button-prd-skip');
-        var backupButton = this.dialog.querySelector('.button-prd-backup');
 
         if (promise) {
             this._dialogActionPromise = promise;
         }
-
-        this.repositionDialog();
+        if (!is_mobile) {
+            this.repositionDialog();
+        }
     };
 
     PasswordReminderDialog.prototype.hideDialog = function() {
@@ -681,14 +722,14 @@
 
         this.dialog.classList.add('hidden');
         this.dialog.classList.remove('fm-dialog');
-
-        var skipButton = this.dialog.querySelector('.button-prd-skip');
-        var backupButton = this.dialog.querySelector('.button-prd-backup');
+        if (is_mobile) {
+            this.dialog.classList.remove('overlay');
+        }
 
         this.resetUI();
 
         $(window).off('resize.prd');
-        $(document.body).off('mousedown.prd');
+        $(document.body).off(MouseDownEvent);
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {
@@ -771,4 +812,5 @@
     mBroadcaster.addListener('attr:passwordReminderDialog', function() {
         passwordReminderDialog.passwordReminderAttribute.attributeUpdatedViaAp();
     });
+
 })(window);

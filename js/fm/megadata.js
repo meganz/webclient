@@ -164,12 +164,30 @@ function MegaData() {
                 var ab = mobile.alertBanner;
                 var isPro = Object(u_attr).p;
 
-                if (data.isFull) {
-                    ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
-                    mobile.overStorageQuotaOverlay.show();
+                var action = function() {
+                    var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+                        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+                    if (data.isFull) {
+
+                        ab.showError(isPro ? l[22667].replace('%1', mStoragePossible) :
+                            l[22671].replace('%1', mStoragePossible)); // Your account is full
+
+                        mobile.overStorageQuotaOverlay.show();
+                    }
+                    else {
+                        ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
+                            l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                                .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                        ); // Your account is almost full.
+                    }
+                };
+
+                if (!pro.membershipPlans || !pro.membershipPlans.length) {
+                    pro.loadMembershipPlans(action);
                 }
                 else {
-                    ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
+                    action();
                 }
 
                 // When the banner is taped, show pro page.

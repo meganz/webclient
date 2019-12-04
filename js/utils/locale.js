@@ -725,6 +725,8 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[22670] = escapeHTML(l[22670])
+        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
@@ -918,7 +920,7 @@ mBroadcaster.once('startMega', function populate_l() {
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973,
-        22117
+        22117, 22667, 22668, 22674, 22669, 22671
     ];
     for (i = common.length; i--;) {
         var num = common[i];

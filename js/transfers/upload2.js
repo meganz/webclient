@@ -109,7 +109,10 @@ var ulmanager = {
         M.safeShowDialog('upload-overquota', function() {
             $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
-            $('.p-after-icon.msg-overquota', $dialog).text(is_mobile ? l[20145] : l[19136]);
+            $('.p-after-icon.msg-overquota', $dialog).text(is_mobile ?
+                l[22673].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                : l[19136]);
 
             $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
                 eventlog(99700, true);

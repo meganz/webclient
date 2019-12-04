@@ -3884,7 +3884,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         return promise.reject();
     }
 
-    
+
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('fm-notification almost-full full');
 
@@ -3894,23 +3894,27 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     this.showOverStorageQuotaPromise = promise;
 
     if (quota === -1) {
-        quota = {percent: 100};
+        quota = { percent: 100 };
         quota.isFull = quota.isAlmostFull = true;
-        options = {custom: 1};
+        options = { custom: 1 };
     }
+
+    var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+    $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
+        replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
-        var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+        
         $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
 
         $('.fm-notification-block.almost-full')
             .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
 
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-        $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
-            replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+        
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
             .safeHTML(l[16361] + ' ' + l[16314]);

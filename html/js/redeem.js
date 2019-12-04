@@ -670,9 +670,10 @@ var redeem = {
     },
 
     /**
-     * Function used when accessing '/reddem' without a voucher code in 'localStorage.voucher'
+     * Function used when accessing '/reddem' without a voucher code in 'localStorage.voucher', or
+     * having an existing voucher code but didn't complete login or register before
      */
-    setupVoucherInputbox: function() {
+    setupVoucherInputbox: function(code) {
         'use strict';
         var promoter;
         var path = getSitePath();
@@ -722,6 +723,12 @@ var redeem = {
 
             return false;
         });
+
+        // Auto fill the existing voucher code into input box when accessing '/redeem'
+        // without completion of login or register
+        if (typeof code === 'string' && code.length > 11) {
+            $input.val(code).trigger('input').trigger('focus');
+        }
     },
 
     /**

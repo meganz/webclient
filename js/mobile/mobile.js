@@ -389,6 +389,17 @@ var mobile = {
         // Show white background overlay behind the dialog
         $('.light-overlay').removeClass('hidden');
         $('.mobile.common-check-email-dialog').removeClass('hidden');
+
+        // Assgn history to make back button working
+        pushHistoryState(page);
+
+        $(window).rebind('popstate.mega-mobile', function() {
+            $(this).off('popstate.mega-mobile');
+            history.back();
+            $('.light-overlay').addClass('hidden');
+            $('.mobile.common-check-email-dialog').addClass('hidden');
+            $('#startholder').removeClass('no-scroll');
+        });
     },
 
     /**

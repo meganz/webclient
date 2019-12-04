@@ -543,7 +543,10 @@ var SelectionManager = function($selectable, resume) {
      * @param notificationText
      */
     this.showSelectionBar = function (notificationText) {
+
         var $selectionBar = $('.selection-status-bar');
+        var jsp;
+
         $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
         $selectionBar.addClass('visible');
         $selectionBar.parent('div').addClass('select');
@@ -552,8 +555,25 @@ var SelectionManager = function($selectable, resume) {
             $selectionBar.css("opacity", 0);
         }
 
-        // TODO: fm_resize_handler() on shares and out-shares pages
-        if (M.currentdirid !== "shares" && M.currentdirid !== "out-shares") {
+        if (M.currentdirid === "out-shares") {
+            jsp = M.viewmode ? $('.out-shared-blocks-scrolling').data('jsp') :
+                $('.out-shared-grid-view .grid-scrolling-table').data('jsp');
+        }
+        else if (M.currentdirid === "shares") {
+            jsp = M.viewmode ? $('.shared-blocks-scrolling').data('jsp') :
+                $('.shared-grid-view .grid-scrolling-table').data('jsp');
+        }
+
+        if (jsp) {
+            var jspPercentY = jsp.getPercentScrolledY();
+            jsp.reinitialise();
+
+            // If this is scrolled to bottom, keep it stick on bottom
+            if (jspPercentY === 1) {
+                jsp.scrollToBottom();
+            }
+        }
+        else {
             var scrollBarYClass = (M.viewmode === 1) ?
                 '.file-block-scrolling.ps-active-y' : '.grid-scrolling-table.ps-active-y';
             var scrollBarY = document.querySelector(scrollBarYClass);

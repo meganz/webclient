@@ -1993,7 +1993,7 @@ FileManager.prototype.createFolderUI = function() {
  * This will fill up $.selected with what user selected on the dialog.
  * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
  */
-FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
+FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
     'use strict';
 
     // If chat is not ready.
@@ -2036,7 +2036,9 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
             onAttach: function() {
                 closeDialog();
                 $.selected = selected;
-                M.getLinkAction();
+                if (OnSelectCallback) {
+                    OnSelectCallback(selected);
+                }
             }
         }
     };

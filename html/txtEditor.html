@@ -182,6 +182,10 @@
                 }
             });
 
+        $('#mega-text-editor .editor-btn-container .open-f').off('click').on('click', function openFileClick() {
+            window.parent.M.initFileAndFolderSelectDialog('openFile');
+        });
+
         
     </script>
 </body>

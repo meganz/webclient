@@ -21,7 +21,10 @@ var extensions = {
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
-    'raw': [['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'], 'RAW'],
+    'raw': [
+        ['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'],
+        'RAW'
+    ],
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
@@ -30,8 +33,9 @@ var extensions = {
     'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
     'web-lang': [['php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql',
-        'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
-    'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word']
+                  'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
+    'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word'],
+    'code': [['c', 'cpp', 'h'], 'Source Code']
 };
 
 var extdesc = {

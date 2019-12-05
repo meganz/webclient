@@ -102,6 +102,11 @@ pro.propay = {
                 // Load payment providers and do the rest of the rendering
                 pro.propay.loadPaymentGatewayOptions();
             });
+
+            l[22670] = l[22670].replace('%1', bytesToSize(pro.minPlan[2] * 1024 * 1024 * 1024, 0)).
+                replace('%2', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0));
+
+            $('.storage-txt-small').safeHTML(l[22670]);
         });
     },
 

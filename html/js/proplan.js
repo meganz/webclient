@@ -253,6 +253,11 @@ pro.proplan = {
             // Check which plans are applicable or grey them out if not
             pro.proplan.checkApplicablePlans();
 
+            l[22670] = l[22670].replace('%1', bytesToSize(pro.minPlan[2] * 1024 * 1024 * 1024, 0)).
+                replace('%2', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0));
+
+            $('.storage-txt-small').safeHTML(l[22670]);
+
             // Close loading spinner
             loadingDialog.hide();
         });

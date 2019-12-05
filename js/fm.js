@@ -3813,7 +3813,7 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
     });
     // End of typing search for dropdowns
 
-    $('#fmholder, .fm-dialog').rebind('click.defaultselect', function(e) {
+    $('#fmholder, .fm-dialog, #startholder').rebind('click.defaultselect', function(e) {
 
         if (!$dropdown.has($(e.target)).length && !$dropdown.is(e.target)) {
             $dropdown.removeClass('active').find('.default-select-dropdown').addClass('hidden');

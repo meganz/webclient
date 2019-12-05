@@ -1962,11 +1962,13 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
         var prefixTree = M.currentCustomView.prefixTree || '';
+        var $treeElements = $('#treea_' + handle).add('#treea_os_' + handle).add('#treea_pl_' + handle);
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
-        $('#treea_' + prefixTree + handle).removeClass('labeled').find('.colour-label-ind').remove();
+        $treeElements.removeClass('labeled');
+        $('.colour-label-ind', $treeElements).remove();
 
         if (labelId) {
             // Add colour label classes.
@@ -1974,7 +1976,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
-            $('#treea_' + prefixTree + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
+            $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
         }
 
@@ -1991,26 +1993,20 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
             }
         }
 
-
         // make filter enable/disable depending on filter availabilty.
         $('.dropdown-section .dropdown-item-label')
             .add('.dropdown-section.filter-by .labels')
             .addClass('disabled static');
-        if (M.checkFilterAvailable()) {
+
+        if (M.isLabelExistNodeList(M.v)) {
             $('.dropdown-section .dropdown-item-label')
                 .add('.dropdown-section.filter-by .labels')
                 .removeClass('disabled static');
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            var curDir = M.currentdirid.replace('out-shares/', '').replace('public-links/', '');
-            var refresh = false;
-            if (curDir === 'public-links') {
-                if (M.v.indexOf(n) !== -1) {
-                    refresh = true;
-                }
-            }
-            if (refresh || n.p === curDir) {
+            // We only required to re-render if there is filter on the page.
+            if (M.filterLabel[M.currentCustomView.type]) {
 
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');

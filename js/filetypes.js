@@ -32,10 +32,11 @@ var extensions = {
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
     'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
-    'web-lang': [['php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql',
-                  'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
-    'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word'],
-    'code': [['c', 'cpp', 'h'], 'Source Code']
+    'web-lang': [[
+        'php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql', 'accdb','db','dbf','mdb', 'pdb',
+        'c', 'cpp', 'h', 'cs', 'sh', 'vb', 'swift'
+    ], 'Web Server Code'],
+    'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word']
 };
 
 var extdesc = {
@@ -218,7 +219,9 @@ var extdesc = {
     'xltm': l[20391],
     'xml': l[20363],
     'zip': l[20364],
-    'mp4': l[20365]
+    'mp4': l[20365],
+    'vb': l[22676],
+    'swift': l[22677]
 };
 
 var extmime = {

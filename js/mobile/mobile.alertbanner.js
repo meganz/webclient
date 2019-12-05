@@ -131,6 +131,9 @@ mobile.alertBanner = {
      */
     onTap: function(handler) {
         'use strict';
+        if (this.$alertBanner === null) {
+            this.init();
+        }
         return this.on('tap', handler);
     },
 

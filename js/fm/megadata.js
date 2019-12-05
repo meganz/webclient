@@ -168,12 +168,14 @@ function MegaData() {
                     var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
                         ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
 
+                    var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
+                        l[22671].replace('%1', mStoragePossible)
+
                     if (data.isFull) {
 
-                        ab.showError(isPro ? l[22667].replace('%1', mStoragePossible) :
-                            l[22671].replace('%1', mStoragePossible)); // Your account is full
+                        ab.showError(msg); // Your account is full
 
-                        mobile.overStorageQuotaOverlay.show();
+                        mobile.overStorageQuotaOverlay.show(msg);
                     }
                     else {
                         ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :

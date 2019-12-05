@@ -32,13 +32,21 @@ mobile.overStorageQuotaOverlay = {
     /**
      * Show the Overlay
      */
-    show: function() {
+    show: function(msg) {
         'use strict';
 
         var display = function() {
+
+            if (msg) {
+                mobile.overStorageQuotaOverlay.$overlay.find('.rb-empty-overlay-message.dialog-body-text')
+                    .safeHTML(msg);
+            }
+
             mobile.overStorageQuotaOverlay.$fileManagerBlock.addClass('disable-scroll');
             mobile.overStorageQuotaOverlay.$overlay.removeClass('hidden').addClass('overlay');
         };
+
+        
 
         // Init the overlay if this is the first time we are opening it.
         if (!this.$overlay) {

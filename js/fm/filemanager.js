@@ -3904,14 +3904,13 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
 
     $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
         replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+    $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+
+    $('.fm-notification-block.almost-full')
+        .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
-        
-        $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
-
-        $('.fm-notification-block.almost-full')
-            .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
 
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
         

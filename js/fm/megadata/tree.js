@@ -1035,35 +1035,6 @@ MegaData.prototype.addTreeUI = function() {
         }
     });
 
-    // disabling right click, default contextmenu.
-    $(document).rebind('contextmenu', function(e) {
-        var $target = $(e.target);
-
-        if (!is_fm() ||
-            $target.parents('#startholder').length ||
-            $target.is('input') ||
-            $target.is('textarea') ||
-            $target.is('#embed-code-field') ||
-            $target.is('.download.info-txt') ||
-            $target.closest('.multiple-input').length ||
-            $target.closest('.create-folder-input-bl').length ||
-            $target.closest('.content-panel.conversations').length ||
-            $target.closest('.messages.content-area').length ||
-            $target.closest('.chat-right-pad .user-card-data').length ||
-            $target.parents('.fm-account-main').length ||
-            $target.parents('.export-link-item').length ||
-            $target.parents('.contact-fingerprint-txt').length ||
-            $target.parents('.fm-breadcrumbs').length ||
-            $target.hasClass('contact-details-user-name') ||
-            $target.hasClass('contact-details-email') ||
-            $target.hasClass('nw-conversations-name')) {
-        }
-        else if (!localStorage.contextmenu) {
-            $.hideContextMenu();
-            return false;
-        }
-    });
-
     $treeItem.rebind('click.treeUI, contextmenu.treeUI', function(e) {
 
         var $this = $(this);

@@ -60,7 +60,7 @@
                 </div>
                 <div class="editor-file-name-title">
                     <span class="transfer-filetype-icon text file"></span>
-                    <span class="txt-editor-opened-f-name" >fdkjghfdkjlhnj5894ngdfkjgngfikmdgfdognmdfoingeoirnteso845.txt</span>
+                    <span class="txt-editor-opened-f-name">fdkjghfdkjlhnj5894ngdfkjgngfikmdgfdognmdfoingeoirnteso845.txt</span>
                 </div>
                 <div class="buttons-holder">
                     <div class="default-white-button gradient txt-editor-btn close-btn">
@@ -105,7 +105,7 @@
 
         $('#mega-text-editor .top-menu-item, #mega-text-editor .top-menu-divider').off('click').on('click',
             function textEditorMenuItemSelect() {
-                
+
                 return false;
             });
 
@@ -129,6 +129,7 @@
 
             $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
             if (editor) {
+                savedFileData = txt;
                 editor.setValue(txt);
                 bindChangeListner();
                 //var changeListner = function() {
@@ -155,7 +156,32 @@
         //    console.error(u_attr);
         //}
         // end of test
+        function selectedItemOpen(node) {
 
+            var openFile = function() {
+                var $parent = window.parent.$(window.parent.document);
+                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            };
+            var self = this;
+
+            if (savedFileData !== editor.getValue()) {
+                window.parent.msgDialog('confirmation', '', 'The Opened file has been modified.',
+                    'Are you sure you want to discard changes and open the selected file?',
+                    function(e) {
+                        if (e) {
+                            openFile();
+                        }
+                    });
+            }
+            else {
+                openFile();
+            }
+
+            //if ((versionHandle && versionHandle !== node.h) || (fileHandle !== node.h)) {
+
+
+            //}
+        }
 
         $('#mega-text-editor .buttons-holder .close-btn').off('click').on('click',
             function textEditorCloseBtnClick() {
@@ -181,7 +207,8 @@
                             remFunction(versionHandle);
                         }
                         versionHandle = fh;
-                        
+                        savedFileData = editor.getValue();
+
                         bindChangeListner();
                         // $('#mega-text-editor .disability-overlay').addClass('hidden');
                         window.parent.loadingDialog.hide();
@@ -190,10 +217,10 @@
             });
 
         $('#mega-text-editor .editor-btn-container .open-f').off('click').on('click', function openFileClick() {
-            window.parent.M.initFileAndFolderSelectDialog('openFile');
+            window.parent.M.initFileAndFolderSelectDialog('openFile', selectedItemOpen);
         });
 
-        
+
     </script>
 </body>
 </html>

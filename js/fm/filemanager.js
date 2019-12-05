@@ -2030,9 +2030,22 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         'openFile': {
             title: l[22666],
             classes: 'no-incoming', // Hide incoming share tab
-            selectLabel: l[1523],
+            selectLabel: l[865],
             folderSelectNotAllowed: true,
             folderSelectable: false, // Can select folder(s)
+            customFilterFn: function(node) {
+                if (node.t) {
+                    return true;
+                }
+                if (node.s >= 20971520) {
+                    return false;
+                }
+                var fType = filetype(node, true)[0];
+                if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+                    return true;
+                }
+                return false;
+            },
             onAttach: function() {
                 closeDialog();
                 $.selected = selected;
@@ -2043,7 +2056,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         }
     };
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
+    var prop = {
         title: options[type].title,
         folderSelectable: options[type].folderSelectable,
         selectLabel: options[type].selectLabel,
@@ -2057,7 +2070,15 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
             selected = node;
         },
         onAttachClicked: options[type].onAttach,
-    });
+    };
+    if (options[type].folderSelectNotAllowed) {
+        prop.folderSelectNotAllowed = options[type].folderSelectNotAllowed;
+    }
+    if (options[type].customFilterFn) {
+        prop.customFilterFn = options[type].customFilterFn;
+    }
+
+    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
 };

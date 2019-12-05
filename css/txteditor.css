@@ -166,6 +166,10 @@
     margin-right: 9px;
     margin-top: 8px;
 }
+#mega-text-editor .top-menu-item:hover {
+    background-color: #AAAAAA;
+    color: white;
+}
 .CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
     position: absolute;
     background: #ccc;

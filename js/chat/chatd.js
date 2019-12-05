@@ -1466,9 +1466,6 @@ Chatd.Shard.prototype.exec = function(a) {
 
                 len = 23 + Chatd.unpack16le(cmd.substr(21, 2));
                 var rtcmd = cmd.charCodeAt(23);
-                if (self.loggerIsEnabled) {
-                    self.logger.debug("processing RTCMD_" + constStateToText(RTCMD, rtcmd));
-                }
                 self.chatd.rtcHandler.handleMessage(self, cmd, len);
                 break;
             case Chatd.Opcode.CALLDATA:

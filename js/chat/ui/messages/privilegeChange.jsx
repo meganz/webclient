@@ -1,10 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
 class PrivilegeChange extends ConversationMessageMixin {
     haveMoreContactListeners() {
@@ -16,13 +12,10 @@ class PrivilegeChange extends ConversationMessageMixin {
         if (uid && M.u[uid]) {
             return uid;
         }
-        else {
-            return false;
-        }
+        return false;
     }
     render() {
         var self = this;
-        var cssClasses = "message body";
 
         var message = this.props.message;
         var chatRoom = this.props.message.chatRoom;
@@ -85,7 +78,7 @@ class PrivilegeChange extends ConversationMessageMixin {
 
                 <div className="message content-area small-info-txt">
                     <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
-                                              chatRoom={self.props.chatRoom} />
+                        chatRoom={self.props.chatRoom} />
                     {datetime}
 
                     <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>

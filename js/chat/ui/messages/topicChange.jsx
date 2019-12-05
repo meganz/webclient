@@ -1,15 +1,10 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
 class TopicChange extends ConversationMessageMixin {
     render() {
         var self = this;
-        var cssClasses = "message body";
 
         var message = this.props.message;
         var megaChat = this.props.message.chatRoom.megaChat;
@@ -21,7 +16,7 @@ class TopicChange extends ConversationMessageMixin {
 
 
         var datetime = <div className="message date-time simpletip"
-                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {
@@ -77,7 +72,7 @@ class TopicChange extends ConversationMessageMixin {
 
         return <div>{messages}</div>;
     }
-};
+}
 
 export {
     TopicChange

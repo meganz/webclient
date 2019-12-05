@@ -1,10 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
 class TruncatedMessage extends ConversationMessageMixin {
     render() {
@@ -12,7 +8,6 @@ class TruncatedMessage extends ConversationMessageMixin {
         var cssClasses = "message body";
 
         var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
         var chatRoom = this.props.message.chatRoom;
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
@@ -21,7 +16,7 @@ class TruncatedMessage extends ConversationMessageMixin {
 
 
         var datetime = <div className="message date-time simpletip"
-                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {
@@ -37,10 +32,10 @@ class TruncatedMessage extends ConversationMessageMixin {
         }
         else {
             avatar = <ContactsUI.Avatar contact={contact}
-                                        className="message avatar-wrapper small-rounded-avatar"
-                                        chatRoom={chatRoom} />;
+                className="message avatar-wrapper small-rounded-avatar"
+                chatRoom={chatRoom} />;
             datetime = <div className="message date-time simpletip"
-                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
         }
 
 
@@ -63,7 +58,7 @@ class TruncatedMessage extends ConversationMessageMixin {
             </div>
         );
     }
-};
+}
 
 export {
     TruncatedMessage

@@ -639,6 +639,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
         return MegaPromise.resolve();
     }
 
+    // eslint-disable-next-line local-rules/hints
     var promise = new MegaPromise();
 
     var lastName = {name: 'lastname', value: null};

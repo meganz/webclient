@@ -14,29 +14,30 @@ export class Dropdown extends MegaRenderMixin {
         this.onResized = this.onResized.bind(this);
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    componentWillUpdate(nextProps) {
+        // eslint-disable-next-line eqeqeq
         if (this.props.active != nextProps.active) {
-            this.onActiveChange(nextProps.active)
+            this.onActiveChange(nextProps.active);
         }
     }
 
-    specificShouldComponentUpdate(nextProps, nextState) {
+    specShouldComponentUpdate(nextProps, nextState) {
         if (this.props.active != nextProps.active) {
             if (this.props.onBeforeActiveChange) {
                 this.props.onBeforeActiveChange(nextProps.active);
             }
             return true;
         }
+        // eslint-disable-next-line eqeqeq
         else if (this.props.focused != nextProps.focused) {
             return true;
         }
+        // eslint-disable-next-line eqeqeq
         else if (this.state && this.state.active != nextState.active) {
             return true;
         }
-        else {
-            // not sure, leave to the render mixing to decide.
-            return undefined;
-        }
+        // not sure, leave to the render mixing to decide.
+        return undefined;
     }
 
     onActiveChange(newVal) {
@@ -44,83 +45,88 @@ export class Dropdown extends MegaRenderMixin {
             this.props.onActiveChange(newVal);
         }
     }
+    reposElementUsing(element, obj, info) {
+        var $element;
+        if (this.popupElement) {
+            $element = $(this.popupElement);
+        }
+        else {
+            return;
+        }
+        var self = this;
+        var vertOffset = 0;
+        var horizOffset = 0;
+        var offsetLeft = 0;
 
+        if (!self.props.noArrow) {
+            var $arrow = $('.dropdown-white-arrow', $element);
+            var arrowHeight;
+            if (self.props.arrowHeight) {
+                arrowHeight = self.props.arrowHeight;
+                if (info.vertical === "top") {
+                    arrowHeight = 0;
+                }
+                else {
+                    arrowHeight *= -1;
+                }
+            }
+            else {
+                arrowHeight = $arrow.outerHeight();
+            }
+            if (info.vertical === "top") {
+                $(element)
+                    .removeClass("down-arrow")
+                    .addClass("up-arrow");
+            }
+            else {
+                $(element)
+                    .removeClass("up-arrow")
+                    .addClass("down-arrow");
+            }
+
+            vertOffset += info.vertical === "top" ? arrowHeight : 0;
+        }
+
+
+        if (self.props.vertOffset) {
+            vertOffset += self.props.vertOffset * (info.vertical === "top" ? 1 : -1);
+        }
+
+        if (self.props.horizOffset) {
+            horizOffset += self.props.horizOffset;
+        }
+
+        $(element).css({
+            left: obj.left + (offsetLeft ? offsetLeft / 2 : 0) + horizOffset + 'px',
+            top: obj.top + vertOffset + 'px'
+        });
+    }
     onResized() {
         var self = this;
-        if (this.props.active === true) {
-            if (this.popupElement) {
-                var $element = $(this.popupElement);
-                var $positionToElement = $('.button.active:visible');
-                if ($positionToElement.length === 0) {
-                    return;
-                }
-                var offsetLeft = 0;
-                var $container = $positionToElement.closest('.messages.scroll-area');
-
-                if ($container.length === 0) {
-                    $container = $(document.body);
-                }
-
-                $element.css('margin-left', '');
-
-                $element.position({
-                    of: $positionToElement,
-                    my: self.props.positionMy ? self.props.positionMy : "center top",
-                    at: self.props.positionAt ? self.props.positionAt : "center bottom",
-                    collision: "flipfit",
-                    within: $container,
-                    using: function(obj, info) {
-                        var vertOffset = 0;
-                        var horizOffset = 0;
-
-                        if (!self.props.noArrow) {
-                            var $arrow = $('.dropdown-white-arrow', $element);
-                            var arrowHeight;
-                            if (self.props.arrowHeight) {
-                                arrowHeight = self.props.arrowHeight;
-                                if (info.vertical !== "top") {
-                                    arrowHeight *= -1;
-                                }
-                                else {
-                                    arrowHeight = 0;
-                                }
-                            }
-                            else {
-                                arrowHeight = $arrow.outerHeight();
-                            }
-                            if (info.vertical != "top") {
-                                $(this)
-                                    .removeClass("up-arrow")
-                                    .addClass("down-arrow");
-                            }
-                            else {
-                                $(this)
-                                    .removeClass("down-arrow")
-                                    .addClass("up-arrow");
-                            }
-
-                            vertOffset += (
-                                info.vertical === "top" ? arrowHeight : 0
-                            );
-                        }
-
-
-                        if (self.props.vertOffset) {
-                            vertOffset += (self.props.vertOffset * (info.vertical == "top" ? 1 : -1));
-                        }
-
-                        if (self.props.horizOffset) {
-                            horizOffset += self.props.horizOffset;
-                        }
-
-
-                        $(this).css({
-                            left: (obj.left + (offsetLeft ? offsetLeft / 2 : 0) + horizOffset) + 'px',
-                            top: (obj.top + vertOffset + 'px')
-                        });
-                    }
-                });
+        if (this.props.active === true && this.popupElement) {
+            var $element = $(this.popupElement);
+            // eslint-disable-next-line local-rules/jquery-scopes
+            var $positionToElement = $('.button.active:visible');
+            if ($positionToElement.length === 0) {
+                return;
             }
+            var $container = $positionToElement.closest('.messages.scroll-area');
+
+            if ($container.length === 0) {
+                $container = $(document.body);
+            }
+
+            $element.css('margin-left', '');
+
+            $element.position({
+                of: $positionToElement,
+                my: self.props.positionMy ? self.props.positionMy : "center top",
+                at: self.props.positionAt ? self.props.positionAt : "center bottom",
+                collision: "flipfit",
+                within: $container,
+                using: function(obj, info) {
+                    self.reposElementUsing(this, obj, info);
+                }});
         }
     }
 
@@ -178,69 +184,67 @@ export class Dropdown extends MegaRenderMixin {
                 return React.cloneElement(child, {
                     active: activeVal
                 });
-            } else {
-                return null;
             }
-        }.bind(this))
+            return null;
+        });
     }
 
     render() {
         if (this.props.active !== true) {
             return null;
-        } else {
-            var classes = (
-                "dropdown body " + (!this.props.noArrow ? "dropdown-arrow up-arrow" : "") + " " + this.props.className
-            );
-
-            var styles;
-
-            // calculate and move the popup arrow to the correct position.
-            if (this.popupElement) {
-                styles = {
-                    'zIndex': 123,
-                    'position': 'absolute',
-                    'width': this.props.styles ? this.props.styles.width : undefined
-                };
-            }
-
-            var self = this;
-
-            var child = null;
-
-            if (this.props.children) {
-                child = <div>{self.renderChildren()}</div>;
-            } else if (this.props.dropdownItemGenerator) {
-                child = this.props.dropdownItemGenerator(this);
-            }
-
-            if (!child && !this.props.forceShowWhenEmpty) {
-                if (this.props.active !== false) {
-                    (window.setImmediate || window.setTimeout)(function() {
-                        self.onActiveChange(false);
-                    });
-                }
-                return null;
-            }
-
-
-            return <utils.RenderTo element={document.body} className={classes} style={styles}
-                                   popupDidMount={(popupElement) => {
-                                       self.popupElement = popupElement;
-                                       self.onResized();
-                                   }}
-                                   popupWillUnmount={(popupElement) => {
-                                       delete self.popupElement;
-                                   }}>
-                <div onClick={function (e) {
-                    $(document.body).trigger('closeAllDropdownsExcept', self);
-                }}>
-                    {!this.props.noArrow ? <i className="dropdown-white-arrow"></i> : null}
-                    {child}
-                </div>
-            </utils.RenderTo>;
         }
+        var classes = "dropdown body " + (this.props.noArrow ? "" : "dropdown-arrow up-arrow") + " " +
+            this.props.className;
+
+        var styles;
+
+        // calculate and move the popup arrow to the correct position.
+        if (this.popupElement) {
+            styles = {
+                'zIndex': 123,
+                'position': 'absolute',
+                'width': this.props.styles ? this.props.styles.width : undefined
+            };
+        }
+
+        var self = this;
+
+        var child = null;
+
+        if (this.props.children) {
+            child = <div>{self.renderChildren()}</div>;
+        }
+        else if (this.props.dropdownItemGenerator) {
+            child = this.props.dropdownItemGenerator(this);
+        }
+
+        if (!child && !this.props.forceShowWhenEmpty) {
+            if (this.props.active !== false) {
+                (window.setImmediate || window.setTimeout)(function() {
+                    self.onActiveChange(false);
+                });
+            }
+            return null;
+        }
+
+
+        return <utils.RenderTo element={document.body} className={classes} style={styles}
+            popupDidMount={(popupElement) => {
+                self.popupElement = popupElement;
+                self.onResized();
+            }}
+            popupWillUnmount={() => {
+                delete self.popupElement;
+            }}>
+            <div onClick={function() {
+                $(document.body).trigger('closeAllDropdownsExcept', self);
+            }}>
+                {this.props.noArrow ? null : <i className="dropdown-white-arrow"></i>}
+                {child}
+            </div>
+        </utils.RenderTo>;
     }
-};
+}
 
 export class DropdownContactsSelector extends MegaRenderMixin {
     static defaultProps = {
@@ -255,16 +259,20 @@ export class DropdownContactsSelector extends MegaRenderMixin {
         this.onSelectClicked = this.onSelectClicked.bind(this);
         this.onSelected = this.onSelected.bind(this);
     }
-    specificShouldComponentUpdate(nextProps, nextState) {
+    specShouldComponentUpdate(nextProps, nextState) {
+        // eslint-disable-next-line eqeqeq
         if (this.props.active != nextProps.active) {
             return true;
         }
+        // eslint-disable-next-line eqeqeq
         else if (this.props.focused != nextProps.focused) {
             return true;
         }
+        // eslint-disable-next-line eqeqeq
         else if (this.state && this.state.active != nextState.active) {
             return true;
         }
+        // eslint-disable-next-line eqeqeq
         else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
             return true;
         }
@@ -287,32 +295,34 @@ export class DropdownContactsSelector extends MegaRenderMixin {
         var self = this;
 
         return <Dropdown className={"popup contacts-search " + this.props.className + " tooltip-blur"}
-                         active={this.props.active}
-                         closeDropdown={this.props.closeDropdown}
-                         ref="dropdown"
-                         positionMy={this.props.positionMy}
-                         positionAt={this.props.positionAt}
-                         arrowHeight={this.props.arrowHeight}
-                         vertOffset={this.props.vertOffset}
-                >
-                <ContactPickerWidget
-                    active={this.props.active}
-                    className="popup contacts-search tooltip-blur small-footer"
-                    contacts={M.u}
-                    selectFooter={this.props.selectFooter}
-                    megaChat={this.props.megaChat}
-                    exclude={this.props.exclude}
-                    allowEmpty={this.props.allowEmpty}
-                    multiple={this.props.multiple}
-                    showTopButtons={this.props.showTopButtons}
-                    onSelectDone={this.props.onSelectDone}
-                    multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
-                    singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
-                    nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
-                    />
+            active={this.props.active}
+            closeDropdown={this.props.closeDropdown}
+            ref={function(r) {
+                self.dropdownRef = r;
+            }}
+            positionMy={this.props.positionMy}
+            positionAt={this.props.positionAt}
+            arrowHeight={this.props.arrowHeight}
+            vertOffset={this.props.vertOffset}
+        >
+            <ContactPickerWidget
+                active={this.props.active}
+                className="popup contacts-search tooltip-blur small-footer"
+                contacts={M.u}
+                selectFooter={this.props.selectFooter}
+                megaChat={this.props.megaChat}
+                exclude={this.props.exclude}
+                allowEmpty={this.props.allowEmpty}
+                multiple={this.props.multiple}
+                showTopButtons={this.props.showTopButtons}
+                onSelectDone={this.props.onSelectDone}
+                multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
+                singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
+                nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
+            />
         </Dropdown>;
     }
-};
+}
 
 export class DropdownItem extends MegaRenderMixin {
     static defaultProps = {
@@ -326,7 +336,7 @@ export class DropdownItem extends MegaRenderMixin {
     }
     renderChildren() {
         var self = this;
-        return React.Children.map(this.props.children, function (child) {
+        return React.Children.map(this.props.children, function(child) {
             var props = {
                 active: self.state.isClicked,
                 closeDropdown: function() {
@@ -334,7 +344,7 @@ export class DropdownItem extends MegaRenderMixin {
                 }
             };
             return React.cloneElement(child, props);
-        }.bind(this))
+        });
     }
     onClick(e) {
         var self = this;
@@ -347,8 +357,6 @@ export class DropdownItem extends MegaRenderMixin {
         }
     }
     onMouseOver(e) {
-        var self = this;
-
         if (this.props.className === "contains-submenu") {
             var $contextItem = $(e.target).closest(".contains-submenu");
             var $subMenu = $contextItem.next('.submenu');
@@ -390,20 +398,22 @@ export class DropdownItem extends MegaRenderMixin {
         let child = null;
 
         child = <div>
-                {self.renderChildren()}
-            </div>;
+            {self.renderChildren()}
+        </div>;
 
         return <div
-                    className={`dropdown-item ${self.props.className ? self.props.className : ''}`}
-                    onClick={self.props.onClick ? (e) => {
-                        $(document).trigger('closeDropdowns');
-                        !self.props.disabled && self.props.onClick(e);
-                    } : self.onClick}
-                    onMouseOver={self.onMouseOver}
-                >
-                    {icon}
-                    <span>{label}</span>
-                    {child}
-                </div>;
+            className={`dropdown-item ${self.props.className ? self.props.className : ''}`}
+            onClick={self.props.onClick ? (e) => {
+                $(document).trigger('closeDropdowns');
+                if (!self.props.disabled) {
+                    self.props.onClick(e);
+                }
+            } : self.onClick}
+            onMouseOver={self.onMouseOver}
+        >
+            {icon}
+            <span>{label}</span>
+            {child}
+        </div>;
     }
 };

@@ -1,4 +1,5 @@
 (function(scope) {
+/* eslint-disable indent */
 "use strict";
 
 /**
@@ -1026,18 +1027,17 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
         // speed up a little bit, by skipping the .isArray checks.
         return MegaPromise.resolve();
     }
-    console.error('_ensureKeysAreLoaded', messages, users, chathandle);
-
 
     var promises = [];
 
     if (Array.isArray(messages)) {
-        messages.forEach(function(msgObject) {
+        for (var i = 0; i < messages.length; i++) {
+            var msgObject = messages[i];
             if (typeof(msgObject.userId) === "undefined" || msgObject.userId === null) {
-                return;
+                continue;
             }
             if (msgObject.userId === strongvelope.COMMANDER) {
-                return;
+                continue;
             }
             else {
                 if (!pubCu25519[msgObject.userId]) {
@@ -1058,16 +1058,17 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
                     );
                 }
             }
-        });
+        }
     }
     if (Array.isArray(users) || users instanceof Set) {
-        users.forEach(function(userId) {
+        for (var i2 = 0; i2 < users.length; i2++) {
+            var userId = users[i2];
             if (typeof(userId) === "undefined" || userId === null) {
-                return;
+                continue;
             }
 
             if (userId === strongvelope.COMMANDER) {
-                return;
+                continue;
             }
             else {
                 if (!pubCu25519[userId]) {
@@ -1088,17 +1089,19 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
                     );
                 }
             }
-        });
+        }
     }
+
     return MegaPromise.allDone(promises);
 };
 
 
 ChatdIntegration._ensureContactExists = function(users) {
     if (Array.isArray(users) || users instanceof Set) {
-        users.forEach(function(userId) {
+        for (var i2 = 0; i2 < users.length; i2++) {
+            var userId = users[i2];
             if (userId === strongvelope.COMMANDER) {
-                return;
+                continue;
             }
 
             if (!M.u[userId]) {
@@ -1112,7 +1115,7 @@ ChatdIntegration._ensureContactExists = function(users) {
                     })
                 );
             }
-        });
+        }
     }
 };
 
@@ -1897,10 +1900,6 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
         var participants = chatRoom.getParticipantsExceptMe();
         if (participants.length === 0 && chatRoom.type === "private") {
             return;
-        } else {
-            participants.forEach(function (v, k) {
-                participants[k] = v;
-            });
         }
 
         promises.push(

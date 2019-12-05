@@ -43,10 +43,8 @@ class ParticipantsList extends MegaRenderMixin {
         }
 
         var $parentContainer = $node.closest('.chat-right-pad');
-        var maxHeight = (
-            $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-            $('.chat-right-head', $parentContainer).outerHeight(true) - 72
-        );
+        var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
+            $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
 
         if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
             fitHeight = Math.max(fitHeight /* margin! */, 53);
@@ -80,15 +78,11 @@ class ParticipantsList extends MegaRenderMixin {
             return null;
         }
         var contactHandle;
-        var contact;
         var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
         if (contacts && contacts.length > 0) {
             contactHandle = contacts[0];
-            contact = M.u[contactHandle];
         }
-        else {
-            contact = {};
-        }
+
 
 
         return <div className="chat-contacts-list">
@@ -144,23 +138,10 @@ class ParticipantsListInner extends MegaRenderMixin {
             // save some memory/DOM
             return false;
         }
-        var contactHandle;
-        var contact;
         var contacts = room.getParticipantsExceptMe();
-        if (contacts && contacts.length > 0) {
-            contactHandle = contacts[0];
-            contact = M.u[contactHandle];
-        } else {
-            contact = {};
-        }
-
-        const myPresence = anonymouschat ? 'offline' : room.megaChat.userPresenceToCssClass(M.u[u_handle].presence);
 
         var contactsList = [];
 
-
-
-        const extraItems = 16;
         const firstVisibleUserNum = Math.floor(scrollPositionY / contactCardHeight);
         const visibleUsers = Math.ceil(scrollHeight / contactCardHeight);
         const lastVisibleUserNum = firstVisibleUserNum + visibleUsers;
@@ -180,105 +161,89 @@ class ParticipantsListInner extends MegaRenderMixin {
             contactListInnerStyles.height += contactCardHeight;
         }
 
-        var i = 0;
-        contacts.forEach(function(contactHash) {
+        var onRemoveClicked = (contactHash) => {
+            $(room).trigger('onRemoveUserRequest', [contactHash]);
+        };
+
+        var onSetPrivClicked = (contactHash, priv) => {
+            if (room.members[contactHash] !== priv) {
+                $(room).trigger('alterUserPrivilege', [contactHash, priv]);
+            }
+        };
+
+        for (var i = 0; i < contacts.length; i++) {
+            var contactHash = contacts[i];
             var contact = M.u[contactHash];
 
-            if (contact) {
-                if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
-                    i++;
-                    return;
+            if (!contact) {
+                continue;
+            }
+            if (i < firstVisibleUserNum || i > lastVisibleUserNum) {
+                continue;
+            }
+            var dropdowns = [];
+
+            var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
+            var dropdownRemoveButton = [];
+
+            if (room.type === "public" || room.type === "group" && room.members) {
+
+                if (room.iAmOperator() && contactHash !== u_handle) {
+                    dropdownRemoveButton.push(
+                        <DropdownsUI.DropdownItem className="red"
+                            key="remove" icon="rounded-stop" label={__(l[8867])}
+                            onClick={onRemoveClicked.bind(this, contactHash)}/>
+                    );
                 }
-                var dropdowns = [];
 
-                var dropdownIconClasses = "small-icon tiny-icon icons-sprite grey-dots";
+                if (room.iAmOperator() || contactHash === u_handle) {
+                    // operator
+                    dropdowns.push(
+                        <div key="setPermLabel" className="dropdown-items-info">
+                            {__(l[8868])}
+                        </div>
+                    );
 
-                if ((room.type === "public") ||
-                    (room.type === "group" && room.members)) {
-                    var dropdownRemoveButton = [];
+                    dropdowns.push(
+                        <DropdownsUI.DropdownItem
+                            key="privOperator" icon="gentleman"
+                            label={__(l[8875])}
+                            className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
+                            disabled={contactHash === u_handle}
+                            onClick={onSetPrivClicked.bind(this, contactHash, FULL)} />
+                    );
 
-                    if (room.iAmOperator() && contactHash !== u_handle) {
-                        dropdownRemoveButton.push(
-                            <DropdownsUI.DropdownItem className="red"
-                                key="remove" icon="rounded-stop" label={__(l[8867])}
-                                onClick={() => {
-                                    $(room).trigger('onRemoveUserRequest', [contactHash]);
-                                }}/>
-                        );
-                    }
+                    dropdowns.push(
+                        <DropdownsUI.DropdownItem
+                            key="privFullAcc" icon="conversation-icon"
+                            className={"tick-item " + (room.members[contactHash] === OPERATOR ? "active" : "")}
+                            disabled={contactHash === u_handle}
+                            label={__(l[8874])} onClick={onSetPrivClicked.bind(this, contactHash, OPERATOR)} />
+                    );
 
+                    dropdowns.push(
+                        <DropdownsUI.DropdownItem
+                            key="privReadOnly" icon="eye-icon"
+                            className={"tick-item " + (room.members[contactHash] === READONLY ? "active" : "")}
+                            disabled={contactHash === u_handle}
+                            label={__(l[8873])} onClick={onSetPrivClicked.bind(this, contactHash, READONLY)}/>
+                    );
 
-                    if (room.iAmOperator() || contactHash === u_handle) {
-                        // operator
-                        dropdowns.push(
-                            <div key="setPermLabel" className="dropdown-items-info">
-                                {__(l[8868])}
-                            </div>
-                        );
+                }
 
-                        dropdowns.push(
-                            <DropdownsUI.DropdownItem
-                                key="privOperator" icon="gentleman"
-                                label={__(l[8875])}
-                                className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
-                                disabled={contactHash === u_handle}
-                                onClick={() => {
-                                    if (room.members[contactHash] !== FULL) {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, FULL]);
-                                    }
-                                }}/>
-                        );
-
-                        dropdowns.push(
-                            <DropdownsUI.DropdownItem
-                                key="privFullAcc" icon="conversation-icon"
-                                className={"tick-item " + (room.members[contactHash] === OPERATOR ? "active" : "")}
-                                disabled={contactHash === u_handle}
-                                label={__(l[8874])} onClick={() => {
-                                    if (room.members[contactHash] !== OPERATOR) {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, OPERATOR]);
-                                    }
-                                }}/>
-                        );
-
-                        dropdowns.push(
-                            <DropdownsUI.DropdownItem
-                                key="privReadOnly" icon="eye-icon"
-                                className={"tick-item " + (room.members[contactHash] === READONLY ? "active" : "")}
-                                disabled={contactHash === u_handle}
-                                label={__(l[8873])} onClick={() => {
-                                    if (room.members[contactHash] !== READONLY) {
-                                        $(room).trigger('alterUserPrivilege', [contactHash, READONLY]);
-                                    }
-                                }}/>
-                        );
-
-                    }
-                    else if (room.members[u_handle] === OPERATOR) {
-                        // full access
-
-                    }
-                    else if (room.members[u_handle] === 1) {
-                        // read write
-                        // should not happen.
-                    }
-                    else if (room.isReadOnly()) {
-                        // read only
-                    }
-                    else {
-                        // should not happen.
-                    }
-
-                    // other user privilege
-                    if (room.members[contactHash] === FULL) {
+                // other user privilege
+                switch (room.members[contactHash]) {
+                    case FULL:
                         dropdownIconClasses = "small-icon gentleman";
-                    } else if (room.members[contactHash] === OPERATOR) {
+                        break;
+                    case OPERATOR:
                         dropdownIconClasses = "small-icon conversation-icon";
-                    } else if (room.members[contactHash] === READONLY) {
+                        break;
+                    case READONLY:
                         dropdownIconClasses = "small-icon eye-icon";
-                    } else {
-                        // should not happen.
-                    }
+                        break;
+                    default:
+                        break;
                 }
 
                 contactsList.push(
@@ -291,10 +256,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                         dropdownPositionAt="left top"
                         dropdowns={dropdowns}
                         dropdownDisabled={contactHash === u_handle || anonymouschat}
-                        dropdownButtonClasses={
-                            (room.type === "group" || room.type === "public") &&
-                            myPresence !== 'offline' ? "button icon-dropdown" : "button icon-dropdown"
-                        }
+                        dropdownButtonClasses="button icon-dropdown"
                         dropdownRemoveButton={dropdownRemoveButton}
                         dropdownIconClasses={dropdownIconClasses}
                         noLoading={true}
@@ -306,10 +268,8 @@ class ParticipantsListInner extends MegaRenderMixin {
                         }}
                     />
                 );
-
-                i++;
             }
-        });
+        }
 
         return (
             <div className="chat-contacts-list-inner" style={contactListInnerStyles}>

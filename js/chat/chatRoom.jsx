@@ -129,11 +129,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
         if (newState === ChatRoom.STATE.READY) {
-            if (!self.isReadOnly()) {
-                if (self.chatd && self.isOnline() && self.chatIdBin) {
-                    // this should never happen, but just in case...
-                    self.getChatIdMessages().resend();
-                }
+            if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
+                // this should never happen, but just in case...
+                self.getChatIdMessages().resend();
             }
             self.loadContactNames();
         }
@@ -308,13 +306,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                         roomRequiresUpdate = true;
                     }
                 }
-                else {
-                    if (!contact._onMembUpdUIListener) {
-                        contact._onMembUpdUIListener = contact.addChangeListener(function() {
-                            self.trackDataChange.apply(self, arguments);
-                        });
-                        roomRequiresUpdate = true;
-                    }
+                else if (!contact._onMembUpdUIListener) {
+                    contact._onMembUpdUIListener = contact.addChangeListener(function() {
+                        self.trackDataChange.apply(self, arguments);
+                    });
+                    roomRequiresUpdate = true;
                 }
             }
         }
@@ -795,8 +791,8 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
 /**
  * Get room title
  *
- * @param [ignoreTopic] {Boolean}
- * @param [encapsTopicInQuotes] {Boolean}
+ * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
+ * @param {Boolean} [encapsTopicInQuotes] add quotes for the returned topic
  * @returns {string}
  */
 ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
@@ -823,7 +819,7 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
                 );
             }
         }
-        var def = __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
+        var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
         if (names.length === 0) {
             return def;
         }

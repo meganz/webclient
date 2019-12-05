@@ -81,7 +81,7 @@ var FUNCTIONS = [
     'updateScroll',
     'isActive',
     'onMessagesScrollReinitialise',
-    'specificShouldComponentUpdate',
+    'specShouldComponentUpdate',
     'attachAnimationEvents',
     'eventuallyReinitialise',
     'reinitialise',
@@ -270,7 +270,7 @@ export class MegaRenderMixin extends React.Component {
         //
         //this.requiresLazyRendering();
 
-        if (INTERSECTION_OBSERVER_AVAILABLE && !this.componentSpecificIsComponentEventuallyVisible) {
+        if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
             var node = this.findDOMNode();
             if (node) {
                 this.__intersectionVisibility = false;
@@ -310,8 +310,11 @@ export class MegaRenderMixin extends React.Component {
         if (!this.__isMounted) {
             return false;
         }
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            return this.componentSpecificIsComponentEventuallyVisible();
+        if (this.customIsEventuallyVisible) {
+            var result = this.customIsEventuallyVisible();
+            if (result !== -1) {
+                return result;
+            }
         }
 
         if (this.__intersectionVisibility === false) {
@@ -346,8 +349,8 @@ export class MegaRenderMixin extends React.Component {
             return false;
         }
 
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            return this.componentSpecificIsComponentEventuallyVisible();
+        if (this.customIsEventuallyVisible) {
+            return this.customIsEventuallyVisible();
         }
 
         if (this.props.isVisible) {
@@ -601,9 +604,9 @@ export class MegaRenderMixin extends React.Component {
             }
             return false;
         }
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
-            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+        if (this.customIsEventuallyVisible) {
+            // we asume `customIsEventuallyVisible` is super quick/does have low CPU usage
+            if (!this._queueUpdateWhenVisible && !this.customIsEventuallyVisible()) {
                 this._queueUpdateWhenVisible = true;
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -612,15 +615,15 @@ export class MegaRenderMixin extends React.Component {
                     );
                 }
             }
-            else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+            else if (this._queueUpdateWhenVisible && this.customIsEventuallyVisible()) {
                 delete this._queueUpdateWhenVisible;
                 return true;
             }
         }
 
         // component specific control of the React lifecycle
-        if (this.specificShouldComponentUpdate) {
-            var r = this.specificShouldComponentUpdate(nextProps, nextState);
+        if (this.specShouldComponentUpdate) {
+            var r = this.specShouldComponentUpdate(nextProps, nextState);
             if (r === false) {
                 if (window.RENDER_DEBUG) {
                     console.error(

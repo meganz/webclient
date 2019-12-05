@@ -512,7 +512,7 @@ class BrowserEntries extends MegaRenderMixin {
             self.props.onAttachClicked(self.state.selected);
         }
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return true;
     }
     render() {

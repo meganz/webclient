@@ -7,21 +7,23 @@ import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
+var _attchRerenderCbContacts = function() {
+    this.addDataStructListenerForProperties(this.props.contact, [
+        'name',
+        'firstName',
+        'lastName',
+        'nickname',
+        'm',
+        'avatar'
+    ]);
+};
+
 export class ContactsListItem extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'avatar',
-            'presence'
-        ]);
-    }
+    attachRerenderCallback = _attchRerenderCbContacts;
     render() {
         var classString = "nw-conversations-item";
 
@@ -38,7 +40,7 @@ export class ContactsListItem extends ContactAwareComponent {
         return (
             <div>
                 <div className={classString}
-                     onClick={this.props.onContactClicked.bind(this)}>
+                    onClick={this.props.onContactClicked.bind(this)}>
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
                     <div className="nw-conversations-name">
@@ -59,18 +61,12 @@ export class ContactButton extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'm',
-            'avatar'
-        ]);
-    }
-    componentSpecificIsComponentEventuallyVisible() {
-        return this.props.chatRoom.isCurrentlyActive;
+    attachRerenderCallbacks = _attchRerenderCbContacts;
+    customIsEventuallyVisible() {
+        if (this.props.chatRoom) {
+            return this.props.chatRoom.isCurrentlyActive;
+        }
+        return -1;
     }
     render() {
         var self = this;
@@ -105,27 +101,24 @@ export class ContactButton extends ContactAwareComponent {
         if (!self.props.noContextMenu) {
             var moreDropdowns = [];
 
+
+            var onContactClicked = function() {
+                if (contact.c === 2) {
+                    loadSubPage('fm/account');
+                }
+                if (contact.c === 1) {
+                    loadSubPage('fm/' + contact.u);
+                }
+            };
+
             moreDropdowns.push(
                 <div className="dropdown-avatar rounded" key="mainContactInfo">
                     <Avatar className="avatar-wrapper context-avatar"
-                            chatRoom={this.props.chatRoom}
-                            contact={contact} hideVerifiedBadge="true" onClick={() => {
-                                if (contact.c === 2) {
-                                    loadSubPage('fm/account');
-                                }
-                                if (contact.c === 1) {
-                                    loadSubPage('fm/' + contact.u);
-                                }
-                    }} />
-                    <div className="dropdown-user-name" onClick={() => {
-                        if (contact.c === 2) {
-                            loadSubPage('fm/account');
-                        }
-                        if (contact.c === 1) {
-                            loadSubPage('fm/' + contact.u);
-                        }}}>
-                         <div className="name">
-                             {username}
+                        chatRoom={this.props.chatRoom}
+                        contact={contact} hideVerifiedBadge="true" onClick={onContactClicked} />
+                    <div className="dropdown-user-name" onClick={onContactClicked}>
+                        <div className="name">
+                            {username}
                             <ContactPresence className="small" contact={contact} />
                         </div>
                         <span className="email">
@@ -157,29 +150,29 @@ export class ContactButton extends ContactAwareComponent {
             }
             if (contact.c === 1) {
 
+                var startAudioCall = function() {
+                    megaChat.createAndShowPrivateRoomFor(contact.u)
+                        .then(function(room) {
+                            room.setActive();
+                            room.startAudioCall();
+                        });
+                };
+
                 if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                     moreDropdowns.push(
                         <DropdownItem
                             key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
-                            onClick={() => {
-                                megaChat.createAndShowPrivateRoomFor(contact.u)
-                                    .then(function(room) {
-                                        room.setActive();
-                                        room.startAudioCall();
-                                    });
-                            }} />
+                            onClick={startAudioCall} />
                     );
+
+
+
                     moreDropdowns.push(
                         <div className="dropdown body submenu" key="dropdownGroup">
                             <div>
                                 <DropdownItem
-                                        key="startAudio" icon="context handset" label={__(l[1565])} onClick={() => {
-                                            megaChat.createAndShowPrivateRoomFor(contact.u)
-                                                .then(function(room) {
-                                                    room.setActive();
-                                                    room.startAudioCall();
-                                                });
-                                        }} />
+                                    key="startAudio" icon="context handset" label={__(l[1565])}
+                                    onClick={startAudioCall} />
                             </div>
                             <div>
                                 <DropdownItem
@@ -196,10 +189,10 @@ export class ContactButton extends ContactAwareComponent {
                 }
                 else {
                     moreDropdowns.push(
-                            <DropdownItem
-                                key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
-                                    loadSubPage('fm/chat/p/' + contact.u);
-                                }} />
+                        <DropdownItem
+                            key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
+                                loadSubPage('fm/chat/p/' + contact.u);
+                            }} />
                     );
                 }
 
@@ -238,37 +231,38 @@ export class ContactButton extends ContactAwareComponent {
                                         JSON.stringify({u: contact.u, unixTime: unixtime()})
                                     );
                                 }
-                            } else {
-                                M.syncContactEmail(contact.u)
-                                .done(function(email) {
-                                    var exists = false;
-                                    Object.keys(M.opc).forEach(function (k) {
-                                        if (!exists && M.opc[k].m === email) {
-                                            exists = true;
-                                            return false;
-                                        }
-                                    });
-
-                                    if (exists) {
-                                        closeDialog();
-                                        msgDialog('warningb', '', l[17545]);
-                                    } else {
-                                        M.inviteContact(M.u[u_handle].m, email);
-                                        var title = l[150];
-
-                                        var msg = l[5898].replace('[X]', email);
-
-                                        closeDialog();
-                                        msgDialog('info', title, msg);
-                                    }
-                                })
-                                .always(function() {
-                                    loadingDialog.hide();
-                                });
                             }
-                            return;
+                            else {
+                                M.syncContactEmail(contact.u)
+                                    .done(function(email) {
+                                        var exists = false;
+                                        var opcKeys = Object.keys(M.opc);
+                                        for (var i = 0; i < opcKeys.length; i++) {
+                                            if (!exists && M.opc[opcKeys[i]].m === email) {
+                                                exists = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (exists) {
+                                            closeDialog();
+                                            msgDialog('warningb', '', l[17545]);
+                                        }
+                                        else {
+                                            M.inviteContact(M.u[u_handle].m, email);
+                                            var title = l[150];
+                                            var msg = l[5898].replace('[X]', email);
+
+                                            closeDialog();
+                                            msgDialog('info', title, msg);
+                                        }
+                                    })
+                                    .always(function() {
+                                        loadingDialog.hide();
+                                    });
+                            }
                         }
-                    }/>
+                        } />
                 );
             }
 
@@ -283,7 +277,7 @@ export class ContactButton extends ContactAwareComponent {
                     <DropdownItem
                         key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
                             nicknames.setNicknameDialog.init(contact.u);
-                    }} />
+                        }} />
                 );
             }
 
@@ -321,7 +315,10 @@ export class ContactButton extends ContactAwareComponent {
 };
 
 ContactButton.propTypes = {
-    chatRoom: PropTypes.object.isRequired
+    chatRoom: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.bool
+    ])
 };
 
 export class ContactVerified extends MegaRenderMixin {
@@ -377,15 +374,6 @@ export class ContactPresence extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
-    }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'avatar'
-        ]);
     }
     render() {
         var contact = this.props.contact;
@@ -477,15 +465,7 @@ export class Avatar extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'avatar'
-        ]);
-    }
+    attachRerenderCallbacks = _attchRerenderCbContacts;
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -551,16 +531,16 @@ export class Avatar extends ContactAwareComponent {
             }
 
             displayedAvatar = <div className={classes} style={this.props.style}
-                    {...extraProps}
-                    onClick={self.props.onClick ? (e) => {
-                        $(document).trigger('closeDropdowns');
-                        self.props.onClick(e);
-                    } : self.onClick}>
-                        {verifiedElement}
-                        <span>
-                            {isLoading ? "" : avatarMeta.avatar.letters}
-                        </span>
-                </div>;
+                {...extraProps}
+                onClick={self.props.onClick ? (e) => {
+                    $(document).trigger('closeDropdowns');
+                    self.props.onClick(e);
+                } : self.onClick}>
+                {verifiedElement}
+                <span>
+                    {isLoading ? "" : avatarMeta.avatar.letters}
+                </span>
+            </div>;
 
         }
 
@@ -583,18 +563,8 @@ export class ContactCard extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'presence',
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'm',
-            'avatar'
-        ]);
-    }
-    specificShouldComponentUpdate(nextProps, nextState) {
+    attachRerenderCallbacks = _attchRerenderCbContacts;
+    specShouldComponentUpdate(nextProps, nextState) {
         var self = this;
 
         var foundKeys = Object.keys(self.props);
@@ -717,45 +687,43 @@ export class ContactCard extends ContactAwareComponent {
         }
 
         return <div
-                    className={
-                        "contacts-info body " +
-                        (pres === "offline" ? "offline" : "") +
-                        (className ? " " + className : "")
-                    }
-                    onClick={(e) => {
-
-                        if (self.props.onClick) {
-                            self.props.onClick(contact, e);
-                        }
-                    }}
-                    onDoubleClick={(e) => {
-                        if (self.props.onDoubleClick) {
-                            self.props.onDoubleClick(contact, e);
-                        }
-                    }}
-                    style={self.props.style}
-                    >
-                <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar"
-                        chatRoom={this.props.chatRoom} />
-
-                {
-                    anonymouschat || noContextButton ? null :
-                        <ContactButton
-                            key="button"
-                            dropdowns={dropdowns}
-                            dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
-                            disabled={self.props.dropdownDisabled}
-                            noContextMenu={noContextMenu}
-                            contact={contact}
-                            className={self.props.dropdownButtonClasses}
-                            dropdownRemoveButton={dropdownRemoveButton}
-                            noLoading={self.props.noLoading}
-                            chatRoom={self.props.chatRoom}
-                        />
+            className={
+                "contacts-info body " +
+                (pres === "offline" ? "offline" : "") +
+                (className ? " " + className : "")
+            }
+            onClick={(e) => {
+                if (self.props.onClick) {
+                    self.props.onClick(contact, e);
                 }
-                {selectionTick}
-                {userCard}
-            </div>;
+            }}
+            onDoubleClick={(e) => {
+                if (self.props.onDoubleClick) {
+                    self.props.onDoubleClick(contact, e);
+                }
+            }}
+            style={self.props.style}>
+            <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar"
+                chatRoom={this.props.chatRoom} />
+
+            {
+                anonymouschat || noContextButton ? null :
+                <ContactButton
+                    key="button"
+                    dropdowns={dropdowns}
+                    dropdownIconClasses={self.props.dropdownIconClasses ? self.props.dropdownIconClasses : ""}
+                    disabled={self.props.dropdownDisabled}
+                    noContextMenu={noContextMenu}
+                    contact={contact}
+                    className={self.props.dropdownButtonClasses}
+                    dropdownRemoveButton={dropdownRemoveButton}
+                    noLoading={self.props.noLoading}
+                    chatRoom={self.props.chatRoom}
+                />
+            }
+            {selectionTick}
+            {userCard}
+        </div>;
     }
 };
 
@@ -771,15 +739,7 @@ export class ContactItem extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks() {
-        this.addDataStructListenerForProperties(this.props.contact, [
-            'name',
-            'firstName',
-            'lastName',
-            'nickname',
-            'avatar'
-        ]);
-    }
+    attachRerenderCallbacks = _attchRerenderCbContacts;
     render() {
         var classString = "nw-conversations-item";
         var self = this;
@@ -792,18 +752,19 @@ export class ContactItem extends ContactAwareComponent {
         var username = this.props.namePrefix ? this.props.namePrefix : "" + M.getNameByHandle(contact.u);
 
         return <div className="selected-contact-card short">
+            {/* eslint-disable-next-line sonarjs/no-identical-functions */}
             <div className="remove-contact-bttn"  onClick={(e) => {
-                        if (self.props.onClick) {
-                            self.props.onClick(contact, e);
-                        }
-                    }}>
+                if (self.props.onClick) {
+                    self.props.onClick(contact, e);
+                }
+            }}>
                 <i className="tiny-icon small-cross"></i>
             </div>
             <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true}
-                    chatRoom={this.props.chatRoom} />
+                chatRoom={this.props.chatRoom} />
             <div className="user-card-data">
-                    <ContactButton contact={contact} className="light"
-                                   label={username} chatRoom={this.props.chatRoom} />
+                <ContactButton contact={contact} className="light"
+                    label={username} chatRoom={this.props.chatRoom} />
             </div>
         </div>;
     }
@@ -811,7 +772,10 @@ export class ContactItem extends ContactAwareComponent {
 
 
 ContactItem.propTypes = {
-    chatRoom: PropTypes.object.isRequired
+    chatRoom: PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.bool
+    ])
 };
 
 export class ContactPickerWidget extends MegaRenderMixin {
@@ -826,7 +790,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         this.state = {
             'searchValue': '',
             'selected': this.props.selected || false,
-        }
+        };
     }
     onSearchChange(e) {
         var self = this;
@@ -1037,9 +1001,11 @@ export class ContactPickerWidget extends MegaRenderMixin {
         };
 
         if (self.props.readOnly) {
-            (self.state.selected || []).forEach(function (v, k) {
+            var sel = self.state.selected || [];
+            for (var i = 0; i < sel.length; i++) {
+                var v = sel[i];
                 contactsSelected.push(<ContactItem contact={M.u[v]} key={v} chatRoom={self.props.chatRoom} />);
-            });
+            }
         }
         else if (self.props.multiple) {
             selectableContacts = true;
@@ -1114,21 +1080,23 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 selectedContacts = true;
 
                 onContactSelectDoneCb = onContactSelectDoneCb.bind(self);
-                (self.state.selected || []).forEach(function (v, k) {
-                    contactsSelected.push(<ContactItem contact={M.u[v]}
-                                                       onClick={onContactSelectDoneCb}
-                                                       chatRoom={self.props.chatRoom}
-                                                       key={v}
+                var sel2 = self.state.selected || [];
+                for (var i2 = 0; i2 < sel2.length; i2++) {
+                    var v2 = sel2[i2];
+                    contactsSelected.push(<ContactItem contact={M.u[v2]}
+                        onClick={onContactSelectDoneCb}
+                        chatRoom={self.props.chatRoom || false}
+                        key={v2}
                     />);
-                });
+                }
 
                 multipleContacts =
                     <div className="horizontal-contacts-list">
                         <PerfectScrollbar className="perfectScrollbarContainer selected-contact-block horizontal-only"
-                                          selected={this.state.selected}
-                                          ref={function (psSelected) {
-                                              self.psSelected = psSelected;
-                                          }}>
+                            selected={this.state.selected}
+                            ref={function(psSelected) {
+                                self.psSelected = psSelected;
+                            }}>
                             <div className="select-contact-centre" style={{width: selectedWidth}}>
                                 {contactsSelected}
                             </div>
@@ -1145,10 +1113,10 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
                     <a className={"default-grey-button right " + (!selectedContacts ? "disabled" : "")}
                         onClick = {function(e) {
-                                if (self.state.selected.length > 0) {
-                                    onSelectDoneCb(e);
-                                }
-                            }}>
+                            if (self.state.selected.length > 0) {
+                                onSelectDoneCb(e);
+                            }
+                        }}>
                         {
                             this.props.multipleSelectedButtonLabel ?
                                 this.props.multipleSelectedButtonLabel

@@ -1,10 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import {MegaRenderMixin} from './../../../stores/mixins.js';
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
 class CloseOpenModeMessage extends ConversationMessageMixin {
     render() {

@@ -137,12 +137,13 @@
 
         "indent": [2, 4, {
             "SwitchCase": 1,
-             "outerIIFEBody": 0,
+//            "outerIIFEBody": 0,
             "FunctionDeclaration": {"parameters": "first"},
             "FunctionExpression": {"parameters": "first"},
             "CallExpression": {"arguments": "first"},
             "ArrayExpression": "first",
-            "ObjectExpression": "first"
+            "ObjectExpression": "first",
+            "ignoredNodes": ["JSXElement"]
         }],
 
         // ESLint plugins configuration follows
@@ -186,7 +187,8 @@
         "unicorn/prefer-text-content": 2,
         "unicorn/regex-shorthand": 2,
 
-        "react/no-find-dom-node": "off"
+        "react/no-find-dom-node": "off",
+        "react/jsx-indent": ["error", 4]
     },
 
     "overrides": [
@@ -197,6 +199,9 @@
             "parserOptions": {
                 "ecmaVersion": 6,
                 "sourceType": "module"
+            },
+            "rules": {
+                "complexity": [2, 28]
             }
         }
     ]

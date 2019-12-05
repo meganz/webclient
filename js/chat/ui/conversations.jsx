@@ -112,7 +112,7 @@ var getRoomName = function(chatRoom) {
 };
 
 class ConversationsListItem extends MegaRenderMixin {
-    specificShouldComponentUpdate() {
+    specShouldComponentUpdate() {
         if (
             this.loadingShown ||
             (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
@@ -457,7 +457,7 @@ class ConversationsListItem extends MegaRenderMixin {
     }
 };
 
-class ArchivedConversationsListItem extends MegaRenderMixin {
+class ArchConversationsListItem extends MegaRenderMixin {
     render() {
         var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
 
@@ -874,7 +874,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
             }
 
             currConvsList.push(
-                <ArchivedConversationsListItem
+                <ArchConversationsListItem
                     key={chatRoom.roomId}
                     chatRoom={chatRoom}
                     contact={contact}

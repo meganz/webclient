@@ -14,18 +14,20 @@ import { Accordion } from './../../ui/accordion.jsx';
 import { AccordionPanel } from './../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
 import { GenericConversationMessage } from './messages/generic.jsx';
-import { AlterParticipantsConversationMessage }  from './messages/alterParticipants.jsx';
+import { AltPartsConvMessage }  from './messages/alterParticipants.jsx';
 import { TruncatedMessage } from './messages/truncated.jsx';
 import { PrivilegeChange } from './messages/privilegeChange.jsx';
 import { TopicChange } from './messages/topicChange.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
-import { IncomingSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
+import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
 import { ChatHandleMessage } from './messages/chatHandle.jsx';
 import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
-import { ConversationAudioVideoPanel } from './conversationaudiovideopanel.jsx';
+import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
+
+// eslint-disable-next-line id-length
 var MAX_USERS_CHAT_PRIVATE_AND_ADD = 100;
 
 export class JoinCallNotification extends MegaRenderMixin {
@@ -65,7 +67,7 @@ export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
     allContactsInChat(participants) {
@@ -423,16 +425,16 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ?
                                                     " disabled" : "")
                                             }
-                                                 onClick={(e) => {
-                                                     if (
-                                                         Object.keys(room.members).length >
-                                                         MAX_USERS_CHAT_PRIVATE_AND_ADD ||
-                                                         $(e.target).closest('.disabled').length > 0
-                                                     ) {
-                                                         return false;
-                                                     }
-                                                     self.props.onMakePrivateClicked();
-                                                 }}>
+                                            onClick={(e) => {
+                                                if (
+                                                    Object.keys(room.members).length >
+                                                    MAX_USERS_CHAT_PRIVATE_AND_ADD ||
+                                                    $(e.target).closest('.disabled').length > 0
+                                                ) {
+                                                    return false;
+                                                }
+                                                self.props.onMakePrivateClicked();
+                                            }}>
                                                 <i className="small-icon yellow-key colorized"></i>
                                                 <span>{l[20623]}</span>
                                             </div>
@@ -515,7 +517,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}
                                                    sharedFiles={room.messagesBuff.sharedFiles} />
                         {room.type === "private" ?
-                            <IncomingSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
+                            <IncSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
                             null
                         }
                     </Accordion>
@@ -547,7 +549,7 @@ export class ConversationPanel extends MegaRenderMixin {
         this.handleWindowResize = this.handleWindowResize.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
     uploadFromComputer() {
@@ -1026,7 +1028,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
 
     }
-    specificShouldComponentUpdate() {
+    specShouldComponentUpdate() {
         if (
             this.isRetrievingHistoryViaScrollPull ||
             this.loadingShown ||
@@ -1257,7 +1259,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 if (v.dialogType) {
                     var messageInstance = null;
                     if (v.dialogType === 'alterParticipants') {
-                        messageInstance = <AlterParticipantsConversationMessage
+                        messageInstance = <AltPartsConvMessage
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
@@ -1919,7 +1921,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 noContextButton="true"
                 contact={contact}
                 showLastGreen={true}
-                key={contact.u} />
+                key={contact.u} />;
         }
 
         var startCallDisabled = isStartCallDisabled(room);
@@ -2005,7 +2007,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     /> : null}
                     {
                         room.callManagerCall && room.callManagerCall.isStarted() ?
-                            <ConversationAudioVideoPanel
+                            <ConversationAVPanel
                                 chatRoom={this.props.chatRoom}
                                 unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
                                 onMessagesToggle={function(isActive) {

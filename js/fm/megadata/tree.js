@@ -409,21 +409,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             if (buildnode) {
                 M.buildtree(folders[idx], dialog, stype, sDeepIndex + 1);
             }
-
-            /**
-             * XXX: if this was really needed, add it at DOM node creation
-             * if (fminitialized) {
-             *     var currNode = M.d[curItemHandle];
-             *
-             *     if ((currNode && currNode.shares) || M.ps[curItemHandle]) {
-             *         sharedUInode(curItemHandle);
-             *     }
-             *
-             *     if (currNode && currNode.lbl) {
-             *         M.labelDomUpdate(curItemHandle, currNode.lbl);
-             *     }
-             * }
-             */
         }// END of for folders loop
 
         for (var h in labelhash) {

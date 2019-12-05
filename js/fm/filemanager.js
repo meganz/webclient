@@ -1569,8 +1569,6 @@ FileManager.prototype.initContextUI = function() {
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
             M.labeling($.selected, labelId);
         }
-
-        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {

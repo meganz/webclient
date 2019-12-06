@@ -11,6 +11,10 @@
     height: 99%;
     margin-left: 20%;
 }
+#mega-text-editor #text-editor-textarea{
+    width: 100%;
+    height: 100%;
+}
 #mega-text-editor .disability-overlay{
     width: 100%;
     height: 100%;

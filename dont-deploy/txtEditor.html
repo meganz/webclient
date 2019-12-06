@@ -55,7 +55,7 @@
                             <div class="txt-editor-sp-menu"></div>
                         </div>
 
-                        <div class="top-menu-item save-f">Print...</div>
+                        <div class="top-menu-item print-f">Print...</div>
                     </div>
                 </div>
                 <div class="editor-file-name-title">
@@ -71,7 +71,9 @@
                     </div>
                 </div>
             </div>
-            <textarea id="txtar"></textarea>
+            <div id="text-editor-textarea">
+                <textarea id="txtar"></textarea>
+            </div>
         </div>
     </div>
     <script>
@@ -82,6 +84,8 @@
         var remFunction;
         var fileHandle;
         var versionHandle;
+        var $parent;
+        var fName;
 
         var editor;
         //var editor = CodeMirror.fromTextArea(myTextarea[0], {
@@ -141,11 +145,15 @@
             }
 
             $('#mega-text-editor .txt-editor-opened-f-name').text(fName);
+            $('.top-menu-popup').hide();
+
             iFramecontainer = container;
             setFunction = setterFunction;
             remFunction = removeFunction;
             fileHandle = handle;
             versionHandle = '';
+            $parent = null;
+            this.fName = fName;
         }
 
         // remove for testing only
@@ -156,31 +164,65 @@
         //    console.error(u_attr);
         //}
         // end of test
-        function selectedItemOpen(node) {
 
-            var openFile = function() {
-                var $parent = window.parent.$(window.parent.document);
-                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
-            };
-            var self = this;
-
+        function validateAction(msg, submsg, callback) {
             if (savedFileData !== editor.getValue()) {
-                window.parent.msgDialog('confirmation', '', 'The Opened file has been modified.',
-                    'Are you sure you want to discard changes and open the selected file?',
+                window.parent.msgDialog('confirmation', '', msg,
+                    submsg,
                     function(e) {
                         if (e) {
-                            openFile();
+                            callback();
                         }
                     });
             }
             else {
-                openFile();
+                callback();
             }
+        }
+
+        function selectedItemOpen(node) {
+
+            var openFile = function() {
+                !$parent && ($parent = window.parent.$(window.parent.document));
+                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            };
+
+            validateAction('The Opened file has been modified.',
+                'Are you sure you want to discard changes and open the selected file?', openFile);
+
+            //if (savedFileData !== editor.getValue()) {
+            //    window.parent.msgDialog('confirmation', '', 'The Opened file has been modified.',
+            //        'Are you sure you want to discard changes and open the selected file?',
+            //        function(e) {
+            //            if (e) {
+            //                openFile();
+            //            }
+            //        });
+            //}
+            //else {
+            //    openFile();
+            //}
 
             //if ((versionHandle && versionHandle !== node.h) || (fileHandle !== node.h)) {
 
 
             //}
+        }
+
+        function printText() {
+            // var content = document.getElementById('text-editor-textarea').innerHTML;
+            var mywindow = window.open('', fName, 'height=600,width=800');
+
+            mywindow.document.write('<html><head><title>' + fName + '</title>');
+            mywindow.document.write('</head><body >');
+            mywindow.document.write('<pre>' + editor.getValue() + '</pre>');
+            mywindow.document.write('</body></html>');
+
+            mywindow.document.close();
+            mywindow.focus()
+            mywindow.print();
+            mywindow.close();
+            return true;
         }
 
         $('#mega-text-editor .buttons-holder .close-btn').off('click').on('click',
@@ -218,6 +260,24 @@
 
         $('#mega-text-editor .editor-btn-container .open-f').off('click').on('click', function openFileClick() {
             window.parent.M.initFileAndFolderSelectDialog('openFile', selectedItemOpen);
+        });
+
+        $('#mega-text-editor .editor-btn-container .save-f').off('click').on('click', function saveFileMenuClick() {
+            $('#mega-text-editor .buttons-holder .save-btn').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .get-link-f').off('click').on('click', function getLinkFileMenuClick() {
+            !$parent && ($parent = window.parent.$(window.parent.document));
+            $parent.find('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .send-contact-f').off('click').on('click', function sendToContactMenuClick() {
+            !$parent && ($parent = window.parent.$(window.parent.document));
+            $parent.find('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .print-f').off('click').on('click', function printMenuClick() {
+            printText();
         });
 
 

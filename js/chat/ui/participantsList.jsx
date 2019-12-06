@@ -26,6 +26,7 @@ class ParticipantsList extends MegaRenderMixin {
     }
     componentDidUpdate() {
         var self = this;
+
         if (!self.isMounted()) {
             return;
         }
@@ -83,9 +84,14 @@ class ParticipantsList extends MegaRenderMixin {
             contactHandle = contacts[0];
         }
 
+        var contactListStyles = {};
+
+        if (contacts.length > 7) {
+            contactListStyles.height = 204;
+        }
 
 
-        return <div className="chat-contacts-list">
+        return <div className="chat-contacts-list" style={contactListStyles}>
             <PerfectScrollbar
                 chatRoom={room}
                 members={room.members}

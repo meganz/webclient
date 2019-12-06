@@ -223,6 +223,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                 <div>
                     {isReadOnlyElement}
                     <ParticipantsList
+                        ref={function(r) {
+                            self.participantsListRef = r;
+                        }}
                         chatRoom={room}
                         members={room.members}
                         isCurrentlyActive={room.isCurrentlyActive}
@@ -292,6 +295,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                             setTimeout(function() {
                                 if (self.rightScroll) {
                                     self.rightScroll.reinitialise();
+                                }
+                                if (self.participantsListRef) {
+                                    self.participantsListRef.safeForceUpdate();
                                 }
                             }, 250);
                         }}

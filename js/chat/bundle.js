@@ -225,17 +225,16 @@ function (_React$Component) {
           var promises = [];
 
           if (Array.isArray(cb) && !args && !ctx) {
-            var calls = cb;
-
             for (var i = 0; i < cb.length; i++) {
               var _cb = cb[i][0];
               var _args = cb[i][1];
               var _ctx = cb[i][2];
+              var _failCb = cb[i][3];
 
               var promiseReq = _cb.apply(_ctx, _args);
 
-              if (failCb) {
-                promiseReq.fail(failCb);
+              if (_failCb) {
+                promiseReq.fail(_failCb);
               }
 
               promises.push(promiseReq);
@@ -10466,8 +10465,15 @@ function (_MegaRenderMixin) {
         contactHandle = contacts[0];
       }
 
+      var contactListStyles = {};
+
+      if (contacts.length > 7) {
+        contactListStyles.height = 204;
+      }
+
       return external_React_default.a.createElement("div", {
-        className: "chat-contacts-list"
+        className: "chat-contacts-list",
+        style: contactListStyles
       }, external_React_default.a.createElement(participantsList_PerfectScrollbar, {
         chatRoom: room,
         members: room.members,
@@ -15834,6 +15840,9 @@ function (_MegaRenderMixin2) {
 
       if (room.type === "group" || room.type === "public") {
         participantsList = external_React_default.a.createElement("div", null, isReadOnlyElement, external_React_default.a.createElement(participantsList_ParticipantsList, {
+          ref: function ref(r) {
+            self.participantsListRef = r;
+          },
           chatRoom: room,
           members: room.members,
           isCurrentlyActive: room.isCurrentlyActive
@@ -15890,6 +15899,10 @@ function (_MegaRenderMixin2) {
           setTimeout(function () {
             if (self.rightScroll) {
               self.rightScroll.reinitialise();
+            }
+
+            if (self.participantsListRef) {
+              self.participantsListRef.safeForceUpdate();
             }
           }, 250);
         },

@@ -118,14 +118,14 @@ export class MegaRenderMixin extends React.Component {
             if (!self._loadingPromise) {
                 var promises = [];
                 if (Array.isArray(cb) && !args && !ctx) {
-                    var calls = cb;
                     for (var i = 0; i < cb.length; i++) {
                         var _cb = cb[i][0];
                         var _args = cb[i][1];
                         var _ctx = cb[i][2];
+                        var _failCb = cb[i][3];
                         var promiseReq = _cb.apply(_ctx, _args);
-                        if (failCb) {
-                            promiseReq.fail(failCb);
+                        if (_failCb) {
+                            promiseReq.fail(_failCb);
                         }
                         promises.push(promiseReq);
                     }

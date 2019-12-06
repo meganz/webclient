@@ -13794,17 +13794,6 @@ input[type='range']::-webkit-slider-thumb {
 .image-explorer-container .fd-slider .fd-slider-range {
     left: 4px;
 }
-.new-affiliate-mid-header, .new-affiliate-bot-header {
-    font-size: 16px;
-    line-height: 20px;
-    letter-spacing: -0.1px;
-    color: #3F4646;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 23px 0 4px 0;
-}
-.new-affiliate-mid-header.new-affiliate-bot-pad {
-    padding: 39px 0 10px 0;
-}
 ul.top-ul {
     margin: 0 0 45px 0;
     padding: 0;
@@ -14232,56 +14221,6 @@ a.contact-new-button:hover {
     color: #666666;
     min-height: 80px;
     margin: 0 0 15px 0;
-}
-.dev-new-button {
-    height: 34px;
-    border: 2px solid #d9d9d9;
-    background-color: white;
-    cursor: pointer;
-    float: left;
-    -moz-border-radius: 5px;
-    font-size: 14px;
-    line-height: 28px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    padding: 0 30px 0 13px;
-    background-image: url(../images/mega/sdk-sprite.png);
-    background-position: right -760px;
-    background-repeat: no-repeat;
-    color: #333333;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    font-family: 'source_sans_prosemibold', Arial;
-}
-.dev-new-button:hover, .dev-new-button.active {
-    background-color: #D92E00;
-    border-color: #D92E00;
-    color: white;
-    background-position: right -830px;
-}
-.dev-new-button.down-arrow {
-    padding: 0 13px 0 38px;
-    background-position: -865px -899px;
-}
-.dev-new-button.down-arrow:hover, .dev-new-button.down-arrow.active {
-    background-position: -865px -969px;
-}
-.dev-new-button.plus-icon {
-    padding: 0 13px 0 38px;
-    background-position: 10px -286px;
-}
-.dev-new-button.plus-icon:hover, .dev-new-button.plus-icon.active {
-    background-position: 10px -366px;
-}
-.dev-new-button.del-icon {
-    padding: 0 13px 0 38px;
-    float: right;
-    margin: 49px 0 0 0;
-    background-position: 11px -907px;
-}
-.dev-new-button.del-icon:hover, .dev-new-button.del-icon.active {
-    background-position: 11px -967px;
 }
 .new-right-content-block .new-bottom-pages h1 {
     color: #38393D;
@@ -29750,7 +29689,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row.complete .transfer-filetype-txt {
     max-width: 260px;
 }
-.transfer-task-row.error .transfer-filetype-txt, 
+.transfer-task-row.error .transfer-filetype-txt,
 .transfer-task-row .transfer-file-size {
     position: relative;
     display: inline-block;

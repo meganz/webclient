@@ -11553,7 +11553,26 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
     background-position: -17px -1091px;
 }
-
+.new-bottom-pages.dev-nw .new-left-menu-block {
+    display: none;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul {
+    list-style: unset;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul li {
+    background-image: unset;
+    background-size: unset;
+    list-style: unset;
+}
+code, c {
+    font-family: "Courier New", Courier, monospace;
+}
+.mobile .dev-new-button {
+    margin-top: 10px;
+}
+.mobile .key-management {
+    display: none;
+}
 /** Developer Settings Page **/
 .bottom-page.developer-settings .developer-settings-table {
     margin: auto;

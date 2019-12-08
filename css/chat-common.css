@@ -1087,26 +1087,22 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     vertical-align: top;
     box-sizing: border-box;
     position: relative;
-    margin-left: -24px;
-    margin-top: 0;
+    margin: 5px 12px 4px -20px;
     -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
     animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 
 .contacts-info.body.right-chat-contact-card .contact-name-loading {
-    margin-top: 11px;
-    margin-left: -19px;
+    margin: 11px 0 0 -19px;
 }
 
-.avatar-name-loading {
+.small-rounded-avatar.horizontal-sprite {
     -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
     animation: fadeInOutLoopSubtle 2s linear infinite;
-    background-image: url(/images/temp/avatar_loading_placeholder@2x.png);
-    background-size: contain;
+    background-position: 0 -4px;
 }
-.chat-contacts-list-inner {
-    background-image: url(/images/temp/members_placeholder.png);
-    background-repeat: repeat-y;
+.chat-contacts-list-inner.horizontal-sprite {
+    background-position: 0 0;
 }
 .chat-contacts-list-inner .contacts-info.right-chat-contact-card {
     background-color: white;

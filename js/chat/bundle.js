@@ -1671,7 +1671,7 @@ function (_ContactAwareComponen3) {
         var isLoading = self.isLoadingContactInfo();
 
         if (isLoading) {
-          classes += " avatar-name-loading";
+          classes += " horizontal-sprite";
         }
 
         displayedAvatar = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
@@ -10665,7 +10665,7 @@ function (_MegaRenderMixin2) {
       }
 
       return external_React_default.a.createElement("div", {
-        className: "chat-contacts-list-inner",
+        className: "chat-contacts-list-inner horizontal-sprite",
         style: contactListInnerStyles
       }, contactsList);
     }

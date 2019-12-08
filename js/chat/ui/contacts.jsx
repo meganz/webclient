@@ -88,7 +88,7 @@ export class ContactButton extends ContactAwareComponent {
             horizOffset = 0;
         }
         if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
-            label = <em className="contact-name-loading" />;
+            label = <em className="contact-name-loading"></em>;
         }
 
         if (!contact) {
@@ -527,7 +527,7 @@ export class Avatar extends ContactAwareComponent {
             classes += " color" + avatarMeta.avatar.colorIndex;
             var isLoading = self.isLoadingContactInfo();
             if (isLoading) {
-                classes += " avatar-name-loading";
+                classes += " horizontal-sprite";
             }
 
             displayedAvatar = <div className={classes} style={this.props.style}

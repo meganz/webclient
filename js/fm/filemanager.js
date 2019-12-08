@@ -1531,6 +1531,9 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
 
+        // WE HAVE A RACE HERE....
+        // DONT FORGET TO HANDLE
+
         var txtEditorFrame = $('.txt-editor-frame');
         var txtEditoriFrame = txtEditorFrame.find('#txt-editor-iframe');
         if (!txtEditoriFrame.attr('src')) {

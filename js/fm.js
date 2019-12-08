@@ -2829,18 +2829,24 @@ function createFolderDialog(close) {
 function createFileDialog(close) {
     "use strict";
 
-    var $dialog = $('.fm-dialog.create-file-dialog');
-    var $input = $('input', $dialog);
-    $input.val('');
 
-    if (close) {
+    var closeFunction = function() {
         if ($.cftarget) {
             delete $.cftarget;
         }
         closeDialog();
-        return true;
+        return false;
+    };
 
+
+    if (close) {
+        return closeFunction();
     }
+
+    var $dialog = $('.fm-dialog.create-file-dialog');
+    var $input = $('input', $dialog);
+    $input.val('');
+
     var doCreateFile = function(v) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
@@ -2849,23 +2855,20 @@ function createFileDialog(close) {
             $input.addClass('error');
             return;
         }
-        else {
+        else if (duplicated(0, v, target)) {
+            $dialog.addClass('duplicate');
+            $input.addClass('error');
 
-            if (duplicated(0, v, target)) {
-                $dialog.addClass('duplicate');
-                $input.addClass('error');
+            setTimeout(function() {
+                $dialog.removeClass('duplicate');
+                $input.removeClass('error');
 
-                setTimeout(function() {
-                    $dialog.removeClass('duplicate');
-                    $input.removeClass('error');
+                $input.focus();
+            }, 5000);
 
-                    $input.focus();
-                }, 2000);
-
-                return;
-            }
+            return;
         }
-        createFileDialog(1);
+        closeFunction();
         loadingDialog.pshow();
         M.addNewFile(v, target)
             .done(function() {
@@ -2910,14 +2913,14 @@ function createFileDialog(close) {
         }
     });
 
-    $('.fm-dialog-close, .create-folder-button-cancel', $dialog).rebind('click', createFolderDialog);
+    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click', closeFunction);
 
     $('.fm-dialog-input-clear', $dialog).rebind('click', function() {
         $input.val('');
         $dialog.removeClass('active');
     });
 
-    $('.fm-dialog-new-folder-button', $dialog).rebind('click', function() {
+    $('.create-file', $dialog).rebind('click', function() {
         var v = $input.val();
 
         if (v === '' || v === l[17506]) {

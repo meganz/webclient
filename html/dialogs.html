@@ -198,24 +198,30 @@
 <div class="fm-dialog create-file-dialog filled-input hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title">[$17505]</div>
-    <div class="create-folder-size-icon short-size">
-    </div>
-    <div class="create-folder-pad">
+    <!--<div class="create-folder-size-icon short-size">
+    </div>-->
+    <!--<div class="create-folder-pad">-->
+    <div class="fm-dialog-body mid-pad">
         <div class="create-folder-input-bl">
             <div class="transfer-filetype-icon text">
-                <div class="duplicated-input-warning">
-                    <div class="arrow"></div>
-                    <span>[$17578]</span>
-                </div>
+                <!--<div class="duplicated-input-warning">
+                <div class="arrow"></div>
+                <span>[$17578]</span>
+            </div>-->
             </div>
-            <input name="dialog-new-folder" type="text" value="" placeholder="[$17506]" autofocus />
+            <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
         </div>
-        <div class="create-folder-bottom">
-            <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
-            <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
-            <div class="clear"></div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17578]</span>
         </div>
     </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-new-file-button default-green-button button right create-file"><span>[$455]</span></div>
+        <div class="create-file-button-cancel default-white-button right cancel-create-file"><span>[$82]</span></div>
+        <div class="clear"></div>
+    </div>
+    <!--</div>-->
 </div>
 
 
@@ -3588,7 +3594,7 @@
 </div>
 
 <div class="txt-editor-frame hidden">
-    <iframe id="txt-editor-iframe" src="" allowtransparency="true"/>
+    <iframe id="txt-editor-iframe" src="" allowtransparency="true" />
 </div>
 <div class="viewer-overlay hidden">
     <div class="viewer-body">

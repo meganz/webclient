@@ -1099,10 +1099,10 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .small-rounded-avatar.horizontal-sprite {
     -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
     animation: fadeInOutLoopSubtle 2s linear infinite;
-    background-position: 0 -4px;
 }
+
 .chat-contacts-list-inner.horizontal-sprite {
-    background-position: 0 0;
+    background-position: -32px 0;
 }
 .chat-contacts-list-inner .contacts-info.right-chat-contact-card {
     background-color: white;

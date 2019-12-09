@@ -9361,8 +9361,13 @@ body:not(.en) .warning-dialog-a.wide {
 #msgDialog.loginrequired-dialog .fm-dialog-title, #msgDialog.loginrequired-dialog .fm-dialog-close {
     display: block;
 }
-#msgDialog.loginrequired-dialog .fm-notification-body {
-    padding: 16px 20px 20px 20px;
+#msgDialog.loginrequired-dialog .fm-notification-body,
+.fm-dialog.warning-dialog-a.login .fm-notification-body {
+    padding: 10px 20px 20px 20px;
+}
+.fm-dialog.warning-dialog-a.login .fm-notification-body .fm-notification-info p {
+    color: #333;
+    font-size: 16px;
 }
 .checkbox-block.top-pad {
     padding-top: 1px;
@@ -29750,7 +29755,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .transfer-task-row.complete .transfer-filetype-txt {
     max-width: 260px;
 }
-.transfer-task-row.error .transfer-filetype-txt, 
+.transfer-task-row.error .transfer-filetype-txt,
 .transfer-task-row .transfer-file-size {
     position: relative;
     display: inline-block;

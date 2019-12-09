@@ -116,6 +116,32 @@ mega.filesEditor = new function FileTextEditor() {
         return operationPromise;
     };
 
+
+    this.saveFileAs = function(newName, directory, content) {
+        var operationPromise = new MegaPromise();
+
+        if (!newName || !directory) {
+            return operationPromise.reject();
+        }
+
+        var fType = filemime(newName);
+        var nFile = new File([content], newName, { type: fType });
+        nFile.target = directory;
+        nFile.id = ++__ul_id;
+        nFile.path = '';
+        nFile.isCreateFile = true;
+        nFile._replaces = handle;
+        nFile.promiseToInvoke = operationPromise;
+
+        operationPromise.done(function(nHandle) {
+            storeFileData(nHandle, content);
+        });
+
+        ul_queue.push(nFile);
+        return operationPromise;
+    };
+
+
     this.removeOldVersion = function(handle) {
         api_req({ a: 'd', n: handle, v: 1 });
     };

@@ -306,6 +306,8 @@
         var names = Object.create(null);
         var items = $.selected || [];
 
+        $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
+
         var jScrollPane = function() {
             var jsp = $div.data('jsp');
 
@@ -335,7 +337,6 @@
             items = [$.saveToDialogNode.h];
             names[$.saveToDialogNode.h] = $.saveToDialogNode.name;
         }
-
         if ($.copyToShare) {
             items = [];
             single = true;
@@ -370,32 +371,49 @@
             $div.addClass('unfold');
             $div.safeAppend('<div class="item-row-group"></div>');
             $div = $div.find('.item-row-group');
+
         }
 
-        for (var i = 0; i < items.length; i++) {
-            var h = items[i];
-            var n = M.getNodeByHandle(h) || Object(h);
-            var name = names[h] || M.getNameByHandle(h) || n.name;
-            var tail = '<div class="delete-img icon"></div>';
-            var icon = fileIcon(n);
-            var data = n.uuid || h;
+        if ($.nodeSaveAs) {
+            items = [$.nodeSaveAs.h];
+            names[$.nodeSaveAs.h] = $.nodeSaveAs.name;
+            // names[$.nodeSaveAs.h] = $('input.summary-ff-name', $dialog).val();
+            $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
 
-            if (single) {
-                tail = '<span>(@@)</span>';
-                if (items.length < 2) {
-                    tail = '';
+            var rowHtml = '<div class="item-row">' +
+                '<div class="transfer-filetype-icon file text"></div>' +
+                '<input id="f-name-input" class="summary-ff-name" type="text" value="' + $.nodeSaveAs.name
+                + '" placeholder="' + l[17506] + '"/> &nbsp; ';
+            '</div>';
+
+            $div.safeHTML(rowHtml);
+        }
+        else {
+            for (var i = 0; i < items.length; i++) {
+                var h = items[i];
+                var n = M.getNodeByHandle(h) || Object(h);
+                var name = names[h] || M.getNameByHandle(h) || n.name;
+                var tail = '<div class="delete-img icon"></div>';
+                var icon = fileIcon(n);
+                var data = n.uuid || h;
+
+                if (single) {
+                    tail = '<span>(@@)</span>';
+                    if (items.length < 2) {
+                        tail = '';
+                    }
                 }
-            }
 
-            $div.safeAppend(
-                '<div class="item-row" data-node="@@">' +
-                '    <div class="transfer-filetype-icon file @@"></div>' +
-                '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
-            );
+                $div.safeAppend(
+                    '<div class="item-row" data-node="@@">' +
+                    '    <div class="transfer-filetype-icon file @@"></div>' +
+                    '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
+                    '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
+                );
 
-            if (single) {
-                break;
+                if (single) {
+                    break;
+                }
             }
         }
 
@@ -475,7 +493,7 @@
             return l[1940]; // Send
         }
 
-        if ($.saveToDialog) {
+        if ($.saveToDialog || $.saveAsDialog) {
             return l[776]; // Save
         }
 
@@ -513,6 +531,10 @@
 
         if ($.saveToDialog) {
             return l[776]; // Save
+        }
+
+        if ($.saveAsDialog) {
+            return l[22678];
         }
 
         if (section === 'conversations') {
@@ -825,7 +847,8 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog
+            || $.saveAsDialog) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -1043,6 +1066,22 @@
                 return $dialog;
             });
         }
+
+        return false;
+    };
+
+    /**
+     * Save As dialog show
+     * @param {Object} node    The node to save AS
+     * @param {Function} cb    a callback to be called when the user "Save"
+     */
+    global.openSaveAsDialog = function(node, cb) {
+        M.safeShowDialog('saveAs', function() {
+            $.saveAsCallBack = cb;
+            $.nodeSaveAs = node;
+            handleOpenDialog(null, node.p || M.RootID);
+            return $dialog;
+        });
 
         return false;
     };

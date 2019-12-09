@@ -2826,7 +2826,7 @@ function createFolderDialog(close) {
     });
 }
 
-function createFileDialog(close) {
+function createFileDialog(close, action, params) {
     "use strict";
 
 
@@ -2841,6 +2841,24 @@ function createFileDialog(close) {
 
     if (close) {
         return closeFunction();
+    }
+
+    if (!action) {
+        action = function(name, t) {
+            loadingDialog.pshow();
+            M.addNewFile(name, t)
+                .done(function() {
+                    if (d) {
+                        console.log('Created new file %s->%s', t, name);
+                    }
+                    loadingDialog.phide();
+
+                })
+                .fail(function(error) {
+                    loadingDialog.phide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                });
+        };
     }
 
     var $dialog = $('.fm-dialog.create-file-dialog');
@@ -2869,19 +2887,7 @@ function createFileDialog(close) {
             return;
         }
         closeFunction();
-        loadingDialog.pshow();
-        M.addNewFile(v, target)
-            .done(function() {
-                if (d) {
-                    console.log('Created new file %s->%s', target, v);
-                }
-                loadingDialog.phide();
-
-            })
-            .fail(function(error) {
-                loadingDialog.phide();
-                msgDialog('warninga', l[135], l[47], api_strerror(error));
-            });
+        action(v, target, params);
     };
 
 
@@ -2933,7 +2939,7 @@ function createFileDialog(close) {
 
     M.safeShowDialog('createfile', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input', $dialog).focus();
+        $('.fm-dialog-body.mid-pad input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });

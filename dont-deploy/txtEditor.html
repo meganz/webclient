@@ -266,6 +266,15 @@
             $('#mega-text-editor .buttons-holder .save-btn').trigger('click');
         });
 
+        $('#mega-text-editor .editor-btn-container .new-f').off('click').on('click', function newFileMenuClick() {
+            validateAction('The Opened file has been modified.',
+                'Are you sure you want to discard changes and create a new file?', window.parent.createFileDialog);
+        });
+
+        $('#mega-text-editor .editor-btn-container .save-as-f').off('click').on('click', function newFileMenuClick() {
+
+        });
+
         $('#mega-text-editor .editor-btn-container .get-link-f').off('click').on('click', function getLinkFileMenuClick() {
             !$parent && ($parent = window.parent.$(window.parent.document));
             $parent.find('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');

@@ -5247,3 +5247,8 @@ body.en .register-side-pane.container.visible {
     margin-right: 4px;
 }
 /* End of Business password change dialog */
+.fm-picker-dialog .summary-input #f-name-input {
+    border: none;
+    width: 365px;
+    max-width: 365px;
+}

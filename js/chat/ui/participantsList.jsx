@@ -17,6 +17,10 @@ class ParticipantsList extends MegaRenderMixin {
         };
     }
     onUserScroll() {
+        if (!this.contactsListScroll) {
+            return;
+        }
+
         var scrollPosY = this.contactsListScroll.getScrollPositionY();
         if (this.state.scrollPositionY !== scrollPosY) {
             this.setState({

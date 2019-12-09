@@ -2068,6 +2068,10 @@ function (_MegaRenderMixin4) {
     value: function _eventuallyAddContact(v, contacts, selectableContacts, forced) {
       var self = this;
 
+      if (!forced && (v.c !== 1 || v.u === u_handle)) {
+        return false;
+      }
+
       if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
         // continue;
         return false;
@@ -2098,11 +2102,6 @@ function (_MegaRenderMixin4) {
       }
 
       var pres = megaChat.getPresence(v.u);
-
-      if (!forced && (v.c != 1 || v.u == u_handle)) {
-        return false;
-      }
-
       var avatarMeta = generateAvatarMeta(v.u);
 
       if (self.state.searchValue && self.state.searchValue.length > 0) {
@@ -10389,6 +10388,10 @@ function (_MegaRenderMixin) {
   participantsList_createClass(ParticipantsList, [{
     key: "onUserScroll",
     value: function onUserScroll() {
+      if (!this.contactsListScroll) {
+        return;
+      }
+
       var scrollPosY = this.contactsListScroll.getScrollPositionY();
 
       if (this.state.scrollPositionY !== scrollPosY) {
@@ -16294,8 +16297,12 @@ function (_MegaRenderMixin3) {
       var self = this;
       var chatRoom = self.props.chatRoom;
       var megaChat = chatRoom.megaChat;
-      chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
-      delete this._messagesBuffChangeHandler;
+
+      if (this._messagesBuffChangeHandler) {
+        chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+        delete this._messagesBuffChangeHandler;
+      }
+
       window.removeEventListener('resize', self.handleWindowResize);
       window.removeEventListener('keydown', self.handleKeyDown);
       $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
@@ -17590,10 +17597,12 @@ function (_MegaRenderMixin3) {
               // the event triggers a weird "scroll up" animation out of nowhere...
 
               $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function () {
-                self.messagesListScrollable.scrollToBottom(false);
-                setTimeout(function () {
-                  self.messagesListScrollable.enable();
-                }, 1500);
+                if (self.messagesListScrollable) {
+                  self.messagesListScrollable.scrollToBottom(false);
+                  setTimeout(function () {
+                    self.messagesListScrollable.enable();
+                  }, 1500);
+                }
               });
               self.props.chatRoom.sendMessage(messageContents);
               self.messagesListScrollable.disable();

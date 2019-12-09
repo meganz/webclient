@@ -857,6 +857,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
     }
     _eventuallyAddContact(v, contacts, selectableContacts, forced) {
         var self = this;
+        if (!forced && (v.c !== 1 || v.u === u_handle)) {
+            return false;
+        }
         if (self.props.exclude && self.props.exclude.indexOf(v.u) > -1) {
             // continue;
             return false;
@@ -888,9 +891,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             v.u
         );
 
-        if (!forced && (v.c != 1 || v.u == u_handle)) {
-            return false;
-        }
 
         var avatarMeta = generateAvatarMeta(v.u);
 

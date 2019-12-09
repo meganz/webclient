@@ -745,8 +745,10 @@ export class ConversationPanel extends MegaRenderMixin {
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
-        chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
-        delete this._messagesBuffChangeHandler;
+        if (this._messagesBuffChangeHandler) {
+            chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+            delete this._messagesBuffChangeHandler;
+        }
 
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
@@ -2249,10 +2251,12 @@ export class ConversationPanel extends MegaRenderMixin {
                                             // scrollTop is now 0..and if in that time the user sends a message
                                             // the event triggers a weird "scroll up" animation out of nowhere...
                                             $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function() {
-                                                self.messagesListScrollable.scrollToBottom(false);
-                                                setTimeout(function() {
-                                                    self.messagesListScrollable.enable();
-                                                }, 1500);
+                                                if (self.messagesListScrollable) {
+                                                    self.messagesListScrollable.scrollToBottom(false);
+                                                    setTimeout(function() {
+                                                        self.messagesListScrollable.enable();
+                                                    }, 1500);
+                                                }
                                             });
 
                                             self.props.chatRoom.sendMessage(messageContents);

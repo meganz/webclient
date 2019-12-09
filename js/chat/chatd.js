@@ -376,7 +376,7 @@ Chatd.Shard = function(chatd, shard) {
                     // (not chat)
                     var firstChatId = Object.keys(self.chatIds)[0];
                     connectionRetryManager.pause();
-                    self.retrieveMcurlAndExecuteOnce(
+                    self.retrieveMcurlAndExecOnce(
                         base64urlencode(firstChatId),
                         function(mcurl) {
                             connectionRetryManager.unpause();
@@ -513,29 +513,35 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
 };
 
 
-Chatd.Shard.prototype.retrieveMcurlAndExecuteOnce = function(chatId, resolvedCb, failedCb) {
-    var self = this;
-    if (self.mcurlRequests[chatId]) {
-        // already waiting for mcurl response
-        return;
+Chatd.Shard.prototype.retrieveMcurlAndExecOnce = function(chatId, resolvedCb, failedCb) {
+    var isPublic = anonymouschat && pchandle;
+    var chatHandleOrId = chatId;
+
+    if (isPublic) {
+        chatHandleOrId = pchandle;
+    }
+    else {
+        var chatRoom = megaChat.getChatById(chatId);
+        if (chatRoom && chatRoom.publicChatHandle) {
+            isPublic = true;
+            chatHandleOrId = chatRoom.publicChatHandle;
+        }
     }
 
-    var promise = self.mcurlRequests[chatId] = asyncApiReq({
-        a: 'mcurl',
-        id: chatId,
-        v: Chatd.VERSION
-    });
-
-    promise.done(function(mcurl) {
-            resolvedCb(mcurl);
+    megaChat.plugins.chatdIntegration._retrieveShardUrl(
+        isPublic,
+        chatHandleOrId
+    )
+        .done(function(ret) {
+            if (ret && ret.url) {
+                resolvedCb(ret.url);
+            }
+            else {
+                failedCb(ret);
+            }
         })
         .fail(function(r) {
             failedCb(r);
-        })
-        .always(function() {
-            if (promise === self.mcurlRequests[chatId]) {
-                delete self.mcurlRequests[chatId];
-            }
         });
 };
 

@@ -138,7 +138,7 @@
             $btn.removeClass('disabled');
         }
         else {
-            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog;
+            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog || $.nodeSaveAs;
 
             console.assert(!$.copyToShare || Object($.selected).length === 0, 'check this...');
 
@@ -376,7 +376,7 @@
 
         if ($.nodeSaveAs) {
             items = [$.nodeSaveAs.h];
-            names[$.nodeSaveAs.h] = $.nodeSaveAs.name;
+            names[$.nodeSaveAs.h] = $.nodeSaveAs.name || '';
             // names[$.nodeSaveAs.h] = $('input.summary-ff-name', $dialog).val();
             $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
 
@@ -494,6 +494,9 @@
         }
 
         if ($.saveToDialog || $.saveAsDialog) {
+            if (!$.nodeSaveAs.h) {
+                return l[158];
+            }
             return l[776]; // Save
         }
 
@@ -534,6 +537,9 @@
         }
 
         if ($.saveAsDialog) {
+            if (!$.nodeSaveAs.h) {
+                return l[22680];
+            }
             return l[22678];
         }
 
@@ -1075,10 +1081,11 @@
      * @param {Object} node    The node to save AS
      * @param {Function} cb    a callback to be called when the user "Save"
      */
-    global.openSaveAsDialog = function(node, cb) {
+    global.openSaveAsDialog = function(node, content, cb) {
         M.safeShowDialog('saveAs', function() {
             $.saveAsCallBack = cb;
-            $.nodeSaveAs = node;
+            $.nodeSaveAs = ((typeof node === 'string') ? M.d[node] : node);
+            $.saveAsContent = content;
             handleOpenDialog(null, node.p || M.RootID);
             return $dialog;
         });
@@ -1576,12 +1583,43 @@
                 return false;
             }
 
+            if ($.nodeSaveAs) {
+                var saveAsName = $('#f-name-input', $dialog).val();
+
+                if (!M.isSafeName(saveAsName)) {
+                    // ui things
+                    return false;
+                }
+                if (duplicated(0, saveAsName, $.mcselected)) {
+                    // ui things
+                    return false;
+                }
+
+                closeDialog();
+                mega.filesEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(
+                    function(handle) {
+                        if ($.saveAsCallBack) {
+                            if (Array.isArray(handle)) {
+                                $.selected = handle;
+                            }
+                            else {
+                                $.selected = [handle];
+                            }
+                            $.saveAsCallBack(handle);
+                        }
+                    }
+                );
+                
+                return false;
+            }
+
             closeDialog();
 
             if (saveToDialog) {
                 saveToDialogCb(saveToDialogNode, section === 'conversations' && chats || $.mcselected);
                 return false;
             }
+            
 
             // Get active tab
             if (section === 'cloud-drive' || section === 'folder-link' || section === 'rubbish-bin') {

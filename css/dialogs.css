@@ -5251,4 +5251,6 @@ body.en .register-side-pane.container.visible {
     border: none;
     width: 365px;
     max-width: 365px;
+    padding: initial;
+    height: 31px;
 }

@@ -117,27 +117,53 @@ mega.filesEditor = new function FileTextEditor() {
     };
 
 
-    this.saveFileAs = function(newName, directory, content) {
+    this.saveFileAs = function(newName, directory, content, nodeToSaveAs) {
         var operationPromise = new MegaPromise();
 
-        if (!newName || !directory) {
+        if (!newName || !directory || (!nodeToSaveAs && !content)) {
             return operationPromise.reject();
         }
+        
 
-        var fType = filemime(newName);
-        var nFile = new File([content], newName, { type: fType });
-        nFile.target = directory;
-        nFile.id = ++__ul_id;
-        nFile.path = '';
-        nFile.isCreateFile = true;
-        nFile._replaces = handle;
-        nFile.promiseToInvoke = operationPromise;
+        if (typeof content === 'undefined' || content === null) {
+            if (typeof nodeToSaveAs === 'string') {
+                nodeToSaveAs = M.d[nodeToSaveAs];
+            }
+            var nNode = Object.create(null);
+            var node = clone(nodeToSaveAs);
 
-        operationPromise.done(function(nHandle) {
-            storeFileData(nHandle, content);
-        });
+            node.name = M.getSafeName(newName);
+            nNode.k = node.k;
+            node.lbl = 0;
+            node.fav = 0;
+            delete node.rr;
+            nNode.a = ab_to_base64(crypto_makeattr(node, nNode));
+            nNode.h = node.h;
+            nNode.t = node.t;
 
-        ul_queue.push(nFile);
+            var opTree = [nNode];
+            opTree.opSize = node.s || 0;
+
+            M.copyNodes([nodeToSaveAs], directory, null, operationPromise, opTree);
+        }
+        else {
+            window.parent.loadingDialog.show();
+            var fType = filemime(newName);
+            var nFile = new File([content], newName, { type: fType });
+            nFile.target = directory;
+            nFile.id = ++__ul_id;
+            nFile.path = '';
+            nFile.isCreateFile = true;
+            nFile.promiseToInvoke = operationPromise;
+
+            operationPromise.done(function(nHandle) {
+                storeFileData(nHandle, content);
+            });
+
+            ul_queue.push(nFile);
+        }
+
+
         return operationPromise;
     };
 

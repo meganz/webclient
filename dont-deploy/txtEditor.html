@@ -8,9 +8,9 @@
     <link rel="stylesheet" type="text/css" href="../css/fonts.css" />
     <link rel="stylesheet" type="text/css" href="../css/dialogs.css" />
     <link rel="stylesheet" type="text/css" href="../css/buttons.css" />
-    <link rel="stylesheet" type="text/css" href="../css/toast.css" />
+    <!--<link rel="stylesheet" type="text/css" href="../css/toast.css" />
     <link rel="stylesheet" type="text/css" href="../css/dropdowns.css" />
-    <link rel="stylesheet" type="text/css" href="../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../css/settings.css" />-->
     <link rel="stylesheet" type="text/css" href="../css/txteditor.css" />
     <link rel="stylesheet" type="text/css" href="../css/top-menu.css" />
 
@@ -125,10 +125,12 @@
         function setupEditor(fName, txt, container, setterFunction, handle, removeFunction) {
             // myTextarea.text(txt);
             myTextarea = $('#txtar');
-            editor = CodeMirror.fromTextArea(myTextarea[0], {
-                lineNumbers: true,
-                scrollbarStyle: "overlay"
-            });
+            if (!editor) {
+                editor = CodeMirror.fromTextArea(myTextarea[0], {
+                    lineNumbers: true,
+                    scrollbarStyle: "overlay"
+                });
+            }
 
 
             $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
@@ -268,11 +270,29 @@
 
         $('#mega-text-editor .editor-btn-container .new-f').off('click').on('click', function newFileMenuClick() {
             validateAction('The Opened file has been modified.',
-                'Are you sure you want to discard changes and create a new file?', window.parent.createFileDialog);
+                'Are you sure you want to discard changes and create a new file?',
+                function() {
+                    window.parent.loadingDialog.show();
+                    window.parent.openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
+                        !$parent && ($parent = window.parent.$(window.parent.document));
+                        window.parent.loadingDialog.hide();
+                        $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                    });
+                }
+            );
         });
 
         $('#mega-text-editor .editor-btn-container .save-as-f').off('click').on('click', function newFileMenuClick() {
-
+            window.parent.loadingDialog.show();
+            var editedTxt = editor.getValue();
+            if (editedTxt === savedFileData) {
+                editedTxt = null;
+            }
+            window.parent.openSaveAsDialog(versionHandle || fileHandle, editedTxt, function(handle) {
+                !$parent && ($parent = window.parent.$(window.parent.document));
+                window.parent.loadingDialog.hide();
+                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            });
         });
 
         $('#mega-text-editor .editor-btn-container .get-link-f').off('click').on('click', function getLinkFileMenuClick() {

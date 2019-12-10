@@ -8,7 +8,7 @@
 }
 #mega-text-editor .editor-textarea-container{
     width: 60%;
-    height: 99%;
+    height: 80%;
     margin-left: 20%;
 }
 #mega-text-editor #text-editor-textarea{
@@ -28,8 +28,12 @@
     margin-left: 20%;
 }*/
 #mega-text-editor .CodeMirror {
-    height: 95%;
+    height: 100%;
     font-family: 'Source Code Pro', monospace;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.3);
+    box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
+    border-top: none;
 }
 #mega-text-editor .editor-textarea-container .editor-btn-container{
     background-color:#FAFAFA;
@@ -74,9 +78,15 @@
     padding-right: 65px;*/
 }
 #mega-text-editor .editor-btn-container {
-    border: solid;
+    /*border: solid;
     border-color: rgba(0,0,0,0.1);
     border-width: 1px;
+    border-right: none;
+    border-left: none;*/
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.3);
+    box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 #mega-text-editor .txt-editor-menu {
     background-position: -6px -60px;
@@ -218,7 +228,7 @@
 .CodeMirror-overlayscroll-horizontal {
     bottom: 0;
     left: 0;
-    height: 6px;
+    height: 9px;
 }
 .CodeMirror-overlayscroll-horizontal div {
     bottom: 0;
@@ -228,8 +238,8 @@
 .CodeMirror-overlayscroll-vertical {
     right: 0;
     top: 0;
-    margin-right: 37px;
-    width: 6px;
+    /*margin-right: 37px;*/
+    width: 9px;
 }
 .CodeMirror-overlayscroll-vertical div {
     right: 0;

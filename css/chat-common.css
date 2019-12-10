@@ -1110,3 +1110,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .privatechat.conversations .chat-contacts-list-inner .contacts-info.right-chat-contact-card {
     background-color: #F4F8F9;
 }
+
+.chat-contacts-list .ps-active-y .right-chat-contact-card {
+    width: 220px !important;
+}

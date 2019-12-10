@@ -302,7 +302,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             if (contact && contact.addChangeListener && contact.removeChangeListener) {
                 if (eventData.priv === 255 || eventData.priv === -1) {
                     if (contact._onMembUpdUIListener) {
-                        contact._onMembUpdUIListener.removeChangeListener(contact._onMembUpdUIListener);
+                        contact.removeChangeListener(contact._onMembUpdUIListener);
                         roomRequiresUpdate = true;
                     }
                 }

@@ -365,7 +365,7 @@ function dashboardUI() {
 
             if (u_attr.p) {
                 $('.account.widget.bandwidth').addClass('enabled-pr-bar');
-                $('.dashboard .account.rounded-icon.right').addClass('hidden');
+                $('.dashboard .account.learn-more.right').addClass('hidden');
             }
             else {
 
@@ -377,20 +377,18 @@ function dashboardUI() {
                     $('.account.widget.bandwidth').removeClass('enabled-pr-bar');
                 }
 
-                $('.dashboard .account.rounded-icon.right').removeClass('hidden');
-                $('.dashboard .account.rounded-icon.right').rebind('click', function() {
-                    if (!$(this).hasClass('active')) {
-                        $(this).addClass('active');
-                        $(this).find('.dropdown').removeClass('hidden');
+                $('.dashboard .account.learn-more.right').removeClass('hidden');
+                $('.dashboard .account.learn-more.right').rebind('click', function() {
+                    var $dropDownItem = $('.dropdown', $(this));
+                    if ($dropDownItem.hasClass('hidden')) {
+                        $dropDownItem.removeClass('hidden');
                     }
                     else {
-                        $(this).removeClass('active');
-                        $(this).find('.dropdown').addClass('hidden');
+                        $dropDownItem.addClass('hidden');
                     }
                 });
                 $('.fm-right-block.dashboard').rebind('click', function(e) {
-                    if (!$(e.target).hasClass('rounded-icon') && $('.account.rounded-icon.info').hasClass('active')) {
-                        $('.account.rounded-icon.info').removeClass('active');
+                    if (!$(e.target).hasClass('learn-more') && !$('.dropdown.body.bandwidth-inf').hasClass('hidden')) {
                         $('.dropdown.body.bandwidth-info').addClass('hidden');
                     }
                 });

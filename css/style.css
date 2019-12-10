@@ -11499,27 +11499,14 @@ table {
     padding: 0 6px;
     margin: 1px 0 0 0;
 }
-.account.rounded-icon {
-    width: 21px;
+.account.learn-more {
     height: 21px;
-    background-color: rgba(119,119,119,0.5);
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
-    border-radius: 100%;
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    margin: 2px 0 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
-    background-position: -13px -11775px;
-    background-repeat: no-repeat;
+    font-family: Lato-Medium;
+    font-size: 13px;
+    color: #F0373A;
+    letter-spacing: 0.93px;
     cursor: pointer;
     position: relative;
-}
-.account.rounded-icon:hover, .account.rounded-icon.active {
-    background-color: rgba(119,119,119,1);
 }
 .dropdown.transfer-icon {
     background-image: url(../images/mega/account-sprite_v4.png);

@@ -282,7 +282,7 @@ class ParticipantsListInner extends MegaRenderMixin {
         }
 
         return (
-            <div className="chat-contacts-list-inner horizontal-sprite" style={contactListInnerStyles}>
+            <div className="chat-contacts-list-inner default-bg" style={contactListInnerStyles}>
                 {contactsList}
             </div>
         );

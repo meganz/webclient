@@ -330,10 +330,4 @@ ul.top-ul li span, ul.mid-ul li span, ul.bot-ul li span, ul.can-ul li span, ul.c
     background-size: 367px auto;
 }
 
-
-/* Horizontal sprite. Use it if you need to repeat something by Y */
-.horizontal-sprite {
-    background-image: url(../images/mega/horizontal-sprite@2x.png);
-    background-size: auto 32px;
-}
 }

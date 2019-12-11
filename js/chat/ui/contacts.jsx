@@ -527,7 +527,7 @@ export class Avatar extends ContactAwareComponent {
             classes += " color" + avatarMeta.avatar.colorIndex;
             var isLoading = self.isLoadingContactInfo();
             if (isLoading) {
-                classes += " horizontal-sprite";
+                classes += " default-bg";
             }
 
             displayedAvatar = <div className={classes} style={this.props.style}

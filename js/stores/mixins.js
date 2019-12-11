@@ -881,7 +881,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             }
 
             // force stuck in "Loading" state
-            // promises.push([function() { return new MegaPromise(); }]);
+             promises.push([function() { return new MegaPromise(); }]);
 
             if (promises.length > 0) {
                 this.ensurePromiseLoaded(promises);

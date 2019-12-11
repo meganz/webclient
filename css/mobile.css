@@ -12490,6 +12490,12 @@ img.blog-new-logos {
     width: 140px;
     margin-bottom: 33px
 }
+#blogarticle_post .blog-table-scroll {
+    overflow-x: scroll;
+}
+#blogarticle_post sup {
+    font-size: 13px;
+}
 .blog-article-divider {
     height: 2px;
 }

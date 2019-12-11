@@ -988,8 +988,11 @@ function (_MegaRenderMixin) {
           _noAvatars[contact.u] = true;
         }]);
       } // force stuck in "Loading" state
-      // promises.push([function() { return new MegaPromise(); }]);
 
+
+      promises.push([function () {
+        return new MegaPromise();
+      }]);
 
       if (promises.length > 0) {
         _this2.ensurePromiseLoaded(promises);
@@ -1671,7 +1674,7 @@ function (_ContactAwareComponen3) {
         var isLoading = self.isLoadingContactInfo();
 
         if (isLoading) {
-          classes += " horizontal-sprite";
+          classes += " default-bg";
         }
 
         displayedAvatar = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", _extends({
@@ -10668,7 +10671,7 @@ function (_MegaRenderMixin2) {
       }
 
       return external_React_default.a.createElement("div", {
-        className: "chat-contacts-list-inner horizontal-sprite",
+        className: "chat-contacts-list-inner default-bg",
         style: contactListInnerStyles
       }, contactsList);
     }

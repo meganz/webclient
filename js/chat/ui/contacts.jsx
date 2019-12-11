@@ -80,6 +80,10 @@ export class ContactButton extends ContactAwareComponent {
         var vertOffset = 0;
         var horizOffset = -30;
 
+        if (!contact) {
+            return null;
+        }
+
         if (label) {
             classes = "user-card-name " + classes;
             icon = "";
@@ -89,10 +93,6 @@ export class ContactButton extends ContactAwareComponent {
         }
         if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
             label = <em className="contact-name-loading"></em>;
-        }
-
-        if (!contact) {
-            return null;
         }
 
         var username = M.getNameByHandle(contact.u);

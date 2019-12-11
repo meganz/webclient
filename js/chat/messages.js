@@ -224,7 +224,7 @@ Message.getContactForMessage = function(message) {
     else if (message.userId) {
         if (!M.u[message.userId]) {
             // data is still loading!
-            return null;
+            ChatdIntegration._ensureContactExists([message.userId]);
         }
         contact = M.u[message.userId];
     }

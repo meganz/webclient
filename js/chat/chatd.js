@@ -533,7 +533,10 @@ Chatd.Shard.prototype.retrieveMcurlAndExecOnce = function(chatId, resolvedCb, fa
         chatHandleOrId
     )
         .done(function(ret) {
-            if (ret && ret.url) {
+            if (typeof ret === "string") {
+                resolvedCb(ret);
+            }
+            else if (ret && ret.url) {
                 resolvedCb(ret.url);
             }
             else {

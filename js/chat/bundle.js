@@ -1170,6 +1170,10 @@ function (_ContactAwareComponen2) {
       var vertOffset = 0;
       var horizOffset = -30;
 
+      if (!contact) {
+        return null;
+      }
+
       if (label) {
         classes = "user-card-name " + classes;
         icon = "";
@@ -1182,10 +1186,6 @@ function (_ContactAwareComponen2) {
         label = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("em", {
           className: "contact-name-loading"
         });
-      }
-
-      if (!contact) {
-        return null;
       }
 
       var username = M.getNameByHandle(contact.u);
@@ -19267,7 +19267,7 @@ Chat.prototype.processNewUser = function (u, isNewChat) {
   var self = this;
   self.logger.debug("added: ", u);
 
-  if (M.u[u] && M.u[u].c !== 1 && self.plugins.presencedIntegration) {
+  if (M.u[u] && M.u[u].c === 1 && self.plugins.presencedIntegration) {
     self.plugins.presencedIntegration.addContact(u, isNewChat);
   }
 

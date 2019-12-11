@@ -2308,9 +2308,12 @@ else if (!browserUpdate) {
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
         jsl.push({f:'js/fm/FileTextEditor.js', n: 'filetexteditor_js', j:1});
-        jsl.push({f:'html/txtEditor.html', n: 'txtEditor', j:4});
-        jsl.push({f:'js/vendor/codemirror.js', n: 'codemirror_js', j:4});
-        jsl.push({f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:4});
+        jsl.push({f:'js/fm/TextEditorUI.js', n: 'texteditorui_js', j:1});
+        jsl.push({f:'html/txtEditor.html', n: 'txtEditor', j:0});
+        jsl.push({f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1});
+        jsl.push({f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1});
+        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {

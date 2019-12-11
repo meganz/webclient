@@ -146,6 +146,8 @@
 .dropdown.body .dropdown-item {
     position: relative;
     z-index: 10;
+    border: 1px solid rgba(0,0,0,0.00);
+    border-radius: 4px;
 }
 .dropdown-white-arrow {
     display: none;
@@ -161,7 +163,7 @@
     background-position: 0 -2249px;
 }
 .dropdown-dark-arrow {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v34.png);
     background-repeat: no-repeat;
     background-position: -41px -1315px;
     display: none;
@@ -265,8 +267,11 @@
     font-size: 14px;
 }
 .dropdown-item:not(.static):hover, .dropdown-item.opened {
-    background-color: #AAAAAA;
-    color: white;
+    /*background-color: #AAAAAA;
+    color: white;*/
+    background-color: #f1f1f196;
+    border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 4px;
 }
 .txt-hovers .dropdown-item:not(.static):hover, .dropdown-item.active {
     background-color: transparent;
@@ -284,7 +289,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v34.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
@@ -292,13 +297,13 @@
     -khtml-opacity: 0.73;
     opacity: 0.73;
 }
-.dropdown-item.contains-submenu:hover::before, .dropdown-item.contains-submenu.opened::before {
+/*.dropdown-item.contains-submenu:hover::before, .dropdown-item.contains-submenu.opened::before {
     background-position: -146px -254px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-}
+}*/
 .dropdown-item.tick-item {
     padding-right: 24px;
 }
@@ -331,9 +336,9 @@
     margin: 6px 9px 1px 0;
     vertical-align: middle;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=73);
-    -moz-opacity: 0.73;
+    /*-moz-opacity: 0.73;
     -khtml-opacity: 0.73;
-    opacity: 0.73;
+    opacity: 0.73;*/
     float: left;
 }
 .dark .dropdown-item i {
@@ -358,7 +363,7 @@
     top: 7px;
     content: '';
     display: block;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v34.png);
     background-repeat: no-repeat;
 }
 .colour-sorting-menu .dropdown-item.asc i::after {/* Dark arrow pointing up */
@@ -650,7 +655,7 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .labels:not(.disabled) .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v34.png);
     background-position: 2.2px -532.2px;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;

@@ -1530,15 +1530,7 @@ FileManager.prototype.initContextUI = function() {
         if (!nodeHandle) {
             return;
         }
-
-        // WE HAVE A RACE HERE....
-        // DONT FORGET TO HANDLE
-
         var txtEditorFrame = $('.txt-editor-frame');
-        var txtEditoriFrame = txtEditorFrame.find('#txt-editor-iframe');
-        if (!txtEditoriFrame.attr('src')) {
-            txtEditoriFrame.attr('src', '../dont-deploy/txtEditor.html');
-        }
 
         loadingDialog.show();
 
@@ -1546,10 +1538,7 @@ FileManager.prototype.initContextUI = function() {
             function(data) {
                 loadingDialog.hide();
                 txtEditorFrame.removeClass('hidden');
-                
-
-                txtEditoriFrame[0].contentWindow.setupEditor(M.d[nodeHandle].name, data, txtEditorFrame,
-                    mega.filesEditor.setFile, nodeHandle, mega.filesEditor.removeOldVersion);
+                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
             }
         ).fail(function() {
             loadingDialog.hide();

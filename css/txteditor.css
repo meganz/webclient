@@ -101,6 +101,9 @@
     display:inline-block;
     cursor:pointer;
 }
+#mega-text-editor .top-menu-item {
+    padding-right: 10px;
+}
 #mega-text-editor .editor-file-name-title {
     display: inline-block;
     height: 24px;

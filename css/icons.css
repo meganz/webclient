@@ -175,6 +175,12 @@
     width: 21px;
     margin-right: 8px;
 }
+.context .small-icon.conversations {
+    margin-right: 8px;
+    background-image: url(../images/mega/send_to_contact_ico.svg);
+    background-position: -1px -4px;
+    width: 23px;
+}
 .small-icon.refresh-circle {
     background-position: -4px -2074px;
 }
@@ -437,7 +443,7 @@
 .dropdown-item:hover .small-icon.grey-chain {
     background-position: -3px -2881px;
 }
-.dropdown-item:hover .small-icon.icons-sprite.chain {
+/*.dropdown-item:hover .small-icon.icons-sprite.chain {
     background-position: -240px -133px;
 }
 .dropdown-item:hover .small-icon.rounded-grey-down-arrow {
@@ -448,7 +454,7 @@
 }
 .dropdown-item:hover .small-icon.grey-cloud {
     background-position: -4px -773px;
-}
+}*/
 .dropdown-item:hover .small-icon.grey-computer {
     background-position: -4px -815px;
 }
@@ -503,9 +509,9 @@
 .dropdown-item:hover .small-icon.rounded-stop {
     background-position: -54px -218px;
 }
-.dropdown-item.opened .small-icon.context.sortgrid, .dropdown-item:hover .small-icon.context.sortgrid {
+/*.dropdown-item.opened .small-icon.context.sortgrid, .dropdown-item:hover .small-icon.context.sortgrid {
     background-position: -117px -1992px;
-}
+}*/
 .dropdown.body:not(.context) .dropdown-item .small-icon.remove-link {
     margin: 6px 8px 1px -1px;
 }
@@ -1086,6 +1092,13 @@
     background-image: url(../images/mega/top-sprite_v7.png);
     background-position: -10px -1266px;
 }
+.semi-small-icon.send-to-contact-menu {
+    background-image: url(../images/mega/send_to_contact_ico.svg);
+    background-position: 0;
+}
+.top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
+    filter: drop-shadow(2px 4px 6px black);
+}
 .small-icon.dark-grey-plus {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: -14px -11545px;
@@ -1516,10 +1529,10 @@
 }
 .dropdown-item:hover .small-icon.context.network-diagnostic {
     background-position: -241px -538px;
-}
+}*/
 .dropdown-item:hover .small-icon.context.leave-share {
     background-position: -140px -539px;
-}*/
+}
 /*.dropdown-item:hover .small-icon.context.aim {
     background-position: -140px -60px;
 }*/

@@ -76,6 +76,16 @@
 #mega-text-editor .CodeMirror-lines {
     /*line-height: 24px;
     padding-right: 65px;*/
+    /*padding-left: 25px;*/
+}
+
+#mega-text-editor .CodeMirror-gutter {
+    padding-left: 20px;
+    padding-right: 1px;
+}
+#mega-text-editor .CodeMirror-gutter-elt {
+    padding-left: 20px;
+    padding-right: 1px;
 }
 #mega-text-editor .editor-btn-container {
     /*border: solid;

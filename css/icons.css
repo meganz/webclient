@@ -175,12 +175,12 @@
     width: 21px;
     margin-right: 8px;
 }
-.context .small-icon.conversations {
+/*.context .small-icon.conversations {
     margin-right: 8px;
     background-image: url(../images/mega/send_to_contact_ico.svg);
     background-position: -1px -4px;
     width: 23px;
-}
+}*/
 .small-icon.refresh-circle {
     background-position: -4px -2074px;
 }
@@ -437,13 +437,13 @@
 .dropdown-item .small-icon.writing-pen {
     background-position: -3px -347px;
 }
-/*.dropdown-item:hover .small-icon.conversations {
+.dropdown-item:hover .small-icon.conversations {
     background-position: -3px -3092px;
-}*/
+}
 .dropdown-item:hover .small-icon.grey-chain {
     background-position: -3px -2881px;
 }
-/*.dropdown-item:hover .small-icon.icons-sprite.chain {
+.dropdown-item:hover .small-icon.icons-sprite.chain {
     background-position: -240px -133px;
 }
 .dropdown-item:hover .small-icon.rounded-grey-down-arrow {
@@ -454,22 +454,22 @@
 }
 .dropdown-item:hover .small-icon.grey-cloud {
     background-position: -4px -773px;
-}*/
+}
 .dropdown-item:hover .small-icon.grey-computer {
     background-position: -4px -815px;
 }
 .dropdown-item:hover .small-icon.red-cross {
     background-position: -3px -926px;
 }
-/*.dropdown-item:hover .small-icon.writing-pen {
+.dropdown-item:hover .small-icon.writing-pen {
     background-position: -3px -857px;
-}*/
+}
 .dropdown-item:hover .small-icon.quotes {
     background-position: -3px -899px;
 }
-/*.dropdown-item:hover .small-icon.human-profile {
+.dropdown-item:hover .small-icon.human-profile {
     background-position: -3px -986px;
-}*/
+}
 .dropdown-item:hover .small-icon.eye-icon {
     background-position: -84px -497px;
 }
@@ -497,21 +497,21 @@
 .dropdown-item .small-icon.audio-call {
     background-position: -104px -38px;
 }
-/*.dropdown-item:hover .small-icon.audio-call {
+.dropdown-item:hover .small-icon.audio-call {
     background-position: -154px -38px;
-}*/
+}
 .dropdown-item .small-icon.video-call {
     background-position: -104px -74px;
 }
-/*.dropdown-item:hover .small-icon.video-call {
+.dropdown-item:hover .small-icon.video-call {
     background-position: -154px -74px;
-}*/
+}
 .dropdown-item:hover .small-icon.rounded-stop {
     background-position: -54px -218px;
 }
-/*.dropdown-item.opened .small-icon.context.sortgrid, .dropdown-item:hover .small-icon.context.sortgrid {
+.dropdown-item.opened .small-icon.context.sortgrid, .dropdown-item:hover .small-icon.context.sortgrid {
     background-position: -117px -1992px;
-}*/
+}
 .dropdown.body:not(.context) .dropdown-item .small-icon.remove-link {
     margin: 6px 8px 1px -1px;
 }
@@ -1178,13 +1178,16 @@
     background-position: -101px -499px;
 }
 .small-icon.context.labels, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.labels {
-    background-position: -111px -2103px;
+    /*background-position: -111px -2103px;*/
+    background-position: -101px -99px;
 }
 .small-icon.context.download {
-    background-position: -144px -2103px;
+    /*background-position: -144px -2103px;*/
+    background-position: -101px -138px;
 }
 .small-icon.context.get-link {
-    background-position: -174px -2103px;
+    /*background-position: -174px -2103px;*/
+    background-position: -200px -133px;
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
@@ -1231,15 +1234,18 @@
     background-position: -1px -365px;
 }
 .small-icon.context.writing-pen {
-    background-position: -208px -2103px;
+    /*background-position: -208px -2103px;*/
+    background-position: -202px -226px;
 }
 .small-icon.context.position-arrows {
-    background-position: -8px -2139px;
+    /*background-position: -8px -2139px;*/
+    background-position: -200px -258px;
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
 .small-icon.context.cloned-files {
-    background-position: -47px -2137px;
+    /*background-position: -47px -2137px;*/
+    background-position: -202px -288px;
     height: 24px;
     margin-top: 4px;
 }
@@ -1253,7 +1259,8 @@
     background-position: -201px -461px;
 }
 .small-icon.context.remove-to-bin {
-    background-position: -78px -2140px;
+    /*background-position: -78px -2140px;*/
+    background-position: -200px -322px;
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
@@ -1267,7 +1274,8 @@
     background-position: -2px -1071px;
 }
 .small-icon.context.info {
-    background-position: -45px -2103px;
+    /*background-position: -45px -2103px;*/
+    background-position: -202px -71px;
 }
 .small-icon.context.clock {
     background-position: -200px -1200px;
@@ -1278,7 +1286,8 @@
     margin: 6px 13px 1px 0px;
 }
 .small-icon.context.heart, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.heart {
-    background-position: -78px -2103px;
+    /*background-position: -78px -2103px;*/
+    background-position: -202px -499px;
 }
 .small-icon.context.broken-heart {
     background-position: -202px -103px;
@@ -1358,31 +1367,31 @@
     width: 22px;
     height: 22px;
 }
-/*.dropdown-item:hover .small-icon.icons-sprite.grey-plus {
+.dropdown-item:hover .small-icon.icons-sprite.grey-plus {
     background-position: -240px -391px;
-}*/
-/*.dropdown-item:hover .small-icon.context.arrow-in-circle {
+}
+.dropdown-item:hover .small-icon.context.arrow-in-circle {
     background-position: -41px -228px;
-}*/
+}
 .small-icon.dark-grey-plus {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: -14px -11545px;
 }
-/*.dropdown-item:hover .small-icon.context.share-folder {
+.dropdown-item:hover .small-icon.context.share-folder {
     background-position: -41px -260px;
-}*/
+}
 .dropdown-item:hover .small-icon.context.headset, .dropdown-item.opened .small-icon.context.headset {
     background-position: -42px -179px;
 }
 .dropdown-item:hover .small-icon.context.red-stop {
     background-position: -41px -299px;
 }
-/*.dropdown-item:hover .small-icon.context.arrow-in-circle {
+.dropdown-item:hover .small-icon.context.arrow-in-circle {
     background-position: -41px -228px;
-}*/
-/*.dropdown-item:hover .small-icon.context.share-folder {
+}
+.dropdown-item:hover .small-icon.context.share-folder {
     background-position: -41px -260px;
-}*/
+}
 .dropdown-item:hover .small-icon.context.headset, .dropdown-item.opened .small-icon.context.headset {
     background-position: -42px -179px;
 }
@@ -1398,9 +1407,9 @@
 .dropdown-item:hover .small-icon.icons-sprite.bold-crossed-eye {
     background-position: -39px -1498px;
 }
-/*.dropdown-item:hover .small-icon.context.download-as-zip {
+.dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
-}*/
+}
 .small-icon.context.az, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.az  {
     background-position: 0px -1277px;
 }
@@ -1432,20 +1441,20 @@
     background-position: -202px -1112px;
 }
 /* hovers*/
-/*.dropdown-item:hover .small-icon.context.standart-download {
+.dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
 }
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
-}*/
-/*.dropdown-item:not(.static):hover .small-icon.context.labels,
+}
+.dropdown-item:not(.static):hover .small-icon.context.labels,
 .dropdown-item.opened .small-icon.context.labels, .dark .dropdown-item .small-icon.context.labels {
     background-position: -141px -99px;
-}*/
-/*.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
+}
+.dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
     background-position: -141px -138px;
-}*/
-/*.dropdown-item:hover .small-icon.context.get-link {
+}
+.dropdown-item:hover .small-icon.context.get-link {
     background-position: -240px -133px;
 }
 .dropdown-item:hover .small-icon.context.remove-link {
@@ -1456,20 +1465,20 @@
 }
 .dropdown-item:hover .small-icon.context.share {
     background-position: -139px -172px;
-}*/
-/*.dropdown-item:hover .small-icon.context.conversation, .dark .dropdown-item:not(.static) .small-icon.context.conversation {
+}
+.dropdown-item:hover .small-icon.context.conversation, .dark .dropdown-item:not(.static) .small-icon.context.conversation {
     background-position: -41px -147px;
 }
 .dropdown-item:hover .small-icon.context.handset, .dropdown-item.opened .small-icon.context.handset {
     background-position: -41px -333px;
-}*/
-/*.dropdown-item:hover .small-icon.context.videocam {
+}
+.dropdown-item:hover .small-icon.context.videocam {
     background-position: -41px -365px;
 }
 .dropdown-item:hover .small-icon.context.writing-pen {
     background-position: -242px -226px;
-}*/
-/*.dropdown-item:hover .small-icon.context.position-arrows, .dropdown-item.opened .small-icon.context.position-arrows {
+}
+.dropdown-item:hover .small-icon.context.position-arrows, .dropdown-item.opened .small-icon.context.position-arrows {
     background-position: -240px -258px;
 }
 .dropdown-item:hover .small-icon.context.cloned-files {
@@ -1492,30 +1501,30 @@
 }
 .dropdown-item:hover .small-icon.context.open-folder {
     background-position: -42px -1071px;
-}*/
-/*.dropdown-item:hover .small-icon.context.info {
+}
+.dropdown-item:hover .small-icon.context.info {
     background-position: -242px -71px;
-}*/
-/*.dropdown-item:hover .small-icon.context.clock {
+}
+.dropdown-item:hover .small-icon.context.clock {
     background-position: -40px -1200px;
 }
 .dropdown-item:hover .small-icon.context.clock-with-cross {
     background-position: -120px -1200px;
-}*/
-/*.dropdown-item:hover:not(.static) .small-icon.context.heart,*/
+}
+.dropdown-item:hover:not(.static) .small-icon.context.heart,
 .dark .dropdown-item:not(.static) .small-icon.context.heart {
     background-position: -242px -499px;
 }
-/*.dropdown-item:hover .small-icon.context.broken-heart {
+.dropdown-item:hover .small-icon.context.broken-heart {
     background-position: -242px -103px;
-}*/
+}
 .dropdown-item:hover .small-icon.context.red-cross {
     background-position: -142px -212px;
 }
-/*.dropdown-item:hover .small-icon.context.pause {
+.dropdown-item:hover .small-icon.context.pause {
     background-position: -41px -39px;
-}*/
-/*.dropdown-item:hover .small-icon.context.play {
+}
+.dropdown-item:hover .small-icon.context.play {
     background-position: -41px 1px;
 }
 .dropdown-item:hover .small-icon.context.move-up {
@@ -1523,25 +1532,25 @@
 }
 .dropdown-item:hover .small-icon.context.move-down {
     background-position: -41px -110px;
-}*/
-/*.dropdown-item:hover .small-icon.context.small-refresh {
+}
+.dropdown-item:hover .small-icon.context.small-refresh {
     background-position: -242px 2px;
 }
 .dropdown-item:hover .small-icon.context.network-diagnostic {
     background-position: -241px -538px;
-}*/
+}
 .dropdown-item:hover .small-icon.context.leave-share {
     background-position: -140px -539px;
 }
-/*.dropdown-item:hover .small-icon.context.aim {
+.dropdown-item:hover .small-icon.context.aim {
     background-position: -140px -60px;
-}*/
-/*.dropdown-item:hover .small-icon.context.cloud, .dropdown-item.opened .small-icon.context.cloud {
+}
+.dropdown-item:hover .small-icon.context.cloud, .dropdown-item.opened .small-icon.context.cloud {
     background-position: -142px -30px;
-}*/
-/*.dropdown-item:hover .small-icon.context.folder-item, .dropdown-item.opened .small-icon.context.folder-item {
+}
+.dropdown-item:hover .small-icon.context.folder-item, .dropdown-item.opened .small-icon.context.folder-item {
     background-position: -140px -291px;
-}*/
+}
 .dropdown-item:hover .small-icon.context.shared-folder-item, .dropdown-item.opened .small-icon.context.shared-folder-item {
     background-position: -40px -260px;
 }
@@ -1551,7 +1560,7 @@
 .small-icon.context.puf-folder {
     background-position: -150px -911px;
 }
-/*.dropdown-item:hover .small-icon.context.create-widget {
+.dropdown-item:hover .small-icon.context.create-widget {
     background-position: -122px -1071px;
 }
 .dropdown-item:hover .small-icon.context.remove-widget {
@@ -1559,7 +1568,7 @@
 }
 .dropdown-item:hover .small-icon.context.manage-widget {
     background-position: -42px -1112px;
-}*/
+}
 .dropdown-item:hover:not(.static) .small-icon.context.az, .dark .dropdown-item:not(.static) .small-icon.context.az {
     background-position: -40px -1277px;
 }

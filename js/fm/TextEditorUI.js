@@ -184,7 +184,8 @@ mega.textEditorUI = new function() {
 
     var validateAction = function(msg, submsg, callback) {
         'use strict';
-        if (savedFileData !== editor.getValue()) {
+        // if (savedFileData !== editor.getValue()) {
+        if (savedFileData && !$('.buttons-holder .save-btn', $editorContianer).hasClass('disabled')) {
             msgDialog('confirmation', '', msg,
                 submsg,
                 function(e) {

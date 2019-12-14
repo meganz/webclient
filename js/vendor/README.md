@@ -150,7 +150,7 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 ---
-[codemirror.js]: Text editor in JavaScript Ver. 5.37.0
+[codemirror.js]: Text editor in JavaScript Ver. 5.49.2
 
 > This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
 

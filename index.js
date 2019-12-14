@@ -2830,6 +2830,10 @@ function loadSubPage(tpage, event) {
         slideshow(0, 1);
     }
 
+    if (window.textEditorVisible) {
+        mega && mega.textEditorUI && mega.textEditorUI.doClose();
+    }
+
     if (window.versiondialogid) {
         fileversioning.closeFileVersioningDialog(window.versiondialogid);
     }

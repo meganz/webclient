@@ -1530,14 +1530,12 @@ FileManager.prototype.initContextUI = function() {
         if (!nodeHandle) {
             return;
         }
-        var txtEditorFrame = $('.txt-editor-frame');
 
         loadingDialog.show();
 
         mega.filesEditor.getFile(nodeHandle).done(
             function(data) {
                 loadingDialog.hide();
-                txtEditorFrame.removeClass('hidden');
                 mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
             }
         ).fail(function() {

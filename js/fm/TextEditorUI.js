@@ -45,19 +45,17 @@ mega.textEditorUI = new function() {
         $('.buttons-holder .close-btn', $editorContianer).off('click').on('click',
             function textEditorCloseBtnClick() {
 
-                var doClose = function() {
-                    editor && editor.setValue('');
-                    if ($containerDialog) {
-                        $containerDialog.addClass('hidden');
-                    }
-                };
-
                 if (editor) {
                     validateAction('The opened file has been modified.',
-                        'Are you sure that you want to discard changes and close the editor?', doClose);
+                        'Are you sure that you want to discard changes and close the editor?',
+                        function() {
+                            history.back();
+                            mega.textEditorUI.doClose();
+                        });
                 }
                 else {
-                    doClose();
+                    history.back();
+                    mega.textEditorUI.doClose();
                 }
                 return false;
             });
@@ -100,6 +98,7 @@ mega.textEditorUI = new function() {
                 function() {
                     loadingDialog.show();
                     openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
+                        history.back();
                         loadingDialog.hide();
                         $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
                     });
@@ -114,6 +113,7 @@ mega.textEditorUI = new function() {
                 editedTxt = null;
             }
             openSaveAsDialog(versionHandle || fileHandle, editedTxt, function(handle) {
+                history.back();
                 loadingDialog.hide();
                 $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
             });
@@ -143,10 +143,21 @@ mega.textEditorUI = new function() {
         editor.on('change', changeListner);
     };
 
+    this.doClose = function() {
+        editor && editor.setValue('');
+        if ($containerDialog) {
+            $containerDialog.addClass('hidden');
+            window.textEditorVisible = false;
+        }
+    };
+
 
     this.setupEditor = function(fName, txt, handle) {
         'use strict';
         init();
+        $containerDialog.removeClass('hidden');
+        addingFakeHistoryState();
+        window.textEditorVisible = true;
         myTextarea = $('#txtar', $editorContianer);
         if (!editor) {
             editor = CodeMirror.fromTextArea(myTextarea[0], {
@@ -190,6 +201,7 @@ mega.textEditorUI = new function() {
     var selectedItemOpen = function () {
         'use strict';
         var openFile = function() {
+            history.back();
             $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
         };
 

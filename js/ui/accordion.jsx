@@ -27,7 +27,7 @@ class Accordion extends MegaRenderMixin {
 
         this.state = {
             'expandedPanel': this.props.expandedPanel
-        }
+        };
     }
     componentDidMount() {
         super.componentDidMount();
@@ -56,13 +56,20 @@ class Accordion extends MegaRenderMixin {
         //     });
     }
     onToggle(e, key) {
-        var obj = clone(this.state.expandedPanel);
-        if (obj[key]) {
-            delete obj[key];
-        }
-        else {
-            obj[key] = true;
-        }
+        // allow multiple opened panels at a time
+        // var obj = clone(this.state.expandedPanel);
+        // if (obj[key]) {
+        //     delete obj[key];
+        // }
+        // else {
+        //     obj[key] = true;
+        // }
+
+        // allow only 1 opened accordion panel at a time.
+        var obj = {};
+        obj[key] = true;
+
+
         this.setState({'expandedPanel': obj});
         this.props.onToggle && this.props.onToggle(key);
     }

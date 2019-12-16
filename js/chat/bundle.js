@@ -10285,14 +10285,17 @@ function (_MegaRenderMixin2) {
   }, {
     key: "onToggle",
     value: function onToggle(e, key) {
-      var obj = clone(this.state.expandedPanel);
-
-      if (obj[key]) {
-        delete obj[key];
-      } else {
-        obj[key] = true;
-      }
-
+      // allow multiple opened panels at a time
+      // var obj = clone(this.state.expandedPanel);
+      // if (obj[key]) {
+      //     delete obj[key];
+      // }
+      // else {
+      //     obj[key] = true;
+      // }
+      // allow only 1 opened accordion panel at a time.
+      var obj = {};
+      obj[key] = true;
       this.setState({
         'expandedPanel': obj
       });
@@ -10401,6 +10404,20 @@ function (_MegaRenderMixin) {
       }
     }
   }, {
+    key: "calculateListHeight",
+    value: function calculateListHeight($parentContainer) {
+      var room = this.props.chatRoom;
+      return ($parentContainer ? $parentContainer : $('.conversationsApp')).outerHeight() - 3
+      /* 3 accordion headers */
+      * 48 - 10
+      /* some padding */
+      - (room.type === "public" && room.observers > 0 ? 48 : 0
+      /* Observers row */
+      ) - (room.isReadOnly() ? 12 : 0
+      /* is readonly row */
+      );
+    }
+  }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
       var self = this;
@@ -10434,7 +10451,7 @@ function (_MegaRenderMixin) {
         fitHeight = Math.max(maxHeight, 53);
       }
 
-      fitHeight = Math.min(200, fitHeight);
+      fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
       var $contactsList = $('.chat-contacts-list', $parentContainer);
 
       if ($contactsList.height() !== fitHeight + 4) {
@@ -10461,19 +10478,11 @@ function (_MegaRenderMixin) {
         return null;
       }
 
-      var contactHandle;
       var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
+      var contactListStyles = {}; // dont wait for render to finish to set height, otherwise there would be a minor flickering in the right
+      // pane
 
-      if (contacts && contacts.length > 0) {
-        contactHandle = contacts[0];
-      }
-
-      var contactListStyles = {};
-
-      if (contacts.length > 7) {
-        contactListStyles.height = 204;
-      }
-
+      contactListStyles.height = Math.min(this.calculateListHeight(), contacts.length * this.props.contactCardHeight);
       return external_React_default.a.createElement("div", {
         className: "chat-contacts-list",
         style: contactListStyles

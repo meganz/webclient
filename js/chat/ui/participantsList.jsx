@@ -28,6 +28,15 @@ class ParticipantsList extends MegaRenderMixin {
             });
         }
     }
+    calculateListHeight($parentContainer) {
+        var room = this.props.chatRoom;
+        return ($parentContainer ? $parentContainer : $('.conversationsApp'))
+            .outerHeight() - 3 /* 3 accordion headers */ * 48 - 10 /* some padding */ - (
+            room.type === "public" && room.observers > 0 ? 48 : 0 /* Observers row */
+        ) - (
+            room.isReadOnly() ? 12 : 0 /* is readonly row */
+        );
+    }
     componentDidUpdate() {
         var self = this;
 
@@ -57,7 +66,7 @@ class ParticipantsList extends MegaRenderMixin {
         else if (maxHeight < fitHeight) {
             fitHeight = Math.max(maxHeight, 53);
         }
-        fitHeight = Math.min(200, fitHeight);
+        fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
 
         var $contactsList = $('.chat-contacts-list', $parentContainer);
 
@@ -82,17 +91,16 @@ class ParticipantsList extends MegaRenderMixin {
             // destroyed
             return null;
         }
-        var contactHandle;
-        var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
-        if (contacts && contacts.length > 0) {
-            contactHandle = contacts[0];
-        }
 
+        var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
         var contactListStyles = {};
 
-        if (contacts.length > 7) {
-            contactListStyles.height = 204;
-        }
+
+        // dont wait for render to finish to set height, otherwise there would be a minor flickering in the right
+        // pane
+        contactListStyles.height = Math.min(
+            this.calculateListHeight(), contacts.length * this.props.contactCardHeight
+        );
 
 
         return <div className="chat-contacts-list" style={contactListStyles}>

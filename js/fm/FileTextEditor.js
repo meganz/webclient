@@ -124,7 +124,7 @@ mega.filesEditor = new function FileTextEditor() {
             return operationPromise.reject();
         }
         
-
+        loadingDialog.show();
         if (typeof content === 'undefined' || content === null) {
             if (typeof nodeToSaveAs === 'string') {
                 nodeToSaveAs = M.d[nodeToSaveAs];
@@ -147,7 +147,6 @@ mega.filesEditor = new function FileTextEditor() {
             M.copyNodes([nodeToSaveAs], directory, null, operationPromise, opTree);
         }
         else {
-            window.parent.loadingDialog.show();
             var fType = filemime(newName);
             var nFile = new File([content], newName, { type: fType });
             nFile.target = directory;

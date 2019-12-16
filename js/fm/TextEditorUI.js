@@ -96,7 +96,7 @@ mega.textEditorUI = new function() {
             validateAction('The Opened file has been modified.',
                 'Are you sure you want to discard changes and create a new file?',
                 function() {
-                    loadingDialog.show();
+                    // loadingDialog.show();
                     openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
                         history.back();
                         loadingDialog.hide();
@@ -107,7 +107,7 @@ mega.textEditorUI = new function() {
         });
 
         $('.editor-btn-container .save-as-f', $editorContianer).off('click').on('click', function saveAsMenuClick() {
-            loadingDialog.show();
+            // loadingDialog.show();
             var editedTxt = editor.getValue();
             if (editedTxt === savedFileData) {
                 editedTxt = null;

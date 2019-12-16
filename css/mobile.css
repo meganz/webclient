@@ -11935,7 +11935,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     transition: margin 0.15s linear;
 }
 /** //End Mobile Notifications Page **/
-
+@media screen and (orientation: landscape) {
+    .mobile.toast-notification.active {
+        margin-bottom: 0;
+    }
+}
 /** Mobile Blog **/
 @media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
     .mobile .blog-new-item p,

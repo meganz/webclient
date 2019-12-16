@@ -1044,8 +1044,11 @@ ul, li {
     background-position: -3px -2931px;
     display: none;
 }
+.mobile.fm-item .fm-icon.versions {
+    display: none;
+}
 .mobile.fm-item.taken-down .fm-icon.taken-down,
-.mobile.fm-item.taken-down .fm-icon.taken-down {
+.mobile.fm-item.versions .fm-icon.versions {
     display: unset;
 }
 /** End Taken down Status **/
@@ -1143,8 +1146,12 @@ ul, li {
 .mobile.fm-icon.taken-down {
     background-position: -205px -1072px;
 }
+.mobile.fm-icon.versions {
+    background-position: -156px -3088px;
+}
 .mobile.fm-item .fm-icon.link,
-.mobile.fm-item .fm-icon.taken-down {
+.mobile.fm-item .fm-icon.taken-down,
+.mobile.fm-item .fm-icon.versions {
     margin-top: 8px;
     width: 24px;
 }

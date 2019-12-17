@@ -11638,7 +11638,7 @@ code, c {
     text-align: center;
     position: relative;
 }
-.main-mid-pad.bus-repay .main-left-block, .main-mid-pad.bus-repay .main-right-block {
+.mobile .main-mid-pad.bus-repay .main-left-block, .mobile .main-mid-pad.bus-repay .main-right-block {
     padding: 32px 0 0;
 }
 .mobile .bus-reg-icon {
@@ -11688,13 +11688,59 @@ code, c {
 .mobile .repay-btn.small-view-btn {
     display: block;
 }
-.bus-reg-plan.repay .repay-breakdown-tb tr th:nth-child(2), .bus-reg-plan.repay .repay-breakdown-tb tr td:nth-child(2) {
-    width: 37%;
-    min-width: 100px;
-}
-.bus-reg-plan.repay .repay-breakdown-tb tr:last-child td:last-child {
-    width: 67%;
-    min-width: 182px;
+
+@media only screen and (min-width: 882px) {
+    .mobile .card-container.bus-repay {
+        width: 850px;
+        height: auto;
+        padding: 32px 16px 24px;
+        margin: 0 auto 80px;
+        box-sizing: border-box;
+        background-color: #fff;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 40, 100, 0.12);
+    } 
+    .mobile .main-mid-pad.bus-repay .main-left-block, .mobile .main-mid-pad.bus-repay .main-right-block {
+        padding: 20px;
+    }
+    .mobile .main-mid-pad.bus-repay .bus-reg-plan.repay {
+        width: 364px;
+        left: 0;
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(0,0,0,0.1);
+    }
+    .mobile .main-mid-pad.bus-repay .section-wrapper:last-child .default-56px-button {
+        display: block;
+        font-size: 18px;
+        -moz-border-radius: 4px;
+        -webkit-border-radius: 4px;
+        border-radius: 4px;
+        line-height: 55px;
+        color: white;
+        padding: 0 15px;
+        min-width: 203px;
+        height: 56px;
+        text-align: center;
+        cursor: pointer;
+        background-color: #00BFA5;
+        position: relative;
+        -webkit-transition: all 200ms ease-in-out;
+        -moz-transition: all 200ms ease-in-out;
+        -o-transition: all 200ms ease-in-out;
+        -ms-transition: all 200ms ease-in-out;
+        transition: all 200ms ease-in-out;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        white-space: nowrap;
+    }
+    .mobile .main-mid-pad.bus-repay .section-wrapper:last-child .disabled {
+        opacity: 0.5;
+    }
+    .mobile .repay-btn.small-view-btn {
+        display: none;
+    }
 }
 /** Password Reminder Overlay **/
 .mobile.password-reminder-overlay .dont-show-again-container {

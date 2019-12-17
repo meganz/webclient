@@ -1471,18 +1471,21 @@ Call.prototype.msgJoin = function(packet) {
         delete self._sentSessions[peerId];
         var ownHashKey = self.manager.crypto.random(32);
 
-        // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
-        // flags contains a flag whether we support stream renegotiation
-        self.manager.cmdEndpoint(RTCMD.SESSION, packet,
-            packet.callid +
-            newSid +
-            self.manager.ownAnonId +
-            self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
-            self.id +
-            String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
-        );
-        var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
-        self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        self.manager.crypto.loadCryptoForPeer(packet.fromUser)
+        .then(function() {
+            // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
+            // flags contains a flag whether we support stream renegotiation
+            self.manager.cmdEndpoint(RTCMD.SESSION, packet,
+                packet.callid +
+                newSid +
+                self.manager.ownAnonId +
+                self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
+                self.id +
+                String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
+            );
+            var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
+            self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        });
     } else {
         self.logger.log("Ignoring JOIN while in state", constStateToText(CallState, self.state));
         return;
@@ -2000,7 +2003,6 @@ Call.prototype._join = function() {
         (RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)));
     self._setState(CallState.kJoining);
     if (!self.cmdBroadcast(RTCMD.JOIN, data)) {
-        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
     if (self.recovery) {

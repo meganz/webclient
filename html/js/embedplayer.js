@@ -185,7 +185,10 @@ function init_embed(ph, key, g) {
 
         watchdog.registerOverrider('psts', dlmanager._onQuotaRetry.bind(dlmanager));
 
-        iniVideoStreamLayout(node, $('body'), {preBuffer: false})
+        var buffer = $.playbackOptions && $.playbackOptions.indexOf('1a') > -1 &&
+            (window.chrome || $.playbackOptions.indexOf('1m') > -1);
+
+        iniVideoStreamLayout(node, $('body'), {preBuffer: buffer})
             .then(function(stream) {
                 if (stream instanceof Streamer) {
                     stream.on('activity', function() {
@@ -196,6 +199,10 @@ function init_embed(ph, key, g) {
                         }
                         return true;
                     });
+
+                    if (stream.options.autoplay) {
+                        $('.video-wrapper .play-video-button').click();
+                    }
                 }
             });
 

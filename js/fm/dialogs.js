@@ -891,6 +891,14 @@
 
         dialogPositioning($dialog);
 
+        // 'New contact' button
+        if (section === 'conversations') {
+            $('.dialog-newcontact-button', $dialog).removeClass('hidden');
+        }
+        else {
+            $('.dialog-newcontact-button', $dialog).addClass('hidden');
+        }
+
         // Activate tab
         $('.fm-picker-dialog-button.' + section, $dialog).addClass('active');
     };
@@ -1296,6 +1304,11 @@
                 selectTreeItem(p);
                 selectTreeItem(h);
             });
+        });
+
+        $('.dialog-newcontact-button', $dialog).rebind('click', function() {
+            closeDialog();
+            contactAddDialog();
         });
 
         $dialog.rebind('click', '.nw-contact-item', function() {

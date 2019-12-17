@@ -1044,8 +1044,11 @@ ul, li {
     background-position: -3px -2931px;
     display: none;
 }
+.mobile.fm-item .fm-icon.versions {
+    display: none;
+}
 .mobile.fm-item.taken-down .fm-icon.taken-down,
-.mobile.fm-item.taken-down .fm-icon.taken-down {
+.mobile.fm-item.versions .fm-icon.versions {
     display: unset;
 }
 /** End Taken down Status **/
@@ -1143,8 +1146,12 @@ ul, li {
 .mobile.fm-icon.taken-down {
     background-position: -205px -1072px;
 }
+.mobile.fm-icon.versions {
+    background-position: -156px -3088px;
+}
 .mobile.fm-item .fm-icon.link,
-.mobile.fm-item .fm-icon.taken-down {
+.mobile.fm-item .fm-icon.taken-down,
+.mobile.fm-item .fm-icon.versions {
     margin-top: 8px;
     width: 24px;
 }
@@ -11553,7 +11560,26 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
     background-position: -17px -1091px;
 }
-
+.new-bottom-pages.dev-nw .new-left-menu-block {
+    display: none;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul {
+    list-style: unset;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul li {
+    background-image: unset;
+    background-size: unset;
+    list-style: unset;
+}
+code, c {
+    font-family: "Courier New", Courier, monospace;
+}
+.mobile .dev-new-button {
+    margin-top: 10px;
+}
+.mobile .key-management {
+    display: none;
+}
 /** Developer Settings Page **/
 .bottom-page.developer-settings .developer-settings-table {
     margin: auto;
@@ -11935,7 +11961,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     transition: margin 0.15s linear;
 }
 /** //End Mobile Notifications Page **/
-
+@media screen and (orientation: landscape) {
+    .mobile.toast-notification.active {
+        margin-bottom: 0;
+    }
+}
 /** Mobile Blog **/
 @media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
     .mobile .blog-new-item p,
@@ -12489,6 +12519,12 @@ img.blog-new-logos {
     display: block;
     width: 140px;
     margin-bottom: 33px
+}
+#blogarticle_post .blog-table-scroll {
+    overflow-x: scroll;
+}
+#blogarticle_post sup {
+    font-size: 13px;
 }
 .blog-article-divider {
     height: 2px;

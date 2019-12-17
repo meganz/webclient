@@ -1302,6 +1302,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         var onOverQuotaCT;
+        var videoElement = $('video', $wrapper).get(0);
 
         if (typeof destroy === 'object') {
             options = destroy;
@@ -1324,6 +1325,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                     options.filter = v.slice(-6).split(/(.{2})/).filter(String);
                 }
+                else if (k === 'a') {
+                    options.autoplay = options.preBuffer = v | 0;
+                }
+                else if (k === 'm') {
+                    options.muted = videoElement.muted = v | 0;
+                }
             });
             $.playbackOptions = null;
         }
@@ -1334,7 +1341,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 options.type = c && c[0];
             }
         }
-        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
+        var s = Streamer(node.link || node.h, videoElement, options);
 
         _initVideoControls($wrapper, s, node, options);
 

@@ -52,6 +52,13 @@
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
             }
+
+            if (folderlink) {
+                $('.dropdown-item.edit-file-item span').text(l[16797]);
+            }
+            else {
+                $('.dropdown-item.edit-file-item span').text(l[865]);
+            }
         }
 
         if (d) {

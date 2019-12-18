@@ -10,7 +10,7 @@ mega.textEditorUI = new function() {
     var remFunction;
     var fileHandle;
     var versionHandle;
-    var fName;
+    var fileName;
     var savedFileData;
 
     var editor;
@@ -32,6 +32,9 @@ mega.textEditorUI = new function() {
 
         $('.txt-editor-menu', $editorContianer).off('click').on('click',
             function textEditorMenuOpen() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
                 $('.top-menu-popup', $editorContianer).removeClass('hidden').show();
                 return false;
             });
@@ -129,6 +132,15 @@ mega.textEditorUI = new function() {
 
         $('.editor-btn-container .print-f', $editorContianer).off('click').on('click', printText);
 
+        $('.editor-btn-container .txt-editor-download-btn', $editorContianer).off('click').on('click', function downloadBtnClicked() {
+
+            validateAction('The Opened file has been modified.',
+                'Are you sure you want to discard changes and download the original file?',
+                function() {
+                    M.saveAs(savedFileData, fileName);
+                });
+        });
+
         initialized = true;
 
     };
@@ -165,6 +177,14 @@ mega.textEditorUI = new function() {
                 scrollbarStyle: "overlay"
             });
         }
+        if (folderlink || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+            editor.options.readOnly = true;
+            $('.txt-editor-menu', $editorContianer).addClass('disabled');
+        }
+        else {
+            editor.options.readOnly = false;
+            $('.txt-editor-menu', $editorContianer).removeClass('disabled');
+        }
 
 
         $('.buttons-holder .save-btn', $editorContianer).addClass('disabled');
@@ -179,7 +199,7 @@ mega.textEditorUI = new function() {
 
         fileHandle = handle;
         versionHandle = '';
-        this.fName = fName;
+        fileName = fName;
     };
 
     var validateAction = function(msg, submsg, callback) {
@@ -213,9 +233,9 @@ mega.textEditorUI = new function() {
 
     var printText = function() {
         'use strict';
-        var mywindow = window.open('', fName, 'height=600,width=800');
+        var mywindow = window.open('', fileName, 'height=600,width=800');
 
-        mywindow.document.write('<html><head><title>' + fName + '</title>');
+        mywindow.document.write('<html><head><title>' + fileName + '</title>');
         mywindow.document.write('</head><body >');
         mywindow.document.write('<pre>' + editor.getValue() + '</pre>');
         mywindow.document.write('</body></html>');

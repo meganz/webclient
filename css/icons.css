@@ -1094,7 +1094,10 @@
 }
 .semi-small-icon.send-to-contact-menu {
     background-image: url(../images/mega/send_to_contact_ico.svg);
-    background-position: 0;
+    background-position: 0px -4px;
+    width: 24px;
+    height: 24px;
+    background-size: auto;
 }
 .top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
     filter: drop-shadow(2px 4px 6px black);

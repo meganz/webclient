@@ -1895,7 +1895,7 @@
     "17828": "Lire le contenu audio",
     "17829": "Mon code QR",
     "17830": "Accepter automatiquement",
-    "17831": "Les utilisateurs qui balayeront votre code QR seront ajout\u00e9s automatiquement \u00e0 votre liste de contacts",
+    "17831": "Les utilisateurs de MEGA qui balayeront votre code QR seront automatiquement ajout\u00e9s \u00e0 votre liste de contacts",
     "17832": "R\u00e9initialiser le code QR",
     "17833": "Les codes QR pr\u00e9c\u00e9dents ne seront plus valides",
     "17834": "Enregistrer comme image",
@@ -3366,5 +3366,5 @@
     "22674": "[A]Surclassez votre compte maintenant[\/A] et continuez \u00e0 profiter d\u2019un stockage nuagique s\u00e9curis\u00e9, chiffr\u00e9 de bout en bout.Les comptes PRO obtiennent [S]jusqu\u2019\u00e0 %1 d\u2019espace de stockage[\/S] et %2 de quota de transfert qu\u2019ils peuvent partager avec les utilisateurs qui t\u00e9l\u00e9chargent leurs fichiers.",
     "22676": "Code source Visual Basic",
     "22677": "Code source Swift",
-    "22681": "Transparency Report"
+    "22681": "Rapport de transparence"
 }

@@ -52,12 +52,12 @@ mega.textEditorUI = new function() {
                     validateAction('The opened file has been modified.',
                         'Are you sure that you want to discard changes and close the editor?',
                         function() {
-                            history.back();
+                            !hashLogic && history.back();
                             mega.textEditorUI.doClose();
                         });
                 }
                 else {
-                    history.back();
+                    !hashLogic && history.back();
                     mega.textEditorUI.doClose();
                 }
                 return false;

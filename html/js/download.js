@@ -494,6 +494,28 @@ function dl_g(res) {
                 }
             };
 
+            var showTextView = function() {
+                var fType = filetype(dl_node, true)[0];
+                if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+                    var $containerB = $('.download.info-block');
+                    var $viewBtns = $containerB.find('.file-type-wrapper, .txt-view-button');
+
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click', function() {
+                            loadingDialog.show();
+
+                            mega.filesEditor.getFile(dl_node.link, true).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    mega.textEditorUI.setupEditor(dl_node.name, data, dl_node.h, true);
+                                }
+                            ).fail(function() {
+                                loadingDialog.hide();
+                            });
+                        });
+                }
+            };
+
             if (res.fa) {
                 var promise = Promise.resolve();
 
@@ -530,6 +552,9 @@ function dl_g(res) {
                         showPreviewButton();
                     }
                 });
+            }
+            else {
+                showTextView();
             }
 
             if (prevBut) {

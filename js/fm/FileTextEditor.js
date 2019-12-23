@@ -41,14 +41,15 @@ mega.filesEditor = new function FileTextEditor() {
 
     /**
      * Get file data
-     * @param {String} handle   Node handle
+     * @param {String} handle       Node handle
+     * @param {Boolean} isPublic    flag to isPublic link
      */
-    this.getFile = function(handle) {
+    this.getFile = function(handle, isPublic) {
 
         var operationPromise = new MegaPromise();
 
         // if called with no handle or invalid one, exit
-        if (!handle || !M.d[handle]) {
+        if (!handle || (!M.d[handle] && !isPublic)) {
             return operationPromise.reject();
         }
 
@@ -57,9 +58,17 @@ mega.filesEditor = new function FileTextEditor() {
             return operationPromise.resolve(filesDataMap[handle]);
         }
 
+        var node;
+
+        if (isPublic && dl_node) {
+            node = dl_node;
+        }
+        else {
+            node = M.d[handle];
+        }
 
         // this is empty file, no need to bother Data Servers + API
-        if (M.d[handle].s <= 0) {
+        if (node.s <= 0) {
             storeFileData(handle, '');
             return operationPromise.resolve(filesDataMap[handle]);
         }

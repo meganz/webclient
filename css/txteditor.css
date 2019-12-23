@@ -8,7 +8,7 @@
 }
 #mega-text-editor .editor-textarea-container{
     width: 60%;
-    height: 80%;
+    height: calc(100% - 50px);
     margin-left: 20%;
 }
 #mega-text-editor #text-editor-textarea{

@@ -164,7 +164,7 @@ mega.textEditorUI = new function() {
     };
 
 
-    this.setupEditor = function(fName, txt, handle) {
+    this.setupEditor = function(fName, txt, handle, isReadonly) {
         'use strict';
         init();
         $containerDialog.removeClass('hidden');
@@ -177,7 +177,7 @@ mega.textEditorUI = new function() {
                 scrollbarStyle: "overlay"
             });
         }
-        if (folderlink || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+        if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
             editor.options.readOnly = true;
             $('.txt-editor-menu', $editorContianer).addClass('disabled');
         }

@@ -2437,6 +2437,9 @@ function topmenuUI() {
             else if (className.indexOf('logout') > -1) {
                 mLogout();
             }
+            else if (className.indexOf('transparency') > -1) {
+                window.open('https://mega.nz/Mega_Transparency_Report_201909.pdf', '_blank');
+            }
         }
         return false;
     });

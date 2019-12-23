@@ -1521,8 +1521,8 @@
     "16312": "Kelihatannya anda kehabisan storage",
     "16313": "[A]Upgrade sekarang[\/A] ke akun [S]PRO Lite[\/S] dan tidak perlu kuatir kehabisan quota. [S]Untuk \u20ac%1 sebulan anda mendapat 200 GB storage[\/S] dan 1 TB transfer quota.",
     "16314": "Anda dapat membuka free storage lebih dan transfer quota dengan menyelesaikan achievement lebih banyak.",
-    "16315": "[S]Akun anda penuh.[\/S] [A]Upgrade sekarang[\/A] ke akun PRO dan dapatkan [S]sampai 4 TB (4096 GB)[\/S] cloud storage space.",
-    "16316": "[S]Cloud Drive hampir penuh.[\/S] [A]Upgrade sekarang[\/A] ke akun PRO dan dapatkan [S]sampai 4 TB (4096 GB)[\/S] cloud storage space.",
+    "16315": "[S]Cloud Drive Anda penuh.[\/S] [A]Tingkatkan sekarang[\/A] ke akun PRO dan dapatkan [S]hingga %@ TB (%@ GB) [\/S] ruang penyimpanan cloud.",
+    "16316": "[S]Drive Cloud Anda hampir penuh.[\/S] [A]Tingkatkan sekarang[\/A] ke akun PRO dan dapatkan [S]hingga %@ TB (%@ GB)[\/S] ruang penyimpanan cloud.",
     "16317": "Teman anda harus mendaftar akun gratis MEGA dan  [S]install setidaknya satu MEGA client application[\/S] (antara sync client atau salah satu mobile apps kami)",
     "16318": "Anda dapat mengabarkan teman anda melalui metoda apapun. Anda akan menerima quota jika anda telah memasukan email teman anda disini sebelum mereka mendaftar dengan email tersebut.",
     "16319": "Masukkan email teman anda:",
@@ -3353,8 +3353,9 @@
     "22157": "Pemilik:",
     "22158": "Lihat transfer yang sedang berlangsung",
     "22159": "Lihat transfer yang selesai",
-    "22185": "You may have disallowed access to the device(s) when the call was started or answered, there may be access conflict with another application, or a configuration problem. If you have granted access rights after joining\/starting the call, you may need to hang up and re-join or re-start the call. If nothing else helps, you can also try restarting your computer.",
+    "22185": "You may have disallowed access to the device(s) when the call was started or answered, there may be access conflict with another application, or a configuration problem. If you have granted access rights after joining\/starting the call, you may need to hang up and re-join or re-start the call. If the issue persists, you can also try restarting your computer.",
     "22186": "There was an error accessing your camera",
+    "22188": "Autoplay this video",
     "22667": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22668": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22669": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don\u2019t worry about running out of storage. [S]For \u20ac%1 a month you get %2 of storage[\/S] and %3 of transfer quota.",
@@ -3362,5 +3363,8 @@
     "22671": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]%1[\/S] of cloud storage space.",
     "22672": "Cloud Drive is almost full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
     "22673": "Cloud Drive is full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
-    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files."
+    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files.",
+    "22676": "Visual Basic Source Code",
+    "22677": "Swift Source Code",
+    "22681": "Transparency Report"
 }

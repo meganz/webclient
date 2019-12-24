@@ -3161,7 +3161,7 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                         $('.create-new-folder input').val('');
 
                         M.updFileManagerUI().always(function() {
-                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
                                 refreshDialogContent();
                             }
                             hideOverlay();

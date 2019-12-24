@@ -819,7 +819,9 @@ var ulmanager = {
             }
         }
 
-        M.ulstart(file);
+        if (!file.isCreateFile) {
+            M.ulstart(file);
+        }
         if (file.done_starting) {
             file.done_starting();
         }
@@ -1199,7 +1201,8 @@ ChunkUpload.prototype.updateprogress = function() {
             Math.floor(tp / this.file.size * 100),
             tp,
             this.file.size,
-            GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0) // speed
+        GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0), // speed
+        this.file.isCreateFile
         );
 
     if (tp === this.file.size) {

@@ -1434,8 +1434,12 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
 };
 
 
-MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
     'use strict';
+
+    if (skipUIUpdate) {
+        return;
+    }
 
     var id = ul.id;
     var domElement = ul.domElement;

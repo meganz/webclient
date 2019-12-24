@@ -318,7 +318,7 @@
 .CodeMirror-overlayscroll-horizontal div:hover {
     height: 130%;
 }
-#mega-text-editor .top-menu-popup {
+#mega-text-editor .top-menu-popup-editor {
     right: unset;
     top: 8px;
     margin-left: 8px;
@@ -328,8 +328,10 @@
     background-color: #FFFFFF;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
     transition: left 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
-    display:none;
-    width:190px;
+    display: none;
+    width: 190px;
+    position: fixed;
+    z-index: 1120;
 }
 #mega-text-editor .top-menu-popup .txt-editor-sp-menu {
     height: 1px;

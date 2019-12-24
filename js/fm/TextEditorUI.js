@@ -35,13 +35,13 @@ mega.textEditorUI = new function() {
                 if ($(this).hasClass('disabled')) {
                     return false;
                 }
-                $('.top-menu-popup', $editorContianer).removeClass('hidden').show();
+                $('.top-menu-popup-editor', $editorContianer).removeClass('hidden').show();
                 return false;
             });
 
         $editorContianer.off('click').on('click',
             function textEditorGlobalClick() {
-                $('.top-menu-popup', $editorContianer).addClass('hidden').hide();
+                $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
                 return false;
             });
 
@@ -195,7 +195,7 @@ mega.textEditorUI = new function() {
         }
 
         $('.txt-editor-opened-f-name', $editorContianer).text(fName);
-        $('.top-menu-popup', $editorContianer).addClass('hidden').hide();
+        $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
 
         fileHandle = handle;
         versionHandle = '';

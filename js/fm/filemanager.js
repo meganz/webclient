@@ -2030,8 +2030,9 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
                 if (node.s >= 20971520) {
                     return false;
                 }
-                var fType = filetype(node, true)[0];
-                if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+                //var fType = filetype(node, true)[0];
+                //if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+                if (isTextual(node)) {
                     return true;
                 }
                 return false;
@@ -2243,7 +2244,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
             addressDialog.closeDialog();
         }
-        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.copyrightsDialog)) {
+        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog
+            || $.copyrightsDialog || $.saveAsDialog)) {
             closeDialog();
         }
         else if (e.keyCode == 27 && $.topMenu) {
@@ -3611,6 +3613,10 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
+        else if (isTextual(n)) {
+            $.selected = [h];
+            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        }
         else {
             M.addDownload([h]);
         }
@@ -4132,11 +4138,12 @@ FileManager.prototype.getLinkAction = function() {
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
         copy: ['createfolder'],
         move: ['createfolder'],
         register: ['terms'],
-        selectFolder: ['createfolder']
+        selectFolder: ['createfolder'],
+        saveAs: ['createfolder']
     };
 
     var _openDialog = function(name, dsp) {

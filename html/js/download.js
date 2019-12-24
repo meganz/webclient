@@ -495,8 +495,7 @@ function dl_g(res) {
             };
 
             var showTextView = function() {
-                var fType = filetype(dl_node, true)[0];
-                if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+                if (isTextual(dl_node)) {
                     var $containerB = $('.download.info-block');
                     var $viewBtns = $containerB.find('.file-type-wrapper, .txt-view-button');
 

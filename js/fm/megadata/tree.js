@@ -136,6 +136,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         else if ($.selectFolderDialog) {
             prefix = 'SelectFolder' + stype;
         }
+        else if ($.saveAsDialog) {
+            prefix = 'SaveAs' + stype;
+        }
     }
 
     var btd = d > 1;
@@ -453,7 +456,7 @@ MegaData.prototype.initTreePanelSorting = function() {
         'shared-with-me', 'cloud-drive', 'rubbish-bin', 'out-shares', 'public-links' // Sorting sections for tree parts
     ];
     var byType = ['name', 'status', 'last-interaction', 'label'];
-    var dialogs = ['Copy', 'Move', 'SelectFolder'];
+    var dialogs = ['Copy', 'Move', 'SelectFolder', 'SaveAs'];
     var byDefault;
     var type;
 

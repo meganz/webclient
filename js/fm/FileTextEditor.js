@@ -50,6 +50,9 @@ mega.filesEditor = new function FileTextEditor() {
 
         // if called with no handle or invalid one, exit
         if (!handle || (!M.d[handle] && !isPublic)) {
+            if (d) {
+                console.error('Handle rejected in getFile ' + handle);
+            }
             return operationPromise.reject();
         }
 
@@ -190,4 +193,17 @@ mega.filesEditor = new function FileTextEditor() {
     this.prepareTextEditoFrame = function(iframe) {
         var iframeHtml = window['txtEditor'];
     }
+
+
+    /**
+     * Check if the node is for a textual file
+     * @param {MegaData} node       The node to check
+     */
+    window.isTextual = function(node) {
+        var fType = filetype(node, true)[0];
+        if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+            return true;
+        }
+        return false;
+    };
 };

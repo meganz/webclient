@@ -2589,7 +2589,7 @@ function closeDialog(ev) {
     if ($.dialog === 'terms' && $.registerDialog) {
         $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
     }
-    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
@@ -2636,6 +2636,7 @@ function closeDialog(ev) {
         delete $.shareToContactId;
         delete $.copyrightsDialog;
         delete $.selectFolderDialog;
+        delete $.saveAsDialog;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;
@@ -2689,9 +2690,9 @@ function closeDialog(ev) {
         $.dialog = $.propertiesDialog;
     }
 
-    if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
         // the createfolder dialog was closed
-        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog;
+        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
         $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');

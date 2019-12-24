@@ -101,9 +101,8 @@ mega.textEditorUI = new function() {
                 function() {
                     // loadingDialog.show();
                     openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
-                        history.back();
                         loadingDialog.hide();
-                        $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                        mega.textEditorUI.setupEditor(M.d[handle].name, '', handle);
                     });
                 }
             );
@@ -116,9 +115,8 @@ mega.textEditorUI = new function() {
                 editedTxt = null;
             }
             openSaveAsDialog(versionHandle || fileHandle, editedTxt, function(handle) {
-                history.back();
                 loadingDialog.hide();
-                $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                mega.textEditorUI.setupEditor(M.d[handle].name, editedTxt || savedFileData, handle);
             });
         });
 

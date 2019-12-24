@@ -133,6 +133,10 @@ mega.filesEditor = new function FileTextEditor() {
         var operationPromise = new MegaPromise();
 
         if (!newName || !directory || (!nodeToSaveAs && !content)) {
+            if (d) {
+                console.error('saveFileAs is called incorrectly newName=' + newName +
+                    ' dir=' + directory + ' !content=' + !content + ' nodetoSave=' + nodeToSaveAs);
+            }
             return operationPromise.reject();
         }
         

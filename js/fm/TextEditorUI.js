@@ -49,8 +49,7 @@ mega.textEditorUI = new function() {
             function textEditorCloseBtnClick() {
 
                 if (editor) {
-                    validateAction('The opened file has been modified.',
-                        'Are you sure that you want to discard changes and close the editor?',
+                    validateAction(l[22750], l[22751],
                         function() {
                             !hashLogic && history.back();
                             mega.textEditorUI.doClose();
@@ -96,8 +95,7 @@ mega.textEditorUI = new function() {
         });
 
         $('.editor-btn-container .new-f', $editorContianer).off('click').on('click', function newFileMenuClick() {
-            validateAction('The Opened file has been modified.',
-                'Are you sure you want to discard changes and create a new file?',
+            validateAction(l[22750], l[22752],
                 function() {
                     // loadingDialog.show();
                     openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
@@ -132,8 +130,7 @@ mega.textEditorUI = new function() {
 
         $('.editor-btn-container .txt-editor-download-btn', $editorContianer).off('click').on('click', function downloadBtnClicked() {
 
-            validateAction('The Opened file has been modified.',
-                'Are you sure you want to discard changes and download the original file?',
+            validateAction(l[22750], l[22753],
                 function() {
                     M.saveAs(savedFileData, fileName);
                 });
@@ -224,8 +221,7 @@ mega.textEditorUI = new function() {
             $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
         };
 
-        validateAction('The Opened file has been modified.',
-            'Are you sure you want to discard changes and open the selected file?', openFile);
+        validateAction(l[22750], l[22754], openFile);
 
     };
 

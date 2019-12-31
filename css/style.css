@@ -12013,7 +12013,7 @@ table {
     padding: 0 15px 0 15px;
 }
 .bottom-page.sign .main-mid-pad {
-    width: 1020px;
+    max-width: 1020px;
 }
 .main-mid-pad.improved-recovery-steps, .main-mid-pad.backup-recover.withkey, .main-mid-pad.bus-repay {
     max-width: 100%;
@@ -12045,7 +12045,7 @@ table {
     margin-left: 520px;
 }
 .sign .main-right-block {
-    padding-top: 100px;
+    padding-top: 116px;
     margin-left: 560px;
 }
 h3.main-italic-header {

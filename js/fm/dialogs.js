@@ -382,9 +382,11 @@
 
             var rowHtml = '<div class="item-row">' +
                 '<div class="transfer-filetype-icon file text"></div>' +
-                '<input id="f-name-input" class="summary-ff-name" type="text" value="' + $.nodeSaveAs.name
-                + '" placeholder="' + l[17506] + '"/> &nbsp; ';
-            '</div>';
+                '<input id="f-name-input" class="summary-ff-name" type="text" value="' + escapeHTML($.nodeSaveAs.name)
+                + '" placeholder="' + l[17506] + '" autocomplete="off"/> &nbsp; '
+                + '</div>'
+                + '<div class="duplicated-input-warning"> <div class="arrow"></div> <span>'
+                + l[17578] + '</span> </div>';
 
             $div.safeHTML(rowHtml);
         }
@@ -953,6 +955,7 @@
 
         $.hideContextMenu();
         dialogPositioning($dialog);
+        $dialog.removeClass('duplicate');
 
         console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
     };
@@ -1584,16 +1587,37 @@
             }
 
             if ($.nodeSaveAs) {
-                var saveAsName = $('#f-name-input', $dialog).val();
+                var $nameInput = $('#f-name-input', $dialog);
+                var saveAsName = $nameInput.val();
+
+                var removeErrorStyling = function() {
+                    $nameInput.removeClass('error');
+                    $dialog.removeClass('duplicate');
+                    $nameInput.off('input');
+                }
 
                 if (!M.isSafeName(saveAsName)) {
                     // ui things
+                    $nameInput.addClass('error');
+
+                    $nameInput.off('input').on('input', function() {
+                        removeErrorStyling();
+                    });
+
                     return false;
                 }
                 if (duplicated(0, saveAsName, $.mcselected)) {
                     // ui things
+                    $nameInput.addClass('error');
+                    $dialog.addClass('duplicate');
+
+                    $nameInput.off('input').on('input', function() {
+                        removeErrorStyling();
+                    });
+
                     return false;
                 }
+                $nameInput.off('input');
 
                 closeDialog();
                 mega.filesEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(

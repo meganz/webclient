@@ -8017,7 +8017,8 @@ table {
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
 }
-.error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl, .rename-input-bl input.error, .create-folder-input-bl input.error {
+.error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl, .rename-input-bl input.error, .create-folder-input-bl input.error,
+input.summary-ff-name.error {
     color: #D90007;
 }
 .rename-input-bl .transfer-filetype-icon, .create-folder-input-bl .transfer-filetype-icon {

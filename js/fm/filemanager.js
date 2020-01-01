@@ -519,8 +519,45 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
 
+    // disabling right click, default contextmenu.
+    var alwaysShowContextMenu = Boolean(localStorage.contextmenu);
+    $(document).rebind('contextmenu.doc', function(ev) {
+        var target = ev.target;
+        var ALLOWED_IDS = {'embed-code-field': 1};
+        var ALLOWED_NODES = {INPUT: 1, TEXTAREA: 1, VIDEO: 1};
+        var ALLOWED_CLASSES = [
+            'contact-details-user-name',
+            'contact-details-email',
+            'nw-conversations-name'
+        ];
+        var ALLOWED_PARENTS =
+            '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs';
+        var ALLOWED_CLOSEST =
+            '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
+            '.messages.content-area, .chat-right-pad .user-card-data';
+
+        if (ALLOWED_NODES[target.nodeName] || ALLOWED_IDS[target.id] || alwaysShowContextMenu) {
+            return;
+        }
+
+        for (var i = ALLOWED_CLASSES.length; i--;) {
+            if (target.classList.contains(ALLOWED_CLASSES[i])) {
+                return;
+            }
+        }
+
+        var $target = $(target);
+        if (!is_fm() || $target.parents(ALLOWED_PARENTS).length || $target.closest(ALLOWED_CLOSEST).length) {
+            return;
+        }
+
+        $.hideContextMenu();
+        return false;
+    });
+
     var thElm;
     var startOffset;
+    var $fmholder = $('#fmholder');
     $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
         var $me = $(this);
         var th = $me.closest('th');
@@ -528,7 +565,7 @@ FileManager.prototype.initFileManagerUI = function() {
         startOffset = th.outerWidth() - col.pageX;
     });
 
-    $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+    $fmholder.rebind('mousemove.colresize', function(col) {
         if (M.chat) {
             return;
         }
@@ -566,7 +603,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+    $fmholder.rebind('mouseup.colresize', function() {
         if (M.chat) {
             return;
         }
@@ -580,9 +617,8 @@ FileManager.prototype.initFileManagerUI = function() {
         $('#fmholder').css('cursor', '');
     });
 
-    $('#fmholder')
-        .off('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll')
-        .on('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
+    $fmholder
+        .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
                 console.warn(e);
@@ -678,7 +714,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).off('resize.ccmui');
     };
 
-    $('#fmholder').rebind('click.contextmenu', function(e) {
+    $fmholder.rebind('click.contextmenu', function(e) {
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
             $.hideTopMenu(e);
@@ -1592,8 +1628,6 @@ FileManager.prototype.initContextUI = function() {
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
             M.labeling($.selected, labelId);
         }
-
-        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -3939,6 +3973,16 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     'use strict'; /* jshint -W074 */
 
     var promise = new MegaPromise();
+
+    if (!pro.membershipPlans || !pro.membershipPlans.length) {
+        pro.loadMembershipPlans(function() {
+            M.showOverStorageQuota(quota, options);
+        });
+        // no caller relay on the promise really, 1 call has .always
+        return promise.reject();
+    }
+
+
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('fm-notification almost-full full');
 
@@ -3948,26 +3992,38 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     this.showOverStorageQuotaPromise = promise;
 
     if (quota === -1) {
-        quota = {percent: 100};
+        quota = { percent: 100 };
         quota.isFull = quota.isAlmostFull = true;
-        options = {custom: 1};
+        options = { custom: 1 };
     }
+
+    var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+    $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
+        replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+    $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+
+    $('.fm-notification-block.almost-full')
+        .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
-        $('.fm-notification-block.full').safeHTML(l[16358]);
-        $('.fm-notification-block.almost-full')
-            .safeHTML('<div class="fm-notification-close"></div>' + l[16359]);
+
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
+        
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
             .safeHTML(l[16361] + ' ' + l[16314]);
     }
     else {
+        var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
+            .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
+
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()));
+            .safeHTML(minStorage);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
+            .safeHTML(minStorage + ' ' + l[16314]);
     }
 
     if (quota.isAlmostFull || Object(options).custom) {

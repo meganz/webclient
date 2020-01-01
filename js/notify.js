@@ -796,7 +796,8 @@ var notify = {
 
         // Use the email address in the notification/action packet if the contact doesn't exist locally
         // or if it was populated partially locally (i.e from chat, without email)
-        else if ((typeof M.u[userHandle] === 'undefined' || !M.u[userHandle].m)
+        // or if the notification is closed account notification, M.u cannot be exist, so just using attached email.
+        else if ((typeof M.u[userHandle] === 'undefined' || !M.u[userHandle].m || notification.type === 'c')
             && (typeof notification.data.m !== 'undefined')) {
             userEmail = notification.data.m;
         }

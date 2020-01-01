@@ -78,6 +78,14 @@ function render_blogarticle() {
 
     $('#blogarticle_by').safeHTML('<span>by:</span> ' + escapeHTML(by));
 
+    if (is_mobile) {
+        // Move tables inside of a div element with the table scroll container class.
+        var $tables = $('table', '#blogarticle_post');
+        for (var t = 0; t < $tables.length; t++) {
+            $($tables[t]).wrap('<div class="blog-table-scroll"/>');
+        }
+    }
+
     if (!m && !is_mobile) {
         blog_archive();
     }

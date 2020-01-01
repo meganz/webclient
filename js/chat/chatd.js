@@ -614,10 +614,6 @@ Chatd.Shard.prototype.reconnect = function() {
         self.keepAlive.stop();
         self.connectionRetryManager.doConnectionRetry();
         self.histRequests = {};
-        var chats = self.chatd.chatIdMessages;
-        for (var chatid in self.chatIds) {
-            chats[chatid]._setLoginState(LoginState.DISCONN);
-        }
         self.chatd.trigger('onError', {
             shard: self
         });
@@ -659,6 +655,7 @@ Chatd.Shard.prototype.handleDisconnect = function() {
         var chat = chats[chatid];
         assert(chat);
         chat._clearCallInfo();
+        chats[chatid]._setLoginState(LoginState.DISCONN);
     }
     chatd.trigger('onClose', {
         shard: self

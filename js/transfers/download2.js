@@ -172,6 +172,15 @@ var dlmanager = {
      */
     openInBrowser: function(n) {
         'use strict';
+
+        // These browsers do not support opening blob.
+        if (ua.details.brand === 'FxiOS'
+            || ua.details.browser === 'Opera'
+            || ua.details.browser === 'SamsungBrowser') {
+
+            return false;
+        }
+
         var exts = ["pdf", "txt", "png", "gif", "jpg", "jpeg"];
 
         if (ua.details.engine === 'Gecko') {

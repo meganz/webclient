@@ -63,7 +63,7 @@ function FMDB(plainname, schema, channelmap) {
     // whether multi-table transactions work (1) or not (0) (Apple, looking at you!)
     this.cantransact = -1;
 
-    // a flag to know if we have sn set in database. -1 = we don't know, 0 = not set, 1 = is set 
+    // a flag to know if we have sn set in database. -1 = we don't know, 0 = not set, 1 = is set
     this.sn_Set = -1;
 
     // initialise additional channels
@@ -511,7 +511,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 var sendOperation = function() {
                     fmdb.commit = false;
                     fmdb.writing = 3;
-                    
+
                     dispatchputs();
                 };
                 if (currsn) {
@@ -796,6 +796,13 @@ FMDB.prototype.stripnode = Object.freeze({
             delete f.shares; // will be populated from the s table
         }
 
+        if (!(f.fav | 0)) {
+            delete f.fav;
+        }
+        if (!(f.lbl | 0)) {
+            delete f.lbl;
+        }
+
         if (f.p) {
             t.p = f.p;
             delete f.p;
@@ -817,6 +824,9 @@ FMDB.prototype.stripnode = Object.freeze({
         if (!f.tf) delete f.tf;
         if (!f.tvf) delete f.tvf;
         if (!f.tvb) delete f.tvb;
+        if (!(f.lbl | 0)) {
+            delete f.lbl;
+        }
         return t;
     },
 

@@ -239,6 +239,12 @@ function init_page() {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
 
+    // Check if we should show browser update page.
+    if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
+        localStorage.prevPage = page;
+        window.location = (is_extension ? '' : '/') + 'update.html';
+    }
+
     // If they are transferring from mega.co.nz
     if (page.substr(0, 13) == 'sitetransfer!') {
 
@@ -1679,14 +1685,16 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
-        if (localStorage.voucher) {
+        if (localStorage.voucher && u_type > 2) {
+            // To complete the redeem voucher process after user logs in if the voucher code exists
             parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
             redeem.init();
         }
         else {
             // No voucher found, ask to enter it.
+            // Or back to the voucher redeem page without completion of login or register if entered code before
             parsepage(pages.redeem);
-            redeem.setupVoucherInputbox();
+            redeem.setupVoucherInputbox(localStorage.voucher);
         }
     }
 
@@ -2300,7 +2308,7 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click', function (e) {
+    $('#pageholder, #startholder').rebind('click.hidetopmenu', function(e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }
@@ -2428,6 +2436,9 @@ function topmenuUI() {
             }
             else if (className.indexOf('logout') > -1) {
                 mLogout();
+            }
+            else if (className.indexOf('transparency') > -1) {
+                window.open('https://mega.nz/Mega_Transparency_Report_201909.pdf', '_blank');
             }
         }
         return false;
@@ -2638,8 +2649,11 @@ function topmenuUI() {
         notify.init();
     }
 
-    if (!is_mobile && u_type === 3) {
-        if (mega.ui.passwordReminderDialog) {
+    if (u_type === 3 && mega.ui.passwordReminderDialog) {
+        if (is_mobile) {
+            mega.ui.passwordReminderDialog.prepare();
+        }
+        else {
             mega.ui.passwordReminderDialog.onTopmenuReinit();
         }
     }

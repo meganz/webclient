@@ -744,9 +744,10 @@ var showUpdatePage = function() {
     'use strict';
 
 
-    // Temperary update for disable showing updatepage feature for IE11 as requested from Management team.
-    // Please remove this when we made decision to show it again.
-    return false;
+    // Always show the site update page for IE11 users except for public links only
+    if (isPublicLink(page)) {
+        return false;
+    }
 
     var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
 
@@ -2270,6 +2271,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/developersettings.js', n: 'developersettings_js', j:1 });
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
+    jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2302,7 +2304,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
-        jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});

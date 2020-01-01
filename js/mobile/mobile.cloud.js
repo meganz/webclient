@@ -386,6 +386,10 @@ mobile.cloud = {
 
                 // Render a file
                 $nodeTemplate = this.updateFileTemplate($fileTemplateSelector, node);
+
+                if (node.tvf) {
+                    $nodeTemplate.addClass('versions');
+                }
             }
 
             // If this is an undecryptable node

@@ -70,6 +70,7 @@ mobile.backup = {
                     // If it succeeded, show a toast message
                     if (success) {
                         mobile.showToast(l[8836]);    // Recovery Key copied to clipboard
+                        mBroadcaster.sendMessage('keyexported');
                     }
                     else {
                         // Otherwise tell them to copy manually

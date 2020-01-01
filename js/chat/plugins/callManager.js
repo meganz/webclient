@@ -1310,10 +1310,17 @@ CallManagerCall.prototype.onLocalMediaObtained = function () {
     self.room.trackDataChange();
 };
 
-CallManagerCall.prototype.onLocalMediaFail = function () {
+CallManagerCall.prototype.onLocalMediaFail = function (what, err) {
     var self = this;
     $('.camera-access').addClass('hidden');
     self.room.trackDataChange();
+    var deviceMsg;
+    if (what & Av.Audio) {
+        deviceMsg = (what & Av.Video) ? l[10372] : l[22096];
+    } else if (what & Av.Video) {
+        deviceMsg = l[22186];
+    }
+    showToast("warning", deviceMsg + ".<br/>" + l[22185]);
 };
 
 CallManagerCall.prototype.muteAudio = function () {

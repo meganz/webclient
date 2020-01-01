@@ -36,6 +36,13 @@ function isjQuery(node) {
     return id && id.name.startsWith('$');
 }
 
+function dump(what) {
+    if (typeof what !== 'string') {
+        what = require('util').inspect(what);
+    }
+    process.stderr.write(what + '\n');
+}
+
 module.exports = {
     'hints': {
         meta: {
@@ -69,7 +76,10 @@ module.exports = {
                 Identifier(node) {
                     // Enforce the use of toArray.apply(null, arguments)
                     if (node.name === "arguments" && xpath(node, 'parent/callee/property/name') !== 'apply') {
-                        context.report(node, 'The `arguments` object must not be passed or leaked anywhere.');
+                        // do not complain about safe arguments.length usages
+                        if (xpath(node, 'parent/property/name') !== 'length') {
+                            context.report(node, 'The `arguments` object must not be passed or leaked anywhere.');
+                        }
                     }
                 },
                 TryStatement(node) {

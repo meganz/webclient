@@ -377,7 +377,6 @@
         if ($.nodeSaveAs) {
             items = [$.nodeSaveAs.h];
             names[$.nodeSaveAs.h] = $.nodeSaveAs.name || '';
-            // names[$.nodeSaveAs.h] = $('input.summary-ff-name', $dialog).val();
             $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
 
             var rowHtml = '<div class="item-row">' +

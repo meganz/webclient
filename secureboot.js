@@ -2310,7 +2310,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
         jsl.push({f:'js/fm/FileTextEditor.js', n: 'filetexteditor_js', j:1});
         jsl.push({f:'js/fm/TextEditorUI.js', n: 'texteditorui_js', j:1});
-        jsl.push({f:'html/txtEditor.html', n: 'txtEditor', j:0});
         jsl.push({f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1});
         jsl.push({f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1});
         jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2417,8 +2416,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:4,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:4,w:5,c:1,d:1,cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});

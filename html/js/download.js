@@ -517,6 +517,7 @@ function dl_g(res) {
                 }
             };
 
+            /** Function to show UI elements if textual files */
             var showTextView = function() {
                 if (isTextual(dl_node)) {
                     var $containerB = $('.download.info-block');
@@ -576,6 +577,7 @@ function dl_g(res) {
                 });
             }
             else {
+                // if it's textual file, then handle the UI.
                 showTextView();
             }
 

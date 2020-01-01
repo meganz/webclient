@@ -158,7 +158,13 @@ mega.textEditorUI = new function() {
         }
     };
 
-
+    /**
+     * Setup and init Text editor.
+     * @param {String} fName        File name
+     * @param {String} txt          File textual content
+     * @param {String} handle       Node handle
+     * @param {Boolean} isReadonly  Flag to open Editor in read-only mode
+     */
     this.setupEditor = function(fName, txt, handle, isReadonly) {
         'use strict';
         init();
@@ -197,9 +203,14 @@ mega.textEditorUI = new function() {
         fileName = fName;
     };
 
+    /**
+     * Check if the file content has been changed and show a message if so
+     * @param {String} msg          Message to show if file content is changed
+     * @param {String} submsg       sub-message to show if file content is changed
+     * @param {Function} callback   callback function to be called if file is not changed or user ignored changes.
+     */
     var validateAction = function(msg, submsg, callback) {
         'use strict';
-        // if (savedFileData !== editor.getValue()) {
         if (savedFileData && !$('.buttons-holder .save-btn', $editorContianer).hasClass('disabled')) {
             msgDialog('confirmation', '', msg,
                 submsg,

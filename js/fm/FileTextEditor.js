@@ -97,7 +97,11 @@ mega.filesEditor = new function FileTextEditor() {
         return operationPromise;
     };
 
-
+    /**
+     * Set file's data (save it)
+     * @param {String} handle           Node's handle
+     * @param {String} content          Text content to be saved
+     */
     this.setFile = function(handle, content) {
         var operationPromise = new MegaPromise();
 
@@ -128,7 +132,13 @@ mega.filesEditor = new function FileTextEditor() {
         return operationPromise;
     };
 
-
+    /**
+     * Save text file As
+     * @param {String} newName          New name
+     * @param {String} directory        Destination handle
+     * @param {String} content          Text content to be saved
+     * @param {String} nodeToSaveAs     Original node's handle
+     */
     this.saveFileAs = function(newName, directory, content, nodeToSaveAs) {
         var operationPromise = new MegaPromise();
 
@@ -141,6 +151,7 @@ mega.filesEditor = new function FileTextEditor() {
         }
         
         loadingDialog.show();
+        // if content is not changed, then do a copy operation with new name
         if (typeof content === 'undefined' || content === null) {
             if (typeof nodeToSaveAs === 'string') {
                 nodeToSaveAs = M.d[nodeToSaveAs];
@@ -162,6 +173,7 @@ mega.filesEditor = new function FileTextEditor() {
 
             M.copyNodes([nodeToSaveAs], directory, null, operationPromise, opTree);
         }
+        // if content changed then do upload operation
         else {
             var fType = filemime(newName);
             var nFile = new File([content], newName, { type: fType });
@@ -182,7 +194,10 @@ mega.filesEditor = new function FileTextEditor() {
         return operationPromise;
     };
 
-
+    /**
+     * Remove previously created version, this is used when users do multiple saves to the same file.
+     * @param {String} handle       Node's handle
+     */
     this.removeOldVersion = function(handle) {
         api_req({ a: 'd', n: handle, v: 1 });
     };
@@ -194,13 +209,8 @@ mega.filesEditor = new function FileTextEditor() {
         }
     };
 
-    this.prepareTextEditoFrame = function(iframe) {
-        var iframeHtml = window['txtEditor'];
-    }
-
-
     /**
-     * Check if the node is for a textual file
+     * Global function to Check if the node is for a textual file
      * @param {MegaData} node       The node to check
      */
     window.isTextual = function(node) {

@@ -175,12 +175,6 @@
     width: 21px;
     margin-right: 8px;
 }
-/*.context .small-icon.conversations {
-    margin-right: 8px;
-    background-image: url(../images/mega/send_to_contact_ico.svg);
-    background-position: -1px -4px;
-    width: 23px;
-}*/
 .small-icon.refresh-circle {
     background-position: -4px -2074px;
 }
@@ -1181,15 +1175,12 @@
     background-position: -101px -499px;
 }
 .small-icon.context.labels, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.labels {
-    /*background-position: -111px -2103px;*/
     background-position: -101px -99px;
 }
 .small-icon.context.download {
-    /*background-position: -144px -2103px;*/
     background-position: -101px -138px;
 }
 .small-icon.context.get-link {
-    /*background-position: -174px -2103px;*/
     background-position: -200px -133px;
     width: 22px;
     margin: 6px 13px 1px -1px;
@@ -1237,17 +1228,14 @@
     background-position: -1px -365px;
 }
 .small-icon.context.writing-pen {
-    /*background-position: -208px -2103px;*/
     background-position: -202px -226px;
 }
 .small-icon.context.position-arrows {
-    /*background-position: -8px -2139px;*/
     background-position: -200px -258px;
     width: 22px;
     margin: 6px 13px 1px -1px;
 }
 .small-icon.context.cloned-files {
-    /*background-position: -47px -2137px;*/
     background-position: -202px -288px;
     height: 24px;
     margin-top: 4px;
@@ -1262,7 +1250,6 @@
     background-position: -201px -461px;
 }
 .small-icon.context.remove-to-bin {
-    /*background-position: -78px -2140px;*/
     background-position: -200px -322px;
     width: 22px;
     margin: 6px 13px 1px -1px;
@@ -1277,7 +1264,6 @@
     background-position: -2px -1071px;
 }
 .small-icon.context.info {
-    /*background-position: -45px -2103px;*/
     background-position: -202px -71px;
 }
 .small-icon.context.clock {
@@ -1289,7 +1275,6 @@
     margin: 6px 13px 1px 0px;
 }
 .small-icon.context.heart, .txt-hovers .dropdown-item:not(.static):hover .small-icon.context.heart {
-    /*background-position: -78px -2103px;*/
     background-position: -202px -499px;
 }
 .small-icon.context.broken-heart {

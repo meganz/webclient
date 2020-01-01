@@ -2845,6 +2845,7 @@ function loadSubPage(tpage, event) {
     }
 
     if (window.textEditorVisible) {
+        // if we are loading a page and text editor was visible, then hide it.
         mega && mega.textEditorUI && mega.textEditorUI.doClose();
     }
 

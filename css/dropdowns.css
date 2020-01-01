@@ -146,8 +146,6 @@
 .dropdown.body .dropdown-item {
     position: relative;
     z-index: 10;
-    /*border: 1px solid rgba(0,0,0,0.00);
-    border-radius: 4px;*/
 }
 .dropdown-white-arrow {
     display: none;
@@ -269,9 +267,6 @@
 .dropdown-item:not(.static):hover, .dropdown-item.opened {
     background-color: #AAAAAA;
     color: white;
-    /*background-color: #f1f1f196;
-    border: 1px solid rgba(0,0,0,0.07);
-    border-radius: 4px;*/
 }
 .txt-hovers .dropdown-item:not(.static):hover, .dropdown-item.active {
     background-color: transparent;

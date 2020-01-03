@@ -1521,8 +1521,8 @@
     "16312": "Ihnen geht der Speicherplatz aus.",
     "16313": "[A]Wechseln Sie jetzt[\/A] zu einem [S]PRO Lite[\/S]-Plan und vergessen Sie vor\u00fcbergehend Ihre Speicherplatzsorgen! [S]F\u00fcr %1\u20ac pro Monat erhalten Sie 200 GB Speicherplatz[\/S] und 1 TB Transfervolumen.",
     "16314": "Sie k\u00f6nnen zus\u00e4tzlichen Speicherplatz und Transfervolumen durch unser Bonusprogramm verdienen.",
-    "16315": "[S]Ihr Account hat sein Speicherlimit erreicht.[\/S] Mit [A]MEGA PRO[\/A] erhalten Sie [S]bis zu 8 TB (8192 GB)[\/S] Speicherplatz in der Cloud.",
-    "16316": "[S]Ihr Cloud Drive ist fast voll.[\/S] [A]Wechseln Sie jetzt[\/A] auf einen PRO-Plan und erhalten Sie [S]bis zu 8 TB (8192 GB)[\/S] Speicherplatz in der Cloud.",
+    "16315": "[S]Your Cloud Drive is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to %@ TB (%@ GB)[\/S] of cloud storage space.",
+    "16316": "[S]Your Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to %@ TB (%@ GB)[\/S] of cloud storage space.",
     "16317": "Der eingeladene Benutzer muss einen kostenlosen MEGA-Account erstellen und [S]mindens eine unserer Apps installieren und nutzen[\/S] (MEGAsync oder eine unserer Mobil-Apps)",
     "16318": "Sie k\u00f6nnen den oder die eingeladenen Benutzer mit Mitteln Ihrer Wahl von einer Registrierung \u00fcberzeugen. Sie erhalten den Bonus, sofern sich der Benutzer nach Ihrer Einladung mit der von Ihnen angegebenen E-Mail-Adresse bei uns anmeldet.",
     "16319": "E-Mail-Adresse(n) Ihrer Freunde:",
@@ -3353,8 +3353,9 @@
     "22157": "Eigent\u00fcmer:",
     "22158": "Aktive Transfers anzeigen",
     "22159": "Abgeschlossene Transfers anzeigen",
-    "22185": "M\u00f6gliche Gr\u00fcnde: Zugriffskonflikt, keine Erlaubnis oder ein Konfigurationsfehler. In manchen F\u00e4llen hilft ein Reboot.",
+    "22185": "You may have disallowed access to the device(s) when the call was started or answered, there may be access conflict with another application, or a configuration problem. If you have granted access rights after joining\/starting the call, you may need to hang up and re-join or re-start the call. If the issue persists, you can also try restarting your computer.",
     "22186": "Fehler beim Zugriff auf Ihre Kamera",
+    "22188": "Video automatisch abspielen",
     "22667": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22668": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22669": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don\u2019t worry about running out of storage. [S]For \u20ac%1 a month you get %2 of storage[\/S] and %3 of transfer quota.",
@@ -3362,5 +3363,8 @@
     "22671": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]%1[\/S] of cloud storage space.",
     "22672": "Cloud Drive is almost full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
     "22673": "Cloud Drive is full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
-    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files."
+    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files.",
+    "22676": "Visual Basic Source Code",
+    "22677": "Swift Source Code",
+    "22681": "Transparency Report"
 }

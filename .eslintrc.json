@@ -183,6 +183,7 @@
         "unicorn/no-unsafe-regex": 2,
         "unicorn/prefer-dataset": 2,
         "unicorn/prefer-event-key": 1,
+        "unicorn/prefer-modern-dom-apis": 2,
         "unicorn/prefer-starts-ends-with": 2,
         "unicorn/prefer-text-content": 2,
         "unicorn/regex-shorthand": 2,

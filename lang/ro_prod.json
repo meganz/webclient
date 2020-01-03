@@ -1521,8 +1521,8 @@
     "16312": "Se pare c\u0103 r\u0103m\u00e2i f\u0103r\u0103 spa\u021biu de stocare.",
     "16313": "[A]Upgradeaz\u0103 acum[\/A] la un cont [S]PRO Lite[\/S] \u0219i nu-\u021bi f\u0103 griji despre epuizarea spa\u021biului de stocare. [S]Pentru %1\u20ac pe lun\u0103 prime\u0219ti 200 GB spa\u021biu de stocare[\/S] \u0219i 1 TB cot\u0103 de transfer.",
     "16314": "Po\u021bi debloca mai mult spa\u021biu de stocare gratuit \u0219i cot\u0103 de transfer prin \u00eendeplinirea mai multor realiz\u0103ri.",
-    "16315": "[S]Contul t\u0103u este plin.[\/S] [A]Upgradeaz\u0103 acum[\/A] la un cont PRO \u0219i ob\u021bine [S]p\u00e2n\u0103 la 8 TB (8192 GB)[\/S] spa\u021biu de stocare \u00een cloud.",
-    "16316": "[S]Unitatea cloud este aproape plin\u0103.[\/S] [A]Upgradeaz\u0103 acum[\/A] la un cont PRO \u0219i ob\u021bine [S]p\u00e2n\u0103 la 8 TB (8192 GB)[\/S] spa\u021biu de stocare \u00een cloud.",
+    "16315": "[S]Your Cloud Drive is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to %@ TB (%@ GB)[\/S] of cloud storage space.",
+    "16316": "[S]Your Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]up to %@ TB (%@ GB)[\/S] of cloud storage space.",
     "16317": "Prietenul t\u0103u trebuie s\u0103 se \u00eenregistreze pentru un cont gratuit pe MEGA \u0219i [S]s\u0103 instaleze cel pu\u021bin un client MEGA[\/S] (fie clientul de sincronizare, fie una dintre aplica\u021biile noastre mobile)",
     "16318": "Po\u021bi s\u0103 \u00ee\u021bi informezi prietenul prin orice metod\u0103. Vei c\u00e2\u0219tiga cota dac\u0103 ai introdus e-mailul prietenului t\u0103u aici \u00eenainte de a se \u00eenregistra cu acea adres\u0103.",
     "16319": "Introdu e-mailul(urile) prietenului:",
@@ -3353,8 +3353,9 @@
     "22157": "Proprietar:",
     "22158": "Vezi transferurile \u00een curs",
     "22159": "Vezi transferurile \u00eencheiate",
-    "22185": "You may have disallowed access to the device(s) when the call was started or answered, there may be access conflict with another application, or a configuration problem. If you have granted access rights after joining\/starting the call, you may need to hang up and re-join or re-start the call. If nothing else helps, you can also try restarting your computer.",
+    "22185": "You may have disallowed access to the device(s) when the call was started or answered, there may be access conflict with another application, or a configuration problem. If you have granted access rights after joining\/starting the call, you may need to hang up and re-join or re-start the call. If the issue persists, you can also try restarting your computer.",
     "22186": "There was an error accessing your camera",
+    "22188": "Autoplay this video",
     "22667": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22668": "[S]Cloud Drive is almost full.[\/S] [A]Upgrade now[\/A] and get [S]up to %1[\/S] of cloud storage space.",
     "22669": "[A]Upgrade now[\/A] to a [S]PRO Lite[\/S] account and don\u2019t worry about running out of storage. [S]For \u20ac%1 a month you get %2 of storage[\/S] and %3 of transfer quota.",
@@ -3362,5 +3363,8 @@
     "22671": "[S]Your account is full.[\/S] [A]Upgrade now[\/A] to a PRO account and get [S]%1[\/S] of cloud storage space.",
     "22672": "Cloud Drive is almost full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
     "22673": "Cloud Drive is full. Upgrade to PRO and get up to %1 of storage and %2 of transfer quota.",
-    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files."
+    "22674": "[A]Upgrade now[\/A] and keep enjoying secure, end-to-end encrypted cloud storage. PRO accounts get [S]up to %1 of storage[\/S] and %2 of transfer quota that they can share with users downloading their files.",
+    "22676": "Visual Basic Source Code",
+    "22677": "Swift Source Code",
+    "22681": "Transparency Report"
 }

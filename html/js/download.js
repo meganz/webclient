@@ -521,16 +521,26 @@ function dl_g(res) {
             var showTextView = function() {
                 if (isTextual(dl_node)) {
                     var $containerB = $('.download.info-block');
-                    var $viewBtns = $containerB.find('.file-type-wrapper, .txt-view-button');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
 
                     $viewBtns.addClass('clickable').removeClass('hidden')
                         .rebind('click', function() {
                             loadingDialog.show();
 
-                            mega.filesEditor.getFile(dl_node.link, true).done(
+                            mega.filesEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
                                 function(data) {
                                     loadingDialog.hide();
-                                    mega.textEditorUI.setupEditor(dl_node.name, data, dl_node.h, true);
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info');
+
+                                        fName = $fileinfoBlock.find('.big-txt').attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
                                 }
                             ).fail(function() {
                                 loadingDialog.hide();

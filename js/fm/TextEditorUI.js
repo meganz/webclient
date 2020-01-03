@@ -3,11 +3,9 @@
  * UI Controller to handle operations on the UI of text Editor
  * */
 mega.textEditorUI = new function() {
+    "use strict";
+    var $myTextarea;
 
-    var myTextarea;
-
-    var setFunction;
-    var remFunction;
     var fileHandle;
     var versionHandle;
     var fileName;
@@ -27,7 +25,7 @@ mega.textEditorUI = new function() {
         }
 
         $containerDialog = $('.txt-editor-frame');
-        $editorContianer = $containerDialog.find('#mega-text-editor');
+        $editorContianer = $('#mega-text-editor', $containerDialog);
 
 
         $('.txt-editor-menu', $editorContianer).off('click').on('click',
@@ -122,19 +120,22 @@ mega.textEditorUI = new function() {
             $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
         });
 
-        $('.editor-btn-container .send-contact-f', $editorContianer).off('click').on('click', function sendToContactMenuClick() {
-            $('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
-        });
+        $('.editor-btn-container .send-contact-f', $editorContianer).off('click').on('click',
+            function sendToContactMenuClick() {
+                $('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
+            }
+        );
 
         $('.editor-btn-container .print-f', $editorContianer).off('click').on('click', printText);
 
-        $('.editor-btn-container .txt-editor-download-btn', $editorContianer).off('click').on('click', function downloadBtnClicked() {
-
-            validateAction(l[22750], l[22753],
-                function() {
-                    M.saveAs(savedFileData, fileName);
-                });
-        });
+        $('.editor-btn-container .txt-editor-download-btn', $editorContianer).off('click').on('click',
+            function downloadBtnClicked() {
+                validateAction(l[22750], l[22753],
+                    function() {
+                        M.saveAs(savedFileData, fileName);
+                    });
+            }
+        );
 
         initialized = true;
 
@@ -171,9 +172,9 @@ mega.textEditorUI = new function() {
         $containerDialog.removeClass('hidden');
         addingFakeHistoryState();
         window.textEditorVisible = true;
-        myTextarea = $('#txtar', $editorContianer);
+        $myTextarea = $('#txtar', $editorContianer);
         if (!editor) {
-            editor = CodeMirror.fromTextArea(myTextarea[0], {
+            editor = CodeMirror.fromTextArea($myTextarea[0], {
                 lineNumbers: true,
                 scrollbarStyle: "overlay"
             });
@@ -225,7 +226,7 @@ mega.textEditorUI = new function() {
         }
     };
 
-    var selectedItemOpen = function () {
+    var selectedItemOpen = function() {
         'use strict';
         var openFile = function() {
             history.back();
@@ -238,15 +239,17 @@ mega.textEditorUI = new function() {
 
     var printText = function() {
         'use strict';
-        var mywindow = window.open('', fileName, 'height=600,width=800');
+        var mywindow = window.open('', escapeHTML(fileName), 'height=600,width=800');
 
-        mywindow.document.write('<html><head><title>' + fileName + '</title>');
+        mywindow.document.write('<html><head><title>' + escapeHTML(fileName) + '</title>');
         mywindow.document.write('</head><body >');
-        mywindow.document.write('<pre>' + editor.getValue() + '</pre>');
+        var textContent = mywindow.document.createElement('pre');
+        textContent.textContent = editor.getValue();
+        mywindow.document.write(textContent.innerHTML);
         mywindow.document.write('</body></html>');
 
         mywindow.document.close();
-        mywindow.focus()
+        mywindow.focus();
         mywindow.print();
         mywindow.close();
         return true;

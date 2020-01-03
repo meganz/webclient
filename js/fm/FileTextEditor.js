@@ -4,6 +4,7 @@
 */
 
 mega.filesEditor = new function FileTextEditor() {
+    "use strict";
     // the maximum slots in memory for edited files
     // we have the maximum editable file size = 20MB --> max Total = 100MB
     var maxFilesInMemory = 5;
@@ -18,7 +19,7 @@ mega.filesEditor = new function FileTextEditor() {
      * @param {String} handle       Node handle
      * @param {String} data         File data
      */
-    var storeFileData = function(handle,data) {
+    var storeFileData = function(handle, data) {
 
         // store the data in memory
         filesDataMap[handle] = data;
@@ -30,8 +31,8 @@ mega.filesEditor = new function FileTextEditor() {
         // reserve the slot
         slotsMap[slotIndex++] = handle;
 
-        // round-robin 
-        if (slotIndex > 4) {
+        // round-robin
+        if (slotIndex > (maxFilesInMemory - 1)) {
             slotIndex = 0;
         }
     };
@@ -149,7 +150,7 @@ mega.filesEditor = new function FileTextEditor() {
             }
             return operationPromise.reject();
         }
-        
+
         loadingDialog.show();
         // if content is not changed, then do a copy operation with new name
         if (typeof content === 'undefined' || content === null) {

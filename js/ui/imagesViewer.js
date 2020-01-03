@@ -576,7 +576,7 @@ var slideshowid;
     /** Adding the current page to history if needed to preserve navigation correctness */
     global.addingFakeHistoryState = function() {
         // then pushing fake states of history/hash
-        if (!hashLogic ) {
+        if (!hashLogic) {
             var isSearch = page.indexOf('fm/search/');
             if (isSearch >= 0) {
                 var searchString = page.substring(isSearch + 10);

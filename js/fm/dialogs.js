@@ -1600,13 +1600,13 @@
 
             if ($.nodeSaveAs) {
                 var $nameInput = $('#f-name-input', $dialog);
-                var saveAsName = $nameInput.val();
+                var saveAsName = $.trim($nameInput.val());
 
                 var removeErrorStyling = function() {
                     $nameInput.removeClass('error');
                     $dialog.removeClass('duplicate');
                     $nameInput.off('input');
-                }
+                };
 
                 if (!M.isSafeName(saveAsName)) {
                     // ui things
@@ -1645,7 +1645,6 @@
                         }
                     }
                 );
-                
                 return false;
             }
 
@@ -1655,7 +1654,6 @@
                 saveToDialogCb(saveToDialogNode, section === 'conversations' && chats || $.mcselected);
                 return false;
             }
-            
 
             // Get active tab
             if (section === 'cloud-drive' || section === 'folder-link' || section === 'rubbish-bin') {

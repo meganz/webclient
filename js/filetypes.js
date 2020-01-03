@@ -521,6 +521,7 @@ function filemime(n, def) {
  * @param {Boolean} getFullType     Optional to return full detailed array of the type
  */
 function filetype(n, getFullType) {
+    "use strict";
     if (typeof n === 'object') {
         n = n.name;
     }

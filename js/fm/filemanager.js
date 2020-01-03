@@ -1577,8 +1577,6 @@ FileManager.prototype.initContextUI = function() {
         ).fail(function() {
             loadingDialog.hide();
         });
-
-        
     });
 
     $(c + '.properties-versions').rebind('click', function() {
@@ -2064,8 +2062,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
                 if (node.s >= 20971520) {
                     return false;
                 }
-                //var fType = filetype(node, true)[0];
-                //if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+
                 if (isTextual(node)) {
                     return true;
                 }

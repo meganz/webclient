@@ -1403,6 +1403,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
  * @return {MegaPromise} megaPromise to be resolved/rejected once the operation is finished.
  */
 MegaData.prototype.addNewFile = function(fileName, dest) {
+    'use strict';
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
 

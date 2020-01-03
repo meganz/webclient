@@ -2857,7 +2857,7 @@ function createFileDialog(close, action, params) {
                     if ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 ||
                         $.selectddUIgrid.indexOf('.file-block-scrolling') > -1) {
                         var $grid = $($.selectddUIgrid);
-                        var $newElement = $grid.find('#' + nh);
+                        var $newElement = $('#' + nh, $grid);
 
                         var jsp = $grid.data('jsp');
                         if (jsp) {
@@ -2865,7 +2865,7 @@ function createFileDialog(close, action, params) {
                         }
                         else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
                             M.megaRender.megaList.scrollToItem(nh);
-                            $newElement = $grid.find('#' + nh);
+                            $newElement = $('#' + nh, $grid);
                         }
 
                         // now let's select the item. we can not use the click handler due
@@ -2892,6 +2892,8 @@ function createFileDialog(close, action, params) {
 
     var doCreateFile = function(v) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
+
+        v = $.trim(v);
 
         if (!M.isSafeName(v)) {
             $dialog.removeClass('active');

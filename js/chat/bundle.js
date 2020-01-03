@@ -7631,6 +7631,11 @@ function (_MegaRenderMixin2) {
                     if (!n.h || n.h.length === 11) {
                         return;
                     }
+                    if (self.props.customFilterFn) {
+                        if (!self.props.customFilterFn(n)) {
+                            return;
+                        }
+                    }
                     entries.push(n);
                 })
         }

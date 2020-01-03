@@ -309,7 +309,7 @@
     position: fixed;
     z-index: 1120;
 }
-#mega-text-editor .top-menu-popup .txt-editor-sp-menu {
+#mega-text-editor .top-menu-popup-editor .txt-editor-sp-menu {
     height: 1px;
     opacity: 0.1;
     background-color: #000000;

@@ -2848,11 +2848,35 @@ function createFileDialog(close, action, params) {
         action = function(name, t) {
             loadingDialog.pshow();
             M.addNewFile(name, t)
-                .done(function() {
+                .done(function(nh) {
                     if (d) {
                         console.log('Created new file %s->%s', t, name);
                     }
                     loadingDialog.phide();
+
+                    if ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 ||
+                        $.selectddUIgrid.indexOf('.file-block-scrolling') > -1) {
+                        var $grid = $($.selectddUIgrid);
+                        var $newElement = $grid.find('#' + nh);
+
+                        var jsp = $grid.data('jsp');
+                        if (jsp) {
+                            jsp.scrollToElement($newElement);
+                        }
+                        else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                            M.megaRender.megaList.scrollToItem(nh);
+                            $newElement = $grid.find('#' + nh);
+                        }
+
+                        // now let's select the item. we can not use the click handler due
+                        // to redraw if element was out of viewport.
+                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+                        $newElement.addClass('ui-selected');
+                        $.gridLastSelected = $newElement;
+                        selectionManager.clear_selection();
+                        selectionManager.add_to_selection(nh);
+
+                    }
 
                 })
                 .fail(function(error) {

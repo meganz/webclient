@@ -987,6 +987,11 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
                     if (!n.h || n.h.length === 11) {
                         return;
                     }
+                    if (self.props.customFilterFn) {
+                        if (!self.props.customFilterFn(n)) {
+                            return;
+                        }
+                    }
                     entries.push(n);
                 })
         }

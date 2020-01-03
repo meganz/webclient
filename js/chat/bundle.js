@@ -15631,7 +15631,7 @@ function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototype
 
 var ENABLE_GROUP_CALLING_FLAG = true; // eslint-disable-next-line id-length
 
-var MAX_USERS_CHAT_PRIVATE_AND_ADD = 100;
+var MAX_USERS_CHAT_PRIVATE = 100;
 var conversationpanel_JoinCallNotification =
 /*#__PURE__*/
 function (_MegaRenderMixin) {
@@ -15712,18 +15712,11 @@ function (_MegaRenderMixin2) {
       var currentContacts = M.u;
       var foundNonMembers = 0;
       currentContacts.forEach(function (u, k) {
-        if (u.c === 1) {
-          if (participants.indexOf(k) === -1) {
-            foundNonMembers++;
-          }
+        if (u.c === 1 && participants.indexOf(k) === -1) {
+          foundNonMembers++;
         }
       });
-
-      if (foundNonMembers > 0) {
-        return false;
-      } else {
-        return true;
-      }
+      return foundNonMembers <= 0;
     }
   }, {
     key: "render",
@@ -15865,7 +15858,7 @@ function (_MegaRenderMixin2) {
         className: "link-button green light",
         icon: "rounded-plus colorized",
         label: __(l[8007]),
-        disabled: Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ||
+        disabled:
         /* Disable in case I don't have any more contacts to add ... */
         !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
       }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
@@ -16012,9 +16005,9 @@ function (_MegaRenderMixin2) {
       }, external_React_default.a.createElement("div", {
         className: "chat-button-seperator"
       }), external_React_default.a.createElement("div", {
-        className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ? " disabled" : ""),
+        className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ? " disabled" : ""),
         onClick: function onClick(e) {
-          if (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD || $(e.target).closest('.disabled').length > 0) {
+          if (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE || $(e.target).closest('.disabled').length > 0) {
             return false;
           }
 

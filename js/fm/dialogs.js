@@ -624,6 +624,10 @@
                         if (!chatRoom.topic) {
                             ChatdIntegration._ensureContactExists(chatRoom.members);
                             for (var grHandle in chatRoom.members) {
+                                if (gNames.length > 4) {
+                                    break;
+                                }
+
                                 if (grHandle !== u_handle) {
                                     gNames.push(M.getNameByHandle(grHandle));
                                 }

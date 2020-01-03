@@ -28,7 +28,7 @@ import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 var ENABLE_GROUP_CALLING_FLAG = true;
 
 // eslint-disable-next-line id-length
-var MAX_USERS_CHAT_PRIVATE_AND_ADD = 100;
+var MAX_USERS_CHAT_PRIVATE = 100;
 
 export class JoinCallNotification extends MegaRenderMixin {
     componentDidUpdate() {
@@ -79,19 +79,12 @@ export class ConversationRightArea extends MegaRenderMixin {
         var currentContacts = M.u;
         var foundNonMembers = 0;
         currentContacts.forEach(function(u, k) {
-            if (u.c === 1) {
-                if (participants.indexOf(k) === -1) {
-                    foundNonMembers++;
-                }
+            if (u.c === 1 && participants.indexOf(k) === -1) {
+                foundNonMembers++;
             }
         });
 
-        if (foundNonMembers > 0) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return foundNonMembers <= 0;
     }
     render() {
         const self = this;
@@ -240,7 +233,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                     icon="rounded-plus colorized"
                     label={__(l[8007])}
                     disabled={
-                        Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ||
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
                             !self.allContactsInChat(excludedParticipants) &&
@@ -428,13 +420,13 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             <div className="chat-button-seperator"></div>
                                             <div className={
                                                 "link-button light " +
-                                                (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE_AND_ADD ?
+                                                (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ?
                                                     " disabled" : "")
                                             }
                                             onClick={(e) => {
                                                 if (
                                                     Object.keys(room.members).length >
-                                                    MAX_USERS_CHAT_PRIVATE_AND_ADD ||
+                                                    MAX_USERS_CHAT_PRIVATE ||
                                                     $(e.target).closest('.disabled').length > 0
                                                 ) {
                                                     return false;

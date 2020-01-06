@@ -245,7 +245,7 @@ mega.textEditorUI = new function() {
         mywindow.document.write('</head><body >');
         var textContent = mywindow.document.createElement('pre');
         textContent.textContent = editor.getValue();
-        mywindow.document.write(textContent.innerHTML);
+        mywindow.document.write(textContent.outerHTML);
         mywindow.document.write('</body></html>');
 
         mywindow.document.close();

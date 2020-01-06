@@ -83,10 +83,17 @@ mega.filesEditor = new function FileTextEditor() {
             if (data.buffer === null) {
                 return operationPromise.reject();
             }
+            var bData = new Blob([data.buffer], { type: "text/plain" });
+            var binaryReader = new FileReader();
 
-            storeFileData(handle, ab_to_str(data.buffer));
 
-            operationPromise.resolve(filesDataMap[handle]);
+            binaryReader.addEventListener('loadend', function(e) {
+                var text = e.srcElement.result;
+                storeFileData(handle, text);
+                operationPromise.resolve(filesDataMap[handle]);
+            });
+            binaryReader.readAsText(bData);
+
         }).fail(function(ev) {
             if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
                 dlmanager.setUserFlags();

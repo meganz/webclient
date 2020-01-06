@@ -388,6 +388,12 @@
                 + l[17578] + '</span> </div>';
 
             $div.safeHTML(rowHtml);
+
+            $('#f-name-input', $div).off('keydown').on('keydown', function(e) {
+                if (e.which === 13 || e.keyCode === 13) {
+                    $('.dialog-picker-button', $dialog).trigger('click');
+                }
+            });
         }
         else {
             for (var i = 0; i < items.length; i++) {
@@ -1088,8 +1094,9 @@
 
     /**
      * Save As dialog show
-     * @param {Object} node    The node to save AS
-     * @param {Function} cb    a callback to be called when the user "Save"
+     * @param {Object} node     The node to save AS
+     * @param {String} content  Content to be saved
+     * @param {Function} cb     a callback to be called when the user "Save"
      */
     global.openSaveAsDialog = function(node, content, cb) {
         M.safeShowDialog('saveAs', function() {
@@ -1608,12 +1615,15 @@
                     $nameInput.off('input');
                 };
 
+                removeErrorStyling();
+
                 if (!M.isSafeName(saveAsName)) {
                     // ui things
                     $nameInput.addClass('error');
 
                     $nameInput.off('input').on('input', function() {
                         removeErrorStyling();
+                        return false;
                     });
 
                     return false;
@@ -1625,10 +1635,16 @@
 
                     $nameInput.off('input').on('input', function() {
                         removeErrorStyling();
+                        return false;
                     });
 
                     return false;
                 }
+                $nameInput.off('input').on('input', function() {
+                    removeErrorStyling();
+                    return false;
+                });
+
                 $nameInput.off('input');
 
                 closeDialog();

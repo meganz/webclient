@@ -536,8 +536,7 @@ function dl_g(res) {
                                     }
                                     else {
                                         var $fileinfoBlock = $('.download.file-info');
-
-                                        fName = $fileinfoBlock.find('.big-txt').attr('title');
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
                                     }
 
                                     mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);

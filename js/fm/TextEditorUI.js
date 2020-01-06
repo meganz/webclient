@@ -2,7 +2,7 @@
 /**
  * UI Controller to handle operations on the UI of text Editor
  * */
-mega.textEditorUI = new function() {
+mega.textEditorUI = new function TextEditorUI() {
     "use strict";
     var $myTextarea;
 
@@ -17,9 +17,73 @@ mega.textEditorUI = new function() {
     var $containerDialog;
     var $editorContianer;
 
+
+    /**
+     * Check if the file content has been changed and show a message if so
+     * @param {String} msg          Message to show if file content is changed
+     * @param {String} submsg       sub-message to show if file content is changed
+     * @param {Function} callback   callback function to be called if file is not changed or user ignored changes.
+     */
+    var validateAction = function(msg, submsg, callback) {
+        'use strict';
+        if (savedFileData && !$('.buttons-holder .save-btn', $editorContianer).hasClass('disabled')) {
+            msgDialog('confirmation', '', msg,
+                submsg,
+                function(e) {
+                    if (e) {
+                        callback();
+                    }
+                });
+        }
+        else {
+            callback();
+        }
+    };
+
+
+    var selectedItemOpen = function() {
+        'use strict';
+        var openFile = function() {
+            history.back();
+            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        };
+
+        validateAction(l[22750], l[22754], openFile);
+
+    };
+
+    var bindChangeListner = function() {
+        'use strict';
+        var changeListner = function() {
+            $('.buttons-holder .save-btn', $editorContianer).removeClass('disabled');
+            editor.off('change', changeListner);
+        };
+
+        editor.on('change', changeListner);
+    };
+
+    var printText = function() {
+        'use strict';
+        var mywindow = window.open('', escapeHTML(fileName), 'height=600,width=800');
+
+        mywindow.document.write('<html><head><title>' + escapeHTML(fileName) + '</title>');
+        mywindow.document.write('</head><body >');
+        var textContent = mywindow.document.createElement('pre');
+        textContent.textContent = editor.getValue();
+        mywindow.document.write(textContent.outerHTML);
+        mywindow.document.write('</body></html>');
+
+        mywindow.document.close();
+        mywindow.focus();
+        mywindow.print();
+        mywindow.close();
+        return true;
+    };
+
+
+
     /** Init Controller */
     var init = function() {
-        'use strict';
         if (initialized) {
             return;
         }
@@ -35,15 +99,17 @@ mega.textEditorUI = new function() {
                 }
                 $('.top-menu-popup-editor', $editorContianer).removeClass('hidden').show();
                 return false;
-            });
+            }
+        );
 
         $editorContianer.off('click').on('click',
             function textEditorGlobalClick() {
                 $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
                 return false;
-            });
+            }
+        );
 
-        $('.buttons-holder .close-btn', $editorContianer).off('click').on('click',
+        $('.buttons-holder .close-btn, .editor-btn-container .close-f', $editorContianer).off('click').on('click',
             function textEditorCloseBtnClick() {
 
                 if (editor) {
@@ -116,9 +182,10 @@ mega.textEditorUI = new function() {
             });
         });
 
-        $('.editor-btn-container .get-link-f', $editorContianer).off('click').on('click', function getLinkFileMenuClick() {
-            $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
-        });
+        $('.editor-btn-container .get-link-f', $editorContianer).off('click').on('click',
+            function getLinkFileMenuClick() {
+                $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
+            });
 
         $('.editor-btn-container .send-contact-f', $editorContianer).off('click').on('click',
             function sendToContactMenuClick() {
@@ -139,16 +206,6 @@ mega.textEditorUI = new function() {
 
         initialized = true;
 
-    };
-
-    var bindChangeListner = function() {
-        'use strict';
-        var changeListner = function() {
-            $('.buttons-holder .save-btn', $editorContianer).removeClass('disabled');
-            editor.off('change', changeListner);
-        };
-
-        editor.on('change', changeListner);
     };
 
     this.doClose = function() {
@@ -199,60 +256,13 @@ mega.textEditorUI = new function() {
         $('.txt-editor-opened-f-name', $editorContianer).text(fName);
         $('.top-menu-popup-editor', $editorContianer).addClass('hidden').hide();
 
+        if (Array.isArray(handle)) {
+            handle = handle[0];
+        }
+
         fileHandle = handle;
         versionHandle = '';
         fileName = fName;
-    };
-
-    /**
-     * Check if the file content has been changed and show a message if so
-     * @param {String} msg          Message to show if file content is changed
-     * @param {String} submsg       sub-message to show if file content is changed
-     * @param {Function} callback   callback function to be called if file is not changed or user ignored changes.
-     */
-    var validateAction = function(msg, submsg, callback) {
-        'use strict';
-        if (savedFileData && !$('.buttons-holder .save-btn', $editorContianer).hasClass('disabled')) {
-            msgDialog('confirmation', '', msg,
-                submsg,
-                function(e) {
-                    if (e) {
-                        callback();
-                    }
-                });
-        }
-        else {
-            callback();
-        }
-    };
-
-    var selectedItemOpen = function() {
-        'use strict';
-        var openFile = function() {
-            history.back();
-            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
-        };
-
-        validateAction(l[22750], l[22754], openFile);
-
-    };
-
-    var printText = function() {
-        'use strict';
-        var mywindow = window.open('', escapeHTML(fileName), 'height=600,width=800');
-
-        mywindow.document.write('<html><head><title>' + escapeHTML(fileName) + '</title>');
-        mywindow.document.write('</head><body >');
-        var textContent = mywindow.document.createElement('pre');
-        textContent.textContent = editor.getValue();
-        mywindow.document.write(textContent.outerHTML);
-        mywindow.document.write('</body></html>');
-
-        mywindow.document.close();
-        mywindow.focus();
-        mywindow.print();
-        mywindow.close();
-        return true;
     };
 
 };

@@ -153,6 +153,7 @@ Unless otherwise noted, they were released under a [MIT License].
 [codemirror.js]: Text editor in JavaScript Ver. 5.49.2
 
 > This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+> **This is a fork**, [See the changes](https://github.com/codemirror/CodeMirror/compare/master...meganz:master)
 
 ---
 [simplescrollbars.js]: Custom scroll bar for code-mirror

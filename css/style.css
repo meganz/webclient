@@ -30294,3 +30294,16 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: -moz-calc(100% - 110px);
     height: calc(100% - 110px);
 }
+.duplication-found .file-block-scrolling {
+    height: 100%;
+    height: -webkit-calc(100% - 35px);
+    height: -moz-calc(100% - 35px);
+    height: calc(100% - 35px);
+}
+
+.select.duplication-found .file-block-scrolling {
+    height: 100%;
+    height: -webkit-calc(100% - 70px);
+    height: -moz-calc(100% - 70px);
+    height: calc(100% - 70px);
+}

@@ -1928,7 +1928,7 @@ MegaData.prototype.colourLabelcmUpdate = function(node) {
     var $items = $('.files-menu .dropdown-colour-item');
     var value;
 
-    value = node.lbl;
+    value = node.lbl | 0;
 
     // Reset label submenu
     $items.removeClass('active');
@@ -1962,11 +1962,13 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
         var prefixTree = M.currentCustomView.prefixTree || '';
+        var $treeElements = $('#treea_' + handle).add('#treea_os_' + handle).add('#treea_pl_' + handle);
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
-        $('#treea_' + prefixTree + handle).removeClass('labeled').find('.colour-label-ind').remove();
+        $treeElements.removeClass('labeled');
+        $('.colour-label-ind', $treeElements).remove();
 
         if (labelId) {
             // Add colour label classes.
@@ -1974,7 +1976,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
-            $('#treea_' + prefixTree + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
+            $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
         }
 
@@ -1991,26 +1993,20 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
             }
         }
 
-
         // make filter enable/disable depending on filter availabilty.
         $('.dropdown-section .dropdown-item-label')
             .add('.dropdown-section.filter-by .labels')
             .addClass('disabled static');
-        if (M.checkFilterAvailable()) {
+
+        if (M.isLabelExistNodeList(M.v)) {
             $('.dropdown-section .dropdown-item-label')
                 .add('.dropdown-section.filter-by .labels')
                 .removeClass('disabled static');
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            var curDir = M.currentdirid.replace('out-shares/', '').replace('public-links/', '');
-            var refresh = false;
-            if (curDir === 'public-links') {
-                if (M.v.indexOf(n) !== -1) {
-                    refresh = true;
-                }
-            }
-            if (refresh || n.p === curDir) {
+            // We only required to re-render if there is filter on the page.
+            if (M.filterLabel[M.currentCustomView.type]) {
 
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');
@@ -2031,35 +2027,50 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
  * @param {Integer} labelId Numeric value of label
  */
 MegaData.prototype.labeling = function(handles, labelId) {
-
-    var newLabelState = 0;
+    'use strict';
 
     if (fminitialized && handles) {
         if (!Array.isArray(handles)) {
             handles = [handles];
         }
 
-        $.each(handles, function(index, handle) {
-
+        for (var i = handles.length; i--;) {
+            var newLabelState = labelId | 0;
+            var handle = handles[i];
             var node = M.d[handle];
-            newLabelState = labelId;
+            if (!node) {
+                if (d) {
+                    console.warn('Node not found.', handle);
+                }
+                continue;
+            }
 
-            if (node.lbl === labelId) {
+            if (node.lbl === newLabelState) {
                 newLabelState = 0;
             }
             node.lbl = newLabelState;
+            if (!node.lbl) {
+                delete node.lbl;
+            }
+
             if (node.tvf) {
                 fileversioning.labelVersions(handle, newLabelState);
             }
+
             api_setattr(node, mRandomToken('lbl'));
 
             // sync with global tree
             if (node.t > 0) {
-                M.tree[node.p][node.h].lbl = node.lbl;
+                var tn = M.tree[node.p][node.h];
+
+                tn.lbl = node.lbl;
+                if (!tn.lbl) {
+                    delete tn.lbl;
+                }
             }
 
             M.labelDomUpdate(handle, newLabelState);
-        });
+        }
 
         M.initLabelFilter(M.v);
     }
@@ -2257,10 +2268,9 @@ MegaData.prototype.applyLabelFilter = function (e) {
 MegaData.prototype.isLabelExistNodeList = function(nodelist) {
     "use strict";
 
-    for (var i = 0; i < nodelist.length; i++) {
-        if (typeof nodelist[i] !== 'undefined'
-            && (typeof nodelist[i].lbl !== 'undefined'
-                && nodelist[i].lbl !== 0)){
+    for (var i = nodelist.length; i--;) {
+        var lbl = (nodelist[i] || {}).lbl | 0;
+        if (lbl) {
             return true;
         }
     }
@@ -2334,7 +2344,10 @@ MegaData.prototype.favourite = function(handles, newFavState) {
             var node = M.getNodeByHandle(handle);
 
             if (node && !exportLink.isTakenDown(handle)) {
-                node.fav = newFavState;
+                node.fav = newFavState | 0;
+                if (!node.fav) {
+                    delete node.fav;
+                }
                 api_setattr(node, mRandomToken('fav'));
                 if (node.tvf) {
                     fileversioning.favouriteVersions(handle, newFavState);
@@ -2615,8 +2628,8 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
 
         // check it need to clear node attribute
         if ($.clearCopyNodeAttr) {
-            n.lbl = 0;
-            n.fav = 0;
+            delete n.lbl;
+            delete n.fav;
         }
 
         // regardless to where the copy is remove rr
@@ -3929,8 +3942,8 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             $.saveToDialogPromise = reject;
 
             // Remove original fav and lbl for new node.
-            srcNode.fav = 0;
-            srcNode.lbl = 0;
+            delete srcNode.fav;
+            delete srcNode.lbl;
 
             n.a = ab_to_base64(crypto_makeattr(srcNode));
 

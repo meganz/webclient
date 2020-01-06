@@ -852,6 +852,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
+        // Special audio volume control for Safari
+        var _setVolumeForSafari = function(v) {
+            // If this is Safari and audio playing
+            if (window.webkitAudioContext && streamer.stream._audioSource) {
+                streamer.stream._audioSource.gain.value = v;
+            }
+        };
+
         // Increase/decrease video volume.
         var setVideoVolume = function(v) {
             if (videoElement.muted) {
@@ -860,6 +868,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
             $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+
+            _setVolumeForSafari(videoElement.volume);
         };
 
         // Increase/decrease color filter
@@ -1052,6 +1062,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 $this.find('span').css('height', percentage + '%');
                 videoElement.volume = percentage / 100;
+
+                _setVolumeForSafari(videoElement.volume);
             }
             else {
                 if (!videoElement.muted) {
@@ -1071,6 +1083,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 videoElement.muted = !videoElement.muted;
                 changeButtonState('mute');
                 updateVolumeBar();
+                _setVolumeForSafari(!videoElement.muted);
             }
             return false;
         });
@@ -1289,6 +1302,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         var onOverQuotaCT;
+        var videoElement = $('video', $wrapper).get(0);
 
         if (typeof destroy === 'object') {
             options = destroy;
@@ -1311,6 +1325,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                     options.filter = v.slice(-6).split(/(.{2})/).filter(String);
                 }
+                else if (k === 'a') {
+                    options.autoplay = options.preBuffer = v | 0;
+                }
+                else if (k === 'm') {
+                    options.muted = videoElement.muted = v | 0;
+                }
             });
             $.playbackOptions = null;
         }
@@ -1321,7 +1341,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 options.type = c && c[0];
             }
         }
-        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
+        var s = Streamer(node.link || node.h, videoElement, options);
 
         _initVideoControls($wrapper, s, node, options);
 
@@ -3180,6 +3200,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
 mBroadcaster.once('startMega', function isAudioContextSupported() {
     'use strict';
+
+    // Safari AudioContext polyfill for audio streaming support
+    if (!window.AudioContext && window.webkitAudioContext) {
+        window.AudioContext = window.webkitAudioContext;
+    }
 
     if ('AudioContext' in window) {
         var ctx;

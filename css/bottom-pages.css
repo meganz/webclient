@@ -4293,7 +4293,7 @@ a.opensource-icon-txt.coming-soon {
 }
 .bottom-page.grey-angle-bg {
     background-size: cover !important;
-    background-image: 
+    background-image:
         linear-gradient(transparent, transparent),
         url(../images/mega/bottom-page/grey-angle_v1.svg) !important;
 }
@@ -5700,7 +5700,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
     background-size: 600px auto;
 }
 }
-    
+
 .rtl .bottom-page.big-header, .rtl .bottom-page.small-info, .rtl .bottom-page.mid-header, .rtl .startpage.button-48-height, .rtl .startpage.square-block, .rtl .bottom-page.square-nav-button,  .rtl .bottom-page .mid-green-link, .rtl .startpage.plan-features .plan-feature, .rtl .startpage.plan-top-square, .rtl .startpage.top-notice, .rtl .startpage.top-info, .rtl .startpage.top-header, .rtl .pages-nav.content-block .button-label, .rtl .bottom-menu.link, .rtl .bottom-menu.header, .rtl .bottom-menu.company-info, .rtl .bottom-menu.copyrights {
     direction: rtl;
 }
@@ -5735,3 +5735,64 @@ body:not(.mobile) .bottom-page.unsub .tip-wrapper .underline-btn-txt {
     box-sizing: border-box;
 }
 /*end of subscription page*/
+.new-affiliate-mid-header, .new-affiliate-bot-header {
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.1px;
+    color: #3F4646;
+    font-family: 'Open Sans Semibold Italic', Arial;
+    padding: 23px 0 4px 0;
+}
+.new-affiliate-mid-header.new-affiliate-bot-pad {
+    padding: 39px 0 10px 0;
+}
+.dev-new-button {
+    height: 34px;
+    border: 2px solid #d9d9d9;
+    background-color: white;
+    cursor: pointer;
+    float: left;
+    -moz-border-radius: 5px;
+    font-size: 14px;
+    line-height: 28px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    padding: 0 30px 0 13px;
+    background-image: url(../images/mega/sdk-sprite.png);
+    background-position: right -760px;
+    background-repeat: no-repeat;
+    color: #333333;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: 'source_sans_prosemibold', Arial;
+}
+.dev-new-button:hover, .dev-new-button.active {
+    background-color: #D92E00;
+    border-color: #D92E00;
+    color: white;
+    background-position: right -830px;
+}
+.dev-new-button.down-arrow {
+    padding: 0 13px 0 38px;
+    background-position: -865px -899px;
+}
+.dev-new-button.down-arrow:hover, .dev-new-button.down-arrow.active {
+    background-position: -865px -969px;
+}
+.dev-new-button.plus-icon {
+    padding: 0 13px 0 38px;
+    background-position: 10px -286px;
+}
+.dev-new-button.plus-icon:hover, .dev-new-button.plus-icon.active {
+    background-position: 10px -366px;
+}
+.dev-new-button.del-icon {
+    padding: 0 13px 0 38px;
+    float: right;
+    margin: 49px 0 0 0;
+    background-position: 11px -907px;
+}
+.dev-new-button.del-icon:hover, .dev-new-button.del-icon.active {
+    background-position: 11px -967px;
+}

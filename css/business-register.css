@@ -475,6 +475,7 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
 	height: 100%;
 	width: 100%;
 	padding-top: 80px;
+	padding-bottom: 8px;
 }
 .card-header {
 	text-align: center;

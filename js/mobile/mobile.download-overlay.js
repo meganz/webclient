@@ -700,6 +700,12 @@ mobile.downloadOverlay = {
             return false;
         }
 
+        // Edge ios is not supporting both download and open blob uri. - Nov 2019
+        if (ua.details.brand === 'Edgios') {
+            inBrowserError(false);
+            return false;
+        }
+
         // Check if the download is supported
         dlmanager.getMaximumDownloadSize().done(function(maxFileSize) {
             dlmanager.getResumeInfo({id: node.h, hasResumeSupport: true}, function(aResumeInfo) {

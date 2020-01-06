@@ -523,6 +523,9 @@
         <div class="default-white-button left dialog-newfolder-button">
             [$68]
         </div>
+        <div class="default-white-button left dialog-newcontact-button">
+            [$71]
+        </div>
         <div class="fm-picker-notagain checkbox-block hidden">
             <div class="checkdiv checkboxOff">
                 <input type="checkbox" id="fm-picker-notagain" class="notagain" />
@@ -725,6 +728,22 @@
                                 <input type="number" value="360" min="72" readonly />
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="enable-autoplay">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="enable-autoplay" class="checkboxOff" />
+                        </div>
+                        <label for="enable-autoplay" class="radio-txt">[$22188]<div class="small-icon info-icon simpletip" data-simpletip-style="{&quot;text-align&quot;:&quot;center&quot;}" data-simpletip="Currently, only the Chrome browser supports autoplay embed video with sound.[BR]To autoplay on other browsers, please mute the video with the option below."></div></label>
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <div class="mute-video">
+                        <div class="checkdiv checkboxOff">
+                            <input type="checkbox" id="mute-video" class="checkboxOff" />
+                        </div>
+                        <label for="mute-video" class="radio-txt">Mute this video</label>
                     </div>
                 </div>
             </div>
@@ -2628,13 +2647,18 @@
                         <div class="pro-plan-descr">
                             <div class="reg-st3-storage">
                                 <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt">200 <span>GB</span></div>
+                                <div class="reg-st3-big-txt ">
+                                    <span class="storage-amount">1</span>
+                                    <span class="storage-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$495]</div>
                                 <div class="clear"></div>
                             </div>
                             <div class="reg-st3-bandwidth">
                                 <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                                <div class="reg-st3-big-txt">
+                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$16120]</div>
                                 <div class="clear"></div>
                             </div>
@@ -2661,13 +2685,18 @@
                         <div class="pro-plan-descr">
                             <div class="reg-st3-storage">
                                 <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt">1 <span>TB</span></div>
+                                <div class="reg-st3-big-txt ">
+                                    <span class="storage-amount">1</span>
+                                    <span class="storage-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$495]</div>
                                 <div class="clear"></div>
                             </div>
                             <div class="reg-st3-bandwidth">
                                 <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">2 <span>TB</span></div>
+                                <div class="reg-st3-big-txt">
+                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$16120]</div>
                                 <div class="clear"></div>
                             </div>
@@ -2694,13 +2723,18 @@
                         <div class="pro-plan-descr">
                             <div class="reg-st3-storage">
                                 <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt">4 <span>TB</span></div>
+                                <div class="reg-st3-big-txt ">
+                                    <span class="storage-amount">1</span>
+                                    <span class="storage-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$495]</div>
                                 <div class="clear"></div>
                             </div>
                             <div class="reg-st3-bandwidth">
                                 <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                                <div class="reg-st3-big-txt">
+                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$16120]</div>
                                 <div class="clear"></div>
                             </div>
@@ -2727,13 +2761,18 @@
                         <div class="pro-plan-descr">
                             <div class="reg-st3-storage">
                                 <div class="pro-feature-icon"></div>
-                                <div class="reg-st3-big-txt">8 <span>TB</span></div>
+                                <div class="reg-st3-big-txt ">
+                                    <span class="storage-amount">1</span>
+                                    <span class="storage-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$495]</div>
                                 <div class="clear"></div>
                             </div>
                             <div class="reg-st3-bandwidth">
                                 <div class="pro-feature-icon bandwidth"></div>
-                                <div class="reg-st3-big-txt">16 <span>TB</span></div>
+                                <div class="reg-st3-big-txt">
+                                    <span class="bandwidth-amount">2</span> <span class="bandwidth-unit">TB</span>
+                                </div>
                                 <div class="reg-st3-mid-txt">[$16120]</div>
                                 <div class="clear"></div>
                             </div>

@@ -272,9 +272,13 @@ function crypto_makeattr(n, nn) {
     else if (n.mtime) ar.t = n.mtime;
 
     if (typeof n.name != 'undefined') ar.n = n.name;
-    if (typeof n.fav != 'undefined') ar.fav = n.fav;
-    if (typeof n.lbl != 'undefined') ar.lbl = n.lbl;
     if (typeof n.f != 'undefined') ar.f = n.f;
+    if (n.fav | 0) {
+        ar.fav = n.fav | 0;
+    }
+    if (n.lbl | 0) {
+        ar.lbl = n.lbl | 0;
+    }
     if (typeof n.rr !== 'undefined') {
         ar.rr = n.rr;
     }
@@ -346,12 +350,18 @@ function crypto_procattr(n, key) {
             }
 
             if (typeof o.fav != 'undefined') {
-                n.fav = o.fav;
+                n.fav = o.fav | 0;
+                if (!n.fav) {
+                    delete n.fav;
+                }
                 delete o.fav;
             }
 
             if (typeof o.lbl != 'undefined') {
-                n.lbl = o.lbl;
+                n.lbl = o.lbl | 0;
+                if (!n.lbl) {
+                    delete n.lbl;
+                }
                 delete o.lbl;
             }
 

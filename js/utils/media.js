@@ -1115,6 +1115,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
+
+            // Store the current time in session storage such that we can restore on reload.
+            sessionStorage.setItem('previewTime', streamer.currentTime);
         });
 
         /* Drag status */
@@ -1309,6 +1312,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             destroy = null;
         }
         options = Object.assign(Object.create(null), options);
+
+        // If a preview time is set, use it as the starting time.
+        if (sessionStorage.previewNode && sessionStorage.previewTime && sessionStorage.previewNode === node.h) {
+            options.startTime = sessionStorage.previewTime;
+        }
+        sessionStorage.removeItem('previewTime');
 
         if ($.playbackOptions) {
             String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {

@@ -590,6 +590,8 @@ var slideshowid;
         }
 
         if (close) {
+            sessionStorage.removeItem('previewNode');
+            sessionStorage.removeItem('previewTime');
             zoom_mode = false;
             switchedSides = false;
             slideshowid = false;
@@ -653,6 +655,7 @@ var slideshowid;
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
+        sessionStorage.setItem('previewNode', id);
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);

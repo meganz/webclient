@@ -30284,13 +30284,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .duplication-found .grid-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 48px);
-    height: -moz-calc(100% - 48px);
-    height: calc(100% - 48px);
+    height: -webkit-calc(100% - 47px);
+    height: -moz-calc(100% - 47px);
+    height: calc(100% - 47px);
 }
 .select.duplication-found .grid-scrolling-table {
     height: 100%;
-    height: -webkit-calc(100% - 83px);
-    height: -moz-calc(100% - 83px);
-    height: calc(100% - 83px);
+    height: -webkit-calc(100% - 81px);
+    height: -moz-calc(100% - 81px);
+    height: calc(100% - 81px);
 }

@@ -1283,7 +1283,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.warningCallback = callback;
 
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide');
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide with-close-btn');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
 
@@ -1476,10 +1476,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .removeClass('plan4')
             .addClass('plan' + plan);
     }
-    else if (type === 'import_login' || type === 'import_register') {
-        var buttonLabel = type === 'import_login' ? l[171] : l[170];
-
-        $('#msgDialog').addClass('warning-dialog-a wide');
+    else if (type === 'import_login_or_register') {
+        // Show import confirmation dialog if a user isn't logged in
+        $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="bottom-bar-link">@@</div>' +
                 '<div class="default-green-button right notification-button confirm button semi-big">' +
@@ -1488,25 +1487,27 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel semi-big">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="clear"></div></div>', l[20754], buttonLabel, l[79]);
+                '<div class="clear"></div></div>', l[20754], l[170], l[171]);
 
+        // Register a new account to complete the import
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(true);
+                $.warningCallback('register');
             }
         });
-        /*!4*/
+        // Login to complete the import
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(undefined);
+                $.warningCallback('login');
             }
         });
+        // Have an ephemeral account to complete the import
         $('#msgDialog .bottom-bar-link').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(false);
+                $.warningCallback('ephemeral');
             }
         });
     }

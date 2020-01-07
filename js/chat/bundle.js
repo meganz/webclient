@@ -7620,39 +7620,32 @@ function (_MegaRenderMixin2) {
       var order = self.state.sortBy[1] === "asc" ? 1 : -1;
       var entries = [];
 
-        if (
-            self.state.currentlyViewedEntry === "search" &&
-            self.state.searchValue &&
-            self.state.searchValue.length >= 3
-        ) {
-            M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue))
-                .forEach(function(n) {
-                    // skip contacts and invalid data.
-                    if (!n.h || n.h.length === 11) {
-                        return;
-                    }
-                    if (self.props.customFilterFn) {
-                        if (!self.props.customFilterFn(n)) {
-                            return;
-                        }
-                    }
-                    entries.push(n);
-                })
-        }
-        else {
-            Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach((h) => {
-                if (M.d[h]) {
-                    if (self.props.customFilterFn) {
-                        if (self.props.customFilterFn(M.d[h])) {
-                            entries.push(M.d[h]);
-                        }
-                    }
-                    else {
-                        entries.push(M.d[h]);
-                    }
-                }
-            });
-        }
+      if (self.state.currentlyViewedEntry === "search" && self.state.searchValue && self.state.searchValue.length >= 3) {
+        M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue)).forEach(function (n) {
+          // skip contacts and invalid data.
+          if (!n.h || n.h.length === 11) {
+            return;
+          }
+
+          if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
+            return;
+          }
+
+          entries.push(n);
+        });
+      } else {
+        Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach(function (h) {
+          if (M.d[h]) {
+            if (self.props.customFilterFn) {
+              if (self.props.customFilterFn(M.d[h])) {
+                entries.push(M.d[h]);
+              }
+            } else {
+              entries.push(M.d[h]);
+            }
+          }
+        });
+      }
 
       var sortFunc;
 

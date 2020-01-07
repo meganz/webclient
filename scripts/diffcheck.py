@@ -778,7 +778,7 @@ def main(base, target, norules, branch, jscpd):
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
                   '"git rebase -i --autosquash {}", unless they do not care.'.format(authors, base))
-        sys.exit(1)
+        sys.exit(0)
 
     if warnings:
         print('\nAll fine, but there were some warnings you may want to look into.')

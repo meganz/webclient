@@ -30296,14 +30296,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .duplication-found .file-block-scrolling {
     height: 100%;
-    height: -webkit-calc(100% - 35px);
-    height: -moz-calc(100% - 35px);
-    height: calc(100% - 35px);
+    height: -webkit-calc(100% - 27px);
+    height: -moz-calc(100% - 27px);
+    height: calc(100% - 27px);
 }
 
 .select.duplication-found .file-block-scrolling {
     height: 100%;
-    height: -webkit-calc(100% - 70px);
-    height: -moz-calc(100% - 70px);
-    height: calc(100% - 70px);
+    height: -webkit-calc(100% - 60px);
+    height: -moz-calc(100% - 60px);
+    height: calc(100% - 60px);
 }

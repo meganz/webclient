@@ -526,6 +526,11 @@ var Help = (function() {
                     if (question.lastIndexOf('-') !== -1) {
                         question = question.substring(question.lastIndexOf('-') + 1);
                     }
+                    else {
+                        // Reload the short url of the help article when title is missing in original url
+                        loadSubPage('help/s/' + question);
+                        return;
+                    }
                 }
             } else if (args.length !== 1) {
                 loadSubPage('help');

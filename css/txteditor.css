@@ -2,12 +2,12 @@
     width: 100%;
     height: 100%;
     background-color: rgba(213,218,220,0.95);
-    min-width: 1000px;
 }
 #mega-text-editor .editor-textarea-container{
     width: 60%;
-    height: calc(100% - 50px);
-    margin-left: 20%;
+    height: calc(100% - 48px);
+    margin-left: max(calc( calc(100% - max(60%,800px)) / 2 ),0px);
+    min-width: 800px;
 }
 #mega-text-editor #text-editor-textarea{
     width: 100%;
@@ -81,7 +81,7 @@
 }
 #mega-text-editor .txt-editor-menu {
     background-position: -2px -56px;
-    opacity: 0.7;
+    /*opacity: 0.7;*/
     background-image: url(../images/mega/top-sprite_v7@2x.png);
     background-size: 38px auto;
     width: 34px;
@@ -125,7 +125,7 @@
     color: #333333;
     font-family: 'LatoWebSemibold', 'source_sans_proregular';
     font-size: 14px;
-    line-height: 20px;
+    line-height: 18px;
     position: fixed;
     margin-top: 8px;
     margin-left: 5px;
@@ -142,12 +142,16 @@
 }
 #mega-text-editor .top-menu-item {
     padding-right: 10px;
+    cursor: default;
+}
+#mega-text-editor .top-menu-item span {
+    cursor: pointer;
 }
 #mega-text-editor .editor-file-name-title {
     display: inline-block;
     height: 24px;
     /* width: 50px; */
-    margin-left: calc(50% - 300px);
+    margin-left: calc(50% - 252px);
     width: 408px;
     text-align: center;
     vertical-align: super;
@@ -190,7 +194,7 @@
     border-radius: 4px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4);
     min-width:unset;
-    margin-left:11px;
+    margin-left:6px;
 }
 #mega-text-editor .default-green-button:hover {
     /*-webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
@@ -223,10 +227,7 @@
     margin-right: 9px;
     margin-top: 8px;
 }
-#mega-text-editor .top-menu-item:hover {
-    background-color: #AAAAAA;
-    color: white;
-}
+
 .CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
     position: absolute;
     background: #ccc;
@@ -262,7 +263,7 @@
 .CodeMirror-overlayscroll-horizontal div, .CodeMirror-overlayscroll-vertical div {
     position: absolute;
     background: #666666;
-    border-radius: 3px;
+    border-radius: 5px;
 }
 .CodeMirror-overlayscroll-horizontal, .CodeMirror-overlayscroll-vertical {
     position: absolute;
@@ -276,6 +277,8 @@
 .CodeMirror-overlayscroll-horizontal div {
     bottom: 0;
     height: 100%;
+    -webkit-transition: height 250ms;
+    transition: height 250ms;
     cursor:pointer;
 }
 .CodeMirror-overlayscroll-vertical {
@@ -286,13 +289,19 @@
 .CodeMirror-overlayscroll-vertical div {
     right: 0;
     width: 100%;
+    -webkit-transition: width 250ms;
+    transition: width 250ms;
     cursor:pointer;
 }
 .CodeMirror-overlayscroll-vertical div:hover {
     width: 130%;
+    -webkit-transition: width 250ms;
+    transition: width 250ms;
 }
 .CodeMirror-overlayscroll-horizontal div:hover {
     height: 130%;
+    -webkit-transition: height 250ms;
+    transition: height 250ms;
 }
 #mega-text-editor .top-menu-popup-editor {
     right: unset;

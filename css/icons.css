@@ -1093,9 +1093,9 @@
     height: 24px;
     background-size: auto;
 }
-.top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
+/*.top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
     filter: drop-shadow(2px 4px 6px black);
-}
+}*/
 .small-icon.dark-grey-plus {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: -14px -11545px;
@@ -1243,6 +1243,14 @@
 .small-icon.context.plus {
     background-position: -201px -391px;
 }
+.small-icon.context.plusfolder {
+    background-position: -3px -3px;
+    background-image: url(../images/mega/newFolder_ico_black.svg);
+}
+.small-icon.context.plusfile {
+    background-position: -3px -3px;
+    background-image: url(../images/mega/newTextFile_ico_black.svg);
+}
 .small-icon.context.file-upload {
     background-position: -201px -429px;
 }
@@ -1258,7 +1266,9 @@
     background-position: -102px 1px;
 }
 .small-icon.context.edit-file {
-    background-position: -143px -2138px
+    background-image: url(../images/mega/edit_ico_black.svg);
+    background-position: -3px -2px;
+    opacity: 1;
 }
 .small-icon.context.open-folder {
     background-position: -2px -1071px;
@@ -1433,7 +1443,8 @@
     background-position: -41px -499px;
 }
 .dropdown-item:hover .small-icon.context.edit-file {
-    background-position: -176px -2138px;
+    background-image: url(../images/mega/edit_ico_white.svg);
+    background-position: -3px -2px;
 }
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
@@ -1477,6 +1488,14 @@
 }
 .dropdown-item:hover .small-icon.context.plus {
     background-position: -241px -391px;
+}
+.dropdown-item:hover .small-icon.context.plusfolder {
+    background-position: -3px -3px;
+    background-image: url(../images/mega/newFolder_ico_white.svg);
+}
+.dropdown-item:hover .small-icon.context.plusfile {
+    background-position: -3px -3px;
+    background-image: url(../images/mega/newTextFile_ico_white.svg);
 }
 .dropdown-item:hover .small-icon.context.file-upload {
     background-position: -241px -429px;

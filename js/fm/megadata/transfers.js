@@ -1404,6 +1404,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
  */
 MegaData.prototype.addNewFile = function(fileName, dest) {
     'use strict';
+    // eslint-disable-next-line local-rules/hints
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
 
@@ -1435,6 +1436,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
 };
 
 
+// eslint-disable-next-line complexity
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
     'use strict';
 

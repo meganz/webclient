@@ -573,7 +573,9 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
-    /** Adding the current page to history if needed to preserve navigation correctness */
+    /** Adding the current page to history if needed to preserve navigation correctness
+     * @returns {Void}      No return value should be expected
+     */
     global.addingFakeHistoryState = function() {
         // then pushing fake states of history/hash
         if (!hashLogic) {

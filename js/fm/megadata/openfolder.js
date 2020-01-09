@@ -54,9 +54,13 @@
             }
 
             if (folderlink) {
+                // there's no jquery parent for this container.
+                // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown-item.edit-file-item span').text(l[16797]);
             }
             else {
+                // there's no jquery parent for this container.
+                // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown-item.edit-file-item span').text(l[865]);
             }
         }

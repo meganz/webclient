@@ -1387,6 +1387,7 @@ FileManager.prototype.initContextUI = function() {
         }
         createFolderDialog();
     });
+    // eslint-disable-next-line local-rules/jquery-scopes
     $(c + '.newfile-item').rebind('click', function() {
         createFileDialog();
     });
@@ -1561,6 +1562,7 @@ FileManager.prototype.initContextUI = function() {
         propertiesDialog();
     });
 
+    // eslint-disable-next-line local-rules/jquery-scopes
     $(c + '.edit-file-item').rebind('click', function() {
         var nodeHandle = $.selected && $.selected[0];
         if (!nodeHandle) {
@@ -2010,6 +2012,8 @@ FileManager.prototype.createFolderUI = function() {
     });
 };
 
+/* eslint-disable id-length */
+
 /**
  * Initialize file and folder select dialog from chat.
  * This will fill up $.selected with what user selected on the dialog.
@@ -2017,7 +2021,7 @@ FileManager.prototype.createFolderUI = function() {
  */
 FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
     'use strict';
-
+    /* eslint-enable id-length */
     // If chat is not ready.
     if (!megaChatIsReady) {
         if (megaChatIsDisabled) {
@@ -3646,6 +3650,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
         else if (isTextual(n)) {
             $.selected = [h];
+            // there's no jquery parent for this container.
+            // eslint-disable-next-line local-rules/jquery-scopes
             $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
         }
         else {

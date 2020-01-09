@@ -517,14 +517,18 @@ function dl_g(res) {
                 }
             };
 
-            /** Function to show UI elements if textual files */
+            /** Function to show UI elements if textual files
+             *@returns {Void}           void
+             */
             var showTextView = function() {
                 if (isTextual(dl_node)) {
+                    // there's no jquery parent for this container.
+                    // eslint-disable-next-line local-rules/jquery-scopes
                     var $containerB = $('.download.info-block');
                     var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
 
                     $viewBtns.addClass('clickable').removeClass('hidden')
-                        .rebind('click', function() {
+                        .rebind('click.txtViewer', function() {
                             loadingDialog.show();
 
                             mega.filesEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
@@ -535,7 +539,7 @@ function dl_g(res) {
                                         fName = dl_node.name;
                                     }
                                     else {
-                                        var $fileinfoBlock = $('.download.file-info');
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
                                         fName = $('.big-txt', $fileinfoBlock).attr('title');
                                     }
 

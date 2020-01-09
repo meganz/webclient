@@ -389,7 +389,7 @@
 
             $div.safeHTML(rowHtml);
 
-            $('#f-name-input', $div).off('keydown').on('keydown', function(e) {
+            $('#f-name-input', $div).rebind('keydown.saveas', function(e) {
                 if (e.which === 13 || e.keyCode === 13) {
                     $('.dialog-picker-button', $dialog).trigger('click');
                 }
@@ -1097,11 +1097,12 @@
      * @param {Object} node     The node to save AS
      * @param {String} content  Content to be saved
      * @param {Function} cb     a callback to be called when the user "Save"
+     * @returns {Object}        The jquery object of the dialog
      */
     global.openSaveAsDialog = function(node, content, cb) {
         M.safeShowDialog('saveAs', function() {
             $.saveAsCallBack = cb;
-            $.nodeSaveAs = ((typeof node === 'string') ? M.d[node] : node);
+            $.nodeSaveAs = typeof node === 'string' ? M.d[node] : node;
             $.saveAsContent = content;
             handleOpenDialog(null, node.p || M.RootID);
             return $dialog;
@@ -1113,6 +1114,7 @@
     /**
      * A version of the select a folder dialog used for "New Shared Folder" in out-shares.
      * @global
+     * @returns {Object}        The jquery object of the dialog
      */
     global.openNewSharedFolderDialog = function openNewSharedFolderDialog() {
         if (isUserAllowedToOpenDialogs()) {
@@ -1608,11 +1610,12 @@
             if ($.nodeSaveAs) {
                 var $nameInput = $('#f-name-input', $dialog);
                 var saveAsName = $.trim($nameInput.val());
+                var eventName = 'input.saveas';
 
                 var removeErrorStyling = function() {
                     $nameInput.removeClass('error');
                     $dialog.removeClass('duplicate');
-                    $nameInput.off('input');
+                    $nameInput.off(eventName);
                 };
 
                 removeErrorStyling();
@@ -1621,7 +1624,7 @@
                     // ui things
                     $nameInput.addClass('error');
 
-                    $nameInput.off('input').on('input', function() {
+                    $nameInput.rebind(eventName, function() {
                         removeErrorStyling();
                         return false;
                     });
@@ -1633,19 +1636,19 @@
                     $nameInput.addClass('error');
                     $dialog.addClass('duplicate');
 
-                    $nameInput.off('input').on('input', function() {
+                    $nameInput.rebind(eventName, function() {
                         removeErrorStyling();
                         return false;
                     });
 
                     return false;
                 }
-                $nameInput.off('input').on('input', function() {
+                $nameInput.rebind(eventName, function() {
                     removeErrorStyling();
                     return false;
                 });
 
-                $nameInput.off('input');
+                $nameInput.off(eventName);
 
                 closeDialog();
                 mega.filesEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(

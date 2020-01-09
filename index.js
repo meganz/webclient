@@ -2846,6 +2846,7 @@ function loadSubPage(tpage, event) {
 
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
+        // eslint-disable-next-line no-unused-expressions
         mega && mega.textEditorUI && mega.textEditorUI.doClose();
     }
 

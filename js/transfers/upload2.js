@@ -1199,13 +1199,14 @@ ChunkUpload.prototype.updateprogress = function() {
     this.file.progressevents = (this.file.progressevents || 0) + 1;
 
     M.ulprogress(
-            this.file,
-            Math.floor(tp / this.file.size * 100),
-            tp,
-            this.file.size,
+        this.file,
+        Math.floor(tp / this.file.size * 100),
+        tp,
+        this.file.size,
+        // eslint-disable-next-line no-extra-parens
         GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0), // speed
         this.file.isCreateFile
-        );
+    );
 
     if (tp === this.file.size) {
         this.file.complete = true;
@@ -1545,7 +1546,7 @@ FileUpload.prototype.run = function(done) {
     file.ul_lastreason = file.ul_lastreason || 0;
 
     var domNode = document.getElementById('ul_' + file.id);
-    if (ulmanager.ulStartingPhase || (!domNode && !file.isCreateFile)) {
+    if (ulmanager.ulStartingPhase || !(domNode || file.isCreateFile)) {
         done();
         ASSERT(0, "This shouldn't happen");
         return ulQueue.pushFirst(this);
@@ -1560,7 +1561,7 @@ FileUpload.prototype.run = function(done) {
     }
     if (!file.isCreateFile) {
         domNode.classList.add('transfer-initiliazing');
-        domNode.querySelector('.transfer-status').textContent = (l[1042]);
+        domNode.querySelector('.transfer-status').textContent = l[1042];
     }
 
     ulmanager.ulSize += file.size;

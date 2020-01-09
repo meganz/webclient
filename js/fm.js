@@ -2692,6 +2692,7 @@ function closeDialog(ev) {
 
     if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
         // the createfolder dialog was closed
+        // eslint-disable-next-line local-rules/hints
         $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
@@ -2886,6 +2887,8 @@ function createFileDialog(close, action, params) {
         };
     }
 
+    // there's no jquery parent for this container.
+    // eslint-disable-next-line local-rules/jquery-scopes
     var $dialog = $('.fm-dialog.create-file-dialog');
     var $input = $('input', $dialog);
     $input.val('');
@@ -2918,18 +2921,18 @@ function createFileDialog(close, action, params) {
     };
 
 
-    $input.rebind('focus', function() {
+    $input.rebind('focus.fileDialog', function() {
         if ($(this).val() === l[17506]) {
             $input.val('');
         }
         $dialog.addClass('focused');
     });
 
-    $input.rebind('blur', function() {
+    $input.rebind('blur.fileDialog', function() {
         $dialog.removeClass('focused');
     });
 
-    $input.rebind('keyup', function() {
+    $input.rebind('keyup.fileDialog', function() {
         if ($input.val() === '' || $input.val() === l[17506]) {
             $dialog.removeClass('active');
         }
@@ -2939,25 +2942,26 @@ function createFileDialog(close, action, params) {
         }
     });
 
-    $input.rebind('keypress', function(e) {
+    $input.rebind('keypress.fileDialog', function(e) {
 
         if (e.which === 13 && $(this).val() !== '') {
             doCreateFile($(this).val());
         }
     });
 
-    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click', closeFunction);
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
 
-    $('.fm-dialog-input-clear', $dialog).rebind('click', function() {
+    $('.fm-dialog-input-clear', $dialog).rebind('click.fileDialog', function() {
         $input.val('');
         $dialog.removeClass('active');
     });
 
-    $('.create-file', $dialog).rebind('click', function() {
+    $('.create-file', $dialog).rebind('click.fileDialog', function() {
         var v = $input.val();
 
         if (v === '' || v === l[17506]) {
-            alert(l[8566]);
+            msgDialog('warninga', '', l[8566]);
         }
         else {
             doCreateFile(v);

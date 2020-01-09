@@ -517,8 +517,9 @@ function filemime(n, def) {
 
 /**
  * Get file type
- * @param {Object} n            Node
+ * @param {Object} n                Node
  * @param {Boolean} getFullType     Optional to return full detailed array of the type
+ * @returns {String|Array}          Extension Desc, or full type info
  */
 function filetype(n, getFullType) {
     "use strict";

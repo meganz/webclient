@@ -18,6 +18,7 @@ mega.filesEditor = new function FileTextEditor() {
      * store data in memory
      * @param {String} handle       Node handle
      * @param {String} data         File data
+     * @returns {Void}              void
      */
     var storeFileData = function(handle, data) {
 
@@ -31,26 +32,27 @@ mega.filesEditor = new function FileTextEditor() {
         // reserve the slot
         slotsMap[slotIndex++] = handle;
 
+        var slots = maxFilesInMemory - 1;
+
         // round-robin
-        if (slotIndex > (maxFilesInMemory - 1)) {
+        if (slotIndex > slots) {
             slotIndex = 0;
         }
     };
-
-
-
 
     /**
      * Get file data
      * @param {String} handle       Node handle
      * @param {Boolean} isPublic    flag to isPublic link
+     * @returns {MegaPromise}       Promise of the operation
      */
     this.getFile = function(handle, isPublic) {
 
+        // eslint-disable-next-line local-rules/hints
         var operationPromise = new MegaPromise();
 
         // if called with no handle or invalid one, exit
-        if (!handle || (!M.d[handle] && !isPublic)) {
+        if (!handle || !(M.d[handle] || isPublic)) {
             if (d) {
                 console.error('Handle rejected in getFile ' + handle);
             }
@@ -109,8 +111,10 @@ mega.filesEditor = new function FileTextEditor() {
      * Set file's data (save it)
      * @param {String} handle           Node's handle
      * @param {String} content          Text content to be saved
+     * @returns {MegaPromise}           Operation Promise
      */
     this.setFile = function(handle, content) {
+        // eslint-disable-next-line local-rules/hints
         var operationPromise = new MegaPromise();
 
         // if called with no handle or invalid one, exit
@@ -146,11 +150,13 @@ mega.filesEditor = new function FileTextEditor() {
      * @param {String} directory        Destination handle
      * @param {String} content          Text content to be saved
      * @param {String} nodeToSaveAs     Original node's handle
+     * @returns {MegaPromise}           Operation Promise
      */
     this.saveFileAs = function(newName, directory, content, nodeToSaveAs) {
+        // eslint-disable-next-line local-rules/hints
         var operationPromise = new MegaPromise();
 
-        if (!newName || !directory || (!nodeToSaveAs && !content)) {
+        if (!newName || !directory || !(nodeToSaveAs || content)) {
             if (d) {
                 console.error('saveFileAs is called incorrectly newName=' + newName +
                     ' dir=' + directory + ' !content=' + !content + ' nodetoSave=' + nodeToSaveAs);
@@ -205,6 +211,7 @@ mega.filesEditor = new function FileTextEditor() {
     /**
      * Remove previously created version, this is used when users do multiple saves to the same file.
      * @param {String} handle       Node's handle
+     * @returns {Void}              void
      */
     this.removeOldVersion = function(handle) {
         api_req({ a: 'd', n: handle, v: 1 });
@@ -220,6 +227,7 @@ mega.filesEditor = new function FileTextEditor() {
     /**
      * Global function to Check if the node is for a textual file
      * @param {MegaData} node       The node to check
+     * @returns {Void}              void
      */
     window.isTextual = function(node) {
         var fType = filetype(node, true)[0];

@@ -216,6 +216,10 @@
         });
 
         $(self.passwordField).rebind('keypress.prd', function(e) {
+            if (!self.dialog) {
+                console.warn('This event should no longer be reached...');
+                return;
+            }
             if (e.which === 13 || e.keyCode === 13) {
                 $(self.dialog.querySelector('.button-prd-confirm')).triggerHandler('click');
                 return false;
@@ -730,6 +734,7 @@
 
         $(window).off('resize.prd');
         $(document.body).off(MouseDownEvent);
+        $(this.passwordField).off('keypress.prd');
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {

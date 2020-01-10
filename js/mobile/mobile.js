@@ -641,6 +641,10 @@ mega.tpw = {
     pauseDownloadUpload: function() {},
     removeRow: function() {},
     showWidget: function() { return false;},
+    resetErrorsAndQuotasUI: function() {
+        'use strict';
+        return false;
+    },
     isWidgetVisibile: function() {
         'use strict';
         return false;
@@ -805,6 +809,22 @@ function removeUInode(nodeHandle, parentHandle) {
 function showToast(type, msg) {
     'use strict';
     mobile.showToast(msg);
+}
+
+function bottomPageDialog() {
+    'use strict';
+    // TODO: mobile version
+    loadSubPage('fm');
+}
+
+function previewimg() {
+    'use strict';
+    console.warn('TBD, watch 99665');
+}
+
+function openRecents() {
+    'use strict';
+    loadSubPage('fm');
 }
 
 // Not required for mobile

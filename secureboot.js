@@ -56,7 +56,12 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
-var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
+self.fetchStreamSupport = (
+    window.fetch && !window.MSBlobBuilder
+    && typeof ReadableStream === 'function'
+    && typeof AbortController === 'function'
+    && typeof Object(AbortController.prototype).abort === 'function'
+);
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
     loadFailuresDefault: {},        // Count of failures on the EU static server per file
@@ -2332,6 +2337,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2385,7 +2391,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -2613,7 +2618,6 @@ else if (!browserUpdate) {
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
         'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
         'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
-        'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
@@ -2752,7 +2756,6 @@ else if (!browserUpdate) {
         'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
         'gdpr': ['gdpr', 'gdpr_js'],
-        'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],

@@ -234,6 +234,12 @@
             return false;
         });
 
+        // Handle forgot password button.
+        $(self.dialog.querySelector('.forgot-password')).rebind('click.prd', function() {
+            self.onChangePassClicked();
+            return false;
+        });
+
         uiCheckboxes(
             $(this.dialog.querySelector(is_mobile ? '.content-cell' : '.content-block')),
             undefined,

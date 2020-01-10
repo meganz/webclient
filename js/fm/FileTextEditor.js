@@ -3,7 +3,7 @@
  * and performs memory/bandwidth optimization.
 */
 
-mega.filesEditor = new function FileTextEditor() {
+mega.fileTextEditor = new function FileTextEditor() {
     "use strict";
     // the maximum slots in memory for edited files
     // we have the maximum editable file size = 20MB --> max Total = 100MB

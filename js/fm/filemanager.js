@@ -1571,7 +1571,7 @@ FileManager.prototype.initContextUI = function() {
 
         loadingDialog.show();
 
-        mega.filesEditor.getFile(nodeHandle).done(
+        mega.fileTextEditor.getFile(nodeHandle).done(
             function(data) {
                 loadingDialog.hide();
                 mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);

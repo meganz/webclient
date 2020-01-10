@@ -1651,7 +1651,7 @@
                 $nameInput.off(eventName);
 
                 closeDialog();
-                mega.filesEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(
+                mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(
                     function(handle) {
                         if ($.saveAsCallBack) {
                             if (Array.isArray(handle)) {

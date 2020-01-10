@@ -531,7 +531,7 @@ function dl_g(res) {
                         .rebind('click.txtViewer', function() {
                             loadingDialog.show();
 
-                            mega.filesEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
+                            mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
                                 function(data) {
                                     loadingDialog.hide();
                                     var fName;

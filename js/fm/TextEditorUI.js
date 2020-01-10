@@ -56,7 +56,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 return;
             }
 
-            mega.filesEditor.getFile(nodeHandle).done(
+            mega.fileTextEditor.getFile(nodeHandle).done(
                 function(data) {
                     loadingDialog.hide();
                     mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
@@ -177,9 +177,9 @@ mega.textEditorUI = new function TextEditorUI() {
 
                     loadingDialog.show();
 
-                    mega.filesEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
+                    mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
-                            mega.filesEditor.removeOldVersion(versionHandle);
+                            mega.fileTextEditor.removeOldVersion(versionHandle);
                         }
                         versionHandle = fh;
                         savedFileData = editor.getValue();

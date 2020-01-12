@@ -30163,6 +30163,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     font-size: 13px;
     font-weight: 600;
     display: inline-block;
+    width: 19px;
+    text-align: center;
 }
 .grid-table .ver-col-container .ver-icon.versioning {
     display: inline-block;

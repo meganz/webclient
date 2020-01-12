@@ -1339,9 +1339,13 @@ MegaUtils.prototype.checkForDuplication = function(id) {
             }
         }
 
-        if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
-            console.error("Strange case, no Duplications were found in the time when" +
-                "we have a mismatch in length " + id);
+        if (!Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+            if (d) {
+                console.warn("No Duplications were found in the time when"
+                    + "we have a mismatch in lengths "
+                    + id + '. We have names intersected between files and folders');
+            }
+            return;
         }
 
         var resultObject = Object.create(null);

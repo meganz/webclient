@@ -1841,7 +1841,7 @@ FileManager.prototype.createFolderUI = function() {
             }, 2000);
         }
         else {
-            if (duplicated(1, name)) {// Check if folder name already exists
+            if (duplicated(name)) {// Check if folder name already exists
                 $inputWrapper.addClass('duplicate');
                 $input.addClass('error');
 

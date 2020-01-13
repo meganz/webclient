@@ -839,7 +839,9 @@ var dlmanager = {
         }
     },
 
-    dlClearActiveTransfer: function DM_dlClearActiveTransfer(dl_id) {
+    dlClearActiveTransfer: tryCatch(function DM_dlClearActiveTransfer(dl_id) {
+        'use strict';
+
         if (is_mobile) {
             return;
         }
@@ -853,16 +855,18 @@ var dlmanager = {
                 localStorage.aTransfers = JSON.stringify(data);
             }
         }
-    },
+    }),
 
-    dlSetActiveTransfer: function DM_dlSetActiveTransfer(dl_id) {
+    dlSetActiveTransfer: tryCatch(function DM_dlSetActiveTransfer(dl_id) {
+        'use strict';
+
         if (is_mobile) {
             return;
         }
         var data = JSON.parse(localStorage.aTransfers || '{}');
         data[dl_id] = Date.now();
         localStorage.aTransfers = JSON.stringify(data);
-    },
+    }),
 
     isTrasferActive: function DM_isTrasferActive(dl_id) {
         var date = null;

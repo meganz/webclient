@@ -829,7 +829,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         var getTimeOffset = function(x) {
-            var maxduration = videoElement.duration;
+            var maxduration = streamer && streamer.duration || 0;
             var position = x - $progress.offset().left; // Click pos
             var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
             var selectedTime = Math.round(maxduration * percentage / 100);

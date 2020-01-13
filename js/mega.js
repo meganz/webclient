@@ -1273,10 +1273,13 @@ scparser.$add('d', function(a) {
     if (a.m) {
         $.moveNodeShares = !$.moveNodeShares ? {} : $.moveNodeShares;
         (function _checkMoveNodeShare(h) {
-            if (M.d[h].shares) {
-                $.moveNodeShares[h] = M.d[h].shares;
+            // XXX: are or should we ensure all needed nodes are loaded into memory (?)
+            var n = M.d[h] || false;
+
+            if (n.shares) {
+                $.moveNodeShares[h] = n.shares;
             }
-            if (M.d[h].t) {
+            if (n.t) {
                 for (var childHandle in M.c[h]) {
                     if (M.c[h][childHandle]) {
                         _checkMoveNodeShare(childHandle);

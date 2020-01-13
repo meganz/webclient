@@ -1181,10 +1181,6 @@ function init_page() {
         parsepage(pages['gdpr']);
         gdpr.init();
     }
-    else if (page == 'mega') {
-        parsepage(pages['mega']);
-        megainfotxt();
-    }
     else if (page == 'privacycompany') {
         parsepage(pages['privacycompany']);
     }
@@ -1562,15 +1558,16 @@ function init_page() {
         $('body').addClass('business');
         var businessP = new BusinessProductPage();
         businessP.init();
-
     }
     else if (page === 'bird') {
         parsepage(pages['megabird']);
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
-        initMegasync();
-        topmenuUI();
+        M.require('sync_js').then(function() {
+            onIdle(topmenuUI);
+            initMegasync();
+        });
     }
     else if (page == 'cmd') {
         parsepage(pages['cmd']);

@@ -29,7 +29,7 @@ function init_start() {
     if (u_type > 0) {
         $('.startpage.register:not(.business-reg)').text(l[164]);
         $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/fm');
-        
+
         if (is_mobile) {
             $('.startpage.account').attr('href', '/fm/account');
         }
@@ -58,7 +58,7 @@ function init_start() {
 
     // Init Scroll to Top button event
     $('.startpage.scroll-to-top').rebind('click', function () {
-        if ($(this).hasClass('up')) { 
+        if ($(this).hasClass('up')) {
             $('.fmholder, html, body').animate({
                 scrollTop: 0
             }, 1600);
@@ -472,7 +472,10 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    startCountRenderData[type + '_blocks'][i].textContent = total[i];
+                    var elm = startCountRenderData[type + '_blocks'][i];
+                    if (elm) {
+                        elm.textContent = total[i];
+                    }
                 }
             }
         }

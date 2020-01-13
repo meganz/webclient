@@ -252,23 +252,22 @@ mobile.downloadOverlay = {
      * Initialises the close button on the overlay with download button options and also the download progress overlay
      */
     initOverlayCloseButton: function() {
-
         'use strict';
 
+        var self = this;
         var $closeButton = this.$overlay.find('.fm-dialog-close, .text-button');
 
         // Show close button for folder links
         $closeButton.removeClass('hidden');
 
         // Add tap handler
-        $closeButton.off('tap').on('tap', function(e) {
+        $closeButton.rebind('tap.close-download', function(e) {
             // If the tap originates from a direct human input, then instead pop the history which will re-trigger this
             // In the event that this is triggered from a generated event, just close the dialog ignoring the state.
             if (e.originalEvent !== undefined) {
                 history.back();
-            } else {
-                mobile.downloadOverlay.close();
             }
+            onIdle(self.close.bind(self));
             return false;
         });
     },
@@ -308,11 +307,17 @@ mobile.downloadOverlay = {
         'use strict';
 
         var n = M.d[nodeHandle] || false;
-        if (n.t === 1) {
-            this.startDownloadAsZip(nodeHandle);
-        } else {
-            this.startFileDownload(nodeHandle);
+
+        if (!n) {
+            this.close();
+            return mobile.messageOverlay.show(l[16872]);
         }
+
+        if (n.t) {
+            return this.startDownloadAsZip(nodeHandle);
+        }
+
+        this.startFileDownload(nodeHandle);
     },
 
     /**

@@ -197,6 +197,9 @@
     color: #666 !important;
     padding-left: 15px;
 }
+.top-menu-item .right-el.free-account {
+    text-transform: none;
+}
 .free .top-menu-item.upgrade-your-account, .free .top-menu-item.upgrade-your-account:hover {
     color: #31B500;
 }

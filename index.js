@@ -2139,7 +2139,7 @@ function topmenuUI() {
         }
         else {
             // Show the free badge
-            $topMenu.find('.top-menu-item.account .right-el').text(l[435]);
+            $('.top-menu-item.account .right-el', $topMenu).addClass('free-account').text(l[1150]);
             $topHeader.find('.membership-status').attr('class', 'tiny-icon membership-status free');
             $('body').removeClass('lite').addClass('free');
         }

@@ -1521,7 +1521,6 @@
     "16312": "Wygl\u0105da na to, \u017ce zaczyna brakowa\u0107 wolnej powierzchni na dysku.",
     "16313": "[A]Zmien konto[\/A] na [S]PRO Lite[\/S] i ju\u017c wi\u0119cej nie obawiaj si\u0119, \u017ce zabraknie Ci pami\u0119ci na pliki. [S]For \u20ac%1 na miesi\u0105c dostaniesz 200 GB powierzchni na pliki[\/S] i 1 TB limitu na transfer.",
     "16314": "Mo\u017cesz zwi\u0119kszy\u0107 dost\u0119pn\u0105 powiwrzchni\u0119 dysku lub limit transferu poprzez zdobywanie nowych osi\u0105gni\u0119\u0107.",
-    "16315": "[S]Tw\u00f3j dysk w chmurze jest pe\u0142ny.[\/S] [A] Uaktualnij teraz[\/A] do konta PRO i uzyskaj [S]do %@ TB (%@ GB)[\/S] miejsca w chmurze.",
     "16316": "[S]Tw\u00f3j dysk w chmurze jest prawie pe\u0142ny.[\/S] [A] Uaktualnij teraz[\/A] do konta PRO i uzyskaj [S]do %@ TB (%@ GB)[\/S] miejsca w chmurze.",
     "16317": "Tw\u00f3j znajomy musi zarejestrowa\u0107 darmowe konto na MEGA i [S]zainstalowa\u0107 conajmniej jedn\u0105 aplikacj\u0119\u00a0MEGA[\/S] (lub uruchomi\u0107 synchornizacj\u0119 w jednej z naszych aplikacji mobilnych)",
     "16318": "Mo\u017cesz powiadomi\u0107 znajomego dolownym sposobem. Zdob\u0119dziesz nowe limity tylko gdy wpiszesz emaile znajomych tutaj.",
@@ -1895,7 +1894,7 @@
     "17828": "Odtw\u00f3rz dzwi\u0119k",
     "17829": "M\u00f3j kod QR",
     "17830": "Automatycznie akceptuj",
-    "17831": "U\u017cytkownicy, kt\u00f3rzy zeskanuj\u0105 Tw\u00f3j kod QR zostan\u0105 automatycznie dodane do Twoich kontakt\u00f3w.",
+    "17831": "U\u017cytkownicy MEGA, kt\u00f3rzy skanuj\u0105 Tw\u00f3j kod QR, zostan\u0105 automatycznie dodani do Twojej listy kontakt\u00f3w",
     "17832": "Zresetuj QR kod",
     "17833": "Poprzedni QR kod nie b\u0119dzie ju\u017c dost\u0119pny",
     "17834": "Zapisz jako obrazek",
@@ -1966,7 +1965,7 @@
     "18298": "Stuknij przycisk [B]Zmie\u0144 has\u0142o[\/B].",
     "18301": "Kliknij [B]ikon\u0119 [LOGO][\/B] na pasku zada\u0144.",
     "18302": "Kliknij ikon\u0119 [B]Ustawienia[\/B].",
-    "18303": "Kliknij [B]Ustawienia \/ Preferencje[\/B], aby otworzy\u0107 okno dialogowe.",
+    "18303": "Kliknij [B]Ustawienia\/Preferencje[\/B], aby otworzy\u0107 okno dialogowe.",
     "18304": "Kliknij zak\u0142\u0105dk\u0119 [B]Konto[\/B].",
     "18305": "Kliknij przycisk [B]Zmie\u0144 has\u0142o[\/B].",
     "18306": "Potwierd\u017a, \u017ce chcesz Zaparkowa\u0107 swoje konto",
@@ -3216,7 +3215,7 @@
     "20715": "Czy chcesz ten dodatek?",
     "20750": "Utw\u00f3rz swoje konto i uzyskaj [S]50 GB*[\/S] darmowej pami\u0119ci na MEGA. Pobieranie nie zostanie przerwane podczas tworzenia konta.",
     "20751": "Czy chcesz zaimportowa\u0107 ten plik?",
-    "20752": "Zaloguj si\u0119, aby zako\u0144czy\u0107 proces importowania. Mo\u017cesz te\u017c zaimportowa\u0107 ten plik do nowej sesji efemerycznej.",
+    "20752": "Zaloguj si\u0119 lub zarejestruj konto, aby zako\u0144czy\u0107 proces importowania. Mo\u017cesz te\u017c zaimportowa\u0107 ten plik do nowej sesji efemerycznej.",
     "20753": "Zarejestruj konto, aby importowa\u0107 pliki. Mo\u017cesz te\u017c zaimportowa\u0107 ten plik do nowej sesji efemerycznej.",
     "20754": "Importuj do efemerycznej sesji",
     "20755": "Stw\u00f3rz darmowe konto",
@@ -3366,5 +3365,5 @@
     "22674": "[A]Uaktualnij teraz[\/A] i ciesz si\u0119 bezpiecznym, zaszyfrowanym kompleksowym magazynem danych w chmurze.Konta PRO otrzymuj\u0105 [S]do %1 miejsca na dysku[\/S] i %2 przydzia\u0142u transferu, kt\u00f3re mog\u0105 udost\u0119pni\u0107 u\u017cytkownikom pobieraj\u0105cym swoje pliki.",
     "22676": "Kod \u017ar\u00f3d\u0142owy Visual Basic",
     "22677": "Szybki kod \u017ar\u00f3d\u0142owy",
-    "22681": "Transparency Report"
+    "22681": "Raport przejrzysto\u015bci"
 }

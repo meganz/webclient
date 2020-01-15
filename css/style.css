@@ -7560,7 +7560,7 @@ table {
 .contact-requests td:nth-child(3), .sent-requests td:nth-child(3) {
     width: 340px;
 }
-.contact-requests th:nth-child(2)::after, .sent-requests th:nth-child(2)::after {
+.contact-requests th:last-child::after, .sent-requests th:last-child::after {
     display: none;
 }
 .sent-requests-grid .grid-table tr td:first-child, .sent-requests-grid tr th:first-child, .contact-requests-grid .grid-table tr td:first-child, .contact-requests-grid tr th:first-child {

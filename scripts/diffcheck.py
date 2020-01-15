@@ -250,7 +250,7 @@ def reduce_eslint(file_line_mapping, **extra):
                 else:
                     result.append(line)
 
-    result = warning_result + result;
+    result = result + warning_result;
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1

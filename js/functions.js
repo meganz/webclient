@@ -2804,9 +2804,9 @@ function blockChromePasswordManager() {
         var switchReadonly = function __switchReadonly(input) {
 
             input.setAttribute('readonly', true);
-            setTimeout(function() {
+            onIdle(function() {
                 input.removeAttribute('readonly');
-            }, 200);
+            });
         };
 
         $newPasswordField.rebind('focus.blockAutofill, mousedown.blockAutofill', function() {

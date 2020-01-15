@@ -233,6 +233,7 @@ def reduce_eslint(file_line_mapping, **extra):
     # Go through output and collect only relevant lines to the result.
     result = ['\nESLint output:\n==============\n']
     eslint_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
+    warning_result = []
     for line in output:
         parse_result = eslint_expression.findall(line)
         # Check if we've got a relevant line.
@@ -241,16 +242,24 @@ def reduce_eslint(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                result.append(line)
+                line = line.encode('ascii')
 
                 if re.search(r': line \d+, col \d+, Warning - ', line):
                     warnings += 1
+                    warning_result.append(line)
+                else:
+                    result.append(line)
+
+    result = warning_result + result;
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
     if error_count == 0:
         return '', 0
-    result.append('\n{} issue(s)'.format(error_count))
+    if warnings:
+        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+    else:
+        result.append('\n{} error(s) found.'.format(error_count))
     return '\n'.join(result), error_count - warnings
 
 def strip_ansi_codes(s):

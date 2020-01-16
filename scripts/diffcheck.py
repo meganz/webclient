@@ -752,7 +752,7 @@ def main(base, target, norules, branch, jscpd):
             fatal = result[2]
         result = result[0].rstrip();
         if result:
-            results.append(result.decode("utf-8"))
+            results.append(result)
         total_errors += error_count
 
         # If a fatal issue is found, halt execution and quit

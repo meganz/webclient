@@ -1203,8 +1203,7 @@ ChunkUpload.prototype.updateprogress = function() {
         Math.floor(tp / this.file.size * 100),
         tp,
         this.file.size,
-        // eslint-disable-next-line no-extra-parens
-        GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0), // speed
+        GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0, // speed
         this.file.isCreateFile
     );
 

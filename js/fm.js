@@ -2907,13 +2907,6 @@ function createFileDialog(close, action, params) {
             $dialog.addClass('duplicate');
             $input.addClass('error');
 
-            setTimeout(function() {
-                $dialog.removeClass('duplicate');
-                $input.removeClass('error');
-
-                $input.focus();
-            }, 5000);
-
             return;
         }
         closeFunction();
@@ -2946,6 +2939,10 @@ function createFileDialog(close, action, params) {
 
         if (e.which === 13 && $(this).val() !== '') {
             doCreateFile($(this).val());
+        }
+        else {
+            $input.removeClass('error');
+            $dialog.removeClass('duplicate');
         }
     });
 

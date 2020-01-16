@@ -1436,7 +1436,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
 };
 
 
-// eslint-disable-next-line complexity
+
 MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
     'use strict';
 

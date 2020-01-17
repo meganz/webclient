@@ -1243,14 +1243,6 @@
 .small-icon.context.plus {
     background-position: -201px -391px;
 }
-.small-icon.context.plusfolder {
-    background-position: -3px -3px;
-    background-image: url(../images/mega/newFolder_ico_black.svg);
-}
-.small-icon.context.plusfile {
-    background-position: -3px -3px;
-    background-image: url(../images/mega/newTextFile_ico_black.svg);
-}
 .small-icon.context.file-upload {
     background-position: -201px -429px;
 }
@@ -1264,11 +1256,6 @@
 }
 .small-icon.context.loupe {
     background-position: -102px 1px;
-}
-.small-icon.context.edit-file {
-    background-image: url(../images/mega/edit_ico_black.svg);
-    background-position: -3px -2px;
-    opacity: 1;
 }
 .small-icon.context.open-folder {
     background-position: -2px -1071px;
@@ -1438,13 +1425,10 @@
 .small-icon.context.manage-widget {
     background-position: -202px -1112px;
 }
-/* hovers*/
+
+/* icons-sprite hovers*/
 .dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
-}
-.dropdown-item:hover .small-icon.context.edit-file {
-    background-image: url(../images/mega/edit_ico_white.svg);
-    background-position: -3px -2px;
 }
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
@@ -1488,14 +1472,6 @@
 }
 .dropdown-item:hover .small-icon.context.plus {
     background-position: -241px -391px;
-}
-.dropdown-item:hover .small-icon.context.plusfolder {
-    background-position: -3px -3px;
-    background-image: url(../images/mega/newFolder_ico_white.svg);
-}
-.dropdown-item:hover .small-icon.context.plusfile {
-    background-position: -3px -3px;
-    background-image: url(../images/mega/newTextFile_ico_white.svg);
 }
 .dropdown-item:hover .small-icon.context.file-upload {
     background-position: -241px -429px;
@@ -1588,7 +1564,33 @@
 .dropdown-item:hover:not(.static) .small-icon.context.status, .dark .dropdown-item:not(.static) .small-icon.context.status {
     background-position: -199px -1277px;
 }
+
+/* Context-sprite */
+.context-sprite, i.context-sprite {
+    background-image: url(../images/mega/context-sprite_v1.png);
+}
+.small-icon.context-sprite.plusfolder {
+    background-position: 0px 1px;
+}
+.small-icon.context-sprite.plusfile {
+    background-position: -158px 0;
+}
+.small-icon.context-sprite.edit-file {
+    background-position: -77px 0;
+    width: 22px;
+}
+.dropdown-item:hover .small-icon.context-sprite.edit-file {
+    background-position: -117px 0;
+}
+.dropdown-item:hover .small-icon.context-sprite.plusfolder {
+    background-position: -40px 1px;
+}
+.dropdown-item:hover .small-icon.context-sprite.plusfile {
+    background-position: -198px 0px;
+}
+
 /* End of Context menu icons */
+
 .huge-icon.storage-icon {
     background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 20px -771px;
@@ -1917,6 +1919,9 @@ i.account-icon.mobile {
 }
 i.account-icon.select-arrow {
     background-position: -6px -2150px;
+}
+i.account-icon.menu {
+    background-position: -5px -59px;
 }
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);

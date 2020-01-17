@@ -3,17 +3,17 @@
     height: 100%;
     background-color: rgba(213,218,220,0.95);
 }
-#mega-text-editor .editor-textarea-container{
+#mega-text-editor .editor-textarea-container {
     width: 60%;
-    height: calc(100% - 48px);
-    margin-left: max(calc( calc(100% - max(60%,800px)) / 2 ),0px);
+    height: 100%;
+    margin: 0 auto;
     min-width: 800px;
 }
-#mega-text-editor #text-editor-textarea{
+#mega-text-editor #text-editor-textarea {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 48px);
 }
-#mega-text-editor .disability-overlay{
+#mega-text-editor .disability-overlay {
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.3);
@@ -28,12 +28,12 @@
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
     border-top: none;
 }
-#mega-text-editor .editor-textarea-container .editor-btn-container{
+#mega-text-editor .editor-textarea-container .editor-btn-container {
     background-color:#FAFAFA;
     height: 48px;
 }
 #mega-text-editor .CodeMirror-gutters{
-    background-color:white;
+    background-color: white;
     border-color: white;
 }
 #mega-text-editor .CodeMirror-linenumber {
@@ -76,70 +76,6 @@
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
-#mega-text-editor .txt-editor-menu:hover {
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
-#mega-text-editor .txt-editor-menu {
-    background-position: -2px -56px;
-    /*opacity: 0.7;*/
-    background-image: url(../images/mega/top-sprite_v7@2x.png);
-    background-size: 38px auto;
-    width: 34px;
-    height: 34px;
-    display: inline-block;
-    margin-left: 7px;
-    margin-top: 6px;
-    display: inline-block;
-    cursor: pointer;
-    box-sizing: border-box;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4);
-    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
-}
-#mega-text-editor .txt-editor-menu.disabled {
-    opacity:0.1;
-}
-#mega-text-editor .editor-txt-left-btns {
-    display:inline-block;
-}
-#mega-text-editor .txt-editor-download-btn {
-    display: inline-block;
-    box-sizing: border-box;
-    height: 34px;
-    width: 116px;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 4px;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4);
-    position: fixed;
-    margin-top: 6px;
-    margin-left: 8px;
-    transition: color 200ms ease-in-out, box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
-}
-#mega-text-editor .txt-editor-download-btn:hover {
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
-#mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-txt{
-    display: inline-block;
-    color: #333333;
-    font-family: 'LatoWebSemibold', 'source_sans_proregular';
-    font-size: 14px;
-    line-height: 18px;
-    position: fixed;
-    margin-top: 8px;
-    margin-left: 5px;
-}
-#mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-icon{
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    background-image: url(../images/mega/icons-sprite_v36.png);
-    background-position: -99px -136px;
-    margin-top: 4px;
-    margin-left: 7px;
-    opacity: 0.85;
-}
 #mega-text-editor .top-menu-item {
     padding-right: 10px;
     cursor: default;
@@ -148,13 +84,10 @@
     cursor: pointer;
 }
 #mega-text-editor .editor-file-name-title {
-    display: inline-block;
     height: 24px;
-    /* width: 50px; */
-    margin-left: calc(50% - 252px);
     width: 408px;
     text-align: center;
-    vertical-align: super;
+    margin: 11px auto 0 auto;
 }
 #mega-text-editor .transfer-filetype-icon {
     position: initial;
@@ -166,8 +99,7 @@
 #mega-text-editor .txt-editor-file-name {
     display: inline-block;
     height: 24px;
-    vertical-align: middle;
-    padding-bottom: 6px;
+    vertical-align: top;
     font-family: 'source_code_proregular';
     width: 350px;
     text-overflow: ellipsis;
@@ -177,57 +109,33 @@
 #mega-text-editor .txt-editor-opened-f-name {
     display: inline-block;
     height: 24px;
-    vertical-align: middle;
-    padding-bottom: 6px;
+    line-height: 24px;
+    vertical-align: top;
+    padding-bottom: 0;
     max-width: 350px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     font-size: 13px;
-    font-family: 'source_sans_proregular';
 }
-#mega-text-editor .default-green-button {
+#mega-text-editor .default-green-button, #mega-text-editor .default-white-button {
     display: inline-block;
-    position: unset;
-    vertical-align: bottom;
-    border: 1px solid #009985;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4);
-    min-width:unset;
-    margin-left:6px;
-}
-#mega-text-editor .default-green-button:hover {
-    /*-webkit-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);*/
-    box-shadow: 0px 0px 0px 4px rgba(0,191,165,0.3);
-}
-#mega-text-editor .default-white-button {
-    display: inline-block;
-    position: unset;
-    vertical-align: bottom;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.4);
     min-width: unset;
+    margin: 0 4px;
 }
-#mega-text-editor .default-white-button:hover {
-    /*-webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);*/
-    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.15);
-}
-#mega-text-editor .txt-editor-btn:before {
-    content:none;
-}
-#mega-text-editor .txt-editor-btn:after {
-    content: none;
-}
-#mega-text-editor .buttons-holder {
+#mega-text-editor .default-white-button i {
+    opacity: 0.8;
     display: inline-block;
-    float: right;
-    margin-right: 9px;
-    margin-top: 8px;
+}
+#mega-text-editor .txt-editor-menu i {
+    opacity: 0.7;
+    margin: 3px -11px 0px -11px;
 }
 
+#mega-text-editor .buttons-holder {
+    margin: 7px 4px 0 4px;
+    font-size: 0;
+}
 .CodeMirror-simplescroll-horizontal div, .CodeMirror-simplescroll-vertical div {
     position: absolute;
     background: #ccc;

@@ -432,7 +432,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     ignoreGrideExtras = true;
                 }
                 else {
-                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').attr('style', 'display:block ');
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').css('display', 'block');
 
                     if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
                         $(menuCMI).filter('.folderupload-item').show();

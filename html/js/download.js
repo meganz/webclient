@@ -523,8 +523,7 @@ function dl_g(res) {
             var showTextView = function() {
                 if (isTextual(dl_node)) {
                     // there's no jquery parent for this container.
-                    // eslint-disable-next-line local-rules/jquery-scopes
-                    var $containerB = $('.download.info-block');
+                    var $containerB = $('.download.main-pad .download.info-block');
                     var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
 
                     $viewBtns.addClass('clickable').removeClass('hidden')

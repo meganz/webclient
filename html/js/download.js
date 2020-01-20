@@ -521,31 +521,35 @@ function dl_g(res) {
              *@returns {Void}           void
              */
             var showTextView = function() {
-                var $containerB = $('.download.main-pad .download.info-block');
-                var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
+                if (isTextual(dl_node)) {
+                    // there's no jquery parent for this container.
+                    // eslint-disable-next-line local-rules/jquery-scopes
+                    var $containerB = $('.download.info-block');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
 
-                $viewBtns.addClass('clickable').removeClass('hidden')
-                    .rebind('click.txtViewer', function() {
-                        loadingDialog.show();
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click.txtViewer', function() {
+                            loadingDialog.show();
 
-                        mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
-                            function(data) {
+                            mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
+                                }
+                            ).fail(function() {
                                 loadingDialog.hide();
-                                var fName;
-                                if (dl_node && dl_node.name) {
-                                    fName = dl_node.name;
-                                }
-                                else {
-                                    var $fileinfoBlock = $('.download.file-info', $containerB);
-                                    fName = $('.big-txt', $fileinfoBlock).attr('title');
-                                }
-
-                                mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
-                            }
-                        ).fail(function() {
-                            loadingDialog.hide();
+                            });
                         });
-                    });
+                }
             };
 
             if (res.fa) {
@@ -587,9 +591,7 @@ function dl_g(res) {
             }
             else {
                 // if it's textual file, then handle the UI.
-                if (isTextual(dl_node)) {
-                    showTextView();
-                }
+                showTextView();
             }
 
             if (prevBut) {

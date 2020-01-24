@@ -52,7 +52,7 @@
     "grunt-contrib-htmlmin": "3.1.0",
     "grunt-htmljson": "0.1.1",
     "prop-types": "15.7.2",
-    "react-hot-loader": "4.12.18",
+    "react-hot-loader": "4.12.19",
     "webpack": "4.41.5",
     "webpack-cli": "3.3.10"
   },
@@ -60,7 +60,7 @@
     "babel-eslint": "10.0.3",
     "eslint": "6.8.0",
     "eslint-loader": "3.0.3",
-    "eslint-plugin-compat": "3.3.0",
+    "eslint-plugin-compat": "3.5.1",
     "eslint-plugin-dollar-sign": "1.0.2",
     "eslint-plugin-jquery": "1.5.1",
     "eslint-plugin-local-rules": "0.1.1",
@@ -88,7 +88,7 @@
     "karma-sinon": "1.0.5",
     "mocha": "7.0.0",
     "phantomjs-prebuilt": "2.1.16",
-    "sinon": "8.1.0",
+    "sinon": "8.1.1",
     "webpack-dev-server": "3.10.1"
   }
 }

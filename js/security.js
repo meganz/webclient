@@ -800,6 +800,7 @@ security.login = {
 
         // Temporarily cache the email, password and remember me checkbox status
         // in case we need to resend after they have entered their two factor code
+        email = email.trim();
         security.login.email = email;
         security.login.password = password;
         security.login.rememberMe = rememberMe;

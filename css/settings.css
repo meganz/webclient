@@ -504,7 +504,8 @@
     bottom: 0;
     background-color: rgba(0,0,0,0.1);
 }
-.fm-right-account-block .default-white-button {
+.fm-right-account-block .default-white-button,
+.settings-choose-homepage-dropdown {
     position: absolute;
     margin-left: 12px;
     display: inline-block;
@@ -541,7 +542,7 @@
 .fm-voucher-popup .mega-input-title-ontop {
     width: 222px;
 }
-.fm-right-account-block .mega-input-title-ontop input, 
+.fm-right-account-block .mega-input-title-ontop input,
 .fm-voucher-popup .mega-input-title-ontop input {
     width: 220px;
 }
@@ -1410,7 +1411,7 @@
     display: block;
     margin:12px auto;
     text-align: center;
-} 
+}
 .fm-account-main.low-width .last-block .content-txt {
     display: none;
 }

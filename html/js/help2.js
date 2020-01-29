@@ -532,9 +532,20 @@ var Help = (function() {
                 return;
             }
 
+            // If bundleID is not valid, ignore client and section name, just use question id to load.
+            var bundleID = 'help_' + args.join('_');
+            if (!Data.hasOwnProperty(bundleID) && question) {
+                var article = idx.all.filter(function(doc) {
+                    return doc.id.indexOf(question) !== -1;
+                });
 
+                if (article[0] && article[0].url) {
+                    loadSubPage(article[0].url);
+                    return;
+                }
+            }
 
-            var data = Data['help_' + args.join('_')];
+            var data = Data[bundleID];
             if (!data) {
                 loadSubPage('help');
                 return;

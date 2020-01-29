@@ -88,6 +88,8 @@ var accountinputs = {
         Soon(function() {
             $inputs.first().focus()
         });
+
+        return $formWrapper;
     }
 };
 

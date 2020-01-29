@@ -98,33 +98,6 @@ var emailchange = (function() {
     }
 
     /**
-     * Verify if a given password is the user's password. If everything is correct, we attempt to verify the email.
-     *
-     * In the old method, we use the new email address to generate a new "login hash" (email + password AES),
-     * without the step the current user won't be able to login with their new email address.
-     *
-     * @param {String} password The password from the form
-     */
-    function verifyEmailCallback(password) {
-
-        // If the user's Account Authentication Version is set for the new registration process (version 2)
-        if (u_attr.aav === 2) {
-
-            // Derive the keys from the password
-            security.getDerivedEncryptionKey(password, function(derivedEncryptionKeyArray32) {
-                continueEmailVerification(derivedEncryptionKeyArray32);
-            });
-        }
-        else {
-            // Derive the key from the password using the old method
-            var derivedEncryptionKeyArray32 = prepare_key_pw(password);
-
-            // Continue the verification
-            continueEmailVerification(derivedEncryptionKeyArray32);
-        }
-    }
-
-    /**
      * Continue the email verification
      * @param {Array} derivedEncryptionKeyArray32
      */
@@ -215,7 +188,17 @@ var emailchange = (function() {
                 // Receive the old email address and verify the password they typed is correct.
                 // If it is correct, then we update the user hash with the new email address.
                 context.email = res[1];
-                verifyEmailCallback(password);
+
+                // Verify if a given password is the user's password.
+                // If everything is correct, we attempt to verify the email.
+                security.getDerivedEncryptionKey(password)
+                    .then(function(derivedKey) {
+                        continueEmailVerification(derivedKey);
+                    })
+                    .catch(function(ex) {
+                        console.warn(ex);
+                        continueEmailVerification('');
+                    });
             }});
         }
 

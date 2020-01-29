@@ -1,0 +1,302 @@
+/**
+ * Dialogs CSS for mobile and desktop devices.
+ */
+
+.dialog-sprite {
+    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-repeat:  no-repeat;
+}
+.fm-dialog.big-radius {
+    border-radius: 24px;
+    box-shadow: 0 4px 18px 0 rgba(0,0,0,0.1);
+    border: 0;
+}
+.nw-fm-dialog-title, .fm-dialog-title {
+    font-size: 20px;
+    color: #333333;
+    line-height: 30px;
+    color: #666;
+    padding: 20px 48px 0 48px;
+    text-align: center;
+    min-height: 38px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+}
+.fm-dialog-title.small {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-size: 16px;
+    line-height: 25px;
+    letter-spacing: -0.18px;
+    color: #666666;
+}
+.fm-dialog-title.medium {
+    font-family: 'LatoWeb', 'source_sans_proregular';
+    font-size: 18px;
+    color: #333;
+    padding-top: 23px;
+}
+.fm-dialog-title.top-pad {
+    padding-top: 30px;
+}
+.contrast .fm-dialog-title {
+    color: #333333;
+}
+.mobile .fm-dialog-title {
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.mobile .fm-dialog-title.medium {
+    font-size: 16px;
+}
+.mobile .common-dialogs .fm-dialog {
+    max-height: 100%;
+    max-height: -webkit-calc(100% - 30px);
+    max-height: -moz-calc(100% - 30px);
+    max-height: calc(100% - 30px);
+    width: 100%;
+    width: -webkit-calc(100% - 30px);
+    width: -moz-calc(100% - 30px);
+    width: calc(100% - 30px);
+    max-width: 768px;
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+/* Email verification required */
+.fm-dialog.verify-email {
+    max-width: 360px;
+}
+.verify-email.header {
+    height: 240px;
+    background: #ff6464;
+    background: -moz-linear-gradient(top, #ff6464 0%, #cf4949 100%);
+    background: -webkit-linear-gradient(top, #ff6464 0%,#cf4949 100%);
+    background: linear-gradient(to bottom, #ff6464 0%,#cf4949 100%);
+    border-radius: 23px 23px 0 0;
+}
+.verify-email.header-txt {
+    font-size: 15px;
+    line-height: 20px;
+    color: white;
+    padding: 16px 20px 30px 20px;
+    text-align: center;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+    letter-spacing: 0;
+}
+.verify-email.header-txt.grey {
+    color:  #111;
+    padding: 16px 0 8px 0;
+}
+.dialog-top-icon.yellow-triangle {
+    background-position: center -6411px;
+    width: 160px;
+    height: 140px;
+    margin: 0 auto;
+}
+.verify-email.body {
+    padding: 24px 30px 36px 30px;
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+}
+.verify-email.body .text {
+    color: #333;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
+    position: relative;
+}
+.verify-email.body .text strong {
+    font-weight: normal;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
+}
+.verify-email.body .text.small {
+    font-size: 13px;
+    letter-spacing: 0;
+}
+.verify-email.body .text.red {
+    color: #F0373A;
+    font-size: 13px;
+    letter-spacing: 0.93px;
+    display: inline-block;
+    margin-bottom: 24px;
+}
+.verify-email.body .default-green-button {
+    min-width: 128px;
+    font-size: 14px;
+}
+.verify-email .status-txt {
+    font-size: 12px;
+    line-height: 20px;
+    color: #666;
+    position: absolute;
+    width: 100%;
+    bottom: 7px;
+    left: 0;
+}
+.dialog-top-icon.locked-account {
+    background-position: center -6594px;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+}
+.verify-email .dropdown.body {
+    width: 320px;
+    bottom: 25px;
+    left: 50%;
+    margin: 0 0 0 -160px;
+    border-radius: 6px;
+    padding: 27px 12px 12px 12px;
+    visibility: hidden;
+    position: absolute;
+    opacity: 0;
+     -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+    cursor: default;
+}
+.verify-email.body .text.red {
+    cursor: pointer;
+}
+.verify-email.body .text.red .dropdown.body::after {
+    content: '';
+    bottom: -10px;
+    left: 0;
+    height: 34px;
+    position: absolute;
+    width: 100%;
+}
+.verify-email.body .text.red:hover .dropdown.body {
+    visibility: visible;
+    opacity: 1;
+    bottom: 29px;
+}
+.verify-email .dropdown.body .text:last-child {
+    margin: 0;
+}
+.mobile .fm-dialog.verify-email {
+    max-width: 100%;
+}
+.mobile .verify-email.body {
+    padding: 19px 20px 25px 20px;
+}
+.mobile .verify-email.header {
+    height: 220px;
+}
+.mobile .verify-email.header-txt {
+    padding-bottom: 20px;
+}
+.mobile .verify-email.body .text {
+    margin-bottom: 15px;
+}
+.mobile .verify-email.body .text.red {
+    margin-bottom: 20px;
+}
+.mobile .verify-email .dropdown.body {
+    width: 100%;
+    margin-left: -50%;
+}
+.mobile .verify-email.body .text.red {
+    position: static;
+}
+.mobile .verify-email .dropdown.body {
+    max-width: 100%;
+    max-width: -webkit-calc(100% - 60px);
+    max-width: -moz-calc(100% - 60px);
+    max-width: calc(100% - 60px);
+    max-height: 100%;
+    max-height: -webkit-calc(100% - 60px);
+    max-height: -moz-calc(100% - 60px);
+    max-height: calc(100% - 60px);
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    margin: 0;
+    top: 50%;
+    max-height: none;
+    height: auto;
+    bottom: auto !important;
+}
+/*end of  Email verification required */
+
+/* Login to account  if accout has bee suspended */
+.fm-dialog.type-480px227 {
+    max-width: 480px;
+}
+.login-set-pass.body {
+    padding: 22px 35px 35px 35px;
+    font-size: 13px;
+    line-height: 20px;
+    color: #333;
+    text-align: center;
+}
+.login-set-pass .dialog-top-icon.locked-account {
+    margin-bottom: 15px;
+}
+.login-set-pass .text {
+    padding: 2px 0 18px 0;
+}
+.login-set-pass .dialog-login-form {
+    margin-top: 9px;
+}
+.login-set-pass .button {
+    margin-top: 10px;
+}
+.mobile .fm-dialog.type-480px227 {
+    max-width: 100%;
+}
+.mobile .login-set-pass .text {
+    padding-bottom: 5px;
+}
+.mobile .login-set-pass.body {
+    padding: 10px 25px 25px 25px;
+}
+.mobile .login-set-pass .dialog-login-form.low-pad {
+    margin-top: -10px; 
+}
+.mobile .login-set-pass .text {
+    padding: 2px 0 10px 0;
+}
+.mobile .account.dialog-login-form-low-pad {
+    margin-top: -5px;
+}
+.mobile .login-set-pass .dialog-login-form {
+    margin-top: 0;
+}
+.mobile .login-set-pass .dialog-top-icon.locked-account {
+    margin-bottom: 5px;
+}
+.mobile .type-480px227 .mega-input-title-ontop {
+    margin-bottom: 10px;
+}
+.mobile .login-set-pass .button {
+    margin-top: 0;
+}
+/* end of Login to account  if accout has bee suspended */
+
+@media only screen and (orientation:landscape) {
+    .mobile .verify-email.header {
+        height: auto;
+    }
+    .mobile .dialog-top-icon.yellow-triangle {
+        background-position: center -4004px;
+        height: 100px;
+        background-size: 100px auto;
+    }
+    .mobile .verify-email.header-txt {
+        padding-bottom: 0;
+    }
+}
+

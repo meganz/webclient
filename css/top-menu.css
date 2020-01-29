@@ -239,7 +239,7 @@
     height: 14px;
     right: 25px;
     top: 9px;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -12px -1303px;
     opacity: 0.7;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -289,7 +289,7 @@
     width: 24px;
     height: 24px;
     display: block;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
     -moz-transition: all 200ms ease-in-out;

@@ -2277,6 +2277,8 @@ else if (!browserUpdate) {
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+    jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
+    jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2748,6 +2750,7 @@ else if (!browserUpdate) {
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
+        'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
@@ -3524,6 +3527,9 @@ else if (!browserUpdate) {
                     if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
+                    else if (parseInt(response) === -16 /* EBLOCKED */) {
+                        loginresponse = -16;
+                    }
                     else if (typeof response[0] === 'object') {
                         loginresponse = response;
                     }
@@ -3684,6 +3690,10 @@ else if (!browserUpdate) {
         }
         else if (loginresponse === -15) {
             u_logout(true);
+            boot_auth(null, false);
+        }
+        else if (loginresponse === -16) {
+            api_setsid(u_sid);
             boot_auth(null, false);
         }
         else if (loginresponse)
@@ -3855,13 +3865,17 @@ function lazy(target, property, stub) {
 
 function promisify(fc) {
     'use strict';
-    return function() {
+    var a$yncMethod = function() {
         var self = this;
         var args = toArray.apply(null, arguments);
         return new Promise(function(resolve, reject) {
-            fc.apply(self, [resolve, reject].concat(args));
+            a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
         });
     };
+    a$yncMethod.prototype = undefined;
+    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
+    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
+    return a$yncMethod;
 }
 
 mBroadcaster.once('startMega', function() {

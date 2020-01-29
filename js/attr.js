@@ -1421,7 +1421,7 @@ var attribCache = false;
                 }
 
                 var target = typeof create === 'string' && create || M.RootID;
-                M.createFolder(target, ns.name, new MegaPromise()).always(function(target) {
+                M.createFolder(target, ns.name).always(function(target) {
                     if (!M.d[target]) {
                         if (d) {
                             log.warn("Failed to create folder...", target, api_strerror(target));

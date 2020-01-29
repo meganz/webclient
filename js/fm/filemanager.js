@@ -137,7 +137,10 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.default-white-button.l-pane-visibility').removeClass('active');
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
-        if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
+        if ($.dialog === 'pro-login-dialog'
+            || String($.dialog).startsWith('verify-email')
+            || localStorage.awaitingConfirmationAccount) {
+
             return false;
         }
         showWarningTokenInputLose().done(function() {
@@ -1856,16 +1859,16 @@ FileManager.prototype.createFolderUI = function() {
             loadingDialog.pshow();
             var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
-            M.createFolder(currentdirid, name, new MegaPromise())
-                .done(function(h) {
+            M.createFolder(currentdirid, name)
+                .then(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', currentdirid, h);
                     }
                     loadingDialog.phide();
                 })
-                .fail(function(error) {
+                .catch(function(ex) {
                     loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
                 });
         }
 
@@ -4228,4 +4231,21 @@ FileManager.prototype.getLinkAction = function() {
 
         _openDialog(dialogName, dispatcher);
     };
+
+    Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
+        value: function _abort() {
+            if (d && $.dialog) {
+                console.info('Aborting dialogs dispatcher while on %s, queued: ', $.dialog, _cdialogq);
+            }
+
+            delete $.dialog;
+            loadingDialog.hide('force');
+            _cdialogq = Object.create(null);
+
+            $('html, body').removeClass('overlayed');
+            $('.fm-dialog-overlay').addClass('hidden');
+            $('.fm-dialog:visible, .overlay:visible').addClass('hidden');
+        }
+    });
+
 })(self);

@@ -80,8 +80,8 @@ mobile.signin = {
         var $emailField = this.$screen.find('.signin-input.login input');
 
         // If the email has been set (e.g. from recovery process), pre-fill the email field
-        if (this.previousEmailUsed !== null) {
-            $emailField.val(this.previousEmailUsed);
+        if (this.previousEmailUsed || window.login_email) {
+            $emailField.val(this.previousEmailUsed || window.login_email);
         }
     },
 

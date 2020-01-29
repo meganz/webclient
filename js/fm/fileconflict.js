@@ -520,7 +520,7 @@
             if (remaining) {
                 $chk.removeClass('hidden')
                     .find('.radio-txt')
-                    .safeHTML(escapeHTML(l[16494]).replace('[S]2[/S]', '<span>' + remaining + '</span>'));
+                    .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
             }
 
             uiCheckboxes($dialog);

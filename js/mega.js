@@ -36,8 +36,9 @@ if (typeof loadingDialog === 'undefined') {
     // New subject value to specify loading dialog subject.
     // Loading dialog with subject will not disappear until it hided with the subject
     $.loadingSubject = Object.create(null);
-    loadingDialog.show = function(subject) {
 
+    loadingDialog.nest = 0;
+    loadingDialog.show = function(subject) {
         'use strict';
 
         subject = subject || 'common';
@@ -51,7 +52,6 @@ if (typeof loadingDialog === 'undefined') {
         $.loadingSubject[subject] = 1;
     };
     loadingDialog.hide = function(subject) {
-
         'use strict';
 
         subject = subject || 'common';
@@ -61,16 +61,22 @@ if (typeof loadingDialog === 'undefined') {
         if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
             $('.dark-overlay').addClass('hidden');
             $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
+
+            this.nest = 0;
             this.active = false;
+            $.loadingSubject = Object.create(null);
         }
     };
-    loadingDialog.nest = 0;
     loadingDialog.pshow = function() {
+        'use strict';
+
         if (!this.nest++) {
             this.show();
         }
     };
     loadingDialog.phide = function() {
+        'use strict';
+
         if (--this.nest < 1) {
             this.hide();
             this.nest = 0;

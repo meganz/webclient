@@ -51,11 +51,20 @@ pages['placeholder'] = '<div class="bottom-page scroll-block placeholder">' +
     '<div class="main-mid-pad new-bottom-pages"></div>' +
     '</div>';
 
-mBroadcaster.once('startMega', function () {
+mBroadcaster.once('startMega', function() {
     'use strict';
 
+    if (is_mobile) {
+        pages.placeholder = pages.mobile || '';
+    }
+
+    if (pages['dialogs-common']) {
+        $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
+        delete pages['dialogs-common'];
+    }
+
     if (!hashLogic) {
-        $(window).rebind('popstate.mega', function (event) {
+        $(window).rebind('popstate.mega', function(event) {
             var state = event.originalEvent.state || {};
             var add = '';
             if (state.searchString) {
@@ -66,24 +75,23 @@ mBroadcaster.once('startMega', function () {
     }
 });
 
-mBroadcaster.once('startMega:desktop', function () {
+mBroadcaster.once('startMega:desktop', function() {
     'use strict';
 
-    if (pages['dialogs']) {
-        $('body').safeAppend(translate(pages['dialogs'].replace(/{staticpath}/g, staticpath)));
-        delete pages['dialogs'];
-    }
-    if (pages['onboarding']) {
-        $('body').safeAppend(translate(pages['onboarding'].replace(/{staticpath}/g, staticpath)));
-        delete pages['onboarding'];
-    }
-    if (pages['chat']) {
-        $('body').safeAppend(translate(pages['chat'].replace(/{staticpath}/g, staticpath)));
-        delete pages['chat'];
+    var $body = $('body');
+    var p = ['chat', 'onboarding', 'dialogs'];
+
+    for (var i = p.length; i--;) {
+        if (typeof pages[p[i]] === 'string') {
+            $body.safeAppend(translate(pages[p[i]].replace(/{staticpath}/g, staticpath)));
+            delete pages[p[i]];
+        }
     }
 });
 
 function startMega() {
+    'use strict';
+
     jsl = [];
     mBroadcaster.sendMessage('startMega');
 
@@ -525,7 +533,7 @@ function init_page() {
 
     // If password revert link, use generic background page, show the dialog and pass in the code
     if (page.substr(0, 8) === 'pwrevert') {
-        parsepage(pages[is_mobile ? 'mobile' : 'placeholder']);
+        parsepage(pages.placeholder);
         passwordRevert.init(page);
 
         // Make sure placeholder background is shown
@@ -604,26 +612,16 @@ function init_page() {
 
     // If the account has just finished being cancelled
     if (localStorage.beingAccountCancellation) {
-        if (is_mobile) {
-            parsepage(pages['mobile']);
+        // Insert placeholder page while waiting for user input
+        parsepage(pages.placeholder);
 
-            // Show message that the account has been cancelled successfully
-            mobile.messageOverlay.show(l[6188], l[6189], function () {
-                loadSubPage('start');
-            });
-        }
-        else {
-            // Insert placeholder page while waiting for user input
-            parsepage(pages['placeholder']);
-
-            msgDialog('warninga', l[6188], l[6189], '', function () {
-                loadSubPage('start');
-            });
-        }
+        // Show message that the account has been cancelled successfully
+        msgDialog('warninga', l[6188], l[6189], '', loadSubPage.bind(null, 'start'));
 
         delete localStorage.beingAccountCancellation;
         return false;
     }
+
     // Password protected link decryption dialog
     if (page.substr(0, 2) === 'P!' && page.length > 2) {
         // Check if TextEncoder function is available for the stringToByteArray function
@@ -929,6 +927,9 @@ function init_page() {
                 signupcodebad: signUpFailedCallback
             });
         }
+    }
+    else if (page.startsWith('emailverify')) {
+        return security.showVerifyEmailDialog('login-to-account');
     }
     else if (u_type == 2) {
         if (is_mobile) {
@@ -1892,8 +1893,7 @@ function init_page() {
         }
         $('#topmenu').safeHTML(parsetopmenu());
 
-        $('#pageholder').hide();
-        $('#startholder').hide();
+        $('#pageholder, #startholder').addClass('hidden');
 
         // Prevent duplicate HTML content breaking things
         // what a strange solution!  [emptying #startholder!]
@@ -1908,7 +1908,7 @@ function init_page() {
                 $('.nw-fm-left-icons-panel').addClass('hidden');
                 $('.top-head .logo').css("display", "block");
             }
-            $('#fmholder').show();
+            $('#fmholder').removeAttr('style').removeClass('hidden');
             if (fminitialized && !is_mobile) {
                 M.addViewUI();
 
@@ -1941,7 +1941,7 @@ function init_page() {
         pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
-        if (loggedout) {
+        if (loggedout || u_type === false) {
             loadSubPage('start');
             return false;
         }
@@ -2761,50 +2761,48 @@ function pagemetadata() {
 }
 
 
-function parsepage(pagehtml, pp) {
+function parsepage(pagehtml) {
+    'use strict';
+
+    var $body = $('body').removeClass('ads');
+    $('#fmholder, #pageholder, #startholder').addClass('hidden');
     pagemetadata();
-    $('body').removeClass('ads');
-    $('#fmholder').hide();
-    $('#pageholder').hide();
-    $('#startholder').hide();
 
     pagehtml = translate('' + pagehtml).replace(/{staticpath}/g, staticpath);
+
+    if (pagehtml.indexOf('((MEGAINFO))') > 0) {
+        pagehtml = pagehtml.replace(/\(\(MEGAINFO\)\)/g, translate(pages.megainfo));
+    }
+    if (pagehtml.indexOf('((TOP))') > 0) {
+        pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, parsetopmenu());
+    }
+    if (pagehtml.indexOf('((BOTTOM))') > 0) {
+        pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(pages.bottom2));
+    }
+    if (pagehtml.indexOf('((PAGESMENU))') > 0) {
+        pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pages.pagesmenu));
+    }
     if (is_chrome_web_ext || is_firefox_web_ext) {
         pagehtml = pagehtml.replace(/\/#/g, '/' + urlrootfile + '#');
     }
 
-    var top = parsetopmenu();
-    var bmenu = pages['bottom'];
-    var bmenu2 = pages['bottom2'];
-    var pagesmenu = pages['pagesmenu'];
-    var $scrollableEl;
-
-    if (is_chrome_web_ext || is_firefox_web_ext) {
-        bmenu2 = bmenu2.replace(/\/#/g, '/' + urlrootfile + '#');
+    if (!$.mTransferWidgetPage) {
+        $.mTransferWidgetPage = translate(pages.transferwidget);
     }
-    pagehtml = pagehtml
-        .replace(/\(\(MEGAINFO\)\)/g, translate(pages['megainfo'])
-            .replace(/{staticpath}/g, staticpath));
-    pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, top);
-    pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(bmenu2));
-    pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pagesmenu));
+    pagehtml = ($.mTransferWidgetPage + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    var $container = $('#startholder');
-    $container
-        .safeHTML('<div class="nav-overlay"></div>' +
-        translate(pages['transferwidget']) + pagehtml)
-        .show();
+    $('#startholder').safeHTML('<div class="nav-overlay"></div>' + pagehtml).removeClass('hidden');
 
-    $('body').addClass('bottom-pages');
-    $scrollableEl = $('body, html, .bottom-pages .fmholder');
-    $scrollableEl.stop(true, true).scrollTop(0);
+    $body.addClass('bottom-pages');
+    $('body, html, .bottom-pages .fmholder').stop(true, true).scrollTop(0);
     bottompage.init();
 
     if (typeof M.initUIKeyEvents === 'function') {
         M.initUIKeyEvents();
     }
-    clickURLs();
-    scrollToURLs();
+    onIdle(clickURLs);
+    onIdle(scrollToURLs);
+    onIdle(topmenuUI);
 }
 
 function parsetopmenu() {

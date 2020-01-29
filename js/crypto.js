@@ -927,6 +927,11 @@ function api_reqfailed(c, e) {
                     // needed to verify by SMS and if logged out then it won't work
                     return false;
                 }
+                else if (reasonCode === 700) {
+                    var to = String(page).startsWith('emailverify') && 'login-to-account';
+                    security.showVerifyEmailDialog(to);
+                    return false;
+                }
                 else {
                     // Unknown reasonCode
                     reasonText = l[17740]; // Your account was terminated due to breach of Mega's Terms of Service...

@@ -2770,16 +2770,16 @@ function parsepage(pagehtml) {
 
     pagehtml = translate('' + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    if (pagehtml.indexOf('((MEGAINFO))') > 0) {
+    if (pagehtml.indexOf('((MEGAINFO))') > -1) {
         pagehtml = pagehtml.replace(/\(\(MEGAINFO\)\)/g, translate(pages.megainfo));
     }
-    if (pagehtml.indexOf('((TOP))') > 0) {
+    if (pagehtml.indexOf('((TOP))') > -1) {
         pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, parsetopmenu());
     }
-    if (pagehtml.indexOf('((BOTTOM))') > 0) {
+    if (pagehtml.indexOf('((BOTTOM))') > -1) {
         pagehtml = pagehtml.replace(/\(\(BOTTOM\)\)/g, translate(pages.bottom2));
     }
-    if (pagehtml.indexOf('((PAGESMENU))') > 0) {
+    if (pagehtml.indexOf('((PAGESMENU))') > -1) {
         pagehtml = pagehtml.replace(/\(\(PAGESMENU\)\)/g, translate(pages.pagesmenu));
     }
     if (is_chrome_web_ext || is_firefox_web_ext) {

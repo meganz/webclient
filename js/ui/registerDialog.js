@@ -373,7 +373,8 @@
             }
         });
 
-        $('.checkbox-block.register a', $dialog).rebind('click', function(e) {
+        $('.checkbox-block.register .terms-check a', $dialog).rebind('click', function(e) {
+
             e.preventDefault();
             $.termsAgree = function() {
                 $('.register-check', $dialog).removeClass('checkboxOff')

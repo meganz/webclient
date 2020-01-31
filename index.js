@@ -2949,3 +2949,14 @@ mBroadcaster.once('boot_done', function () {
     attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
     attribCache.bitMapsManager = new MegaDataBitMapManager();
 });
+
+// After open folder call, check if we should restore any previously opened preview node.
+mBroadcaster.once('mega:openfolder', function() {
+    'use strict';
+
+    if (sessionStorage && sessionStorage.previewNode) {
+        var previewNode = sessionStorage.previewNode;
+        sessionStorage.removeItem('previewNode');
+        (is_mobile ? mobile.slideshow.init : slideshow)(previewNode);
+    }
+});

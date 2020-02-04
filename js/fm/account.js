@@ -379,7 +379,7 @@ accountUI.general = {
             $('.small-icon.membership').addClass('pro' + planNum);
         }
         else {
-            $('.account.membership-plan').text(l[435]);
+            $('.account.membership-plan').text(l[1150]);
         }
 
         // update avatar
@@ -1575,7 +1575,7 @@ accountUI.plan = {
             }
             else {
                 // free account:
-                $('.account.plan-info.accounttype span').text(l[435]);
+                $('.account.plan-info.accounttype span').text(l[1150]);
                 $('.account.plan-info.expiry').text(l[436]);
                 $('.btn-cancel-sub').addClass('hidden');
                 if (account.mxfer) {

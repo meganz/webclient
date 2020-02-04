@@ -1644,7 +1644,7 @@
 
 
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
-        if (chatRoom.type !== "public") {
+        if (chatRoom && chatRoom.type !== "public") {
             promise.always(function() {
 
                 if (

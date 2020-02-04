@@ -242,8 +242,6 @@ def reduce_eslint(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                line = line.encode('ascii')
-
                 if re.search(r': line \d+, col \d+, Warning - ', line):
                     warnings += 1
                     warning_result.append(line)
@@ -400,8 +398,8 @@ def analyse_files_for_special_chars(filename, result):
                 for column, character in enumerate(line):
                     code = ord(character)
                     if code >= 128:
-                        result.append('Found non-ASCII character {} ({}) at file {}, line {}, column {}'
-                                     .format(code, character.encode("utf-8"), filename, linenumber + 1, column))
+                        result.append(u'Found non-ASCII character {} ({}) at file {}, line {}, column {}'
+                                     .format(code, character, filename, linenumber + 1, column))
                         test_fail = True
 
     return test_fail
@@ -772,7 +770,7 @@ def main(base, target, norules, branch, jscpd):
     warnings = count - total_errors
     if count:
         logging.info('Output of reduced results ...')
-        print('\n\n'.join(results).rstrip())
+        print('\n\n'.join(results).rstrip().encode("utf-8"))
 
     if jscpd and copypaste_detector(file_line_mapping):
         total_errors += 1

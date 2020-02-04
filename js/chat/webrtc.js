@@ -556,7 +556,7 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
                     // so we must take care ourselves of the previous call
                     // If we don't delete activeCall.incallPingTimer, activeCall._destroy() will send an ENDCALL,
                     // server will reply with an ENDCALL, which will terminate the other (surviving) call
-                    delete activeCall._inCallPingTimer;
+                    activeCall._stopIncallPingTimer(true);
                     activeCall._destroy(Term.kCancelOutAnswerIn, false)
                     .then(function() {
                         // Create an incoming call from the packet, and auto answer it
@@ -1802,14 +1802,18 @@ Call.prototype._startIncallPingTimer = function() {
     func();
 };
 
-Call.prototype._stopIncallPingTimer = function() {
+Call.prototype._stopIncallPingTimer = function(dontSendEndcall) {
     var self = this;
-    if (self._inCallPingTimer) {
-        clearInterval(self._inCallPingTimer);
-        delete self._inCallPingTimer;
+    if (!self._inCallPingTimer) {
+        return;
+    }
+    clearInterval(self._inCallPingTimer);
+    delete self._inCallPingTimer;
+    if (!dontSendEndcall) {
         self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
     }
 };
+
 Call.prototype.hasNoSessions = function() {
     return (Object.keys(this.sessions).length === 0);
 };

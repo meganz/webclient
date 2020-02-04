@@ -1601,6 +1601,22 @@ RtcSessionEventHandler.prototype.onDestroy = function () {
     // unused
 };
 
+RtcSessionEventHandler.prototype.onStats = function (strStats) {
+    var sess = this.rtcSession;
+    var peerView = document.querySelector('.stream' + base64urlencode(sess.peer) + '_' + base64urlencode(sess.peerClient) +
+                     '_' + base64urlencode(sess.sid));
+    if (!peerView) {
+        return;
+    }
+    var statsOverlay = peerView.querySelector('.rtc-stats');
+    if (!statsOverlay) {
+        statsOverlay = document.createElement('pre');
+        statsOverlay.classList.add('rtc-stats');
+        peerView.appendChild(statsOverlay);
+    }
+    statsOverlay.innerHTML = strStats;
+};
+
 RtcSessionEventHandler.prototype.onConnect = function () {
     this.call.onSessionConnected(makeStreamId(this.rtcSession));
 };

@@ -917,9 +917,9 @@ function start_import() {
     }
 
     var dialogHeader = l[20751];
-    var dialogTxt = l[20753];
-    var dialogType = 'import_register';
-    var buttonEvent = function() {
+    var dialogTxt = l[20752];
+    var dialogType = 'import_login_or_register';
+    var buttonEventRegister = function() {
         mega.ui.showRegisterDialog({
             body: l[20756],
             showLogin: true,
@@ -935,19 +935,18 @@ function start_import() {
         });
     };
 
-    if (u_wasloggedin()) {
-        dialogTxt = l[20752];
-        dialogType = 'import_login';
-        buttonEvent = function() {
-            mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
-        };
-    }
+    var buttonEventLogin = function() {
+        mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
+    };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === true) {
-            buttonEvent();
+        if (e === 'login') {
+            buttonEventLogin();
         }
-        else if (e === false) {
+        else if (e === 'register') {
+            buttonEventRegister();
+        }
+        else if (e === 'ephemeral') {
             start_anoimport();
         }
         else {

@@ -216,16 +216,13 @@ var dlmanager = {
      * @param {String} filename The filename..
      * @returns {MegaPromise}
      */
-    getFileSizeOnDisk: function(handle, filename) {
+    getFileSizeOnDisk: promisify(function(resolve, reject, handle, filename) {
         'use strict';
-
-        var promise = new MegaPromise();
-        var reject = promise.reject.bind(promise, null);
 
         if (dlMethod === FileSystemAPI) {
             M.getFileEntryMetadata('mega/' + handle)
                 .then(function(metadata) {
-                    promise.resolve(metadata.size);
+                    resolve(metadata.size);
                 }).catch(reject);
         }
         else if (is_chrome_firefox && typeof OS !== 'undefined') {
@@ -234,7 +231,7 @@ var dlmanager = {
 
                 OS.File.stat(OS.Path.join(root.path, filename))
                     .then(function(info) {
-                        promise.resolve(info.size);
+                        resolve(info.size);
                     }, reject);
             }
             catch (ex) {
@@ -244,9 +241,7 @@ var dlmanager = {
         else {
             reject(EACCESS);
         }
-
-        return promise;
-    },
+    }),
 
     /**
      * Initialize download

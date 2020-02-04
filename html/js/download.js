@@ -320,7 +320,7 @@ function dl_g(res) {
 
                         dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
-                            dlResumeInfo.byteLength = size;
+                            dlResumeInfo.byteLength = size >= 0 ? size : null;
 
                             if (isPageRefresh) {
                                 if (d) {

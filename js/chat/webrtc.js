@@ -11,6 +11,7 @@
 // jshint -W098
 // jshint -W074
 // jshint -W073
+/* no-eq-null: "off" */
 
 var CallDataType = Object.freeze({
     kNotRinging: 0,
@@ -39,6 +40,9 @@ function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
         throw new RtcModule.NotSupportedError(
             "Attempted to create RtcModule, but there is no webRTC support in this browser"
         );
+    }
+    if (!RtcModule.cfg) {
+        RtcModule.setupCfg();
     }
     var self = this;
     self.setupLogger();
@@ -88,6 +92,7 @@ RtcModule.kStreamRenegTimeout = 10000;
 // If sess setup times out and the time elapsed since the SDP handshake completed
 // till the timeout is more than this, then fail the session with kErrIceTimeout
 RtcModule.kIceTimeout = 18000;
+RtcModule.kMediaConnRecoveryTimeout = 15000;
 
 RtcModule.kMaxCallReceivers = 20;
 RtcModule.kMaxCallAudioSenders = RtcModule.kMaxCallReceivers;
@@ -96,6 +101,36 @@ RtcModule.kMicInputDetectTimeout = 10000;
 RtcModule.kSessTermAckTimeout = 1000;
 RtcModule.kSessRetryDelay = 0;
 RtcModule.kEnableStreamReneg = true;
+
+// Local storage settings cache
+RtcModule.setupCfg = function() {
+    var keys = ["forceRelay", "maxBr", "maxGroupBr", "showStats", "tearSessOnMediaDisconn"];
+    var cache = {};
+    var cfg = RtcModule.cfg = {};
+    keys.forEach(function(k) {
+        Object.defineProperty(cfg, k, {
+            get: function() {
+                if (!cache.hasOwnProperty(k)) {
+                    cache[k] = localStorage["rtc:" + k]; // cache first if available
+                }
+                return cache[k];
+            },
+            set: function(val) {
+                if (val == null) {
+                    delete cache[k];
+                    localStorage.removeItem("rtc:" + k);
+                    console.warn("Deleted config value '" + k + "' from localStorage");
+                }
+                else {
+                    cache[k] = val;
+                    localStorage["rtc:" + k] = val;
+                    console.warn("Saved config value '" + k + "' to localStorage");
+                }
+            },
+            configurable: false
+        });
+    });
+};
 
 RtcModule.prototype.logToServer = function(type, data) {
     if (typeof data !== 'object') {
@@ -119,21 +154,15 @@ RtcModule.prototype.logToServer = function(type, data) {
 };
 
 RtcModule.prototype.setupLogger = function() {
-    var loggerDebug = localStorage['webrtcDebug'] === "1";
-    var minLogLevel = loggerDebug ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
     var self = this;
     self._loggerOpts = {
         minLogLevel: function() {
-            return MegaLogger.LEVELS.DEBUG; // minLogLevel;
+            return MegaLogger.LEVELS.DEBUG;
         },
         transport: function(level, args) {
             if (level === MegaLogger.LEVELS.ERROR || level === MegaLogger.LEVELS.CRITICAL) {
                 console.error.apply(console, args);
                 self.logToServer('e', args.join(' '));
-                return;
-            }
-            if (loggerDebug) {
-                console.error.apply(console, args);
                 return;
             }
             var fn;
@@ -1437,7 +1466,7 @@ Call.prototype.msgJoin = function(packet) {
                 // we have a session to that peer
                 if (s.state === SessState.kTerminating) {
                     // but session is terminating, force its removal and handle the join
-                    s._forceDestroy();
+                    s._destroy(s._terminateReason);
                     assert(!self.sessions[sid]);
                 } else {
                     self.logger.warn("Ignoring JOIN from", base64urlencode(packet.fromUser),
@@ -1856,10 +1885,24 @@ Call.prototype._removeSession = function(sess, reason, msg) {
         return;
     }
 // Retry session
+    var reconnCnt;
+    var tsLastMedia = sess._tsLastMedia;
+    if (sess._reconnInfo) {
+        reconnCnt = sess._reconnInfo.reconnCnt + 1;
+        // Only if we did not have any media, get tsLastMedia from the previous session
+        if (!tsLastMedia && !sess._tsIceConn) {
+            tsLastMedia = sess._reconnInfo.tsLastMedia;
+        }
+    }
+    else {
+        reconnCnt = 1; // needed for stats, during the next session it will be 1 already
+    }
     var sessRetries = self.sessRetries;
     sessRetries[peerId] = {
         start: Date.now(),
         oldSid: delSid,
+        reconnCnt: reconnCnt,
+        tsLastMedia: tsLastMedia,
         termReason: reasonNoPeer
     };
     self.logger.warn("Scheduling session reconnect for session " + base64urlencode(sess.sid) +
@@ -2803,6 +2846,8 @@ function Session(call, packet, sessParams) {
     self.peerClient = packet.fromClient;
     self.crypto = call.manager.crypto;
     self._networkQuality = -1;
+    self._mediaHiccups = 0;
+    self._mediaHiccupMaxDur = 0;
     self._terminatePromise = createPromiseWithResolveMethods();
     if (packet.type === RTCMD.SDP_OFFER) { // peer's offer
         assert(sessParams);
@@ -3021,7 +3066,7 @@ Session.prototype._createRtcConn = function() {
         this.logger.log("Using ICE servers:", JSON.stringify(iceServers[0].urls));
     }
     var pcOptions = { iceServers: iceServers, sdpSemantics: 'unified-plan' };
-    if (localStorage.forceRelay) {
+    if (RtcModule.cfg.forceRelay) {
         pcOptions.iceTransportPolicy = 'relay';
     }
     var conn = self.rtcConn = new RTCPeerConnection(pcOptions);
@@ -3043,7 +3088,7 @@ Session.prototype._createRtcConn = function() {
             self.cmd(RTCMD.END_ICE_CANDIDATES);
             return;
         }
-        if (localStorage.forceRelay) {
+        if (RtcModule.cfg.forceRelay) {
         // "manual" match, in theory should not be needed, as we specify iceTransportPolicy=relay
         // but just in case iceTransportPolicy is not recognized
             var m = candString.match(/typ\s([^\s]+)/);
@@ -3137,12 +3182,37 @@ Session.prototype._createRtcConn = function() {
             return;
         }
         if (state === 'disconnected') {
-            self.terminateAndDestroy(Term.kErrIceDisconn);
-        } else if (state === 'failed') {
-            self.terminateAndDestroy(Term.kErrIceFail);
-        } else if (state === 'connected') {
+            // Firefox appears to continue showing / sending video even after 'disconnected',
+            // may switch back to 'connected', but that may take longer that our timer, so we ignore this event
+            // The side effect is that we don't have a safety timer to prevent a stuck 'disconnected' state,
+            // but it appears to reliably fire a 'failed' event if it can't recover. After 'failed', the video
+            // finally stops
+            if (RtcModule.cfg.tearSessOnMediaDisconn) {
+                self.terminateAndDestroy(Term.kErrIceDisconn);
+                return;
+            }
+            if (!RTC.isFirefox) {
+                self._handleMediaConnDisconnected();
+            }
+        }
+        else if (state === 'failed') {
+            self._handleMediaConnFailed();
+        }
+        else if (state === 'connected') {
+            if (self.state === SessState.kSessInProgress) {
+                if (RTC.isFirefox) {
+                    assert(!self._tsLastMedia);
+                }
+                else {
+                    self._handleMediaConnRecovered();
+                }
+                return;
+            }
+            assert(self.state !== SessState.kSessInProgress);
             self._setState(SessState.kSessInProgress);
             self._tsIceConn = Date.now();
+            // We may have had a previous connect-disconnect cycle, clear the end of the previous
+            delete self._tsLastMedia;
             self._fire("onConnect");
             if (RTC.Stats) {
                 self._lostAudioPktAvg = 0;
@@ -3162,10 +3232,63 @@ Session.prototype._createRtcConn = function() {
             */
         }
     };
+    conn.onconnectionstatechange = function(event) {
+        self.logger.log("Connstate changed to", conn.connectionState);
+        if (conn.connectionState === "failed") {
+            self._handleMediaConnFailed();
+        }
+    };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
     if ((typeof RTC.Stats === 'undefined') && (typeof statsGlobalInit === 'function')) {
         statsGlobalInit(conn);
     }
+};
+
+Session.prototype._handleMediaConnDisconnected = function() {
+    var self = this;
+    self._clearMediaRecoveryTimer();
+    self._tsLastMedia = Date.now(); // needed for stats about media stall time
+    self._mediaRecoveryTimer = setTimeout(function() {
+        if (self.state < SessState.kTerminating && self.rtcConn.iceConnectionState !== 'connected') {
+            self.logger.warn("Timed out waiting for media connection to recover, terminating session");
+            self.terminateAndDestroy(Term.kErrIceDisconn);
+        }
+    }, RtcModule.kMediaConnRecoveryTimeout);
+};
+
+Session.prototype._handleMediaConnRecovered = function() {
+    var self = this;
+    self._clearMediaRecoveryTimer();
+    if (self._tsLastMedia) {
+        self._mediaHiccups++;
+        var hiccupDur = Date.now() - self._tsLastMedia;
+        delete self._tsLastMedia;
+        if (hiccupTime > self._mediaHiccupMaxDur) {
+            self._mediaHiccupMaxDur = hiccupDur;
+        }
+        self.logger.log("Incoming media stalled for " + hiccupDur + " ms");
+    }
+    self.logger.log("Media stream successfully recovered by webRTC");
+};
+
+Session.prototype._handleMediaConnFailed = function() {
+    var self = this;
+    if (RTC.isFirefox) {
+        self._tsLastMedia = Date.now();
+    }
+    self.terminateAndDestroy(self.state === SessState.kSessInProgress
+        ? Term.kErrIceDisconn // We can have 'failed' when webRTC gives up trying to recoved after 'disconnected'
+        : Term.kErrIceFail // or when initial ICE discovery fails
+    );
+};
+
+Session.prototype._clearMediaRecoveryTimer = function() {
+    var self = this;
+    if (!self._mediaRecoveryTimer) {
+        return;
+    }
+    clearTimeout(self._mediaRecoveryTimer);
+    delete self._mediaRecoveryTimer;
 };
 
 Session.prototype._setStreamRenegTimeout = function() {
@@ -3193,11 +3316,13 @@ Session.prototype.onStatCommonInfo = function(info) {
 };
 
 Session.prototype.onStatSample = function(sample, added) {
-    // pollStats() initiates this call, and is called on the session only if
-    // it has a statRecorder, but onStatSample() is called back asynchronously,
-    // so meanwhile statRecorder may be gone
+    // pollStats() calls us, and does it only if the session has a statRecorder
+    // Note that the call is asynchronous, so the statRecorder may be gone meanwhile
     if (!this.statRecorder) {
         return -1;
+    }
+    if (RtcModule.cfg.showStats) {
+        this._sendTextStats(sample);
     }
     var ret = this.calcNetworkQuality(sample);
     if (Date.now() - this.statRecorder.getStartTime() >= 6000) {
@@ -3205,7 +3330,74 @@ Session.prototype.onStatSample = function(sample, added) {
     }
     return ret;
 };
-// ====
+
+function relayType(rly) {
+    if (rly == null) {
+        return "?";
+    }
+    else if (rly) {
+        return "relay";
+    }
+    return "direct";
+}
+
+Session.prototype._sendTextStats = function(sample) {
+    var basic = this.statRecorder.basicStats;
+    var a = sample.a;
+    var v = sample.v;
+    var str = "conn: " + relayType(basic.rly) + "-" + relayType(basic.rrly) +
+        ", quality: " + this.getPeerNetworkQuality();
+    var sub = "\nrtt: " + ((a.rtt != null) ? (a.rtt + " ms") : "?");
+    var as = a.s;
+    var ar = a.r;
+    if (ar.kbps) {
+        if (ar.jtr) {
+            sub += ", jtr: " + ar.jtr + " ms";
+        }
+        sub += "\nrx: " + ar.kbps + " kbps";
+        if (ar.pl) {
+            sub += ", " + ar.pl + " pkt lost";
+        }
+        if (ar.nacktx) {
+            sub += "nacktx: " + ar.nacktx;
+        }
+    }
+    if (as.kbps) {
+        sub += "\ntx: " + as.kbps + " kbps";
+    }
+    if (sub.length) {
+        str += "\n  -- audio --" + sub;
+    }
+
+    var vr = v.r;
+    var vs = v.s;
+    sub = '';
+    if (v.rtt != null) {
+        sub += "\nrtt: " + v.rtt +  "ms";
+    }
+    if (vr.kbps) {
+        sub += "\nrx: ";
+        if (vr.width) {
+            sub += vr.width + "x" + vr.height + ", ";
+        }
+        sub += vr.fps + "fps, " + vr.kbps + "kbps";
+        if (vr.pl) {
+            sub += ", " + vr.pl + " pkt lost";
+        }
+    }
+    if (vs.kbps) {
+        sub += "\ntx: ";
+        if (vs.width) {
+            sub += vs.width + "x" + vs.height + ", ";
+        }
+        sub += vs.fps + "fps, " + vs.kbps + "kbps";
+    }
+    if (sub.length) {
+        str += "\n\n  -- video --" + sub;
+    }
+    // bypass ._fire because it will log the stats string
+    this.handler.onStats(str);
+};
 
 Session.prototype._sendAv = function(av) {
     this.cmd(RTCMD.MUTE, String.fromCharCode(av));
@@ -3304,6 +3496,10 @@ Session.prototype.msgSdpOfferRenegotiate = function(packet) {
 
 Call.prototype._addNewSession = function(packet, params) {
     var sess = new Session(this, packet, params);
+    var retry = this.sessRetries[sess.peer + sess.peerClient];
+    if (retry) {
+        sess._reconnInfo = retry;
+    }
     this.sessions[sess.sid] = sess;
     this._notifyNewSession(sess);
     return sess;
@@ -3391,6 +3587,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
     }
     self._terminateReason = code;
     self._setState(SessState.kTerminating);
+    self._clearMediaRecoveryTimer();
     // Send SESS_TERMINATE synchronously (in case of tab close, the event loop will exit,
     // so no chance of doing it async), but destroy async so that we have dont have the
     // sessions object of a call altered if destroyed from a loop
@@ -3459,6 +3656,9 @@ Session.prototype.msgSessTerminate = function(packet) {
             "it should have been removed from the sessions map of the call");
         return;
     }
+    if (reason === Term.kErrIceDisconn && this._tsIceConn) {
+        this._tsLastMedia = Date.now();
+    }
     if (self.state === SessState.kTerminating && this._terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet); // the ack handler should destroy it
@@ -3466,12 +3666,11 @@ Session.prototype.msgSessTerminate = function(packet) {
     if (self.state === SessState.kDestroyed) {
         return;
     }
-    self._setState(SessState.kTerminating); // need this before destroy sets the state to kDestroyed
     self._destroy(reason | Term.kPeer);
 };
 
 /** Terminates a session without the signalling terminate handshake.
-  * This should normally not be called directly, but via terminate(),
+  * This should normally not be called directly, but via terminateAndDestroy(),
   * unless there is a network error
   */
 Session.prototype._destroy = function(code, msg) {
@@ -3486,7 +3685,7 @@ Session.prototype._destroy = function(code, msg) {
     if (msg) {
         this.logger.log("Destroying session due to:", msg);
     }
-
+    this._clearMediaRecoveryTimer();
     this.submitStats(code, msg);
 
     if (this.rtcConn) {
@@ -3540,6 +3739,22 @@ Session.prototype.submitStats = function(termCode, errInfo) {
     }
     if (errInfo) {
         stats.errInfo = errInfo;
+    }
+    if (this._mediaHiccups) {
+        stats.hicc = {
+            cnt: this._mediaHiccups,
+            maxDur: this._mediaHiccupMaxDur
+        };
+    }
+    var rcInfo = this._reconnInfo;
+    if (rcInfo) {
+        var reconn = stats.reconn = {
+            cnt: rcInfo.reconnCnt,
+            prevSid: base64urlencode(rcInfo.oldSid)
+        };
+        if (rcInfo.tsLastMedia && this._tsIceConn) {
+            reconn.tStall = this._tsIceConn - rcInfo.tsLastMedia;
+        }
     }
     var url = this.call.manager.statsUrl;
     if (url) {
@@ -3634,7 +3849,7 @@ Session.prototype._fire = function(evName) {
 
 Session.prototype._mungeSdp = function(sdp) {
     try {
-        var maxbr = this.call.isGroup ? localStorage.webrtcMaxGroupBr : localStorage.webrtcMaxBr;
+        var maxbr = this.call.isGroup ? RtcModule.cfg.maxGroupBr : RtcModule.cfg.maxBr;
         if (maxbr) {
             maxbr = parseInt(maxbr);
             assert(!isNaN(maxbr));
@@ -3685,7 +3900,7 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
         if (bwav != null && width != null) {
             if (width >= 480) {
                 if (bwav < 30) {
-                    this.logger.log("Width >= 480, bu bwav < 30, returning link quality 0");
+                    this.logger.log("Width >= 480, but bwav < 30, returning link quality 0");
                     return 0;
                 } else if (bwav < 64) {
                     return 1;

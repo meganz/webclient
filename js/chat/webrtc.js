@@ -3267,7 +3267,7 @@ Session.prototype._handleMediaConnRecovered = function() {
         self._mediaHiccups++;
         var hiccupDur = Date.now() - self._tsLastMedia;
         delete self._tsLastMedia;
-        if (hiccupTime > self._mediaHiccupMaxDur) {
+        if (hiccupDur > self._mediaHiccupMaxDur) {
             self._mediaHiccupMaxDur = hiccupDur;
         }
         self.logger.log("Incoming media stalled for " + hiccupDur + " ms");

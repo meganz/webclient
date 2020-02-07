@@ -30,6 +30,21 @@ var redeem = {
             return redeem.goToCloud();
         }
 
+        if (u_attr && u_attr.b) {
+            // business user
+
+            msgDialog(
+                'warninga',
+                l[1578],
+                l[22888],
+                '',
+                function() {
+                    redeem.goToCloud();
+                }
+            );
+            return;
+        }
+
         // Init functionality
         if (localStorage.oldRedeemFlow) {
             return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));

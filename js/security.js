@@ -596,6 +596,7 @@ var security = {
 
         M.safeShowDialog(name, function() {
             parsepage(pages.placeholder);
+            watchdog.registerOverrider('logout');
 
             var $dialog = $('.fm-dialog.' + name);
             if (!$dialog.length) {
@@ -633,7 +634,7 @@ var security = {
                             return msgDialog('warninga', l[135], l[7719], false, reset);
                         }
                         if (!Array.isArray(res) || !res[6]) {
-                            return msgDialog('warninga', l[135], l[47], api_strerror(res), reset);
+                            return msgDialog('warninga', l[135], l[47], res < 0 ? api_strerror(res) : l[253], reset);
                         }
 
                         u_logout(true);
@@ -699,6 +700,7 @@ var security = {
                             security.completeVerifyEmail(pw1, u_attr.evc)
                                 .then(function() {
                                     login_email = u_attr.email;
+                                    watchdog.unregisterOverrider('logout');
 
                                     u_logout(true);
                                     eventlog(99728);

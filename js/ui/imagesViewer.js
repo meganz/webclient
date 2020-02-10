@@ -203,7 +203,7 @@ var slideshowid;
         var root = M.getNodeRoot(n && n.h || false);
 
         if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
-            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
+            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');
         }

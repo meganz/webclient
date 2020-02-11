@@ -764,15 +764,6 @@ Call.prototype._initialGetLocalStream = function(av) {
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
             self._fire('onLocalMediaObtained', stream);
-
-            if (!self.manager.audioInputDetected) {
-                if (!self._audioMutedChecker) {
-                    self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
-                }
-                if (needAudio && stream.getAudioTracks().length) {
-                    self._audioMutedChecker.start(stream);
-                } // otherwise it should be started when user unmutes audio
-            }
             delete self._obtainingLocalStream;
             resolve(stream);
         })
@@ -795,6 +786,19 @@ Call.prototype._initialGetLocalStream = function(av) {
         delete self._obtainingLocalStream;
         return Promise.reject(err);
     });
+};
+
+Call.prototype._checkStartMicMonitor = function() {
+    var self = this;
+    if (self.manager.audioInputDetected) {
+        return;
+    }
+    if (!self._audioMutedChecker) {
+        self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
+    }
+    if (self.localAv() & Av.Audio) {
+        self._audioMutedChecker.start(self.gLocalStream);
+    } // otherwise it should be started when user unmutes audio
 };
 
 Call.prototype._getLocalVideo = function(screenCapture) {
@@ -2358,6 +2362,7 @@ Call.prototype._notifySessionConnected = function(sess) {
         delete self._renegotiateAfterInitialConnect;
         self.sendOffer();
     }
+    self._checkStartMicMonitor();
 };
 
 Call.prototype.enableAudio = function(enable) {
@@ -4582,7 +4587,7 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         var lastLevel = self._lastLevel;
         // console.warn('max=', max);
         if (Math.abs(max - lastLevel) >= self._changeThreshold ||
-           (max <= 0.001 && lastLevel >= 0.005)) { // return to zero
+           (max <= 0.0001 && lastLevel >= 0.0005)) { // return to zero
             self._lastLevel = max;
             handler.onAudioLevelChange(max);
         }
@@ -4686,9 +4691,8 @@ AudioMutedChecker.prototype.destroy = function() {
 
 AudioMutedChecker.prototype.onAudioLevelChange = function(level) {
     var self = this;
-    if (level <= 0.001) {
+    if (level <= 0.0001) {
         // if we disconnect, there will be an artificial change to 0
-        // console.warn("AudioMutedChecker: Received level change to", level, "- should be > 0");
         return;
     }
     self._handler.audioInputDetected = true;

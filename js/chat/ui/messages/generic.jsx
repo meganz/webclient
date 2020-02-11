@@ -284,15 +284,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         }
                     }
                     else {
-                        if (target === M.RootID) {
-                            // since if the user clicks Save without picking, its a bit weird, where the file went
-                            // we show a simple dialog telling him the file is in Cloud Drive.
-                            msgDialog(
-                                'info',
-                                l[8005],
-                                l[8006]
-                            );
-                        }
+                        msgDialog('info', l[8005], l[8006]);
                     }
                 });
             }

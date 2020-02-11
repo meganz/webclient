@@ -235,7 +235,7 @@ function pagelogin() {
     var $email = $formWrapper.find('#login-name2');
     var $password = $formWrapper.find('#login-password2');
 
-    var e = $email.val();
+    var e = $email.val().trim();
     if (e === '' || !isValidEmail(e)) {
         $email.megaInputsShowError(l[141]);
         $email.focus();
@@ -251,7 +251,7 @@ function pagelogin() {
             localStorage.hideloginwarning = 1;
         }
 
-        var email = $email.val();
+        var email = e;
         var password = $password.val();
         var rememberMe = false;
         var twoFactorPin = null;

@@ -408,7 +408,7 @@ function isValidEmail(email) {
     // which is possible in local environment/networks but not in WWW.
     // so I applied + instead of * at the end
     var regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-    return regex.test(email.trim());
+    return regex.test(email);
 }
 
 /**

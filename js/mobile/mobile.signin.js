@@ -132,7 +132,7 @@ mobile.signin = {
         $signInButton.off('tap').on('tap', function() {
 
             // Get the current text field values
-            var email = $emailField.val();
+            var email = $emailField.val().trim();
             var password = $passwordField.val();
             var rememberMe = $rememberMeCheckbox.is(':checked');
             var twoFactorPin = null;

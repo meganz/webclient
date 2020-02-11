@@ -763,7 +763,7 @@ var doProLogin = function($dialog) {
     var $passwordInput = $dialog.find('input#login-password3');
     var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-    var email = $emailInput.val();
+    var email = $emailInput.val().trim();
     var password = $passwordInput.val();
     var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
     var twoFactorPin = null;

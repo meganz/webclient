@@ -1869,15 +1869,19 @@ else if (!browserUpdate) {
             }
             dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
 
+            var expectedSourceOrigin = url || ln > 10;
+
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (url || ln > 10) {
-                    siteLoadError(dump.m, url + ':' + ln);
+                if (expectedSourceOrigin) {
+                    return siteLoadError(dump.m, url + ':' + ln);
                 }
-                else {
+            }
+
+            if (!expectedSourceOrigin) {
                     console.error(dump.m, arguments);
 
                     onIdle(function() {
@@ -1889,7 +1893,6 @@ else if (!browserUpdate) {
                             )
                         );
                     });
-                }
                 return;
             }
 

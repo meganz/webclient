@@ -96,6 +96,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 
     var state = '';
     var pauseTxt = '';
+    var isFailed = false;
     if (isPaused) {
         state = 'transfer-paused';
         pauseTxt = l[1651];
@@ -104,6 +105,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         pauseTxt = '';
     }
 
+    else if (node.failed && node.dl_failed) {
+        isFailed = true;
+    }
     var flashhtml = '';
     if (dlMethod === FlashIO) {
         flashhtml = '<object width="1" height="1" id="dlswf_'
@@ -136,6 +140,9 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 
     if (isPaused) {
         fm_tfspause('dl_' + handle);
+    }
+    if (isFailed) {
+        M.dlerror(node, node.lasterror || l[135]);
     }
     if (ttl) {
         ttl.left--;

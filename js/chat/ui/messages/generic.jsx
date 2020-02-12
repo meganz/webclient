@@ -477,7 +477,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 noThumbPrev = 'no-thumb-prev';
                             }
                             var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                            var previewIcon = isAudio || isVideo ? 'context play' : 'search-icon';
+                            var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
                             previewButton =
                                 <span key="previewButton">
                                     <DropdownsUI.DropdownItem

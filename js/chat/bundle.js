@@ -11860,7 +11860,7 @@ function (_ConversationMessageM) {
                 }
 
                 var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                var previewIcon = isAudio || isVideo ? 'context play' : 'search-icon';
+                var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
                 previewButton = external_React_default.a.createElement("span", {
                   key: "previewButton"
                 }, external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {

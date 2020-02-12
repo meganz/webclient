@@ -1368,11 +1368,14 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
 }
 
 ChunkUpload.prototype.upload = function() {
+    'use strict';
+
     var url, xhr;
+    var self = this;
+    var logger = self.logger || ulmanager.logger;
 
     if (!this.file) {
         if (d) {
-            var logger = this.logger || ulmanager.logger;
             logger.error('This upload was cancelled while the Encrypter was working,'
                 + ' prevent this aborting it beforehand');
         }
@@ -1402,11 +1405,20 @@ ChunkUpload.prototype.upload = function() {
         this.logger.info("pushing", url);
     }
 
-    xhr.open('POST', url);
-    xhr.responseType = 'arraybuffer';
-    xhr.send(this.bytes.buffer);
-
-    this.xhr = xhr;
+    tryCatch(function() {
+        xhr.open('POST', url);
+        xhr.responseType = 'arraybuffer';
+        xhr.send(self.bytes.buffer);
+        self.xhr = xhr;
+    }, function(ex) {
+        if (self.file) {
+            logger.warn('fatal upload error, attempting to restart...', String(ex.message || ex), [self, ex]);
+            ulmanager.restart(self.file, ex.message || ex);
+        }
+        else {
+            logger.debug('fatal upload error, holding while restarting...', String(ex.message || ex), [self, ex]);
+        }
+    })();
 };
 
 ChunkUpload.prototype.io_ready = function(res) {
@@ -1594,7 +1606,7 @@ FileUpload.prototype.run = function(done) {
         }
         else if (file.hash === result.hash) {
             // Retrying.
-            ulmanager.ulStart(this);
+            setTimeout(ulmanager.ulStart.bind(ulmanager, self), 950 + Math.floor(Math.random() * 4e3));
         }
         else {
             file.ts = result.ts;

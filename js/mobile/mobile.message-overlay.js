@@ -49,8 +49,8 @@ mobile.messageOverlay = {
         }
 
         // Clear old messages
-        $firstMessage.text('');
-        $optionalSecondMessage.text('');
+        $firstMessage.empty();
+        $optionalSecondMessage.empty();
         $('.third span', $overlay).text(l[148]);
 
         // If the close button is needed, unhide the button
@@ -63,7 +63,7 @@ mobile.messageOverlay = {
         $closeButton.rebind('tap', reject);
 
         // Set the first message
-        $firstMessage.text(message);
+        $firstMessage.safeHTML(message);
 
         // If there is a second message, set that
         if (typeof subMessage === 'string' && subMessage.length) {

@@ -668,7 +668,13 @@ pro.proplan = {
             if (data.srenew) { // This is subscription plan
 
                 var renewTimestamp = data.srenew[0];
-                $currPlan.addClass('renew').find('.plan-tag-description.renew b').text(time2date(renewTimestamp, 2));
+                if (renewTimestamp === 0) {
+                    $currPlan.addClass('renew').addClass('no-pops');
+                }
+                else {
+                    $currPlan.addClass('renew');
+                    $('.plan-tag-description.renew b', $currPlan).text(time2date(renewTimestamp, 2));
+                }
             }
             else {
                 var currentExpireTimestamp = data.nextplan ? data.nextplan.t : data.suntil;

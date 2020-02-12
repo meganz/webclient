@@ -554,8 +554,20 @@ function getID3CoverArt(entry) {
                     var frame = readFrame(offset);
                     if (frame.id === 'APIC') {
                         offset += 11;
-                        for (var x = 2; x--; offset++) {
-                            while (u8[offset++]) ;
+                        while (u8[offset++]) {}
+                        ++offset;
+                        if (u8[offset] === 0xFF && u8[offset + 1] === 0xFE
+                            || u8[offset] === 0xFE && u8[offset + 1] === 0xFF) {
+
+                            while (u8[offset]) {
+                                offset += 2;
+                            }
+                            offset += 3;
+                            frame.size += offset; // fixme..
+                        }
+                        else {
+                            while (u8[offset++]) {}
+                            ++offset;
                         }
                         result = u8.slice(--offset, frame.size);
                         break;

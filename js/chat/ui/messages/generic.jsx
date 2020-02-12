@@ -288,10 +288,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             'info',
                             l[8005],
                             // Confirmation message based on the selected location.
-                            // e.x.:
                             // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
-                            // b) `Attachment added to ${DIR}.`
-                            target === M.RootID ? l[8006] : `${l[22902]} ${M.d[target].name}.`
+                            // b) `Attachment added to %s.`
+                            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name))
                         );
                     }
                 });

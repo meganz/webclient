@@ -453,6 +453,41 @@ MegaData.prototype.sortByStatus = function(d) {
     this.sort();
 };
 
+MegaData.prototype.getSortByVersionFn = function() {
+    'use strict';
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+
+        var av = a.tvf || 0;
+        var ab = a.tvb || 0;
+        var bv = b.tvf || 0;
+        var bb = b.tvb || 0;
+
+        if (av < bv) {
+            return -1 * d;
+        }
+        else if (av > bv) {
+            return d;
+        }
+        else if (ab < bb) {
+            return -1 * d;
+        }
+        else if (ab > bb) {
+            return d;
+        }
+    };
+
+    return sortfn;
+};
+
+MegaData.prototype.sortByVersion = function(d) {
+    'use strict';
+    this.sortfn = this.getSortByVersionFn();
+    this.sortd = d;
+    this.sort();
+};
+
 MegaData.prototype.getSortByInteractionFn = function() {
     var self = this;
 

@@ -11665,7 +11665,11 @@ function (_ConversationMessageM) {
                 console.warn('Unable to inject nodes... no longer existing?', res);
               }
             } else {
-              msgDialog('info', l[8005], l[8006]);
+              msgDialog('info', l[8005], // Confirmation message based on the selected location.
+              // e.x.:
+              // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+              // b) `Attachment added to ${DIR}.`
+              target === M.RootID ? l[8006] : "".concat(l[22902], " ").concat(M.d[target].name, "."));
             }
           });
         }

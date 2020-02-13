@@ -476,9 +476,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 noThumbPrev = 'no-thumb-prev';
                             }
                             var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                            previewButton = <span key="previewButton">
-                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                              onClick={self._startPreview.bind(self, v)}/>
+                            var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
+                            previewButton =
+                                <span key="previewButton">
+                                    <DropdownsUI.DropdownItem
+                                        label={previewLabel}
+                                        icon={previewIcon}
+                                        onClick={self._startPreview.bind(self, v)}
+                                    />
                                 </span>;
                         }
 

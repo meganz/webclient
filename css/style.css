@@ -15047,6 +15047,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -khtml-toast-notification: 1;
     opacity: 1;
     visibility: visible;
+    z-index: 11;
 }
 .selection-status-bar span {
     font-size: 14px;

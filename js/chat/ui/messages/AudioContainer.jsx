@@ -15,38 +15,33 @@ class AudioContainer extends React.Component {
 
     getAudioFile() {
         const self = this;
-        const { mime, h } = this.props;
-        let blobUrl = null;
+        const {mime, h} = this.props;
 
         self.setState({
             loading: true
         });
 
-        if (mime === 'audio/mp4') {
-            blobUrl =  new Promise((resolve, reject) => {
-
-                M.gfsfetch(h, 0, -1, null).done(function(data) {
-                    resolve({
-                        buffer: data.buffer,
-                    });
-                }).fail((e) => {reject(e)})
-            })
-            .then(({ buffer }) => {
-                const uint8Array  = new Uint8Array(buffer);
-                const arrayBuffer = uint8Array.buffer;
-
-                    self.setState((prevState) => {
-                        return {
-                            audioBlobUrl: mObjectURL([arrayBuffer], 'audio/mp4'),
-                            loading: false
-                        }
-                    });
-            }).catch((e) => {
-                console.error(e);
-            });
+        if (mime !== 'audio/mp4') {
+            if (d) {
+                console.warn('cannot play this file type (%s)', mime, h, [self]);
+            }
+            return false;
         }
 
-        return blobUrl;
+        M.gfsfetch(h, 0, -1)
+            .then(({buffer}) => {
+                self.setState(() => {
+                    return {
+                        audioBlobUrl: mObjectURL([buffer], 'audio/mp4'),
+                        loading: false
+                    };
+                });
+            })
+            .catch((ex) => {
+                console.error(ex);
+            });
+
+        return true;
     }
 
     render() {

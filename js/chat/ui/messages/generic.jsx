@@ -284,15 +284,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         }
                     }
                     else {
-                        if (target === M.RootID) {
-                            // since if the user clicks Save without picking, its a bit weird, where the file went
-                            // we show a simple dialog telling him the file is in Cloud Drive.
-                            msgDialog(
-                                'info',
-                                l[8005],
-                                l[8006]
-                            );
-                        }
+                        msgDialog(
+                            'info',
+                            l[8005],
+                            // Confirmation message based on the selected location.
+                            // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+                            // b) `Attachment added to %s.`
+                            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name))
+                        );
                     }
                 });
             }

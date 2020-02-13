@@ -1818,6 +1818,11 @@ else if (!browserUpdate) {
             }
             if (__cdumps.length > 3) return false;
 
+            var expectedSourceOrigin = url || ln > 10;
+            if (url === '@srvlog') {
+                url = '';
+            }
+
             var dump = {
                 l: ln,
                 f: mTrim(url),
@@ -1868,8 +1873,6 @@ else if (!browserUpdate) {
                 }
             }
             dump.m = (is_mobile ? '[mobile] ' : is_embed ? '[embed] ' : is_drop ? '[drop] ' : '') + dump.m.replace(/\s+/g, ' ');
-
-            var expectedSourceOrigin = url || ln > 10;
 
             if (!window.jsl_done && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while

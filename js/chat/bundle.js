@@ -19153,6 +19153,7 @@ Chat.prototype.renderListing = function () {
         }
       } else {
         $('.fm-empty-conversations').removeClass('hidden');
+        self.displayArchivedChats = false;
       }
     }
   }

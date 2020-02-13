@@ -11,7 +11,7 @@ file2=$(mktemp)
 git diff develop...$1 >"$file1"
 git diff develop...$2 >"$file2"
 
-diff -dB -u1 --color "$file1" "$file2"
+diff -dB -u0 --color "$file1" "$file2" | grep -vE '^[-+]?@@'
 rc=$?
 
 rm "$file1"

@@ -9279,6 +9279,7 @@ function (_MegaRenderMixin) {
           self.setState({
             typedMessage: ""
           });
+          $(document).trigger('closeDropdowns');
         }
 
         e.preventDefault();
@@ -11918,10 +11919,11 @@ function (_ConversationMessageM) {
               if (d) {
                 console.warn('Unable to inject nodes... no longer existing?', res);
               }
-            } else if (target === M.RootID) {
-              // since if the user clicks Save without picking, its a bit weird, where the file went
-              // we show a simple dialog telling him the file is in Cloud Drive.
-              msgDialog('info', l[8005], l[8006]);
+            } else {
+              msgDialog('info', l[8005], // Confirmation message based on the selected location.
+              // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+              // b) `Attachment added to %s.`
+              target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name)));
             }
           });
         }
@@ -12120,11 +12122,12 @@ function (_ConversationMessageM) {
                 }
 
                 var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
+                var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
                 previewButton = external_React_default.a.createElement("span", {
                   key: "previewButton"
                 }, external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
-                  icon: "search-icon",
                   label: previewLabel,
+                  icon: previewIcon,
                   onClick: self._startPreview.bind(self, v)
                 }));
               }

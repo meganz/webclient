@@ -669,9 +669,13 @@ ul, li {
 .mobile.red-button.disabled i {
     display: none;
 }
-.mobile.red-button span, .mobile.download-progress span, .mobile.upload-progress span {
+.mobile.red-button span,
+.mobile.download-progress span,
+.mobile.upload-progress span {
     position: relative;
     display: inline-block;
+    line-height: 22px;
+    white-space: normal;
 }
 .mobile.dialog-button {
     color: white;

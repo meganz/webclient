@@ -249,6 +249,9 @@ mega.textEditorUI = new function TextEditorUI() {
         $('.editor-btn-container .get-link-f', $editorContianer).rebind(
             'click.txt-editor',
             function getLinkFileMenuClick() {
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(versionHandle || fileHandle);
+
                 // there's no jquery parent for this container.
                 // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
@@ -258,6 +261,9 @@ mega.textEditorUI = new function TextEditorUI() {
         $('.editor-btn-container .send-contact-f', $editorContianer).rebind(
             'click.txt-editor',
             function sendToContactMenuClick() {
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(versionHandle || fileHandle);
+
                 // there's no jquery parent for this container.
                 // eslint-disable-next-line local-rules/jquery-scopes
                 $('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
@@ -319,10 +325,12 @@ mega.textEditorUI = new function TextEditorUI() {
             if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
                 editor.options.readOnly = true;
                 $('.txt-editor-menu', $editorContianer).addClass('disabled');
+                $('.txt-editor-btn.save-btn', $editorContianer).addClass('hidden');
             }
             else {
                 editor.options.readOnly = false;
                 $('.txt-editor-menu', $editorContianer).removeClass('disabled');
+                $('.txt-editor-btn.save-btn', $editorContianer).removeClass('hidden');
             }
 
             if (editor) {

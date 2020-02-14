@@ -2877,6 +2877,17 @@ function createFileDialog(close, action, params) {
                         selectionManager.clear_selection();
                         selectionManager.add_to_selection(nh);
 
+                        loadingDialog.show();
+
+                        mega.fileTextEditor.getFile(nh).done(
+                            function(data) {
+                                loadingDialog.hide();
+                                mega.textEditorUI.setupEditor(M.d[nh].name, data, nh);
+                            }
+                        ).fail(function() {
+                            loadingDialog.hide();
+                        });
+
                     }
 
                 })
@@ -2891,7 +2902,7 @@ function createFileDialog(close, action, params) {
     // eslint-disable-next-line local-rules/jquery-scopes
     var $dialog = $('.fm-dialog.create-file-dialog');
     var $input = $('input', $dialog);
-    $input.val('');
+    $input.val('.txt')[0].setSelectionRange(0, 0);
 
     var doCreateFile = function(v) {
         var target = $.cftarget = $.cftarget || M.currentdirid;

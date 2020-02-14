@@ -123,6 +123,9 @@
     min-width: unset;
     margin: 0 4px;
 }
+#mega-text-editor .default-green-button.hidden, #mega-text-editor .default-white-button.hidden {
+    display: none;
+}
 #mega-text-editor .default-white-button i {
     opacity: 0.8;
     display: inline-block;

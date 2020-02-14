@@ -203,7 +203,7 @@ var slideshowid;
         var root = M.getNodeRoot(n && n.h || false);
 
         if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
-            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
+            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');
         }
@@ -590,6 +590,8 @@ var slideshowid;
         }
 
         if (close) {
+            sessionStorage.removeItem('previewNode');
+            sessionStorage.removeItem('previewTime');
             zoom_mode = false;
             switchedSides = false;
             slideshowid = false;
@@ -653,6 +655,7 @@ var slideshowid;
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
+        sessionStorage.setItem('previewNode', id);
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);

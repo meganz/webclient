@@ -955,6 +955,7 @@
 
     /**
      * Refresh copy/move dialog content with newly created directory.
+     * @global
      */
     global.refreshDialogContent = function refreshDialogContent() {
         var tab = $.cfsection || 'cloud-drive';
@@ -1301,7 +1302,7 @@
 
             // Auto-select the created folder.
             $.cfpromise.done(function(h) {
-                var p = $.cftarget;
+                var p = Object(M.d[h]).p || $.cftarget;
 
                 // Make sure parent has selected class to make it expand
                 $('#mctreea_' + p, $dialog).addClass('selected');

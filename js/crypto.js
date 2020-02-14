@@ -587,12 +587,12 @@ function api_proc(q) {
     var currCmd = [];
     var currCtx = [];
     var element = q.cmdsQueue.dequeue(); // only first element alone
-    if (element && element !== null) {
+    if (element) {
         currCmd.push(element.st1);
         currCtx.push(element.st2);
         if (!element.st1.length) { // we will distinguish String + array of CMDs
             element = q.cmdsQueue.dequeue(true);
-            while (element && element !== null) {
+            while (element) {
                 currCmd.push(element.st1);
                 currCtx.push(element.st2);
                 element = q.cmdsQueue.dequeue(true);
@@ -925,6 +925,11 @@ function api_reqfailed(c, e) {
 
                     // Exit early to prevent logout because further API requests are
                     // needed to verify by SMS and if logged out then it won't work
+                    return false;
+                }
+                else if (reasonCode === 700) {
+                    var to = String(page).startsWith('emailverify') && 'login-to-account';
+                    security.showVerifyEmailDialog(to);
                     return false;
                 }
                 else {

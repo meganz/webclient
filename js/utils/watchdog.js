@@ -48,13 +48,14 @@ var watchdog = Object.freeze({
      * @param {String} msg  The message
      * @param {String} data Any data sent to other tabs, optional
      */
-    notify: function(msg, data) {
+    notify: tryCatch(function(msg, data) {
+        'use strict';
         data = {origin: this.wdID, data: data, sid: Math.random()};
         localStorage.setItem(this.eTag + msg, JSON.stringify(data));
         if (d) {
             console.log('mWatchDog Notifying', this.eTag + msg, msg === 'setsid' ? '' : localStorage[this.eTag + msg]);
         }
-    },
+    }),
 
     /**
      * Perform a query to other tabs and wait for reply through a Promise
@@ -134,12 +135,12 @@ var watchdog = Object.freeze({
     /**
      * Register event handling overrider
      * @param {String} event The event name
-     * @param {Function|*} callback
+     * @param {Function|*} [callback] Optional function to invoke on overriding
      */
     registerOverrider: function(event, callback) {
         'use strict';
 
-        this.overrides[event] = callback;
+        this.overrides[event] = callback || true;
     },
 
     /**

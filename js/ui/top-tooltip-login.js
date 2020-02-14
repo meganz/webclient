@@ -88,6 +88,8 @@ var accountinputs = {
         Soon(function() {
             $inputs.first().focus()
         });
+
+        return $formWrapper;
     }
 };
 
@@ -191,7 +193,7 @@ var tooltiplogin = {
         var $loginWarningCheckbox = $topLoginPopup.find('.loginwarning-checkbox');
         var $loginRememberCheckbox = $topLoginPopup.find('.login-check');
 
-        var email = $emailField.val();
+        var email = $emailField.val().trim();
         var password = $passwordField.val();
         var rememberMe = false;
         var twoFactorPin = null;

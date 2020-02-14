@@ -91,7 +91,7 @@ mobile.conflictResolutionDialog = {
             this.$overlay.find(".repeat-action-container")
                 .removeClass('hidden checkboxOn')
                 .find('.checkbox-label')
-                .safeHTML(escapeHTML(l[16494]).replace('[S]2[/S]', '<span>' + remaining + '</span>'));
+                .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
             mobile.initCheckbox("repeat-action-container");
         }
 

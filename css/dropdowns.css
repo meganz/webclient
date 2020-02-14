@@ -367,10 +367,10 @@
 .colour-sorting-menu .dropdown-item.desc i::after {/* Dark arrow pointing down */
     background-position: -43px -1353px;
 }
-.nw-sorting-menu .dropdown-item.asc i::after, .dialog-sorting-menu .dropdown-item.asc i::after{/* White arrow pointing up */
+.nw-sorting-menu .dropdown-item.asc i::after, .dialog-sorting-menu .dropdown-item.asc i::after, .colour-sorting-menu .dropdown-item.asc:hover i::after {/* White arrow pointing up */
     background-position: -83px -1353px;
 }
-.nw-sorting-menu .dropdown-item.desc i::after, .dialog-sorting-menu .dropdown-item.desc i::after{/* Dark arrow pointing up */
+.nw-sorting-menu .dropdown-item.desc i::after, .dialog-sorting-menu .dropdown-item.desc i::after, .colour-sorting-menu .dropdown-item.desc:hover i::after {/* Dark arrow pointing up */
     background-position: -123px -1353px;
 }
 .dropdown-item.active i, .dropdown-item:not(.static):hover > i, .dark .dropdown-item:not(.static):hover > i, .dropdown-item.opened > i, .dropdown-item.red i, .dropdown-item.do-sort i {

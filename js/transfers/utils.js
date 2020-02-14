@@ -48,6 +48,11 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
     else {
         if (fatalError) {
             dlmanager.onDownloadFatalError = status;
+
+            if (is_mobile && lock !== 2 && dl) {
+                mobile.downloadOverlay.close();
+                mobile.messageOverlay.show(status);
+            }
         }
 
         $('.transfer-table #' + id + ' .transfer-status')

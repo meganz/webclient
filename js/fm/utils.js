@@ -1530,9 +1530,10 @@ MegaUtils.prototype.getSafeName = function(name) {
  *
  * this method will be called to control, renamings from webclient UI.
  * @param {String} name The filename
+ * @param {Boolean} [allowPathSep] whether to allow ether / or \ as a mean for nested folder creation requirements.
  * @returns {Boolean}
  */
-MegaUtils.prototype.isSafeName = function (name) {
+MegaUtils.prototype.isSafeName = function(name, allowPathSep) {
     'use strict';
     // below are mainly denied in windows or android.
     // we can enhance this as much as we can as
@@ -1542,10 +1543,7 @@ MegaUtils.prototype.isSafeName = function (name) {
     if (name.trim().length <= 0) {
         return false;
     }
-    if (name.search(/[\\\/<>:*\"\|?]/) >= 0 || name.length > 250) {
-        return false;
-    }
-    return true;
+    return !(name.search(allowPathSep ? /["*:<>?|]/ : /["*/:<>?\\|]/) >= 0 || name.length > 250);
 };
 
 /**

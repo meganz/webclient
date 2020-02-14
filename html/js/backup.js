@@ -1,4 +1,12 @@
 function init_backup() {
+    'use strict';
+
+    if (!window.u_k) {
+        login_txt = l[1298];
+        login_next = 'backup';
+        loadSubPage('login');
+        return false;
+    }
     var key = a32_to_base64(u_k);
 
     $('#backup_keyinput').val(key);

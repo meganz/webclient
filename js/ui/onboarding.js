@@ -801,8 +801,11 @@
     mBroadcaster.addListener('fm:initialized', function _delayedInitOnboarding() {
         if (!folderlink) {
             assert(typeof mega.ui.onboarding === 'undefined', 'unexpected onboarding initialization');
-            assert(typeof u_handle !== 'undefined', 'onboarding expects a valid user...');
 
+            if (typeof u_handle === 'undefined') {
+                console.error('onboarding expects a valid user...');
+                return;
+            }
             mega.ui.onboarding = new mega.ui.Onboarding({});
 
             if (u_attr && u_attr.b) {

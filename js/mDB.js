@@ -1412,6 +1412,12 @@ function StorageDB(name) {
     if (!(this instanceof StorageDB)) {
         return new StorageDB(name);
     }
+    if (!window.u_k_aes) {
+        if (d) {
+            console.error('StorageDB requires a fully active account!');
+        }
+        return this;
+    }
     var self = this;
     var dbname = '$' + this.encrypt(name);
 

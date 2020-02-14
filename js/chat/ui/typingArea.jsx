@@ -198,6 +198,7 @@ export class TypingArea extends MegaRenderMixin {
 
             if (self.onConfirmTrigger(val) !== true) {
                 self.setState({typedMessage: ""});
+                $(document).trigger('closeDropdowns');
             }
             e.preventDefault();
             e.stopPropagation();

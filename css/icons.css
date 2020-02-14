@@ -125,7 +125,7 @@
     background-position: -51px -3609px;
 }
 .tiny-icon.green-tick, .tiny-icon.red-cross {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -12px -1437px;
 }
 .tiny-icon.red-cross {
@@ -719,7 +719,7 @@
     background-position: -17px -10463px;
 }
 .medium-icon.rocket {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -7px -16px;
 }
 .medium-icon.down-arrow {
@@ -1051,7 +1051,7 @@
     background-position: -5px -12796px;
 }
 .tiny-icon.membership-status {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -10px -979px;
     width: 16px;
 }
@@ -1075,15 +1075,15 @@
 }
 
 .semi-small-icon.grey-mega {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -10px -326px;
 }
 .semi-small-icon.white-mega {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -10px -701px;
 }
 .semi-small-icon.yellow-triangle {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -10px -1266px;
 }
 .small-icon.dark-grey-plus {
@@ -1854,7 +1854,7 @@ i.icons-sprite, i.small-icon.icons-sprite {
 i.account-icon {
     width: 26px;
     height: 26px;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-repeat: no-repeat;
 }
 i.account-icon.building {

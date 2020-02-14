@@ -277,13 +277,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             console.warn('Unable to inject nodes... no longer existing?', res);
                         }
                     }
-                    else if (target === M.RootID) {
-                        // since if the user clicks Save without picking, its a bit weird, where the file went
-                        // we show a simple dialog telling him the file is in Cloud Drive.
+                    else {
                         msgDialog(
                             'info',
                             l[8005],
-                            l[8006]
+                            // Confirmation message based on the selected location.
+                            // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+                            // b) `Attachment added to %s.`
+                            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name))
                         );
                     }
                 });
@@ -475,10 +476,15 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 noThumbPrev = 'no-thumb-prev';
                             }
                             var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                            previewButton = <span key="previewButton">
-                                <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                    onClick={self._startPreview.bind(self, v)}/>
-                            </span>;
+                            var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
+                            previewButton =
+                                <span key="previewButton">
+                                    <DropdownsUI.DropdownItem
+                                        label={previewLabel}
+                                        icon={previewIcon}
+                                        onClick={self._startPreview.bind(self, v)}
+                                    />
+                                </span>;
                         }
 
                         if (contact.u === u_handle) {

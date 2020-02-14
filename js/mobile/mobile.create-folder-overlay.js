@@ -66,7 +66,6 @@ mobile.createFolderOverlay = {
             var folderName = $folderNameInput.val();
             var trimmedFolderName = $.trim(folderName);
             var folderNameExists = mobile.createFolderOverlay.checkIfFolderNameAlreadyExists(trimmedFolderName);
-            var promise = new MegaPromise();
 
             // If invalid folder name, show an error
             if (trimmedFolderName === '' || !M.isSafeName(trimmedFolderName)) {
@@ -86,7 +85,7 @@ mobile.createFolderOverlay = {
                 $createFolderButton.addClass('loading');
 
                 // Try creating the folder
-                M.createFolder(M.currentdirid, trimmedFolderName, promise)
+                M.createFolder(M.currentdirid, trimmedFolderName)
                     .always(function(result) {
 
                         // Hide the loading dialog and loading button
@@ -113,8 +112,6 @@ mobile.createFolderOverlay = {
                             // Add a server log
                             api_req({ a: 'log', e: 99677, m: 'Mobile web new folder created' });
                         }
-
-                        promise.resolve();
                     });
             }
 

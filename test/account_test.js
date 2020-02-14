@@ -149,9 +149,6 @@ describe("account unit test", function() {
 
             it("private attribute, internal callback OK, custom callback", function() {
                 mStub(ns._logger, '_log');
-
-                mStub(window, 'assertUserHandle');
-                mStub(window, 'base64urldecode').callsFake(_echo);
                 mStub(tlvstore, 'blockDecrypt').callsFake(_echo);
                 mStub(tlvstore, 'tlvRecordsToContainer').callsFake(_echo);
                 var myCallback = sinon.spy();

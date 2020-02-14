@@ -160,14 +160,14 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     z-index: 10;
 }
 .mega-input-title-ontop.with-icon .mega-input-title {
-    left: 40px;
+    left: 38px;
 }
 .mega-input-title-ontop.halfSize-l {
-    width: 49.5%;
+    width: 48%;
     float: left;
 }
 .mega-input-title-ontop.halfSize-r {
-    width: 49.5%;
+    width: 48%;
     float: right;
 }
 .mega-input-title-ontop input:-webkit-autofill {
@@ -235,6 +235,40 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     font-size: 14px;
     opacity: 0;
 }
+
+/* Smaller font size input */
+.mega-input-title-ontop.small-txt input {
+    font-size: 14px;
+    line-height: 22px;
+}
+.mega-input-title-ontop.small-txt .mega-input-title, .mega-input-title-ontop.active.small-txt .mega-input-title, .mega-input-title-ontop.valued.small-txt .mega-input-title {
+    font-size: 12px;
+}
+.mega-input-title-ontop.small-txt input::placeholder {
+    font-size: 12px;
+}
+.mega-input-title-ontop.small-txt input::-webkit-input-placeholder {
+    font-size: 12px;
+}
+.mega-input-title-ontop.small-txt input:-moz-placeholder {
+    font-size: 12px;
+}
+.mega-input-title-ontop.small-txt input::-moz-placeholder {
+    font-size: 12px;
+}
+.mega-input-title-ontop.small-txt input:-ms-input-placeholder {
+    font-size: 12px;
+}
+/* end of Smaller font size input */
+
+/* Disabled class. Hides underline */
+.mega-input-title-ontop.disabled {
+    opacity: 1;
+}
+.mega-input-title-ontop.disabled::after {
+    display: none;
+}
+/* end of Disabled class */
 
 /* three extra status for the inputs: error, active, valued */
 .mega-input-title-ontop.active .mega-input-title, 

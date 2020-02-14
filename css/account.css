@@ -5,7 +5,7 @@
     padding-top: 94px;
 }
 .bottom-page.sign .main-left-block {
-    width: 456px;
+    width: 486px;
     padding:64px 0;
 }
 .account.register-form, .account.login-form {
@@ -46,10 +46,10 @@
 }
 .account.top-header {
     font-family: 'montserrat_light', 'LatoWeb', 'source_sans_proregular', Arial;
-    font-size: 32px;
+    font-size: 28px;
     line-height: 44px;
     color: #333;
-    padding: 40px 0 48px 0;
+    padding: 48px 0 40px 0;
 }
 .fm-dialog-header .account.top-header {
     padding: 40px 0px 10px 40px;
@@ -676,7 +676,7 @@ body.ar .sms-verification-number-input {
     -moz-box-shadow: none;
     box-shadow: none;
     margin: 0;
-    opacity: 0.8;
+    opacity: 0.4;
     -webkit-transition: all 250ms ease-in-out;
     -moz-transition: all 250ms ease-in-out;
     -o-transition: all 250ms ease-in-out;

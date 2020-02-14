@@ -137,7 +137,10 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.default-white-button.l-pane-visibility').removeClass('active');
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
-        if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
+        if ($.dialog === 'pro-login-dialog'
+            || String($.dialog).startsWith('verify-email')
+            || localStorage.awaitingConfirmationAccount) {
+
             return false;
         }
         showWarningTokenInputLose().done(function() {
@@ -1879,16 +1882,16 @@ FileManager.prototype.createFolderUI = function() {
             loadingDialog.pshow();
             var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
-            M.createFolder(currentdirid, name, new MegaPromise())
-                .done(function(h) {
+            M.createFolder(currentdirid, name)
+                .then(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', currentdirid, h);
                     }
                     loadingDialog.phide();
                 })
-                .fail(function(error) {
+                .catch(function(ex) {
                     loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
                 });
         }
 
@@ -2198,7 +2201,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // up in grid/table
@@ -2209,7 +2212,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // down in grid/table
@@ -2335,7 +2338,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
 
-        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
+        if (sl && String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1) {
             // if something is selected, scroll to that item
             var jsp = $($.selectddUIgrid).data('jsp');
             if (jsp) {
@@ -4014,7 +4017,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         // update texts with "for free accounts" sentences removed.
 
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-        
+
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
             .safeHTML(l[16361] + ' ' + l[16314]);
@@ -4296,4 +4299,21 @@ FileManager.prototype.getLinkAction = function() {
 
         _openDialog(dialogName, dispatcher);
     };
+
+    Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
+        value: function _abort() {
+            if (d && $.dialog) {
+                console.info('Aborting dialogs dispatcher while on %s, queued: ', $.dialog, _cdialogq);
+            }
+
+            delete $.dialog;
+            loadingDialog.hide('force');
+            _cdialogq = Object.create(null);
+
+            $('html, body').removeClass('overlayed');
+            $('.fm-dialog-overlay').addClass('hidden');
+            $('.fm-dialog:visible, .overlay:visible').addClass('hidden');
+        }
+    });
+
 })(self);

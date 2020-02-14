@@ -1283,7 +1283,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.warningCallback = callback;
 
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide');
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide with-close-btn');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
 
@@ -1476,10 +1476,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .removeClass('plan4')
             .addClass('plan' + plan);
     }
-    else if (type === 'import_login' || type === 'import_register') {
-        var buttonLabel = type === 'import_login' ? l[171] : l[170];
-
-        $('#msgDialog').addClass('warning-dialog-a wide');
+    else if (type === 'import_login_or_register') {
+        // Show import confirmation dialog if a user isn't logged in
+        $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="bottom-bar-link">@@</div>' +
                 '<div class="default-green-button right notification-button confirm button semi-big">' +
@@ -1488,25 +1487,27 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel semi-big">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="clear"></div></div>', l[20754], buttonLabel, l[79]);
+                '<div class="clear"></div></div>', l[20754], l[170], l[171]);
 
+        // Register a new account to complete the import
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(true);
+                $.warningCallback('register');
             }
         });
-        /*!4*/
+        // Login to complete the import
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(undefined);
+                $.warningCallback('login');
             }
         });
+        // Have an ephemeral account to complete the import
         $('#msgDialog .bottom-bar-link').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(false);
+                $.warningCallback('ephemeral');
             }
         });
     }
@@ -2516,19 +2517,26 @@ function closeImportContactNotification(c) {
  */
 
 function showWarningTokenInputLose() {
-
     "use strict";
+
+    var $dialog = $('.fm-dialog:visible');
+    if ($dialog.length !== 1) {
+        console.warn('Unexpected number of dialogs...', [$dialog]);
+        return MegaPromise.resolve();
+    }
 
     var promise = new MegaPromise();
 
     // If there is any tokenizer on the dialog and it is triggered by dom event.
-    var $tokenInput = $('.fm-dialog:visible li[class*="token-input-input"]');
+    var $tokenInput = $('li[class*="token-input-input"]', $dialog);
 
     // Make sure all input is tokenized.
-    $tokenInput.find('input').trigger('blur');
+    if ($tokenInput.length) {
+        $('input', $tokenInput).trigger('blur');
+    }
 
     // If tokenizer is on the dialog, check it has input already. If it has, warn user.
-    var $tokenItems = $('li[class*="token-input-token"]');
+    var $tokenItems = $('li[class*="token-input-token"]', $dialog);
 
     if ($tokenItems.length) {
         msgDialog('confirmation', '', l[20474], l[18229], function(e) {
@@ -2719,14 +2727,15 @@ function createFolderDialog(close) {
         if ($.cftarget) {
             delete $.cftarget;
         }
-        closeDialog();
+        if ($.dialog === 'createfolder') {
+            closeDialog();
+        }
         return true;
-
     }
-    var doCreateFolder = function (v) {
-        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
 
-        if (!M.isSafeName(v)) {
+    var doCreateFolder = function(v) {
+
+        if (!M.isSafeName(v, true)) {
             $dialog.removeClass('active');
             $input.addClass('error');
             return;
@@ -2751,28 +2760,44 @@ function createFolderDialog(close) {
             }
         }
 
-        loadingDialog.pshow();
-        $dialog.addClass('hidden');
+        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
+        var awaitingPromise = $.cfpromise;
+        delete $.cfpromise;
 
-        M.createFolder(target, v, new MegaPromise())
-            .done(function(h) {
+        closeDialog();
+        loadingDialog.pshow();
+
+        M.createFolder(target, v.split(/[/\\]/))
+            .then(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
                 loadingDialog.phide();
-                if ($.cfpromise) {
-                    $.cfpromise.resolve(h);
-                    delete $.cfpromise;
+
+                if (awaitingPromise) {
+                    // dispatch an awaiting promise expecting to perform its own action instead of the default one
+                    awaitingPromise.resolve(h);
+                }
+                else {
+                    // By default auto-select the newly created folder as long no awaiting promise
+                    M.openFolder(Object(M.d[h]).p || target)
+                        .always(function() {
+                            $.selected = [h];
+                            reselect(1);
+                        });
                 }
                 createFolderDialog(1);
             })
-            .fail(function(error) {
+            .catch(function(ex) {
                 loadingDialog.phide();
-                $dialog.removeClass('hidden');
-                msgDialog('warninga', l[135], l[47], api_strerror(error));
+
+                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
+                    if (awaitingPromise) {
+                        awaitingPromise.reject(ex);
+                    }
+                });
             });
     };
-
 
     $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {

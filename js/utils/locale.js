@@ -28,6 +28,7 @@ if (typeof l === 'undefined') {
  * @returns {String}
  */
 function translate(html) {
+    'use strict';
 
     /**
      * String.replace callback
@@ -54,8 +55,18 @@ function translate(html) {
                 l[match] = String(l[match]).replace(/'/g, "\\'");
             }
 
-            return l[match];
+            localeNum = match;
         }
+
+        // XXX: Seeing this warning could simply mean we forgot to replace entity tags
+        //      within populate_l(), or it may indicate a worse issue where html pages
+        //      are used before startMega() have finished. Also, injecting them in the
+        //      DOM to manipulate it later is something we should avoid doing as well.
+        // FIXME: we will for now whitelist onboarding strings doing so though...
+        if (d && /\[\w+]/.test(l[localeNum]) && (localeNum < 17566 || localeNum > 17577)) {
+            console.warn('locale string %s does contain raw entity tags', localeNum, [l[localeNum]]);
+        }
+
         return String(l[localeNum]);
     };
 
@@ -525,11 +536,13 @@ function daysSince1Jan2000() {
 
 //----------------------------------------------------------------------------
 
-mBroadcaster.once('startMega', function populate_l() {
+// eslint-disable-next-line complexity
+mBroadcaster.once('boot_done', function populate_l() {
+    'use strict';
     var i;
 
     if (d) {
-        for (i = 24000; i--;) {
+        for (i = 32000; i--;) {
             l[i] = (l[i] || '(translation-missing)');
         }
     }
@@ -633,6 +646,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');
     l[7202] = l[7202].replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">')
                      .replace('[/A]', '</a>');
+    l[7709] = l[7709].replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7945] = l[7945].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[7996] = l[7996].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
@@ -640,6 +654,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
+    l[8436] = l[8436].replace('[/A]', '</a>').replace('[A]', '<a class="red" href="mailto:support@mega.nz">');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
@@ -708,6 +723,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl">').replace('[/A]', '</a>')
         .replace('[I]', '<i class="semi-small-icon rocket"></i>');
+    l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16389] = escapeHTML(l[16389]).replace(
         '%1',
             '<span class="checkdiv checkboxOn autoaway">' +
@@ -725,6 +741,7 @@ mBroadcaster.once('startMega', function populate_l() {
     l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
     l[16393] = escapeHTML(l[16393])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
     l[22670] = escapeHTML(l[22670])
         .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
@@ -911,8 +928,10 @@ mBroadcaster.once('startMega', function populate_l() {
     l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
         .replace('[A]', '<a href="/security" class="red txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
-    l[22094] = l[22094].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
-    l[22095] = l[22095].replace(/\[S\]/g, '<strong>').replace(/\[\/S\]/g, '</strong>');
+    l[22077] = l[22077].replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
+    l[22094] = l[22094].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22095] = l[22095].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22247] = l[22247].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

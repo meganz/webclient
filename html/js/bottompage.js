@@ -82,14 +82,14 @@ var bottompage = {
         "use strict";
 
         $('#startholder').rebind('scroll.bottompage', function() {
-            sessionStorage.setItem('scrollPosition_' + page, $(this).scrollTop());
+            sessionStorage.setItem('scrpos' + MurmurHash3(page).toString(16), $(this).scrollTop() | 0);
             if (page === 'download') {
                 $(window).unbind('resize.download-bar');
             }
         });
 
         window.onpopstate = function() {
-            var sessionData = sessionStorage['scrollPosition_' + page];
+            var sessionData = sessionStorage['scrpos' + MurmurHash3(page).toString(16)];
 
             if ($('body').hasClass('bottom-pages') && sessionData) {
                 $('#startholder').scrollTop(sessionData);
@@ -100,7 +100,7 @@ var bottompage = {
             }
         };
     },
-    
+
     initScrollToContent: function() {
         "use strict";
 

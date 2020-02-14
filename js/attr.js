@@ -195,7 +195,9 @@ var attribCache = false;
     ns.get = function _getUserAttribute(
             userhandle, attribute, pub, nonHistoric, callback, ctx, chathandle, decodeValues) {
 
-        assertUserHandle(userhandle);
+        if (typeof userhandle !== 'string' || base64urldecode(userhandle).length !== 8) {
+            return MegaPromise.reject(EARGS);
+        }
         var self = this;
         var myCtx = ctx || {};
         var args = toArray.apply(null, arguments);
@@ -1156,7 +1158,7 @@ var attribCache = false;
         uaPacketParserHandler['^!prd'] = function() {
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
             // if page is session history and new password action detected. update session table.
-            if (fminitialized && page === 'fm/account/security') {
+            if (fminitialized && page === 'fm/account/security' && accountUI.security) {
                 accountUI.security.session.update(1);
             }
         };
@@ -1167,7 +1169,7 @@ var attribCache = false;
         };
         uaPacketParserHandler['^clv'] = function(userHandle) {
             mega.attr.get(userHandle, 'clv', -2, 0, function(res) {
-                u_attr['clv'] = res;
+                u_attr['^clv'] = res;
                 if (fminitialized && $.dialog === 'qr-dialog') {
                     openAccessQRDialog();
                 }
@@ -1419,7 +1421,7 @@ var attribCache = false;
                 }
 
                 var target = typeof create === 'string' && create || M.RootID;
-                M.createFolder(target, ns.name, new MegaPromise()).always(function(target) {
+                M.createFolder(target, ns.name).always(function(target) {
                     if (!M.d[target]) {
                         if (d) {
                             log.warn("Failed to create folder...", target, api_strerror(target));

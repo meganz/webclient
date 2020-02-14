@@ -16,7 +16,7 @@ function BusinessRegister() {
 
 
 /** a function to rest business registration page to its initial state*/
-BusinessRegister.prototype.initPage = function () {
+BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, preSetFname, preSetLname, preSetEmail) {
     "use strict";
 
     loadingDialog.show();
@@ -24,12 +24,12 @@ BusinessRegister.prototype.initPage = function () {
     var $pageContainer = $('.bus-reg-body');
     var mySelf = this;
 
-    var $nbUsersInput = $pageContainer.find('#business-nbusrs').val('');
-    var $cnameInput = $pageContainer.find('#business-cname').val('');
-    var $telInput = $pageContainer.find('#business-tel').val('');
-    var $fnameInput = $pageContainer.find('#business-fname').val('');
-    var $lnameInput = $pageContainer.find('#business-lname').val('');
-    var $emailInput = $pageContainer.find('#business-email').val('');
+    var $nbUsersInput = $pageContainer.find('#business-nbusrs').val(preSetNb || '');
+    var $cnameInput = $pageContainer.find('#business-cname').val(preSetName || '');
+    var $telInput = $pageContainer.find('#business-tel').val(preSetTel || '');
+    var $fnameInput = $pageContainer.find('#business-fname').val(preSetFname || '');
+    var $lnameInput = $pageContainer.find('#business-lname').val(preSetLname || '');
+    var $emailInput = $pageContainer.find('#business-email').val(preSetEmail || '');
     var $passInput = $pageContainer.find('#business-pass').val('');
     var $rPassInput = $pageContainer.find('#business-rpass').val('');
     $pageContainer.find('.bus-reg-radio-block .bus-reg-radio').removeClass('checkOn').addClass('checkOff');
@@ -79,7 +79,7 @@ BusinessRegister.prototype.initPage = function () {
     $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
 
     // function to show first step of registration
-    var unhidePage = function () {
+    var unhidePage = function() {
         $pageContainer.removeClass('hidden');  // viewing the main sign-up part
         $('.bus-confirm-body.confirm').addClass('hidden'); // hiding confirmation part
         $('.bus-confirm-body.verfication').addClass('hidden'); // hiding verification part
@@ -126,7 +126,7 @@ BusinessRegister.prototype.initPage = function () {
 
     $('.bus-reg-btn, .bus-reg-btn-2', $pageContainer).addClass('disabled');
 
-    var fillPaymentGateways = function (status, list) {
+    var fillPaymentGateways = function(status, list) {
 
         var failureExit = function(msg) {
 
@@ -185,7 +185,7 @@ BusinessRegister.prototype.initPage = function () {
         unhidePage();
     };
 
-    var updatePriceGadget = function (users) {
+    var updatePriceGadget = function(users) {
         if (!users) {
             users = mySelf.minUsers; // minimum val
         }
@@ -243,8 +243,8 @@ BusinessRegister.prototype.initPage = function () {
     /**input values validation
      * @param {Object}  $element    the single element to validate, if not passed all will be validated
      * @returns {Boolean}   whether the validation passed or not*/
-    var inputsValidator = function ($element) {
-        
+    var inputsValidator = function($element) {
+
         var passed = true;
 
         if (mySelf.isLoggedIn === false) {
@@ -392,7 +392,7 @@ BusinessRegister.prototype.initPage = function () {
  * @param {String} email        email
  * @param {String} pass         password
  */
-BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, tel, email, pass) {
+BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
     if (is_mobile) {
         parsepage(pages['mobile']);
@@ -400,7 +400,7 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
     loadingDialog.show();
     var mySelf = this;
 
-    var afterEmphermalAccountCreation = function (isUpgrade) {
+    var afterEmphermalAccountCreation = function(isUpgrade) {
         // at this point i know BusinessAccount Class is required before
         var business = new BusinessAccount();
         var settingPromise = business.setMasterUserAttributes(nbusers, cname, tel, fname, lname,
@@ -408,17 +408,28 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
                 if (res[1] && res[1] === EEXIST) {
-                    msgDialog('warninga', l[1578], l[7869], '', function () {
-                        loadingDialog.hide();
-                        var $emailInput = $('.bus-reg-body #business-email');
-                        $emailInput.megaInputsShowError(l[1297]);
-                        $emailInput.focus();
-                    });
+                    msgDialog(
+                        'warninga',
+                        l[1578],
+                        l[7869],
+                        '',
+                        function() {
+                            loadingDialog.hide();
+                            if (is_mobile) {
+                                parsepage(pages['registerb']);
+                                mySelf.initPage(nbusers, cname, tel, fname, lname, email);
+
+                            }
+                            var $emailInput = $('.bus-reg-body #business-email');
+                            $emailInput.megaInputsShowError(l[1297]);
+                            $emailInput.focus();
+                        }
+                    );
                 }
                 else {
-                    msgDialog('warninga', l[1578], l[19508], '', function () {
+                    msgDialog('warninga', l[1578], l[19508], '', function() {
                         loadingDialog.hide();
-                        mySelf.initPage();
+                        mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });
                 }
                 return;
@@ -448,7 +459,7 @@ BusinessRegister.prototype.doRegister = function (nbusers, cname, fname, lname, 
  * show the payment dialog
  * @param {Object} userInfo     user info (fname, lname and nbOfUsers)
  */
-BusinessRegister.prototype.goToPayment = function (userInfo) {
+BusinessRegister.prototype.goToPayment = function(userInfo) {
     "use strict";
 
     addressDialog.init(this.planInfo, userInfo, this);
@@ -460,15 +471,15 @@ BusinessRegister.prototype.goToPayment = function (userInfo) {
  * @param {Object} payDetails       payment collected details from payment dialog
  * @param {Object} businessPlan     business plan details
  */
-BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) {
+BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     "use strict";
     loadingDialog.show();
 
     var mySelf = this;
 
-    var finalizePayment = function (st, res) {
+    var finalizePayment = function(st, res) {
         if (st === 0) {
-            msgDialog('warninga', '', l[19511], '', function () {
+            msgDialog('warninga', '', l[19511], '', function() {
                 loadingDialog.hide();
                 addressDialog.closeDialog();
             });
@@ -504,7 +515,7 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
                 }
             }
 
-            
+
         }
 
         if (showWarnDialog) {
@@ -514,7 +525,7 @@ BusinessRegister.prototype.processPayment = function (payDetails, businessPlan) 
             redirectToPaymentGateway();
         }
 
-        
+
     };
 
     // at this point i know BusinessAccount class is required before

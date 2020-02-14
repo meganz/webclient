@@ -393,6 +393,9 @@
         else if (id === 'ipc') {
             id = 'ipc';
         }
+        else if (is_mobile && String(id).startsWith('chat')) {
+            id = this.RootID;
+        }
         else if (id && id.substr(0, 15) === 'user-management') {
             // id = 'user-management';
             M.require('businessAcc_js', 'businessAccUI_js').done(function () {

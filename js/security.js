@@ -306,14 +306,18 @@ var security = {
      * A helper function for the check password feature (used when changing email or checking if they can remember).
      * This function will only pass the Derived Encryption Key to the completion callback.
      * @param {String} password The password from the user
-     * @param {String} completeCallback The callback to run when complete which will pass derivedEncryptionKeyArray32
+     * @param {String} [saltBase64] Account Authentication Salt, if applicable
+     * @returns {Promise} derivedEncryptionKeyArray32
      */
-    getDerivedEncryptionKey: function(password, completeCallback) {
-
+    getDerivedEncryptionKey: promisify(function(resolve, reject, password, saltBase64) {
         'use strict';
 
+        saltBase64 = saltBase64 === undefined ? u_attr && u_attr.aas || '' : saltBase64;
+        if (!saltBase64) {
+            return resolve(prepare_key_pw(password));
+        }
+
         // Convert the salt and password to byte arrays
-        var saltBase64 = u_attr.aas;                        // Account Authentication Salt
         var saltArrayBuffer = base64_to_ab(saltBase64);
         var saltBytes = new Uint8Array(saltArrayBuffer);
         var passwordBytes = security.stringToByteArray(password);
@@ -332,9 +336,9 @@ var security = {
             var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
 
             // Pass only the Derived Encryption Key back to the callback
-            completeCallback(derivedEncryptionKeyArray32);
+            resolve(derivedEncryptionKeyArray32);
         });
-    },
+    }),
 
     /**
      * Complete the Park Account process
@@ -494,6 +498,256 @@ var security = {
                 { callback: completeCallback });
             }
         );
+    },
+
+    /**
+     * Check whether the provided password is valid to decrypt a key.
+     * @param {String|*} aPassword The password to test against.
+     * @param {String|*} aMasterKey The encrypted master key.
+     * @param {String|*} aPrivateKey The encrypted private key.
+     * @param {String|*} [aSalt] Account authentication salt, if applicable.
+     * @returns {Boolean|*} whether it succeed.
+     */
+    verifyPassword: promisify(function(resolve, reject, aPassword, aMasterKey, aPrivateKey, aSalt) {
+        'use strict';
+
+        if (typeof aPrivateKey === 'string') {
+            aPrivateKey = base64_to_a32(aPrivateKey);
+        }
+
+        if (typeof aMasterKey === 'string') {
+            aMasterKey = [[aMasterKey, aSalt]];
+        }
+        var keys = aMasterKey.concat();
+
+        (function _next() {
+            var pair = keys.pop();
+            if (!pair) {
+                return reject(ENOENT);
+            }
+
+            var mk = pair[0];
+            var salt = pair[1];
+
+            security.getDerivedEncryptionKey(aPassword, salt || false)
+                .then(function(derivedKey) {
+                    if (typeof mk === 'string') {
+                        mk = base64_to_a32(mk);
+                    }
+
+                    var decryptedMasterKey = decrypt_key(new sjcl.cipher.aes(derivedKey), mk);
+                    var decryptedPrivateKey = decrypt_key(new sjcl.cipher.aes(decryptedMasterKey), aPrivateKey);
+
+                    if (crypto_decodeprivkey(a32_to_str(decryptedPrivateKey))) {
+                        return resolve({k: decryptedMasterKey, s: salt});
+                    }
+
+                    onIdle(_next);
+                })
+                .catch(function(ex) {
+                    console.warn(mk, salt, ex);
+                    onIdle(_next);
+                });
+        })();
+    }),
+
+    /**
+     * Complete the email verification process
+     * @param {String} pwd The new password for the account.
+     * @param {String} code The code from the email notification.
+     * @returns {Promise}
+     */
+    completeVerifyEmail: promisify(function(resolve, reject, pwd, code) {
+        'use strict';
+
+        var req = {a: 'erx', c: code, r: 'v1'};
+        var xhr = function(key, uh) {
+            req.y = uh;
+            req.x = a32_to_base64(key);
+            M.req(req).then(resolve).catch(reject);
+        };
+
+        // If using the new registration method (v2)
+        if (u_attr.aav > 1) {
+            req.r = 'v2';
+
+            security.deriveKeysFromPassword(pwd, u_k, tryCatch(function(crv, key, uh) {
+                req.z = ab_to_base64(crv);
+                xhr(key, ab_to_base64(uh));
+            }, reject));
+        }
+        else {
+            var aes = new sjcl.cipher.aes(prepare_key_pw(pwd));
+            xhr(encrypt_key(aes, u_k), stringhash(u_attr.email.toLowerCase(), aes));
+        }
+    }),
+
+    /**
+     * Ask the user for email verification on account suspension.
+     * @param {String} [aStep] What step of the email verification should be triggered.
+     * @returns {undefined}
+     */
+    showVerifyEmailDialog: function(aStep) {
+        'use strict';
+        var name = 'verify-email' + (aStep ? '-' + aStep : '');
+
+        // abort any ongoing dialog operation that may would get stuck by receiving an whyamiblocked=700
+        M.safeShowDialog.abort();
+
+        M.safeShowDialog(name, function() {
+            parsepage(pages.placeholder);
+            watchdog.registerOverrider('logout');
+
+            var $dialog = $('.fm-dialog.' + name);
+            if (!$dialog.length) {
+                $('#loading').addClass('hidden');
+                parsepage(pages['dialogs-common']);
+                $dialog = $('.fm-dialog.' + name);
+            }
+            var showLoading = function() {
+                loadingDialog.show();
+                $dialog.addClass('arrange-to-back');
+            };
+            var hideLoading = function() {
+                loadingDialog.hide();
+                $dialog.removeClass('arrange-to-back');
+            };
+            var reset = function(step) {
+                hideLoading();
+                closeDialog();
+                security.showVerifyEmailDialog(step && step.to);
+            };
+            $('.fm-dialog:visible').addClass('hidden');
+
+            if (aStep === 'login-to-account') {
+                var code = String(page).substr(11);
+
+                onIdle(showLoading);
+                console.assert(String(page).startsWith('emailverify'));
+
+                M.req({a: 'erv', v: 2, c: code})
+                    .always(function(res) {
+                        loadingDialog.hide();
+                        console.debug('erv', [res]);
+
+                        if (res === EEXPIRED || res === ENOENT) {
+                            return msgDialog('warninga', l[135], l[7719], false, reset);
+                        }
+                        if (!Array.isArray(res) || !res[6]) {
+                            return msgDialog('warninga', l[135], l[47], res < 0 ? api_strerror(res) : l[253], reset);
+                        }
+
+                        u_logout(true);
+                        $dialog.removeClass('arrange-to-back');
+
+                        u_handle = res[4];
+                        u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
+
+                        $('.mail', $dialog).val(u_attr.email);
+                        $('.button', $dialog).rebind('click.ve', function() {
+                            var $input = $('.pass', $dialog);
+                            var pwd = $input.val();
+
+                            showLoading();
+                            security.verifyPassword(pwd, u_attr.evk, u_attr.privk)
+                                .then(function(res) {
+                                    u_k = res.k;
+                                    u_attr.aav = 1 + !!res.s;
+                                    reset({to: 'set-new-pass'});
+                                })
+                                .catch(function(ex) {
+                                    hideLoading();
+                                    console.debug(ex);
+                                    $input.megaInputsShowError(l[1102]).val('').focus();
+                                });
+
+                            return false;
+                        });
+                    });
+            }
+            else if (aStep === 'set-new-pass') {
+                console.assert(u_attr && u_attr.evc, 'Invalid procedure...');
+
+                $('.button', $dialog).rebind('click.ve', function() {
+                    var pw1 = $('input.pw1', $dialog).val();
+                    var pw2 = $('input.pw2', $dialog).val();
+
+                    var error = function(msg) {
+                        hideLoading();
+                        $('input', $dialog)
+                            .val('').trigger('blur')
+                            .first().trigger('input').megaInputsShowError(msg).trigger('focus');
+                        return false;
+                    };
+
+                    var pwres = security.isValidPassword(pw1, pw2);
+                    if (pwres !== true) {
+                        return error(pwres);
+                    }
+
+                    showLoading();
+                    security.verifyPassword(pw1, u_attr.evk, u_attr.privk)
+                        .then(function() {
+                            // Do not allow to use a old known password
+                            error(l[22675]);
+                        })
+                        .catch(function(ex) {
+                            if (ex !== ENOENT) {
+                                console.error(ex);
+                                return error(l[8982]);
+                            }
+
+                            security.completeVerifyEmail(pw1, u_attr.evc)
+                                .then(function() {
+                                    login_email = u_attr.email;
+                                    watchdog.unregisterOverrider('logout');
+
+                                    u_logout(true);
+                                    eventlog(99728);
+                                    loadSubPage('login');
+                                })
+                                .catch(function(ex) {
+                                    hideLoading();
+                                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, reset);
+                                });
+                        });
+
+                    return false;
+                });
+            }
+            else {
+                $('.send-email', $dialog).rebind('click.ve', function() {
+                    $(this).unbind('click.ve').addClass('disabled');
+                    M.req('era').always(function(res) {
+                        if (res === 0) {
+                            $('.status-txt', $dialog).removeClass('hidden');
+                        }
+                        else {
+                            msgDialog('warninga', l[135], l[47], api_strerror(res), loadSubPage.bind(null, 'contact'));
+                        }
+                    });
+                    return false;
+                });
+            }
+
+            var $inputs = $('input', $dialog);
+            $inputs.rebind('keypress.ve', function(ev) {
+                var key = ev.code || ev.key;
+
+                if (key === 'Enter') {
+                    if ($inputs.get(0) === this) {
+                        $inputs.trigger('blur');
+                        $($inputs.get(1)).trigger('focus');
+                    }
+                    else {
+                        $('.button', $dialog).trigger('click');
+                    }
+                }
+            });
+
+            mega.ui.MegaInputs($inputs);
+            return $dialog;
+        });
     }
 };
 

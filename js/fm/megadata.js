@@ -151,12 +151,24 @@ function MegaData() {
     };
 
     if (is_mobile) {
+        /* eslint-disable no-useless-concat */
         var dummy = function() {
             return MegaPromise.resolve();
         };
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
+
+        this['addWeb' + 'Download'] = function(nodes) {
+            // @see filesystem.js/abortAndStartOver
+            if (d) {
+                console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
+            }
+            M.resetUploadDownload();
+            later(function() {
+                mobile.downloadOverlay.startDownload(nodes[0]);
+            });
+        };
 
         // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = function(data) {

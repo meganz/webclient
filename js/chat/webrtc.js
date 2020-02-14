@@ -966,6 +966,10 @@ RtcModule.prototype.onClientLeftCall = function(chat, userid, clientid) {
         this.logger.log("Notifying about last client leaving call");
     }
     this._fire('onClientLeftCall', chatid, userid, clientid);
+    var call = this.calls[chatid];
+    if (call) {
+        call._onClientLeftCall(userid, clientid);
+    }
 };
 
 RtcModule.prototype.onClientJoinedCall = function(chat, userid, clientid) {
@@ -2179,9 +2183,9 @@ Call.prototype._reject = function(reason) {
 };
 
 Call.prototype._onClientLeftCall = function(userid, clientid) {
+    // We received an ENDCALL
     var self = this;
     if (userid === self.manager.chatd.userId && clientid === self.shard.clientId) {
-        // We received an ENDCALL
         if (self.recovery && self.state === CallState.kJoining) {
             // We may receive a parasitic ENDCALL after we reconnect to chatd, which is about the previous connection
             self.logger.warn("Ignoring ENDCALL received for a reconnect call while in kJoining state");

@@ -14,7 +14,7 @@ last=$2
 
 if [[ "$1" = "--smart" ]]; then
     [[ ! -z "$2" ]] && git checkout $2
-    reflog=$(git log --reflog --oneline | grep "$(git log -1 --pretty=%B)" |  awk '{ print $1 }')
+    reflog=$(git log --reflog --oneline --topo-order | grep "$(git log -1 --pretty=%B)" |  awk '{ print $1 }')
     prev=$(echo $reflog | awk '{ print $2 }')
     last=$(echo $reflog | awk '{ print $1 }')
 fi

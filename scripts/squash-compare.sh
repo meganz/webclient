@@ -19,6 +19,8 @@ if [[ "$1" = "--smart" ]]; then
     last=$(echo $reflog | awk '{ print $1 }')
 fi
 
+echo "@@@ squash-compare against $prev..$last"
+
 git diff develop...$prev >"$file1"
 git diff develop...$last >"$file2"
 

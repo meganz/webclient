@@ -3898,7 +3898,7 @@ function fm_thumbnails(mode, nodeList, callback)
 
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
 
-    if ((M.viewmode && !M.chat) || mode === 'standalone')
+    if (!M.chat || mode === 'standalone')
     {
         for (var i = 0; i < nodeList.length; i++) {
             var n = nodeList[i];

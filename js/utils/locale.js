@@ -829,6 +829,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[19835] = l[19835].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[19840] = l[19840].replace('[A]', '<a class="red toResetLink">').replace('[/A]', '</a>');
     l[19843] = l[19843].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[23052] = l[23052].replace('[A]', '<a class="red" href="mailto:business@mega.nz">').replace('[/A]', '</a>');
     l[19849] = l[19849].replace('[A]', '<a class="red" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
     l[19857] = l[19857] ? l[19857].replace('[BR]', '<br>') : l[19857];

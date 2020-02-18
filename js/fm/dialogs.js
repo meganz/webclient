@@ -501,7 +501,7 @@
         }
 
         if ($.saveToDialog || $.saveAsDialog) {
-            if (!$.nodeSaveAs.h) {
+            if ($.nodeSaveAs && !$.nodeSaveAs.h) {
                 return l[158];
             }
             return l[776]; // Save
@@ -544,7 +544,7 @@
         }
 
         if ($.saveAsDialog) {
-            if (!$.nodeSaveAs.h) {
+            if ($.nodeSaveAs && !$.nodeSaveAs.h) {
                 return l[22680];
             }
             return l[22678];

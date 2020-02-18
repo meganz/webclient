@@ -322,7 +322,7 @@ mega.textEditorUI = new function TextEditorUI() {
             // Without parentheses && will be applied first,
             // I want JS to start from left and go in with first match
             // eslint-disable-next-line no-extra-parens
-            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 2)) {
                 editor.options.readOnly = true;
                 $('.txt-editor-menu', $editorContianer).addClass('disabled');
                 $('.txt-editor-btn.save-btn', $editorContianer).addClass('hidden');

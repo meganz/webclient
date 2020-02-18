@@ -966,6 +966,10 @@ RtcModule.prototype.onClientLeftCall = function(chat, userid, clientid) {
         this.logger.log("Notifying about last client leaving call");
     }
     this._fire('onClientLeftCall', chatid, userid, clientid);
+    var call = this.calls[chatid];
+    if (call) {
+        call._onClientLeftCall(userid, clientid);
+    }
 };
 
 RtcModule.prototype.onClientJoinedCall = function(chat, userid, clientid) {
@@ -994,17 +998,23 @@ RtcModule.prototype.onShutdown = function() {
 RtcModule.prototype.onChatOnline = function(chat) {
     var chatid = chat.chatId;
     var recovery = this.callRecoveries[chatid];
-    if (recovery) {
-        // we have a call to recover on this chatid
-        var callInfo = chat.callInfo;
-        if (!callInfo.participantCount() || recovery.callid !== callInfo.callId) {
-            this.logger.log("We reconnected, but call is gone, aborting recovery...");
-            this.abortCallRecovery(chatid);
-            return;
-        }
-        this.logger.log("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
-        this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
+    if (!recovery) {
+        return;
     }
+    // we have a call to recover on this chatid
+    if (this.calls[chatid]) {
+        this.logger.log("We reconnected, but there is already another call, aborting recovery...");
+        recovery.abort(Term.kErrAlready);
+        return;
+    }
+    var callInfo = chat.callInfo;
+    if (!callInfo.participantCount() || recovery.callid !== callInfo.callId) {
+        this.logger.log("We reconnected, but call is gone or replaced, aborting recovery...");
+        recovery.abort(Term.kErrCallRecoveryFailed);
+        return;
+    }
+    this.logger.log("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
+    this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
 };
 
 RtcModule.prototype._startStatsTimer = function() {
@@ -1483,6 +1493,7 @@ Call.prototype.msgJoin = function(packet) {
         if (self.state === CallState.kReqSent) {
             self._setCallInProgress();
             if (!self.isGroup) {
+                delete self.isRingingOut;
                 if (!self._bcastCallData(CallDataType.kNotRinging)) {
                     return;
                 }
@@ -1703,7 +1714,7 @@ function CallRecovery(call) {
             var call = manager.calls[self.chatid];
             if (call && call.id === self.callid && call.state !== CallState.kCallInProgress) {
                 // call is being recovered, but not yet established - we have to terminate it
-                self.logger.log("Call recovery timed out while recovery call is being set up - destroying call");
+                call.logger.log("Call recovery timed out while recovery call is being set up - destroying call");
                 call._destroy(Term.kErrCallRecoveryFailed, true);
             }
             assert(!self.localStream); // we are not in callRecoveries, localStream must be either moved to a call or closed
@@ -2215,7 +2226,6 @@ Call.prototype._onClientLeftCall = function(userid, clientid) {
                     self._deleteRetry(peerId);
                     return;
                 } else {
-                    assert(sess.state !== SessState.kTerminated);
                     // peer abruptly went offline
                     didSetLastErrPeerOffline = true;
                     self._lastErrPeerOffline = { peerId: peerId, ts: Date.now() };

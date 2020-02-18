@@ -2190,9 +2190,9 @@ Call.prototype._reject = function(reason) {
 };
 
 Call.prototype._onClientLeftCall = function(userid, clientid) {
+    // We received an ENDCALL
     var self = this;
     if (userid === self.manager.chatd.userId && clientid === self.shard.clientId) {
-        // We received an ENDCALL
         if (self.recovery && self.state === CallState.kJoining) {
             // We may receive a parasitic ENDCALL after we reconnect to chatd, which is about the previous connection
             self.logger.warn("Ignoring ENDCALL received for a reconnect call while in kJoining state");

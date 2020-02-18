@@ -314,7 +314,14 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
                     // Incoming while outgoing call request
                     self._updatePeerAvState(parsedCallData);
                     self.handleCallRequest(parsedCallData); // decides which call to honor
-                } else {
+                }
+                else if ((call.state === CallState.kRingIn) && (userid === self.chatd.userId) && ringing) {
+                    self.logger.warn("Our user sent a call request while we already have an incoming one." +
+                        "Possibly buggy client sent call request without checking if there is already a call." +
+                        "Nevertheless, destroying the previous incoming call");
+                    call._destroy(Term.kCallRejected);
+                }
+                else {
                     self.logger.error("Ignoring CALLDATA because its callid is different " +
                         "than the call that we have in that chatroom");
                 }

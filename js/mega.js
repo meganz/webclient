@@ -2790,12 +2790,12 @@ function process_f(f, cb, updateVersioning) {
             M.addNode(n);
             ufsc.addNode(n);
         }
-
-        if (cb) {
-            cb(newmissingkeys && M.checkNewMissingKeys());
-        }
     }
-    else if (cb) cb();
+
+    // TODO: This function is no longer asynchronous, remove the callback dependency (?)
+    if (typeof cb === 'function') {
+        cb();
+    }
 }
 
 /**
@@ -3592,10 +3592,6 @@ function loadfm_callback(res) {
         }
         else {
             getsc(true);
-        }
-
-        if (hasMissingKeys) {
-            srvlog('Got missing keys processing gettree...', null, true);
         }
     });
 }

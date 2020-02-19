@@ -1474,30 +1474,6 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
     }
 };
 
-/** Don't report `newmissingkeys` unless there are *new* missing keys */
-MegaUtils.prototype.checkNewMissingKeys = function() {
-    var result = true;
-
-    try {
-        var keys = Object.keys(missingkeys).sort();
-        var hash = MurmurHash3(JSON.stringify(keys));
-        var prop = u_handle + '_lastMissingKeysHash';
-        var oldh = parseInt(localStorage[prop]);
-
-        if (oldh !== hash) {
-            localStorage[prop] = hash;
-        }
-        else {
-            result = false;
-        }
-    }
-    catch (ex) {
-        console.error(ex);
-    }
-
-    return result;
-};
-
 /**
  * Sanitise filename so that saving to local disk won't cause any issue...
  * @param {String} name The filename

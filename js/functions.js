@@ -2853,6 +2853,9 @@ function registerLinuxDownloadButton($links) {
  */
 function isTextual(node) {
     'use strict';
+    if (node && node.name && fileext(node.name) === '') {
+        return true;
+    }
     var fType = filetype(node, true)[0];
     if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
         return true;

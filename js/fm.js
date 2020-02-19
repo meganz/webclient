@@ -2645,6 +2645,7 @@ function closeDialog(ev) {
         delete $.copyrightsDialog;
         delete $.selectFolderDialog;
         delete $.saveAsDialog;
+        delete $.nodeSaveAs;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;

@@ -1651,8 +1651,9 @@
 
                 $nameInput.off(eventName);
 
+                var nodeToSave = $.nodeSaveAs;
                 closeDialog();
-                mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, $.nodeSaveAs).done(
+                mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave).done(
                     function(handle) {
                         if ($.saveAsCallBack) {
                             if (Array.isArray(handle)) {
@@ -1664,7 +1665,7 @@
                             $.saveAsCallBack(handle);
                         }
                     }
-                );
+                );                
                 return false;
             }
 

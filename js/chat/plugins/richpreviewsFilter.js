@@ -91,6 +91,18 @@ RichpreviewsFilter._canceled = {};
  */
 RichpreviewsFilter._messageUpdating = {};
 
+/**
+ * Regular expression for reserved IP addresses
+ * @type {RegExp}
+ * @private
+ */
+
+RichpreviewsFilter._RFC_REGEXP = new RegExp(
+    '(^127\\.)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2\\d\\.)|(^172\\.3[01]\\.)|(^192\\.)|(^169\\.254\\.)|(^100\\.)' +
+    '|(^255\\.255\\.)|(^203\\.)|(^0\\.)|(^240\\.0)|(^224\\.0)|(^198\\.)|(^239\\.255)|localhost/',
+    'mg'
+);
+
 
 /**
  * Main API for retrieving (and in-memory caching) previews for specific URL.
@@ -170,7 +182,7 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isE
         className: 'chatlink',
         truncate: false,
         newWindow: true,
-        stripPrefix: false,
+        stripPrefix: true,
         stripTrailingSlash: false,
         twitter: false,
         replaceFn : function(match) {
@@ -181,6 +193,11 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isE
                     if (LinkInfoHelper.isMegaLink(link)) {
                         // skip MEGA links.
                         return true;
+                    }
+
+                    if (RichpreviewsFilter._RFC_REGEXP.test(match.getAnchorText())) {
+                        // no previews for reserved IP addresses
+                        return false;
                     }
 
                     if (link.indexOf("http://") !== 0 && link.indexOf("https://") !== 0) {

@@ -1517,7 +1517,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-notification-info h1').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-info p').text(submsg);
+        $('#msgDialog .fm-notification-info p').safeHTML(submsg);
         $('#msgDialog .fm-notification-info p').removeClass('hidden');
     }
     else {

@@ -1516,6 +1516,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 key    : keys[i].key
             };
         }
+
+        chatRoom._keysAreSeeding = new MegaPromise();
+
         var seedKeys = function() {
             for (var i=0;i < keys.length;i++) {
                 if (chatRoom.protocolHandler.seedKeys([keys[i]])) {
@@ -1523,7 +1526,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     delete  chatRoom.notDecryptedKeys[cacheKey];
                 }
             }
+            chatRoom._keysAreSeeding.resolve();
         };
+
         ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
             ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
         });

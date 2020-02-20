@@ -1350,16 +1350,26 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 };
 
 
-                if (chatRoom.protocolHandler) {
-                    invitors = array.unique(invitors);
-                    ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle)
-                        .always(decryptMessages);
-                }
-                else if (chatRoom.strongvelopeSetupPromises) {
-                    chatRoom.strongvelopeSetupPromises.always(function() {
+
+                var proceed = function() {
+                    if (chatRoom.protocolHandler) {
+                        invitors = array.unique(invitors);
                         ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle)
                             .always(decryptMessages);
-                    });
+                    }
+                    else if (chatRoom.strongvelopeSetupPromises) {
+                        chatRoom.strongvelopeSetupPromises.always(function() {
+                            ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle)
+                                .always(decryptMessages);
+                        });
+                    }
+                };
+
+                if (chatRoom._keysAreSeeding) {
+                    chatRoom._keysAreSeeding.always(proceed);
+                }
+                else {
+                    proceed();
                 }
             }
             else {

@@ -353,8 +353,8 @@ export class MegaRenderMixin extends React.Component {
             return this.customIsEventuallyVisible();
         }
 
-        if (this.props.isVisible) {
-            return true;
+        if (typeof this.props.isVisible !== 'undefined') {
+            return this.props.isVisible;
         }
 
         if (this.__intersectionVisibility === false) {
@@ -837,44 +837,45 @@ export class ContactAwareComponent extends MegaRenderMixin {
     constructor (props) {
         super(props);
         var contact = this.props.contact;
+        var contactHandle = contact && (contact.h || contact.u);
         var promises = [];
         var chatHandle = pchandle || (this.props.chatRoom ? this.props.chatRoom.publicChatHandle : undefined);
 
-        if (contact && contact.h) {
-            if (!contact.firstName && !contact.lastName) {
+        if (contact && contactHandle) {
+            if (!contact.firstName && !contact.lastName && M.u[contactHandle]) {
                 promises.push(
                     [
                         M.syncUsersFullname,
                         [
-                            this.props.contact.h,
+                            contactHandle,
                             chatHandle
                         ],
                         M
                     ]
                 );
             }
-            if (!contact.m && !anonymouschat) {
+            if (!contact.m && !anonymouschat && M.u[contactHandle]) {
                 promises.push(
                     [
                         M.syncContactEmail,
                         [
-                            this.props.contact.h
+                            contactHandle
                         ],
                         M
                     ]
                 );
             }
-            if (!avatars[contact.u] && !_noAvatars[contact.u]) {
+            if (!avatars[contactHandle] && !_noAvatars[contactHandle]) {
                 promises.push(
                     [
                         useravatar.loadAvatar,
                         [
-                            contact.u,
+                            contactHandle,
                             chatHandle
                         ],
                         useravatar,
                         function(e) {
-                            _noAvatars[contact.u] = true;
+                            _noAvatars[contactHandle] = true;
                         }
                     ]
                 );

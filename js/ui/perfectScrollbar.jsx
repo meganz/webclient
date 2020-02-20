@@ -8,14 +8,18 @@ var x = 0;
  * @type {*|Function}
  */
 export class PerfectScrollbar extends MegaRenderMixin {
-    static isUserScroll = true;
-    static scrollEventIncId = 0;
     static defaultProps = {
         className: "perfectScrollbarContainer",
         requiresUpdateOnResize: true
     };
     static MAX_BOTTOM_POS = 9999999;
 
+    constructor(props) {
+        super(props);
+
+        this.isUserScroll = true;
+        this.scrollEventIncId = 0;
+    }
     get$Node() {
         if (!this.$Node) {
             this.$Node = $(this.findDOMNode());
@@ -239,7 +243,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
     }
     getContentHeight() {
         var $elem = this.get$Node();
-        return $elem[0].children[0].offsetHeight;
+        return $elem[0].scrollHeight;
     }
     setCssContentHeight(h) {
         var $elem = this.get$Node();

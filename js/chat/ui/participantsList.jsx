@@ -15,6 +15,44 @@ class ParticipantsList extends MegaRenderMixin {
             'scrollPositionY': 0,
             'scrollHeight': 36 * 4
         };
+
+        this.doResizesOnComponentUpdate = SoonFc(function() {
+            var self = this;
+            var $node = $(self.findDOMNode());
+            var scrollHeight = self.contactsListScroll.getContentHeight();
+            var fitHeight = scrollHeight;
+            if (fitHeight === 0) {
+                // not visible at the moment.
+                return null;
+            }
+
+            var $parentContainer = $node.closest('.chat-right-pad');
+            var maxHeight = $parentContainer.outerHeight(true) -
+                $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
+
+            if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
+                fitHeight = Math.max(fitHeight /* margin! */, 53);
+            }
+            else if (maxHeight < fitHeight) {
+                fitHeight = Math.max(maxHeight, 53);
+            }
+            fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
+
+            var $contactsList = $('.chat-contacts-list', $parentContainer);
+
+            if ($contactsList.height() !== fitHeight) {
+                $('.chat-contacts-list', $parentContainer).height(
+                    fitHeight
+                );
+                self.contactsListScroll.eventuallyReinitialise(true);
+            }
+
+
+            if (self.state.scrollHeight !== fitHeight) {
+                self.setState({'scrollHeight': fitHeight});
+            }
+            self.onUserScroll();
+        }, 100);
     }
     onUserScroll() {
         if (!this.contactsListScroll) {
@@ -44,44 +82,12 @@ class ParticipantsList extends MegaRenderMixin {
             return;
         }
 
-        var $node = $(self.findDOMNode());
 
         if (!self.contactsListScroll) {
             return null;
         }
-        var scrollHeight = self.contactsListScroll.getContentHeight();
-        var fitHeight = scrollHeight;
-        if (fitHeight === 0) {
-            // not visible at the moment.
-            return null;
-        }
 
-        var $parentContainer = $node.closest('.chat-right-pad');
-        var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) -
-            $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
-
-        if (fitHeight  < $('.buttons-block', $parentContainer).outerHeight(true)) {
-            fitHeight = Math.max(fitHeight /* margin! */, 53);
-        }
-        else if (maxHeight < fitHeight) {
-            fitHeight = Math.max(maxHeight, 53);
-        }
-        fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
-
-        var $contactsList = $('.chat-contacts-list', $parentContainer);
-
-        if ($contactsList.height() !== fitHeight + 4) {
-            $('.chat-contacts-list', $parentContainer).height(
-                fitHeight + 4
-            );
-            self.contactsListScroll.eventuallyReinitialise(true);
-        }
-
-
-        if (self.state.scrollHeight !== fitHeight) {
-            self.setState({'scrollHeight': fitHeight});
-        }
-        self.onUserScroll();
+        self.doResizesOnComponentUpdate();
     }
     render() {
         var self = this;
@@ -116,6 +122,7 @@ class ParticipantsList extends MegaRenderMixin {
                 onAnimationEnd={function() {
                     self.safeForceUpdate();
                 }}
+                isVisible={self.props.chatRoom.isCurrentlyActive}
             >
                 <ParticipantsListInner
                     chatRoom={room}

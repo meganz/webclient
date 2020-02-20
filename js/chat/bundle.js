@@ -483,8 +483,8 @@ function (_React$Component) {
         return this.customIsEventuallyVisible();
       }
 
-      if (this.props.isVisible) {
-        return true;
+      if (typeof this.props.isVisible !== 'undefined') {
+        return this.props.isVisible;
       }
 
       if (this.__intersectionVisibility === false) {
@@ -971,21 +971,22 @@ function (_MegaRenderMixin) {
 
     _this2 = _possibleConstructorReturn(this, _getPrototypeOf(ContactAwareComponent).call(this, props));
     var contact = _this2.props.contact;
+    var contactHandle = contact && (contact.h || contact.u);
     var promises = [];
     var chatHandle = pchandle || (_this2.props.chatRoom ? _this2.props.chatRoom.publicChatHandle : undefined);
 
-    if (contact && contact.h) {
-      if (!contact.firstName && !contact.lastName) {
-        promises.push([M.syncUsersFullname, [_this2.props.contact.h, chatHandle], M]);
+    if (contact && contactHandle) {
+      if (!contact.firstName && !contact.lastName && M.u[contactHandle]) {
+        promises.push([M.syncUsersFullname, [contactHandle, chatHandle], M]);
       }
 
-      if (!contact.m && !anonymouschat) {
-        promises.push([M.syncContactEmail, [_this2.props.contact.h], M]);
+      if (!contact.m && !anonymouschat && M.u[contactHandle]) {
+        promises.push([M.syncContactEmail, [contactHandle], M]);
       }
 
-      if (!avatars[contact.u] && !_noAvatars[contact.u]) {
-        promises.push([useravatar.loadAvatar, [contact.u, chatHandle], useravatar, function (e) {
-          _noAvatars[contact.u] = true;
+      if (!avatars[contactHandle] && !_noAvatars[contactHandle]) {
+        promises.push([useravatar.loadAvatar, [contactHandle, chatHandle], useravatar, function (e) {
+          _noAvatars[contactHandle] = true;
         }]);
       } // force stuck in "Loading" state
       // promises.push([function() { return new MegaPromise(); }]);
@@ -4421,10 +4422,15 @@ var PerfectScrollbar =
 function (_MegaRenderMixin) {
   _inherits(PerfectScrollbar, _MegaRenderMixin);
 
-  function PerfectScrollbar() {
+  function PerfectScrollbar(props) {
+    var _this;
+
     _classCallCheck(this, PerfectScrollbar);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(PerfectScrollbar).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(PerfectScrollbar).call(this, props));
+    _this.isUserScroll = true;
+    _this.scrollEventIncId = 0;
+    return _this;
   }
 
   _createClass(PerfectScrollbar, [{
@@ -4649,7 +4655,7 @@ function (_MegaRenderMixin) {
     key: "getContentHeight",
     value: function getContentHeight() {
       var $elem = this.get$Node();
-      return $elem[0].children[0].offsetHeight;
+      return $elem[0].scrollHeight;
     }
   }, {
     key: "setCssContentHeight",
@@ -4802,8 +4808,6 @@ function (_MegaRenderMixin) {
 
   return PerfectScrollbar;
 }(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__["MegaRenderMixin"]);
-PerfectScrollbar.isUserScroll = true;
-PerfectScrollbar.scrollEventIncId = 0;
 PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
   requiresUpdateOnResize: true
@@ -10296,7 +10300,7 @@ function (_MegaRenderMixin2) {
       // }
       // allow only 1 opened accordion panel at a time.
       var obj = {};
-      obj[key] = true;
+      obj[key] = !(this.state.expandedPanel || {})[key];
       this.setState({
         'expandedPanel': obj
       });
@@ -10386,6 +10390,44 @@ function (_MegaRenderMixin) {
       'scrollPositionY': 0,
       'scrollHeight': 36 * 4
     };
+    _this.doResizesOnComponentUpdate = SoonFc(function () {
+      var self = this;
+      var $node = $(self.findDOMNode());
+      var scrollHeight = self.contactsListScroll.getContentHeight();
+      var fitHeight = scrollHeight;
+
+      if (fitHeight === 0) {
+        // not visible at the moment.
+        return null;
+      }
+
+      var $parentContainer = $node.closest('.chat-right-pad');
+      var maxHeight = $parentContainer.outerHeight(true) - $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
+
+      if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
+        fitHeight = Math.max(fitHeight
+        /* margin! */
+        , 53);
+      } else if (maxHeight < fitHeight) {
+        fitHeight = Math.max(maxHeight, 53);
+      }
+
+      fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
+      var $contactsList = $('.chat-contacts-list', $parentContainer);
+
+      if ($contactsList.height() !== fitHeight) {
+        $('.chat-contacts-list', $parentContainer).height(fitHeight);
+        self.contactsListScroll.eventuallyReinitialise(true);
+      }
+
+      if (self.state.scrollHeight !== fitHeight) {
+        self.setState({
+          'scrollHeight': fitHeight
+        });
+      }
+
+      self.onUserScroll();
+    }, 100);
     return _this;
   }
 
@@ -10427,46 +10469,11 @@ function (_MegaRenderMixin) {
         return;
       }
 
-      var $node = $(self.findDOMNode());
-
       if (!self.contactsListScroll) {
         return null;
       }
 
-      var scrollHeight = self.contactsListScroll.getContentHeight();
-      var fitHeight = scrollHeight;
-
-      if (fitHeight === 0) {
-        // not visible at the moment.
-        return null;
-      }
-
-      var $parentContainer = $node.closest('.chat-right-pad');
-      var maxHeight = $parentContainer.outerHeight(true) - $('.buttons-block', $parentContainer).outerHeight(true) - $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
-
-      if (fitHeight < $('.buttons-block', $parentContainer).outerHeight(true)) {
-        fitHeight = Math.max(fitHeight
-        /* margin! */
-        , 53);
-      } else if (maxHeight < fitHeight) {
-        fitHeight = Math.max(maxHeight, 53);
-      }
-
-      fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
-      var $contactsList = $('.chat-contacts-list', $parentContainer);
-
-      if ($contactsList.height() !== fitHeight + 4) {
-        $('.chat-contacts-list', $parentContainer).height(fitHeight + 4);
-        self.contactsListScroll.eventuallyReinitialise(true);
-      }
-
-      if (self.state.scrollHeight !== fitHeight) {
-        self.setState({
-          'scrollHeight': fitHeight
-        });
-      }
-
-      self.onUserScroll();
+      self.doResizesOnComponentUpdate();
     }
   }, {
     key: "render",
@@ -10498,7 +10505,8 @@ function (_MegaRenderMixin) {
         requiresUpdateOnResize: true,
         onAnimationEnd: function onAnimationEnd() {
           self.safeForceUpdate();
-        }
+        },
+        isVisible: self.props.chatRoom.isCurrentlyActive
       }, external_React_default.a.createElement(participantsList_ParticipantsListInner, {
         chatRoom: room,
         members: room.members,
@@ -15712,14 +15720,17 @@ function (_MegaRenderMixin2) {
         return false;
       }
 
-      var currentContacts = M.u;
-      var foundNonMembers = 0;
-      currentContacts.forEach(function (u, k) {
-        if (u.c === 1 && participants.indexOf(k) === -1) {
-          foundNonMembers++;
+      var currentContacts = M.u.keys();
+
+      for (var i = 0; i < currentContacts.length; i++) {
+        var k = currentContacts[i];
+
+        if (M.u[k].c === 1 && participants.indexOf(k) === -1) {
+          return false;
         }
-      });
-      return foundNonMembers <= 0;
+      }
+
+      return true;
     }
   }, {
     key: "render",
@@ -15863,7 +15874,7 @@ function (_MegaRenderMixin2) {
         label: __(l[8007]),
         disabled:
         /* Disable in case I don't have any more contacts to add ... */
-        !(!self.allContactsInChat(excludedParticipants) && !room.isReadOnly() && room.iAmOperator())
+        !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants))
       }, external_React_default.a.createElement(ui_dropdowns["DropdownContactsSelector"], {
         contacts: this.props.contacts,
         chatRoom: room,
@@ -15898,6 +15909,7 @@ function (_MegaRenderMixin2) {
           self.rightScroll = _ref;
         },
         triggerGlobalResize: true,
+        isVisible: self.props.chatRoom.isCurrentlyActive,
         chatRoom: self.props.chatRoom
       }, external_React_default.a.createElement("div", {
         className: "chat-right-pad"
@@ -19269,8 +19281,7 @@ Chat.prototype.sendMessage = function (roomJid, val) {
 
 
 Chat.prototype.processNewUser = function (u, isNewChat) {
-  var self = this;
-  self.logger.debug("added: ", u);
+  var self = this; // self.logger.debug("added: ", u);
 
   if (M.u[u] && M.u[u].c === 1 && self.plugins.presencedIntegration) {
     self.plugins.presencedIntegration.addContact(u, isNewChat);
@@ -19291,8 +19302,7 @@ Chat.prototype.processNewUser = function (u, isNewChat) {
 
 
 Chat.prototype.processRemovedUser = function (u) {
-  var self = this;
-  self.logger.debug("removed: ", u);
+  var self = this; // self.logger.debug("removed: ", u);
 
   if (self.plugins.presencedIntegration) {
     self.plugins.presencedIntegration.removeContact(u);
@@ -20767,7 +20777,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
       }
 
       self.initialMessageHistLoaded.reject();
-    }, 5000);
+    }, 30000);
   });
   this.membersSetFromApi = new ChatRoom.MembersSet(this);
 

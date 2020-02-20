@@ -76,15 +76,14 @@ export class ConversationRightArea extends MegaRenderMixin {
             return false;
         }
 
-        var currentContacts = M.u;
-        var foundNonMembers = 0;
-        currentContacts.forEach(function(u, k) {
-            if (u.c === 1 && participants.indexOf(k) === -1) {
-                foundNonMembers++;
+        var currentContacts = M.u.keys();
+        for (var i = 0; i < currentContacts.length; i++) {
+            var k = currentContacts[i];
+            if (M.u[k].c === 1 && participants.indexOf(k) === -1) {
+                return false;
             }
-        });
-
-        return foundNonMembers <= 0;
+        }
+        return true;
     }
     render() {
         const self = this;
@@ -235,9 +234,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                     disabled={
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
-                            !self.allContactsInChat(excludedParticipants) &&
                             !room.isReadOnly() &&
-                            room.iAmOperator()
+                            room.iAmOperator() &&
+                            !self.allContactsInChat(excludedParticipants)
                         )
                     }
                 >
@@ -279,6 +278,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     self.rightScroll = ref;
                 }}
                 triggerGlobalResize={true}
+                isVisible={self.props.chatRoom.isCurrentlyActive}
                 chatRoom={self.props.chatRoom}>
                 <div className="chat-right-pad">
                     <Accordion

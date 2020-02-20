@@ -67,7 +67,7 @@ class Accordion extends MegaRenderMixin {
 
         // allow only 1 opened accordion panel at a time.
         var obj = {};
-        obj[key] = true;
+        obj[key] = !(this.state.expandedPanel || {})[key];
 
 
         this.setState({'expandedPanel': obj});

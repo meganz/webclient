@@ -1613,7 +1613,7 @@ Chat.prototype.sendMessage = function(roomJid, val) {
 Chat.prototype.processNewUser = function(u, isNewChat) {
     var self = this;
 
-    self.logger.debug("added: ", u);
+    // self.logger.debug("added: ", u);
 
     if (M.u[u] && M.u[u].c === 1 && self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.addContact(u, isNewChat);
@@ -1635,7 +1635,7 @@ Chat.prototype.processNewUser = function(u, isNewChat) {
 Chat.prototype.processRemovedUser = function(u) {
     var self = this;
 
-    self.logger.debug("removed: ", u);
+    // self.logger.debug("removed: ", u);
 
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.removeContact(u);

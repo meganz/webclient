@@ -383,7 +383,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                 console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
             self.initialMessageHistLoaded.reject();
-        }, 5000);
+        }, 30000);
     });
 
 

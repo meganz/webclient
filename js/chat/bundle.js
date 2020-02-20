@@ -7627,11 +7627,23 @@ function (_MegaRenderMixin2) {
             return;
           }
 
+          if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
+            return;
+          }
+
           entries.push(n);
         });
       } else {
         Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach(function (h) {
-          M.d[h] && entries.push(M.d[h]);
+          if (M.d[h]) {
+            if (self.props.customFilterFn) {
+              if (self.props.customFilterFn(M.d[h])) {
+                entries.push(M.d[h]);
+              }
+            } else {
+              entries.push(M.d[h]);
+            }
+          }
         });
       }
 

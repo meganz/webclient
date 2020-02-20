@@ -1396,8 +1396,54 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     });
 };
 
-MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
+/**
+ * Create new file on the cloud
+ * @param {String} fileName a string with the file name to create.
+ * @param {String} dest The handle where the file will be created.
+ * @return {MegaPromise} megaPromise to be resolved/rejected once the operation is finished.
+ */
+MegaData.prototype.addNewFile = function(fileName, dest) {
     'use strict';
+    // eslint-disable-next-line local-rules/hints
+    var addFilePromise = new MegaPromise();
+    dest = dest || M.currentdirid || M.RootID;
+    dest = dest.replace('public-links/', '').replace('out-shares/', '');
+
+    if ([8, 11].indexOf(String(dest).length) === -1) {
+        return addFilePromise.reject(EACCESS);
+    }
+    if (!fileName) {
+        return addFilePromise.reject('File Name is empty');
+    }
+    if (M.c[dest]) {
+        // Check if a node (file or folder) with the same name already exists.
+        for (var handle in M.c[dest]) {
+            if (M.d[handle] && M.d[handle].name === name) {
+                return addFilePromise.reject('A node with the same name already exists');
+            }
+        }
+    }
+
+    var nFile = new File([''], fileName, { type: "text/plain" });
+    nFile.target = dest;
+    nFile.id = ++__ul_id;
+    nFile.path = '';
+    nFile.isCreateFile = true;
+    nFile.promiseToInvoke = addFilePromise;
+
+
+    ul_queue.push(nFile);
+    return addFilePromise;
+};
+
+
+
+MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
+    'use strict';
+
+    if (skipUIUpdate) {
+        return;
+    }
 
     var id = ul.id;
     var domElement = ul.domElement;
@@ -1577,11 +1623,18 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
 
     mega.tpw.finishDownloadUpload(mega.tpw.UPLOAD, ul, h);
 
-    this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418]);
+    this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418], h);
 };
 
-MegaData.prototype.ulfinalize = function(ul, status) {
+MegaData.prototype.ulfinalize = function(ul, status, h) {
     'use strict';
+    if (ul_queue[ul.pos].promiseToInvoke) {
+        ul_queue[ul.pos].promiseToInvoke.resolve(h);
+        ul_queue[ul.pos] = Object.freeze({});
+        percent_megatitle();
+        return;
+    }
+
 
     var id = ul.id;
     var $tr = $('#ul_' + id);

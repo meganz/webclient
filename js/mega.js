@@ -3378,45 +3378,74 @@ function folderreqerr(c, e)
     }
 }
 
-function init_chat() {
-    function __init_chat() {
-        if ((anonymouschat || u_type) && !megaChatIsReady) {
-            if (d) console.log('Initializing the chat...');
+/**
+ * Initialize the chat subsystem.
+ * @param {*} [action] Specific action procedure to follow
+ * @returns {Promise} promise fulfilled on completion.
+ */
+function init_chat(action) {
+    'use strict';
+    return new Promise(function(resolve) {
+        var __init_chat = function() {
+            var result = false;
 
-            var _chat = new Chat();
+            if ((anonymouschat || u_type) && !megaChatIsReady) {
+                if (d) {
+                    console.info('Initializing the chat...');
+                }
+                var _chat = new Chat();
 
-            // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
-            if (!window.megaChatIsDisabled) {
-                window.megaChat = _chat;
-                megaChat.init();
+                // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
+                if (!window.megaChatIsDisabled) {
+                    window.megaChat = _chat;
+                    megaChat.init();
 
-                if (anonymouschat || fminitialized) {
-                    if (String(M.currentdirid).substr(0, 5) === 'chat/') {
-                        chatui(M.currentdirid);
+                    if (anonymouschat || fminitialized) {
+                        if (String(M.currentdirid).substr(0, 5) === 'chat/') {
+                            chatui(M.currentdirid);
+                        }
+                        // megaChat.renderContactTree();
+                        megaChat.renderMyStatus();
                     }
-                    //megaChat.renderContactTree();
-                    megaChat.renderMyStatus();
+
+                    result = true;
                 }
             }
-        }
 
-        if (!loadfm.loading) {
-            loadingDialog.hide();
-            loadingInitDialog.hide();
-        }
-    }
+            if (!loadfm.loading) {
+                window.loadingDialog.hide();
+                window.loadingInitDialog.hide();
+            }
 
-    if (anonymouschat) {
-        __init_chat();
-    }
-    else {
-        if (pfid) {
-            if (d) console.log('Will not initialize chat [branch:1]');
+            resolve(result);
+        };
+
+        if (window.megaChatIsReady) {
+            $.tresizer();
+            return __init_chat();
+        }
+        var mclp = MediaInfoLib.getMediaCodecsList();
+
+        if (action === 0x104DF11E5) {
+            M.require('chat')
+                .always(function() {
+                    mclp.always(__init_chat);
+                });
+        }
+        else if (anonymouschat) {
+            mclp.always(__init_chat);
+        }
+        else if (pfid) {
+            if (d) {
+                console.log('Will not initialize the chat (folder-link)');
+            }
+
+            resolve(EACCESS);
         }
         else {
             authring.onAuthringReady('chat').done(__init_chat);
         }
-    }
+    });
 }
 
 function loadfm_callback(res) {

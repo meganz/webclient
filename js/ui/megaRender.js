@@ -14,7 +14,7 @@
                         '<span class="grid-status-icon"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"></span>' +
+                        '<span class="transfer-filetype-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +

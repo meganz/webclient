@@ -6636,6 +6636,12 @@ table {
     background-position: -297px -717px;
     margin: 0;
 }
+.thumb .transfer-filetype-icon.image,
+.thumb .transfer-filetype-icon.pdf,
+.thumb .transfer-filetype-icon.video
+{
+    background-image: none;
+}
 .block-view-file-type {
     width: 82px;
     height: 84px;
@@ -7082,6 +7088,17 @@ table {
     border: 0;
     line-height: 0;
     margin-left: -4px;
+}
+.thumb .transfer-filetype-icon.image img,
+.thumb .transfer-filetype-icon.pdf img,
+.thumb .transfer-filetype-icon.video img {
+    display: inline-block;
+    height: 18px;
+    margin: 4px 2px;
+    width: 18px;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
 }
 .fm-flags-icon img {
     margin: 7px 0 0 2px;

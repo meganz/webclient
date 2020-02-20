@@ -13370,8 +13370,18 @@ function (_MegaRenderMixin) {
   }
 
   sharedFilesAccordionPanel_createClass(SharedFileItem, [{
+    key: "handlePreview",
+    value: function handlePreview(_ref) {
+      var nodeHash = _ref.h,
+          nodeChatHandle = _ref.ch;
+      $.autoplay = nodeHash;
+      slideshow(nodeChatHandle, undefined, true);
+    }
+  }, {
     key: "render",
     value: function render() {
+      var _this = this;
+
       var self = this;
       var message = this.props.message;
       var contact = Message.getContactForMessage(message);
@@ -13382,15 +13392,11 @@ function (_MegaRenderMixin) {
       return sharedFilesAccordionPanel_React.makeElement("div", {
         className: "chat-shared-block " + (self.props.isLoading ? "is-loading" : ""),
         key: message.messageId + "_" + node.h,
-        onClick: function onClick(e) {
-          if (self.props.isPreviewable) {
-            slideshow(node.ch, undefined, true);
-          } else {
-            M.addDownload([node]);
-          }
+        onClick: function onClick() {
+          return _this.props.isPreviewable ? _this.handlePreview(node) : M.addDownload([node]);
         },
-        onDoubleClick: function onDoubleClick(e) {
-          M.addDownload([node]);
+        onDoubleClick: function onDoubleClick() {
+          return M.addDownload([node]);
         }
       }, sharedFilesAccordionPanel_React.makeElement("div", {
         className: "icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")

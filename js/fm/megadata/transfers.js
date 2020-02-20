@@ -731,9 +731,9 @@ MegaData.prototype.dlerror = function(dl, error) {
                 api_req({a: 'log', e: 99615, m: 'PRO user got EOVERQUOTA'});
             }
         }
-        else if (error !== EAGAIN) {
-            srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
-        }
+        // else if (error !== EAGAIN) {
+        //     srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
+        // }
     }
 
     switch (error) {

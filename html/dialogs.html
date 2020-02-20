@@ -190,10 +190,32 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="fm-dialog-new-folder-button default-green-button button right"><span>[$455]</span></div>
-         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+        <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
     </div>
 </div>
+
+<div class="fm-dialog create-file-dialog filled-input hidden">
+    <div class="fm-dialog-close"></div>
+    <div class="nw-fm-dialog-title">[$17505]</div>
+    <div class="fm-dialog-body mid-pad">
+        <div class="create-folder-input-bl">
+            <div class="transfer-filetype-icon text">
+            </div>
+            <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17578]</span>
+        </div>
+    </div>
+    <div class="fm-notifications-bottom">
+        <div class="fm-dialog-new-file-button default-green-button button right create-file"><span>[$455]</span></div>
+        <div class="create-file-button-cancel default-white-button right cancel-create-file"><span>[$82]</span></div>
+        <div class="clear"></div>
+    </div>
+</div>
+
 
 <div class="fm-dialog dlkey-dialog hidden">
     <div class="fm-dialog-header">
@@ -400,10 +422,16 @@
                         <div class="transfer-filetype-icon generic file"></div>
                         <div class="summary-ff-name">[$5533]</div>
                         <div class="delete-img icon"></div>
+                        <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
+                    </div>
+                    <div class="duplicated-input-warning">
+                        <div class="arrow"></div>
+                        <span>[$17578]</span>
                     </div>
                 </div>
             </div>
             <div class="icon summary-items-drop-icon drop-down-icon"></div>
+            
         </div>
         <div class="summary-row">
             <div class="summary-title summary-target-title">[$19181]</div>
@@ -630,8 +658,8 @@
                 </div>
                 <div class="expiry-date-select-container default-select hidden">
                     <input type="text" id="link-expiry-datepicker"
-                        class="fm-dialogs-select expiry-date-select"
-                        value="" placeholder="[$17697]-[$17698]-[$17699]" />
+                           class="fm-dialogs-select expiry-date-select"
+                           value="" placeholder="[$17697]-[$17698]-[$17699]" />
                 </div>
                 <div class="disabled-overlay hidden"></div>
             </div>
@@ -1025,7 +1053,7 @@
             <span>[$17579]</span><!--  -->
         </div>
     </div>
-     <div class="fm-notifications-bottom">
+    <div class="fm-notifications-bottom">
         <div class="create-folder-button default-green-button button right"><span>[$455]</span></div>
         <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
         <div class="clear"></div>
@@ -2912,7 +2940,8 @@
                 <div class="big-icon achievements-icon"></div>
                 <div class="fm-account-header">
                     <span>[$20186]</span>
-                    <div class="medium-icon new-dialog-icon"></div></div>
+                    <div class="medium-icon new-dialog-icon"></div>
+                </div>
                 <span class="quota-txt">0</span>
             </div>
         </div>
@@ -3601,6 +3630,90 @@
     </div>
 </div>
 
+<div class="txt-editor-frame hidden">
+    <div id="mega-text-editor">
+        <div class="editor-textarea-container">
+            <div class="editor-btn-container">
+                <div class="buttons-holder left">
+                    <div class="default-white-button txt-editor-menu">
+                        <i class="account-icon menu"></i>
+                    </div>
+                    <div class="default-white-button txt-editor-download-btn">
+                        <i class="small-icon  context download"></i>
+                        <span>[$58]</span>
+                    </div>
+                </div>
+                <div class="buttons-holder right">
+                    <div class="default-white-button txt-editor-btn close-btn">
+                        <span>[$148]</span>
+                    </div>
+                    <div class="default-green-button gradient txt-editor-btn save-btn disabled">
+                        <span>[$776]</span>
+                    </div>
+                </div>
+                <div class="top-menu-popup-editor">
+                    <div class="top-menu-content">
+                        <div class="top-menu-item new-f">
+                            <span>
+                                [$19976]
+                            </span>
+                        </div>
+                        <div class="top-menu-item open-f">
+                            <span>
+                                [$22661]
+                            </span>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item get-link-f">
+                            <span>
+                                [$22662]
+                            </span>
+                        </div>
+                        <div class="top-menu-item send-contact-f"><span class="right-el"><i class="semi-small-icon send-to-contact-menu"></i></span><span>[$22663]</span></div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item close-f">
+                            <span>
+                                [$148]
+                            </span>
+                        </div>
+                        <div class="top-menu-item save-f ">
+                            <span>
+                                [$776]
+                            </span>
+                        </div>
+                        <div class="top-menu-item save-as-f">
+                            <span>
+                                [$22664]
+                            </span>
+                        </div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item print-f">
+                            <span>
+                                [$22665]
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-file-name-title">
+                    <span class="transfer-filetype-icon text file"></span>
+                    <span class="txt-editor-opened-f-name"> </span>
+                </div>
+            </div>
+            <div id="text-editor-textarea">
+                <textarea id="txtar"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="viewer-overlay hidden">
     <div class="viewer-body">
         <div class="viewer-top-bl">
@@ -4368,8 +4481,8 @@
     </div>
     <div class="fm-notifications-bottom">
         <div class="button default-white-button left preview-widget">
-                    <span>[$17409]</span>
-                </div>
+            <span>[$17409]</span>
+        </div>
         <div class="button default-green-button right copy-widget-code url">
             <span>[$17835]</span>
         </div>
@@ -4873,7 +4986,7 @@
         </form>
 
         <!-- Step 2 - Verify Code (from SMS) -->
-        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off" >
+        <form id="verify-dialog_code_form" class="js-verify-code-page hidden" autocomplete="off">
             <div class="verify-ph-info long">
                 <span>[$20217]</span>
                 <span class="phone-num js-user-phone-number"></span>
@@ -4920,7 +5033,7 @@
                     <div class="icon56 achievements-icon bonus-image"></div>
                     <div class="verify-ph-bonus-intro-wrapper">
                         <div class="big-num js-transfer-quota"></div>
-                         <div class="body-txt">[$20406]</div>
+                        <div class="body-txt">[$20406]</div>
                     </div>
                 </div>
             </div>
@@ -4956,7 +5069,7 @@
         <p class="first-paragraph">[$19853]</p>
         <p class="first-paragraph post-register">[$20188]</p>
         <p class="second-paragraph">[$19854]</p>
-        <p class="second-paragraph post-register">[$20189]<br/><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
+        <p class="second-paragraph post-register">[$20189]<br /><a href="https://mega.nz/security" class="red" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
         <div class="recover-paste-block">
             <div class="left-section">
                 <h5 class="main-italic-header">[$8963]</h5>
@@ -5010,9 +5123,9 @@
             </div>
         </div>
         <div class="clear"></div>
-            <div class="default-green-button height-48 close-dialog">
-                <span class="label">[$81]</span>
-            </div>
+        <div class="default-green-button height-48 close-dialog">
+            <span class="label">[$81]</span>
+        </div>
     </div>
 </div>
 <!-- user management dialog !-->
@@ -5064,7 +5177,7 @@
     </div><!-- END folder container -->
     <div class="dialog-button-container white-bg">
         <div class="invite-link-option">
-            <div class="enable-pw-txt" >[$19599]</div>
+            <div class="enable-pw-txt">[$19599]</div>
             <div class="dialog-feature-toggle">
                 <div class="dialog-feature-switch"></div>
             </div>

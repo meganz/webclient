@@ -7,7 +7,7 @@ function BusinessAccountUI() {
         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
-        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
+        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler.bind(this));
         this.initialized = false;
     }
     else {
@@ -118,6 +118,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
 
     var mySelf = this;
+    this.business.hasSubs = false;
 
     var subAccountsView;
     if (!isBlockView) {
@@ -134,6 +135,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
+    this.business.hasSubs = true;
 
     loadingDialog.pshow();
 
@@ -3391,6 +3393,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     }
 
     var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+    var self = this;
 
     // private function to update left panel
     var updateLeftSubUserPanel = function (subuser) {
@@ -3404,6 +3407,17 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             $userRow = $userLaeftPanelRow.clone(true);
             $userRow.removeClass('hidden selected');
             $userRow.attr('id', subuser.u);
+            if (self && !self.business.hasSubs) {
+                $userRow.rebind(
+                    'click.subuser',
+                    function() {
+                        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        self.viewSubAccountInfoUI(subuser.u);
+                    }
+                );
+            }
+
             $usersLeftPanel.append($userRow);
         }
 

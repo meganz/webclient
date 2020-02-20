@@ -2839,6 +2839,12 @@ function loadSubPage(tpage, event) {
         slideshow(0, 1);
     }
 
+    if (window.textEditorVisible) {
+        // if we are loading a page and text editor was visible, then hide it.
+        // eslint-disable-next-line no-unused-expressions
+        mega && mega.textEditorUI && mega.textEditorUI.doClose();
+    }
+
     if (window.versiondialogid) {
         fileversioning.closeFileVersioningDialog(window.versiondialogid);
     }

@@ -7838,11 +7838,23 @@ function (_MegaRenderMixin2) {
             return;
           }
 
+          if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
+            return;
+          }
+
           entries.push(n);
         });
       } else {
         Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach(function (h) {
-          M.d[h] && entries.push(M.d[h]);
+          if (M.d[h]) {
+            if (self.props.customFilterFn) {
+              if (self.props.customFilterFn(M.d[h])) {
+                entries.push(M.d[h]);
+              }
+            } else {
+              entries.push(M.d[h]);
+            }
+          }
         });
       }
 
@@ -13595,8 +13607,18 @@ function (_MegaRenderMixin) {
   }
 
   sharedFilesAccordionPanel_createClass(SharedFileItem, [{
+    key: "handlePreview",
+    value: function handlePreview(_ref) {
+      var nodeHash = _ref.h,
+          nodeChatHandle = _ref.ch;
+      $.autoplay = nodeHash;
+      slideshow(nodeChatHandle, undefined, true);
+    }
+  }, {
     key: "render",
     value: function render() {
+      var _this = this;
+
       var self = this;
       var message = this.props.message;
       var contact = Message.getContactForMessage(message);
@@ -13607,15 +13629,11 @@ function (_MegaRenderMixin) {
       return sharedFilesAccordionPanel_React.makeElement("div", {
         className: "chat-shared-block " + (self.props.isLoading ? "is-loading" : ""),
         key: message.messageId + "_" + node.h,
-        onClick: function onClick(e) {
-          if (self.props.isPreviewable) {
-            slideshow(node.ch, undefined, true);
-          } else {
-            M.addDownload([node]);
-          }
+        onClick: function onClick() {
+          return _this.props.isPreviewable ? _this.handlePreview(node) : M.addDownload([node]);
         },
-        onDoubleClick: function onDoubleClick(e) {
-          M.addDownload([node]);
+        onDoubleClick: function onDoubleClick() {
+          return M.addDownload([node]);
         }
       }, sharedFilesAccordionPanel_React.makeElement("div", {
         className: "icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")
@@ -19408,6 +19426,7 @@ Chat.prototype.renderListing = function () {
         }
       } else {
         $('.fm-empty-conversations').removeClass('hidden');
+        self.displayArchivedChats = false;
       }
     }
   }

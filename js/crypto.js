@@ -676,7 +676,7 @@ function api_proc(q) {
                         // the last onprogress(), send .substr(this.q.received) instead!
                         // otherwise, we send false to indicate no further input
                         // in all cases, set the inputcomplete flag to catch incomplete API responses
-                        if (!this.q.splitter.chunkproc((response && response.length > this.q.received) ? response : false, true)) {
+                        if (!this.q.splitter.chunkproc(((response && response.length > this.q.received) || typeof this.totalBytes === 'undefined') ? response : false, true)) {
                             fm_fullreload(this.q, 'onload JSON Syntax Error');
                         }
                         return;

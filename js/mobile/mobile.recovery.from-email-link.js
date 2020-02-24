@@ -66,6 +66,14 @@ mobile.recovery.fromEmailLink = {
                     // If recovering with key
                     if (result[0] === 9) {
 
+                        if (u_type || u_type === 0) {
+
+                            msgDialog("warninga", '', l[22817], '', function() {
+                                loadSubPage('fm');
+                            });
+
+                            return;
+                        }
                         // Store the email from the request
                         mobile.recovery.fromEmailLink.recoveryEmail = result[1];
 
@@ -75,6 +83,16 @@ mobile.recovery.fromEmailLink = {
 
                     // Otherwise if they don't have the key and will park their account
                     else if (result[0] === 10) {
+
+                        if (u_type || u_type === 0) {
+                            debugger;
+
+                            msgDialog("warninga", '', l[22818], '', function() {
+                                loadSubPage('fm');
+                            });
+
+                            return;
+                        }
 
                         // Store the email from the request
                         mobile.recovery.fromEmailLink.recoveryEmail = result[1];

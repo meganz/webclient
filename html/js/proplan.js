@@ -735,6 +735,18 @@ function showLoginDialog(email, password) {
         $('.input-email', $dialog).val(email || '');
         $('.input-password', $dialog).val(password || '');
 
+        $('.top-login-forgot-pass', $dialog).rebind('click.forgetPass', function() {
+
+            var email = document.getElementById('login-name').value;
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
+            loadSubPage('recovery');
+        });
+
+
         $inputs.rebind('keydown.initdialog', function(e) {
             if (e.keyCode === 13) {
                 doProLogin($dialog);

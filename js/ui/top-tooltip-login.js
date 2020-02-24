@@ -154,6 +154,13 @@ var tooltiplogin = {
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function() {
+
+            var email = document.getElementById('login-name').value;
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
             loadSubPage('recovery');
         });
 

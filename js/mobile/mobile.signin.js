@@ -216,6 +216,12 @@ mobile.signin = {
         // Add click/tap handler to Forgot Password button
         this.$screen.find('.forgot-password-button').off('tap').on('tap', function() {
 
+            var email = $('.signin-input.login input').val();
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
             // Load the Recovery page
             loadSubPage('recovery');
             return false;

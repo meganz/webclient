@@ -143,17 +143,13 @@ var ChatdIntegration = function(megaChat) {
     });
 
     megaChat.rebind('onNewGroupChatRequest.chatdInt', function(e, contactHashes, opts) {
-        var users = [];
         var participants = new Set();
         contactHashes = contactHashes || [];
         participants.add(u_handle);
-        contactHashes.forEach(function(k) {
-            users.push({
-                'u': k,
-                'p': 2
-            });
-            participants.add(k);
+        contactHashes.forEach(function(contactHash) {
+            participants.add(contactHash);
         });
+
 
         var chatMode = opts.keyRotation ? strongvelope.CHAT_MODE.CLOSED : strongvelope.CHAT_MODE.PUBLIC;
 
@@ -170,21 +166,30 @@ var ChatdIntegration = function(megaChat) {
             ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
         );
 
-
         var _createChat = function() {
             var invited_users = [];
-            contactHashes.forEach(function(k) {
+            contactHashes.forEach(function(contactHash) {
                 var entry = {
-                    'u': k,
+                    'u': contactHash,
                     'p': 2
                 };
                 if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
-                    var chatkey = protocolHandler.packKeyTo([protocolHandler.unifiedKey], k);
+                    var chatkey = protocolHandler.packKeyTo([protocolHandler.unifiedKey], contactHash);
                     entry['ck'] = base64urlencode(chatkey);
                 }
                 invited_users.push(entry);
             });
             var myKey = protocolHandler.packKeyTo([protocolHandler.unifiedKey], u_handle);
+
+            var topic = null;
+            if (opts.topic) {
+                topic = ChatRoom.encryptTopic(
+                    protocolHandler,
+                    opts.topic,
+                    participants,
+                    (chatMode === strongvelope.CHAT_MODE.PUBLIC)
+                );
+            }
 
             var mccPacket = {
                 'a': 'mcc',
@@ -193,6 +198,10 @@ var ChatdIntegration = function(megaChat) {
                 'm': chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
                 'v': Chatd.VERSION
             };
+
+            if (topic) {
+                mccPacket['ct'] = topic;
+            }
 
             if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
                 mccPacket['ck'] = base64urlencode(myKey);
@@ -671,14 +680,11 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
             if (setAsActive) {
                 // wait for the .protocolHandler to be initialized
                 createTimeoutPromise(function() {
-                        return !!chatRoom.protocolHandler;
+                        return !!chatRoom.protocolHandler && chatRoom.state === ChatRoom.STATE.READY;
                     }, 500, 10000)
                         .done(function() {
-                            var promise = chatRoom.setRoomTitle(setAsActive.topic);
-                            if (promise && setAsActive.createChatLink) {
-                                promise.always(function () {
-                                    chatRoom.trigger('showGetChatLinkDialog');
-                                });
+                            if (setAsActive.createChatLink) {
+                                chatRoom.trigger('showGetChatLinkDialog');
                             }
                         })
                         .fail(function() {

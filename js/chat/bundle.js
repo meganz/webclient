@@ -20604,6 +20604,20 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
   'LEFT': -1
 };
 
+ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants) {
+  var isPublic = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+  if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
+    var topic = protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, isPublic);
+
+    if (topic) {
+      return base64urlencode(topic);
+    }
+  }
+
+  return false;
+};
+
 ChatRoom.MembersSet.prototype.trackFromActionPacket = function (ap, isMcf) {
   var self = this;
   var apMembers = {};
@@ -20989,7 +21003,7 @@ ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
   newTopic = allowEmpty ? newTopic : String(newTopic);
   var masterPromise = new MegaPromise();
 
-  if ((allowEmpty || $.trim(newTopic).length > 0) && newTopic !== self.getRoomTitle()) {
+  if ((allowEmpty || newTopic.trim().length > 0) && newTopic !== self.getRoomTitle()) {
     self.scrolledToBottom = true;
     var participants = self.protocolHandler.getTrackedParticipants();
     var promises = [];

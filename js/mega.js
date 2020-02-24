@@ -1526,9 +1526,7 @@ scparser.$finalize = function() {
                 loadavatars = [];
             }
 
-            if (M.viewmode) {
-                delay('thumbnails', fm_thumbnails, 3200);
-            }
+            delay('thumbnails', fm_thumbnails, 3200);
 
             if ($.dialog === 'properties') {
                 delay($.dialog, propertiesDialog.bind(this, 3));

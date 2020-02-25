@@ -1819,12 +1819,8 @@ function init_page() {
                 u_handle = "AAAAAAAAAAA";
                 pchandle = id.substr(5, 8);
 
-                M.require('chat')
-                    .always(function() {
-                        if (typeof ChatRoom !== 'undefined') {
-                            init_chat();
-                        }
-                    });
+                loadingInitDialog.show();
+                init_chat(0x104DF11E5);
             }
             else if (u_type === 0) {
                 // ephemeral
@@ -1847,8 +1843,10 @@ function init_page() {
                 $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
             }
 
-            mega.initLoadReport();
-            loadfm();
+            if (!anonymouschat) {
+                mega.initLoadReport();
+                loadfm();
+            }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
             M.openFolder(id, true);

@@ -43,8 +43,8 @@ var aboutus = {
         if (page.substr(6, 10) === 'jobs') {
             subsection = 'jobs';
         }
-        else if (page.substr(6, 10) === 'data') {
-            subsection = 'data';
+        else if (page.substr(6, 17) === 'reliability') {
+            subsection = 'reliability';
         }
         else if (page.substr(6, 13) === 'privacy') {
             subsection = 'privacy';

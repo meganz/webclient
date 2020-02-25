@@ -2755,7 +2755,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about'],
+        'about': ['about','about_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits'],

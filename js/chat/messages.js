@@ -352,6 +352,8 @@ Message.prototype._onAttachmentReceived = function(data) {
         this.chatRoom.messagesBuff.sharedFiles.push(this);
         this.chatRoom.messagesBuff.sharedFiles.trackDataChange();
     }
+
+    this.trackDataChange();
 };
 
 /**

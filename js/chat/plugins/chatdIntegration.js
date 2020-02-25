@@ -1574,8 +1574,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         mb.messages.remove(msgObject.pendingMessageId);
                                     }
                                     msg.source = Message.SOURCE.CHATD;
+                                    self._parseMessage(chatRoom, msg);
                                     mb.messages.push(msg);
-                                    self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }
                             } else {
                                 self.logger.error('Unknown message type!');

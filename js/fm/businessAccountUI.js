@@ -2321,13 +2321,13 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         }
                         myPage = myPage.replace('{8itemDate}', escapeHTML(itemDate));
                         myPage = myPage.replace('{9itemDesc}', escapeHTML(itemDec));
-                        myPage = myPage.replace('{10itemAmount}', escapeHTML(Number(itemAmount).toFixed(2)));
+                        myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{15totalVal}',
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
                         myPage = myPage.replace('{11itemVat}',
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent));
-                        myPage = myPage.replace('{12totalCost}', '\u20ac' + escapeHTML(Number(invoiceDetail.tot).toFixed(2)));
+                        myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');

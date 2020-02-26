@@ -270,7 +270,7 @@
 .about.hiring-txt {
     display: inline-block;
     text-transform: uppercase;
-    font-size: 40px;
+    font-size: 30px;
     line-height: 48px;
     color: white;
     width: 360px;
@@ -279,10 +279,13 @@
     vertical-align: top;
 }
 .about.hiring-txt span {
-    font-size: 40px;
+    font-size: 32px;
     line-height: 173px;
     font-family: 'LatoWebBlack', 'source_sans_problack', Arial;
     display: block;
+}
+.en .about.hiring-txt {
+    font-size: 40px;
 }
 .en .about.hiring-txt span {
     font-size: 80px;

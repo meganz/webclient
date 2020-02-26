@@ -143,7 +143,7 @@ body:not(.mobile) .about.top-info a:hover {
     -webkit-transition: background-color 200ms ease-in-out, top 200ms ease-in-out;
     transition: background-color 200ms ease-in-out, top 200ms ease-in-out;
 }
-body:not(.mobile) .about.leader:hover .about.leader-overlay {
+.about.leader:hover .about.leader-overlay {
     background-color: rgba(216,216,216,0.88);
     top: 0;
 }
@@ -177,7 +177,7 @@ body:not(.mobile) .about.leader:hover .about.leader-overlay {
     display: block;
     clear: both;
 }
-body:not(.mobile) .about.leader:hover .about.leader-info {
+.about.leader:hover .about.leader-info {
     visibility: visible;
     opacity: 1;
 }

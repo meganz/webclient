@@ -63,7 +63,7 @@
 .about.top-info.centered {
     text-align: center;
 }
-.about.top-info a, .about.top-info:visited {
+.about.top-info a, .about.top-info:visited, .mobile .about.top-info a:hover {
     color: #373737;
     text-decoration: underline;
 }

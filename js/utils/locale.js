@@ -936,7 +936,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[23075] = l[23075].replace('[A1]', '<a href="/terms" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="/terms" '
+        .replace('[A2]', '<a href="/takedown" '
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a href="https://mega.nz/blog_59" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');

@@ -239,6 +239,9 @@
 .believe .inline-block.mid-pad {
     padding-top: 10px;
 }
+.bottom-page.locs {
+    font-size: 0
+}
 .locs a.inline-block {
     cursor: default;
 }

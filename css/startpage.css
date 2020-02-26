@@ -875,14 +875,6 @@ body:not(.en) .download .startpage.top-header {
     right: 14px;
     background-position: -218px -2739px;
 }
-.de .startpage.quote-icon.open {
-    left: auto;
-    right: 14px;
-}
-.de .startpage.quote-icon.close {
-    left: 14px;
-    right: auto;
-}
 .startpage.declaration-lnk {
     text-align: center;
     font-size: 14px;

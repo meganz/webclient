@@ -5833,7 +5833,7 @@ body:not(.en) .content-block .pages-nav.compound-items.active {
 }
 }
 
-.rtl .bottom-page.big-header, .rtl .bottom-page.small-info, .rtl .bottom-page.mid-header, .rtl .startpage.button-48-height, .rtl .startpage.square-block, .rtl .bottom-page.square-nav-button,  .rtl .bottom-page .mid-green-link, .rtl .startpage.plan-features .plan-feature, .rtl .startpage.plan-top-square, .rtl .startpage.top-notice, .rtl .startpage.top-info, .rtl .startpage.top-header, .rtl .pages-nav.content-block .button-label, .rtl .bottom-menu.link, .rtl .bottom-menu.header, .rtl .bottom-menu.company-info, .rtl .bottom-menu.copyrights {
+.rtl .bottom-page.big-header, .rtl .bottom-page.small-info, .rtl .bottom-page.mid-header, .rtl .startpage.button-48-height, .rtl .startpage.square-block, .rtl .bottom-page.square-nav-button,  .rtl .bottom-page .mid-green-link, .rtl .startpage.plan-features .plan-feature, .rtl .startpage.plan-top-square, .rtl .startpage.top-notice, .rtl .startpage.top-info, .rtl .startpage.top-header, .rtl .pages-nav.content-block .button-label, .rtl .bottom-menu.link, .rtl .bottom-menu.header, .rtl .bottom-menu.company-info, .rtl .bottom-menu.copyrights, .rtl-support {
     direction: rtl;
 }
 /*subscription page*/

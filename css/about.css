@@ -32,11 +32,17 @@
     margin-left: 0;
 }
 .about.main-menu.item span {
+    display: inline-block;
     border-bottom: 4px solid transparent;
     padding-bottom: 3px;
-    display: inline-block;
     -webkit-transition: color 200ms ease-in-out, border-color 200ms ease-in-out;
     transition: color 200ms ease-in-out, border-color 200ms ease-in-out;
+}
+.en .about.main-menu.item span.lang.en, .about.main-menu.item span.lang {
+    display:  inline-block;
+}
+.en .about.main-menu.item span.lang, .about.main-menu.item span.lang.en {
+    display: none;
 }
 .about.main-menu.item:hover span {
     color: #00C0A6;
@@ -264,10 +270,13 @@
     vertical-align: top;
 }
 .about.hiring-txt span {
-    font-size: 80px;
+    font-size: 40px;
     line-height: 173px;
     font-family: 'LatoWebBlack', 'source_sans_problack', Arial;
     display: block;
+}
+.en .about.hiring-txt span {
+    font-size: 80px;
 }
 .about.joing-txt {
     display: inline-block;
@@ -432,11 +441,17 @@
     }
     .about.hiring-txt {
         width: auto;
+        margin-top: 125px;
+    }
+    .en .about.hiring-txt {
+        margin-top: 121px;
     }
     .about.joing-txt {
-        margin-left: 0;
         margin-right: 0;
         width: auto;
+    }
+    .about.hiring-txt span, .en .about.hiring-txt span {
+        line-height: 84px;
     }
 }
 @media only screen and (max-width: 783px) {
@@ -444,7 +459,8 @@
         font-size: 44px;
     }
     .about.main-menu.item {
-        margin: 0 0 -1px 35px;
+        margin: 0 0 -1px 15px;
+        font-size: 14px;
     }
     .about.numbers-info {
         font-size: 20px;
@@ -461,26 +477,29 @@
     .about.hiring {
         height: auto;
     }
-    .about.hiring-txt {
+    .about.hiring-txt, .en .about.hiring-txt {
         display: block;
         font-size: 20px;
         line-height: 28px;
         margin: 30px 0 0 0;
     }
     .about.hiring-txt span {
-        font-size: 40px;
         line-height: 50px;
     }
     .about.joing-txt {
         padding: 20px 0 30px 0;
         font-size: 20px;
         line-height: 30px;
+        margin: 0;
     }
     .about.joing-txt span {
         padding: 0 0 12px 0;
     }
 }
 @media only screen and (max-width:565px) {
+    .ru .about.main-menu.item {
+        font-size: 12px;
+    }
     .believe .inline-block.mid-pad {
         padding-top: 0;
         margin-top: -12px;
@@ -491,18 +510,12 @@
     .about.hiring {
         margin: 30px auto 0 auto;
     }
-    .about.main-menu.item {
-        font-size: 14px;
-    }
     .bottom-page.big-header {
         font-size: 26px;
         line-height: 38px;
     }
     .about.top-info {
         padding: 0 0 15px 0;
-    }
-    .about.main-menu.item {
-        margin: 0 0 -1px 30px;
     }
     .about.big-numbers {
         padding: 26px 0 3px 0;
@@ -545,10 +558,25 @@
         margin: 38px 0 50px 0;
     }
 }
-@media only screen and (max-width:420px) {
-    .about.main-menu.item {
-        font-size: 14px;
+@media only screen and (max-width: 490px) {
+    .br .about.main-menu.item {
+        font-size: 12px;
     }
+    .ru .about.main-menu.body {
+        white-space: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .ru .about.main-menu.item {
+        width: 50%;
+        margin: 0;
+    }
+    .ru .about.main-menu.item span {
+        padding-bottom: 0;
+        margin-bottom: 10px;
+    }
+}
+@media only screen and (max-width: 420px) {
     .bottom-page.big-header {
         font-size: 20px;
         line-height: 28px;
@@ -557,10 +585,6 @@
         font-size: 14px;
         line-height: 21px;
         padding: 0 0 15px 0;
-    }
-    .about.main-menu.item {
-        margin: 0 0 -1px 20px;
-        font-size: 12px;
     }
     .about.big-numbers {
         font-size: 18px;
@@ -609,8 +633,9 @@
         height: auto;
         padding: 0 10px;
     }
-    .about.hiring-txt span {
+    .about.hiring-txt span, .en .about.hiring-txt span {
         font-size: 34px;
+        line-height: 50px;
     }
     .about.white-button, .about.joing-txt {
         font-size: 18px;
@@ -642,12 +667,70 @@
         font-size: 16px;
         line-height: 20px;
     }
+    .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item, .tl .about.main-menu.item {
+        font-size: 12px;
+    }
 }
-@media only screen and (max-width:340px) {
+@media only screen and (max-width: 380px) {
+    .about.main-menu.item {
+        font-size: 12px;
+    }
+    .cn .about.main-menu.item, .ct .about.main-menu.item, .ar .about.main-menu.item,  .jp .cn .about.main-menu.item {
+        font-size: 14px;
+    }
+    .br .about.main-menu.body, .fr .about.main-menu.body, .ro .about.main-menu.body, .vi .about.main-menu.body {
+        white-space: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .br .about.main-menu.item, .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item {
+        width: 50%;
+        margin: 0;
+    }
+    .br .about.main-menu.item span, .fr .about.main-menu.item span, .ro .about.main-menu.item span, .vi .about.main-menu.item span {
+        padding-bottom: 0;
+        margin-bottom: 10px;
+    }
+}
+@media only screen and (max-width: 340px) {
     .bottom-page.about-sprite.use {
         width: 205px;
         height: 115px;
         background-position: -7px -688px;
         background-size: 315px auto;
     }
+    .ru .about.main-menu.item {
+        text-transform: none;
+    }
 }
+@media only screen and (max-width: 320px) {
+    .es .about.main-menu.body {
+        white-space: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .es .about.main-menu.item {
+        width: 50%;
+        margin: 0;
+    }
+    .es .about.main-menu.item span {
+        padding-bottom: 0;
+        margin-bottom: 10px;
+    }
+}
+@media only screen and (max-width: 315px) {
+    .about.main-menu.body {
+        white-space: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .about.main-menu.item {
+        width: 50%;
+        margin: 0;
+    }
+    .about.main-menu.item span {
+        padding-bottom: 0;
+        margin-bottom: 10px;
+    }
+}
+

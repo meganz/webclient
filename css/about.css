@@ -81,15 +81,21 @@
     padding: 66px 0 10px 0;
 }
 .about.numbers-info {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 29px;
     color: #373737;
-    padding-bottom: 56px;
-    max-width: 212px;
+    padding: 0 10px 56px 10px;
+    max-width: 232px;
     margin: auto;
+    webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.en .about.numbers-info {
+    font-size: 24px;
 }
 .en .about.numbers-info.short {
-    max-width: 145px;
+    max-width: 165px;
 }
 .about-numbers .bottom-page.horizontal-centered-bl.wide {
     max-width: 1146px;
@@ -120,6 +126,9 @@
     position: relative;
     height: 317px;
     overflow: hidden;
+    webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .about.leader img {
     width: 100%;
@@ -453,23 +462,26 @@
     .about.hiring-txt span, .en .about.hiring-txt span {
         line-height: 84px;
     }
+    .about .bottom-page .col-4 {
+        width: 50%;
+    }
 }
 @media only screen and (max-width: 783px) {
     .about.big-numbers {
         font-size: 44px;
     }
     .about.main-menu.item {
-        margin: 0 0 -1px 15px;
+        margin: 0 0 -1px 20px;
         font-size: 14px;
     }
-    .about.numbers-info {
+    .en .about.main-menu.item  {
+        margin-left: 30px;
+    }
+    .en .about.numbers-info {
         font-size: 20px;
     }
     .about .bottom-page .col-6 {
         width: 25%;
-    }
-    .about .bottom-page .col-4 {
-        width: 50%;
     }
     .first-line .about.numbers-info {
         padding-bottom: 0;
@@ -557,9 +569,16 @@
     .about.img6 {
         margin: 38px 0 50px 0;
     }
+    .about.numbers-info, .en .about.numbers-info {
+        font-size: 16px;
+        line-height: 18px;
+    }
 }
 @media only screen and (max-width: 490px) {
-    .br .about.main-menu.item {
+    .about.main-menu.item {
+        margin: 0 0 -1px 15px;
+    }
+    .br .about.main-menu.item, .fr .about.main-menu.item, .it .about.main-menu.item {
         font-size: 12px;
     }
     .ru .about.main-menu.body {
@@ -574,6 +593,9 @@
     .ru .about.main-menu.item span {
         padding-bottom: 0;
         margin-bottom: 10px;
+    }
+    .nl .about.main-menu.item {
+        font-size: 12px;
     }
 }
 @media only screen and (max-width: 420px) {
@@ -591,12 +613,10 @@
         line-height: 22px;
         padding: 43px 0 3px 0;
     }
-    .about.numbers-info {
+    .about.numbers-info,  .en .about.numbers-info {
         font-size: 14px;
         line-height: 18px;
         padding-bottom: 40px;
-        padding-left: 10px;
-        padding-right: 10px;
     }
     .about.big-numbers {
         padding: 26px 0 3px 0;
@@ -667,29 +687,51 @@
         font-size: 16px;
         line-height: 20px;
     }
-    .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item, .tl .about.main-menu.item {
+    .ro .about.main-menu.item, .vi .about.main-menu.item, .tl .about.main-menu.item, .es .about.main-menu.item {
         font-size: 12px;
+    }
+    .nl .about.main-menu.body {
+        white-space: normal;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .nl .about.main-menu.item {
+        width: 50%;
+        margin: 0;
+    }
+    .nl .about.main-menu.item span {
+        padding-bottom: 0;
+        margin-bottom: 10px;
     }
 }
 @media only screen and (max-width: 380px) {
     .about.main-menu.item {
         font-size: 12px;
     }
-    .cn .about.main-menu.item, .ct .about.main-menu.item, .ar .about.main-menu.item,  .jp .cn .about.main-menu.item {
+    .cn .about.main-menu.item, .ct .about.main-menu.item, .ar .about.main-menu.item {
         font-size: 14px;
     }
-    .br .about.main-menu.body, .fr .about.main-menu.body, .ro .about.main-menu.body, .vi .about.main-menu.body {
+    .br .about.main-menu.body, .fr .about.main-menu.body, .ro .about.main-menu.body, .vi .about.main-menu.body, .es .about.main-menu.body, .it .about.main-menu.body, .pl .about.main-menu.body {
         white-space: normal;
         padding-left: 10px;
         padding-right: 10px;
     }
-    .br .about.main-menu.item, .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item {
+    .br .about.main-menu.item, .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item, .es .about.main-menu.item, .it .about.main-menu.item, .pl .about.main-menu.item {
         width: 50%;
         margin: 0;
     }
-    .br .about.main-menu.item span, .fr .about.main-menu.item span, .ro .about.main-menu.item span, .vi .about.main-menu.item span {
+    .br .about.main-menu.item span, .fr .about.main-menu.item span, .ro .about.main-menu.item span, .vi .about.main-menu.item span, .es .about.main-menu.item span, .it .about.main-menu.item span, .p .about.main-menu.item span {
         padding-bottom: 0;
         margin-bottom: 10px;
+    }
+    .about .bottom-page .col-4 {
+        width: 100%;
+    }
+    .first-line .about.numbers-info, .about.numbers-info, .en .about.numbers-info {
+        padding-bottom: 0;
+    }
+    .bottom-page.about-numbers {
+        padding-bottom: 40px;
     }
 }
 @media only screen and (max-width: 340px) {

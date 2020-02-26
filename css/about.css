@@ -500,6 +500,12 @@ body:not(.mobile) .about.white-button:hover {
         padding: 0 0 12px 0;
     }
 }
+@media only screen and (max-width:712px) {
+    .bottom-page.about-sprite.use {
+        background-position: -7px -907px;
+        background-size: 415px auto;
+    }
+}
 @media only screen and (max-width:565px) {
     .ru .about.main-menu.item {
         font-size: 12px;
@@ -548,6 +554,10 @@ body:not(.mobile) .about.white-button:hover {
     }
     .bottom-page.about-sprite.use, .bottom-page.about-sprite.encryption {
         margin: 30px 0 10px 0;
+    }
+    .bottom-page.about-sprite.use {
+        background-position: -11px -1150px;
+        background-size: 525px auto;
     }
     .bottom-page.about-sprite.gdpr {
         margin: 30px 0 0 0;

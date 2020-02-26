@@ -173,6 +173,14 @@ body:not(.mobile) .about.top-info a:hover {
 .about.leader-info i.right {
     margin: 19px 0 0 23px;
 }
+/*.de */.about.leader-info i {
+    float: right;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+/*.de */.about.leader-info i.right {
+    float: none;
+}
 .about.leader-info span {
     display: block;
     clear: both;

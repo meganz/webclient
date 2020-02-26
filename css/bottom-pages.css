@@ -2535,10 +2535,10 @@ bottom-page.top-title.uwp::before {
     height: 32px;
 }
 .bottom-page.icon-32.about-sprite.open-quote {
-    background-position: -451px -807px;
+    background-position: -255px -801px;
 }
 .bottom-page.icon-32.about-sprite.close-quote {
-    background-position: -255px -801px;
+    background-position: -451px -807px;
 }
 .cropped-page .bottom-page.big-icon {
     width: 96px;

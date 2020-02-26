@@ -1494,6 +1494,10 @@ accountUI.plan = {
                 var paymentType = (account.sgw.length > 0) ? account.sgw[0] : ''; // Credit Card etc
                 var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, etc
 
+                if (paymentType.indexOf('Credit Card') === 0) {
+                    paymentType = paymentType.replace('Credit Card', l[6952]);
+                }
+
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var dateString = time2date(timestamp, 2);

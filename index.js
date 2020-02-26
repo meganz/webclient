@@ -1099,15 +1099,8 @@ function init_page() {
         }
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
-        if (page.length > 9) {
-            var pageParams = page.substr(9);
-            if (pageParams.length > 14) {
-                var uaoParam = pageParams.indexOf('/uao=');
-                if (uaoParam > -1) {
-                    mega.uaoref = pageParams.substr(uaoParam + 5);
-                }
-            }
-        }
+        getUAOParameter(page, 'registerb');
+
         parsepage(pages['registerb']);
         $('body').addClass('business');
         var regBusiness = new BusinessRegister();
@@ -1514,8 +1507,9 @@ function init_page() {
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
     }
-    else if (page === 'repay') {
+    else if (page.substr(0, 5) === 'repay') {
         if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            getUAOParameter(page, 'repay');
             parsepage(pages['repay']);
             var repayPage = new RepayPage();
             repayPage.initPage();

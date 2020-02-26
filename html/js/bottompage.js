@@ -71,8 +71,8 @@ var bottompage = {
 
     /**
      * Init Animated blocks
-    * @param {Object} $content The jQuery selector for the current page
-    * @returns {void}
+     * @param {Object} $content The jQuery selector for the current page
+     * @returns {void}
      */
     initAnimations: function($content) {
         "use strict";
@@ -82,15 +82,9 @@ var bottompage = {
         // Init top-block animations
         setTimeout(function() {
             $content.addClass('start-animation');
-        },  700);
+        }, 700);
 
-
-        /**
-        * isVisibleBlock
-        * @param {Object} $row DOM element which should be checked
-        * @returns {void}
-        */
-        function isVisibleBlock($row) {
+        var isVisibleBlock = function($row) {
             if ($row.length === 0) {
                 return false;
             }
@@ -101,16 +95,10 @@ var bottompage = {
             var viewportTop = $window.scrollTop();
             var viewportBottom = viewportTop + $window.outerHeight();
 
-            return elementBottom - 80 > viewportTop && elementTop  < viewportBottom;
-        }
+            return elementBottom - 80 > viewportTop && elementTop < viewportBottom;
+        };
 
-        /**
-        * showAnimated
-        * @param {Object} $content The jQuery selector for the current page
-        * @returns {void}
-        */
-        function showAnimated($content) {
-
+        var showAnimated = function($content) {
             var $blocks = $('.animated, .fadein', $content);
 
             for (var i = $blocks.length - 1; i >= 0; i--) {
@@ -126,7 +114,7 @@ var bottompage = {
                     $block.removeClass('start-animation');
                 }
             }
-        }
+        };
 
         showAnimated($content);
 

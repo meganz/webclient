@@ -44,7 +44,7 @@
 .en .about.main-menu.item span.lang, .about.main-menu.item span.lang.en {
     display: none;
 }
-.about.main-menu.item:hover span {
+body:not(.mobile) .about.main-menu.item:hover span {
     color: #00C0A6;
 }
 .about.main-menu.item.active span {
@@ -63,11 +63,11 @@
 .about.top-info.centered {
     text-align: center;
 }
-.about.top-info a, .about.top-info:visited, .mobile .about.top-info a:hover {
+.about.top-info a, .about.top-info:visited {
     color: #373737;
     text-decoration: underline;
 }
-.about.top-info a:hover {
+body:not(.mobile) .about.top-info a:hover {
     text-decoration: none;
 }
 .about-numbers {
@@ -143,7 +143,7 @@
     -webkit-transition: background-color 200ms ease-in-out, top 200ms ease-in-out;
     transition: background-color 200ms ease-in-out, top 200ms ease-in-out;
 }
-.about.leader:hover .about.leader-overlay {
+body:not(.mobile) .about.leader:hover .about.leader-overlay {
     background-color: rgba(216,216,216,0.88);
     top: 0;
 }
@@ -185,7 +185,7 @@
     display: block;
     clear: both;
 }
-.about.leader:hover .about.leader-info {
+body:not(.mobile) .about.leader:hover .about.leader-info {
     visibility: visible;
     opacity: 1;
 }
@@ -326,7 +326,7 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.about.white-button:hover {
+body:not(.mobile) .about.white-button:hover {
     box-shadow: 0 0 0 4px rgba(255,255,255,0.3);
 }
 .about.bold-header.bott-pad {

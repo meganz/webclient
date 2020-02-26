@@ -866,14 +866,22 @@ body:not(.en) .download .startpage.top-header {
     left: 14px;
     top: -25px;
     background-image: url(../images/mega/startpage-sprite_v10.png);
-    background-position: -218px -2739px;
+    background-position: -115px -2739px;
 }
 .startpage.quote-icon.close {
     left: auto;
     top: auto;
     bottom: -25px;
     right: 14px;
-    background-position: -115px -2739px;
+    background-position: -218px -2739px;
+}
+.de .startpage.quote-icon.open {
+    left: auto;
+    right: 14px;
+}
+.de .startpage.quote-icon.close {
+    left: 14px;
+    right: auto;
 }
 .startpage.declaration-lnk {
     text-align: center;

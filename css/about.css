@@ -158,8 +158,17 @@
 .about.leader-info i.right {
     margin: 19px 0 0 23px;
 }
+.de .about.leader-info i {
+    float: right;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.de .about.leader-info i.right {
+    float: none;
+}
 .about.leader-info span {
     display: block;
+    clear: both;
 }
 .about.leader:hover .about.leader-info {
     visibility: visible;
@@ -353,6 +362,14 @@
     left: auto;
     right: 0;
 }
+.de .about-privacy .startpage.quote-icon.open {
+    left: auto;
+    right: 0;
+}
+.de .about-privacy .startpage.quote-icon.close {
+    left: 0;
+    right: auto;
+}
 .about-data .about.top-info {
     max-width: 865px;
 }
@@ -380,9 +397,16 @@
     color: #373737;
     padding: 6px 35px;
     font-family: 'LatoWebBlack', 'source_sans_probold', Arial;
+    clear: both;
 }
 .about.data-header i {
     display: block;
+}
+.de .about.data-header i.open-quote {
+    float: right;
+}
+.de .about.data-header i.close-quote {
+    float: none;
 }
 @-webkit-keyframes animatedBackground {
   from {

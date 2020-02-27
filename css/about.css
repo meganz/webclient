@@ -1,5 +1,6 @@
 .about .bottom-page.full-block {
     display: none;
+    font-size: 0;
 }
 .about .bottom-page.full-block.active {
     display: block;

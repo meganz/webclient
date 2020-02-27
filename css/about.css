@@ -729,6 +729,9 @@ body:not(.mobile) .about.white-button:hover {
     .about .bottom-page .col-4 {
         width: 100%;
     }
+    .about .bottom-page .col-4.first-line:nth-of-type(2) .big-numbers {
+        padding: 26px 0 3px 0;
+    }
     .first-line .about.numbers-info, .about.numbers-info, .en .about.numbers-info {
         padding-bottom: 0;
     }

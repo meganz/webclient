@@ -1,5 +1,6 @@
 .about .bottom-page.full-block {
     display: none;
+    font-size: 0;
 }
 .about .bottom-page.full-block.active {
     display: block;
@@ -417,9 +418,6 @@ body:not(.mobile) .about.white-button:hover {
 }
 .about.data-header i {
     display: block;
-}
-.about-jobs .horizontal-centered-bl {
-    font-size: 0;
 }
 @-webkit-keyframes animatedBackground {
   from {

@@ -11,6 +11,7 @@ var aboutus = {
 
         aboutus.openSubSection($page);
         this.randomMemberOrderMix($page);
+        this.dynamicCount($page);
     },
 
     /**
@@ -79,6 +80,25 @@ var aboutus = {
         for (var i = 0; i < $randomed.length; i++) {
             $aboutMember[0].appendChild($randomed[i]);
         }
-    }
+    },
 
+    dynamicCount: function($page) {
+
+        "use strict";
+
+        loadingDialog.show();
+
+        api_req({a: "dailystats"}, {
+            callback: function(res) {
+                loadingDialog.hide();
+
+                var muser = res.confirmedusers.total / 1000000 | 0;
+                var bfiles = res.files.total / 1000000000 | 0;
+
+                // Locale of million and biliion will comes
+                $('#about-register-count', $page).text(muser + 'M+');
+                $('#about-files-count', $page).text(bfiles + 'B+');
+            }
+        });
+    }
 };

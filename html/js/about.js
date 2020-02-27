@@ -10,6 +10,7 @@ var aboutus = {
         var $page = $('.bottom-page.scroll-block.about', 'body');
 
         aboutus.openSubSection($page);
+        this.randomMemberOrderMix($page);
     },
 
     /**
@@ -59,6 +60,25 @@ var aboutus = {
         $('.about.main-menu.item', $page).rebind('click.about', function() {
             aboutus.showSubsectionContent($page, $(this).data('page'));
         });
+    },
+
+    /**
+     * Lets mix order of memebers list
+     * @param {Object} $page The jQuery selector for the current page
+     * @returns {void}
+     */
+    randomMemberOrderMix: function($page) {
+
+        "use strict";
+
+        var $aboutMember = $('.about.members', $page);
+        var $randomed = $aboutMember.children().sort(function() {
+            return 0.5 - Math.random();
+        });
+
+        for (var i = 0; i < $randomed.length; i++) {
+            $aboutMember[0].appendChild($randomed[i]);
+        }
     }
 
 };

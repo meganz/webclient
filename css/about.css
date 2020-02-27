@@ -219,6 +219,10 @@ body:not(.mobile) .about.top-info a:hover {
     width: 68px;
     height: 68px;
 }
+.mobile .about.members img {
+    width: 67px;
+    height: 67px;
+}
 .about.members img.shadow {
     box-shadow: 0 0 0 1px rgba(216,216,216,0.4);
 }
@@ -288,7 +292,7 @@ body:not(.mobile) .about.top-info a:hover {
     font-family: 'LatoWebBlack', 'source_sans_problack', Arial;
     display: block;
 }
-.en .about.hiring-txt {
+.en .about.hiring-txt, .ro .about.hiring-txt {
     font-size: 40px;
 }
 .en .about.hiring-txt span {
@@ -298,7 +302,7 @@ body:not(.mobile) .about.top-info a:hover {
     font-size: 40px;
     text-transform: none;
 }
-.es .about.hiring-txt span {
+.es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
     font-size: 52px;
 }
 .about.joing-txt {
@@ -493,7 +497,7 @@ body:not(.mobile) .about.white-button:hover {
     .about.hiring {
         height: auto;
     }
-    .about.hiring-txt, .en .about.hiring-txt, .es .about.hiring-txt {
+    .about.hiring-txt, .en .about.hiring-txt, .es .about.hiring-txt, .ro .about.hiring-txt  {
         display: block;
         font-size: 20px;
         line-height: 28px;
@@ -679,7 +683,7 @@ body:not(.mobile) .about.white-button:hover {
         height: auto;
         padding: 0 10px;
     }
-    .about.hiring-txt span, .en .about.hiring-txt span, .es .about.hiring-txt span {
+    .about.hiring-txt span, .en .about.hiring-txt span, .es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
         font-size: 34px;
         line-height: 50px;
     }

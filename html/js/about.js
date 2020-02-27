@@ -90,10 +90,16 @@ var aboutus = {
 
         api_req({a: "dailystats"}, {
             callback: function(res) {
+
                 loadingDialog.hide();
 
-                var muser = res.confirmedusers.total / 1000000 | 0;
-                var bfiles = res.files.total / 1000000000 | 0;
+                var muser = 175;
+                var bfiles = 75;
+
+                if (typeof res === 'object') {
+                    var muser = res.confirmedusers.total / 1000000 | 0;
+                    var bfiles = res.files.total / 1000000000 | 0;
+                }
 
                 // Locale of million and biliion will comes
                 $('#about-register-count', $page).text(muser + 'M+');

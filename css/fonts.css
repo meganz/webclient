@@ -262,9 +262,10 @@
         url('../fonts/montserrat-light-webfont.woff2') format('woff2'),
         url('../fonts/montserrat-light-webfont.woff') format('woff'),
         url('../fonts/montserrat-light-webfont.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+     font-weight: normal;
+     font-style: normal;
+     text-rendering: optimizeLegibility;
+ }
 @font-face {
     font-family: 'Source Code Pro';
     src: url('../fonts/SourceCodePro-Regular.ttf');

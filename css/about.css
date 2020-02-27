@@ -418,6 +418,9 @@ body:not(.mobile) .about.white-button:hover {
 .about.data-header i {
     display: block;
 }
+.about-jobs .horizontal-centered-bl {
+    font-size: 0;
+}
 @-webkit-keyframes animatedBackground {
   from {
     background-position: 0 0;

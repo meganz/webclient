@@ -627,7 +627,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     vertOffset={3}
                                 >
                                     {previewButton}
-                                    <hr/>
+                                    {previewButton && <hr/>}
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
                                                               onClick={self._startDownload.bind(self, v)}/>
                                     <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}

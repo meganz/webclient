@@ -1065,7 +1065,7 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
     render() {
         var self = this;
 
-        const entries = self.state.entries || self.getEntries();
+        const entries = self.getEntries();
         const viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
         const classes = `add-from-cloud ${self.props.className}`;

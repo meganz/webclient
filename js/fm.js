@@ -516,15 +516,16 @@ function contactsInfoDialog(title, username, msg, close) {
 }
 
 /**
- * publicLinkInit
-  *
- * Set piublick link and init CopyToClipboard events
+ * setContactLink
  *
+ * Set public link and init CopyToClipboard events
+ * @param {Node|jQuery} [$container] optional container node, used to scope the `public-contact-link`
+ * @returns {undefined|Boolean}
  */
-function setContactLink() {
+function setContactLink($container) {
     "use strict";
 
-    var $publicLink = $('.public-contact-link:visible');
+    var $publicLink = $container ? $('.public-contact-link', $container) : $('.public-contact-link:visible');
     // multiple link data may exists!
     var linkData = $publicLink.attr('data-lnk');
     var account = M.account || false;
@@ -542,7 +543,7 @@ function setContactLink() {
     }
     else {
         api_req({ a: 'clc' }, {
-            callback: function (res, ctx) {
+            callback: function(res) {
                 if (typeof res === 'string') {
                     contactPrefix =  res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
@@ -568,7 +569,7 @@ function setContactLink() {
         $('.dropdown.tooltip.small').removeClass('visible');
     });
 
-    $publicLink.rebind('click', function() {
+    $publicLink.rebind('click.publiclnk', function() {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
@@ -639,7 +640,7 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     M.safeShowDialog('add-user-popup', $d);
 
-    setContactLink();
+    setContactLink($d);
 
     var $textarea = $d.find('.add-user-textarea textarea');
 
@@ -1517,7 +1518,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-notification-info h1').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-info p').text(submsg);
+        $('#msgDialog .fm-notification-info p').safeHTML(submsg);
         $('#msgDialog .fm-notification-info p').removeClass('hidden');
     }
     else {

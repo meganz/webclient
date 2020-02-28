@@ -639,6 +639,7 @@ mega.tpw = {
     finishDownloadUpload: function() {},
     errorDownloadUpload: function() {},
     pauseDownloadUpload: function() {},
+    resumeDownloadUpload: function() {},
     removeRow: function() {},
     showWidget: function() { return false;},
     resetErrorsAndQuotasUI: function() {

@@ -1486,6 +1486,7 @@ Call.prototype.msgJoin = function(packet) {
         // If the last peer that dropped out of the call reconnects, clear the timer that would hold our call open
         // in case everyone leaves
         if (self._lastErrPeerOffline && (self._lastErrPeerOffline.peerId === packet.fromUser + packet.fromClient)) {
+            self._clearCallRecoveryTimer();
             delete self._lastErrPeerOffline;
         }
         for (var sid in self.sessions) {
@@ -1664,11 +1665,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
         self._stopIncallPingTimer();
-        if (self._peerCallRecoveryWaitTimer) {
-            clearTimeout(self._peerCallRecoveryWaitTimer);
-            // Just in case, keep state consistent if someone acceeses us after being destroyed
-            delete self._peerCallRecoveryWaitTimer;
-        }
+        self._clearCallRecoveryTimer();
         self._setState(CallState.kDestroyed);
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, willRecover);
         self.manager._removeCall(self);
@@ -2231,7 +2228,7 @@ Call.prototype._onClientLeftCall = function(userid, clientid) {
         for (var sid in sessions) {
             var sess = sessions[sid];
             if (sess.peer === userid && sess.peerClient === clientid) {
-                if (sess.state === SessState.kTerminating) {
+                if (sess.state >= SessState.kTerminating) {
                     // The termination reason is not kErrPeerOffline, so don't consider the session
                     // for call recovery
                     // Destroy and remove it immediately, as the peer may immediately reconnect
@@ -2346,6 +2343,14 @@ Call.prototype._removeRetry = function(reason, userid, clientid) {
     return true;
 };
 
+Call.prototype._clearCallRecoveryTimer = function() {
+    if (!this._peerCallRecoveryWaitTimer) {
+        return;
+    }
+    clearTimeout(this._peerCallRecoveryWaitTimer);
+    delete this._peerCallRecoveryWaitTimer;
+};
+
 Call.prototype._notifySessionConnected = function(sess) {
     /*
     var url = this.manager.statsUrl;
@@ -2355,11 +2360,8 @@ Call.prototype._notifySessionConnected = function(sess) {
     }
     */
     var self = this;
-    if (this._peerCallRecoveryWaitTimer) {
-        clearTimeout(this._peerCallRecoveryWaitTimer);
-        delete this._peerCallRecoveryWaitTimer;
-    }
 
+    self._clearCallRecoveryTimer();
     self._deleteRetry(sess.peer + sess.peerClient);
     self._checkLocalMuteCompleted();
     // handle first connected session

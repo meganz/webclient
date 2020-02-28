@@ -444,6 +444,24 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
     'LEFT': -1
 };
 
+ChatRoom.encryptTopic = function(protocolHandler, newTopic, participants, isPublic = false) {
+    if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
+        const topic = protocolHandler.embeddedEncryptTo(
+            newTopic,
+            strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+            participants,
+            undefined,
+            isPublic
+        );
+
+        if (topic) {
+            return base64urlencode(topic)
+        }
+    }
+
+    return false;
+};
+
 ChatRoom.MembersSet.prototype.trackFromActionPacket = function(ap, isMcf) {
     var self = this;
 
@@ -839,7 +857,7 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
     var masterPromise = new MegaPromise();
 
     if (
-        (allowEmpty || $.trim(newTopic).length > 0) &&
+        (allowEmpty || newTopic.trim().length > 0) &&
         newTopic !== self.getRoomTitle()
     ) {
         self.scrolledToBottom = true;
@@ -1450,7 +1468,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
     ids.forEach(function(nodeId) {
         var proxyPromise = new MegaPromise();
 
-        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+        if (M.d[nodeId] && (M.d[nodeId].u !== u_handle || M.getNodeRoot(nodeId) === "shares")) {
             // I'm not the owner of this file.
             // can be a d&d to a chat or Send to contact from a share
             M.myChatFilesFolder.get(true)

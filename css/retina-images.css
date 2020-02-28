@@ -372,4 +372,9 @@ i.small-icon.icons-sprite,
     background-image: url(../images/mega/context-sprite_v1@2x.png);
     background-size: 217px auto;
 }
+
+.bottom-page.about-sprite, i.bottom-page.about-sprite {
+    background-image: url(../images/mega/about-sprite_v1@2x.png) !important;
+    background-size: 525px auto;
+}
 }

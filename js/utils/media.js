@@ -2010,7 +2010,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 db = new Dexie(dbname);
                 db.version(1).stores({kv: '&k'});
                 db.open().then(read).catch(console.warn.bind(console, dbname));
-                timer = setTimeout(apiReq, 800);
+                timer = setTimeout(apiReq, 1400);
 
                 // save the db name for our getDatabaseNames polyfill
                 localStorage['_$mdb$' + dbname] = 1;

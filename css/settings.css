@@ -1354,12 +1354,18 @@
     box-sizing: border-box;
     max-width: calc(100% - 2px);
 }
+.orange-notification.body.hidden {
+    display: none;
+}
 .orange-notification.cell {
     display: table-cell;
     vertical-align: middle;
     color: #FF6F00;
     font-size: 13px;
     line-height: 18px;
+}
+.argentina-only .orange-notification.cell {
+    padding: 6px;
 }
 .orange-notification.cell.text {
     padding: 5px 0;

@@ -290,17 +290,6 @@
         ]
     };
 
-    var labelsColors = {
-        'red': l[16223],
-        'orange': l[16224],
-        'yellow': l[16225],
-        'green': l[16226],
-        'blue': l[16227],
-        'purple': l[16228],
-        'grey': l[16229]
-    };
-
-
     var versionColumnPrepare = function(versionsNb, VersionsSize) {
         var versionsTemplate = '<div class="ver-col-container">' +
             '<div class="ver-nb">' + versionsNb + '</div>' +
@@ -399,6 +388,16 @@
         else {
             this.chatIsReady = megaChatIsReady;
         }
+
+        this.labelsColors = {
+            'red': l[16223],
+            'orange': l[16224],
+            'yellow': l[16225],
+            'green': l[16226],
+            'blue': l[16227],
+            'purple': l[16228],
+            'grey': l[16229]
+        };
 
         this.numInsertedDOMNodes = 0;
 
@@ -948,7 +947,7 @@
                         var colourLabel = M.getLabelClassFromId(aNode.lbl);
                         props.classNames.push('colour-label');
                         props.classNames.push(colourLabel);
-                        props.labelC = labelsColors[colourLabel];
+                        props.labelC = this.labelsColors[colourLabel];
                     }
                 }
 

@@ -26,6 +26,15 @@ function init_reset() {
             }
             else {
                 if (res[0] === 9) {
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22817], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withkey').removeClass('hidden');
 
@@ -61,6 +70,16 @@ function init_reset() {
                     });
                 }
                 else if (res[0] === 10) {
+
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22818], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withoutkey').removeClass('hidden');
                     $('.backup-notification-block').removeClass('hidden');

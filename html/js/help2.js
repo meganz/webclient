@@ -108,7 +108,7 @@ var Help = (function() {
                     location.hash = '#' + newpage;
                 }
                 else {
-                    history.pushState({subpage: newpage}, '', '/' + newpage);
+                    history.replaceState({subpage: newpage}, '', '/' + newpage);
                 }
             }
         }, 100);

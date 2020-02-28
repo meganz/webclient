@@ -5886,6 +5886,7 @@ select.mobile.dropdown-style {
     letter-spacing: .1px;
     margin: 0 auto;
     font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    padding: 0 15px;
 }
 .securitypractice .mobile.cta-button {
     margin: 0 auto;

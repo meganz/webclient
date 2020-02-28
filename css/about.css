@@ -219,6 +219,10 @@ body:not(.mobile) .about.top-info a:hover {
     width: 68px;
     height: 68px;
 }
+.mobile .about.members img {
+    width: 67px;
+    height: 67px;
+}
 .about.members img.shadow {
     box-shadow: 0 0 0 1px rgba(216,216,216,0.4);
 }
@@ -273,7 +277,6 @@ body:not(.mobile) .about.top-info a:hover {
 }
 .about.hiring-txt {
     display: inline-block;
-    text-transform: uppercase;
     font-size: 30px;
     line-height: 48px;
     color: white;
@@ -281,6 +284,7 @@ body:not(.mobile) .about.top-info a:hover {
     margin: 89px 42px 0 0;
     white-space: normal;
     vertical-align: top;
+    text-transform: uppercase;
 }
 .about.hiring-txt span {
     font-size: 32px;
@@ -288,11 +292,18 @@ body:not(.mobile) .about.top-info a:hover {
     font-family: 'LatoWebBlack', 'source_sans_problack', Arial;
     display: block;
 }
-.en .about.hiring-txt {
+.en .about.hiring-txt, .ro .about.hiring-txt {
     font-size: 40px;
 }
 .en .about.hiring-txt span {
     font-size: 80px;
+}
+.es .about.hiring-txt {
+    font-size: 40px;
+    text-transform: none;
+}
+.es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
+    font-size: 52px;
 }
 .about.joing-txt {
     display: inline-block;
@@ -304,6 +315,10 @@ body:not(.mobile) .about.top-info a:hover {
     line-height: 30px;
     vertical-align: top;
     margin: 0 -40px 0 40px;
+}
+.es .about.joing-txt {
+    margin-left: 0;
+    margin-right: 0;
 }
 .about.joing-txt span {
     display: block;
@@ -482,7 +497,7 @@ body:not(.mobile) .about.white-button:hover {
     .about.hiring {
         height: auto;
     }
-    .about.hiring-txt, .en .about.hiring-txt {
+    .about.hiring-txt, .en .about.hiring-txt, .es .about.hiring-txt, .ro .about.hiring-txt  {
         display: block;
         font-size: 20px;
         line-height: 28px;
@@ -500,11 +515,32 @@ body:not(.mobile) .about.white-button:hover {
     .about.joing-txt span {
         padding: 0 0 12px 0;
     }
-}
-@media only screen and (max-width:712px) {
+    .about-privacy .bottom-page.table.changed-order .left-cell,     .about-privacy .bottom-page.table.changed-order .right-cell {
+        height: auto;
+    }
+    .about-privacy .bottom-page.left-cell, .bottom-page.right-cell {
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
+    .about-privacy .bottom-page.table.changed-order .order2 {
+        display: block;
+    }
+    .about-privacy .bottom-page.table.changed-order .order1 {
+        display: none;
+    }
+    .about-privacy .bottom-page.big-header.left-txt-align, .about-privacy .about.top-info {
+        text-align: center;
+    }
+    .bottom-page.about-sprite.use, .bottom-page.about-sprite.encryption {
+        margin: 30px 0 10px 0;
+    }
     .bottom-page.about-sprite.use {
-        background-position: -7px -907px;
-        background-size: 415px auto;
+        background-position: -11px -1150px;
+        background-size: 525px auto;
+    }
+    .bottom-page.about-sprite.gdpr {
+        margin: 30px 0 0 0;
     }
 }
 @media only screen and (max-width:565px) {
@@ -553,16 +589,7 @@ body:not(.mobile) .about.white-button:hover {
     .bottom-page.big-header.left-txt-align, .about.top-info {
         text-align: center;
     }
-    .bottom-page.about-sprite.use, .bottom-page.about-sprite.encryption {
-        margin: 30px 0 10px 0;
-    }
-    .bottom-page.about-sprite.use {
-        background-position: -11px -1150px;
-        background-size: 525px auto;
-    }
-    .bottom-page.about-sprite.gdpr {
-        margin: 30px 0 0 0;
-    }
+
     .about.img4 {
         margin: 47px 0 8px 3%;
     }
@@ -656,7 +683,7 @@ body:not(.mobile) .about.white-button:hover {
         height: auto;
         padding: 0 10px;
     }
-    .about.hiring-txt span, .en .about.hiring-txt span {
+    .about.hiring-txt span, .en .about.hiring-txt span, .es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
         font-size: 34px;
         line-height: 50px;
     }

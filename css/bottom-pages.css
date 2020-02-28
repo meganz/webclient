@@ -766,6 +766,9 @@ body.mobile:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 .bottom-page.big-header.light {
     font-family: 'montserrat_light', 'montserrat', 'LatoWebLigth', Arial;
 }
+.cn .bottom-page.big-header.light, .ct .bottom-page.big-header.light, .jp .bottom-page.big-header.light, .kr .bottom-page.big-header.light {
+    font-family: 'montserrat', 'LatoWeb', Arial;
+}
 .bottom-page.big-header.max-width {
     max-width: 895px;
     margin: 0 auto;

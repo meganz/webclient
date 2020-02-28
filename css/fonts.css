@@ -266,8 +266,6 @@
      font-style: normal;
      text-rendering: optimizeLegibility;
  }
-
-}
 @font-face {
     font-family: 'Source Code Pro';
     src: url('../fonts/SourceCodePro-Regular.ttf');

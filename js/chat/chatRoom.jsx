@@ -1462,7 +1462,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
     ids.forEach(function(nodeId) {
         var proxyPromise = new MegaPromise();
 
-        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+        if (M.d[nodeId] && (M.d[nodeId].u !== u_handle || M.getNodeRoot(nodeId) === "shares")) {
             // I'm not the owner of this file.
             // can be a d&d to a chat or Send to contact from a share
             M.myChatFilesFolder.get(true)

@@ -940,7 +940,7 @@ mBroadcaster.once('boot_done', function populate_l() {
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a href="https://mega.nz/blog_59" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
-    l[23126] = l[23126].replace(/\[BR]/g, '<br/>');
+    l[23126] = escapeHTML(l[23126].replace(/\"/g, '%1')).replace(/\[BR\]/g, '<br/>').replace(/%1/g, '"');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

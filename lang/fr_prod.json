@@ -3413,9 +3413,10 @@
     "23075": "De plus, en raison de ses ant\u00e9c\u00e9dents controvers\u00e9s, MEGA a massivement investi dans la conformit\u00e9, sous la direction de ses conseillers juridiques internationaux. MEGA applique strictement ses [A1]conditions g\u00e9n\u00e9rales d\u2019utilisation[\/A1] et offre une [A2]directive sur les retraits[\/A2]. MEGA publie aussi r\u00e9guli\u00e8rement un [A3]rapport de transparence[\/A3].",
     "23076": "Les personnes qui rendent cela possible",
     "23077": "Nos dirigeants",
+    "23078": "Quand c\u2019est bien fait, \u00e7a fonctionne.",
     "23079": "Promettre moins, offrir plus.",
     "23080": "C'est un marathon, pas un sprint.",
-    "23081": "Emplacement de nos bureaux",
+    "23081": "Emplacements de nos bureaux",
     "23082": "Les possibilit\u00e9s de carri\u00e8re de MEGA commencent ici\u2009!",
     "23083": "Vous r\u00e9jouissez-vous de vous joindre \u00e0 une entreprise progressiste\u2009? MEGA est \u00e0 la recherche d\u2019innovateurs avant-gardistes",
     "23084": "Ce en quoi nous croyons",
@@ -3460,9 +3461,12 @@
     "23123": "Les probl\u00e8mes techniques sont une r\u00e9alit\u00e9 incontournable. Des disques durs tombent en panne tous les jours, parfois, c\u2019est un serveur entier. Malgr\u00e9 toute la diligence d\u00e9ploy\u00e9e par les op\u00e9rateurs de nos centres de donn\u00e9es et par les entreprises de fibres optiques, des pannes de courant et des coupures de fibres se produisent la plupart du temps.",
     "23124": "Nous ne voulons pas que vous ayez \u00e0 vous soucier de tels accidents. Nous voulons que vous puissiez acc\u00e9der \u00e0 vos fichiers continuellement, m\u00eame si un pays entier o\u00f9 nous h\u00e9bergeons des donn\u00e9es tombait hors ligne (ce qui, nous l\u2019esp\u00e9rons, n\u2019arrivera jamais).",
     "23125": "Quelle est la solution\u2009?",
-    "23126": "La solution est simple\u00a0: nous fractionnons chaque fichier en parties \u00e0 peu pr\u00e8s \u00e9gales et stockons chacune de ces parties dans un pays diff\u00e9rent. Nous stockons aussi (dans un pays encore diff\u00e9rent) si le nombre de bits\u00a0\u00ab\u00a01\u00a0\u00bb d\u2019une position donn\u00e9e de toutes les parties est pair ou impair.[BR]Cela signifie que vous pouvez reconstruire vos donn\u00e9es m\u00eame si l\u2019une des parties n\u2019est pas accessible. Et mieux encore, votre navigateur peut se connecter directement \u00e0 tous les centres de traitement de donn\u00e9es et r\u00e9assembler votre fichier gr\u00e2ce \u00e0 notre moteur JavaScript unique de traitement \u00e0 la vol\u00e9e des transferts que nous utilisons aussi pour notre cryptographie de bout en bout.",
+    "23126": "La solution est simple\u00a0: nous fractionnons chaque fichier en parties \u00e0 peu pr\u00e8s \u00e9gales et stockons chacune de ces parties dans un pays diff\u00e9rent. Nous stockons aussi une autre partie (dans un pays encore diff\u00e9rent) qui enregistre si le nombre de bits\u00a0\u00ab\u00a01\u00a0\u00bb d\u2019une position donn\u00e9e de toutes les parties est pair ou impair.[BR]Cela signifie que vous pouvez reconstruire vos donn\u00e9es m\u00eame si l\u2019une des parties n\u2019est pas accessible. Et mieux encore, votre navigateur peut se connecter directement \u00e0 tous les centres de traitement de donn\u00e9es et r\u00e9assembler votre fichier gr\u00e2ce \u00e0 notre moteur JavaScript unique de traitement \u00e0 la vol\u00e9e des transferts que nous utilisons aussi pour notre cryptographie de bout en bout.",
     "23127": "Nous appelons cette technologie CloudRAID\u00a0:",
     "23128": "Ensemble redondant de centres de traitement de donn\u00e9es ind\u00e9pendants",
     "23129": "MEGA g\u00e8re des centres de traitement de donn\u00e9es CloudRAID au Luxembourg, en Allemagne, en France, aux Pays-Bas, en Espagne, en Belgique et au Canada, et totalise une capacit\u00e9 de liaison montante de plus de 1\u2009000\u00a0gigabits\/s.",
-    "23132": "As a result of the Social Solidarity and Productive Reactivation Law, the final price charged may have an additional 30% added due to these new taxes."
+    "23132": "As a result of the Social Solidarity and Productive Reactivation Law, the final price charged may have an additional 30% added due to these new taxes.",
+    "23133": "Auckland",
+    "23134": "Salamanca",
+    "23135": "Porto"
 }

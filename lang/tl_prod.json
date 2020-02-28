@@ -3413,6 +3413,7 @@
     "23075": "Furthermore, owing to its controversial background, MEGA has invested heavily in compliance under the guidance of its global legal advisers. MEGA enforces its [A1]Terms of Service[\/A1] strictly and provides a [A2]Takedown Guidance[\/A2]. MEGA also periodically publishes a [A3]transparency report[\/A3].",
     "23076": "The people who are making it possible",
     "23077": "Our Leaders",
+    "23078": "When done right, it works.",
     "23079": "Underpromise, overdeliver.",
     "23080": "It's a marathon, not a sprint.",
     "23081": "Office locations",
@@ -3456,13 +3457,16 @@
     "23119": "GDPR protections and rights",
     "23120": "On 25 May 2018, the European Union's General Data Protection Regulation (GDPR) came into effect. The GDPR provides rights to European users, but, as a leading privacy company, we make the GDPR protections and rights available to all our users globally in respect of personal data (or \"personal information\" as we refer to it in New Zealand), wherever they may live.",
     "23121": "Mega's Terms of Service, Privacy and Data Policy, Takedown Guidance and Contacts provide all the disclosures and explanations required by the GDPR.",
-    "23122": "MEGA's mission is not limited to just keeping your valuable data private: Safeguarding it is equally important to us.",
+    "23122": "MEGA's mission is not limited to just keeping your valuable data private: safeguarding it is equally important to us.",
     "23123": "Technical issues are a fact of life. Hard disks fail on a daily basis. Sometimes, an entire server goes down. And despite the best efforts of our datacentre operators and fibre carriers, power outages and fibre cuts happen more often than not.",
     "23124": "We do not want you to have to worry about such mishaps. We want you to be able to access your files 24\/7, even while an entire country we host in has gone offline (which we hope won't ever happen).",
     "23125": "What's the solution?",
-    "23126": "The solution is simple: We split each file into roughly equal-sized parts and store each of them in a different country. We also store (in yet another country) whether the number of \"1\" bits at a certain position within all parts is even or odd.[BR]This means that you can reconstruct your data even when one of the parts is unavailable. And best of all, your browser can connect directly to all datacentres and reassemble your file thanks to our unique JavaScript on-the-fly transfer processing engine that we also use for our end-to-end cryptography.",
+    "23126": "The solution is simple: we split each file into roughly equal-sized parts and store each of them in a different country. We also store another part (in yet another country) recording whether the number of \"1\" bits at a certain position within all parts is even or odd.[BR]This means that you can reconstruct your data even when one of the parts is unavailable. And best of all, your browser can connect directly to all datacentres and reassemble your file thanks to our unique JavaScript on-the-fly transfer processing engine that we also use for our end-to-end cryptography.",
     "23127": "We call this technology CloudRAID:",
     "23128": "Redundant Array of Independent Datacentres",
     "23129": "MEGA operates CloudRAID datacentres in Luxembourg, Germany, France, Netherlands, Spain, Belgium and Canada and has a total carrier uplink capacity of more than 1000 gigabit\/s.",
-    "23132": "As a result of the Social Solidarity and Productive Reactivation Law, the final price charged may have an additional 30% added due to these new taxes."
+    "23132": "As a result of the Social Solidarity and Productive Reactivation Law, the final price charged may have an additional 30% added due to these new taxes.",
+    "23133": "Auckland",
+    "23134": "Salamanca",
+    "23135": "Porto"
 }

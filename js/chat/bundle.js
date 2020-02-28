@@ -7410,8 +7410,10 @@ function (_MegaRenderMixin2) {
       'highlighted': [],
       'currentlyViewedEntry': M.RootID,
       'selectedTab': 'clouddrive',
-      'searchValue': ''
+      'searchValue': '',
+      'entries': null
     };
+    _this2.state.entries = _this2.getEntries();
     _this2.onAttachClicked = _this2.onAttachClicked.bind(_assertThisInitialized(_this2));
     _this2.onClearSearchIconClick = _this2.onClearSearchIconClick.bind(_assertThisInitialized(_this2));
     _this2.onHighlighted = _this2.onHighlighted.bind(_assertThisInitialized(_this2));
@@ -7428,15 +7430,16 @@ function (_MegaRenderMixin2) {
   _createClass(CloudBrowserDialog, [{
     key: "toggleSortBy",
     value: function toggleSortBy(colId) {
+      var newState = {};
+
       if (this.state.sortBy[0] === colId) {
-        this.setState({
-          'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"]
-        });
+        newState.sortBy = [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"];
       } else {
-        this.setState({
-          'sortBy': [colId, "asc"]
-        });
+        newState.sortBy = [colId, "asc"];
       }
+
+      newState.entries = this.getEntries(newState);
+      this.setState(newState);
     }
   }, {
     key: "onViewButtonClick",
@@ -7575,7 +7578,7 @@ function (_MegaRenderMixin2) {
           dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise()).done(function () {
             self.setState({
               'isLoading': false,
-              'entries': null
+              'entries': self.getEntries()
             });
           });
           return;
@@ -7588,7 +7591,7 @@ function (_MegaRenderMixin2) {
           dbfetch.get(handle).always(function () {
             self.setState({
               'isLoading': false,
-              'entries': null
+              'entries': self.getEntries()
             });
           });
           return;
@@ -7609,15 +7612,16 @@ function (_MegaRenderMixin2) {
         }
 
         this.setState({
-          entries: null
+          entries: this.getEntries()
         });
       }
     }
   }, {
     key: "getEntries",
-    value: function getEntries() {
+    value: function getEntries(newState) {
       var self = this;
-      var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+      var sortBy = newState && newState.sortBy || self.state.sortBy;
+      var order = sortBy[1] === "asc" ? 1 : -1;
       var entries = [];
 
       if (self.state.currentlyViewedEntry === "search" && self.state.searchValue && self.state.searchValue.length >= 3) {
@@ -7649,11 +7653,11 @@ function (_MegaRenderMixin2) {
 
       var sortFunc;
 
-      if (self.state.sortBy[0] === "name") {
+      if (sortBy[0] === "name") {
         sortFunc = M.getSortByNameFn();
-      } else if (self.state.sortBy[0] === "size") {
+      } else if (sortBy[0] === "size") {
         sortFunc = M.getSortBySizeFn();
-      } else if (self.state.sortBy[0] === "ts") {
+      } else if (sortBy[0] === "ts") {
         sortFunc = M.getSortByDateTimeFn(); // invert
 
         order = order === 1 ? -1 : 1;
@@ -7714,7 +7718,6 @@ function (_MegaRenderMixin2) {
     key: "render",
     value: function render() {
       var self = this;
-      var entries = self.getEntries();
       var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
       var classes = "add-from-cloud ".concat(self.props.className);
       var folderIsHighlighted = false;
@@ -7927,7 +7930,7 @@ function (_MegaRenderMixin2) {
       })))), gridHeader, React.makeElement(cloudBrowserModalDialog_BrowserEntries, {
         isLoading: self.state.isLoading,
         currentlyViewedEntry: self.state.currentlyViewedEntry,
-        entries: entries,
+        entries: self.state.entries || [],
         onExpand: function onExpand(node) {
           self.onSelected([]);
           self.onHighlighted([]);

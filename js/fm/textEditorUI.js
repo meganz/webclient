@@ -351,6 +351,7 @@ mega.textEditorUI = new function TextEditorUI() {
             fileHandle = handle;
             versionHandle = '';
             fileName = fName;
+            api_req({ a: 'log', e: 99807, m: 'File Text Editor opened' });
         });
     };
 

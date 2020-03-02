@@ -86,6 +86,10 @@ body.rtl .fm-dialog.pass-reminder,
 body.rtl .membership-st2-info .save-money,
 body.rtl .main-mid-pad.third-section .reg-st3-txt-localcurrencyprogram,
 body.rtl .mobile.main-block.park-account-change-password,
+body.rtl .button.download.mid-button.to-clouddrive.transition,
+body.rtl .button.download.big-button.to-clouddrive.transition,
+body.rtl .download.transfer-wrapper .download.checkbox-txt,
+body.rtl .about.top-info,
 body.rtl .rtl-block-if-rtl {
     direction: rtl;
 }
@@ -115,7 +119,8 @@ body.rtl .align-right-if-rtl {
 }
 
 body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-header,
-body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text {
+body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text,
+body.rtl .about.top-info {
     text-align: center;
 }
 

@@ -3190,6 +3190,9 @@ function process_u(users, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
+    if (!suba || !suba.length) {
+        return;
+    }
     M.require('businessAcc_js', 'businessAccUI_js').done(function () {
 
         // the response is an array of users's handles (Masters). this means at least it will contain

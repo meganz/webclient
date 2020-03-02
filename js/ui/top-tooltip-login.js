@@ -154,6 +154,13 @@ var tooltiplogin = {
         });
 
         $('.top-login-forgot-pass', $dialog).rebind('click', function() {
+
+            var email = document.getElementById('login-name').value;
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
             loadSubPage('recovery');
         });
 
@@ -193,7 +200,7 @@ var tooltiplogin = {
         var $loginWarningCheckbox = $topLoginPopup.find('.loginwarning-checkbox');
         var $loginRememberCheckbox = $topLoginPopup.find('.login-check');
 
-        var email = $emailField.val();
+        var email = $emailField.val().trim();
         var password = $passwordField.val();
         var rememberMe = false;
         var twoFactorPin = null;

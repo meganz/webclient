@@ -58,9 +58,8 @@ mobile.chatlink = {
         }
 
         var self = this;
-        M.require('chat')
+        init_chat(0x104DF11E5)
             .always(function() {
-                init_chat();
                 self.retrieved = self.linkInfo.getInfo();
                 self.retrieved.done(function(result) {
                     if (result.topic) {

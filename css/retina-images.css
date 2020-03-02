@@ -163,8 +163,9 @@ i.small-icon.icons-sprite,
 .transfer-progress-type.download .transfer-progress-pct::before,
 .transfer-progress-type.upload .transfer-progress-pct::before,
 .transfer-task-row::before,
-.toast-icon.multi-files-icon {
-    background-image: url(../images/mega/icons-sprite_v33@2x.png);
+.toast-icon.multi-files-icon,
+#mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-icon{
+    background-image: url(../images/mega/icons-sprite_v36@2x.png);
     background-size: 262px auto;
 }
 #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
@@ -364,5 +365,16 @@ i.small-icon.icons-sprite,
 .register-page .slider-ctrl-button {
     background-image: url(../images/mega/business@2x.png) !important;
     background-size: 367px auto;
+}
+    
+/* Context-sprite */
+.context-sprite, i.context-sprite {
+    background-image: url(../images/mega/context-sprite_v1@2x.png);
+    background-size: 217px auto;
+}
+
+.bottom-page.about-sprite, i.bottom-page.about-sprite {
+    background-image: url(../images/mega/about-sprite_v1@2x.png) !important;
+    background-size: 525px auto;
 }
 }

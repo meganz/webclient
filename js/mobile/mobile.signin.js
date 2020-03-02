@@ -132,7 +132,7 @@ mobile.signin = {
         $signInButton.off('tap').on('tap', function() {
 
             // Get the current text field values
-            var email = $emailField.val();
+            var email = $emailField.val().trim();
             var password = $passwordField.val();
             var rememberMe = $rememberMeCheckbox.is(':checked');
             var twoFactorPin = null;
@@ -215,6 +215,12 @@ mobile.signin = {
 
         // Add click/tap handler to Forgot Password button
         this.$screen.find('.forgot-password-button').off('tap').on('tap', function() {
+
+            var email = $('.signin-input.login input').val();
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
 
             // Load the Recovery page
             loadSubPage('recovery');

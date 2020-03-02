@@ -210,6 +210,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
         else {
+            if (selNode.s < 20971520 && isTextual(selNode)) { // 20 MB
+                items['.edit-file-item'] = 1;
+            }
+
             if ((selNode.tvf > 0) && !folderlink) {
                 items['.properties-versions'] = 1;
                 if (M.getNodeRights(selNode.h) > 1) {
@@ -428,7 +432,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     ignoreGrideExtras = true;
                 }
                 else {
-                    $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').show();
 
                     if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
                         $(menuCMI).filter('.folderupload-item').show();

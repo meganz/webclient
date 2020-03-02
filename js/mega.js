@@ -36,8 +36,9 @@ if (typeof loadingDialog === 'undefined') {
     // New subject value to specify loading dialog subject.
     // Loading dialog with subject will not disappear until it hided with the subject
     $.loadingSubject = Object.create(null);
-    loadingDialog.show = function(subject) {
 
+    loadingDialog.nest = 0;
+    loadingDialog.show = function(subject) {
         'use strict';
 
         subject = subject || 'common';
@@ -51,7 +52,6 @@ if (typeof loadingDialog === 'undefined') {
         $.loadingSubject[subject] = 1;
     };
     loadingDialog.hide = function(subject) {
-
         'use strict';
 
         subject = subject || 'common';
@@ -61,16 +61,22 @@ if (typeof loadingDialog === 'undefined') {
         if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
             $('.dark-overlay').addClass('hidden');
             $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
+
+            this.nest = 0;
             this.active = false;
+            $.loadingSubject = Object.create(null);
         }
     };
-    loadingDialog.nest = 0;
     loadingDialog.pshow = function() {
+        'use strict';
+
         if (!this.nest++) {
             this.show();
         }
     };
     loadingDialog.phide = function() {
+        'use strict';
+
         if (--this.nest < 1) {
             this.hide();
             this.nest = 0;
@@ -1273,10 +1279,13 @@ scparser.$add('d', function(a) {
     if (a.m) {
         $.moveNodeShares = !$.moveNodeShares ? {} : $.moveNodeShares;
         (function _checkMoveNodeShare(h) {
-            if (M.d[h].shares) {
-                $.moveNodeShares[h] = M.d[h].shares;
+            // XXX: are or should we ensure all needed nodes are loaded into memory (?)
+            var n = M.d[h] || false;
+
+            if (n.shares) {
+                $.moveNodeShares[h] = n.shares;
             }
-            if (M.d[h].t) {
+            if (n.t) {
                 for (var childHandle in M.c[h]) {
                     if (M.c[h][childHandle]) {
                         _checkMoveNodeShare(childHandle);
@@ -1517,9 +1526,7 @@ scparser.$finalize = function() {
                 loadavatars = [];
             }
 
-            if (M.viewmode) {
-                delay('thumbnails', fm_thumbnails, 3200);
-            }
+            delay('thumbnails', fm_thumbnails, 3200);
 
             if ($.dialog === 'properties') {
                 delay($.dialog, propertiesDialog.bind(this, 3));
@@ -2781,12 +2788,12 @@ function process_f(f, cb, updateVersioning) {
             M.addNode(n);
             ufsc.addNode(n);
         }
-
-        if (cb) {
-            cb(newmissingkeys && M.checkNewMissingKeys());
-        }
     }
-    else if (cb) cb();
+
+    // TODO: This function is no longer asynchronous, remove the callback dependency (?)
+    if (typeof cb === 'function') {
+        cb();
+    }
 }
 
 /**
@@ -3371,45 +3378,74 @@ function folderreqerr(c, e)
     }
 }
 
-function init_chat() {
-    function __init_chat() {
-        if ((anonymouschat || u_type) && !megaChatIsReady) {
-            if (d) console.log('Initializing the chat...');
+/**
+ * Initialize the chat subsystem.
+ * @param {*} [action] Specific action procedure to follow
+ * @returns {Promise} promise fulfilled on completion.
+ */
+function init_chat(action) {
+    'use strict';
+    return new Promise(function(resolve) {
+        var __init_chat = function() {
+            var result = false;
 
-            var _chat = new Chat();
+            if ((anonymouschat || u_type) && !megaChatIsReady) {
+                if (d) {
+                    console.info('Initializing the chat...');
+                }
+                var _chat = new Chat();
 
-            // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
-            if (!window.megaChatIsDisabled) {
-                window.megaChat = _chat;
-                megaChat.init();
+                // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
+                if (!window.megaChatIsDisabled) {
+                    window.megaChat = _chat;
+                    megaChat.init();
 
-                if (anonymouschat || fminitialized) {
-                    if (String(M.currentdirid).substr(0, 5) === 'chat/') {
-                        chatui(M.currentdirid);
+                    if (anonymouschat || fminitialized) {
+                        if (String(M.currentdirid).substr(0, 5) === 'chat/') {
+                            chatui(M.currentdirid);
+                        }
+                        // megaChat.renderContactTree();
+                        megaChat.renderMyStatus();
                     }
-                    //megaChat.renderContactTree();
-                    megaChat.renderMyStatus();
+
+                    result = true;
                 }
             }
-        }
 
-        if (!loadfm.loading) {
-            loadingDialog.hide();
-            loadingInitDialog.hide();
-        }
-    }
+            if (!loadfm.loading) {
+                window.loadingDialog.hide();
+                window.loadingInitDialog.hide();
+            }
 
-    if (anonymouschat) {
-        __init_chat();
-    }
-    else {
-        if (pfid) {
-            if (d) console.log('Will not initialize chat [branch:1]');
+            resolve(result);
+        };
+
+        if (window.megaChatIsReady) {
+            $.tresizer();
+            return __init_chat();
+        }
+        var mclp = MediaInfoLib.getMediaCodecsList();
+
+        if (action === 0x104DF11E5) {
+            M.require('chat')
+                .always(function() {
+                    mclp.always(__init_chat);
+                });
+        }
+        else if (anonymouschat) {
+            mclp.always(__init_chat);
+        }
+        else if (pfid) {
+            if (d) {
+                console.log('Will not initialize the chat (folder-link)');
+            }
+
+            resolve(EACCESS);
         }
         else {
             authring.onAuthringReady('chat').done(__init_chat);
         }
-    }
+    });
 }
 
 function loadfm_callback(res) {
@@ -3583,10 +3619,6 @@ function loadfm_callback(res) {
         }
         else {
             getsc(true);
-        }
-
-        if (hasMissingKeys) {
-            srvlog('Got missing keys processing gettree...', null, true);
         }
     });
 }
@@ -3889,7 +3921,7 @@ function fm_thumbnails(mode, nodeList, callback)
 
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;
 
-    if ((M.viewmode && !M.chat) || mode === 'standalone')
+    if (!M.chat || mode === 'standalone')
     {
         for (var i = 0; i < nodeList.length; i++) {
             var n = nodeList[i];

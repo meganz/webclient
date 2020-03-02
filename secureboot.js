@@ -56,7 +56,12 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
-var fetchStreamSupport = window.fetch && typeof ReadableStream === 'function' && typeof AbortController === 'function' && !window.MSBlobBuilder;
+self.fetchStreamSupport = (
+    window.fetch && !window.MSBlobBuilder
+    && typeof ReadableStream === 'function'
+    && typeof AbortController === 'function'
+    && typeof Object(AbortController.prototype).abort === 'function'
+);
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
     loadFailuresDefault: {},        // Count of failures on the EU static server per file
@@ -1813,6 +1818,11 @@ else if (!browserUpdate) {
             }
             if (__cdumps.length > 3) return false;
 
+            var expectedSourceOrigin = url || ln > 10;
+            if (url === '@srvlog') {
+                url = '';
+            }
+
             var dump = {
                 l: ln,
                 f: mTrim(url),
@@ -1869,10 +1879,12 @@ else if (!browserUpdate) {
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (url || ln > 10) {
-                    siteLoadError(dump.m, url + ':' + ln);
+                if (expectedSourceOrigin) {
+                    return siteLoadError(dump.m, url + ':' + ln);
                 }
-                else {
+            }
+
+            if (!expectedSourceOrigin) {
                     console.error(dump.m, arguments);
 
                     onIdle(function() {
@@ -1884,7 +1896,6 @@ else if (!browserUpdate) {
                             )
                         );
                     });
-                }
                 return;
             }
 
@@ -2249,6 +2260,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -2272,6 +2284,8 @@ else if (!browserUpdate) {
     jsl.push({f:'html/repay.html', n: 'repay', j:0 });
     jsl.push({f:'html/js/repay.js', n: 'repay_js', j:1 });
     jsl.push({f:'js/ui/passwordReminderDialog.js', n: 'prd_js', j:1,w:1});
+    jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
+    jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
@@ -2308,6 +2322,13 @@ else if (!browserUpdate) {
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
+        jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
+        jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
+        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Bottom pages for desktop
+        jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
@@ -2332,6 +2353,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
+    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -2385,7 +2407,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -2595,6 +2616,7 @@ else if (!browserUpdate) {
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
+        'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
@@ -2613,7 +2635,6 @@ else if (!browserUpdate) {
         'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
         'gdpr': {f:'html/gdpr.html', n: 'gdpr', j:0},
         'gdpr_js': {f:'html/js/gdpr.js', n: 'gdpr_js', j:1},
-        'mega': {f:'html/mega.html', n: 'mega', j:0},
         'terms': {f:'html/terms.html', n: 'terms', j:0},
         'backup': {f:'html/backup.html', n: 'backup', j:0},
         'backup_js': {f:'html/js/backup.js', n: 'backup_js', j:1},
@@ -2671,7 +2692,9 @@ else if (!browserUpdate) {
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
         'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
-        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0}
+        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
+        'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
     };
 
     var jsl3 = {
@@ -2732,7 +2755,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about'],
+        'about': ['about','about_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits'],
@@ -2744,6 +2767,7 @@ else if (!browserUpdate) {
         'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
         'register': ['register','register_js', 'zxcvbn_js'],
         'newsignup': ['register','register_js', 'zxcvbn_js'],
+        'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
         '!': ['download','download_js'],
         'dispute': ['dispute'],
@@ -2752,7 +2776,6 @@ else if (!browserUpdate) {
         'copyrightnotice': ['copyrightnotice','copyright_js'],
         'privacy': ['privacy','privacycompany'],
         'gdpr': ['gdpr', 'gdpr_js'],
-        'mega': ['mega'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
@@ -3521,6 +3544,9 @@ else if (!browserUpdate) {
                     if (parseInt(response) === -15 /* ESID */) {
                         loginresponse = -15;
                     }
+                    else if (parseInt(response) === -16 /* EBLOCKED */) {
+                        loginresponse = -16;
+                    }
                     else if (typeof response[0] === 'object') {
                         loginresponse = response;
                     }
@@ -3681,6 +3707,10 @@ else if (!browserUpdate) {
         }
         else if (loginresponse === -15) {
             u_logout(true);
+            boot_auth(null, false);
+        }
+        else if (loginresponse === -16) {
+            api_setsid(u_sid);
             boot_auth(null, false);
         }
         else if (loginresponse)
@@ -3852,13 +3882,17 @@ function lazy(target, property, stub) {
 
 function promisify(fc) {
     'use strict';
-    return function() {
+    var a$yncMethod = function() {
         var self = this;
         var args = toArray.apply(null, arguments);
         return new Promise(function(resolve, reject) {
-            fc.apply(self, [resolve, reject].concat(args));
+            a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
         });
     };
+    a$yncMethod.prototype = undefined;
+    Object.defineProperty(fc, '__method__', {value: a$yncMethod});
+    Object.defineProperty(a$yncMethod, '__function__', {value: fc});
+    return a$yncMethod;
 }
 
 mBroadcaster.once('startMega', function() {

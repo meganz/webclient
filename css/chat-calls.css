@@ -302,7 +302,7 @@ video.localViewport {
     -ms-transition: margin-top 400ms ease-in-out;
     transition: margin-top 400ms ease-in-out;
     display: table-cell;
-    font-size: 0;
+/*    font-size: 0; */
     vertical-align: middle;
 }
 
@@ -843,3 +843,14 @@ video.localViewport {
     left: 50%;
     margin: -35px 0 0 -35px;
 }
+.rtc-stats {
+    position: absolute; /* Sit on top of the page content */
+    width: 100%; /* Full width (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: white;
+    text-align: left;
+    z-index: 9; /* Buttons panel has z-index 10, and we need to have it on top of us */
+  }

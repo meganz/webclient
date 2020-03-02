@@ -554,8 +554,20 @@ function getID3CoverArt(entry) {
                     var frame = readFrame(offset);
                     if (frame.id === 'APIC') {
                         offset += 11;
-                        for (var x = 2; x--; offset++) {
-                            while (u8[offset++]) ;
+                        while (u8[offset++]) {}
+                        ++offset;
+                        if (u8[offset] === 0xFF && u8[offset + 1] === 0xFE
+                            || u8[offset] === 0xFE && u8[offset + 1] === 0xFF) {
+
+                            while (u8[offset]) {
+                                offset += 2;
+                            }
+                            offset += 3;
+                            frame.size += offset; // fixme..
+                        }
+                        else {
+                            while (u8[offset++]) {}
+                            ++offset;
                         }
                         result = u8.slice(--offset, frame.size);
                         break;
@@ -829,7 +841,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         var getTimeOffset = function(x) {
-            var maxduration = videoElement.duration;
+            var maxduration = streamer && streamer.duration || 0;
             var position = x - $progress.offset().left; // Click pos
             var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
             var selectedTime = Math.round(maxduration * percentage / 100);
@@ -1115,6 +1127,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
+
+            // Store the current time in session storage such that we can restore on reload.
+            sessionStorage.setItem('previewTime', streamer.currentTime);
         });
 
         /* Drag status */
@@ -1309,6 +1324,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             destroy = null;
         }
         options = Object.assign(Object.create(null), options);
+
+        // If a preview time is set, use it as the starting time.
+        if (sessionStorage.previewNode && sessionStorage.previewTime && sessionStorage.previewNode === node.h) {
+            options.startTime = sessionStorage.previewTime;
+        }
+        sessionStorage.removeItem('previewTime');
 
         if ($.playbackOptions) {
             String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
@@ -1989,7 +2010,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 db = new Dexie(dbname);
                 db.version(1).stores({kv: '&k'});
                 db.open().then(read).catch(console.warn.bind(console, dbname));
-                timer = setTimeout(apiReq, 800);
+                timer = setTimeout(apiReq, 1400);
 
                 // save the db name for our getDatabaseNames polyfill
                 localStorage['_$mdb$' + dbname] = 1;

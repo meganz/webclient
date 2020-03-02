@@ -446,8 +446,8 @@ body:not(.rtl) .default-white-button::first-letter {
     -moz-box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
     box-shadow: 0 0 0 4px rgba(62,136,126,0.4);
 }
-.default-white-button.small-text {
-    font-size: 13px;
+.default-white-button.small-text, .default-green-button.small-text  {
+    font-size: 13px !important;
 }
 .default-white-button::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.05);
@@ -1063,7 +1063,7 @@ body:not(.rtl) .default-white-button::first-letter {
 }
 .default-green-button.height-48 {
     height: 48px;
-    line-height: 47px;
+    line-height: 48px;
     font-size: 15px;
     display: inline-block;
 }

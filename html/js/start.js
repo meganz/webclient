@@ -6,14 +6,17 @@ function init_start() {
     var carouselInterval;
     var darkSliderInterval;
     var swipeInterval = 10000;
+    var $page = $('.bottom-page.scroll-block', '.fmholder');
 
     // Set prices for personal and business plans
     if (l[20624] && l[20624]) {
-        $('.startpage.plan-price.personal')
-            .safeHTML(l[20624].replace('%1', '<span class="price"><span class="big">4.</span>99 &euro;</span>'));
+        $('.startpage.plan-price.personal', $page)
+            .safeHTML(l[20624]
+                .replace('%1', '<span class="price"><span class="big">4.</span>99 &euro;</span>'));
 
-        $('.startpage.plan-price.business')
-            .safeHTML(l[20625].replace('%1', '<span class="price"><span class="big">10.</span>00 &euro;</span>'));
+        $('.startpage.plan-price.business', $page)
+            .safeHTML(l[20625]
+                .replace('%1', '<span class="price"><span class="big">10.</span>00 &euro;</span>'));
     }
 
     // Load the membership plans
@@ -27,46 +30,49 @@ function init_start() {
     });
 
     if (u_type > 0) {
-        $('.startpage.register:not(.business-reg)').text(l[164]);
-        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/fm');
-        
+        $('.startpage.register:not(.business-reg)', $page).text(l[164]);
+        $('.mid-green-link.register-lnk, .startpage.register', $page).attr('href', '/fm');
+
         if (is_mobile) {
-            $('.startpage.account').attr('href', '/fm/account');
+            $('.startpage.account', $page).attr('href', '/fm/account');
         }
         else {
-            $('.startpage.account').attr('href', '/fm/dashboard');
+            $('.startpage.account', $page).attr('href', '/fm/dashboard');
         }
         if (u_type === 3) {
-            $('.business-reg').addClass('hidden').attr('href', '');
+            $('.business-reg', $page).addClass('hidden').attr('href', '');
         }
     }
     else {
-        $('.mid-green-link.register-lnk, .startpage.register').attr('href', '/register');
-        $('.business-reg').removeClass('hidden').attr('href', '/registerb');
+        $('.mid-green-link.register-lnk, .startpage.register', $page).attr('href', '/register');
+        $('.business-reg', $page).removeClass('hidden').attr('href', '/registerb');
     }
 
-    $('.bottom-menu.logo').rebind('click.clickurl', function(e) {
+    $('.bottom-menu.body .logo', '.fmholder').rebind('click.clickurl', function(e) {
+        var $scrollableBlock;
+
         e.preventDefault();
 
         if (page === 'start') {
-            $('.fmholder, html, body').animate({ scrollTop: 0 }, 1600);
+            $scrollableBlock = is_mobile ? $(window) : $('.fmholder', 'body');
+            $scrollableBlock.animate({ scrollTop: 0 }, 1600);
         }
         else {
             loadSubPage('start');
         }
     });
 
-    // Init Scroll to Top button event
-    $('.startpage.scroll-to-top').rebind('click', function () {
-        if ($(this).hasClass('up')) { 
-            $('.fmholder, html, body').animate({
-                scrollTop: 0
-            }, 1600);
+    // Top banner controls init
+    $('.bottom-page.banner-control', $page).rebind('click.top-banner', function() {
+        var $banners = $('.bottom-page.top-banner', $page);
+
+        if ($banners.filter('.active').hasClass('banner1')) {
+            $banners.removeClass('active');
+            $banners.filter('.banner2').addClass('active');
         }
         else {
-            $('.fmholder, html, body').animate({
-                scrollTop: $('.bottom-page.content').outerHeight()
-            }, 1600);
+            $banners.removeClass('active');
+            $banners.filter('.banner1').addClass('active');
         }
     });
 
@@ -223,61 +229,6 @@ function init_start() {
 
         if (!$this.hasClass('active')) {
             showDarkSlide(slideNum);
-        }
-    });
-
-    // Init Animations
-    setTimeout(function() {
-        $('.startpage .bottom-page.top').addClass('start-animation');
-    },  700);
-
-    /**
-     * isVisibleBlock
-     *
-     * {Object} $row. DOM element which should be checked
-     */
-    function isVisibleBlock($row) {
-        if ($row.length === 0) {
-            return false;
-        }
-
-        var $window = $(window);
-        var elementTop = $row.offset().top;
-        var elementBottom = elementTop + $row.outerHeight();
-        var viewportTop = $window.scrollTop();
-        var viewportBottom = viewportTop + $window.outerHeight();
-
-        return elementBottom - 80 > viewportTop && elementTop  < viewportBottom;
-    }
-
-    /**
-     * showAnimated
-     */
-    function showAnimated() {
-        $('.animated').each(function() {
-            if (isVisibleBlock($(this))) {
-                if (!$(this).hasClass('start-animation')) {
-                    $(this).addClass('start-animation');
-                }
-            }
-            else if ($(this).hasClass('start-animation')) {
-                $(this).removeClass('start-animation');
-            }
-        });
-    }
-
-    showAnimated();
-
-    $('#startholder').add(window).rebind('scroll.startpage', function() {
-        if (page === 'start' || page === 'download') {
-
-            showAnimated();
-            if (!isVisibleBlock($('.bottom-page.light-blue.top, .bottom-page.top-bl'))) {
-                $('.startpage.scroll-to-top').addClass('up');
-            }
-            else {
-                $('.startpage.scroll-to-top').removeClass('up');
-            }
         }
     });
 
@@ -472,7 +423,10 @@ function start_countUpdate() {
         if (total.length === startCountRenderData[type].length) {
             for (var i = 0, len = total.length; i < len; i++) {
                 if (startCountRenderData[type][i] !== total[i]) {
-                    startCountRenderData[type + '_blocks'][i].textContent = total[i];
+                    var elm = startCountRenderData[type + '_blocks'][i];
+                    if (elm) {
+                        elm.textContent = total[i];
+                    }
                 }
             }
         }

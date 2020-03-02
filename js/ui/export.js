@@ -1461,6 +1461,13 @@ var exportExpiry = {
                 }
                 setCode();
             });
+            // Reset all numeric inputs under Share Options
+            $('.embed-code-container .settings-container .embed-setting').addClass('disabled');
+            $('.embed-code-container .settings-container input[type=number]').get().forEach(function(e) {
+                var $this = $(e);
+                $this.val($this.attr('value'));
+                $this.prop('readonly', true);
+            });
             $('.fm-dialog-tab', $linksDialog).removeClass('hidden');
 
             (function _() {

@@ -1,32 +1,7 @@
-.nw-fm-dialog-title, .fm-dialog-title {
-    font-size: 20px;
-    color: #333333;
-    line-height: 30px;
-    color: #666;
-    padding: 20px 48px 0 48px;
-    text-align: center;
-    min-height: 38px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: nowrap;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-}
-.fm-dialog-title.small {
-    font-family: 'LatoWeb', 'source_sans_proregular';
-    font-size: 16px;
-    line-height: 25px;
-    letter-spacing: -0.18px;
-    color: #666666;
-}
-.fm-dialog-title.top-pad {
-    padding-top: 30px;
-}
-.contrast .fm-dialog-title {
-    color: #333333;
-}
+/**
+ * Dialogs CSS for desktop devices.
+ */
+
 .fm-dialog .bottom-bar-link {
     float: left;
     margin: 19px 0 0 0;
@@ -391,7 +366,7 @@ body.de .fm-dialog.new-group-chat {
     height: 24px;
     display: block;
     background-position: -6px -474px;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -1966,7 +1941,8 @@ li.token-input-token-invite .input-close {
 }
 /* End of Invitation status dialog */
 
-.fm-dialog.create-folder-dialog {
+.fm-dialog.create-folder-dialog,
+.fm-dialog.create-file-dialog {
     width: 402px;
     margin: -96px 0 0 -201px;
 }
@@ -3050,7 +3026,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -3480,11 +3456,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v8.png);
+    background-image: url(../images/mega/dialog-sprite_v9.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v8.png);
+    background-image: url(../images/mega/dialog-sprite_v9.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -4530,7 +4506,7 @@ li.token-input-token-invite .input-close {
     bottom: 0;
     left: 50%;
     margin: 0 0 0 -61px;
-    background-image: url(../images/mega/dialog-sprite_v8.png);
+    background-image: url(../images/mega/dialog-sprite_v9.png);
 }
 .verify-ph-icon {
     background-position: -19px -6008px;
@@ -4934,9 +4910,10 @@ body.en .register-side-pane.container.visible {
     text-align: center;
 }
 .register-side-pane.top-block.wide {
-    background-position: 0 -469px;
+    background-size: 728px;
+    background-position: 0 -588px;
     height: 191px;
-    margin-bottom: -11px;
+    margin-bottom: -20px;
 }
 .register-side-pane.top-bg {
     background-image: url(../images/mega/register-sprite_v2.png);
@@ -4990,7 +4967,7 @@ body.en .register-side-pane.container.visible {
 }
 .fm-dialog .register-side-pane.header {
     min-width: 330px;
-    padding: 0 30px 14px 30px;
+    padding: 0 30px 24px 30px;
     font-size: 24px;
 }
 .register-side-pane.header span {
@@ -5127,10 +5104,10 @@ body.en .register-side-pane.container.visible {
     z-index: 1180;
     top: 50%;
     left: 50%;
-    width: 596px;
-    margin: -288px 0 0 -298px;
+    width: 728px;
+    margin: -288px 0 0 -364px;
     text-align: center;
-    border-radius: 16px;
+    border-radius: 24px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
 }
 .pro-register-dialog .fm-dialog-body {
@@ -5160,11 +5137,13 @@ body.en .register-side-pane.container.visible {
     margin: 8px 11px 0 0;
 }
 .pro-register-dialog .account.checkbox-block {
-    padding: 19px 0 0 0;
+    width: 105%;
+    padding: 12px 0 0 0;
 }
 .pro-register-dialog .button {
     cursor: pointer;
-    margin-top: 11px;
+    margin-top: 32px;
+    padding: 0 32px;
     display: inline-block;
     left: 50%;
     transform: translateX(-50%);
@@ -5196,6 +5175,147 @@ body.en .register-side-pane.container.visible {
 .pro-register-paypal-dialog .reg-success-icon.unionpay, .payment-confirmation .icon.unionpay {
     background-position: center -846px;
 }
+/* end of Register */
+
+/* Email verification required */
+.fm-dialog.verify-email {
+    width: 360px;
+    margin: -236px 0 0 -180px;
+}
+.verify-email.header {
+    height: 240px;
+    background: #ff6464;
+    background: -moz-linear-gradient(top, #ff6464 0%, #cf4949 100%);
+    background: -webkit-linear-gradient(top, #ff6464 0%,#cf4949 100%);
+    background: linear-gradient(to bottom, #ff6464 0%,#cf4949 100%);
+    border-radius: 23px 23px 0 0;
+}
+.verify-email.header-txt {
+    font-size: 15px;
+    line-height: 20px;
+    color: white;
+    padding: 16px 20px 30px 20px;
+    text-align: center;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold';
+    letter-spacing: 0;
+}
+.verify-email.header-txt.grey {
+    color:  #111;
+    padding: 16px 0 8px 0;
+}
+.dialog-top-icon.yellow-triangle {
+    background-position: center -6411px;
+    width: 160px;
+    height: 140px;
+    margin: 0 auto;
+}
+.verify-email.body {
+    padding: 24px 30px 36px 30px;
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+}
+.verify-email.body .text {
+    color: #333;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 0 0 20px 0;
+    padding: 0;
+    position: relative;
+}
+.verify-email.body .text strong {
+    font-weight: normal;
+    font-family: 'LatoWebBold', 'source_sans_prosemibold';
+}
+.verify-email.body .text.small {
+    font-size: 13px;
+    letter-spacing: 0;
+}
+.verify-email.body .text.red {
+    color: #F0373A;
+    font-size: 13px;
+    letter-spacing: 0.93px;
+    display: inline-block;
+    margin-bottom: 24px;
+}
+.verify-email.body .default-green-button {
+    min-width: 128px;
+}
+.verify-email .status-txt {
+    font-size: 12px;
+    line-height: 20px;
+    color: #666;
+    position: absolute;
+    width: 100%;
+    bottom: 7px;
+    left: 0;
+}
+.dialog-top-icon.locked-account {
+    background-position: center -6594px;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+}
+.verify-email .dropdown.body {
+    width: 320px;
+    bottom: 25px;
+    left: 50%;
+    margin: 0 0 0 -160px;
+    border-radius: 6px;
+    padding: 27px 12px 12px 12px;
+    visibility: hidden;
+    opacity: 0;
+     -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out, bottom 200ms ease-in-out;
+    cursor: default;
+}
+.verify-email.body .text.red {
+    cursor: pointer;
+}
+.verify-email.body .text.red .dropdown.body::after {
+    content: '';
+    bottom: -10px;
+    left: 0;
+    height: 34px;
+    position: absolute;
+    width: 100%;
+}
+.verify-email.body .text.red:hover .dropdown.body {
+    visibility: visible;
+    opacity: 1;
+    bottom: 29px;
+}
+.verify-email .dropdown.body .text:last-child {
+    margin: 0;
+}
+/*end of  Email verification required */
+
+/* Login to account  if accout has bee suspended */
+.fm-dialog.type-480px227 {
+    width: 480px;
+    margin: -227px 0 0 -240px;
+}
+.login-set-pass.body {
+    padding: 22px 35px 35px 35px;
+    font-size: 13px;
+    line-height: 20px;
+    color: #333;
+    text-align: center;
+}
+.login-set-pass .dialog-top-icon.locked-account {
+    margin-bottom: 15px;
+}
+.login-set-pass .text {
+    padding: 2px 0 18px 0;
+}
+.login-set-pass .dialog-login-form {
+    margin-top: 9px;
+}
+.login-set-pass .button {
+    margin-top: 10px;
+}
+/* end of Login to account  if accout has bee suspended */
+
 /*Business password change dialog*/
 .user-management-dialog.bus-pw-reset {
     width: 560px;
@@ -5246,3 +5366,10 @@ body.en .register-side-pane.container.visible {
     margin-right: 4px;
 }
 /* End of Business password change dialog */
+.fm-picker-dialog .summary-input #f-name-input {
+    border: none;
+    width: 365px;
+    max-width: 365px;
+    padding: initial;
+    height: 31px;
+}

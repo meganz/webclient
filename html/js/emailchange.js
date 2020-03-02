@@ -36,25 +36,47 @@ var emailchange = (function() {
             });
         }
 
-        $input = $('#verify-password');
-        $input.rebind('focus', function() {
+        loadingDialog.show();
 
-            $('.login-register-input.password.first').removeClass('incorrect');
-            $('.login-register-input.password.confirm').removeClass('incorrect');
-            $('.login-register-input.password').addClass('focused');
-        });
+        // Check if the code is valid using 'Email Request Service' API call
+        api_req({ 'a': 'ersv', 'c': context.code }, { callback: function(res) {
 
-        $input.rebind('keyup', function(event) {
+            loadingDialog.hide();
 
-            if (event.keyCode == 13) {
-                ns.verify();
+            if (checkError(res)) {
+                return;
             }
-        });
 
-        $('.restore-verify-button').rebind('click', function() {
+            if (u_attr.u !== res[4]) {
+                return msgDialog('warninga', l[135], l[23046],  false, function() {
+                    loadSubPage('fm');
+                });
+            }
 
-            ns.verify();
-        });
+            // Receive the old email address and verify the password they typed is correct.
+            // If it is correct, then we update the user hash with the new email address.
+            context.email = res[1];
+
+            $input = $('#verify-password');
+            $input.rebind('focus', function() {
+
+                $('.login-register-input.password.first').removeClass('incorrect');
+                $('.login-register-input.password.confirm').removeClass('incorrect');
+                $('.login-register-input.password').addClass('focused');
+            });
+
+            $input.rebind('keyup', function(event) {
+
+                if (event.keyCode === 13) {
+                    ns.verify();
+                }
+            });
+
+            $('.restore-verify-button').rebind('click', function() {
+
+                ns.verify();
+            });
+        }});
     };
 
     /**
@@ -95,33 +117,6 @@ var emailchange = (function() {
         });
 
         return true;
-    }
-
-    /**
-     * Verify if a given password is the user's password. If everything is correct, we attempt to verify the email.
-     *
-     * In the old method, we use the new email address to generate a new "login hash" (email + password AES),
-     * without the step the current user won't be able to login with their new email address.
-     *
-     * @param {String} password The password from the form
-     */
-    function verifyEmailCallback(password) {
-
-        // If the user's Account Authentication Version is set for the new registration process (version 2)
-        if (u_attr.aav === 2) {
-
-            // Derive the keys from the password
-            security.getDerivedEncryptionKey(password, function(derivedEncryptionKeyArray32) {
-                continueEmailVerification(derivedEncryptionKeyArray32);
-            });
-        }
-        else {
-            // Derive the key from the password using the old method
-            var derivedEncryptionKeyArray32 = prepare_key_pw(password);
-
-            // Continue the verification
-            continueEmailVerification(derivedEncryptionKeyArray32);
-        }
     }
 
     /**
@@ -205,18 +200,16 @@ var emailchange = (function() {
 
             $input.val('');
 
-            // Check if the code is valid using 'Email Request Service' API call
-            api_req({ 'a': 'ersv', 'c': context.code }, { callback: function(res) {
-
-                if (checkError(res)) {
-                    return;
-                }
-
-                // Receive the old email address and verify the password they typed is correct.
-                // If it is correct, then we update the user hash with the new email address.
-                context.email = res[1];
-                verifyEmailCallback(password);
-            }});
+            // Verify if a given password is the user's password.
+            // If everything is correct, we attempt to verify the email.
+            security.getDerivedEncryptionKey(password)
+                .then(function(derivedKey) {
+                    continueEmailVerification(derivedKey);
+                })
+                .catch(function(ex) {
+                    console.warn(ex);
+                    continueEmailVerification('');
+                });
         }
 
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');

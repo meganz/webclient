@@ -244,6 +244,9 @@ mobile.slideshow = {
         // Show the dialog
         mobile.slideshow.$overlay.removeClass('hidden');
 
+        // Update preview state.
+        sessionStorage.setItem('previewNode', nodeHandle);
+
         if (is_video(node)) {
             var videoHtmlTemplate = $('.mobile-video-template');
             var videoHtmlDiv = videoHtmlTemplate.html();
@@ -531,6 +534,8 @@ mobile.slideshow = {
         mobile.slideshow.cleanupCurrentlyViewedInstance();
         mobile.slideshow.$overlay.find('.slides.mid img').remove();
         mobile.slideshow.$overlay.find('.slides.mid').prepend('<img alt="" /></div>');
+        sessionStorage.removeItem('previewNode');
+        sessionStorage.removeItem('previewTime');
     },
 
     /**

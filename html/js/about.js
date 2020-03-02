@@ -11,7 +11,9 @@ var aboutus = {
 
         aboutus.openSubSection($page);
         this.randomMemberOrderMix($page);
-        this.dynamicCount($page);
+        if (page === 'about/main') {
+            this.dynamicCount($page);
+        }
     },
 
     /**

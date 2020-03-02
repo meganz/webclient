@@ -217,6 +217,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
             return false;
         }
     }
+    _isUserRegistered() {
+        return typeof u_type !== 'undefined' && u_type > 2;
+    }
     _isNodeHavingALink(h) {
         return M.getNodeShare(h) !== false;
     }
@@ -628,12 +631,25 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
                                     {previewButton}
                                     <hr/>
-                                    <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                              onClick={self._startDownload.bind(self, v)}/>
-                                    <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
-                                                              onClick={self._addToCloudDrive.bind(self, v, false)}/>
-                                    <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
-                                                              onClick={self._addToCloudDrive.bind(self, v, true)}/>
+                                    <DropdownsUI.DropdownItem
+                                        icon="rounded-grey-down-arrow"
+                                        label={__(l[1187])}
+                                        onClick={self._startDownload.bind(self, v)}
+                                    />
+                                    {self._isUserRegistered() &&
+                                        <React.Fragment>
+                                            <DropdownsUI.DropdownItem
+                                                icon="grey-cloud"
+                                                label={__(l[1988])}
+                                                onClick={self._addToCloudDrive.bind(self, v, false)}
+                                            />
+                                            <DropdownsUI.DropdownItem
+                                                icon="conversations"
+                                                label={__(l[17764])}
+                                                onClick={self._addToCloudDrive.bind(self, v, true)}
+                                            />
+                                        </React.Fragment>
+                                    }
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>;
                         }

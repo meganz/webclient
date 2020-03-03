@@ -7,6 +7,8 @@
 # From inside your local webclient directory, run:
 # ./scripts/lang.sh
 
+arg1=$1
+
 # Change to the lang directory
 cd $(dirname $BASH_SOURCE)/../lang
 
@@ -32,16 +34,21 @@ find . -type f -not -name '*_prod.json' -not -name 'lang.tar.gz' -delete
 tar xfvzm lang.tar.gz
 
 # Display any errors from Babel e.g. missing strings to the console
-cat error.json
+if [[ "$arg1" != "--ignore-errors" ]]; then
+    cat error.json
 
-# If the error.json file does not exist, then this command will fail which is fine, so continue as normal
-if [ $? -ne 0 ]; then
+    # If the error.json file does not exist, then this command will fail which is fine, so continue as normal
+    if [ $? -ne 0 ]; then
 
-    echo "No errors from Babel, continuing as normal..."
-else
-    echo
-    echo "ERROR: There are errors above with the language strings from Babel."
-    exit 1
+        echo "No errors from Babel, continuing as normal..."
+    else
+        echo
+        echo "ERROR: There are errors above with the language strings from Babel."
+
+        if [[ "$arg1" != "--continue-on-errors" ]]; then
+            exit 1
+        fi
+    fi
 fi
 
 # Remove unnecessary files

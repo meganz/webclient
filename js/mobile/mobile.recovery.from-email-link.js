@@ -33,9 +33,9 @@ mobile.recovery.fromEmailLink = {
     verifyRecoveryCode: function() {
 
         'use strict';
-        
+
         // Get the code from the URL
-        this.recoveryCode = page.replace('recover', '');
+        this.recoveryCode = sessionStorage.recoveryCode = page.replace('recover', '');
 
         // Show loading spinner
         loadingDialog.show();
@@ -75,7 +75,7 @@ mobile.recovery.fromEmailLink = {
                             return;
                         }
                         // Store the email from the request
-                        mobile.recovery.fromEmailLink.recoveryEmail = result[1];
+                        mobile.recovery.fromEmailLink.recoveryEmail = sessionStorage.recoveryEmail = result[1];
 
                         // Load the page to enter or upload their Master/Recovery Key
                         loadSubPage('recoveryenterkey');
@@ -95,7 +95,7 @@ mobile.recovery.fromEmailLink = {
                         }
 
                         // Store the email from the request
-                        mobile.recovery.fromEmailLink.recoveryEmail = result[1];
+                        mobile.recovery.fromEmailLink.recoveryEmail = sessionStorage.recoveryEmail = result[1];
 
                         // Load the page to change their password and complete the parking process
                         loadSubPage('recoveryparkchangepass');

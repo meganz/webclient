@@ -5886,6 +5886,7 @@ select.mobile.dropdown-style {
     letter-spacing: .1px;
     margin: 0 auto;
     font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    padding: 0 15px;
 }
 .securitypractice .mobile.cta-button {
     margin: 0 auto;
@@ -12811,6 +12812,52 @@ p a.blog-new-read-more {
     opacity: 0.3;
 }
 
+.orange-notification .fvnotice {
+    background-position: -233px -1666px;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin-top: 4px;
+}
+.orange-notification.body {
+    display: table;
+    background-color: rgba(191,74,0,0.05);
+    -webkit-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 16px 0 12px;
+    margin-left: 1px;
+    margin-top: 20px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: calc(100% - 2px);
+}
+.orange-notification.body.hidden {
+    display: none;
+}
+.orange-notification.cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: #FF6F00;
+    font-size: 13px;
+    line-height: 18px;
+}
+.argentina-only .orange-notification.cell {
+    padding: 6px;
+}
+.orange-notification.cell.text {
+    padding: 5px 0;
+}
+.orange-notification .fvnotice {
+    background-position: -3px -1727px;
+}
+.membership-info-pad .orange-notification.body {
+    margin-top: 130px;
+}
 
 /*
  * Retina Sprite for mobile

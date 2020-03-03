@@ -356,13 +356,6 @@ function init_page() {
         return false;
     }
 
-    // Block about page in Mobile Webclient temporarily
-    // We would remove it till we finish the new about page and support mobile version of it
-    if (is_mobile && page === 'about') {
-        loadSubPage('startpage');
-        return false;
-    }
-
     if (!page.match(/^(blog|help|corporate|fm\/recents|page_)/)) {
         $('.top-head').remove();
     }
@@ -1099,15 +1092,8 @@ function init_page() {
         }
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
-        if (page.length > 9) {
-            var pageParams = page.substr(9);
-            if (pageParams.length > 14) {
-                var uaoParam = pageParams.indexOf('/uao=');
-                if (uaoParam > -1) {
-                    mega.uaoref = pageParams.substr(uaoParam + 5);
-                }
-            }
-        }
+        getUAOParameter(page, 'registerb');
+
         parsepage(pages['registerb']);
         $('body').addClass('business');
         var regBusiness = new BusinessRegister();
@@ -1376,36 +1362,9 @@ function init_page() {
             dev_init('sdk');
         }
     }
-    else if (page == 'about') {
-        loadingDialog.show();
-        CMS.get("team", function (err, content) {
-            parsepage(pages['about']);
-
-            var html = '';
-            var a = 4;
-
-            $('.new-bottom-pages.about').safeHTML(content.html);
-            $('.team-person-block').sort(function () {
-                return (Math.round(Math.random()) - 0.5);
-            }).each(function (i, element) {
-                if (a == 4) {
-                    html += element.outerHTML.replace('team-person-block', 'team-person-block first');
-                    a = 0;
-                }
-                else {
-                    html += element.outerHTML;
-                }
-                a++;
-            });
-
-            $('#emailp').safeHTML($('#emailp').text().replace('jobs@mega.nz',
-                '<a href="mailto:jobs@mega.nz">jobs@mega.nz</a>'));
-            $('.new-bottom-pages.about').safeHTML(html + '<div class="clear"></div>');
-            topmenuUI();
-            loadingDialog.hide();
-
-        });
-        return;
+    else if (page.substr(0, 5) === 'about') {
+        parsepage(pages.about);
+        aboutus.init();
     }
     else if (page === 'sourcecode') {
         parsepage(pages['sourcecode']);
@@ -1514,8 +1473,9 @@ function init_page() {
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
         pro.proplan.processReturnUrlFromProvider(page);
     }
-    else if (page === 'repay') {
+    else if (page.substr(0, 5) === 'repay') {
         if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+            getUAOParameter(page, 'repay');
             parsepage(pages['repay']);
             var repayPage = new RepayPage();
             repayPage.initPage();

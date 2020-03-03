@@ -11535,7 +11535,7 @@ table {
 }
 .account.learn-more {
     height: 21px;
-    font-family: Lato-Medium;
+    font-family: LatoWebSemibold;
     font-size: 13px;
     color: #F0373A;
     letter-spacing: 0.93px;
@@ -12986,84 +12986,6 @@ p.privacy-list {
     background-image: url(../images/mega/terms-icons.png);
     background-position: -2px -406px;
     background-repeat: no-repeat;
-}
-.new-bottom-pages.about {
-    font-size: 0;
-    width: 1070px;
-}
-.team-person-block {
-    display: inline-block;
-    vertical-align: top;
-    height: 267px;
-    margin: 30px 0 10px 0;
-    width: 25%;
-}
-.team-person-avatar {
-    width: 160px;
-    height: 160px;
-    margin:  0 auto;
-    border: 2px solid #d9d9d9;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    padding: 2px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    background-color: white;
-    overflow: hidden;
-}
-.team-person-avatar img {
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    width: 152px;
-}
-.team-person-name {
-    text-align: center;
-    color: #D32700;
-    font-family: 'Open Sans Semibold Italic';
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: -0.1px;
-    padding-top: 10px
-}
-.team-person-occupation {
-    font-size: 14px;
-    text-align: center;
-    line-height: 18px;
-    color: #666666;
-}
-.team-social-bl {
-    text-align: center;
-    padding-top: 8px;
-    height: 30px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.team-social-icon {
-    width: 22px;
-    height: 22px;
-    display: inline-block;
-    background-image: url(../images/mega/about-sprite.png);
-    background-repeat: no-repeat;
-    margin: 0 5px;
-}
-.team-social-icon.twitter {
-    background-position: left top;
-}
-.team-social-icon.linkedin {
-    background-position: -50px top;
-}
-.team-social-icon.twitter:hover {
-    background-position: left -50px;
-}
-.team-social-icon.linkedin:hover {
-    background-position: -50px -50px;
-}
-.team-social-icon.hidden {
-    display: none;
 }
 .browsers-mid {
     min-height: 434px;
@@ -15047,6 +14969,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -khtml-toast-notification: 1;
     opacity: 1;
     visibility: visible;
+    z-index: 11;
 }
 .selection-status-bar span {
     font-size: 14px;

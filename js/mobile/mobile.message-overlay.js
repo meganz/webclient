@@ -90,8 +90,6 @@ mobile.messageOverlay = {
                 .find('.second').removeClass('hidden').rebind('tap', reject).find('span').text(cancelButton);
         }
         else {
-            $('.text-button.cancel', $overlay).removeClass('hidden');
-
             $buttons.removeClass('inline-buttons')
                 .find('.first').addClass('red-button').removeClass('green-button').text(l[1596]).end()
                 .find('.second').addClass('hidden');

@@ -136,7 +136,7 @@ mobile.recovery.changePassword = {
             if (!$updateButton.hasClass('active')) {
                 return false;
             }
-            
+
             // Get the current text field values
             var password = $passwordField.val();
             var confirmPassword = $confirmPasswordField.val();
@@ -240,8 +240,8 @@ mobile.recovery.changePassword = {
         'use strict';
 
         // Get details from previous steps in the process
-        var recoveryEmail = mobile.recovery.fromEmailLink.recoveryEmail;
-        var recoveryCode = mobile.recovery.fromEmailLink.recoveryCode;
+        var recoveryEmail = mobile.recovery.fromEmailLink.recoveryEmail || sessionStorage.recoveryEmail;
+        var recoveryCode = mobile.recovery.fromEmailLink.recoveryCode || sessionStorage.recoveryCode;
 
         loadingDialog.show();
 
@@ -258,6 +258,10 @@ mobile.recovery.changePassword = {
 
                     // Pre-fill the email on the login page
                     mobile.signin.previousEmailUsed = recoveryEmail;
+
+                    // Clear session storage variables.
+                    sessionStorage.removeItem('recoveryEmail');
+                    sessionStorage.removeItem('recoveryCode');
 
                     // Load the login page
                     loadSubPage('login');

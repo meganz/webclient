@@ -7627,11 +7627,23 @@ function (_MegaRenderMixin2) {
             return;
           }
 
+          if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
+            return;
+          }
+
           entries.push(n);
         });
       } else {
         Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach(function (h) {
-          M.d[h] && entries.push(M.d[h]);
+          if (M.d[h]) {
+            if (self.props.customFilterFn) {
+              if (self.props.customFilterFn(M.d[h])) {
+                entries.push(M.d[h]);
+              }
+            } else {
+              entries.push(M.d[h]);
+            }
+          }
         });
       }
 
@@ -9072,6 +9084,7 @@ function (_MegaRenderMixin) {
           self.setState({
             typedMessage: ""
           });
+          $(document).trigger('closeDropdowns');
         }
 
         e.preventDefault();
@@ -11665,11 +11678,10 @@ function (_ConversationMessageM) {
                 console.warn('Unable to inject nodes... no longer existing?', res);
               }
             } else {
-              if (target === M.RootID) {
-                // since if the user clicks Save without picking, its a bit weird, where the file went
-                // we show a simple dialog telling him the file is in Cloud Drive.
-                msgDialog('info', l[8005], l[8006]);
-              }
+              msgDialog('info', l[8005], // Confirmation message based on the selected location.
+              // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+              // b) `Attachment added to %s.`
+              target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name)));
             }
           });
         }
@@ -11860,11 +11872,12 @@ function (_ConversationMessageM) {
                 }
 
                 var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
+                var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
                 previewButton = external_React_default.a.createElement("span", {
                   key: "previewButton"
                 }, external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
-                  icon: "search-icon",
                   label: previewLabel,
+                  icon: previewIcon,
                   onClick: self._startPreview.bind(self, v)
                 }));
               }
@@ -13357,8 +13370,18 @@ function (_MegaRenderMixin) {
   }
 
   sharedFilesAccordionPanel_createClass(SharedFileItem, [{
+    key: "handlePreview",
+    value: function handlePreview(_ref) {
+      var nodeHash = _ref.h,
+          nodeChatHandle = _ref.ch;
+      $.autoplay = nodeHash;
+      slideshow(nodeChatHandle, undefined, true);
+    }
+  }, {
     key: "render",
     value: function render() {
+      var _this = this;
+
       var self = this;
       var message = this.props.message;
       var contact = Message.getContactForMessage(message);
@@ -13369,15 +13392,11 @@ function (_MegaRenderMixin) {
       return sharedFilesAccordionPanel_React.makeElement("div", {
         className: "chat-shared-block " + (self.props.isLoading ? "is-loading" : ""),
         key: message.messageId + "_" + node.h,
-        onClick: function onClick(e) {
-          if (self.props.isPreviewable) {
-            slideshow(node.ch, undefined, true);
-          } else {
-            M.addDownload([node]);
-          }
+        onClick: function onClick() {
+          return _this.props.isPreviewable ? _this.handlePreview(node) : M.addDownload([node]);
         },
-        onDoubleClick: function onDoubleClick(e) {
-          M.addDownload([node]);
+        onDoubleClick: function onDoubleClick() {
+          return M.addDownload([node]);
         }
       }, sharedFilesAccordionPanel_React.makeElement("div", {
         className: "icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")
@@ -16125,13 +16144,15 @@ function (_MegaRenderMixin3) {
       }
 
       if (!prevState.renameDialog && self.state.renameDialog === true) {
-        var $input = $('.chat-rename-dialog input');
+        Soon(function () {
+          var $input = $('.chat-rename-dialog input');
 
-        if ($input && $input[0] && !$($input[0]).is(":focus")) {
-          $input.trigger("focus");
-          $input[0].selectionStart = 0;
-          $input[0].selectionEnd = $input.val().length;
-        }
+          if ($input && $input[0] && !$($input[0]).is(":focus")) {
+            $input.trigger("focus");
+            $input[0].selectionStart = 0;
+            $input[0].selectionEnd = $input.val().length;
+          }
+        });
       }
 
       if (prevState.editing === false && self.state.editing !== false) {
@@ -19152,6 +19173,7 @@ Chat.prototype.renderListing = function () {
         }
       } else {
         $('.fm-empty-conversations').removeClass('hidden');
+        self.displayArchivedChats = false;
       }
     }
   }
@@ -20582,6 +20604,20 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
   'LEFT': -1
 };
 
+ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants) {
+  var isPublic = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+  if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
+    var topic = protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, isPublic);
+
+    if (topic) {
+      return base64urlencode(topic);
+    }
+  }
+
+  return false;
+};
+
 ChatRoom.MembersSet.prototype.trackFromActionPacket = function (ap, isMcf) {
   var self = this;
   var apMembers = {};
@@ -20967,7 +21003,7 @@ ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
   newTopic = allowEmpty ? newTopic : String(newTopic);
   var masterPromise = new MegaPromise();
 
-  if ((allowEmpty || $.trim(newTopic).length > 0) && newTopic !== self.getRoomTitle()) {
+  if ((allowEmpty || newTopic.trim().length > 0) && newTopic !== self.getRoomTitle()) {
     self.scrolledToBottom = true;
     var participants = self.protocolHandler.getTrackedParticipants();
     var promises = [];
@@ -21527,7 +21563,7 @@ ChatRoom.prototype.attachNodes = function (ids) {
   ids.forEach(function (nodeId) {
     var proxyPromise = new MegaPromise();
 
-    if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+    if (M.d[nodeId] && (M.d[nodeId].u !== u_handle || M.getNodeRoot(nodeId) === "shares")) {
       // I'm not the owner of this file.
       // can be a d&d to a chat or Send to contact from a share
       M.myChatFilesFolder.get(true).then(function (myChatFilesFolder) {

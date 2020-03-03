@@ -100,6 +100,7 @@ var redeem = {
 
             if (is_mobile) {
                 var $overlay = $('#mobile-ui-error .white-block');
+                $('.third', $overlay).removeClass('hidden');
                 $('.third span', $overlay).text(l[20131]);
                 $('.first', $overlay).addClass('green-button');
             }
@@ -645,7 +646,7 @@ var redeem = {
             $('.close-voucher-redeem', $dlg).off('click').on('click',
                 function() {
                     if (is_mobile) {
-                        loadSubPage('');
+                        loadSubPage('redeem');
                     }
                     else {
                         closeDialog();

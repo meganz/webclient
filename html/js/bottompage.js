@@ -8,6 +8,7 @@ var bottompage = {
      */
     init: function() {
         "use strict";
+        var $content = $('.bottom-page.scroll-block', '.fmholder');
 
         bottompage.initNavButtons();
         if (page.substr(0, 4) === 'help' || page === 'cpage' || page.substr(0, 9) === 'corporate') {
@@ -18,22 +19,27 @@ var bottompage = {
             $('body').removeClass('old');
         }
 
+        // Init animations
+        if ($content.hasClass('animated-page')) {
+            bottompage.initAnimations($content);
+        }
+
         // Init Slider for business page
         if (page === 'business') {
             bottompage.initSlider();
         }
         if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $('.bottom-menu.body .resellerlink').hide(); // hidden class is overwritten
-            $('.bottom-menu.body .pro-link').hide(); // hidden class is overwritten
+            $('.bottom-menu.body .resellerlink', $content).addClass('hidden');
+            $('.bottom-menu.body .pro-link', $content).addClass('hidden');
         }
         else {
-            $('.bottom-menu.body .resellerlink').show();
-            $('.bottom-menu.body .pro-link').show();
+            $('.bottom-menu.body .resellerlink', $content).removeClass('hidden');
+            $('.bottom-menu.body .pro-link', $content).removeClass('hidden');
         }
 
         // Insert variables with replaced browser names
         if (page === 'extensions' || page === 'bird') {
-            bottompage.replaceSpecialVariables();
+            bottompage.replaceSpecialVariables($content);
         }
 
         // Init Video resizing on security page
@@ -63,19 +69,103 @@ var bottompage = {
         }
     },
 
-    replaceSpecialVariables: function() {
+    /**
+     * Init Animated blocks
+     * @param {Object} $content The jQuery selector for the current page
+     * @returns {void}
+     */
+    initAnimations: function($content) {
         "use strict";
 
-        var $topBlock = $('.bottom-page.top-bl');
+        var $scrollableBlock = is_mobile ? $('html') : $('.fmholder', 'body');
 
-        $topBlock.find('.top-dark-button span, .top-copyrights em').each(function() {
-            var $this = $(this);
-            var labelNum = $(this).text().match(/\$([^)]+)\]/);
+        // Init top-block animations
+        setTimeout(function() {
+            $content.addClass('start-animation');
+        }, 700);
+
+        var isVisibleBlock = function($row) {
+            if ($row.length === 0) {
+                return false;
+            }
+
+            var $window = $(window);
+            var elementTop = $row.offset().top;
+            var elementBottom = elementTop + $row.outerHeight();
+            var viewportTop = $window.scrollTop();
+            var viewportBottom = viewportTop + $window.outerHeight();
+
+            return elementBottom - 80 > viewportTop && elementTop < viewportBottom;
+        };
+
+        var showAnimated = function($content) {
+            var $blocks = $('.animated, .fadein', $content);
+
+            for (var i = $blocks.length - 1; i >= 0; i--) {
+
+                var $block = $($blocks[i]);
+
+                if (isVisibleBlock($block)) {
+                    if (!$block.hasClass('start-animation')) {
+                        $block.addClass('start-animation');
+                    }
+                }
+                else if ($block.hasClass('start-animation')) {
+                    $block.removeClass('start-animation');
+                }
+            }
+        };
+
+        showAnimated($content);
+
+        $scrollableBlock.add(window).rebind('scroll.startpage', function() {
+            var $scrollTop = $('.scroll-to-top', $content);
+            showAnimated();
+
+            if (isVisibleBlock($('.bottom-page.light-blue.top, .bottom-page.top-bl', $content))) {
+                $scrollTop.removeClass('up');
+            }
+            else {
+                $scrollTop.addClass('up');
+            }
+        });
+
+        // Init Scroll to Top button event
+        $('.scroll-to-top:visible', $content).rebind('click.scroll', function() {
+
+            if ($(this).hasClass('up')) {
+                $scrollableBlock.animate({
+                    scrollTop: 0
+                }, 1600);
+            }
+            else {
+                $scrollableBlock.animate({
+                    scrollTop: $('.bottom-page.content', $content).outerHeight()
+                }, 1600);
+            }
+        });
+    },
+
+    /**
+    * replaceSpecialVariable
+    * Replaces custom locale variables in HTML
+    * @param {Object} $content The jQuery selector for the current page
+    * @returns {void}
+    */
+    replaceSpecialVariables: function($content) {
+        "use strict";
+
+        var $topBlock = $('.top-bl', $content);
+        var $elems = $('.top-dark-button span, .top-copyrights em', $topBlock);
+
+        for (var i = 0; i < $elems.length; i++) {
+            var $this = $($elems[i]);
+            var labelNum = $this.text().match(/\$([^)]+)]/);
 
             if (labelNum[1] && l[labelNum[1]]) {
                 $this.safeHTML(l[labelNum[1]]);
             }
-        });
+        }
     },
 
     initBackToScroll: function() {

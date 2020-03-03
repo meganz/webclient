@@ -7,7 +7,7 @@ function BusinessAccountUI() {
         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
-        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler);
+        mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler.bind(this));
         this.initialized = false;
     }
     else {
@@ -118,6 +118,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
 
     var mySelf = this;
+    this.business.hasSubs = false;
 
     var subAccountsView;
     if (!isBlockView) {
@@ -134,6 +135,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
     }
+    this.business.hasSubs = true;
 
     loadingDialog.pshow();
 
@@ -2294,21 +2296,21 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         myPage = translate(myPage);
 
                         // now prepare the invoice.
-                        myPage = myPage.replace('{0Date}', time2date(invoiceDetail.ts, 1));
-                        myPage = myPage.replace('{1InvoiceTitle}', $invoiceTopTitle.find('.inv-title.invv').text());
-                        myPage = myPage.replace('{1InvoiceNB}', invoiceDetail.n);
-                        myPage = myPage.replace('{2VATNB}', invoiceDetail.mega.taxnum[1]);
-                        myPage = myPage.replace('{2VATTXT}', invoiceDetail.mega.taxnum[0]);
-                        myPage = myPage.replace('{3CompanyName}', invoiceDetail.u.cname);
-                        myPage = myPage.replace('{4CompanyEmail}', invoiceDetail.u.e);
-                        myPage = myPage.replace('{5CompanyAddress}', validAddressSentFromApi.join(', '));
+                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(invoiceDetail.ts, 1)));
+                        myPage = myPage.replace('{1InvoiceTitle}', escapeHTML($invoiceTopTitle.find('.inv-title.invv').text()));
+                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(invoiceDetail.n));
+                        myPage = myPage.replace('{2VATNB}', escapeHTML(invoiceDetail.mega.taxnum[1]));
+                        myPage = myPage.replace('{2VATTXT}', escapeHTML(invoiceDetail.mega.taxnum[0]));
+                        myPage = myPage.replace('{3CompanyName}', escapeHTML(invoiceDetail.u.cname));
+                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(invoiceDetail.u.e));
+                        myPage = myPage.replace('{5CompanyAddress}', escapeHTML(validAddressSentFromApi.join(', ')));
                         myPage = myPage.replace('{6CompanyCountry}',
-                            invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]);
+                            escapeHTML(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]));
                         var cVat = '---';
                         if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
                             cVat = invoiceDetail.u.taxnum[0] + ': ' + invoiceDetail.u.taxnum[1];
                         }
-                        myPage = myPage.replace('{7CompanyVat}', cVat);
+                        myPage = myPage.replace('{7CompanyVat}', escapeHTML(cVat));
                         var itemDate = '---';
                         var itemDec = '---';
                         var itemAmount = '---';
@@ -2317,14 +2319,14 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             itemDec = invoiceDetail.items[0].d;
                             itemAmount = invoiceDetail.items[0].net;
                         }
-                        myPage = myPage.replace('{8itemDate}', itemDate);
-                        myPage = myPage.replace('{9itemDesc}', itemDec);
+                        myPage = myPage.replace('{8itemDate}', escapeHTML(itemDate));
+                        myPage = myPage.replace('{9itemDesc}', escapeHTML(itemDec));
                         myPage = myPage.replace('{10itemAmount}', Number(itemAmount).toFixed(2));
 
                         myPage = myPage.replace('{15totalVal}',
-                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent);
+                            escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
                         myPage = myPage.replace('{11itemVat}',
-                            $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent);
+                            escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent));
                         myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
@@ -3391,6 +3393,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     }
 
     var $usersLeftPanel = $('.fm-tree-panel .content-panel.user-management');
+    var self = this;
 
     // private function to update left panel
     var updateLeftSubUserPanel = function (subuser) {
@@ -3404,6 +3407,17 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             $userRow = $userLaeftPanelRow.clone(true);
             $userRow.removeClass('hidden selected');
             $userRow.attr('id', subuser.u);
+            if (self && !self.business.hasSubs) {
+                $userRow.rebind(
+                    'click.subuser',
+                    function() {
+                        $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
+                        $(this).addClass('selected');
+                        self.viewSubAccountInfoUI(subuser.u);
+                    }
+                );
+            }
+
             $usersLeftPanel.append($userRow);
         }
 

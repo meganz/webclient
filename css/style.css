@@ -4201,7 +4201,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .files-grid-view.fm .column-settings::before {
     content: "";
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -148px -1992px;
     display: inline-block;
     position: fixed;
@@ -4355,7 +4355,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-tree-panel-arrows {
     right: 7px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -88px -1992px;
     opacity: 0.8;
 }
@@ -4900,7 +4900,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5542,7 +5542,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -6279,7 +6279,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -6635,6 +6635,12 @@ table {
 .rename-input-bl .transfer-filetype-icon.folder, .rename-input-bl .transfer-filetype-icon.folder-shared, .create-folder-input-bl .transfer-filetype-icon.folder {
     background-position: -297px -717px;
     margin: 0;
+}
+.thumb .transfer-filetype-icon.image,
+.thumb .transfer-filetype-icon.pdf,
+.thumb .transfer-filetype-icon.video
+{
+    background-image: none;
 }
 .block-view-file-type {
     width: 82px;
@@ -7083,6 +7089,17 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
+.thumb .transfer-filetype-icon.image img,
+.thumb .transfer-filetype-icon.pdf img,
+.thumb .transfer-filetype-icon.video img {
+    display: inline-block;
+    height: 18px;
+    margin: 4px 2px;
+    width: 18px;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+}
 .fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;
@@ -7213,11 +7230,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -8017,7 +8034,8 @@ table {
     -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
     box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.25);
 }
-.error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl, .rename-input-bl input.error, .create-folder-input-bl input.error {
+.error .create-folder-input-bl, .error .fm-account-input, .error .rename-input-bl, .rename-input-bl input.error, .create-folder-input-bl input.error,
+input.summary-ff-name.error {
     color: #D90007;
 }
 .rename-input-bl .transfer-filetype-icon, .create-folder-input-bl .transfer-filetype-icon {
@@ -8772,6 +8790,17 @@ body:not(.en) .warning-dialog-a.wide {
 .qr-dialog .disabled {
     pointer-events: none;
 }
+.fm-dialog.file-edit-dialog {
+    width: 800px;
+    left: 25%;
+    top: 25%;
+}
+
+.file-edit-dialog iframe {
+    width: 741px;
+    margin-left: 20px;
+}
+
 .fm-dialog.browsers-dialog {
     width: 624px;
     min-height: 520px;
@@ -11506,7 +11535,7 @@ table {
 }
 .account.learn-more {
     height: 21px;
-    font-family: Lato-Medium;
+    font-family: LatoWebSemibold;
     font-size: 13px;
     color: #F0373A;
     letter-spacing: 0.93px;
@@ -12957,84 +12986,6 @@ p.privacy-list {
     background-image: url(../images/mega/terms-icons.png);
     background-position: -2px -406px;
     background-repeat: no-repeat;
-}
-.new-bottom-pages.about {
-    font-size: 0;
-    width: 1070px;
-}
-.team-person-block {
-    display: inline-block;
-    vertical-align: top;
-    height: 267px;
-    margin: 30px 0 10px 0;
-    width: 25%;
-}
-.team-person-avatar {
-    width: 160px;
-    height: 160px;
-    margin:  0 auto;
-    border: 2px solid #d9d9d9;
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    padding: 2px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    background-color: white;
-    overflow: hidden;
-}
-.team-person-avatar img {
-    -webkit-border-radius: 100%;
-    -moz-border-radius: 100%;
-    border-radius: 100%;
-    width: 152px;
-}
-.team-person-name {
-    text-align: center;
-    color: #D32700;
-    font-family: 'Open Sans Semibold Italic';
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: -0.1px;
-    padding-top: 10px
-}
-.team-person-occupation {
-    font-size: 14px;
-    text-align: center;
-    line-height: 18px;
-    color: #666666;
-}
-.team-social-bl {
-    text-align: center;
-    padding-top: 8px;
-    height: 30px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.team-social-icon {
-    width: 22px;
-    height: 22px;
-    display: inline-block;
-    background-image: url(../images/mega/about-sprite.png);
-    background-repeat: no-repeat;
-    margin: 0 5px;
-}
-.team-social-icon.twitter {
-    background-position: left top;
-}
-.team-social-icon.linkedin {
-    background-position: -50px top;
-}
-.team-social-icon.twitter:hover {
-    background-position: left -50px;
-}
-.team-social-icon.linkedin:hover {
-    background-position: -50px -50px;
-}
-.team-social-icon.hidden {
-    display: none;
 }
 .browsers-mid {
     min-height: 434px;
@@ -15018,6 +14969,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     -khtml-toast-notification: 1;
     opacity: 1;
     visibility: visible;
+    z-index: 11;
 }
 .selection-status-bar span {
     font-size: 14px;
@@ -20353,7 +20305,7 @@ div.camera-bottom-txt {
 .account.progress-perc {
     float: left;
     height: 24px;
-    width: 44px;
+    width: 52px;
     font-size: 14px;
     color: #666666;
     margin: 0 0 0 5px;
@@ -29541,7 +29493,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.download .transfer-progress-pct::before, .transfer-progress-type.upload .transfer-progress-pct::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v33.png");
+    background-image: url("../images/mega/icons-sprite_v36.png");
     width: 24px;
     height: 24px;
     left: 0px;
@@ -29612,7 +29564,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     vertical-align: top;
 }
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v33.png");
+    background-image: url("../images/mega/icons-sprite_v36.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29671,7 +29623,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v33.png");
+    background-image: url("../images/mega/icons-sprite_v36.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -29742,7 +29694,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v33.png");
+    background-image: url("../images/mega/icons-sprite_v36.png");
 }
 .transfer-task-actions {
     display: none;
@@ -30306,4 +30258,31 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: -webkit-calc(100% - 81px);
     height: -moz-calc(100% - 81px);
     height: calc(100% - 81px);
+}
+.duplication-found .file-block-scrolling {
+    height: 100%;
+    height: -webkit-calc(100% - 27px);
+    height: -moz-calc(100% - 27px);
+    height: calc(100% - 27px);
+}
+
+.select.duplication-found .file-block-scrolling {
+    height: 100%;
+    height: -webkit-calc(100% - 60px);
+    height: -moz-calc(100% - 60px);
+    height: calc(100% - 60px);
+}
+
+.txt-editor-frame {
+    z-index: 800;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    /*background: rgba(0,0,0,0.5);*/
+}
+.txt-editor-frame iframe{
+    width: 100%;
+    height: 100%;
 }

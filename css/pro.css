@@ -1888,7 +1888,7 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     transition: top 300ms ease-in-out, opacity 300ms ease-in-out;
     position: absolute;
 }
-.plans-block .current:not(.renew):hover .plan-tag-description.current, .plans-block .next:hover .plan-tag-description.next, .plans-block .renew:hover .plan-tag-description.renew {
+.plans-block .current:not(.renew):hover .plan-tag-description.current, .plans-block .next:hover .plan-tag-description.next, .plans-block .renew:not(.no-pops):hover .plan-tag-description.renew {
     opacity: 1;
     font-size: 13px;
     left: 50%;
@@ -1903,6 +1903,9 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
     border-radius: 5px;
     padding: 10px;
     box-sizing: border-box;
+}
+.plans-block .no-pops:hover .plan-tag-description.current {
+    display: none;
 }
 .plans-block .current .plan-tag-description:after, .plans-block .next .plan-tag-description:after {
     content: "";

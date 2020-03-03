@@ -105,7 +105,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         pauseTxt = '';
     }
 
-    else if (node.failed && node.dl_failed) {
+    else if (node.failed || node.dl_failed) {
         isFailed = true;
     }
     var flashhtml = '';

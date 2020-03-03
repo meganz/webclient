@@ -84,7 +84,7 @@ RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
 RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
-RtcModule.kMediaGetTimeout = 20000;
+RtcModule.kMediaGetTimeout = 20000000;
 RtcModule.kSessSetupTimeout = 25000;
 RtcModule.kCallSetupTimeout = 35000;
 RtcModule.kCallRecoveryTimeout = 30000;
@@ -2036,6 +2036,10 @@ Call.prototype._startOrJoin = function(av) {
         self.logger.warn("Couldn't get local stream, continuing as receive-only");
     })
     .then(function() {
+        if (self.state >= CallState.kTerminating) {
+            self.logger.warn("Call killed while getting local stream, aborting start/join");
+            return Promise.reject();
+        }
         if (self.isJoiner) {
             if (!self._join()) {
                 return Promise.reject();
@@ -2098,9 +2102,10 @@ Call.prototype.answer = function(av) {
     var self = this;
     assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
-        self.logger.warn("answer: Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
-            "), nothing to answer");
-        return false;
+        var errMsg = "Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
+            "), nothing to answer";
+        self.logger.error(errMsg);
+        return Promise.reject(errMsg);
     }
     var calls = self.manager.calls;
     if (Object.keys(calls).length <= 1) {

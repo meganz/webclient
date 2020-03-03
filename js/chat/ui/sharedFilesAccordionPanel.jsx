@@ -4,6 +4,11 @@ import MegaRenderMixin from "../../stores/mixins.js";
 import utils from './../../ui/utils.jsx';
 
 class SharedFileItem extends MegaRenderMixin(React.Component) {
+    handlePreview({ h: nodeHash, ch: nodeChatHandle }) {
+        $.autoplay = nodeHash;
+        slideshow(nodeChatHandle, undefined, true);
+    }
+
     render() {
         var self = this;
         var message = this.props.message;
@@ -13,31 +18,25 @@ class SharedFileItem extends MegaRenderMixin(React.Component) {
         var node = this.props.node;
         var icon = this.props.icon;
 
-        return (<div className={"chat-shared-block " + (self.props.isLoading ? "is-loading" : "")}
-                     key={message.messageId + "_" + node.h}
-                     onClick={function(e) {
-                         if (self.props.isPreviewable) {
-                             slideshow(node.ch, undefined, true);
-                         }
-                         else {
-                             M.addDownload([node]);
-                         }
-                    }}
-                    onDoubleClick={function(e) {
-                        M.addDownload([node]);
-                    }}>
-                    <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
-                        <div className={"medium-file-icon " + icon}></div>
-                        <div className="img-wrapper" id={this.props.imgId}>
-                            <img alt="" src={thumbnails[node.h] || ""} />
-                        </div>
+        return (
+            <div
+                className={"chat-shared-block " + (self.props.isLoading ? "is-loading" : "")}
+                key={message.messageId + "_" + node.h}
+                onClick={() => this.props.isPreviewable ? this.handlePreview(node) : M.addDownload([node])}
+                onDoubleClick={() => M.addDownload([node])}>
+                <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
+                    <div className={"medium-file-icon " + icon}></div>
+                    <div className="img-wrapper" id={this.props.imgId}>
+                        <img alt="" src={thumbnails[node.h] || ""}/>
                     </div>
-                    <div className="chat-shared-info">
-                        <span className="txt">{node.name}</span>
-                        <span className="txt small">{name}</span>
-                        <span className="txt small grey">{timestamp}</span>
-                    </div>
-                </div>);
+                </div>
+                <div className="chat-shared-info">
+                    <span className="txt">{node.name}</span>
+                    <span className="txt small">{name}</span>
+                    <span className="txt small grey">{timestamp}</span>
+                </div>
+            </div>
+        );
     }
 };
 

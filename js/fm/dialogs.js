@@ -138,7 +138,7 @@
             $btn.removeClass('disabled');
         }
         else {
-            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog;
+            var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog || $.nodeSaveAs;
 
             console.assert(!$.copyToShare || Object($.selected).length === 0, 'check this...');
 
@@ -306,6 +306,8 @@
         var names = Object.create(null);
         var items = $.selected || [];
 
+        $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
+
         var jScrollPane = function() {
             var jsp = $div.data('jsp');
 
@@ -335,7 +337,6 @@
             items = [$.saveToDialogNode.h];
             names[$.saveToDialogNode.h] = $.saveToDialogNode.name;
         }
-
         if ($.copyToShare) {
             items = [];
             single = true;
@@ -370,32 +371,56 @@
             $div.addClass('unfold');
             $div.safeAppend('<div class="item-row-group"></div>');
             $div = $div.find('.item-row-group');
+
         }
 
-        for (var i = 0; i < items.length; i++) {
-            var h = items[i];
-            var n = M.getNodeByHandle(h) || Object(h);
-            var name = names[h] || M.getNameByHandle(h) || n.name;
-            var tail = '<div class="delete-img icon"></div>';
-            var icon = fileIcon(n);
-            var data = n.uuid || h;
+        if ($.nodeSaveAs) {
+            items = [$.nodeSaveAs.h];
+            names[$.nodeSaveAs.h] = $.nodeSaveAs.name || '';
+            $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
 
-            if (single) {
-                tail = '<span>(@@)</span>';
-                if (items.length < 2) {
-                    tail = '';
+            var rowHtml = '<div class="item-row">' +
+                '<div class="transfer-filetype-icon file text"></div>' +
+                '<input id="f-name-input" class="summary-ff-name" type="text" value="' + escapeHTML($.nodeSaveAs.name)
+                + '" placeholder="' + l[17506] + '" autocomplete="off"/> &nbsp; '
+                + '</div>'
+                + '<div class="duplicated-input-warning"> <div class="arrow"></div> <span>'
+                + l[17578] + '</span> </div>';
+
+            $div.safeHTML(rowHtml);
+
+            $('#f-name-input', $div).rebind('keydown.saveas', function(e) {
+                if (e.which === 13 || e.keyCode === 13) {
+                    $('.dialog-picker-button', $dialog).trigger('click');
                 }
-            }
+            });
+        }
+        else {
+            for (var i = 0; i < items.length; i++) {
+                var h = items[i];
+                var n = M.getNodeByHandle(h) || Object(h);
+                var name = names[h] || M.getNameByHandle(h) || n.name;
+                var tail = '<div class="delete-img icon"></div>';
+                var icon = fileIcon(n);
+                var data = n.uuid || h;
 
-            $div.safeAppend(
-                '<div class="item-row" data-node="@@">' +
-                '    <div class="transfer-filetype-icon file @@"></div>' +
-                '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
-            );
+                if (single) {
+                    tail = '<span>(@@)</span>';
+                    if (items.length < 2) {
+                        tail = '';
+                    }
+                }
 
-            if (single) {
-                break;
+                $div.safeAppend(
+                    '<div class="item-row" data-node="@@">' +
+                    '    <div class="transfer-filetype-icon file @@"></div>' +
+                    '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
+                    '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
+                );
+
+                if (single) {
+                    break;
+                }
             }
         }
 
@@ -475,7 +500,10 @@
             return l[1940]; // Send
         }
 
-        if ($.saveToDialog) {
+        if ($.saveToDialog || $.saveAsDialog) {
+            if ($.nodeSaveAs && !$.nodeSaveAs.h) {
+                return l[158];
+            }
             return l[776]; // Save
         }
 
@@ -513,6 +541,13 @@
 
         if ($.saveToDialog) {
             return l[776]; // Save
+        }
+
+        if ($.saveAsDialog) {
+            if ($.nodeSaveAs && !$.nodeSaveAs.h) {
+                return l[22680];
+            }
+            return l[22678];
         }
 
         if (section === 'conversations') {
@@ -825,7 +860,8 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).removeClass('hidden');
         }
 
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog) {
+        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog
+            || $.saveAsDialog) {
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
@@ -857,7 +893,7 @@
         }
 
         // If copying from contacts tab (Ie, sharing)
-        if (section === 'cloud-drive' && M.currentrootid === 'contacts') {
+        if (section === 'cloud-drive' && (M.currentrootid === 'contacts' || M.currentrootid === 'chat')) {
             $('.fm-picker-dialog-title', $dialog).text(l[1344]);
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
             $('.share-dialog-permissions', $dialog).removeClass('hidden')
@@ -932,6 +968,7 @@
 
         $.hideContextMenu();
         dialogPositioning($dialog);
+        $dialog.removeClass('duplicate');
 
         console.assert($dialog, 'The dialogs subsystem is not yet initialized!...');
     };
@@ -1057,8 +1094,28 @@
     };
 
     /**
+     * Save As dialog show
+     * @param {Object} node     The node to save AS
+     * @param {String} content  Content to be saved
+     * @param {Function} cb     a callback to be called when the user "Save"
+     * @returns {Object}        The jquery object of the dialog
+     */
+    global.openSaveAsDialog = function(node, content, cb) {
+        M.safeShowDialog('saveAs', function() {
+            $.saveAsCallBack = cb;
+            $.nodeSaveAs = typeof node === 'string' ? M.d[node] : node;
+            $.saveAsContent = content;
+            handleOpenDialog(null, node.p || M.RootID);
+            return $dialog;
+        });
+
+        return false;
+    };
+
+    /**
      * A version of the select a folder dialog used for "New Shared Folder" in out-shares.
      * @global
+     * @returns {Object}        The jquery object of the dialog
      */
     global.openNewSharedFolderDialog = function openNewSharedFolderDialog() {
         if (isUserAllowedToOpenDialogs()) {
@@ -1548,6 +1605,67 @@
 
             if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
                 $.selectFolderCallback();
+                return false;
+            }
+
+            if ($.nodeSaveAs) {
+                var $nameInput = $('#f-name-input', $dialog);
+                var saveAsName = $.trim($nameInput.val());
+                var eventName = 'input.saveas';
+
+                var removeErrorStyling = function() {
+                    $nameInput.removeClass('error');
+                    $dialog.removeClass('duplicate');
+                    $nameInput.off(eventName);
+                };
+
+                removeErrorStyling();
+
+                if (!M.isSafeName(saveAsName)) {
+                    // ui things
+                    $nameInput.addClass('error');
+
+                    $nameInput.rebind(eventName, function() {
+                        removeErrorStyling();
+                        return false;
+                    });
+
+                    return false;
+                }
+                if (duplicated(0, saveAsName, $.mcselected)) {
+                    // ui things
+                    $nameInput.addClass('error');
+                    $dialog.addClass('duplicate');
+
+                    $nameInput.rebind(eventName, function() {
+                        removeErrorStyling();
+                        return false;
+                    });
+
+                    return false;
+                }
+                $nameInput.rebind(eventName, function() {
+                    removeErrorStyling();
+                    return false;
+                });
+
+                $nameInput.off(eventName);
+
+                var nodeToSave = $.nodeSaveAs;
+                closeDialog();
+                mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave).done(
+                    function(handle) {
+                        if ($.saveAsCallBack) {
+                            if (Array.isArray(handle)) {
+                                $.selected = handle;
+                            }
+                            else {
+                                $.selected = [handle];
+                            }
+                            $.saveAsCallBack(handle);
+                        }
+                    }
+                );                
                 return false;
             }
 

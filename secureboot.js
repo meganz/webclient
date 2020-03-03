@@ -2260,6 +2260,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+    jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -2321,6 +2322,13 @@ else if (!browserUpdate) {
         jsl.push({f:'html/megadrop.html', n: 'megadrop', j:0});
         jsl.push({f:'html/nomegadrop.html', n: 'nomegadrop', j:0});
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
+        jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
+        jsl.push({f:'js/fm/textEditorUI.js', n: 'texteditorui_js', j:1});
+        jsl.push({f:'css/codemirror.css', n: 'codemirror_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/txteditor.css', n: 'txteditor_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Bottom pages for desktop
+        jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
     if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
@@ -2608,6 +2616,7 @@ else if (!browserUpdate) {
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
+        'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
@@ -2683,7 +2692,9 @@ else if (!browserUpdate) {
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
         'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
-        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0}
+        'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
+        'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
     };
 
     var jsl3 = {
@@ -2744,7 +2755,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about'],
+        'about': ['about','about_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits'],

@@ -3313,7 +3313,7 @@ function processMCF(mcfResponse, ignoreDB) {
             return (a.ts < b.ts ? -1 : (a.ts > b.ts ? 1 : 0)) * -1;
         });
 
-        mcfResponse.forEach(function (chatRoomInfo) {
+        mcfResponse.forEach(function(chatRoomInfo) {
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
             }

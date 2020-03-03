@@ -3404,7 +3404,7 @@ function fm_resize_handler(force) {
         }
         initDashboardScroll();
     }
-    else {
+    else if (!M.chat) {
         if (M.viewmode) {
             initFileblocksScrolling();
         }

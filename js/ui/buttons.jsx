@@ -1,12 +1,12 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 
 
 var _buttonGroups = {};
 
-export class Button extends MegaRenderMixin(React.Component) {
+export class Button extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {'focused': false};

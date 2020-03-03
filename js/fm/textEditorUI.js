@@ -316,7 +316,8 @@ mega.textEditorUI = new function TextEditorUI() {
             if (!editor) {
                 editor = CodeMirror.fromTextArea($myTextarea[0], {
                     lineNumbers: true,
-                    scrollbarStyle: "overlay"
+                    scrollbarStyle: "overlay",
+                    autofocus: true
                 });
             }
             // Without parentheses && will be applied first,
@@ -347,6 +348,7 @@ mega.textEditorUI = new function TextEditorUI() {
             if (Array.isArray(handle)) {
                 handle = handle[0];
             }
+            editor.focus();
 
             fileHandle = handle;
             versionHandle = '';

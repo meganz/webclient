@@ -1439,14 +1439,30 @@ Call.prototype.msgSession = function(packet) {
         return;
     }
 
-    self._addNewSession(packet)
+    self._addNewSession(packet) // handles errors on its own
     .then(function(sess) {
-        assert(sess.isJoiner); // the joiner sends the SDP offer
-        sess._processInputQueue();
-        if (sess.state === SessState.kWaitSdpAnswer) {
-            return sess.sendOffer();
-        }
+        sess._startAsJoiner();
     });
+};
+
+Session.prototype._startAsJoiner = function() {
+    var self = this;
+    assert(self.isJoiner); // the joiner sends the SDP offer
+    try {
+        self._processInputQueue();
+    }
+    catch(e) {
+        return;
+    }
+    if (self.state === SessState.kWaitSdpAnswer) {
+        self.sendOffer()
+        .catch(function(err) {
+            // should not happen, errors should already be handled
+            if (sess.state < SessState.kTerminating) {
+                sess.terminateAndDestroy(Term.kErrInternal);
+            }
+        });
+    }
 };
 
 Call.prototype._notifyNewSession = function(sess) {
@@ -2956,14 +2972,25 @@ Session.prototype._processInputQueue = function() {
     }
     // Keep input queue, so that if somehow we get passed a new packet while processing the queue,
     // it gets enqueued and processed in order
-    if (queue.length > 0) {
-        this.logger.warn("Packets were queued while crypto was being initialized, processing them...");
+    if (queue.length === 0) {
+        delete this.inputQueue;
+        return;
+    }
+    this.logger.warn("Packets were queued while crypto was being initialized, processing them...");
+    try {
         do {
             this.processMsg(queue.shift());
         } while (queue.length > 0);
         this.logger.warn("Done processing queued packets");
+    } catch(e) {
+        if (this.state < Term.kTerminating) {
+            this.terminateAndDestroy(Term.kErrInternal);
+        }
+        throw e;
     }
-    delete this.inputQueue;
+    finally {
+        delete this.inputQueue;
+    }
 };
 
 Session.prototype._asyncInit = function() {
@@ -2972,16 +2999,26 @@ Session.prototype._asyncInit = function() {
     return self.crypto.loadCryptoForPeer(self.peer)
     .catch(function(err) {
         if (self.state < SessState.kTerminating) {
-            self._terminateAndDestroy(Term.kErrCrypto);
+            self.terminateAndDestroy(Term.kErrCrypto);
         }
         return Promise.reject(err);
     })
     .then(function() {
         if (self.state >= SessState.kTerminating) {
-            return Promise.reject(null);
+            return Promise.reject();
         }
-        self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, self._encryptedPeerHashKey);
-        self._createRtcConn();
+        try {
+            self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, self._encryptedPeerHashKey);
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrCrypto);
+            return Promise.reject();
+        }
+        try {
+            self._createRtcConn();
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrInternal);
+            return Promise.reject();
+        }
         return self;
     });
 };
@@ -3524,6 +3561,7 @@ Session.prototype.sendOffer = function() {
         self.terminateAndDestroy(self._streamRenegTimer ? Term.kErrStreamReneg : Term.kErrSdp,
             "Error creating SDP offer: " + err);
         self.logger.error("Error creating SDP offer. Failed SDP offer: ", self.ownSdpOffer);
+        return Promise.reject();
     });
 };
 
@@ -3552,8 +3590,21 @@ Call.prototype.msgSdpOffer = function(packet) {
     self._addNewSession(packet, sentParams)
     .then(function(sess) {
         assert(sess.sid === sentParams.sid);
-        sess.processSdpOfferSendAnswer();
-        sess._processInputQueue();
+        sess._startAsNonJoiner();
+    });
+};
+
+Session.prototype._startAsNonJoiner = function() {
+    var self = this;
+    assert(!self.isJoiner);
+    self.processSdpOfferSendAnswer()
+    .then(function() {
+        self._processInputQueue();
+    })
+    .catch(function(err) {
+        if (self.state < SessState.kTerminating) {
+            self.terminateAndDestroy(kErrInternal);
+        }
     });
 };
 

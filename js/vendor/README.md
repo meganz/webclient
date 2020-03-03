@@ -150,6 +150,16 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 ---
+[codemirror.js]: Text editor in JavaScript Ver. 5.49.2
+
+> This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+> **This is a fork**, [See the changes](https://github.com/codemirror/CodeMirror/compare/master...meganz:master)
+
+---
+[simplescrollbars.js]: Custom scroll bar for code-mirror
+> This is released under [MIT License](https://codemirror.net/LICENSE).
+
+---
 [Chart.js]: Charts drawing class in JavaScript. V2.7.3
 
 > **This is a fork**, [Compare the changes](https://github.com/chartjs/Chart.js/compare/master...meganz:master)

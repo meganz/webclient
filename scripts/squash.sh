@@ -33,7 +33,7 @@ GIT_EDITOR="$SED_BINARY$SED_ARGS"  git rebase -i --autosquash $target_branch
 
 if [ $? -ne 0 ]; then
     echo "Rebasing failed."
-    exit $?
+    exit 128
 fi
 
 for var in "$@"

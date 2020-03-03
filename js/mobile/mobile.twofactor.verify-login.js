@@ -61,7 +61,7 @@ mobile.twofactor.verifyLogin = {
             var pinCode = $.trim($pinCode.val());
 
             // Get cached data that was already entered on the login form
-            var email = security.login.email;
+            var email = security.login.email.trim();
             var password = security.login.password;
             var rememberMe = security.login.rememberMe;
 

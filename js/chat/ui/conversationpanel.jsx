@@ -773,13 +773,14 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             }
         }
         if (!prevState.renameDialog && self.state.renameDialog === true) {
-            var $input = $('.chat-rename-dialog input');
-            if ($input && $input[0] && !$($input[0]).is(":focus")) {
-                $input.trigger("focus");
-                $input[0].selectionStart = 0;
-                $input[0].selectionEnd = $input.val().length;
-            }
-
+            Soon(function() {
+                var $input = $('.chat-rename-dialog input');
+                if ($input && $input[0] && !$($input[0]).is(":focus")) {
+                    $input.trigger("focus");
+                    $input[0].selectionStart = 0;
+                    $input[0].selectionEnd = $input.val().length;
+                }
+            });
         }
 
         if (prevState.editing === false && self.state.editing !== false) {

@@ -52,6 +52,17 @@
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
             }
+
+            if (folderlink) {
+                // there's no jquery parent for this container.
+                // eslint-disable-next-line local-rules/jquery-scopes
+                $('.dropdown-item.edit-file-item span').text(l[16797]);
+            }
+            else {
+                // there's no jquery parent for this container.
+                // eslint-disable-next-line local-rules/jquery-scopes
+                $('.dropdown-item.edit-file-item span').text(l[865]);
+            }
         }
 
         if (d) {

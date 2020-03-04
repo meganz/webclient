@@ -521,7 +521,7 @@ function dl_g(res) {
              *@returns {Void}           void
              */
             var showTextView = function() {
-                if (isTextual(dl_node)) {
+                if (is_textual(dl_node)) {
                     // there's no jquery parent for this container.
                     var $containerB = $('.download.main-pad .download.info-block');
                     var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);

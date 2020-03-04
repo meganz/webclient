@@ -210,7 +210,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
         else {
-            if (selNode.s < 20971520 && isTextual(selNode)) { // 20 MB
+            if (is_textual(selNode)) {
                 items['.edit-file-item'] = 1;
             }
 

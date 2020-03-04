@@ -2865,19 +2865,3 @@ function registerLinuxDownloadButton($links) {
     });
 }
 
-/**
- * Global function to Check if the node is for a textual file
- * @param {MegaData} node       The node to check
- * @returns {Void}              void
- */
-function isTextual(node) {
-    'use strict';
-    if (node && node.name && fileext(node.name) === '') {
-        return true;
-    }
-    var fType = filetype(node, true)[0];
-    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
-        return true;
-    }
-    return false;
-}

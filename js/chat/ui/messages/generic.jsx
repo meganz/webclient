@@ -325,10 +325,24 @@ class GenericConversationMessage extends ConversationMessageMixin {
         }
         assert(M.chat, 'Not in chat.');
 
-        if (is_video(v)) {
-            $.autoplay = v.h;
+        if (v && is_textual(v)) {
+            // v.s check shouldn't be here, since this point shouldn't be reached at all..but just in case...
+            loadingDialog.show();
+            mega.fileTextEditor.getFile(v, true).done(
+                function(data) {
+                    loadingDialog.hide();
+                    mega.textEditorUI.setupEditor(v.name, data, v.h, true);
+                }
+            ).fail(function() {
+                loadingDialog.hide();
+            });
         }
-        slideshow(v.ch, undefined, true);
+        else {
+            if (is_video(v)) {
+                $.autoplay = v.h;
+            }
+            slideshow(v.ch, undefined, true);
+        }
         if (e) {
             e.preventDefault();
             e.stopPropagation();
@@ -464,8 +478,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         var isImage = is_image2(v);
                         var isVideo = mediaType > 0;
                         var isAudio = mediaType > 1;
+                        var isText = !isVideo && !isAudio && is_textual(v);
                         var showThumbnail = String(v.fa).indexOf(':1*') > 0;
-                        var isPreviewable = isImage || isVideo;
+                        var isPreviewable = isImage || isVideo || isText;
 
                         var dropdown = null;
                         var noThumbPrev = '';
@@ -477,6 +492,12 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             }
                             var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
                             var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
+                            if (isText) {
+                                previewLabel = l[16797];
+                                // TODO: Replace with "preview-file" icon?
+                                //  will keep this one for now for consistency with FM.
+                                previewIcon = "context-sprite edit-file";
+                            }
                             previewButton =
                                 <span key="previewButton">
                                     <DropdownsUI.DropdownItem

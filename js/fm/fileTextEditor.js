@@ -59,18 +59,22 @@ mega.fileTextEditor = new function FileTextEditor() {
             return operationPromise.reject();
         }
 
-        // if we have the data cached, return it.
-        if (filesDataMap[handle]) {
-            return operationPromise.resolve(filesDataMap[handle]);
-        }
-
         var node;
 
-        if (isPublic && dl_node) {
+        if (isPublic && typeof dl_node !== 'undefined' && dl_node) {
             node = dl_node;
+        }
+        else if (handle.h) {
+            node = handle;
+            handle = node.h;
         }
         else {
             node = M.d[handle];
+        }
+
+        // if we have the data cached, return it.
+        if (filesDataMap[handle]) {
+            return operationPromise.resolve(filesDataMap[handle]);
         }
 
         // this is empty file, no need to bother Data Servers + API

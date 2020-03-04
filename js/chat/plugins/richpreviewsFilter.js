@@ -93,13 +93,34 @@ RichpreviewsFilter._messageUpdating = {};
 
 /**
  * Regular expression for reserved IP addresses
+ *
+ * http://localhost/
+ * http://0.0.0.0/ - http://0.255.255.255/
+ * http://10.0.0.0/ - http://10.255.255.255/
+ * http://100.64.0.0/ - http://100.127.255.255/
+ * http://127.0.0.0/ - http://127.255.255.255/
+ * http://169.254.0.0/ - http://169.254.255.255/
+ * http://172.16.0.0/ - http://172.31.255.255/
+ * http://192.0.0.0/ - http://192.0.0.255/
+ * http://192.0.2.0/ - http://192.0.2.255/
+ * http://192.88.99.0/ - http://192.88.99.255/
+ * http://192.168.0.0/ - http://192.168.255.255/
+ * http://198.18.0.0/ - http://198.19.255.255/
+ * http://198.51.100.0/ - http://198.51.100.255/
+ * http://203.0.113.0/ - http://203.0.113.255/
+ * http://224.0.0.0/ - http://239.255.255.255/
+ * http://240.0.0.0/ - http://255.255.255.255/
+ *
+ * @see https://en.wikipedia.org/wiki/Reserved_IP_addresses
+ * @see RichpreviewsFilter.prototype.processMessage
  * @type {RegExp}
  * @private
  */
 
 RichpreviewsFilter._RFC_REGEXP = new RegExp(
-    '(^127\\.)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2\\d\\.)|(^172\\.3[01]\\.)|(^192\\.)|(^169\\.254\\.)|(^100\\.)' +
-    '|(^255\\.255\\.)|(^203\\.)|(^0\\.)|(^240\\.0)|(^224\\.0)|(^198\\.)|(^239\\.255)|localhost/',
+    '(^127\\.)|(^10\\.)|(^172\\.1[6-9]\\.)|(^172\\.2\\d\\.)|(^172\\.3[01]\\.)|(^192\\.0\\.)|(^192\\.88\\.)|' +
+    '(^192\\.168\\.)|(^169\\.254\\.)|(^100\\.)|(^255\\.255\\.)|(^203\\.)|(^0\\.)|(^240\\.0)|(^224\\.0)|(^198\\.)|' +
+    '(^239\\.255)|localhost',
     'mg'
 );
 
@@ -189,13 +210,15 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isE
             switch (match.getType()) {
                 case 'url' :
                     var link = match.getUrl();
+                    var anchorText = match.getAnchorText(); // stripped link, e.g. http://172.16.0.0 -> 172.16.0.0
+                    var IS_RFC = !!anchorText.match(RichpreviewsFilter._RFC_REGEXP);
 
                     if (LinkInfoHelper.isMegaLink(link)) {
                         // skip MEGA links.
                         return true;
                     }
 
-                    if (RichpreviewsFilter._RFC_REGEXP.test(match.getAnchorText())) {
+                    if (IS_RFC) {
                         // no previews for reserved IP addresses
                         return false;
                     }

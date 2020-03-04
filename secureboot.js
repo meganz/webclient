@@ -623,7 +623,8 @@ if (is_bot) {
 
 if (String(location.pathname).indexOf('%') > 0) {
     tmp = mURIDecode(location.pathname);
-    if (tmp.indexOf('%') < 0 && !(/[^\x00-\x7f]/.test(tmp))) {
+    if (tmp.indexOf('%') < 0 && sessionStorage.uutmpl !== tmp) {
+        sessionStorage.uutmpl = tmp;
         location.assign(tmp);
     }
 }

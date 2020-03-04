@@ -320,7 +320,7 @@ function dl_g(res) {
 
                         dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
-                            dlResumeInfo.byteLength = size;
+                            dlResumeInfo.byteLength = size >= 0 ? size : null;
 
                             if (isPageRefresh) {
                                 if (d) {
@@ -517,6 +517,40 @@ function dl_g(res) {
                 }
             };
 
+            /** Function to show UI elements if textual files
+             *@returns {Void}           void
+             */
+            var showTextView = function() {
+                if (isTextual(dl_node)) {
+                    // there's no jquery parent for this container.
+                    var $containerB = $('.download.main-pad .download.info-block');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
+
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click.txtViewer', function() {
+                            loadingDialog.show();
+
+                            mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
+                                }
+                            ).fail(function() {
+                                loadingDialog.hide();
+                            });
+                        });
+                }
+            };
+
             if (res.fa) {
                 var promise = Promise.resolve();
 
@@ -553,6 +587,10 @@ function dl_g(res) {
                         showPreviewButton();
                     }
                 });
+            }
+            else {
+                // if it's textual file, then handle the UI.
+                showTextView();
             }
 
             if (prevBut) {
@@ -917,9 +955,9 @@ function start_import() {
     }
 
     var dialogHeader = l[20751];
-    var dialogTxt = l[20753];
-    var dialogType = 'import_register';
-    var buttonEvent = function() {
+    var dialogTxt = l[20752];
+    var dialogType = 'import_login_or_register';
+    var buttonEventRegister = function() {
         mega.ui.showRegisterDialog({
             body: l[20756],
             showLogin: true,
@@ -935,19 +973,18 @@ function start_import() {
         });
     };
 
-    if (u_wasloggedin()) {
-        dialogTxt = l[20752];
-        dialogType = 'import_login';
-        buttonEvent = function() {
-            mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
-        };
-    }
+    var buttonEventLogin = function() {
+        mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
+    };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === true) {
-            buttonEvent();
+        if (e === 'login') {
+            buttonEventLogin();
         }
-        else if (e === false) {
+        else if (e === 'register') {
+            buttonEventRegister();
+        }
+        else if (e === 'ephemeral') {
             start_anoimport();
         }
         else {

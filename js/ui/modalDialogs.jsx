@@ -1,19 +1,19 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import utils  from "./utils.jsx";
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 import Tooltips from "./tooltips.jsx";
 import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-class ExtraFooterElement extends MegaRenderMixin(React.Component) {
+class ExtraFooterElement extends MegaRenderMixin {
     render() {
         return this.props.children;
     }
 };
 
-class ModalDialog extends MegaRenderMixin(React.Component) {
+class ModalDialog extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true
     };
@@ -161,7 +161,7 @@ class ModalDialog extends MegaRenderMixin(React.Component) {
 
 
 
-class SelectContactDialog extends MegaRenderMixin(React.Component) {
+class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': __(l[1940]),
@@ -243,7 +243,7 @@ class SelectContactDialog extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConfirmDialog extends MegaRenderMixin(React.Component) {
+class ConfirmDialog extends MegaRenderMixin {
     static defaultProps = {
         'confirmLabel': __(l[6826]),
         'cancelLabel': __(l[82]),

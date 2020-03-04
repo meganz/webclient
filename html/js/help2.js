@@ -108,7 +108,7 @@ var Help = (function() {
                     location.hash = '#' + newpage;
                 }
                 else {
-                    history.pushState({subpage: newpage}, '', '/' + newpage);
+                    history.replaceState({subpage: newpage}, '', '/' + newpage);
                 }
             }
         }, 100);
@@ -525,6 +525,11 @@ var Help = (function() {
                 if (args.length === 2) {// if this a question.
                     if (question.lastIndexOf('-') !== -1) {
                         question = question.substring(question.lastIndexOf('-') + 1);
+                    }
+                    else {
+                        // Reload the short url of the help article when title is missing in original url
+                        loadSubPage('help/s/' + question);
+                        return;
                     }
                 }
             } else if (args.length !== 1) {

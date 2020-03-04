@@ -728,7 +728,7 @@
     width: 18px;
 }
 .medium-icon.icons-img, .semi-big-icon.icons-img {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
 }
 .medium-icon.icons-img.close {
         background-position: -47px -687px;
@@ -1086,6 +1086,16 @@
     background-image: url(../images/mega/top-sprite_v8.png);
     background-position: -10px -1266px;
 }
+.semi-small-icon.send-to-contact-menu {
+    background-image: url(../images/mega/send_to_contact_ico.svg);
+    background-position: 0px -4px;
+    width: 24px;
+    height: 24px;
+    background-size: auto;
+}
+/*.top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
+    filter: drop-shadow(2px 4px 6px black);
+}*/
 .small-icon.dark-grey-plus {
     background-image: url(../images/mega/fm-main-sprite_v13.png);
     background-position: -14px -11545px;
@@ -1140,15 +1150,15 @@
     background-position: 0px -99px;
 }
 .small-icon.red-lens {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -192px -585px;
 }
 .small-icon.red-play {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -233px -585px;
 }
 .small-icon.small-play-icon {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -148px -634px;
 }
 .thumb .small-icon.small-play-icon {
@@ -1156,7 +1166,7 @@
 }
 /* Context menu icons */
 .small-icon.context {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
 }
 .small-icon.context.standart-download {
     background-position: -1px -499px;
@@ -1415,14 +1425,16 @@
 .small-icon.context.manage-widget {
     background-position: -202px -1112px;
 }
-/* hovers*/
+
+/* icons-sprite hovers*/
 .dropdown-item:hover .small-icon.context.standart-download {
     background-position: -41px -499px;
 }
 .dropdown-item:hover .small-icon.context.download-as-zip {
     background-position: -141px -499px;
 }
-.dropdown-item:not(.static):hover .small-icon.context.labels, .dropdown-item.opened .small-icon.context.labels, .dark .dropdown-item .small-icon.context.labels {
+.dropdown-item:not(.static):hover .small-icon.context.labels,
+.dropdown-item.opened .small-icon.context.labels, .dark .dropdown-item .small-icon.context.labels {
     background-position: -141px -99px;
 }
 .dropdown-item:hover .small-icon.context.download, .dropdown-item.opened .small-icon.context.download {
@@ -1485,7 +1497,8 @@
 .dropdown-item:hover .small-icon.context.clock-with-cross {
     background-position: -120px -1200px;
 }
-.dropdown-item:hover:not(.static) .small-icon.context.heart, .dark .dropdown-item:not(.static) .small-icon.context.heart {
+.dropdown-item:hover:not(.static) .small-icon.context.heart,
+.dark .dropdown-item:not(.static) .small-icon.context.heart {
     background-position: -242px -499px;
 }
 .dropdown-item:hover .small-icon.context.broken-heart {
@@ -1551,7 +1564,33 @@
 .dropdown-item:hover:not(.static) .small-icon.context.status, .dark .dropdown-item:not(.static) .small-icon.context.status {
     background-position: -199px -1277px;
 }
+
+/* Context-sprite */
+.context-sprite, i.context-sprite {
+    background-image: url(../images/mega/context-sprite_v1.png);
+}
+.small-icon.context-sprite.plusfolder {
+    background-position: 0px 1px;
+}
+.small-icon.context-sprite.plusfile {
+    background-position: -158px 0;
+}
+.small-icon.context-sprite.edit-file {
+    background-position: -77px 0;
+    width: 22px;
+}
+.dropdown-item:hover .small-icon.context-sprite.edit-file {
+    background-position: -117px 0;
+}
+.dropdown-item:hover .small-icon.context-sprite.plusfolder {
+    background-position: -40px 1px;
+}
+.dropdown-item:hover .small-icon.context-sprite.plusfile {
+    background-position: -198px 0px;
+}
+
 /* End of Context menu icons */
+
 .huge-icon.storage-icon {
     background-image: url(../images/mega/account-sprite_v4.png);
     background-position: 20px -771px;
@@ -1701,7 +1740,7 @@
     background-position: -205px -1731px;
 }
 i.icons-sprite, i.small-icon.icons-sprite {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
 }
 .medium-icon.icons-sprite.mega {
     background-position: -49px -1004px;
@@ -1881,6 +1920,9 @@ i.account-icon.mobile {
 i.account-icon.select-arrow {
     background-position: -6px -2150px;
 }
+i.account-icon.menu {
+    background-position: -5px -59px;
+}
 .link-button > .small-icon.colorized, .link-button:hover > .small-icon.colorized, .link-button.active > .small-icon, .link-button.red:hover > .small-icon, .link-button.red.active > .small-icon {
  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
@@ -2000,7 +2042,7 @@ i.account-icon.select-arrow {
     margin-top: 4px;
 }
 .toast-icon.multi-files-icon {
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -5px -2019px;
     opacity: 0.6;

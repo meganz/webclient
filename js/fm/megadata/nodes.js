@@ -435,15 +435,16 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
     return nodes.length;
 };
 
-// jshint maxdepth:10
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
  * @param {String}      t             Destination node handle
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {MegaPromise} [promise]     promise to notify completion on (Optional)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
+ * @returns {MegaPromise} The promise provided to this function, if any.
  */
 MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
+    'use strict';
     var todel = [];
 
     if (typeof promise === 'function') {
@@ -559,20 +560,29 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     if (del && !tree.safeToDel) {
         tree.safeToDel = true;
 
-        var mdList = mega.megadrop.isDropExist(cn);
-        if (mdList.length) {
+        var shared = mega.megadrop.isDropExist(cn);
+        for (var i = tree.length; i--;) {
+            var n = M.d[tree[i].h] || false;
+
+            console.assert(n, 'Node not found... (%s)', tree[i].h);
+
+            if (n.shares || M.ps[n.h]) {
+                shared.push(n.h);
+            }
+        }
+
+        if (shared.length) {
             loadingDialog.phide();
-            mega.megadrop.showRemoveWarning(mdList)
-                .done(function() {
-                    // No MEGAdrop folders found, proceed with copy+del
-                    M.copyNodes(cn, t, del, promise, tree);
-                })
-                .fail(function() {
-                    // The user didn't want to disable MEGAdrop folders
-                    if (promise) {
-                        promise.reject(EBLOCKED);
-                    }
-                });
+
+            // Confirm with the user the operation will revoke shares and he wants to
+            msgDialog('confirmation', l[870], l[34] + ' ' + l[7410], l[6994], function(yes) {
+                if (yes) {
+                    M.revokeShares(shared).always(M.copyNodes.bind(M, cn, t, del, promise, tree));
+                }
+                else if (promise) {
+                    promise.reject(EBLOCKED);
+                }
+            });
             return promise;
         }
     }
@@ -1526,6 +1536,7 @@ MegaData.prototype.revokeShares = function(handles) {
     if (!Array.isArray(handles)) {
         handles = [handles];
     }
+    handles = array.unique(handles);
 
     if (d) {
         console.group('revokeShares for %s nodes...', handles.length, handles);
@@ -1740,6 +1751,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
         }
+        // if node in cached mode in editor, clear it
+        if (mega && mega.fileTextEditor) {
+            mega.fileTextEditor.clearCachedFileData(n.h);
+        }
+
         // Update versioning dialog if it is open and the folder is its parent folder,
         // the purpose of the following code is to update permisions of historical files.
         if ($.selected
@@ -3160,7 +3176,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
                         $('.create-new-folder input').val('');
 
                         M.updFileManagerUI().always(function() {
-                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
                                 refreshDialogContent();
                             }
 
@@ -3971,7 +3987,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID ? M.RootID : undefined);
+            _import(!folderlink && M.RootID ? M.RootID : undefined);
         }
     });
 };

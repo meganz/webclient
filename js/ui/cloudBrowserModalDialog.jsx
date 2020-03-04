@@ -1,6 +1,5 @@
-import { Component } from 'react';
 import utils from "./utils.jsx";
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 import ModalDialogsUI from './modalDialogs.jsx';
 import Tooltips from "./tooltips.jsx";
 
@@ -23,7 +22,7 @@ function BrowserCol({ id, className = '', label, sortBy, onClick }) {
     );
 };
 
-class BrowserEntries extends MegaRenderMixin(Component) {
+class BrowserEntries extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true,
         'requiresUpdateOnResize': true
@@ -513,7 +512,7 @@ class BrowserEntries extends MegaRenderMixin(Component) {
             self.props.onAttachClicked(self.state.selected);
         }
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return true;
     }
     render() {
@@ -769,7 +768,7 @@ class BrowserEntries extends MegaRenderMixin(Component) {
 };
 
 
-class CloudBrowserDialog extends MegaRenderMixin(Component) {
+class CloudBrowserDialog extends MegaRenderMixin {
     static defaultProps = {
         'selectLabel': __(l[8023]),
         'openLabel': __(l[1710]),
@@ -975,6 +974,7 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
         var self = this;
         var order = self.state.sortBy[1] === "asc" ? 1 : -1;
         var entries = [];
+
         if (
             self.state.currentlyViewedEntry === "search" &&
             self.state.searchValue &&
@@ -986,13 +986,24 @@ class CloudBrowserDialog extends MegaRenderMixin(Component) {
                     if (!n.h || n.h.length === 11) {
                         return;
                     }
+                    if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
+                        return;
+                    }
                     entries.push(n);
                 })
         }
-
         else {
             Object.keys(M.c[self.state.currentlyViewedEntry] || {}).forEach((h) => {
-                M.d[h] && entries.push(M.d[h]);
+                if (M.d[h]) {
+                    if (self.props.customFilterFn) {
+                        if (self.props.customFilterFn(M.d[h])) {
+                            entries.push(M.d[h]);
+                        }
+                    }
+                    else {
+                        entries.push(M.d[h]);
+                    }
+                }
             });
         }
 

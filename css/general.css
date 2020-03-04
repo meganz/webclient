@@ -163,11 +163,11 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     left: 38px;
 }
 .mega-input-title-ontop.halfSize-l {
-    width: 49.5%;
+    width: 48%;
     float: left;
 }
 .mega-input-title-ontop.halfSize-r {
-    width: 49.5%;
+    width: 48%;
     float: right;
 }
 .mega-input-title-ontop input:-webkit-autofill {

@@ -215,8 +215,8 @@ mobile.account = {
         var spaceUsed = M.account.cstrg;
         var spaceTotal = M.account.mstrg;
         var percentageUsed = spaceUsed / spaceTotal * 100;
-        var percentageUsedText = percentageUsed.toFixed(2);
-        var spaceUsedText = bytesToSize(spaceUsed, 1);
+        var percentageUsedText = Math.round(percentageUsed);
+        var spaceUsedText = bytesToSize(spaceUsed, 2);
         var spaceTotalText = bytesToSize(spaceTotal, 0);
 
         // Display the used and total storage e.g. 0.02% (4.8 GB of 200 GB)

@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 
-class AccordionPanel extends MegaRenderMixin(React.Component) {
+class AccordionPanel extends MegaRenderMixin {
     render() {
         var self = this;
         var contentClass = self.props.className ? self.props.className : '';
@@ -21,13 +21,13 @@ class AccordionPanel extends MegaRenderMixin(React.Component) {
     }
 };
 
-class Accordion extends MegaRenderMixin(React.Component) {
+class Accordion extends MegaRenderMixin {
     constructor(props) {
         super(props);
 
         this.state = {
             'expandedPanel': this.props.expandedPanel
-        }
+        };
     }
     componentDidMount() {
         super.componentDidMount();
@@ -56,13 +56,20 @@ class Accordion extends MegaRenderMixin(React.Component) {
         //     });
     }
     onToggle(e, key) {
-        var obj = clone(this.state.expandedPanel);
-        if (obj[key]) {
-            delete obj[key];
-        }
-        else {
-            obj[key] = true;
-        }
+        // allow multiple opened panels at a time
+        // var obj = clone(this.state.expandedPanel);
+        // if (obj[key]) {
+        //     delete obj[key];
+        // }
+        // else {
+        //     obj[key] = true;
+        // }
+
+        // allow only 1 opened accordion panel at a time.
+        var obj = {};
+        obj[key] = !(this.state.expandedPanel || {})[key];
+
+
         this.setState({'expandedPanel': obj});
         this.props.onToggle && this.props.onToggle(key);
     }

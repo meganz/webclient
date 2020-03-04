@@ -1,10 +1,5 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from './../../../stores/mixins.js';
-var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 var MetaRichPreviewLoading = require('./metaRichPreviewLoading.jsx').MetaRichpreviewLoading;
 
 class MetaRichpreview  extends ConversationMessageMixin {
@@ -19,11 +14,8 @@ class MetaRichpreview  extends ConversationMessageMixin {
     }
     render() {
         var self = this;
-        var cssClasses = "message body";
 
         var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
-        var chatRoom = this.props.message.chatRoom;
 
         var output = [];
 
@@ -51,11 +43,12 @@ class MetaRichpreview  extends ConversationMessageMixin {
                 previewCss['backgroundPosition'] = "center center";
             }
 
-            var previewContainer = undefined;
+            var previewContainer;
 
             if (isLoading) {
                 previewContainer = <MetaRichPreviewLoading message={message} isLoading={message.meta.isLoading} />;
-            } else {
+            }
+            else {
                 var domainName = meta.url;
                 domainName = domainName.replace("https://", "")
                     .replace("http://", "").split("/")[0];
@@ -74,17 +67,17 @@ class MetaRichpreview  extends ConversationMessageMixin {
                                 meta.ic ?
                                     <span className="message richpreview url-favicon">
                                         <img src={self.getBase64Url(meta.ic)} width={16} height={16}
-                                             onError={(e) => {
-                                                 e.target.parentNode.removeChild(e.target);
-                                             }}
-                                             alt=""
+                                            onError={(e) => {
+                                                e.target.parentNode.removeChild(e.target);
+                                            }}
+                                            alt=""
                                         />
                                     </span>
                                     :
                                     ""
                             )}
                             <span className="message richpreview url">
-                            {domainName}
+                                {domainName}
                             </span>
                         </div>
                     </div>
@@ -92,16 +85,12 @@ class MetaRichpreview  extends ConversationMessageMixin {
             }
 
             output.push(
-                <div key={meta.url} className={"message richpreview container " +
-                        (meta.i ? "have-preview" : "no-preview") + " " +
-                        (meta.d ? "have-description" : "no-description") + " " +
-                        (isLoading ? "is-loading" : "done-loading")
-                    }
-                            onClick={function (url) {
-                                if (!message.meta.isLoading) {
-                                    window.open(url, "_blank");
-                                }
-                            }.bind(this, meta.url)}>
+                <div key={meta.url}
+                    onClick={function(url) {
+                        if (!message.meta.isLoading) {
+                            window.open(url, "_blank");
+                        }
+                    }.bind(this, meta.url)}>
                     {previewContainer}
                     <div className="clear"></div>
                 </div>

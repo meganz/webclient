@@ -2904,7 +2904,7 @@ function createFileDialog(close, action, params) {
                         selectionManager.clear_selection();
                         selectionManager.add_to_selection(nh);
 
-                        loadingDialog.show();
+                        loadingDialog.show('common', l[23130]);
 
                         mega.fileTextEditor.getFile(nh).done(
                             function(data) {
@@ -3404,7 +3404,7 @@ function fm_resize_handler(force) {
         }
         initDashboardScroll();
     }
-    else {
+    else if (!M.chat) {
         if (M.viewmode) {
             initFileblocksScrolling();
         }

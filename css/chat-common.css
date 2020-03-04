@@ -1054,3 +1054,75 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
     position: relative;
     z-index: 100;
 }
+
+@keyframes fadeInOutLoopSubtle {
+    0%   { opacity:1; }
+    50%  { opacity:0.3; }
+    100% { opacity:1; }
+}
+@-o-keyframes fadeInOutLoopSubtle {
+    0%   { opacity:1; }
+    50%  { opacity:0.3; }
+    100% { opacity:1; }
+}
+@-moz-keyframes fadeInOutLoopSubtle {
+    0%   { opacity:1; }
+    50%  { opacity:0.3; }
+    100% { opacity:1; }
+}
+@-webkit-keyframes fadeInOutLoopSubtle {
+    0%   { opacity:1; }
+    50%  { opacity:0.3; }
+    100% { opacity:1; }
+}
+
+.contact-name-loading {
+    background-color: #E5E5E5;
+    width: 96px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 3px;
+    content: "...";
+    padding: 0 10px 0 0;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+    margin: 5px 12px 4px -20px;
+    -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+}
+
+.contacts-info.body.right-chat-contact-card .contact-name-loading {
+    margin: 11px 0 0 -19px;
+}
+
+.avatar-wrapper.default-bg {
+    -webkit-animation: fadeInOutLoopSubtle 2s linear infinite;
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+    background: url(../images/mega/avatar-loading.svg);
+    background-size: auto 44px;
+    background-position: 0 -6px;
+}
+.group-chat .chat-right-pad .avatar-wrapper.default-bg  {
+    background-size: auto;
+    background-position: 0 -4px;
+}
+.medium-avatar.default-bg {
+    background-size: auto 248px;
+    background-position: -14px -38px;
+}
+.chat-contacts-list-inner.default-bg {
+    background-image: url(../images/mega/avatar-loading.svg);
+    background-repeat: repeat-y;
+    background-position: 0 0;
+}
+.chat-contacts-list-inner .contacts-info.right-chat-contact-card {
+    background-color: white;
+}
+.privatechat.conversations .chat-contacts-list-inner .contacts-info.right-chat-contact-card {
+    background-color: #F4F8F9;
+}
+
+.chat-contacts-list .ps-active-y .right-chat-contact-card {
+    width: 220px !important;
+}

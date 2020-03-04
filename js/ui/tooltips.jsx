@@ -1,10 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var utils = require("./utils.jsx");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 
 
-class Handler extends MegaRenderMixin(React.Component) {
+class Handler extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true
     };
@@ -16,7 +16,7 @@ class Handler extends MegaRenderMixin(React.Component) {
     }
 };
 
-class Contents extends MegaRenderMixin(React.Component) {
+class Contents extends MegaRenderMixin {
      static defaultProps = {
         'hideable': true
     };
@@ -41,7 +41,7 @@ class Contents extends MegaRenderMixin(React.Component) {
 };
 
 
-class Tooltip extends MegaRenderMixin(React.Component) {
+class Tooltip extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {

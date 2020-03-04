@@ -38,14 +38,31 @@ if (typeof loadingDialog === 'undefined') {
     $.loadingSubject = Object.create(null);
 
     loadingDialog.nest = 0;
-    loadingDialog.show = function(subject) {
+    /**
+     * Show overlay and loading spinner
+     * @param {String} subject Subject of overlay
+     * @param {String} label Loading text label with description
+     * @returns {void}
+     */
+    loadingDialog.show = function(subject, label) {
         'use strict';
+
+        var $overlay;
+        var $spinner;
 
         subject = subject || 'common';
 
         if (!this.quiet) {
-            $('.dark-overlay').removeClass('hidden');
-            $('.loading-spinner:not(.manual-management)').removeClass('hidden').addClass('active');
+            $overlay = $('.dark-overlay');
+            $spinner = $('.loading-spinner:not(.manual-management)');
+
+            if (label) {
+                $overlay.addClass('white');
+                $('.status-txt', $spinner).text(label).addClass('loading');
+            }
+
+            $overlay.removeClass('hidden');
+            $spinner.removeClass('hidden').addClass('active');
             this.active = true;
         }
 
@@ -54,13 +71,20 @@ if (typeof loadingDialog === 'undefined') {
     loadingDialog.hide = function(subject) {
         'use strict';
 
+        var $overlay;
+        var $spinner;
+
         subject = subject || 'common';
 
         delete $.loadingSubject[subject];
 
         if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
-            $('.dark-overlay').addClass('hidden');
-            $('.loading-spinner:not(.manual-management)').addClass('hidden').removeClass('active');
+            $overlay = $('.dark-overlay');
+            $spinner = $('.loading-spinner:not(.manual-management)');
+
+            $overlay.removeClass('white').addClass('hidden');
+            $spinner.removeClass('active').addClass('hidden');
+            $('.status-txt.loading', $spinner).removeClass('loading');
 
             this.nest = 0;
             this.active = false;

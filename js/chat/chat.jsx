@@ -1090,7 +1090,7 @@ Chat.prototype.userPresenceToCssClass = function(presence) {
 /**
  * Used to re-render my own presence/status
  */
-Chat.prototype.renderMyStatus = function() {
+Chat.prototype.renderMyStatus = SoonFc(function() {
     var self = this;
     if (!self.is_initialized) {
         return;
@@ -1165,7 +1165,7 @@ Chat.prototype.renderMyStatus = function() {
             .removeClass("fadeinout");
     }
 
-};
+}, 100);
 
 
 /**
@@ -1272,7 +1272,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         roomId = chatId;
     }
 
-    if (type === "group" || type == "public") {
+    if (type === "group" || type === "public") {
         userHandles.forEach(function(contactHash) {
             assert(contactHash, 'Invalid hash for user (extracted from inc. message)');
 
@@ -1286,14 +1286,18 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                         'c': undefined
                     })
                 );
-                M.syncUsersFullname(contactHash);
+                if (type === "group") {
+                    M.syncUsersFullname(contactHash);
+                    M.syncContactEmail(contactHash);
+                }
                 self.processNewUser(contactHash, true);
-                M.syncContactEmail(contactHash);
             }
         });
 
-        ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
-        ChatdIntegration._ensureNamesAreLoaded(userHandles, chatHandle);
+        if (type === "group") {
+            ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+        }
+        ChatdIntegration._ensureContactExists(userHandles, chatHandle);
     }
 
     if (!roomId && setAsActive) {
@@ -1609,9 +1613,9 @@ Chat.prototype.sendMessage = function(roomJid, val) {
 Chat.prototype.processNewUser = function(u, isNewChat) {
     var self = this;
 
-    self.logger.debug("added: ", u);
+    // self.logger.debug("added: ", u);
 
-    if (self.plugins.presencedIntegration) {
+    if (M.u[u] && M.u[u].c === 1 && self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.addContact(u, isNewChat);
     }
     self.chats.forEach(function(chatRoom) {
@@ -1631,7 +1635,7 @@ Chat.prototype.processNewUser = function(u, isNewChat) {
 Chat.prototype.processRemovedUser = function(u) {
     var self = this;
 
-    self.logger.debug("removed: ", u);
+    // self.logger.debug("removed: ", u);
 
     if (self.plugins.presencedIntegration) {
         self.plugins.presencedIntegration.removeContact(u);

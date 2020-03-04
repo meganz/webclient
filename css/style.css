@@ -20956,6 +20956,9 @@ body.kr .account.chart.data {
     min-height: initial;
     margin-left: 40px;
 }
+.support a.contact-new-button {
+    margin-left: 0;
+}
 .contact-us-revamp .contact-body-wrapper {
     max-width: 1280px;
     margin: 0 auto;

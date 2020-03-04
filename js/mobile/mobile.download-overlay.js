@@ -81,6 +81,16 @@ mobile.downloadOverlay = {
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
 
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
             // Start the download
             mobile.downloadOverlay.startDownload(nodeHandle);
 

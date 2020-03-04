@@ -12321,7 +12321,7 @@ h5.main-italic-header {
 .reg-success-icon-container {
     width: 100px;
     height: 100px;
-    margin: 40px auto 23px auto;
+    margin: 40px auto 24px auto;
     background-color: white;
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
@@ -12391,12 +12391,6 @@ h5.main-italic-header {
     background-repeat: no-repeat;
     background-position: center -5880px;
 }
-.reg-grey-bar {
-    background-color: rgba(0,0,0,0.1);
-    height: 1px;
-    margin: 30px 0;
-    width: auto;
-}
 .reg-success-header {
     font-size: 20px;
     line-height: 32px;
@@ -12411,7 +12405,7 @@ h5.main-italic-header {
 .reg-success-txt {
     font-size: 14px;
     color: #333;
-    font-family: 'LatoWeb';
+    font-family: 'LatoWebSemiBold';
     line-height: 20px;
     padding: 18px 30px 45px 30px;
     text-align: center;
@@ -12424,11 +12418,15 @@ h5.main-italic-header {
     color: #fff;
     display: block;
     text-align: center;
-    padding: 17px 32px 17px 32px;
+    padding: 17px 16px 17px 16px;
     line-height: 20px;
     font-family: 'LatoWeb';
     background-color: #333;
     border-radius: 0 0 6px 6px;
+}
+.special .reg-success-txtb a {
+    cursor: pointer;
+    text-decoration: underline;
 }
 .reset-success .reg-success-txt {
     padding: 10px 30px 20px 30px;
@@ -12436,6 +12434,9 @@ h5.main-italic-header {
 .reg-resend-email {
     display: table;
     width: 100%;
+}
+.special .reg-resend-email {
+    margin-top: 30px;
 }
 .reg-resend-input-bl {
     display: table-cell;
@@ -12496,11 +12497,19 @@ h5.main-italic-header {
 .resend-email-button:hover {
     background-color: #00ac94;
 }
+.reg-resend-email-txt {
+    color:#999999;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 16px;
+    line-height: 24px;
+    padding: 16px 32px 0;
+}
 .reg-success-normal {
     padding-top: 25px;
 }
 .reg-success-special {
-    padding: 0 32px 34px 32px;
+    padding: 0 32px 32px 32px;
+    text-align: center;
     display: none;
 }
 .special .reg-success-normal {
@@ -12510,7 +12519,7 @@ h5.main-italic-header {
     display: block;
 }
 .reg-success-special .reg-success-txt {
-    padding: 18px 0 0 0;
+    padding: 0;
 }
 .reg-success-special .reg-success-txt.chat-header,
 .reg-success-special .reg-success-txt.chat-message,
@@ -12526,7 +12535,11 @@ h5.main-italic-header {
     text-align: center;
 }
 .registration-page-success.chatlink .reg-success-special .reg-success-txt.chat-message {
+    color: #666666;
     display: block;
+    font-size: 13px;
+    padding: 16px 0 0 0;
+    text-align: center;
 }
 .fm-dialog-top-text {
     padding: 0;

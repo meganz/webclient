@@ -3542,7 +3542,8 @@ div.radioOn.green::after {
 .securitypractice .business-info-block {
     max-width: 620px;
     text-align: left;
-    padding: 0 20px
+    padding: 0 20px;
+    display: inline-block;
 }
 .bottom-page .security-illustration {
     background-image: url(../images/mega/bottom-page/security-page-v1.png);

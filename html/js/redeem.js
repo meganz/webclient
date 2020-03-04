@@ -646,7 +646,7 @@ var redeem = {
             $('.close-voucher-redeem', $dlg).off('click').on('click',
                 function() {
                     if (is_mobile) {
-                        loadSubPage('');
+                        loadSubPage('redeem');
                     }
                     else {
                         closeDialog();

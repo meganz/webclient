@@ -27194,7 +27194,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-list-table .fm-user-management-user .admin-icon{
     padding-right: 8px;
     float: left;
-    z-index: 1130;
     margin-left:4px;
 }
 

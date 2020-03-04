@@ -210,14 +210,14 @@ RichpreviewsFilter.prototype.processMessage = function(e, eventData, forced, isE
             switch (match.getType()) {
                 case 'url' :
                     var link = match.getUrl();
-                    var anchorText = match.getAnchorText(); // stripped link, e.g. http://172.16.0.0 -> 172.16.0.0
-                    var IS_RFC = !!anchorText.match(RichpreviewsFilter._RFC_REGEXP);
 
                     if (LinkInfoHelper.isMegaLink(link)) {
                         // skip MEGA links.
                         return true;
                     }
 
+                    var anchorText = match.getAnchorText(); // stripped link, e.g. http://172.16.0.0 -> 172.16.0.0
+                    var IS_RFC = !!anchorText.match(RichpreviewsFilter._RFC_REGEXP);
                     if (IS_RFC) {
                         // no previews for reserved IP addresses
                         return false;

@@ -34,9 +34,13 @@ class ChatHandleMessage extends ConversationMessageMixin {
             cssClasses += " grouped";
         }
         else {
-            avatar = <ContactsUI.Avatar contact={contact} className="message  avatar-wrapper small-rounded-avatar"/>;
+            avatar = <ContactsUI.Avatar
+                contact={contact}
+                className="message  avatar-wrapper small-rounded-avatar"
+                chatRoom={this.props.chatRoom}
+            />;
             datetime = <div className="message date-time"
-                            title={time2date(timestampInt)}>{timestamp}</div>;
+                title={time2date(timestampInt)}>{timestamp}</div>;
         }
 
 

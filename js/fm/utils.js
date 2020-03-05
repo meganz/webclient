@@ -1393,16 +1393,24 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
             else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
                 // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
-                later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
+                msgDialog(
+                    'warninga',
+                    l[882],
+                    l[19341],
+                    '',
+                    function() {
+                        if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
+                            loadSubPage('fm');
+                            return false;
+                        }
+                        else {
+                            loadSubPage(toPage);
+                            return false;
+                        }
+                    }
+                );
 
-                if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                    loadSubPage('fm');
-                    return false;
-                }
-                else {
-                    loadSubPage(toPage);
-                    return false;
-                }
+                return false;
             }
 
             // Likely that they have never logged in here before so we must set this

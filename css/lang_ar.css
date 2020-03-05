@@ -137,6 +137,10 @@ body.rtl .bus-reg-info-block .bus-reg-checkbox {
     margin-left: 12px;
     margin-right: 0px;
 }
+body.rtl .download.big-button.button.to-clouddrive.transition {
+    padding-left: 12px;
+    padding-right: 12px;
+}
 /*body.rtl .membership-st2-info span.number {
     left: initial;
     right: -20px;

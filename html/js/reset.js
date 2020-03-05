@@ -275,7 +275,8 @@ function init_reset_pw() {
     $passwords.add($confirms).rebind('keyup.initresetpw, input.initresetpw', function(e) {
         var valid = _checkInput($(this));
         if (e.keyCode === 13 && valid) {
-            if ($('.restore-verify-button').hasClass('reset-account')) {
+            var $button = $('.restore-verify-button', $(this).parents('.content-wrapper'));
+            if ($button.hasClass('reset-account')) {
                 delete_reset_pw();
             }
             else {

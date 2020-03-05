@@ -1,13 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 
 /**
  * jScrollPane helper
  * @type {*|Function}
  */
-class JScrollPane extends MegaRenderMixin(React.Component) {
+class JScrollPane extends MegaRenderMixin {
     static defaultProps = {
         className: "jScrollPaneContainer",
         requiresUpdateOnResize: true

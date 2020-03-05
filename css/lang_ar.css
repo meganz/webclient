@@ -90,6 +90,7 @@ body.rtl .button.download.mid-button.to-clouddrive.transition,
 body.rtl .button.download.big-button.to-clouddrive.transition,
 body.rtl .download.transfer-wrapper .download.checkbox-txt,
 body.rtl .about.top-info,
+body.rtl .subuser-sec-profile-container,
 body.rtl .rtl-block-if-rtl {
     direction: rtl;
 }

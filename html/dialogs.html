@@ -7,6 +7,7 @@
         <li class="step3">[$8579]</li>
         <li class="step2">[$8578]</li>
         <li class="step1">[$8577]</li>
+        <li class="status-txt">[$8577]</li>
     </ul>
     <div class="loader-progressbar">
         <div class="loader-percents"></div>
@@ -342,21 +343,19 @@
     <div class="reg-success-special">
         <div class="reg-success-txt">[$217]</div>
         <div class="reg-success-txt chat-header">[$20647]</div>
+        <div class="reg-resend-email-txt"></div>
         <div class="reg-success-txt chat-message">[$20648]</div>
-        <div class="reg-grey-bar"></div>
-        <div class="reg-resend-email">
+        <div class="reg-resend-email hidden">
             <div class="reg-resend-input-bl">
                 <input type="text" value="" maxlength="190" />
                 <div class="reg-resend-email-meg">[$1100]</div>
             </div>
             <div class="reg-resend-button-bl">
-                <div class="resend-email-button">
-                    [$8744]
-                </div>
+                <div class="resend-email-button">[$8744]</div>
             </div>
         </div>
     </div>
-    <div class="reg-success-txtb">[$9029]</div>
+    <div class="reg-success-txtb">[$22900]</div>
 </div>
 
 <div class="fm-dialog rename-dialog hidden">
@@ -1204,7 +1203,9 @@
         </div>
         <div class="multiple-input">
             <i class="small-icon icons-sprite email"></i>
-            <input type="text" class="share-multiple-input" id="share-multiple-input" name="" />
+            <div>
+                <input type="text" class="share-multiple-input" id="share-multiple-input" name="" />
+            </div>
             <div class="clear"></div>
         </div>
         <div class="multiple-input-warning">

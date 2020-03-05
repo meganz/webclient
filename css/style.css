@@ -28136,7 +28136,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .recovery-key-container {
     box-sizing: border-box;
     height: 66px;
-    width: 386px;
+    width: 460px;
     border: 1px solid rgba(0,0,0,0.05);
     border-radius: 4px;
     background-color: #FFFFFF;
@@ -28149,7 +28149,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .recovery-key-info-block .recovery-key-name {
     height: 18px;
-    width: 140px;
+    width: 210px;
     color: #333333;
     font-size: 14px;
     line-height: 18px;

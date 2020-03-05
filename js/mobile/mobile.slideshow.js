@@ -270,6 +270,14 @@ mobile.slideshow = {
                             $(this).click();
                             return false;
                         });
+
+                        // Autoplay the video / audio file
+                        if ($.autoplay === nodeHandle) {
+                            onIdle(function() {
+                                $('.play-video-button', mobile.slideshow.$overlay).trigger('click');
+                            });
+                            delete $.autoplay;
+                        }
                     }
                 });
             });

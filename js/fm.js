@@ -516,15 +516,16 @@ function contactsInfoDialog(title, username, msg, close) {
 }
 
 /**
- * publicLinkInit
-  *
- * Set piublick link and init CopyToClipboard events
+ * setContactLink
  *
+ * Set public link and init CopyToClipboard events
+ * @param {Node|jQuery} [$container] optional container node, used to scope the `public-contact-link`
+ * @returns {undefined|Boolean}
  */
-function setContactLink() {
+function setContactLink($container) {
     "use strict";
 
-    var $publicLink = $('.public-contact-link:visible');
+    var $publicLink = $container ? $('.public-contact-link', $container) : $('.public-contact-link:visible');
     // multiple link data may exists!
     var linkData = $publicLink.attr('data-lnk');
     var account = M.account || false;
@@ -542,7 +543,7 @@ function setContactLink() {
     }
     else {
         api_req({ a: 'clc' }, {
-            callback: function (res, ctx) {
+            callback: function(res) {
                 if (typeof res === 'string') {
                     contactPrefix =  res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
@@ -568,7 +569,7 @@ function setContactLink() {
         $('.dropdown.tooltip.small').removeClass('visible');
     });
 
-    $publicLink.rebind('click', function() {
+    $publicLink.rebind('click.publiclnk', function() {
         var linkData = $(this).attr('data-lnk') || '';
 
         if (linkData.length) {
@@ -639,7 +640,7 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     M.safeShowDialog('add-user-popup', $d);
 
-    setContactLink();
+    setContactLink($d);
 
     var $textarea = $d.find('.add-user-textarea textarea');
 
@@ -1283,7 +1284,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $.warningCallback = callback;
 
     $('#msgDialog').removeClass('clear-bin-dialog confirmation-dialog warning-dialog-b warning-dialog-a ' +
-        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide');
+        'notification-dialog remove-dialog delete-contact loginrequired-dialog multiple wide with-close-btn');
     $('#msgDialog .icon').removeClass('fm-bin-clear-icon .fm-notification-icon');
     $('#msgDialog .confirmation-checkbox').addClass('hidden');
 
@@ -1476,10 +1477,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             .removeClass('plan4')
             .addClass('plan' + plan);
     }
-    else if (type === 'import_login' || type === 'import_register') {
-        var buttonLabel = type === 'import_login' ? l[171] : l[170];
-
-        $('#msgDialog').addClass('warning-dialog-a wide');
+    else if (type === 'import_login_or_register') {
+        // Show import confirmation dialog if a user isn't logged in
+        $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="bottom-bar-link">@@</div>' +
                 '<div class="default-green-button right notification-button confirm button semi-big">' +
@@ -1488,25 +1488,27 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 '<div class="default-white-button right notification-button cancel semi-big">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="clear"></div></div>', l[20754], buttonLabel, l[79]);
+                '<div class="clear"></div></div>', l[20754], l[170], l[171]);
 
+        // Register a new account to complete the import
         $('#msgDialog .default-green-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(true);
+                $.warningCallback('register');
             }
         });
-        /*!4*/
+        // Login to complete the import
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(undefined);
+                $.warningCallback('login');
             }
         });
+        // Have an ephemeral account to complete the import
         $('#msgDialog .bottom-bar-link').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
-                $.warningCallback(false);
+                $.warningCallback('ephemeral');
             }
         });
     }
@@ -1516,7 +1518,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     $('#msgDialog .fm-notification-info h1').safeHTML(msg);
     clickURLs();
     if (submsg) {
-        $('#msgDialog .fm-notification-info p').text(submsg);
+        $('#msgDialog .fm-notification-info p').safeHTML(submsg);
         $('#msgDialog .fm-notification-info p').removeClass('hidden');
     }
     else {
@@ -2516,19 +2518,26 @@ function closeImportContactNotification(c) {
  */
 
 function showWarningTokenInputLose() {
-
     "use strict";
+
+    var $dialog = $('.fm-dialog:visible');
+    if ($dialog.length !== 1) {
+        console.warn('Unexpected number of dialogs...', [$dialog]);
+        return MegaPromise.resolve();
+    }
 
     var promise = new MegaPromise();
 
     // If there is any tokenizer on the dialog and it is triggered by dom event.
-    var $tokenInput = $('.fm-dialog:visible li[class*="token-input-input"]');
+    var $tokenInput = $('li[class*="token-input-input"]', $dialog);
 
     // Make sure all input is tokenized.
-    $tokenInput.find('input').trigger('blur');
+    if ($tokenInput.length) {
+        $('input', $tokenInput).trigger('blur');
+    }
 
     // If tokenizer is on the dialog, check it has input already. If it has, warn user.
-    var $tokenItems = $('li[class*="token-input-token"]');
+    var $tokenItems = $('li[class*="token-input-token"]', $dialog);
 
     if ($tokenItems.length) {
         msgDialog('confirmation', '', l[20474], l[18229], function(e) {
@@ -2589,7 +2598,7 @@ function closeDialog(ev) {
     if ($.dialog === 'terms' && $.registerDialog) {
         $('.fm-dialog.bottom-pages-dialog').addClass('hidden');
     }
-    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+    else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
         $('.fm-dialog.create-folder-dialog').addClass('hidden');
         $('.fm-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
@@ -2636,6 +2645,8 @@ function closeDialog(ev) {
         delete $.shareToContactId;
         delete $.copyrightsDialog;
         delete $.selectFolderDialog;
+        delete $.saveAsDialog;
+        delete $.nodeSaveAs;
 
         /* copy/move dialog - save to */
         delete $.saveToDialogCb;
@@ -2689,9 +2700,10 @@ function closeDialog(ev) {
         $.dialog = $.propertiesDialog;
     }
 
-    if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+    if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
         // the createfolder dialog was closed
-        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog;
+        // eslint-disable-next-line local-rules/hints
+        $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
 
         $('.fm-dialog').addClass('arrange-to-back');
         $('.fm-dialog.fm-picker-dialog').removeClass('arrange-to-back');
@@ -2717,14 +2729,15 @@ function createFolderDialog(close) {
         if ($.cftarget) {
             delete $.cftarget;
         }
-        closeDialog();
+        if ($.dialog === 'createfolder') {
+            closeDialog();
+        }
         return true;
-
     }
-    var doCreateFolder = function (v) {
-        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
 
-        if (!M.isSafeName(v)) {
+    var doCreateFolder = function(v) {
+
+        if (!M.isSafeName(v, true)) {
             $dialog.removeClass('active');
             $input.addClass('error');
             return;
@@ -2749,28 +2762,44 @@ function createFolderDialog(close) {
             }
         }
 
-        loadingDialog.pshow();
-        $dialog.addClass('hidden');
+        var target = $.cftarget = $.cftarget || M.currentCustomView.nodeID || M.currentdirid;
+        var awaitingPromise = $.cfpromise;
+        delete $.cfpromise;
 
-        M.createFolder(target, v, new MegaPromise())
-            .done(function(h) {
+        closeDialog();
+        loadingDialog.pshow();
+
+        M.createFolder(target, v.split(/[/\\]/))
+            .then(function(h) {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
                 loadingDialog.phide();
-                if ($.cfpromise) {
-                    $.cfpromise.resolve(h);
-                    delete $.cfpromise;
+
+                if (awaitingPromise) {
+                    // dispatch an awaiting promise expecting to perform its own action instead of the default one
+                    awaitingPromise.resolve(h);
+                }
+                else {
+                    // By default auto-select the newly created folder as long no awaiting promise
+                    M.openFolder(Object(M.d[h]).p || target)
+                        .always(function() {
+                            $.selected = [h];
+                            reselect(1);
+                        });
                 }
                 createFolderDialog(1);
             })
-            .fail(function(error) {
+            .catch(function(ex) {
                 loadingDialog.phide();
-                $dialog.removeClass('hidden');
-                msgDialog('warninga', l[135], l[47], api_strerror(error));
+
+                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
+                    if (awaitingPromise) {
+                        awaitingPromise.reject(ex);
+                    }
+                });
             });
     };
-
 
     $input.rebind('focus', function() {
         if ($(this).val() === l[157]) {
@@ -2825,6 +2854,163 @@ function createFolderDialog(close) {
         return $dialog;
     });
 }
+
+function createFileDialog(close, action, params) {
+    "use strict";
+
+
+    var closeFunction = function() {
+        if ($.cftarget) {
+            delete $.cftarget;
+        }
+        closeDialog();
+        return false;
+    };
+
+
+    if (close) {
+        return closeFunction();
+    }
+
+    if (!action) {
+        action = function(name, t) {
+            loadingDialog.pshow();
+            M.addNewFile(name, t)
+                .done(function(nh) {
+                    if (d) {
+                        console.log('Created new file %s->%s', t, name);
+                    }
+                    loadingDialog.phide();
+
+                    if ($.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 ||
+                        $.selectddUIgrid.indexOf('.file-block-scrolling') > -1) {
+                        var $grid = $($.selectddUIgrid);
+                        var $newElement = $('#' + nh, $grid);
+
+                        var jsp = $grid.data('jsp');
+                        if (jsp) {
+                            jsp.scrollToElement($newElement);
+                        }
+                        else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                            M.megaRender.megaList.scrollToItem(nh);
+                            $newElement = $('#' + nh, $grid);
+                        }
+
+                        // now let's select the item. we can not use the click handler due
+                        // to redraw if element was out of viewport.
+                        $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
+                        $newElement.addClass('ui-selected');
+                        $.gridLastSelected = $newElement;
+                        selectionManager.clear_selection();
+                        selectionManager.add_to_selection(nh);
+
+                        loadingDialog.show('common', l[23130]);
+
+                        mega.fileTextEditor.getFile(nh).done(
+                            function(data) {
+                                loadingDialog.hide();
+                                mega.textEditorUI.setupEditor(M.d[nh].name, data, nh);
+                            }
+                        ).fail(function() {
+                            loadingDialog.hide();
+                        });
+
+                    }
+
+                })
+                .fail(function(error) {
+                    loadingDialog.phide();
+                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                });
+        };
+    }
+
+    // there's no jquery parent for this container.
+    // eslint-disable-next-line local-rules/jquery-scopes
+    var $dialog = $('.fm-dialog.create-file-dialog');
+    var $input = $('input', $dialog);
+    $input.val('.txt')[0].setSelectionRange(0, 0);
+
+    var doCreateFile = function(v) {
+        var target = $.cftarget = $.cftarget || M.currentdirid;
+
+        v = $.trim(v);
+
+        if (!M.isSafeName(v)) {
+            $dialog.removeClass('active');
+            $input.addClass('error');
+            return;
+        }
+        else if (duplicated(0, v, target)) {
+            $dialog.addClass('duplicate');
+            $input.addClass('error');
+
+            return;
+        }
+        closeFunction();
+        action(v, target, params);
+    };
+
+
+    $input.rebind('focus.fileDialog', function() {
+        if ($(this).val() === l[17506]) {
+            $input.val('');
+        }
+        $dialog.addClass('focused');
+    });
+
+    $input.rebind('blur.fileDialog', function() {
+        $dialog.removeClass('focused');
+    });
+
+    $input.rebind('keyup.fileDialog', function() {
+        if ($input.val() === '' || $input.val() === l[17506]) {
+            $dialog.removeClass('active');
+        }
+        else {
+            $dialog.addClass('active');
+            $input.removeClass('error');
+        }
+    });
+
+    $input.rebind('keypress.fileDialog', function(e) {
+
+        if (e.which === 13 && $(this).val() !== '') {
+            doCreateFile($(this).val());
+        }
+        else {
+            $input.removeClass('error');
+            $dialog.removeClass('duplicate');
+        }
+    });
+
+    // eslint-disable-next-line sonarjs/no-duplicate-string
+    $('.fm-dialog-close, .cancel-create-file', $dialog).rebind('click.fileDialog', closeFunction);
+
+    $('.fm-dialog-input-clear', $dialog).rebind('click.fileDialog', function() {
+        $input.val('');
+        $dialog.removeClass('active');
+    });
+
+    $('.create-file', $dialog).rebind('click.fileDialog', function() {
+        var v = $input.val();
+
+        if (v === '' || v === l[17506]) {
+            msgDialog('warninga', '', l[8566]);
+        }
+        else {
+            doCreateFile(v);
+        }
+    });
+
+    M.safeShowDialog('createfile', function() {
+        $dialog.removeClass('hidden');
+        $('.fm-dialog-body.mid-pad input', $dialog).focus();
+        $dialog.removeClass('active');
+        return $dialog;
+    });
+}
+
 
 function chromeDialog(close) {
     'use strict';
@@ -3218,7 +3404,7 @@ function fm_resize_handler(force) {
         }
         initDashboardScroll();
     }
-    else {
+    else if (!M.chat) {
         if (M.viewmode) {
             initFileblocksScrolling();
         }

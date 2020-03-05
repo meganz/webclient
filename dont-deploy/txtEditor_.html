@@ -1,0 +1,326 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MEGA 2.0</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+    <!--<link rel="stylesheet" type="text/css" href="../css/toast.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../css/settings.css" />-->
+    <link rel="stylesheet" type="text/css" href="../css/txteditor.css" />
+    <link rel="stylesheet" type="text/css" href="../css/top-menu.css" />
+
+    <link rel="stylesheet" type="text/css" href="../css/codemirror.css" />
+    <script src="../js/vendor/codemirror.js"></script>
+    <script src="../js/vendor/simplescrollbars.js"></script>
+
+    <script type="text/javascript" src="../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../js/vendor/jquery.jscrollpane.js"></script>
+    <!--<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>-->
+    <script type="text/javascript">
+
+    </script>
+</head>
+
+<body id="body-txt-editor" style="background-color: initial !important;">
+    <div id="mega-text-editor">
+        <!--<div class="disability-overlay hidden"></div>-->
+        <div class="editor-textarea-container">
+            <div class="editor-btn-container">
+                <div class="txt-editor-menu">
+                </div>
+                <div class="top-menu-popup ">
+                    <div class="top-menu-content">
+                        <div class="top-menu-item new-f">New</div>
+                        <div class="top-menu-item open-f">Open...</div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item get-link-f">Get Link...</div>
+                        <div class="top-menu-item send-contact-f"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>Send to Contacts...</span></div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item close-f">Close</div>
+                        <div class="top-menu-item save-f ">Save</div>
+                        <div class="top-menu-item save-as-f">Save as...</div>
+                        <div class="top-menu-divider">
+                            <div class="txt-editor-sp-menu"></div>
+                        </div>
+
+                        <div class="top-menu-item print-f">Print...</div>
+                    </div>
+                </div>
+                <div class="editor-file-name-title">
+                    <span class="transfer-filetype-icon text file"></span>
+                    <span class="txt-editor-opened-f-name">fdkjghfdkjlhnj5894ngdfkjgngfikmdgfdognmdfoingeoirnteso845.txt</span>
+                </div>
+                <div class="buttons-holder">
+                    <div class="default-white-button gradient txt-editor-btn close-btn">
+                        <span>Close</span>
+                    </div>
+                    <div class="default-green-button gradient txt-editor-btn save-btn disabled">
+                        <span>Save</span>
+                    </div>
+                </div>
+            </div>
+            <div id="text-editor-textarea">
+                <textarea id="txtar"></textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        // var myTextarea = $('#txtar');
+        var myTextarea;
+        var iFramecontainer;
+        var setFunction;
+        var remFunction;
+        var fileHandle;
+        var versionHandle;
+        var $parent;
+        var fName;
+
+        var editor;
+        //var editor = CodeMirror.fromTextArea(myTextarea[0], {
+        //    lineNumbers: true,
+        //    scrollbarStyle: "overlay"
+        //});
+
+        $('.txt-editor-menu').off('click').on('click',
+            function textEditorMenuOpen() {
+                $('.top-menu-popup').show();
+                return false;
+            });
+
+
+        $('#mega-text-editor').off('click').on('click',
+            function textEditorGlobalClick() {
+                $('.top-menu-popup').hide();
+                return false;
+            });
+
+
+        $('#mega-text-editor .top-menu-item, #mega-text-editor .top-menu-divider').off('click').on('click',
+            function textEditorMenuItemSelect() {
+
+                return false;
+            });
+
+        function bindChangeListner() {
+            var changeListner = function() {
+                $('#mega-text-editor .buttons-holder .save-btn').removeClass('disabled');
+                editor.off('change', changeListner);
+            };
+
+            editor.on('change', changeListner);
+        }
+
+        function setupEditor(fName, txt, container, setterFunction, handle, removeFunction) {
+            // myTextarea.text(txt);
+            myTextarea = $('#txtar');
+            if (!editor) {
+                editor = CodeMirror.fromTextArea(myTextarea[0], {
+                    lineNumbers: true,
+                    scrollbarStyle: "overlay"
+                });
+            }
+
+
+            $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
+            if (editor) {
+                savedFileData = txt;
+                editor.setValue(txt);
+                bindChangeListner();
+                //var changeListner = function() {
+                //    $('#mega-text-editor .buttons-holder .save-btn').removeClass('disabled');
+                //    editor.off('change', changeListner);
+                //};
+
+                //editor.on('change', changeListner);
+            }
+
+            $('#mega-text-editor .txt-editor-opened-f-name').text(fName);
+            $('.top-menu-popup').hide();
+
+            iFramecontainer = container;
+            setFunction = setterFunction;
+            remFunction = removeFunction;
+            fileHandle = handle;
+            versionHandle = '';
+            $parent = null;
+            this.fName = fName;
+        }
+
+        // remove for testing only
+        //if (u_k) {
+        //     console.error(u_k);
+        //}
+        //if (u_attr) {
+        //    console.error(u_attr);
+        //}
+        // end of test
+
+        function validateAction(msg, submsg, callback) {
+            if (savedFileData !== editor.getValue()) {
+                window.parent.msgDialog('confirmation', '', msg,
+                    submsg,
+                    function(e) {
+                        if (e) {
+                            callback();
+                        }
+                    });
+            }
+            else {
+                callback();
+            }
+        }
+
+        function selectedItemOpen(node) {
+
+            var openFile = function() {
+                !$parent && ($parent = window.parent.$(window.parent.document));
+                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            };
+
+            validateAction('The Opened file has been modified.',
+                'Are you sure you want to discard changes and open the selected file?', openFile);
+
+            //if (savedFileData !== editor.getValue()) {
+            //    window.parent.msgDialog('confirmation', '', 'The Opened file has been modified.',
+            //        'Are you sure you want to discard changes and open the selected file?',
+            //        function(e) {
+            //            if (e) {
+            //                openFile();
+            //            }
+            //        });
+            //}
+            //else {
+            //    openFile();
+            //}
+
+            //if ((versionHandle && versionHandle !== node.h) || (fileHandle !== node.h)) {
+
+
+            //}
+        }
+
+        function printText() {
+            // var content = document.getElementById('text-editor-textarea').innerHTML;
+            var mywindow = window.open('', fName, 'height=600,width=800');
+
+            mywindow.document.write('<html><head><title>' + fName + '</title>');
+            mywindow.document.write('</head><body >');
+            mywindow.document.write('<pre>' + editor.getValue() + '</pre>');
+            mywindow.document.write('</body></html>');
+
+            mywindow.document.close();
+            mywindow.focus()
+            mywindow.print();
+            mywindow.close();
+            return true;
+        }
+
+        $('#mega-text-editor .buttons-holder .close-btn').off('click').on('click',
+            function textEditorCloseBtnClick() {
+                editor && editor.setValue('');
+                if (iFramecontainer) {
+                    iFramecontainer.addClass('hidden');
+                }
+                return false;
+            });
+
+        $('#mega-text-editor .buttons-holder .save-btn').off('click').on('click',
+            function textEditorSaveBtnClick() {
+                if ($(this).hasClass('disabled')) {
+                    return false;
+                }
+                if (setFunction && editor) {
+                    $('#mega-text-editor .buttons-holder .save-btn').addClass('disabled');
+                    // $('#mega-text-editor .disability-overlay').removeClass('hidden');
+                    window.parent.loadingDialog.show();
+
+                    setFunction(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
+                        if (versionHandle) {
+                            remFunction(versionHandle);
+                        }
+                        versionHandle = fh;
+                        savedFileData = editor.getValue();
+
+                        bindChangeListner();
+                        // $('#mega-text-editor .disability-overlay').addClass('hidden');
+                        window.parent.loadingDialog.hide();
+                    });
+                }
+            });
+
+        $('#mega-text-editor .editor-btn-container .open-f').off('click').on('click', function openFileClick() {
+            window.parent.M.initFileAndFolderSelectDialog('openFile', selectedItemOpen);
+        });
+
+        $('#mega-text-editor .editor-btn-container .save-f').off('click').on('click', function saveFileMenuClick() {
+            $('#mega-text-editor .buttons-holder .save-btn').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .new-f').off('click').on('click', function newFileMenuClick() {
+            validateAction('The Opened file has been modified.',
+                'Are you sure you want to discard changes and create a new file?',
+                function() {
+                    window.parent.loadingDialog.show();
+                    window.parent.openSaveAsDialog({ name: 'New file.txt' }, '', function(handle) {
+                        !$parent && ($parent = window.parent.$(window.parent.document));
+                        window.parent.loadingDialog.hide();
+                        $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+                    });
+                }
+            );
+        });
+
+        $('#mega-text-editor .editor-btn-container .save-as-f').off('click').on('click', function newFileMenuClick() {
+            window.parent.loadingDialog.show();
+            var editedTxt = editor.getValue();
+            if (editedTxt === savedFileData) {
+                editedTxt = null;
+            }
+            window.parent.openSaveAsDialog(versionHandle || fileHandle, editedTxt, function(handle) {
+                !$parent && ($parent = window.parent.$(window.parent.document));
+                window.parent.loadingDialog.hide();
+                $parent.find('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+            });
+        });
+
+        $('#mega-text-editor .editor-btn-container .get-link-f').off('click').on('click', function getLinkFileMenuClick() {
+            !$parent && ($parent = window.parent.$(window.parent.document));
+            $parent.find('.dropdown.body.context .dropdown-item.getlink-item').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .send-contact-f').off('click').on('click', function sendToContactMenuClick() {
+            !$parent && ($parent = window.parent.$(window.parent.document));
+            $parent.find('.dropdown.body.context .dropdown-item.send-to-contact-item').trigger('click');
+        });
+
+        $('#mega-text-editor .editor-btn-container .print-f').off('click').on('click', function printMenuClick() {
+            printText();
+        });
+
+
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

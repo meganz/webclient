@@ -1339,9 +1339,13 @@ MegaUtils.prototype.checkForDuplication = function(id) {
             }
         }
 
-        if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
-            console.error("Strange case, no Duplications were found in the time when" +
-                "we have a mismatch in length " + id);
+        if (!Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+            if (d) {
+                console.warn("No Duplications were found in the time when"
+                    + "we have a mismatch in lengths "
+                    + id + '. We have names intersected between files and folders');
+            }
+            return;
         }
 
         var resultObject = Object.create(null);
@@ -1481,30 +1485,6 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
     }
 };
 
-/** Don't report `newmissingkeys` unless there are *new* missing keys */
-MegaUtils.prototype.checkNewMissingKeys = function() {
-    var result = true;
-
-    try {
-        var keys = Object.keys(missingkeys).sort();
-        var hash = MurmurHash3(JSON.stringify(keys));
-        var prop = u_handle + '_lastMissingKeysHash';
-        var oldh = parseInt(localStorage[prop]);
-
-        if (oldh !== hash) {
-            localStorage[prop] = hash;
-        }
-        else {
-            result = false;
-        }
-    }
-    catch (ex) {
-        console.error(ex);
-    }
-
-    return result;
-};
-
 /**
  * Sanitise filename so that saving to local disk won't cause any issue...
  * @param {String} name The filename
@@ -1537,9 +1517,10 @@ MegaUtils.prototype.getSafeName = function(name) {
  *
  * this method will be called to control, renamings from webclient UI.
  * @param {String} name The filename
+ * @param {Boolean} [allowPathSep] whether to allow ether / or \ as a mean for nested folder creation requirements.
  * @returns {Boolean}
  */
-MegaUtils.prototype.isSafeName = function (name) {
+MegaUtils.prototype.isSafeName = function(name, allowPathSep) {
     'use strict';
     // below are mainly denied in windows or android.
     // we can enhance this as much as we can as
@@ -1549,10 +1530,7 @@ MegaUtils.prototype.isSafeName = function (name) {
     if (name.trim().length <= 0) {
         return false;
     }
-    if (name.search(/[\\\/<>:*\"\|?]/) >= 0 || name.length > 250) {
-        return false;
-    }
-    return true;
+    return !(name.search(allowPathSep ? /["*:<>?|]/ : /["*/:<>?\\|]/) >= 0 || name.length > 250);
 };
 
 /**

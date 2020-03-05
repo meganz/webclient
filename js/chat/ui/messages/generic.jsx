@@ -3,7 +3,7 @@ import utils from './../../../ui/utils.jsx';
 import { getMessageString } from './utils.jsx';
 import { ConversationMessageMixin } from './mixin.jsx';
 import { MetaRichpreview } from './metaRichpreview.jsx';
-import { MetaRichpreviewConfirmation } from './metaRichpreviewConfirmation.jsx';
+import { MetaRichprevConfirmation } from './metaRichpreviewConfirmation.jsx';
 import { MetaRichpreviewMegaLinks } from './metaRichpreviewMegaLinks.jsx';
 import { Avatar, ContactButton, ContactPresence, ContactFingerprint, ContactVerified } from './../contacts.jsx';
 import {TypingArea} from './../typingArea.jsx';
@@ -13,9 +13,12 @@ var DropdownsUI = require('./../../../ui/dropdowns.jsx');
 var ButtonsUI = require('./../../../ui/buttons.jsx');
 
 /* 1h as confirmed by Mathias */
-const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60*60;
+// eslint-disable-next-line id-length
+const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
-var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
+// eslint-disable-next-line id-length
+var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big,' +
+    ' .data-block-view.medium';
 
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
@@ -47,10 +50,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 }
             }
         }
-        else if (isMounted && !isBeingEdited && oldState.editing === true) {
-            if (self.props.onUpdate) {
-                self.props.onUpdate();
-            }
+        else if (isMounted && !isBeingEdited && oldState.editing === true && self.props.onUpdate) {
+            self.props.onUpdate();
         }
 
         $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
@@ -75,6 +76,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             }
         }
 
+        var SHARED_INFO_CLS = '.shared-info';
         $node.rebind(
             'click.dropdownShortcut',
             CLICKABLE_ATTACHMENT_CLASSES,
@@ -92,9 +94,11 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 if ($(e.target).is('.shared-data')) {
                     $block = $(e.target);
                 }
-                else if ($(e.target).is('.shared-info') || $(e.target).parents('.shared-info').length > 0) {
-                    $block = $(e.target).is('.shared-info') ?
-                        $(e.target).next() : $(e.target).parents('.shared-info').next();
+                else if (
+                    $(e.target).is(SHARED_INFO_CLS) || $(e.target).parents(SHARED_INFO_CLS).length > 0
+                ) {
+                    $block = $(e.target).is(SHARED_INFO_CLS) ?
+                        $(e.target).next() : $(e.target).parents(SHARED_INFO_CLS).next();
                 }
                 else {
                     $block = $(e.target).parents('.message.shared-data');
@@ -121,20 +125,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
             return false;
         }
 
-        if (this.props.message.meta) {
-            if (this.props.message.meta.participants) {
-                // call ended type of message
-                return this.props.message.meta.participants;
-            }
-            else {
-                return false;
-            }
+        if (this.props.message.meta && this.props.message.meta.participants) {
+            // call ended type of message
+            return this.props.message.meta.participants;
         }
-        else {
-            return false;
-        }
+        return false;
     }
-    _nodeUpdated(h) {
+    _nodeUpdated() {
         var self = this;
         // because it seems the webclient can trigger stuff before the actual
         // change is done on the node, this function would need to be queued
@@ -213,9 +210,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             );
             return isFav;
         }
-        else {
-            return false;
-        }
+        return false;
     }
     _isNodeHavingALink(h) {
         return M.getNodeShare(h) !== false;
@@ -246,11 +241,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
             );
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
-    _startDownload (v) {
+    _startDownload(v) {
         M.addDownload([v]);
     }
     _addToCloudDrive(v, openSendToChat) {
@@ -270,6 +263,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     })
                     .catch(function() {
                         if (d) {
+                            // eslint-disable-next-line local-rules/hints
                             console.error("Failed to allocate 'My chat files' folder.", arguments);
                         }
                     });
@@ -284,15 +278,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         }
                     }
                     else {
-                        if (target === M.RootID) {
-                            // since if the user clicks Save without picking, its a bit weird, where the file went
-                            // we show a simple dialog telling him the file is in Cloud Drive.
-                            msgDialog(
-                                'info',
-                                l[8005],
-                                l[8006]
-                            );
-                        }
+                        msgDialog(
+                            'info',
+                            l[8005],
+                            // Confirmation message based on the selected location.
+                            // a) `Attachment added to Cloud Drive.` for the root directory or none selected (default)
+                            // b) `Attachment added to %s.`
+                            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name))
+                        );
                     }
                 });
             }
@@ -351,6 +344,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
 
+        var avatar = null;
+        var datetime = null;
+        var name = null;
         var additionalClasses = "";
         var buttonsBlock = null;
         var spinnerElement = null;
@@ -359,6 +355,9 @@ class GenericConversationMessage extends ConversationMessageMixin {
         var subMessageComponent = [];
         var attachmentMeta = false;
         var extraPreButtons = [];
+        var files = [];
+        var textMessage;
+        var displayName;
 
         if (this.props.className) {
             additionalClasses += this.props.className;
@@ -396,12 +395,12 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 message.wasRendered = 1;
             }
 
-            var textMessage = message.messageHtml;
+            textMessage = message.messageHtml;
 
             var state = message.getState();
             var stateText = message.getStateText(state);
             var textContents = message.textContents || false;
-            var displayName = contact && generateAvatarMeta(contact.u).fullName || '';
+            displayName = contact && generateAvatarMeta(contact.u).fullName || '';
 
             if (state === Message.STATE.NOT_SENT) {
                 messageIsNowBeingSent = (unixtime() - message.delay < 5);
@@ -451,12 +450,12 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT) {
                     attachmentMeta = message.getAttachmentMeta() || [];
 
-                    var files = [];
-                    attachmentMeta.forEach(function(v, attachmentKey) {
+                    for (var i = 0; i < attachmentMeta.length; i++) {
+                        var v = attachmentMeta[i];
 
                         if (!M.chd[v.ch] || v.revoked) {
                             // don't show revoked files
-                            return;
+                            continue;
                         }
 
                         // generate preview/icon
@@ -477,9 +476,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 noThumbPrev = 'no-thumb-prev';
                             }
                             var previewLabel = isAudio ? l[17828] : isVideo ? l[16275] : l[1899];
-                            previewButton = <span key="previewButton">
-                                    <DropdownsUI.DropdownItem icon="search-icon" label={previewLabel}
-                                                              onClick={self._startPreview.bind(self, v)}/>
+                            var previewIcon = isAudio ? 'context play' : isVideo ? 'context videocam' : 'search-icon';
+                            previewButton =
+                                <span key="previewButton">
+                                    <DropdownsUI.DropdownItem
+                                        label={previewLabel}
+                                        icon={previewIcon}
+                                        onClick={self._startPreview.bind(self, v)}
+                                    />
                                 </span>;
                         }
 
@@ -575,40 +579,39 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                                         }
 
-                                            if (
-                                                !previewButton &&
-                                                firstGroupOfButtons.length === 0 &&
-                                                !downloadButton &&
-                                                linkButtons.length === 0 &&
-                                                !revokeButton
-                                            ) {
-                                                return null;
-                                            }
+                                        if (
+                                            !previewButton &&
+                                            firstGroupOfButtons.length === 0 &&
+                                            !downloadButton &&
+                                            linkButtons.length === 0 &&
+                                            !revokeButton
+                                        ) {
+                                            return null;
+                                        }
 
-                                            if (
-                                                previewButton && (
-                                                    firstGroupOfButtons.length > 0 ||
-                                                    downloadButton ||
-                                                    linkButtons.length > 0 ||
-                                                    revokeButton
-                                                )
-                                            ) {
-                                                previewButton = [previewButton, <hr key="preview-sep"/>];
-                                            }
+                                        if (
+                                            previewButton && (
+                                                firstGroupOfButtons.length > 0 ||
+                                                downloadButton ||
+                                                linkButtons.length > 0 ||
+                                                revokeButton
+                                            )
+                                        ) {
+                                            previewButton = [previewButton, <hr key="preview-sep"/>];
+                                        }
 
 
-                                            return <div>
-                                                {previewButton}
-                                                {firstGroupOfButtons}
-                                                {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
-                                                {downloadButton}
-                                                {linkButtons}
-                                                {revokeButton && downloadButton ? <hr /> : ""}
-                                                {revokeButton}
-                                            </div>;
-                                        }}
-                                    />
-                                </ButtonsUI.Button>;
+                                        return <div>
+                                            {previewButton}
+                                            {firstGroupOfButtons}
+                                            {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr /> : ""}
+                                            {downloadButton}
+                                            {linkButtons}
+                                            {revokeButton && downloadButton ? <hr /> : ""}
+                                            {revokeButton}
+                                        </div>;
+                                    }} />
+                            </ButtonsUI.Button>;
                         }
                         else {
                             dropdown = <ButtonsUI.Button
@@ -623,13 +626,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     vertOffset={3}
                                 >
                                     {previewButton}
-                                    <hr/>
+                                    {previewButton && <hr/>}
                                     <DropdownsUI.DropdownItem icon="rounded-grey-down-arrow" label={__(l[1187])}
-                                                              onClick={self._startDownload.bind(self, v)}/>
+                                        onClick={self._startDownload.bind(self, v)}/>
                                     <DropdownsUI.DropdownItem icon="grey-cloud" label={__(l[1988])}
-                                                              onClick={self._addToCloudDrive.bind(self, v, false)}/>
+                                        onClick={self._addToCloudDrive.bind(self, v, false)}/>
                                     <DropdownsUI.DropdownItem icon="conversations" label={__(l[17764])}
-                                                              onClick={self._addToCloudDrive.bind(self, v, true)}/>
+                                        onClick={self._addToCloudDrive.bind(self, v, true)}/>
                                 </DropdownsUI.Dropdown>
                             </ButtonsUI.Button>;
                         }
@@ -637,7 +640,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                         var attachmentClasses = "message shared-data";
                         var preview = <div className={"data-block-view medium " + noThumbPrev}
-                                           onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}>
+                            onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}>
                             {dropdown}
 
                             <div className="data-block-bg">
@@ -651,18 +654,18 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             var thumbOverlay = null;
 
                             if (isImage) {
-                                thumbClass = thumbClass + " image";
+                                thumbClass += " image";
                                 thumbOverlay = <div className="thumb-overlay"
-                                                    onClick={self._startPreview.bind(self, v)}></div>;
+                                    onClick={self._startPreview.bind(self, v)}></div>;
                             }
                             else {
                                 thumbClass = thumbClass + " video " + (
                                     isPreviewable ? " previewable" : "non-previewable"
                                 );
                                 thumbOverlay = <div className="thumb-overlay"
-                                                    onClick={
-                                                        isPreviewable ? self._startPreview.bind(self, v) : undefined
-                                                    }>
+                                    onClick={
+                                        isPreviewable ? self._startPreview.bind(self, v) : undefined
+                                    }>
                                     {isPreviewable && <div className="play-video-button"></div>}
                                     <div className="video-thumb-details">
                                         {v.playtime && <i className="small-icon small-play-icon"></i>}
@@ -676,8 +679,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 {dropdown}
 
                                 <img alt="" className={"thumbnail-placeholder " + v.h} src={src}
-                                     key={'thumb-' + v.ch}
-                                     onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}
+                                    key={'thumb-' + v.ch}
+                                    onClick={isPreviewable ? self._startPreview.bind(self, v) : undefined}
                                 />
                             </div>) : preview);
                         }
@@ -699,20 +702,26 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                             </div>
                         );
-                    });
+                    }
 
 
-                    var avatar = null;
-                    var datetime = null;
-                    var name = null;
                     if (this.props.grouped) {
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar
+                            contact={contact}
+                            className="message avatar-wrapper small-rounded-avatar"
+                            chatRoom={self.props.chatRoom}
+                        />;
                         datetime = <div className="message date-time simpletip"
-                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            chatRoom={self.props.chatRoom}
+                            label={displayName}
+                        />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -733,7 +742,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     textContents = textContents.substr(2, textContents.length);
 
                     try {
-                        var attachmentMeta = JSON.parse(textContents);
+                        attachmentMeta = JSON.parse(textContents);
                     } catch(e) {
                         return null;
                     }
@@ -758,7 +767,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 label={l[83]}
                                 className="red"
                                 onClick={(e) => {
-                                        self.doDelete(e, message);
+                                    self.doDelete(e, message);
                                 }}
                             />;
 
@@ -793,11 +802,18 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
+                                        <Avatar
+                                            className="avatar-wrapper context-avatar"
+                                            chatRoom={self.props.chatRoom}
+                                            contact={M.u[contact.u]} />
                                         <div className="dropdown-user-name">
-                                             <div className="name">
-                                                 {M.getNameByHandle(contact.u)}
-                                                 <ContactPresence className="small" contact={contact} />
+                                            <div className="name">
+                                                {
+                                                    self.isLoadingContactInfo() ?
+                                                        <em className="contact-name-loading" /> :
+                                                        M.getNameByHandle(contact.u)
+                                                }
+                                                <ContactPresence className="small" contact={contact} />
                                             </div>
                                             <div className="email">
                                                  {M.u[contact.u].m}
@@ -814,13 +830,6 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                         }}
                                     />
                                     <hr/>
-                                    { null /*<DropdownsUI.DropdownItem
-                                     icon="rounded-grey-plus"
-                                     label={__(l[8631])}
-                                     onClick={() => {
-                                     loadSubPage("fm/" + contact.u);
-                                     }}
-                                     />*/}
                                     <DropdownsUI.DropdownItem
                                         icon="conversations"
                                         label={__(l[8632])}
@@ -846,14 +855,15 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]} />
+                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]}
+                                            chatRoom={self.props.chatRoom} />
                                         <div className="dropdown-user-name">
-                                             <div className="name">
-                                                 {M.getNameByHandle(contact.u)}
-                                                 <ContactPresence className="small" contact={contact} />
+                                            <div className="name">
+                                                {M.getNameByHandle(contact.u)}
+                                                <ContactPresence className="small" contact={contact} />
                                             </div>
                                             <div className="email">
-                                                 {M.u[contact.u].m}
+                                                {M.u[contact.u].m}
                                             </div>
                                         </div>
                                     </div>
@@ -918,7 +928,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                                 null
                                         }
                                         {dropdown}
-                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]} />
+                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]}
+                                            chatRoom={self.props.chatRoom} />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
@@ -927,17 +938,20 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     });
 
 
-                    var avatar = null;
-                    var datetime = null;
-                    var name = null;
                     if (this.props.grouped) {
                         additionalClasses += " grouped";
                     }
                     else {
-                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                        avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"
+                            chatRoom={self.props.chatRoom} />;
                         datetime = <div className="message date-time simpletip"
-                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            label={displayName}
+                            chatRoom={self.props.chatRoom}
+                        />;
                     }
 
                     return <div className={message.messageId + " message body" + additionalClasses}>
@@ -973,8 +987,13 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             />
                         );
                         datetime = <div className="message date-time simpletip"
-                                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                        name = <ContactButton contact={contact} className="message" label={displayName} />;
+                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                        name = <ContactButton
+                            contact={contact}
+                            className="message"
+                            label={displayName}
+                            chatRoom={self.props.chatRoom}
+                        />;
                     }
 
                     const attachmentMetadata = message.getAttachmentMeta() || [];
@@ -1032,9 +1051,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 {name}
                                 {datetime}
                                 {messageActionButtons}
-                                <div className="message shared-block">
-                                    {files}
-                                </div>
+                                <div className="message shared-block">{files}</div>
                                 {buttonsBlock}
                                 {spinnerElement}
                                 {audioContainer}
@@ -1042,10 +1059,8 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         </div>
                     );
                 }
-                else {
-                    chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
-                    return null;
-                }
+                chatRoom.logger.warn("Invalid 2nd byte for a management message: ", textContents);
+                return null;
             }
             else {
                 // this is a text message.
@@ -1112,7 +1127,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             ) {
                                 additionalClasses += " preview-requires-confirmation-container";
                                 subMessageComponent.push(
-                                    <MetaRichpreviewConfirmation
+                                    <MetaRichprevConfirmation
                                         key={"confirm"}
                                         message={message}
                                         chatRoom={chatRoom}
@@ -1164,28 +1179,28 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     if (!spinnerElement) {
                         if (!message.requiresManualRetry) {
                             messageNotSendIndicator = <div className="not-sent-indicator tooltip-trigger"
-                                                           data-tooltip="not-sent-notification">
+                                data-tooltip="not-sent-notification">
                                 <i className="small-icon yellow-triangle"></i>
                             </div>;
                         }
                         else {
                             if (self.isBeingEdited()  !== true) {
                                 messageNotSendIndicator = <div className="not-sent-indicator">
-                                        <span className="tooltip-trigger"
-                                              key="retry"
-                                              data-tooltip="not-sent-notification-manual"
-                                              onClick={(e) => {
-                                                self.doRetry(e, message);
-                                            }}>
-                                          <i className="small-icon refresh-circle"></i>
+                                    <span className="tooltip-trigger"
+                                        key="retry"
+                                        data-tooltip="not-sent-notification-manual"
+                                        onClick={(e) => {
+                                            self.doRetry(e, message);
+                                        }}>
+                                        <i className="small-icon refresh-circle"></i>
                                     </span>
                                     <span className="tooltip-trigger"
-                                          key="cancel"
-                                          data-tooltip="not-sent-notification-cancel"
-                                          onClick={(e) => {
-                                                    self.doCancelRetry(e, message);
-                                                }}>
-                                            <i className="small-icon red-cross"></i>
+                                        key="cancel"
+                                        data-tooltip="not-sent-notification-cancel"
+                                        onClick={(e) => {
+                                            self.doCancelRetry(e, message);
+                                        }}>
+                                        <i className="small-icon red-cross"></i>
                                     </span>
                                 </div>;
                             }
@@ -1193,17 +1208,20 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     }
                 }
 
-                var avatar = null;
-                var datetime = null;
-                var name = null;
                 if (this.props.grouped) {
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>;
+                    avatar = <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"
+                        chatRoom={self.props.chatRoom} />;
                     datetime = <div className="message date-time simpletip"
-                                    data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
-                    name = <ContactButton contact={contact} className="message" label={displayName} />;
+                        data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+                    name = <ContactButton
+                        contact={contact}
+                        className="message"
+                        label={displayName}
+                        chatRoom={self.props.chatRoom}
+                    />;
                 }
 
                 var messageDisplayBlock;
@@ -1300,7 +1318,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     className="red"
                                     onClick={(e) => {
                                         self.doDelete(e, message);
-                                }}
+                                    }}
                                 />
                             </DropdownsUI.Dropdown>
                         </ButtonsUI.Button>;
@@ -1356,9 +1374,6 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 .replace("[[", "<span class=\"bold\">")
                 .replace("]]", "</span>");
 
-            var avatar = null;
-            var name = null;
-
             // mapping css icons to msg types
             if (message.showInitiatorAvatar) {
                 if (this.props.grouped) {
@@ -1366,9 +1381,15 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 }
                 else {
                     avatar = <Avatar contact={message.authorContact}
-                                                className="message avatar-wrapper small-rounded-avatar"/>;
+                        className="message avatar-wrapper small-rounded-avatar"
+                        chatRoom={self.props.chatRoom} />;
                     displayName = M.getNameByHandle(message.authorContact.u);
-                    name = <ContactButton contact={contact} className="message" label={displayName} />;
+                    name = <ContactButton
+                        contact={contact}
+                        className="message"
+                        label={displayName}
+                        chatRoom={self.props.chatRoom}
+                    />;
                 }
             }
 
@@ -1450,12 +1471,14 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 var participantNames = [];
                 (message.meta && message.meta.participants || []).forEach(function(handle) {
                     var name = M.getNameByHandle(handle);
-                    name && participantNames.push("[[" + htmlentities(name) + "]]");
+                    if (name) {
+                        participantNames.push("[[" + htmlentities(name) + "]]");
+                    }
                 });
 
 
                 additionalClasses += (
-                    message.type !== "outgoing-call" && message.type != "incoming-call" ? " with-border" : ""
+                    message.type !== "outgoing-call" && message.type !== "incoming-call" ? " with-border" : ""
                 );
                 var translationString = "";
 
@@ -1511,14 +1534,12 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
             return (
                 <div className={message.messageId + " message body" + additionalClasses}
-                     data-id={"id" + message.messageId}>
+                    data-id={"id" + message.messageId}>
                     {!message.showInitiatorAvatar ? (
                         <div className="feedback call-status-block">
                             <i className={"call-icon " + message.cssClass}></i>
                         </div>
-                        ) : (
-                            avatar
-                        )
+                    ) : avatar
                     }
 
                     <div className="message content-area">
@@ -1537,10 +1558,10 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         {buttonsCode}
                     </div>
                 </div>
-            )
+            );
         }
     }
-};
+}
 
 export {
     GenericConversationMessage

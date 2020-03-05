@@ -291,7 +291,8 @@ accountUI.general = {
 
             /* New Used Storage chart */
             var $storageChart = $('.fm-account-blocks.storage');
-            this.perc_c_s = Math.floor(account.space_used / account.space * 100);
+            var usedPercentage = Math.round(account.space_used / account.space * 100);
+            this.perc_c_s = usedPercentage;
             if (this.perc_c_s > 100) {
                 this.perc_c_s = 100;
             }
@@ -318,10 +319,22 @@ accountUI.general = {
 
             // Maximum disk space
             var b2 = bytesToSize(account.space, 0).split(' ');
-            $storageChart.find('.chart.data .pecents-txt').text(b2[0]);
-            $storageChart.find('.chart.data .gb-txt').text(b2[1]);
-            $storageChart.find('.chart.data .perc-txt').text(this.perc_c_s + '%');
-            $storageChart.find('.chart.data .size-txt').text(bytesToSize(account.space_used));
+            $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
+            $('.chart.data .gb-txt', $storageChart).text(b2[1]);
+            $('.chart.data .perc-txt', $storageChart).text(usedPercentage + '%');
+            $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
+            $('.fm-right-block.dashboard .fm-account-blocks.storage .chart-indicator').css(
+                'left',
+                usedPercentage > 100 ?
+                    180 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
+                    : ''
+            );
+            $('.dashboard-container .fm-account-blocks.storage .chart-indicator').css(
+                'left',
+                usedPercentage > 100 ?
+                    150 + (Math.floor(Math.log(usedPercentage) * Math.LOG10E) - 2) * 15 + 'px'
+                    : ''
+            );
             /** End New Used Storage chart */
         },
 
@@ -379,7 +392,7 @@ accountUI.general = {
             $('.small-icon.membership').addClass('pro' + planNum);
         }
         else {
-            $('.account.membership-plan').text(l[435]);
+            $('.account.membership-plan').text(l[1150]);
         }
 
         // update avatar
@@ -1481,6 +1494,10 @@ accountUI.plan = {
                 var paymentType = (account.sgw.length > 0) ? account.sgw[0] : ''; // Credit Card etc
                 var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, etc
 
+                if (paymentType.indexOf('Credit Card') === 0) {
+                    paymentType = paymentType.replace('Credit Card', l[6952]);
+                }
+
                 // Display the date their subscription will renew if known
                 if (timestamp > 0) {
                     var dateString = time2date(timestamp, 2);
@@ -1575,7 +1592,7 @@ accountUI.plan = {
             }
             else {
                 // free account:
-                $('.account.plan-info.accounttype span').text(l[435]);
+                $('.account.plan-info.accounttype span').text(l[1150]);
                 $('.account.plan-info.expiry').text(l[436]);
                 $('.btn-cancel-sub').addClass('hidden');
                 if (account.mxfer) {

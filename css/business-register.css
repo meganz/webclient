@@ -37,7 +37,7 @@
 }
 
 .bus-reg-icon {
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     width: 24px;
     height: 24px;
 }
@@ -154,9 +154,6 @@ background: linear-gradient(to bottom, rgba(0,191,165,1) 0%, rgba(0,148,128,1) 1
     position: absolute;
     width: 12px;
     height: 12px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
     -webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
     box-shadow: 0 0 0 1px rgba(0,0,0,0.2);

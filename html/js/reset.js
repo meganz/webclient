@@ -26,6 +26,15 @@ function init_reset() {
             }
             else {
                 if (res[0] === 9) {
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22817], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withkey').removeClass('hidden');
 
@@ -61,6 +70,16 @@ function init_reset() {
                     });
                 }
                 else if (res[0] === 10) {
+
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22818], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withoutkey').removeClass('hidden');
                     $('.backup-notification-block').removeClass('hidden');
@@ -256,7 +275,8 @@ function init_reset_pw() {
     $passwords.add($confirms).rebind('keyup.initresetpw, input.initresetpw', function(e) {
         var valid = _checkInput($(this));
         if (e.keyCode === 13 && valid) {
-            if ($('.restore-verify-button').hasClass('reset-account')) {
+            var $button = $('.restore-verify-button', $(this).parents('.content-wrapper'));
+            if ($button.hasClass('reset-account')) {
                 delete_reset_pw();
             }
             else {

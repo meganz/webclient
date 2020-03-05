@@ -135,12 +135,12 @@ var watchdog = Object.freeze({
     /**
      * Register event handling overrider
      * @param {String} event The event name
-     * @param {Function|*} callback
+     * @param {Function|*} [callback] Optional function to invoke on overriding
      */
     registerOverrider: function(event, callback) {
         'use strict';
 
-        this.overrides[event] = callback;
+        this.overrides[event] = callback || true;
     },
 
     /**

@@ -108,7 +108,7 @@ var Help = (function() {
                     location.hash = '#' + newpage;
                 }
                 else {
-                    history.pushState({subpage: newpage}, '', '/' + newpage);
+                    history.replaceState({subpage: newpage}, '', '/' + newpage);
                 }
             }
         }, 100);
@@ -526,15 +526,31 @@ var Help = (function() {
                     if (question.lastIndexOf('-') !== -1) {
                         question = question.substring(question.lastIndexOf('-') + 1);
                     }
+                    else {
+                        // Reload the short url of the help article when title is missing in original url
+                        loadSubPage('help/s/' + question);
+                        return;
+                    }
                 }
             } else if (args.length !== 1) {
                 loadSubPage('help');
                 return;
             }
 
+            // If bundleID is not valid, ignore client and section name, just use question id to load.
+            var bundleID = 'help_' + args.join('_');
+            if (!Data.hasOwnProperty(bundleID) && question) {
+                var article = idx.all.filter(function(doc) {
+                    return doc.id.indexOf(question) !== -1;
+                });
 
+                if (article[0] && article[0].url) {
+                    loadSubPage(article[0].url);
+                    return;
+                }
+            }
 
-            var data = Data['help_' + args.join('_')];
+            var data = Data[bundleID];
             if (!data) {
                 loadSubPage('help');
                 return;

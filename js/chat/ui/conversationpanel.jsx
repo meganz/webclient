@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import utils from './../../ui/utils.jsx';
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
@@ -14,20 +14,23 @@ import { Accordion } from './../../ui/accordion.jsx';
 import { AccordionPanel } from './../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
 import { GenericConversationMessage } from './messages/generic.jsx';
-import { AlterParticipantsConversationMessage }  from './messages/alterParticipants.jsx';
+import { AltPartsConvMessage }  from './messages/alterParticipants.jsx';
 import { TruncatedMessage } from './messages/truncated.jsx';
 import { PrivilegeChange } from './messages/privilegeChange.jsx';
 import { TopicChange } from './messages/topicChange.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
-import { IncomingSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
+import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { CloseOpenModeMessage } from './messages/closeOpenMode.jsx';
 import { ChatHandleMessage } from './messages/chatHandle.jsx';
 import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
-import { ConversationAudioVideoPanel } from './conversationaudiovideopanel.jsx';
+import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 
 var ENABLE_GROUP_CALLING_FLAG = true;
 
-export class JoinCallNotification extends MegaRenderMixin(React.Component) {
+// eslint-disable-next-line id-length
+var MAX_USERS_CHAT_PRIVATE = 100;
+
+export class JoinCallNotification extends MegaRenderMixin {
     componentDidUpdate() {
         var $node = $(this.findDOMNode());
         var room = this.props.chatRoom;
@@ -60,11 +63,11 @@ export class JoinCallNotification extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ConversationRightArea extends MegaRenderMixin(React.Component) {
+export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
     allContactsInChat(participants) {
@@ -73,22 +76,14 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
             return false;
         }
 
-        var currentContacts = M.u;
-        var foundNonMembers = 0;
-        currentContacts.forEach(function(u, k) {
-            if (u.c === 1) {
-                if (participants.indexOf(k) === -1) {
-                    foundNonMembers++;
-                }
+        var currentContacts = M.u.keys();
+        for (var i = 0; i < currentContacts.length; i++) {
+            var k = currentContacts[i];
+            if (M.u[k].c === 1 && participants.indexOf(k) === -1) {
+                return false;
             }
-        });
-
-        if (foundNonMembers > 0) {
-            return false;
         }
-        else {
-            return true;
-        }
+        return true;
     }
     render() {
         const self = this;
@@ -220,6 +215,9 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                 <div>
                     {isReadOnlyElement}
                     <ParticipantsList
+                        ref={function(r) {
+                            self.participantsListRef = r;
+                        }}
                         chatRoom={room}
                         members={room.members}
                         isCurrentlyActive={room.isCurrentlyActive}
@@ -236,9 +234,9 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                     disabled={
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
-                            !self.allContactsInChat(excludedParticipants) &&
                             !room.isReadOnly() &&
-                            room.iAmOperator()
+                            room.iAmOperator() &&
+                            !self.allContactsInChat(excludedParticipants)
                         )
                     }
                 >
@@ -280,6 +278,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                     self.rightScroll = ref;
                 }}
                 triggerGlobalResize={true}
+                isVisible={self.props.chatRoom.isCurrentlyActive}
                 chatRoom={self.props.chatRoom}>
                 <div className="chat-right-pad">
                     <Accordion
@@ -288,6 +287,9 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                             setTimeout(function() {
                                 if (self.rightScroll) {
                                     self.rightScroll.reinitialise();
+                                }
+                                if (self.participantsListRef) {
+                                    self.participantsListRef.safeForceUpdate();
                                 }
                             }, 250);
                         }}
@@ -416,13 +418,21 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                                     (
                                         <div className="chat-enable-key-rotation-paragraph">
                                             <div className="chat-button-seperator"></div>
-                                            <div className="link-button light"
-                                                 onClick={(e) => {
-                                                     if ($(e.target).closest('.disabled').length > 0) {
-                                                         return false;
-                                                     }
-                                                     self.props.onMakePrivateClicked();
-                                                 }}>
+                                            <div className={
+                                                "link-button light " +
+                                                (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ?
+                                                    " disabled" : "")
+                                            }
+                                            onClick={(e) => {
+                                                if (
+                                                    Object.keys(room.members).length >
+                                                    MAX_USERS_CHAT_PRIVATE ||
+                                                    $(e.target).closest('.disabled').length > 0
+                                                ) {
+                                                    return false;
+                                                }
+                                                self.props.onMakePrivateClicked();
+                                            }}>
                                                 <i className="small-icon yellow-key colorized"></i>
                                                 <span>{l[20623]}</span>
                                             </div>
@@ -505,7 +515,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
                         <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}
                                                    sharedFiles={room.messagesBuff.sharedFiles} />
                         {room.type === "private" ?
-                            <IncomingSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
+                            <IncSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
                             null
                         }
                     </Accordion>
@@ -515,7 +525,7 @@ export class ConversationRightArea extends MegaRenderMixin(React.Component) {
     }
 }
 
-export class ConversationPanel extends MegaRenderMixin(React.Component) {
+export class ConversationPanel extends MegaRenderMixin {
     static lastScrollPositionPerc = 1;
     constructor(props) {
         super(props);
@@ -537,7 +547,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         this.handleWindowResize = this.handleWindowResize.bind(this);
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
-    componentSpecificIsComponentEventuallyVisible() {
+    customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
     uploadFromComputer() {
@@ -727,8 +737,10 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
-        chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
-        delete this._messagesBuffChangeHandler;
+        if (this._messagesBuffChangeHandler) {
+            chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+            delete this._messagesBuffChangeHandler;
+        }
 
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
@@ -773,13 +785,14 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
             }
         }
         if (!prevState.renameDialog && self.state.renameDialog === true) {
-            var $input = $('.chat-rename-dialog input');
-            if ($input && $input[0] && !$($input[0]).is(":focus")) {
-                $input.trigger("focus");
-                $input[0].selectionStart = 0;
-                $input[0].selectionEnd = $input.val().length;
-            }
-
+            Soon(function() {
+                var $input = $('.chat-rename-dialog input');
+                if ($input && $input[0] && !$($input[0]).is(":focus")) {
+                    $input.trigger("focus");
+                    $input[0].selectionStart = 0;
+                    $input[0].selectionEnd = $input.val().length;
+                }
+            });
         }
 
         if (prevState.editing === false && self.state.editing !== false) {
@@ -1016,7 +1029,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
 
     }
-    specificShouldComponentUpdate() {
+    specShouldComponentUpdate() {
         if (
             this.isRetrievingHistoryViaScrollPull ||
             this.loadingShown ||
@@ -1247,11 +1260,12 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                 if (v.dialogType) {
                     var messageInstance = null;
                     if (v.dialogType === 'alterParticipants') {
-                        messageInstance = <AlterParticipantsConversationMessage
+                        messageInstance = <AltPartsConvMessage
                             message={v}
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'truncated') {
                         messageInstance = <TruncatedMessage
@@ -1259,6 +1273,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'privilegeChange') {
                         messageInstance = <PrivilegeChange
@@ -1266,6 +1281,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'topicChange') {
                         messageInstance = <TopicChange
@@ -1273,6 +1289,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'openModeClosed') {
                         messageInstance = <CloseOpenModeMessage
@@ -1280,6 +1297,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     } else if (v.dialogType === 'chatHandleUpdate') {
                         messageInstance = <ChatHandleMessage
@@ -1287,6 +1305,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                             key={v.messageId}
                             contact={Message.getContactForMessage(v)}
                             grouped={grouped}
+                            chatRoom={room}
                         />
                     }
                     messagesList.push(messageInstance);
@@ -1313,6 +1332,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                 self.setState({'editing': v.messageId});
                                 self.forceUpdate();
                             }}
+                            chatRoom={room}
                             onEditDone={(messageContents) => {
                                 self.props.chatRoom.scrolledToBottom = true;
                                 self.editDomElement = null;
@@ -1647,6 +1667,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                         hideActionButtons={true}
                         initTextScrolling={true}
                         dialog={true}
+                        chatRoom={self.props.chatRoom}
                     />
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1897,10 +1918,11 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
 
             topicInfo = <ContactCard
                 className="short"
+                chatRoom={room}
                 noContextButton="true"
                 contact={contact}
                 showLastGreen={true}
-                key={contact.u}/>
+                key={contact.u} />;
         }
 
         var startCallDisabled = isStartCallDisabled(room);
@@ -1986,7 +2008,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                     /> : null}
                     {
                         room.callManagerCall && room.callManagerCall.isStarted() ?
-                            <ConversationAudioVideoPanel
+                            <ConversationAVPanel
                                 chatRoom={this.props.chatRoom}
                                 unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
                                 onMessagesToggle={function(isActive) {
@@ -2222,10 +2244,12 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
                                             // scrollTop is now 0..and if in that time the user sends a message
                                             // the event triggers a weird "scroll up" animation out of nowhere...
                                             $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function() {
-                                                self.messagesListScrollable.scrollToBottom(false);
-                                                setTimeout(function() {
-                                                    self.messagesListScrollable.enable();
-                                                }, 1500);
+                                                if (self.messagesListScrollable) {
+                                                    self.messagesListScrollable.scrollToBottom(false);
+                                                    setTimeout(function() {
+                                                        self.messagesListScrollable.enable();
+                                                    }, 1500);
+                                                }
                                             });
 
                                             self.props.chatRoom.sendMessage(messageContents);
@@ -2288,7 +2312,7 @@ export class ConversationPanel extends MegaRenderMixin(React.Component) {
     }
 };
 
-export class ConversationPanels extends MegaRenderMixin(React.Component) {
+export class ConversationPanels extends MegaRenderMixin {
     render() {
         var self = this;
 
@@ -2378,7 +2402,7 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
                         var pres = megaChat.userPresenceToCssClass(contact.presence);
 
                         (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactCard contact={contact} key={contact.u}/>
+                            <ContactCard contact={contact} key={contact.u} chatRoom={false} />
                         );
                     }
                 }
@@ -2435,6 +2459,9 @@ export class ConversationPanels extends MegaRenderMixin(React.Component) {
 };
 
 function isStartCallDisabled(room) {
+    if (Object.keys(room.members).length > 20) {
+        return true;
+    }
     return !room.isOnlineForCalls() || room.isReadOnly() || room._callSetupPromise || !room.chatId ||
         (
             room.callManagerCall &&

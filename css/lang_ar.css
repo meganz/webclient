@@ -86,8 +86,12 @@ body.rtl .fm-dialog.pass-reminder,
 body.rtl .membership-st2-info .save-money,
 body.rtl .main-mid-pad.third-section .reg-st3-txt-localcurrencyprogram,
 body.rtl .mobile.main-block.park-account-change-password,
-body.rtl .rtl-block-if-rtl,
-body.rtl .subuser-sec-profile-container {
+body.rtl .button.download.mid-button.to-clouddrive.transition,
+body.rtl .button.download.big-button.to-clouddrive.transition,
+body.rtl .download.transfer-wrapper .download.checkbox-txt,
+body.rtl .about.top-info,
+body.rtl .subuser-sec-profile-container,
+body.rtl .rtl-block-if-rtl {
     direction: rtl;
 }
 body.rtl .bottom-page.blue-block.top-pad.bott-pad.mcmd-pg-p,
@@ -116,7 +120,8 @@ body.rtl .align-right-if-rtl {
 }
 
 body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-header,
-body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text {
+body.rtl .horizontal-centered-bl.huge-pad .bottom-page.business-text,
+body.rtl .about.top-info {
     text-align: center;
 }
 
@@ -131,6 +136,10 @@ body.rtl .bus-reg-radio-block .provider-icon {
 body.rtl .bus-reg-info-block .bus-reg-checkbox {
     margin-left: 12px;
     margin-right: 0px;
+}
+body.rtl .download.big-button.button.to-clouddrive.transition {
+    padding-left: 12px;
+    padding-right: 12px;
 }
 /*body.rtl .membership-st2-info span.number {
     left: initial;

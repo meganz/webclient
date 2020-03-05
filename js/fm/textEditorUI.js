@@ -49,7 +49,7 @@ mega.textEditorUI = new function TextEditorUI() {
     var selectedItemOpen = function() {
 
         var openFile = function() {
-            loadingDialog.show();
+            loadingDialog.show('common', l[23130]);
             var nodeHandle = $.selected && $.selected[0];
             if (!nodeHandle) {
                 loadingDialog.hide();
@@ -175,7 +175,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 if (editor) {
                     $saveButton.addClass('disabled');
 
-                    loadingDialog.show();
+                    loadingDialog.show('common', l[23131]);
 
                     mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
@@ -316,7 +316,8 @@ mega.textEditorUI = new function TextEditorUI() {
             if (!editor) {
                 editor = CodeMirror.fromTextArea($myTextarea[0], {
                     lineNumbers: true,
-                    scrollbarStyle: "overlay"
+                    scrollbarStyle: "overlay",
+                    autofocus: true
                 });
             }
             // Without parentheses && will be applied first,
@@ -347,10 +348,12 @@ mega.textEditorUI = new function TextEditorUI() {
             if (Array.isArray(handle)) {
                 handle = handle[0];
             }
+            editor.focus();
 
             fileHandle = handle;
             versionHandle = '';
             fileName = fName;
+            api_req({ a: 'log', e: 99807, m: 'File Text Editor opened' });
         });
     };
 

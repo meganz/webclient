@@ -298,11 +298,19 @@ body:not(.mobile) .about.top-info a:hover {
 .en .about.hiring-txt span {
     font-size: 80px;
 }
-.es .about.hiring-txt {
-    font-size: 40px;
-    text-transform: none;
+.pl .about.hiring-txt {
+    font-size: 24px;
 }
-.es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
+.es .about.hiring-txt, .nl .about.hiring-txt span {
+    font-size: 28px;
+}
+.es .about.hiring-txt span {
+    font-size: 36px;
+}
+.id .about.hiring-txt span {
+    font-size: 30px;
+}
+ .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
     font-size: 52px;
 }
 .about.joing-txt {
@@ -316,9 +324,11 @@ body:not(.mobile) .about.top-info a:hover {
     vertical-align: top;
     margin: 0 -40px 0 40px;
 }
-.es .about.joing-txt {
-    margin-left: 0;
-    margin-right: 0;
+.es .about.joing-txt, .it .about.joing-txt, .jp .about.joing-txt, .nl .about.joing-txt {
+    margin: 0;
+}
+.id .about.joing-txt {
+    width: 370px;
 }
 .about.joing-txt span {
     display: block;
@@ -457,15 +467,22 @@ body:not(.mobile) .about.white-button:hover {
         background-image: none;
     }
     .about.hiring-txt {
-        width: auto;
         margin-top: 125px;
+        margin-right: 15px;
+        width: 300px;
     }
     .en .about.hiring-txt {
         margin-top: 121px;
     }
-    .about.joing-txt {
-        margin-right: 0;
+    .br .about.hiring-txt {
+        margin-top: 145px;
         width: auto;
+    }
+    .es .about.hiring-txt span {
+        font-size: 32px;
+    }
+    .about.joing-txt {
+        margin: 0;
     }
     .about.hiring-txt span, .en .about.hiring-txt span {
         line-height: 84px;
@@ -473,8 +490,17 @@ body:not(.mobile) .about.white-button:hover {
     .about .bottom-page .col-4 {
         width: 50%;
     }
+    .ru .about .bottom-page.big-icon-info {
+        font-size: 22px;
+    }
+    .id .about .bottom-page.big-icon-info {
+        font-size: 26px;
+    }
 }
 @media only screen and (max-width: 783px) {
+    .about.joing-txt, .about.hiring-txt, .id .about.joing-txt {
+        width: auto;
+    }
     .about.big-numbers {
         font-size: 44px;
     }
@@ -497,7 +523,7 @@ body:not(.mobile) .about.white-button:hover {
     .about.hiring {
         height: auto;
     }
-    .about.hiring-txt, .en .about.hiring-txt, .es .about.hiring-txt, .ro .about.hiring-txt  {
+    .about.hiring-txt, .en .about.hiring-txt, .es .about.hiring-txt, .ro .about.hiring-txt, .br .about.hiring-txt, .pl .about.hiring-txt {
         display: block;
         font-size: 20px;
         line-height: 28px;
@@ -657,7 +683,7 @@ body:not(.mobile) .about.white-button:hover {
     .about .bottom-page.big-header.big-bott-pad {
         padding-bottom: 24px;
     }
-    .about .bottom-page.big-icon-info {
+    .about .bottom-page.big-icon-info, .ru .about .bottom-page.big-icon-info, .id .about .bottom-page.big-icon-info {
         font-size: 20px;
         line-height: 24px;
     }
@@ -683,9 +709,14 @@ body:not(.mobile) .about.white-button:hover {
         height: auto;
         padding: 0 10px;
     }
-    .about.hiring-txt span, .en .about.hiring-txt span, .es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span {
+    .about.hiring-txt span, .en .about.hiring-txt span, .es .about.hiring-txt span, .ro .about.hiring-txt span, .ct .about.hiring-txt span, .kr .about.hiring-txt span, .id .about.hiring-txt span, .nl .about.hiring-txt span {
         font-size: 34px;
         line-height: 50px;
+    }
+    .br .about.hiring-txt span, .es .about.hiring-txt span, .nl .about.hiring-txt span, .pl .about.hiring-txt span {
+        font-size: 24px;
+        line-height: 28px;
+        padding-top: 10px;
     }
     .about.white-button, .about.joing-txt {
         font-size: 18px;
@@ -732,6 +763,10 @@ body:not(.mobile) .about.white-button:hover {
     .nl .about.main-menu.item span {
         padding-bottom: 0;
         margin-bottom: 10px;
+    }
+    .about.leader {
+        margin-left: -20px;
+        margin-right: -20px;
     }
 }
 @media only screen and (max-width: 380px) {

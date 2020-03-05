@@ -1,10 +1,10 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 var ButtonsUI = require('./../../ui/buttons.jsx');
 
 
-export class EmojiAutocomplete extends MegaRenderMixin(React.Component) {
+export class EmojiAutocomplete extends MegaRenderMixin {
     static data_emojis = null;
     static defaultProps = {
         'requiresUpdateOnResize': true,

@@ -219,7 +219,6 @@
     top: 8px;
     margin-left: 8px;
     height: unset;
-    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 8px;
     background-color: #FFFFFF;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.2);
@@ -228,6 +227,16 @@
     width: 190px;
     position: fixed;
     z-index: 1120;
+}
+#mega-text-editor .top-menu-popup-editor::before {
+    content: '';
+    position: absolute;
+    border-radius: inherit;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
 }
 #mega-text-editor .top-menu-popup-editor .txt-editor-sp-menu {
     height: 1px;

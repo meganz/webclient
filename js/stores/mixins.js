@@ -1,6 +1,10 @@
 import ReactDOM from "react-dom";
 import React from "react";
 
+
+
+var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined';
+
 // copied from Facebook's shallowEqual, used in PureRenderMixin, because it was defined as a _private_ module and
 // adapted to be a bit more optimal for functions...
 function shallowEqual(objA, objB) {
@@ -77,7 +81,7 @@ var FUNCTIONS = [
     'updateScroll',
     'isActive',
     'onMessagesScrollReinitialise',
-    'specificShouldComponentUpdate',
+    'specShouldComponentUpdate',
     'attachAnimationEvents',
     'eventuallyReinitialise',
     'reinitialise',
@@ -99,13 +103,51 @@ if (localStorageProfileRenderFns) {
 
 var ID_CURRENT = 0;
 
-export default superClass => class MegaRenderMixin extends superClass {
+export class MegaRenderMixin extends React.Component {
     constructor (props) {
         super(props);
         this.__intersectionObserver = this.__intersectionObserver.bind(this);
     }
     isMounted() {
         return !!this.__isMounted;
+    }
+    ensurePromiseLoaded(cb, args, ctx, failCb) {
+        var self = this;
+        self._loadingPromise = self._loadingPromise || 0;
+        var executePromisesCbs = function() {
+            if (!self._loadingPromise) {
+                var promises = [];
+                if (Array.isArray(cb) && !args && !ctx) {
+                    for (var i = 0; i < cb.length; i++) {
+                        var _cb = cb[i][0];
+                        var _args = cb[i][1];
+                        var _ctx = cb[i][2];
+                        var _failCb = cb[i][3];
+                        var promiseReq = _cb.apply(_ctx, _args);
+                        if (_failCb) {
+                            promiseReq.fail(_failCb);
+                        }
+                        promises.push(promiseReq);
+                    }
+                }
+                else {
+                    var promiseReq2 = cb.apply(ctx, args);
+                    if (failCb) {
+                        promiseReq2.fail(failCb);
+                    }
+                    promises.push(promiseReq2);
+                }
+                self._loadingPromise = MegaPromise.allDone(promises);
+                self._loadingPromise
+                    .always(function() {
+                        if (self.isMounted()) {
+                            self.debouncedForceUpdate();
+                        }
+                    });
+            }
+        };
+
+        this._ensurePromiseLoadedTimeout = setTimeout(executePromisesCbs, 100);
     }
     componentWillUnmount() {
         if (super.componentWillUnmount) {
@@ -119,12 +161,16 @@ export default superClass => class MegaRenderMixin extends superClass {
 
         if (
             typeof this.__intersectionVisibility !== 'undefined' &&
-            this.__intersectionObserver &&
-            this.__intersectionObserver.unobserve
+            this.__intersectionObserverInstance &&
+            this.__intersectionObserverInstance.unobserve
         ) {
-            this.__intersectionObserver.disconnect();
+
+            var node = this.findDOMNode();
+            node && this.__intersectionObserverInstance.unobserve(node);
+            this.__intersectionObserverInstance.disconnect();
             delete this.__intersectionObserver;
             this.__intersectionVisibility = undefined;
+
         }
 
         if (this._dataStructListeners) {
@@ -133,6 +179,10 @@ export default superClass => class MegaRenderMixin extends superClass {
 
         if (this.detachRerenderCallbacks) {
             this.detachRerenderCallbacks();
+        }
+        if (this._ensurePromiseLoadedTimeout) {
+            clearTimeout(this._ensurePromiseLoadedTimeout);
+            delete this._ensurePromiseLoadedTimeout;
         }
     }
     getReactId() {
@@ -174,11 +224,14 @@ export default superClass => class MegaRenderMixin extends superClass {
         }, TIMEOUT_VAL);
     }
     __intersectionObserver(entries) {
-        if (entries[0].intersectionRatio <= 0) {
+        if (entries[0].intersectionRatio <= 0 && !entries[0].isIntersecting) {
             this.__intersectionVisibility = false;
         }
         else {
             this.__intersectionVisibility = true;
+            if (this._requiresUpdateOnResize) {
+                this.eventuallyUpdate();
+            }
         }
     }
     componentDidMount() {
@@ -186,6 +239,8 @@ export default superClass => class MegaRenderMixin extends superClass {
             super.componentDidMount();
         }
         this.__isMounted = true;
+        this._wasRendered = true;
+
         if (this.props.requiresUpdateOnResize) {
             $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
         }
@@ -215,12 +270,24 @@ export default superClass => class MegaRenderMixin extends superClass {
         //
         //this.requiresLazyRendering();
 
-        if (typeof IntersectionObserver !== 'undefined') {
+        if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
             var node = this.findDOMNode();
             if (node) {
                 this.__intersectionVisibility = false;
-                this.__intersectionObserver = new IntersectionObserver(this.__intersectionObserver);
-                this.__intersectionObserver.observe(node);
+                var opts = {
+                    threshold: 0.1
+                };
+
+                var self = this;
+
+                setTimeout(function() {
+                    // bug in IntersectionObserver
+                    self.__intersectionObserverInstance = new IntersectionObserver(
+                        self.__intersectionObserver,
+                        opts
+                    );
+                    self.__intersectionObserverInstance.observe(node);
+                }, 150);
             }
         }
 
@@ -243,11 +310,17 @@ export default superClass => class MegaRenderMixin extends superClass {
         if (!this.__isMounted) {
             return false;
         }
+        if (this.customIsEventuallyVisible) {
+            var result = this.customIsEventuallyVisible();
+            if (result !== -1) {
+                return result;
+            }
+        }
 
         if (this.__intersectionVisibility === false) {
             return false;
         }
-        else {
+        else if (this.__intersectionVisibility === true) {
             return true;
         }
 
@@ -271,17 +344,17 @@ export default superClass => class MegaRenderMixin extends superClass {
         var domNode = this.findDOMNode();
 
 
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            return this.componentSpecificIsComponentEventuallyVisible();
-        }
-
         // .__isMounted is faster then .isMounted() or any other operation
         if (!this.__isMounted) {
             return false;
         }
 
-        if (this.props.isVisible) {
-            return true;
+        if (this.customIsEventuallyVisible) {
+            return this.customIsEventuallyVisible();
+        }
+
+        if (typeof this.props.isVisible !== 'undefined') {
+            return this.props.isVisible;
         }
 
         if (this.__intersectionVisibility === false) {
@@ -298,7 +371,7 @@ export default superClass => class MegaRenderMixin extends superClass {
         }
         return true;
     }
-    eventuallyUpdate() {
+    eventuallyUpdate(debounced) {
         var self = this;
 
         if (self._updatesDisabled === true) {
@@ -531,9 +604,9 @@ export default superClass => class MegaRenderMixin extends superClass {
             }
             return false;
         }
-        if (this.componentSpecificIsComponentEventuallyVisible) {
-            // we asume `componentSpecificIsComponentEventuallyVisible` is super quick/does have low CPU usage
-            if (!this._queueUpdateWhenVisible && !this.componentSpecificIsComponentEventuallyVisible()) {
+        if (this.customIsEventuallyVisible) {
+            // we asume `customIsEventuallyVisible` is super quick/does have low CPU usage
+            if (!this._queueUpdateWhenVisible && !this.customIsEventuallyVisible()) {
                 this._queueUpdateWhenVisible = true;
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -542,15 +615,15 @@ export default superClass => class MegaRenderMixin extends superClass {
                     );
                 }
             }
-            else if (this._queueUpdateWhenVisible && this.componentSpecificIsComponentEventuallyVisible()) {
+            else if (this._queueUpdateWhenVisible && this.customIsEventuallyVisible()) {
                 delete this._queueUpdateWhenVisible;
                 return true;
             }
         }
 
         // component specific control of the React lifecycle
-        if (this.specificShouldComponentUpdate) {
-            var r = this.specificShouldComponentUpdate(nextProps, nextState);
+        if (this.specShouldComponentUpdate) {
+            var r = this.specShouldComponentUpdate(nextProps, nextState);
             if (r === false) {
                 if (window.RENDER_DEBUG) {
                     console.error(
@@ -755,5 +828,69 @@ export default superClass => class MegaRenderMixin extends superClass {
         });
 
         this._dataStructListeners.push(['dsprops', id, obj]);
+    }
+};
+
+var _noAvatars = {};
+
+export class ContactAwareComponent extends MegaRenderMixin {
+    constructor (props) {
+        super(props);
+        var contact = this.props.contact;
+        var contactHandle = contact && (contact.h || contact.u);
+        var promises = [];
+        var chatHandle = pchandle || (this.props.chatRoom ? this.props.chatRoom.publicChatHandle : undefined);
+
+        if (contact && contactHandle) {
+            if (!contact.firstName && !contact.lastName && M.u[contactHandle]) {
+                promises.push(
+                    [
+                        M.syncUsersFullname,
+                        [
+                            contactHandle,
+                            chatHandle
+                        ],
+                        M
+                    ]
+                );
+            }
+            if (!contact.m && !anonymouschat && M.u[contactHandle]) {
+                promises.push(
+                    [
+                        M.syncContactEmail,
+                        [
+                            contactHandle
+                        ],
+                        M
+                    ]
+                );
+            }
+            if (!avatars[contactHandle] && !_noAvatars[contactHandle]) {
+                promises.push(
+                    [
+                        useravatar.loadAvatar,
+                        [
+                            contactHandle,
+                            chatHandle
+                        ],
+                        useravatar,
+                        function(e) {
+                            _noAvatars[contactHandle] = true;
+                        }
+                    ]
+                );
+            }
+
+            // force stuck in "Loading" state
+            // promises.push([function() { return new MegaPromise(); }]);
+
+            if (promises.length > 0) {
+                this.ensurePromiseLoaded(promises);
+            }
+        }
+    }
+    isLoadingContactInfo() {
+        // this._loadingPromise can be 0 in case its throttled in that moment.
+        return this._loadingPromise && this._loadingPromise.state() === 'pending' || this._loadingPromise === 0;
     }
 };

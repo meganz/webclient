@@ -786,8 +786,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'highlighted': [],
             'currentlyViewedEntry': M.RootID,
             'selectedTab': 'clouddrive',
-            'searchValue': ''
+            'searchValue': '',
+            'entries': null
         };
+        this.state.entries = this.getEntries();
         this.onAttachClicked = this.onAttachClicked.bind(this);
         this.onClearSearchIconClick = this.onClearSearchIconClick.bind(this);
         this.onHighlighted = this.onHighlighted.bind(this);
@@ -800,12 +802,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.toggleSortBy = this.toggleSortBy.bind(this);
     }
     toggleSortBy(colId) {
+        var newState = {};
         if (this.state.sortBy[0] === colId) {
-            this.setState({'sortBy': [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"]});
+            newState.sortBy = [colId, this.state.sortBy[1] === "asc" ? "desc" : "asc"];
         }
         else {
-            this.setState({'sortBy': [colId, "asc"]});
+            newState.sortBy = [colId, "asc"];
         }
+        newState.entries = this.getEntries(newState);
+        this.setState(newState);
     }
     onViewButtonClick(e, node) {
         var self = this;
@@ -936,7 +941,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     .done(function() {
                         self.setState({
                             'isLoading': false,
-                            'entries': null
+                            'entries': self.getEntries()
                         });
                     });
                 return;
@@ -947,7 +952,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     .always(function() {
                         self.setState({
                             'isLoading': false,
-                            'entries': null
+                            'entries': self.getEntries()
                         });
                     });
                 return;
@@ -966,13 +971,14 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
             }
 
-            this.setState({entries: null});
+            this.setState({entries: this.getEntries()});
         }
 
     }
-    getEntries() {
+    getEntries(newState) {
         var self = this;
-        var order = self.state.sortBy[1] === "asc" ? 1 : -1;
+        var sortBy = newState && newState.sortBy || self.state.sortBy;
+        var order = sortBy[1] === "asc" ? 1 : -1;
         var entries = [];
 
         if (
@@ -1009,13 +1015,13 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         var sortFunc;
 
-        if (self.state.sortBy[0] === "name") {
+        if (sortBy[0] === "name") {
             sortFunc = M.getSortByNameFn();
         }
-        else if(self.state.sortBy[0] === "size") {
+        else if (sortBy[0] === "size") {
             sortFunc = M.getSortBySizeFn();
         }
-        else if(self.state.sortBy[0] === "ts") {
+        else if (sortBy[0] === "ts") {
             sortFunc = M.getSortByDateTimeFn();
             // invert
             order = order === 1 ? -1 : 1;
@@ -1064,7 +1070,6 @@ class CloudBrowserDialog extends MegaRenderMixin {
     render() {
         var self = this;
 
-        const entries = self.state.entries || self.getEntries();
         const viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
 
         const classes = `add-from-cloud ${self.props.className}`;
@@ -1287,7 +1292,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 <BrowserEntries
                     isLoading={self.state.isLoading}
                     currentlyViewedEntry={self.state.currentlyViewedEntry}
-                    entries={entries}
+                    entries={self.state.entries || []}
                     onExpand={(node) => {
                         self.onSelected([]);
                         self.onHighlighted([]);

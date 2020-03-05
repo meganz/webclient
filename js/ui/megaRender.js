@@ -1130,7 +1130,7 @@
                         title.push(aProperties.codecs);
                     }
                     if (aNode.s) {
-                        title.push(bytesToSize(aNode.s, 0).replace(' ', ''));
+                        title.push(bytesToSize(aNode.s, 0));
                     }
                     title.push(aProperties.name);
                 }

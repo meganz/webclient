@@ -1,11 +1,8 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
 var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
-class AlterParticipantsConversationMessage extends ConversationMessageMixin {
+class AltPartsConvMessage extends ConversationMessageMixin {
     _ensureNameIsLoaded(h) {
         var self = this;
         var contact = M.u[h] ? M.u[h] : {
@@ -49,11 +46,8 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
     }
     render() {
         var self = this;
-        var cssClasses = "message body";
 
         var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
-        var chatRoom = this.props.message.chatRoom;
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();
@@ -61,7 +55,7 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
 
 
         var datetime = <div className="message date-time simpletip"
-                            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {
@@ -81,15 +75,16 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact}
-                                            className="message avatar-wrapper small-rounded-avatar"/>;
+                chatRoom={self.props.chatRoom}
+                className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text = (h === contact.u) ?
                 __('joined the group chat.') :
                 __(l[8907]).replace(
-                "%s",
-                '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
-            );
+                    "%s",
+                    '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
+                );
 
             self._ensureNameIsLoaded(otherContact.u);
             messages.push(
@@ -97,13 +92,14 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
+                            chatRoom={self.props.chatRoom}/>
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
                     </div>
                 </div>
-            )
+            );
         });
 
         message.meta.excluded.forEach(function(h) {
@@ -114,7 +110,8 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
             };
 
             var avatar = <ContactsUI.Avatar contact={otherContact}
-                                            className="message avatar-wrapper small-rounded-avatar"/>;
+                chatRoom={self.props.chatRoom}
+                className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             self._ensureNameIsLoaded(otherContact.u);
@@ -135,7 +132,8 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
                     {avatar}
 
                     <div className="message content-area small-info-txt">
-                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName} />
+                        <ContactsUI.ContactButton contact={otherContact} className="message" label={otherDisplayName}
+                            chatRoom={self.props.chatRoom} />
                         {datetime}
 
                         <div className="message text-block" dangerouslySetInnerHTML={{__html:text}}></div>
@@ -149,5 +147,5 @@ class AlterParticipantsConversationMessage extends ConversationMessageMixin {
 };
 
 export {
-    AlterParticipantsConversationMessage
+    AltPartsConvMessage
 };

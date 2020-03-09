@@ -625,6 +625,37 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 var data = t[t.t++];
                 var limit = 16384; // increase the limit of the batch
 
+                if (op === 'bulkPut') {
+
+                    for (var rw = 0; rw < data.length; rw++) {
+                        var row = data[rw];
+                        if (row.d) {
+                            if (fmdb.stripnode[table]) {
+                                // this node type is stripnode-optimised: temporarily remove redundant elements
+                                // to create a leaner JSON and save IndexedDB space
+                                var d = row.d;  // this references the live object!
+                                var t = fmdb.stripnode[table](d);   // remove overhead
+                                row.d = JSON.stringify(d);          // store lean result
+                                for (var i in t) d[i] = t[i];       // restore overhead
+                            }
+                            else {
+                                // otherwise, just stringify it all
+                                row.d = JSON.stringify(row.d);
+                            }
+                        }
+
+                        // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
+                        for (var i in row) {
+                            if (i == 'd') {
+                                row.d = fmdb.strcrypt(row.d);
+                            }
+                            else if (table !== 'f' || i !== 't') {
+                                row[i] = ab_to_base64(fmdb.strcrypt(row[i]));
+                            }
+                        }
+                    }
+                }
+
                 if (data.length < limit) {
                     fmdb.db[table][op](data).then(writeend).catch(writeerror);
                 }
@@ -955,31 +986,6 @@ FMDB.prototype.add = function fmdb_add(table, row) {
 
     if (this.crashed) return;
 
-    if (row.d) {
-        if (this.stripnode[table]) {
-            // this node type is stripnode-optimised: temporarily remove redundant elements
-            // to create a leaner JSON and save IndexedDB space
-            var d = row.d;  // this references the live object!
-            var t = this.stripnode[table](d);   // remove overhead
-            row.d = JSON.stringify(d);          // store lean result
-            for (var i in t) d[i] = t[i];       // restore overhead
-        }
-        else {
-            // otherwise, just stringify it all
-            row.d = JSON.stringify(row.d);
-        }
-    }
-
-    // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
-    for (var i in row) {
-        if (i == 'd') {
-            row.d = this.strcrypt(row.d);
-        }
-        else if (table !== 'f' || i !== 't') {
-            row[i] = ab_to_base64(this.strcrypt(row[i]));
-        }
-    }
-
     this.enqueue(table, row, 0);
 };
 
@@ -1033,6 +1039,12 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     for (var i = r.length; i--; ) {
         try {
+
+            if (r[i].d && !r[i].d.byteLength) {
+                // not encrypted.
+                continue;
+            }
+
             t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
 
             if (this.restorenode[table]) {

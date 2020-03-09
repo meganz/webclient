@@ -392,7 +392,8 @@
      */
     function sendSignupLinkDialog(accountData, onCloseCallback) {
         var $dialog = $('.fm-dialog.registration-page-success').removeClass('hidden');
-        var $button = $('.resend-email-button', $dialog);
+        var $changeEmailLink = $('.reg-success-change-email-btn', $dialog);
+        var $resendEmailButton = $('.resend-email-button', $dialog);
 
         if (page && page.indexOf("chat/") > -1  || page === "chat") {
             $dialog.addClass('chatlink');
@@ -404,9 +405,23 @@
             $('.reg-success-icon-container-chat', $dialog).addClass('hidden');
             $('.reg-success-icon-container', $dialog).removeClass('hidden');
         }
-        $('input', $dialog).val(accountData.email);
+        $('.reg-resend-email-txt', $dialog).text(accountData.email);
 
-        $button.rebind('click', function _click() {
+        $changeEmailLink.rebind('click', function(event) {
+            event.preventDefault();
+            $('.reg-resend-email-txt', $dialog).addClass('hidden');
+            $('.reg-success-txtb', $dialog).css('display', 'none');
+            if ($dialog.hasClass('chatlink')) {
+                $('.reg-success-special .chat-header', $dialog).text(l[22901]);
+            }
+            else {
+                $(".reg-success-special div[class='reg-success-txt']", $dialog).text(l[22901]);
+            }
+            $('.reg-resend-email input', $dialog).val(accountData.email);
+            $('.reg-resend-email', $dialog).removeClass('hidden');
+        });
+
+        $resendEmailButton.rebind('click', function _click() {
             var ctx = {
                 callback: function(res) {
                     loadingDialog.hide();
@@ -418,19 +433,19 @@
                     if (res !== 0) {
                         console.error('sendsignuplink failed', res);
 
-                        $button.addClass('disabled');
-                        $button.off('click');
+                        $resendEmailButton.addClass('disabled');
+                        $resendEmailButton.off('click');
 
                         var tick = 26;
                         var timer = setInterval(function() {
                             if (--tick === 0) {
                                 clearInterval(timer);
-                                $button.text(l[8744]);
-                                $button.removeClass('disabled');
-                                $button.rebind('click', _click);
+                                $resendEmailButton.text(l[8744]);
+                                $resendEmailButton.removeClass('disabled');
+                                $resendEmailButton.rebind('click', _click);
                             }
                             else {
-                                $button.text('\u23F1 ' + tick + '...');
+                                $resendEmailButton.text('\u23F1 ' + tick + '...');
                             }
                         }, 1000);
 

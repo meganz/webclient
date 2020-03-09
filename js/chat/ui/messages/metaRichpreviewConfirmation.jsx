@@ -1,14 +1,8 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from './../../../stores/mixins.js';
-var ContactsUI = require('./../contacts.jsx');
 var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
-var getMessageString = require('./utils.jsx').getMessageString;
 
-class MetaRichpreviewConfirmation extends ConversationMessageMixin {
+class MetaRichprevConfirmation extends ConversationMessageMixin {
     doAllow() {
-        var self = this;
         var message = this.props.message;
         var megaChat = this.props.message.chatRoom.megaChat;
 
@@ -18,21 +12,19 @@ class MetaRichpreviewConfirmation extends ConversationMessageMixin {
         message.trackDataChange();
     }
     doNotNow() {
-        var self = this;
         var message = this.props.message;
         delete message.meta.requiresConfirmation;
         RichpreviewsFilter.confirmationDoNotNow();
         message.trackDataChange();
     }
     doNever() {
-        var self = this;
         var message = this.props.message;
         msgDialog(
             'confirmation',
             l[870],
             l[18687],
             '',
-            function (e) {
+            function(e) {
                 if (e) {
                     delete message.meta.requiresConfirmation;
                     RichpreviewsFilter.confirmationDoNever();
@@ -41,15 +33,11 @@ class MetaRichpreviewConfirmation extends ConversationMessageMixin {
                 else {
                     // do nothing.
                 }
-         });
+            });
 
     }
     render() {
         var self = this;
-
-        var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
-        var chatRoom = this.props.message.chatRoom;
 
         var notNowButton = null;
         var neverButton = null;
@@ -57,17 +45,17 @@ class MetaRichpreviewConfirmation extends ConversationMessageMixin {
 
         if (RichpreviewsFilter.confirmationCount >= 2) {
             neverButton = <div className="default-white-button small-text small right red"
-                               onClick={function(e) {
-                                   self.doNever();
-                               }}>
+                onClick={function() {
+                    self.doNever();
+                }}>
                 <span>{l[1051]}</span>
             </div>;
         }
 
         notNowButton = <div className="default-white-button small-text small grey-txt right"
-                            onClick={function (e) {
-                                self.doNotNow();
-                            }}>
+            onClick={function() {
+                self.doNotNow();
+            }}>
             <span>{l[18682]}</span>
         </div>;
 
@@ -89,7 +77,7 @@ class MetaRichpreviewConfirmation extends ConversationMessageMixin {
                             {l[18680]}
                         </div>
                         <div className="buttons-block">
-                            <div className="default-grey-button small-text small right" onClick={function(e) {
+                            <div className="default-grey-button small-text small right" onClick={function() {
                                 self.doAllow();
                             }}>
                                 <span>{l[18681]}</span>
@@ -103,8 +91,8 @@ class MetaRichpreviewConfirmation extends ConversationMessageMixin {
             </div>
         </div>;
     }
-};
+}
 
 export {
-    MetaRichpreviewConfirmation
+    MetaRichprevConfirmation
 };

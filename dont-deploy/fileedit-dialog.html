@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MEGA 2.0</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../css/toast.css" />
+    <link rel="stylesheet" type="text/css" href="../css/codemirror.css" />
+    <script type="text/javascript" src="../js/vendor/jquery-2.2.1.js"></script>
+    <script type="text/javascript" src="../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../js/vendor/jquery.qrcode.js"></script>
+    <script type="text/javascript" src="../js/vendor/qrcode.js"></script>
+    <script type="text/javascript" src="../js/vendor/codemirror.js"></script>
+    <!--<script type="text/javascript" src="../js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../js/jquery.tokeninput.js"></script>-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function dialogPositioning() {
+                $('.fm-dialog').css('margin-top', '-' + $('.fm-dialog').outerHeight() / 2 + 'px');
+            }
+            function shareContactsScroll() {
+                $('.share-dialog-contacts').jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true });
+            }
+            dialogPositioning();
+            shareContactsScroll();
+
+            //$('.share-multiple-input').tokenInput([
+            //    { id: 7, name: "Ruby" },
+            //    { id: 11, name: "Python" },
+            //    { id: 13, name: "JavaScript" },
+            //    { id: 17, name: "ActionScript" },
+            //    { id: 19, name: "Scheme" },
+            //    { id: 23, name: "Lisp" },
+            //    { id: 29, name: "C#" },
+            //    { id: 31, name: "Fortran" },
+            //    { id: 37, name: "Visual Basic" },
+            //    { id: 41, name: "C" },
+            //    { id: 43, name: "C++" },
+            //    { id: 47, name: "Java" }
+            //], {
+            //        theme: "mega"
+            //    });
+
+            $('.share-dialog-permissions').unbind('click');
+            $('.share-dialog-permissions').bind('click', function () {
+                var m = $('.permissions-menu'),
+                    scrollPos = 0;
+                if ($('.share-dialog-contacts .jspPane'))
+                    scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+                m.removeClass('search-permissions');
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    var x = $(this).position().left + 50;
+                    var y = $(this).position().top + 14 + scrollPos;
+                    m.css({
+                        'left': x,
+                        'top': y
+                    });
+                    m.removeClass('hidden');
+                    $(this).addClass('active');
+                } else {
+                    m.addClass('hidden');
+                    $(this).removeClass('active');
+                }
+            });
+
+            $('.permissions-icon').unbind('click');
+            $('.permissions-icon').bind('click', function () {
+                var m = $('.permissions-menu');
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    var x = $(this).position().left + 12;
+                    var y = $(this).position().top + 8;
+                    m.css({
+                        'left': x,
+                        'top': y
+                    });
+                    m.removeClass('hidden');
+                    $(this).addClass('active');
+                    m.addClass('search-permissions');
+                } else {
+                    m.addClass('hidden');
+                    $(this).removeClass('active');
+                    m.removeClass('search-permissions');
+                }
+            });
+
+            $('.permissions-menu-item').unbind('click');
+            $('.permissions-menu-item').bind('click', function () {
+                if ($(this).attr('class').indexOf('active') == -1) {
+                    $(this).parent().find('.permissions-menu-item.active').removeClass('active');
+                    var p = $(this).attr('class').replace('permissions-menu-item', '').split(" ").join("");
+                    if ($(this).attr('class').indexOf('search-permissions') == -1) {
+                        $('.permissions-icon').removeClass('read-only read-and-write full-access');
+                        $('.permissions-icon').addClass(p);
+                    }
+                    $(this).addClass('active');
+                } else
+                    $(this).removeClass('active');
+                $('.permissions-menu').addClass('hidden');
+                $('.permissions-icon.active').removeClass('active');
+                $('.share-dialog-permissions.active').removeClass('active');
+
+            });
+
+
+            //Pending info block
+            $('.pending-indicator').bind('mouseover', function () {
+                var x = $(this).position().left,
+                    y = $(this).position().top,
+                    infoBlock = $('.share-pending-info'),
+                    scrollPos = 0;
+                if ($('.share-dialog-contacts .jspPane'))
+                    scrollPos = $('.share-dialog-contacts .jspPane').position().top;
+                infoHeight = infoBlock.outerHeight();
+                infoBlock.css({
+                    'left': x,
+                    'top': y - infoHeight + scrollPos
+                });
+                infoBlock.fadeIn(200);
+            });
+            $('.pending-indicator').bind('mouseout', function () {
+                $('.share-pending-info').fadeOut(200);
+            });
+
+
+            //Personal message
+            $('.share-message textarea').bind('focus', function () {
+                var $this = $(this);
+                $('.share-message').addClass('active');
+                if ($this.val() == 'Include personal message...') {
+                    $this.select();
+                    window.setTimeout(function () {
+                        $this.select();
+                    }, 1);
+                    function mouseUpHandler() {
+                        $this.off("mouseup", mouseUpHandler);
+                        return false;
+                    }
+                    $this.mouseup(mouseUpHandler);
+                }
+            });
+
+            $('.share-message textarea').bind('blur', function () {
+                var $this = $(this);
+                $('.share-message').removeClass('active');
+            });
+
+            function shareMessageResizing() {
+                var txt = $('.share-message textarea'),
+                    txtHeight = txt.outerHeight(),
+                    hiddenDiv = $('.share-message-hidden'),
+                    pane = $('.share-message-scrolling'),
+                    content = txt.val(),
+                    api;
+                content = content.replace(/\n/g, '<br />');
+                hiddenDiv.html(content + '<br/>');
+
+                if (txtHeight != hiddenDiv.outerHeight()) {
+                    txt.height(hiddenDiv.outerHeight());
+
+                    if ($('.share-message-textarea').outerHeight() >= 50) {
+                        pane.jScrollPane({ enableKeyboardNavigation: false, showArrows: true, arrowSize: 5 });
+                        api = pane.data('jsp');
+                        txt.blur();
+                        txt.focus();
+                        api.scrollByY(0);
+                    }
+                    else {
+                        api = pane.data('jsp');
+                        if (api) {
+                            api.destroy();
+                            txt.blur();
+                            txt.focus();
+                        }
+                    }
+                }
+            }
+
+            $('.share-message textarea').on('keyup', function () {
+                shareMessageResizing();
+            });
+
+            /*$('.qr-dialog-label .dialog-feature-toggle').on('click', function () {
+                var me = $(this);
+                if (me.hasClass('toggle-on')) {
+                    me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
+                        me.removeClass('toggle-on');
+                    });
+
+                }
+                else {
+                    me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
+                        me.addClass('toggle-on');
+                    });
+                }
+            });
+
+            var QRoptions = {
+                width: 222,
+                height: 222,
+                correctLevel: QRErrorCorrectLevel.H,    // high
+                foreground: '#D90007',
+                text: 'https://mega.nz/thecaptin121'
+            };
+
+            // Render the QR code
+            $('.qr-icon-big').text('').qrcode(QRoptions);
+
+        });*/
+
+    </script>
+</head>
+
+<body id="bodyel" class="bottom-pages">
+
+
+    <div class="fm-dialog-overlay"></div>
+
+    <div class="fm-dialog file-edit-dialog ">
+        <div class="fm-dialog-header">
+            <div class="fm-dialog-title">File Edit</div>
+            <div class="fm-dialog-close"></div>
+            <div class="clear"></div>
+        </div>
+
+
+        <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
+        <div class="file-edit-content-block">
+            <div class="text-edit-container">
+                <iframe id="texteditoriframe"></iframe>
+
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="fm-notifications-bottom">
+            <div class="default-white-button left links-button " id="qr-dlg-sv-img">
+                <span>Save as Image</span>
+            </div>
+            <div class="default-white-button left links-button copy-to-clipboard" id="qr-dlg-cpy-lnk">
+                <span>Copy Link</span>
+            </div>
+            <div class="default-grey-button right links-button " id="qr-dlg-close">
+                <span>Close</span>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+
+    <div class="fm-dialog create-file-dialog filled-input hidden" >
+        <div class="fm-dialog-close"></div>
+        <div class="nw-fm-dialog-title">[$17505]</div>
+        <div class="create-folder-size-icon short-size">
+        </div>
+        <div class="create-folder-pad">
+            <div class="create-folder-input-bl">
+                <div class="transfer-filetype-icon text">
+                    <div class="duplicated-input-warning">
+                        <div class="arrow"></div>
+                        <span>[$17578]</span>
+                    </div>
+                </div>
+                <input name="dialog-new-folder" type="text" value="" placeholder="[$17506]" autofocus=autofocus autofocus=autofocus />
+            </div>
+            <div class="create-folder-bottom">
+                <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
+                <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="fm-dialog create-folder-dialog filled-input">
+        <div class="fm-dialog-close"></div>
+        <div class="nw-fm-dialog-title">[$68]</div>
+        <div class="create-folder-size-icon short-size">
+        </div>
+        <div class="create-folder-pad">
+            <div class="create-folder-input-bl">
+                <div class="transfer-filetype-icon folder">
+                    <div class="duplicated-input-warning">
+                        <div class="arrow"></div>
+                        <span>[$17579]</span>
+                    </div>
+                </div>
+                <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus=autofocus />
+            </div>
+            <div class="create-folder-bottom">
+                <div class="fm-dialog-new-folder-button default-white-button right"><span>[$455]</span></div>
+                <div class="create-folder-button-cancel default-white-button right"><span>[$82]</span></div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

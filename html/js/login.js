@@ -274,6 +274,7 @@ function init_login() {
     var $formWrapper = $('.main-mid-pad.login');
     var $inputs = $formWrapper.find('input');
     var $button = $formWrapper.find('.big-red-button');
+    var $forgotPassLink = $('.top-login-forgot-pass', $.formWrapper);
 
     if (is_extension) {
         $('.extension-advise').addClass('hidden');
@@ -291,7 +292,7 @@ function init_login() {
         $('.main-right-block').addClass('hidden');
         $('.register-st2-txt-block').addClass('hidden');
         $('.account.small-header-txt').addClass('hidden');
-        $('.top-login-forgot-pass').addClass('hidden');
+        $forgotPassLink.addClass('hidden');
         $('.main-top-info-block').removeClass('hidden');
         $('.big-red-button.login-button').text(l[1131]);
         $('.account.top-header.login').text(l[1131]);
@@ -305,6 +306,17 @@ function init_login() {
             login_txt = false;
         }
     }
+
+    $forgotPassLink.rebind('click.forgotpasslink', function() {
+
+        var email = document.getElementById('login-name2').value;
+
+        if (isValidEmail(email)) {
+            $.prefillEmail = email;
+        }
+
+        loadSubPage('recovery');
+    });
 
     $inputs.rebind('keydown.initlogin', function(e) {
 

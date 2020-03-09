@@ -65,8 +65,8 @@
     margin: -160px 0 0 -180px;
 }
 .fm-dialog.registration-page-success.special {
-    width: 480px;
-    margin: -160px 0 0 -240px;
+    width: 496px;
+    margin: -160px 0 0 -248px;
 }
 .fm-dialog.bandwidth-dialog {
     width: 964px;
@@ -1941,7 +1941,8 @@ li.token-input-token-invite .input-close {
 }
 /* End of Invitation status dialog */
 
-.fm-dialog.create-folder-dialog {
+.fm-dialog.create-folder-dialog,
+.fm-dialog.create-file-dialog {
     width: 402px;
     margin: -96px 0 0 -201px;
 }
@@ -3025,7 +3026,7 @@ li.token-input-token-invite .input-close {
     left: 2px;
     top: 0;
     position: absolute;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -6px -743px;
 }
 .fm-versioning.scroll-bl {
@@ -5365,3 +5366,10 @@ body.en .register-side-pane.container.visible {
     margin-right: 4px;
 }
 /* End of Business password change dialog */
+.fm-picker-dialog .summary-input #f-name-input {
+    border: none;
+    width: 365px;
+    max-width: 365px;
+    padding: initial;
+    height: 31px;
+}

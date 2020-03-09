@@ -549,6 +549,25 @@ function makeMetaAware(kls) {
 }
 
 /**
+ * Gets UAO parameter from the URL if exists and store it
+ * @param {String} url          URL
+ * @param {String} page         Page
+ */
+function getUAOParameter(url, page) {
+    'use strict';
+    var pageLen = page.length;
+    if (url.length > pageLen) {
+        var urlParams = url.substr(pageLen);
+        if (urlParams.length > 14) {
+            var uaoParam = urlParams.indexOf('/uao=');
+            if (uaoParam > -1) {
+                mega.uaoref = urlParams.substr(uaoParam + 5);
+            }
+        }
+    }
+}
+
+/**
  * Simple method for generating unique event name with a .suffix that is a hash of the passed 3-n arguments
  * Main purpose is to be used with jQuery.bind and jQuery.unbind.
  *
@@ -2844,4 +2863,21 @@ function registerLinuxDownloadButton($links) {
         }
         return false;
     });
+}
+
+/**
+ * Global function to Check if the node is for a textual file
+ * @param {MegaData} node       The node to check
+ * @returns {Void}              void
+ */
+function isTextual(node) {
+    'use strict';
+    if (node && node.name && fileext(node.name) === '') {
+        return true;
+    }
+    var fType = filetype(node, true)[0];
+    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+        return true;
+    }
+    return false;
 }

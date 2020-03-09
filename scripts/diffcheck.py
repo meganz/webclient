@@ -483,7 +483,7 @@ def reduce_validator(file_line_mapping, **extra):
     diff_files = get_git_diff_files()
     if any(['images/mega' in f for f in diff_files]):
         base_sprites = get_sprite_images()
-        target_sprites = map_list_to_dict([split_sprite_name(f) for f in filter_list(diff_files, r'@2x')])
+        target_sprites = get_sprite_images(get_current_branch())
         for file, version in target_sprites.iteritems():
             if file in base_sprites and base_sprites[file] > version:
                 fatal += 1

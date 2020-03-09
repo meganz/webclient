@@ -859,6 +859,25 @@ FMDB.prototype.stripnode = Object.freeze({
             'n': mcfResponse.n,
             'url': mcfResponse.url
         };
+
+        if (newMcf.u && Object.keys(newMcf.u).length > 50) {
+            var u = newMcf.u;
+            // cleanup before mcf.add
+            delete newMcf.u;
+            delete mcfResponse.u;
+
+            // restore after fmdb.add
+            t.u = u;
+
+            // build smaller string based version to safe few bytes
+            var stripu = "";
+            for (var i = 0; i < u.length; i++) {
+                stripu += base64urldecode(u[i].u) + String(u[i].p);
+            }
+            newMcf.stripu = stripu;
+        }
+
+
         delete mcfResponse.ou;
         delete mcfResponse.url;
         delete mcfResponse.n;
@@ -914,6 +933,15 @@ FMDB.prototype.restorenode = Object.freeze({
 
     mcf: function(mcf, index) {
         // fill cache.
+        if (mcf.stripu) {
+            mcf.u = [];
+            for (var i = 0; i < mcf.stripu.length; i += 9) {
+                mcf.u.push({
+                    'u': base64urlencode(mcf.stripu.substr(i, 8)),
+                    'p': parseInt(mcf.stripu.substr(i + 8, 1), 10)
+                });
+            }
+        }
         FMDB._mcfCache[mcf.id] = mcf;
     }
 });

@@ -10,7 +10,7 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
-    this.columnsWidth.cloud.label = { max: 130, min: 70, curr: 70, viewed: false };
+    this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
@@ -1390,6 +1390,10 @@ FileManager.prototype.initContextUI = function() {
         }
         createFolderDialog();
     });
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.newfile-item').rebind('click', function() {
+        createFileDialog();
+    });
 
     $(c + '.fileupload-item').rebind('click', function() {
         // check if this is a business expired account
@@ -1559,6 +1563,25 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.properties-item').rebind('click', function() {
         propertiesDialog();
+    });
+
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.edit-file-item').rebind('click', function() {
+        var nodeHandle = $.selected && $.selected[0];
+        if (!nodeHandle) {
+            return;
+        }
+
+        loadingDialog.show('common', l[23130]);
+
+        mega.fileTextEditor.getFile(nodeHandle).done(
+            function(data) {
+                loadingDialog.hide();
+                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
+            }
+        ).fail(function() {
+            loadingDialog.hide();
+        });
     });
 
     $(c + '.properties-versions').rebind('click', function() {
@@ -1992,14 +2015,16 @@ FileManager.prototype.createFolderUI = function() {
     });
 };
 
+/* eslint-disable id-length */
+
 /**
  * Initialize file and folder select dialog from chat.
  * This will fill up $.selected with what user selected on the dialog.
  * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
  */
-FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
+FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
     'use strict';
-
+    /* eslint-enable id-length */
     // If chat is not ready.
     if (!megaChatIsReady) {
         if (megaChatIsDisabled) {
@@ -2030,10 +2055,37 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
                 $.selected = selected;
                 M.getLinkAction();
             }
+        },
+        'openFile': {
+            title: l[22666],
+            classes: 'no-incoming', // Hide incoming share tab
+            selectLabel: l[865],
+            folderSelectNotAllowed: true,
+            folderSelectable: false, // Can select folder(s)
+            customFilterFn: function(node) {
+                if (node.t) {
+                    return true;
+                }
+                if (node.s >= 20971520) {
+                    return false;
+                }
+
+                if (isTextual(node)) {
+                    return true;
+                }
+                return false;
+            },
+            onAttach: function() {
+                closeDialog();
+                $.selected = selected;
+                if (OnSelectCallback) {
+                    OnSelectCallback(selected);
+                }
+            }
         }
     };
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
+    var prop = {
         title: options[type].title,
         folderSelectable: options[type].folderSelectable,
         selectLabel: options[type].selectLabel,
@@ -2047,7 +2099,15 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
             selected = node;
         },
         onAttachClicked: options[type].onAttach,
-    });
+    };
+    if (options[type].folderSelectNotAllowed) {
+        prop.folderSelectNotAllowed = options[type].folderSelectNotAllowed;
+    }
+    if (options[type].customFilterFn) {
+        prop.customFilterFn = options[type].customFilterFn;
+    }
+
+    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
 };
@@ -2222,7 +2282,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
             addressDialog.closeDialog();
         }
-        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.copyrightsDialog)) {
+        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog
+            || $.copyrightsDialog || $.saveAsDialog)) {
             closeDialog();
         }
         else if (e.keyCode == 27 && $.topMenu) {
@@ -3590,6 +3651,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
+        else if (isTextual(n) && n.s < 20971520) {
+            $.selected = [h];
+            // there's no jquery parent for this container.
+            // eslint-disable-next-line local-rules/jquery-scopes
+            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        }
         else {
             M.addDownload([h]);
         }
@@ -4133,11 +4200,12 @@ FileManager.prototype.getLinkAction = function() {
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
         copy: ['createfolder'],
         move: ['createfolder'],
         register: ['terms'],
-        selectFolder: ['createfolder']
+        selectFolder: ['createfolder'],
+        saveAs: ['createfolder']
     };
 
     var _openDialog = function(name, dsp) {

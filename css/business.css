@@ -37,6 +37,11 @@
 .business-info-block {
     text-align: center;
 }
+.business .business-info-block {
+    text-align: center;
+    max-width: 500px;
+    display: inline-block;
+}
 /*.business .bottom-page .default-white-button.individual {
     margin: 4px 0 0 30px;
     font-size: 16px;
@@ -807,6 +812,10 @@ img.bottom-page.business4 {
     }
 }
 @media only screen and (max-width: 783px) {
+    .business .business-info-block {
+        max-width: none;
+        display: block;
+    }
     .bottom-page.big-header.top.dark {
         font-size: 36px;
         line-height: 48px;

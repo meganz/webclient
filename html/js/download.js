@@ -517,6 +517,40 @@ function dl_g(res) {
                 }
             };
 
+            /** Function to show UI elements if textual files
+             *@returns {Void}           void
+             */
+            var showTextView = function() {
+                if (isTextual(dl_node)) {
+                    // there's no jquery parent for this container.
+                    var $containerB = $('.download.main-pad .download.info-block');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
+
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click.txtViewer', function() {
+                            loadingDialog.show();
+
+                            mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
+                                }
+                            ).fail(function() {
+                                loadingDialog.hide();
+                            });
+                        });
+                }
+            };
+
             if (res.fa) {
                 var promise = Promise.resolve();
 
@@ -553,6 +587,10 @@ function dl_g(res) {
                         showPreviewButton();
                     }
                 });
+            }
+            else {
+                // if it's textual file, then handle the UI.
+                showTextView();
             }
 
             if (prevBut) {

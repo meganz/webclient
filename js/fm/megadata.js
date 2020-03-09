@@ -126,7 +126,8 @@ function MegaData() {
         'fav': this.sortByFav.bind(this),
         'email': this.sortByEmail.bind(this),
         'label': this.sortByLabel.bind(this),
-        'sharedwith': this.sortBySharedWith.bind(this)
+        'sharedwith': this.sortBySharedWith.bind(this),
+        'versions': this.sortByVersion.bind(this)
     };
 
     /** EventListener interface. */

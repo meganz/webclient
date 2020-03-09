@@ -1751,6 +1751,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
         }
+        // if node in cached mode in editor, clear it
+        if (mega && mega.fileTextEditor) {
+            mega.fileTextEditor.clearCachedFileData(n.h);
+        }
+
         // Update versioning dialog if it is open and the folder is its parent folder,
         // the purpose of the following code is to update permisions of historical files.
         if ($.selected
@@ -3171,7 +3176,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
                         $('.create-new-folder input').val('');
 
                         M.updFileManagerUI().always(function() {
-                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
                                 refreshDialogContent();
                             }
 
@@ -3982,7 +3987,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID ? M.RootID : undefined);
+            _import(!folderlink && M.RootID ? M.RootID : undefined);
         }
     });
 };

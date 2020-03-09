@@ -573,6 +573,24 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
+    /** Adding the current page to history if needed to preserve navigation correctness
+     * @returns {Void}      No return value should be expected
+     */
+    global.addingFakeHistoryState = function() {
+        // then pushing fake states of history/hash
+        if (!hashLogic) {
+            var isSearch = page.indexOf('fm/search/');
+            if (isSearch >= 0) {
+                var searchString = page.substring(isSearch + 10);
+                var tempPage = page.substring(0, isSearch + 10);
+                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+            }
+            else {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
+        }
+    };
+
     // Viewer Init
     function slideshow(id, close, hideCounter) {
         if (!close && u_attr && u_attr.b && u_attr.b.s === -1) {
@@ -631,17 +649,7 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            if (!hashLogic && !location.hash) {
-                var isSearch = page.indexOf('fm/search/');
-                if (isSearch >= 0) {
-                    var searchString = page.substring(isSearch + 10);
-                    var tempPage = page.substring(0, isSearch + 10);
-                    history.pushState({subpage: tempPage, searchString: searchString}, "", "/" + tempPage);
-                }
-                else {
-                    history.pushState({subpage: page}, '', '/' + page);
-                }
-            }
+            addingFakeHistoryState();
 
             _hideCounter = hideCounter;
         }

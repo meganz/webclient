@@ -128,6 +128,11 @@ function u_checklogin3a(res, ctx) {
             }
         }
 
+        // IP geolocation debuggging
+        if (d && localStorage.ipcc) {
+            u_attr.ipcc = localStorage.ipcc;
+        }
+
         // We do not seem to need this here...
         // u_storage.attr = JSON.stringify(u_attr);
         delete localStorage.attr;

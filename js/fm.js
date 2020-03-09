@@ -559,14 +559,19 @@ function setContactLink($container) {
         var leftPos = $this.offset().left + $this.width() / 2 - $tooltip.outerWidth() / 2;
         var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
 
-        $tooltip.addClass('visible').css({
-            'left': leftPos,
-            'top': topPos
-        });
+        $tooltip
+            .addClass('visible')
+            .removeClass('hidden')
+            .css({
+                'left': leftPos,
+                'top': topPos
+            });
     });
 
     $publicLink.rebind('mouseout.publiclnk', function() {
-        $('.dropdown.tooltip.small').removeClass('visible');
+        $('.dropdown.tooltip.small')
+            .removeClass('visible')
+            .addClass('hidden');
     });
 
     $publicLink.rebind('click.publiclnk', function() {

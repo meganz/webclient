@@ -1,8 +1,8 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "./../stores/mixins.js";
+import {MegaRenderMixin} from "./../stores/mixins.js";
 
-class ToggleCheckbox extends MegaRenderMixin(React.Component) {
+class ToggleCheckbox extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {
@@ -30,7 +30,7 @@ class ToggleCheckbox extends MegaRenderMixin(React.Component) {
     }
 };
 
-class Checkbox extends MegaRenderMixin(React.Component) {
+class Checkbox extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {
@@ -63,7 +63,7 @@ class Checkbox extends MegaRenderMixin(React.Component) {
     }
 };
 
-class IntermediateCheckbox extends MegaRenderMixin(React.Component) {
+class IntermediateCheckbox extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = {

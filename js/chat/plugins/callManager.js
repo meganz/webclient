@@ -97,6 +97,7 @@ CallManager.prototype.registerCall = function (chatRoom, rtcCall, fromUser) {
     var self = this;
     var callManagerCall = new CallManagerCall(chatRoom, rtcCall, fromUser);
     self._calls.push(callManagerCall);
+    $('.camera-access').addClass('hidden');
     return callManagerCall;
 };
 
@@ -759,13 +760,14 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
         var $promise = self.room._retrieveTurnServerFromLoadBalancer(4000);
 
         $promise.always(function () {
-            if (!self.rtcCall.answer(Av.fromMediaOptions(mediaOptions))) {
+            self.rtcCall.answer(Av.fromMediaOptions(mediaOptions))
+            .then(function() {
+                self.room.megaChat.trigger('onCallAnswered', [self, eventData]);
+                self.getCallManager().trigger('CallAnswered', [self, eventData]);
+            })
+            .catch(function(err) {
                 self.onCallTerminated();
-                return;
-            }
-
-            self.room.megaChat.trigger('onCallAnswered', [self, eventData]);
-            self.getCallManager().trigger('CallAnswered', [self, eventData]);
+            });
         });
     }, self.room);
 
@@ -1153,6 +1155,7 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
         self.room.trigger('onCallSessReconnecting', [self]);
         return;
     }
+    $('.camera-access').addClass('hidden');
     var callMgr = self.getCallManager();
 
     // in case rtcCall is empty, this is a "Call resume timeout"'s destroy event
@@ -1315,6 +1318,10 @@ CallManagerCall.prototype.onLocalMediaFail = function (what, err) {
     $('.camera-access').addClass('hidden');
     self.room.trackDataChange();
     var deviceMsg;
+    if (what === 0) {
+        showToast("warning", l[22884]); // timeout
+        return;
+    }
     if (what & Av.Audio) {
         deviceMsg = (what & Av.Video) ? l[10372] : l[22096];
     } else if (what & Av.Video) {

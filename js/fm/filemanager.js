@@ -1572,7 +1572,7 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
 
-        loadingDialog.show();
+        loadingDialog.show('common', l[23130]);
 
         mega.fileTextEditor.getFile(nodeHandle).done(
             function(data) {

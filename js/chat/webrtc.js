@@ -84,7 +84,7 @@ RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
 RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
-RtcModule.kMediaGetTimeout = 20000;
+RtcModule.kMediaGetTimeout = 20000000;
 RtcModule.kSessSetupTimeout = 25000;
 RtcModule.kCallSetupTimeout = 35000;
 RtcModule.kCallRecoveryTimeout = 30000;
@@ -306,6 +306,8 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
             ringing: ringing,
             data: data
         };
+
+        this.crypto.preloadCryptoForPeer(userid);
 
         var call = self.calls[parsedCallData.chatid];
         if (call) {
@@ -1437,9 +1439,30 @@ Call.prototype.msgSession = function(packet) {
         return;
     }
 
-    var sess = self._addNewSession(packet);
-    sess.peerSupportsReneg = ((packet.data.charCodeAt(64) & Caps.kSupportsStreamReneg) !== 0);
-    sess.createRtcConnSendOffer();
+    self._addNewSession(packet) // handles errors on its own
+    .then(function(sess) {
+        sess._startAsJoiner();
+    });
+};
+
+Session.prototype._startAsJoiner = function() {
+    var self = this;
+    assert(self.isJoiner); // the joiner sends the SDP offer
+    try {
+        self._processInputQueue();
+    }
+    catch(e) {
+        return;
+    }
+    if (self.state === SessState.kWaitSdpAnswer) {
+        self.sendOffer()
+        .catch(function(err) {
+            // should not happen, errors should already be handled
+            if (sess.state < SessState.kTerminating) {
+                sess.terminateAndDestroy(Term.kErrInternal);
+            }
+        });
+    }
 };
 
 Call.prototype._notifyNewSession = function(sess) {
@@ -1486,7 +1509,7 @@ Call.prototype.msgJoin = function(packet) {
             var s = self.sessions[sid];
             if (s.peer === packet.fromUser && s.peerClient === packet.fromClient) {
                 // we have a session to that peer
-                if (s.state === SessState.kTerminating) {
+                if (s.state >= SessState.kTerminating) {
                     // but session is terminating, force its removal and handle the join
                     s._destroy(s._terminateReason);
                     assert(!self.sessions[sid]);
@@ -1516,18 +1539,21 @@ Call.prototype.msgJoin = function(packet) {
         delete self._sentSessions[peerId];
         var ownHashKey = self.manager.crypto.random(32);
 
-        // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
-        // flags contains a flag whether we support stream renegotiation
-        self.manager.cmdEndpoint(RTCMD.SESSION, packet,
-            packet.callid +
-            newSid +
-            self.manager.ownAnonId +
-            self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
-            self.id +
-            String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
-        );
-        var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
-        self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        self.manager.crypto.loadCryptoForPeer(packet.fromUser)
+        .then(function() {
+            // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
+            // flags contains a flag whether we support stream renegotiation
+            self.manager.cmdEndpoint(RTCMD.SESSION, packet,
+                packet.callid +
+                newSid +
+                self.manager.ownAnonId +
+                self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
+                self.id +
+                String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
+            );
+            var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
+            self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        });
     } else {
         self.logger.log("Ignoring JOIN while in state", constStateToText(CallState, self.state));
         return;
@@ -2036,6 +2062,10 @@ Call.prototype._startOrJoin = function(av) {
         self.logger.warn("Couldn't get local stream, continuing as receive-only");
     })
     .then(function() {
+        if (self.state >= CallState.kTerminating) {
+            self.logger.warn("Call killed while getting local stream, aborting start/join");
+            return Promise.reject();
+        }
         if (self.isJoiner) {
             if (!self._join()) {
                 return Promise.reject();
@@ -2059,7 +2089,6 @@ Call.prototype._join = function() {
         (RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)));
     self._setState(CallState.kJoining);
     if (!self.cmdBroadcast(RTCMD.JOIN, data)) {
-        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
     if (self.recovery) {
@@ -2098,9 +2127,10 @@ Call.prototype.answer = function(av) {
     var self = this;
     assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
-        self.logger.warn("answer: Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
-            "), nothing to answer");
-        return false;
+        var errMsg = "Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
+            "), nothing to answer";
+        self.logger.error(errMsg);
+        return Promise.reject(errMsg);
     }
     var calls = self.manager.calls;
     if (Object.keys(calls).length <= 1) {
@@ -2877,6 +2907,7 @@ function Session(call, packet, sessParams) {
     self._mediaHiccups = 0;
     self._mediaHiccupMaxDur = 0;
     self._terminatePromise = createPromiseWithResolveMethods();
+    self.inputQueue = []; // packets are queued here until asyncInit() (i.e. crypto) is ready
     if (packet.type === RTCMD.SDP_OFFER) { // peer's offer
         assert(sessParams);
         // SDP_OFFER sid.8 anonId.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
@@ -2892,7 +2923,7 @@ function Session(call, packet, sessParams) {
         // but we can't process them until setRemoteDescription is ready, so
         // we have to store them in a queue
         self.peerHash = data.substr(48, 32);
-        self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, data.substr(16, 32));
+        self._encryptedPeerHashKey = data.substr(16, 32);
         self.peerAv = data.charCodeAt(80);
         var sdpLen = Chatd.unpack16le(data.substr(81, 2));
         assert(data.length >= 83 + sdpLen);
@@ -2906,7 +2937,8 @@ function Session(call, packet, sessParams) {
         assert(data.length >= 56);
         self.ownHashKey = self.crypto.random(32);
         self.peerAnonId = data.substr(16, 8);
-        self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, data.substr(24, 32));
+        self._encryptedPeerHashKey = data.substr(24, 32);
+        self.peerSupportsReneg = ((packet.data.charCodeAt(64) & Caps.kSupportsStreamReneg) !== 0);
     } else {
         assert(false, "Attempted to create a Session object with packet of type",
             constStateToText(RTCMD, packet.type));
@@ -2937,6 +2969,64 @@ function Session(call, packet, sessParams) {
         self.terminateAndDestroy(term);
     }, RtcModule.kSessSetupTimeout);
 }
+
+Session.prototype._processInputQueue = function() {
+    var queue = this.inputQueue;
+    if (!queue) {
+        return;
+    }
+    // Keep input queue, so that if somehow we get passed a new packet while processing the queue,
+    // it gets enqueued and processed in order
+    if (queue.length === 0) {
+        delete this.inputQueue;
+        return;
+    }
+    this.logger.warn("Packets were queued while crypto was being initialized, processing them...");
+    try {
+        do {
+            this.processMsg(queue.shift());
+        } while (queue.length > 0);
+        this.logger.warn("Done processing queued packets");
+    } catch(e) {
+        if (this.state < Term.kTerminating) {
+            this.terminateAndDestroy(Term.kErrInternal);
+        }
+        throw e;
+    }
+    finally {
+        delete this.inputQueue;
+    }
+};
+
+Session.prototype._asyncInit = function() {
+    var self = this;
+    assert(self._encryptedPeerHashKey);
+    return self.crypto.loadCryptoForPeer(self.peer)
+    .catch(function(err) {
+        if (self.state < SessState.kTerminating) {
+            self.terminateAndDestroy(Term.kErrCrypto);
+        }
+        return Promise.reject(err);
+    })
+    .then(function() {
+        if (self.state >= SessState.kTerminating) {
+            return Promise.reject();
+        }
+        try {
+            self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, self._encryptedPeerHashKey);
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrCrypto);
+            return Promise.reject();
+        }
+        try {
+            self._createRtcConn();
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrInternal);
+            return Promise.reject();
+        }
+        return self;
+    });
+};
 
 Session.prototype._setState = function(newState) {
     var oldState = this.state;
@@ -3051,6 +3141,17 @@ Session.prototype._updatePeerNetworkQuality = function(q) {
 };
 
 Session.prototype.handleMsg = function(packet) {
+    if (this.inputQueue) {
+        this.inputQueue.push(packet);
+        this.logger.log("Session not ready, queueing RTCMD.%s packet", constStateToText(RTCMD, packet.type));
+     }
+     else {
+        this.processMsg(packet);
+     }
+};
+
+Session.prototype.processMsg = function(packet) {
+    this.logger.log("Processing RTCMD." + constStateToText(RTCMD, packet.type));
     switch (packet.type) {
         case RTCMD.SDP_ANSWER:
             this.msgSdpAnswer(packet);
@@ -3431,16 +3532,9 @@ Session.prototype._sendAv = function(av) {
     this.cmd(RTCMD.MUTE, String.fromCharCode(av));
 };
 
-Session.prototype.createRtcConnSendOffer = function() {
-    var self = this;
-    assert(self.isJoiner); // the joiner sends the SDP offer
-    assert(self.state === SessState.kWaitSdpAnswer);
-    self._createRtcConn();
-    return self.sendOffer(true);
-};
-
 Session.prototype.sendOffer = function() {
     var self = this;
+    assert(self.peerHashKey);
     assert(self.peerAnonId);
     var isInitial = self.state < SessState.kSessInProgress;
     return self.rtcConn.createOffer(self.pcConstraints())
@@ -3471,7 +3565,8 @@ Session.prototype.sendOffer = function() {
         }
         self.terminateAndDestroy(self._streamRenegTimer ? Term.kErrStreamReneg : Term.kErrSdp,
             "Error creating SDP offer: " + err);
-        self.logger.error("failed SDP offer: ", self.ownSdpOffer);
+        self.logger.error("Error creating SDP offer. Failed SDP offer: ", self.ownSdpOffer);
+        return Promise.reject();
     });
 };
 
@@ -3497,10 +3592,25 @@ Call.prototype.msgSdpOffer = function(packet) {
     }
 
     // create session to this peer
-    var sess = self._addNewSession(packet, sentParams);
-    assert(sess.sid === sentParams.sid);
-    sess._createRtcConn();
-    sess.processSdpOfferSendAnswer();
+    self._addNewSession(packet, sentParams)
+    .then(function(sess) {
+        assert(sess.sid === sentParams.sid);
+        sess._startAsNonJoiner();
+    });
+};
+
+Session.prototype._startAsNonJoiner = function() {
+    var self = this;
+    assert(!self.isJoiner);
+    self.processSdpOfferSendAnswer()
+    .then(function() {
+        self._processInputQueue();
+    })
+    .catch(function(err) {
+        if (self.state < SessState.kTerminating) {
+            self.terminateAndDestroy(kErrInternal);
+        }
+    });
 };
 
 Session.prototype.msgSdpOfferRenegotiate = function(packet) {
@@ -3530,7 +3640,7 @@ Call.prototype._addNewSession = function(packet, params) {
     }
     this.sessions[sess.sid] = sess;
     this._notifyNewSession(sess);
-    return sess;
+    return sess._asyncInit();
 };
 
 Session.prototype.msgSdpAnswer = function(packet) {
@@ -3728,6 +3838,11 @@ Session.prototype._destroy = function(code, msg) {
     this._terminatePromise.resolve(code);
 };
 
+Session.prototype._terminateAndDestroyNow = function() {
+    assert(this.state === SessState.kTerminating);
+    this._destroy(this._terminateReason);
+};
+
 Session.prototype.submitStats = function(termCode, errInfo) {
     var stats;
     if (this.statRecorder) {
@@ -3824,7 +3939,15 @@ Session.prototype.msgIceCandidate = function(packet) {
             sdpMid: mid,
             candidate: data.substr(midLen + 12, candLen)
     });
-
+    if (!self.rtcConn) { // crypto is not ready yet
+        if (!self.peerCandidates) {
+            self._queuedPeerCandidates = [cand];
+        }
+        else {
+            self._queuedPeerCandidates.push(cand);
+        }
+        return;
+    }
     self.rtcConn.addIceCandidate(cand)
     .catch(function(err) {
         self.logger.error("addIceCandidate() failed: " + (err.stack || err.message || err) +
@@ -4242,7 +4365,9 @@ var Term = Object.freeze({
     kErrStreamRenegTimeout: 42, // < Timed out waiting for completion of offer-answer exchange
                                 // < during stream renegotiation
     kErrCallRecoveryFailed: 43, // < Timed out waiting for call to recover after own or peers' network drop
-    kErrorLast: 43,         // < Last enum indicating call termination due to error
+    kErrCrypto: 44,         // < An error was returned from the crypto subsystem used for MiTM attack protection
+                            // < Typically this means that the Cu25519 pubkey of the peer wasn't found
+    kErrorLast: 44,         // < Last enum indicating call termination due to error
     kLast: 43,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
                             // < not at our side

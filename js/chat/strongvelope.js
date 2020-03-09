@@ -815,9 +815,13 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype._parseAndExtractKeys = function(message) {
         var self = this;
+
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
+        if (this.chatMode === CHAT_MODE.PUBLIC) {
+            return MegaPromise.resolve(result);
+        }
 
         if (parsedMessage === false) {
             logger.error('Can not parse the message content.');
@@ -1848,7 +1852,7 @@ var strongvelope = {};
         if (parsedMessage) {
             var proxyPromise = new MegaPromise();
 
-            var verifyPromise = ns._verifyMessage(
+            var verifyPromise = self.chatMode === CHAT_MODE.PUBLIC ? MegaPromise.resolve(true) : ns._verifyMessage(
                 String.fromCharCode(parsedMessage.protocolVersion) +
                     String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
                 parsedMessage.signature,

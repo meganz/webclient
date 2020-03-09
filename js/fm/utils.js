@@ -1403,8 +1403,6 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     l[19341],
                     '',
                     function() {
-                        // We cant use "StartWith" as the rule suggest because it's not supported in all browsers
-                        // eslint-disable-next-line unicorn/prefer-starts-ends-with
                         if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
                             loadSubPage('fm');
                             return false;

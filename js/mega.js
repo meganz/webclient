@@ -3303,9 +3303,12 @@ function process_businessAccountSubUsers_SC(packet) {
         valChanged = true;
     }
     if (valChanged) {
-        var bAccount = new BusinessAccount();
-        bAccount.parseSUBA(subUser, false, true);
-        // mBroadcaster.sendMessage('business:subuserUpdate', subUser);
+        M.require('businessAcc_js', 'businessAccUI_js').done(
+            function() {
+                var bAccount = new BusinessAccount();
+                bAccount.parseSUBA(subUser, false, true);
+            }
+        );
     }
 }
 

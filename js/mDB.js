@@ -164,7 +164,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 
                 reject(ETEMPUNAVAIL);
             }
-        }, 9000);
+        }, 15000);
 
         var dbSchema = {};
         if (!Array.isArray(fmdb.schema)) {
@@ -634,9 +634,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 // this node type is stripnode-optimised: temporarily remove redundant elements
                                 // to create a leaner JSON and save IndexedDB space
                                 var d = row.d;  // this references the live object!
-                                var t = fmdb.stripnode[table](d);   // remove overhead
+                                var t1 = fmdb.stripnode[table](d);   // remove overhead
                                 row.d = JSON.stringify(d);          // store lean result
-                                for (var i in t) d[i] = t[i];       // restore overhead
+                                for (var i1 in t1) d[i1] = t1[i1];       // restore overhead
                             }
                             else {
                                 // otherwise, just stringify it all
@@ -645,12 +645,12 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                         }
 
                         // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
-                        for (var i in row) {
-                            if (i == 'd') {
+                        for (var i2 in row) {
+                            if (i2 == 'd') {
                                 row.d = fmdb.strcrypt(row.d);
                             }
-                            else if (table !== 'f' || i !== 't') {
-                                row[i] = ab_to_base64(fmdb.strcrypt(row[i]));
+                            else if (table !== 'f' || i2 !== 't') {
+                                row[i2] = ab_to_base64(fmdb.strcrypt(row[i2]));
                             }
                         }
                     }

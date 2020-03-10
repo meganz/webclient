@@ -270,6 +270,11 @@ mobile.cloud.contextMenu = {
                 return false;
             }
 
+            // Set `$.autoplay` with the node handle
+            if ($('.mobile.fm-icon', $(this)).is('.playvideo, .playaudio')){
+                $.autoplay = nodeHandle;
+            }
+
             // Show the file preview overlay and hide the context menu
             mobile.slideshow.init(nodeHandle);
             mobile.cloud.contextMenu.hide();

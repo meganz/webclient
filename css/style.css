@@ -20956,6 +20956,9 @@ body.kr .account.chart.data {
     min-height: initial;
     margin-left: 40px;
 }
+.support a.contact-new-button {
+    margin-left: 0;
+}
 .contact-us-revamp .contact-body-wrapper {
     max-width: 1280px;
     margin: 0 auto;
@@ -27212,7 +27215,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-list-table .fm-user-management-user .admin-icon{
     padding-right: 8px;
     float: left;
-    z-index: 1130;
     margin-left:4px;
 }
 

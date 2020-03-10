@@ -3214,6 +3214,9 @@ function process_u(users, ignoreDB) {
  */
 function process_suba(suba, ignoreDB) {
     "use strict";
+    if (!suba || !suba.length) {
+        return;
+    }
     M.require('businessAcc_js', 'businessAccUI_js').done(function () {
 
         // the response is an array of users's handles (Masters). this means at least it will contain
@@ -3300,9 +3303,12 @@ function process_businessAccountSubUsers_SC(packet) {
         valChanged = true;
     }
     if (valChanged) {
-        var bAccount = new BusinessAccount();
-        bAccount.parseSUBA(subUser, false, true);
-        // mBroadcaster.sendMessage('business:subuserUpdate', subUser);
+        M.require('businessAcc_js', 'businessAccUI_js').done(
+            function() {
+                var bAccount = new BusinessAccount();
+                bAccount.parseSUBA(subUser, false, true);
+            }
+        );
     }
 }
 

@@ -6866,6 +6866,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 
+
 function BrowserCol(_ref) {
   var id = _ref.id,
       _ref$className = _ref.className,
@@ -6880,14 +6881,14 @@ function BrowserCol(_ref) {
     classes = "".concat(classes, " ").concat(ordClass);
   }
 
-  return React.makeElement("th", {
+  return external_React_default.a.createElement("th", {
     onClick: function onClick(e) {
       e.preventDefault();
       e.stopPropagation();
 
       _onClick(id);
     }
-  }, React.makeElement("span", {
+  }, external_React_default.a.createElement("span", {
     className: "arrow ".concat(classes)
   }, label));
 }
@@ -7347,6 +7348,12 @@ function (_MegaRenderMixin) {
       self.lastCharKeyIndex = -1;
       e.stopPropagation();
       e.preventDefault();
+      var share = M.getNodeShare(node);
+
+      if (share && share.down) {
+        // node is taken down -> no interactions available
+        return;
+      }
 
       if (node.t) {
         // expand folder
@@ -7400,7 +7407,7 @@ function (_MegaRenderMixin) {
         }
 
         var tooltipElement = null;
-        var icon = React.makeElement("span", {
+        var icon = external_React_default.a.createElement("span", {
           className: "transfer-filetype-icon " + (isFolder ? " folder " : "") + '' + fileIconType
         }, " ");
         var image = null;
@@ -7420,16 +7427,16 @@ function (_MegaRenderMixin) {
             src = window.noThumbURI || '';
           }
 
-          icon = React.makeElement(tooltips["a" /* default */].Tooltip, {
+          icon = external_React_default.a.createElement(tooltips["a" /* default */].Tooltip, {
             withArrow: true
-          }, React.makeElement(tooltips["a" /* default */].Handler, {
+          }, external_React_default.a.createElement(tooltips["a" /* default */].Handler, {
             className: "transfer-filetype-icon " + fileIcon(node)
-          }, " "), React.makeElement(tooltips["a" /* default */].Contents, {
+          }, " "), external_React_default.a.createElement(tooltips["a" /* default */].Contents, {
             className: "img-preview"
-          }, React.makeElement("div", {
+          }, external_React_default.a.createElement("div", {
             className: "dropdown img-wrapper img-block",
             id: node.h
-          }, React.makeElement("img", {
+          }, external_React_default.a.createElement("img", {
             alt: "",
             className: "thumbnail-placeholder " + node.h,
             src: src,
@@ -7438,12 +7445,12 @@ function (_MegaRenderMixin) {
           }))));
 
           if (src) {
-            image = React.makeElement("img", {
+            image = external_React_default.a.createElement("img", {
               alt: "",
               src: src
             });
           } else {
-            image = React.makeElement("img", {
+            image = external_React_default.a.createElement("img", {
               alt: ""
             });
           }
@@ -7455,14 +7462,14 @@ function (_MegaRenderMixin) {
 
         if (share) {
           classLinked = 'linked';
-          hasPublicLink = React.makeElement("span", {
+          hasPublicLink = external_React_default.a.createElement("span", {
             className: "data-item-icon public-link-icon"
           });
         }
 
         if (viewMode === "0") {
-          items.push(React.makeElement("tr", {
-            className: "node_" + node.h + " " + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : ""),
+          items.push(external_React_default.a.createElement("tr", {
+            className: "node_" + node.h + (isFolder ? " folder" : "") + (isHighlighted ? " ui-selected" : "") + (share && share.down ? " taken-down" : ""),
             onClick: function onClick(e) {
               self.onEntryClick(e, node);
             },
@@ -7470,11 +7477,11 @@ function (_MegaRenderMixin) {
               self.onEntryDoubleClick(e, node);
             },
             key: node.h
-          }, React.makeElement("td", null, React.createElement("span", {
+          }, external_React_default.a.createElement("td", null, external_React_default.a.createElement("span", {
             className: "grid-status-icon" + (node.fav ? " star" : "")
-          })), React.makeElement("td", null, icon, React.createElement("span", {
+          })), external_React_default.a.createElement("td", null, icon, external_React_default.a.createElement("span", {
             className: "tranfer-filetype-txt"
-          }, node.name)), React.makeElement("td", null, !isFolder ? bytesToSize(node.s) : ""), React.createElement("td", {
+          }, node.name)), external_React_default.a.createElement("td", null, !isFolder ? bytesToSize(node.s) : ""), external_React_default.a.createElement("td", {
             className: classLinked
           }, time2date(node.ts), " ", hasPublicLink)));
         } else {
@@ -7492,8 +7499,8 @@ function (_MegaRenderMixin) {
             colorLabelClasses += ' ' + colourLabel;
           }
 
-          items.push(React.makeElement("div", {
-            className: "data-block-view node_" + node.h + " " + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + colorLabelClasses,
+          items.push(external_React_default.a.createElement("div", {
+            className: "data-block-view node_" + node.h + (isFolder ? " folder" : " file") + (isHighlighted ? " ui-selected" : "") + (share ? " linked" : "") + (share && share.down ? " taken-down" : "") + (colorLabelClasses && " " + colorLabelClasses),
             onClick: function onClick(e) {
               self.onEntryClick(e, node);
             },
@@ -7503,21 +7510,21 @@ function (_MegaRenderMixin) {
             id: "chat_" + node.h,
             key: "block_" + node.h,
             title: node.name
-          }, React.makeElement("div", {
+          }, external_React_default.a.createElement("div", {
             className: (src ? "data-block-bg thumb" : "data-block-bg") + (is_video(node) ? " video" : "")
-          }, React.makeElement("div", {
+          }, external_React_default.a.createElement("div", {
             className: "data-block-indicators"
-          }, React.makeElement("div", {
+          }, external_React_default.a.createElement("div", {
             className: "file-status-icon indicator" + (node.fav ? " star" : "")
-          }), React.makeElement("div", {
+          }), external_React_default.a.createElement("div", {
             className: "data-item-icon indicator"
-          })), React.makeElement("div", {
+          })), external_React_default.a.createElement("div", {
             className: "block-view-file-type " + (isFolder ? " folder " : " file " + fileIcon(node)) + sharedFolderClass
-          }, image), is_video(node) ? React.makeElement("div", {
+          }, image), is_video(node) ? external_React_default.a.createElement("div", {
             className: "video-thumb-details"
-          }, React.makeElement("i", {
+          }, external_React_default.a.createElement("i", {
             className: "small-icon small-play-icon"
-          }), React.makeElement("span", null, playtime ? playtime : "00:00")) : null), React.createElement("div", {
+          }), external_React_default.a.createElement("span", null, playtime ? playtime : "00:00")) : null), external_React_default.a.createElement("div", {
             className: "file-block-title"
           }, node.name)));
         }
@@ -7529,7 +7536,7 @@ function (_MegaRenderMixin) {
 
       if (items.length > 0) {
         if (viewMode === "0") {
-          return React.makeElement(utils["default"].JScrollPane, {
+          return external_React_default.a.createElement(utils["default"].JScrollPane, {
             className: "fm-dialog-scroll grid",
             selected: this.state.selected,
             highlighted: this.state.highlighted,
@@ -7537,11 +7544,11 @@ function (_MegaRenderMixin) {
             ref: function ref(jsp) {
               self.jsp = jsp;
             }
-          }, React.makeElement("table", {
+          }, external_React_default.a.createElement("table", {
             className: "grid-table fm-dialog-table"
-          }, React.makeElement("tbody", null, items)));
+          }, external_React_default.a.createElement("tbody", null, items)));
         } else {
-          return React.makeElement(utils["default"].JScrollPane, {
+          return external_React_default.a.createElement(utils["default"].JScrollPane, {
             className: "fm-dialog-scroll blocks",
             selected: this.state.selected,
             highlighted: this.state.highlighted,
@@ -7549,47 +7556,47 @@ function (_MegaRenderMixin) {
             ref: function ref(jsp) {
               self.jsp = jsp;
             }
-          }, React.makeElement("div", {
+          }, external_React_default.a.createElement("div", {
             className: "content"
-          }, items, React.makeElement("div", {
+          }, items, external_React_default.a.createElement("div", {
             className: "clear"
           })));
         }
       } else if (self.props.isLoading) {
-        return React.makeElement("div", {
+        return external_React_default.a.createElement("div", {
           className: "dialog-empty-block dialog-fm folder"
-        }, React.makeElement("div", {
+        }, external_React_default.a.createElement("div", {
           className: "dialog-empty-pad"
-        }, React.makeElement("div", {
+        }, external_React_default.a.createElement("div", {
           className: "dialog-empty-icon"
-        }), React.makeElement("div", {
+        }), external_React_default.a.createElement("div", {
           className: "dialog-empty-header"
         }, __(l[5533]))));
       } else if (!self.props.entries.length && self.props.currentlyViewedEntry === 'search') {
-        return React.makeElement("div", {
+        return external_React_default.a.createElement("div", {
           className: "dialog-empty-block dialog-fm folder"
-        }, React.makeElement("div", {
+        }, external_React_default.a.createElement("div", {
           className: "dialog-empty-pad"
-        }, React.makeElement("div", {
+        }, external_React_default.a.createElement("div", {
           className: "fm-empty-search-bg"
-        }), React.makeElement("div", {
+        }), external_React_default.a.createElement("div", {
           className: "dialog-empty-header"
         }, l[978])));
       }
 
-      return React.makeElement("div", {
+      return external_React_default.a.createElement("div", {
         className: "dialog-empty-block dialog-fm folder"
-      }, self.props.currentlyViewedEntry === 'shares' ? React.makeElement("div", {
+      }, self.props.currentlyViewedEntry === 'shares' ? external_React_default.a.createElement("div", {
         className: "dialog-empty-pad"
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-empty-incoming-bg"
-      }), React.makeElement("div", {
+      }), external_React_default.a.createElement("div", {
         className: "dialog-empty-header"
-      }, l[6871])) : React.makeElement("div", {
+      }, l[6871])) : external_React_default.a.createElement("div", {
         className: "dialog-empty-pad"
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-empty-folder-bg"
-      }), React.makeElement("div", {
+      }), external_React_default.a.createElement("div", {
         className: "dialog-empty-header"
       }, self.props.currentlyViewedEntry === M.RootID ? l[1343] : l[782])));
     }
@@ -7932,6 +7939,7 @@ function (_MegaRenderMixin2) {
       var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
       var classes = "add-from-cloud ".concat(self.props.className);
       var folderIsHighlighted = false;
+      var share = false;
       var breadcrumb = [];
       M.getPath(self.state.currentlyViewedEntry).forEach(function (breadcrumbNodeId, k) {
         // skip [share owner handle] when returned by M.getPath.
@@ -7962,7 +7970,7 @@ function (_MegaRenderMixin2) {
         var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name;
 
         (function (breadcrumbNodeId) {
-          breadcrumb.unshift(React.makeElement("a", {
+          breadcrumb.unshift(external_React_default.a.createElement("a", {
             className: "fm-breadcrumbs contains-directories " + breadcrumbClasses,
             key: breadcrumbNodeId,
             onClick: function onClick(e) {
@@ -7976,16 +7984,18 @@ function (_MegaRenderMixin2) {
               self.onSelected([]);
               self.onHighlighted([]);
             }
-          }, React.makeElement("span", {
+          }, external_React_default.a.createElement("span", {
             className: "right-arrow-bg simpletip",
             "data-simpletip": folderName
-          }, React.makeElement("span", null, folderName))));
+          }, external_React_default.a.createElement("span", null, folderName))));
         })(breadcrumbNodeId);
       });
       self.state.highlighted.forEach(function (nodeId) {
         if (M.d[nodeId] && M.d[nodeId].t === 1) {
           folderIsHighlighted = true;
         }
+
+        share = M.getNodeShare(nodeId);
       });
       var buttons = [];
 
@@ -7993,10 +8003,12 @@ function (_MegaRenderMixin2) {
         buttons.push({
           "label": self.props.selectLabel,
           "key": "select",
-          "className": "default-grey-button " + (self.state.selected.length === 0 ? "disabled" : null),
+          "className": "default-grey-button " + (self.state.selected.length === 0 || share && share.down ? "disabled" : null),
           "onClick": function onClick(e) {
             if (self.state.selected.length > 0) {
-              self.props.onSelected(self.state.selected);
+              self.props.onSelected(self.state.selected.filter(function (node) {
+                return !M.getNodeShare(node).down;
+              }));
               self.props.onAttachClicked();
             }
 
@@ -8008,7 +8020,7 @@ function (_MegaRenderMixin2) {
         buttons.push({
           "label": self.props.openLabel,
           "key": "select",
-          "className": "default-grey-button",
+          "className": "default-grey-button " + (share && share.down ? "disabled" : null),
           "onClick": function onClick(e) {
             if (self.state.highlighted.length > 0) {
               self.setState({
@@ -8041,24 +8053,24 @@ function (_MegaRenderMixin2) {
       var gridHeader = [];
 
       if (viewMode === "0") {
-        gridHeader.push(React.makeElement("table", {
+        gridHeader.push(external_React_default.a.createElement("table", {
           className: "grid-table-header fm-dialog-table",
           key: "grid-table-header"
-        }, React.makeElement("tbody", null, React.createElement("tr", null, React.createElement(BrowserCol, {
+        }, external_React_default.a.createElement("tbody", null, external_React_default.a.createElement("tr", null, external_React_default.a.createElement(BrowserCol, {
           id: "grid-header-star",
           sortBy: self.state.sortBy,
           onClick: self.toggleSortBy
-        }), React.makeElement(BrowserCol, {
+        }), external_React_default.a.createElement(BrowserCol, {
           id: "name",
           label: __(l[86]),
           sortBy: self.state.sortBy,
           onClick: self.toggleSortBy
-        }), React.makeElement(BrowserCol, {
+        }), external_React_default.a.createElement(BrowserCol, {
           id: "size",
           label: __(l[87]),
           sortBy: self.state.sortBy,
           onClick: self.toggleSortBy
-        }), React.makeElement(BrowserCol, {
+        }), external_React_default.a.createElement(BrowserCol, {
           id: "ts",
           label: __(l[16169]),
           sortBy: self.state.sortBy && self.state.sortBy[0] === "ts" ? ["ts", self.state.sortBy[1] === "desc" ? "asc" : "desc"] : self.state.sortBy,
@@ -8069,7 +8081,7 @@ function (_MegaRenderMixin2) {
       var clearSearchBtn = null;
 
       if (self.state.searchValue.length >= 3) {
-        clearSearchBtn = React.makeElement("i", {
+        clearSearchBtn = external_React_default.a.createElement("i", {
           className: "top-clear-button",
           style: {
             'right': '85px'
@@ -8080,7 +8092,7 @@ function (_MegaRenderMixin2) {
         });
       }
 
-      return React.makeElement(modalDialogs["a" /* default */].ModalDialog, {
+      return external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
         title: self.props.title || __(l[8011]),
         className: classes,
         onClose: function onClose() {
@@ -8088,57 +8100,57 @@ function (_MegaRenderMixin2) {
         },
         popupDidMount: self.onPopupDidMount,
         buttons: buttons
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-dialog-tabs"
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-dialog-tab cloud active",
         onClick: function onClick(e) {
           self.onTabButtonClick(e, 'clouddrive');
         }
-      }, __(l[164])), React.makeElement("div", {
+      }, __(l[164])), external_React_default.a.createElement("div", {
         className: "fm-dialog-tab incoming",
         onClick: function onClick(e) {
           self.onTabButtonClick(e, 'shares');
         }
-      }, __(l[5542])), React.makeElement("div", {
+      }, __(l[5542])), external_React_default.a.createElement("div", {
         className: "clear"
-      })), React.makeElement("div", {
+      })), external_React_default.a.createElement("div", {
         className: "fm-picker-header"
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-header-buttons"
-      }, React.makeElement("a", {
+      }, external_React_default.a.createElement("a", {
         className: "fm-files-view-icon block-view" + (viewMode === "1" ? " active" : ""),
         title: "Thumbnail view",
         onClick: function onClick(e) {
           self.onViewButtonClick(e);
         }
-      }), React.makeElement("a", {
+      }), external_React_default.a.createElement("a", {
         className: "fm-files-view-icon listing-view" + (viewMode === "0" ? " active" : ""),
         title: "List view",
         onClick: function onClick(e) {
           self.onViewButtonClick(e);
         }
-      }), React.makeElement("div", {
+      }), external_React_default.a.createElement("div", {
         className: "fm-files-search"
-      }, React.makeElement("i", {
+      }, external_React_default.a.createElement("i", {
         className: "search",
         onClick: function onClick(e) {
           self.onSearchIconClick(e);
         }
-      }, ">"), React.makeElement("input", {
+      }, ">"), external_React_default.a.createElement("input", {
         type: "search",
         placeholder: __(l[102]),
         value: self.state.searchValue,
         onChange: self.onSearchChange
-      }), clearSearchBtn), React.makeElement("div", {
+      }), clearSearchBtn), external_React_default.a.createElement("div", {
         className: "clear"
-      })), React.makeElement("div", {
+      })), external_React_default.a.createElement("div", {
         className: "fm-breadcrumbs-wrapper add-from-cloud"
-      }, React.makeElement("div", {
+      }, external_React_default.a.createElement("div", {
         className: "fm-breadcrumbs-block"
-      }, breadcrumb, React.makeElement("div", {
+      }, breadcrumb, external_React_default.a.createElement("div", {
         className: "clear"
-      })))), gridHeader, React.makeElement(cloudBrowserModalDialog_BrowserEntries, {
+      })))), gridHeader, external_React_default.a.createElement(cloudBrowserModalDialog_BrowserEntries, {
         isLoading: self.state.isLoading,
         currentlyViewedEntry: self.state.currentlyViewedEntry,
         entries: self.state.entries || [],
@@ -8208,7 +8220,7 @@ function emojiDropdown_inherits(subClass, superClass) { if (typeof superClass !=
 
 function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiDropdown_setPrototypeOf(o, p); }
 
-var emojiDropdown_React = __webpack_require__(0);
+var React = __webpack_require__(0);
 
 var emojiDropdown_utils = __webpack_require__(3);
 
@@ -8286,7 +8298,7 @@ function (_MegaRenderMixin) {
     key: "_generateEmoji",
     value: function _generateEmoji(meta) {
       var filename = twemoji.convert.toCodePoint(meta.u);
-      return emojiDropdown_React.makeElement("img", {
+      return React.makeElement("img", {
         width: "20",
         height: "20",
         className: "emoji emoji-loading",
@@ -8308,7 +8320,7 @@ function (_MegaRenderMixin) {
     value: function _generateEmojiElement(emoji, cat) {
       var self = this;
       var categoryName = self.data_categories[cat];
-      return emojiDropdown_React.makeElement("div", {
+      return React.makeElement("div", {
         "data-emoji": emoji.n,
         className: "button square-button emoji",
         key: categoryName + "_" + emoji.n,
@@ -8494,7 +8506,7 @@ function (_MegaRenderMixin) {
 
       if (emojis.length > 0) {
         var totalHeight = self.heightDefs.categoryTitleHeight + Math.ceil(totalEmojis / self.heightDefs.numberOfEmojisPerRow) * self.heightDefs.emojiRowHeight;
-        return self._cachedNodes[categoryId] = [totalHeight, emojiDropdown_React.makeElement("div", {
+        return self._cachedNodes[categoryId] = [totalHeight, React.makeElement("div", {
           key: categoryName,
           "data-category-name": categoryName,
           className: "emoji-category-container",
@@ -8502,13 +8514,13 @@ function (_MegaRenderMixin) {
             'position': 'absolute',
             'top': posTop
           }
-        }, emojis.length > 0 ? emojiDropdown_React.makeElement("div", {
+        }, emojis.length > 0 ? React.makeElement("div", {
           className: "clear"
-        }) : null, emojiDropdown_React.makeElement("div", {
+        }) : null, React.makeElement("div", {
           className: "emoji-type-txt"
-        }, self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName), emojiDropdown_React.makeElement("div", {
+        }, self.categoryLabels[categoryName] ? self.categoryLabels[categoryName] : categoryName), React.makeElement("div", {
           className: "clear"
-        }), emojis, emojiDropdown_React.makeElement("div", {
+        }), emojis, React.makeElement("div", {
           className: "clear"
         }))];
       } else {
@@ -8566,7 +8578,7 @@ function (_MegaRenderMixin) {
       });
 
       if (self._emojiReactElements.length === 0) {
-        var emojisNotFound = emojiDropdown_React.makeElement("span", {
+        var emojisNotFound = React.makeElement("span", {
           className: "emojis-not-found",
           key: 'emojis-not-found'
         }, l[20920]);
@@ -8595,9 +8607,9 @@ function (_MegaRenderMixin) {
           txt = slug;
         }
 
-        preview = emojiDropdown_React.makeElement("div", {
+        preview = React.makeElement("div", {
           className: "emoji-preview"
-        }, self._generateEmoji(meta), emojiDropdown_React.makeElement("div", {
+        }, self._generateEmoji(meta), React.makeElement("div", {
           className: "emoji title"
         }, ":" + meta.n + ":"));
       }
@@ -8626,7 +8638,7 @@ function (_MegaRenderMixin) {
 
       self.customCategoriesOrder.forEach(function (categoryName) {
         var activeClass = activeCategoryName === categoryName ? " active" : "";
-        categoryButtons.push(emojiDropdown_React.makeElement("div", {
+        categoryButtons.push(React.makeElement("div", {
           visiblecategories: self.state.visibleCategories,
           className: "button square-button emoji" + activeClass,
           key: categoryIcons[categoryName],
@@ -8643,23 +8655,23 @@ function (_MegaRenderMixin) {
 
             self._onScrollChanged(categoryPosition);
           }
-        }, emojiDropdown_React.makeElement("i", {
+        }, React.makeElement("i", {
           className: "small-icon " + categoryIcons[categoryName]
         })));
       });
-      return emojiDropdown_React.makeElement("div", null, emojiDropdown_React.createElement("div", {
+      return React.makeElement("div", null, React.createElement("div", {
         className: "popup-header emoji"
-      }, preview ? preview : emojiDropdown_React.makeElement("div", {
+      }, preview ? preview : React.makeElement("div", {
         className: "search-block emoji"
-      }, emojiDropdown_React.makeElement("i", {
+      }, React.makeElement("i", {
         className: "small-icon search-icon"
-      }), emojiDropdown_React.makeElement("input", {
+      }), React.makeElement("input", {
         type: "search",
         placeholder: __(l[102]),
         ref: "emojiSearchField",
         onChange: this.onSearchChange,
         value: this.state.searchValue
-      }))), emojiDropdown_React.makeElement(PerfectScrollbar, {
+      }))), React.makeElement(PerfectScrollbar, {
         className: "popup-scroll-area emoji perfectScrollbarContainer",
         searchValue: this.state.searchValue,
         onUserScroll: this.onUserScroll,
@@ -8667,13 +8679,13 @@ function (_MegaRenderMixin) {
         ref: function ref(_ref) {
           self.scrollableArea = _ref;
         }
-      }, emojiDropdown_React.makeElement("div", {
+      }, React.makeElement("div", {
         className: "popup-scroll-content emoji"
-      }, emojiDropdown_React.makeElement("div", {
+      }, React.makeElement("div", {
         style: {
           height: self.state.totalScrollHeight
         }
-      }, self._emojiReactElements))), emojiDropdown_React.makeElement("div", {
+      }, self._emojiReactElements))), React.makeElement("div", {
         className: "popup-footer emoji"
       }, categoryButtons));
     }
@@ -8685,11 +8697,11 @@ function (_MegaRenderMixin) {
 
       if (self.state.isActive === true) {
         if (self.state.loadFailed === true) {
-          popupContents = emojiDropdown_React.makeElement("div", {
+          popupContents = React.makeElement("div", {
             className: "loading"
           }, l[1514]);
         } else if (self.state.isLoading === true && !self.data_emojiByCategory) {
-          popupContents = emojiDropdown_React.makeElement("div", {
+          popupContents = React.makeElement("div", {
             className: "loading"
           }, l[5533]);
         } else {
@@ -8699,7 +8711,7 @@ function (_MegaRenderMixin) {
         popupContents = null;
       }
 
-      return emojiDropdown_React.makeElement(DropdownsUI.Dropdown, _extends({
+      return React.makeElement(DropdownsUI.Dropdown, _extends({
         className: "popup emoji"
       }, self.props, {
         ref: "dropdown",

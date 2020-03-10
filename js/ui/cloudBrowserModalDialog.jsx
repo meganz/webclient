@@ -1,3 +1,4 @@
+import React from 'react';
 import utils from "./utils.jsx";
 import {MegaRenderMixin} from "../stores/mixins.js";
 import ModalDialogsUI from './modalDialogs.jsx';
@@ -498,6 +499,12 @@ class BrowserEntries extends MegaRenderMixin {
         e.stopPropagation();
         e.preventDefault();
 
+        var share = M.getNodeShare(node);
+        if (share && share.down) {
+            // node is taken down -> no interactions available
+            return;
+        }
+
         if (node.t) {
             // expand folder
             self.setState({'selected': [], 'highlighted': [], 'cursor': false});
@@ -597,8 +604,12 @@ class BrowserEntries extends MegaRenderMixin {
 
             if (viewMode === "0") {
                 items.push(
-                    <tr className={
-                            "node_" + node.h + " " + (isFolder ? " folder" :"") + (isHighlighted ? " ui-selected" : "")
+                    <tr
+                        className={
+                            "node_" + node.h +
+                            (isFolder ? " folder" : "") +
+                            (isHighlighted ? " ui-selected" : "") +
+                            (share && share.down ? " taken-down" : "")
                         }
                         onClick={(e) => {
                             self.onEntryClick(e, node);
@@ -635,10 +646,12 @@ class BrowserEntries extends MegaRenderMixin {
                 items.push(
                     <div
                         className={
-                            "data-block-view node_" + node.h + " " + (isFolder ? " folder" :" file") +
+                            "data-block-view node_" + node.h +
+                            (isFolder ? " folder" : " file") +
                             (isHighlighted ? " ui-selected" : "") +
                             (share ? " linked" : "") +
-                            colorLabelClasses
+                            (share && share.down ? " taken-down" : "") +
+                            (colorLabelClasses && " " + colorLabelClasses)
                         }
                         onClick={(e) => {
                             self.onEntryClick(e, node);
@@ -1075,6 +1088,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         const classes = `add-from-cloud ${self.props.className}`;
 
         var folderIsHighlighted = false;
+        var share = false;
 
         var breadcrumb = [];
 
@@ -1138,6 +1152,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
                 folderIsHighlighted = true;
             }
+
+            share = M.getNodeShare(nodeId);
         });
 
         var buttons = [];
@@ -1146,13 +1162,16 @@ class CloudBrowserDialog extends MegaRenderMixin {
             buttons.push({
                 "label": self.props.selectLabel,
                 "key": "select",
-                "className": "default-grey-button "
-                + (self.state.selected.length === 0 ? "disabled" : null),
+                "className": "default-grey-button " +
+                    (self.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
                 "onClick": function(e) {
                     if (self.state.selected.length > 0) {
-                        self.props.onSelected(self.state.selected);
+                        self.props.onSelected(
+                            self.state.selected.filter(node => !M.getNodeShare(node).down)
+                        );
                         self.props.onAttachClicked();
                     }
+
                     e.preventDefault();
                     e.stopPropagation();
                 }
@@ -1162,7 +1181,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             buttons.push({
                 "label": self.props.openLabel,
                 "key": "select",
-                "className": "default-grey-button",
+                "className": "default-grey-button " + (share && share.down ? "disabled" : null),
                 "onClick": function(e) {
                     if (self.state.highlighted.length > 0) {
                         self.setState({'currentlyViewedEntry': self.state.highlighted[0]});

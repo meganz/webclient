@@ -1496,6 +1496,9 @@ var slideshowid;
         }
     }
 
+    /**
+     * @global
+     */
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;

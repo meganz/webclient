@@ -43,33 +43,21 @@ mega.fileTextEditor = new function FileTextEditor() {
     /**
      * Get file data
      * @param {String} handle       Node handle
-     * @param {Boolean} isPublic    flag to isPublic link
      * @returns {MegaPromise}       Promise of the operation
      */
-    this.getFile = function(handle, isPublic) {
+    this.getFile = function(handle) {
 
         // eslint-disable-next-line local-rules/hints
         var operationPromise = new MegaPromise();
+        var node = M.getNodeByHandle(handle);
+        handle = node.link || node.h;
 
         // if called with no handle or invalid one, exit
-        if (!handle || !(M.d[handle] || isPublic)) {
+        if (!handle) {
             if (d) {
                 console.error('Handle rejected in getFile ' + handle);
             }
             return operationPromise.reject();
-        }
-
-        var node;
-
-        if (isPublic && typeof dl_node !== 'undefined' && dl_node) {
-            node = dl_node;
-        }
-        else if (handle.h) {
-            node = handle;
-            handle = node.h;
-        }
-        else {
-            node = M.d[handle];
         }
 
         // if we have the data cached, return it.

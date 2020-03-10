@@ -134,25 +134,23 @@ is_image.raw = {
 
 /**
  * Global function to Check if the node is for a textual file
- * @param {MegaData} node       The node to check
- * @returns {Void}              void
+ * @param {MegaNode} node An ufs node.
+ * @returns {Boolean} Whether it's a text/plain file
  */
-function is_textual(node) {
+function is_text(node) {
     'use strict';
-    if (!node || node.s === undefined || node.s > 2e7) {
+    if (!node || node.fa || node.s === undefined || node.s > 2e7) {
         return false;
     }
 
-    if (node && node.name && fileext(node.name) === '') {
+    if (!fileext(node.name)) {
         return true;
     }
 
     var fType = filetype(node, true)[0];
-    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
-        return true;
-    }
-    return false;
+    return fType === 'text' || fType === 'web-data' || fType === 'web-lang';
 }
+
 
 var mThumbHandler = {
     sup: Object.create(null),

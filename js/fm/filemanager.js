@@ -2070,7 +2070,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
                     return false;
                 }
 
-                if (is_textual(node)) {
+                if (is_text(node)) {
                     return true;
                 }
                 return false;
@@ -3651,7 +3651,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
-        else if (is_textual(n)) {
+        else if (is_text(n)) {
             $.selected = [h];
             // there's no jquery parent for this container.
             // eslint-disable-next-line local-rules/jquery-scopes

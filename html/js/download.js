@@ -521,7 +521,7 @@ function dl_g(res) {
              *@returns {Void}           void
              */
             var showTextView = function() {
-                if (is_textual(dl_node)) {
+                if (is_text(dl_node)) {
                     // there's no jquery parent for this container.
                     var $containerB = $('.download.main-pad .download.info-block');
                     var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
@@ -530,7 +530,7 @@ function dl_g(res) {
                         .rebind('click.txtViewer', function() {
                             loadingDialog.show();
 
-                            mega.fileTextEditor.getFile(dlpage_ph + '!' + dlpage_key, true).done(
+                            mega.fileTextEditor.getFile(dlpage_ph).done(
                                 function(data) {
                                     loadingDialog.hide();
                                     var fName;

@@ -137,6 +137,12 @@ mobile.linkOverlay = {
         // Format the public link with key
         var publicUrl = this.formatLink(nodeHandle);
 
+        if (!publicUrl) {
+            // Something went wrong...
+            msgDialog('warninga', l[17564], l[17565]);
+            return false;
+        }
+
         // Cache some selectors
         var $overlay = mobile.linkOverlay.$overlay;
         var $publicLinkTextField = $overlay.find('.public-link');
@@ -182,29 +188,29 @@ mobile.linkOverlay = {
      *                   https://mega.nz/#!X4NiADjR!BRqpTTSy-4UvHLz_6sHlpnGS-dS0E_RIVCpGAtjFmZQ
      */
     formatLink: function(nodeHandle) {
-
         'use strict';
 
-        var node = M.d[nodeHandle];
-        var key = null;
+        var node = M.getNodeByHandle(nodeHandle);
+        var key = node.k;
         var type = '';
 
-        // If folder
+        if (!node.ph) {
+            if (d) {
+                console.warn('No public handle for node %s', nodeHandle);
+            }
+            return false;
+        }
+
         if (node.t) {
             type = 'F';
             key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
-        }
-        else {
-            // Otherwise for file
-            key = node.k;
         }
 
         // Create the URL
         var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
         var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
-        var publicUrl = nodeUrlWithPublicHandle + nodeDecryptionKey;
 
-        return publicUrl;
+        return nodeUrlWithPublicHandle + nodeDecryptionKey;
     },
 
     /**

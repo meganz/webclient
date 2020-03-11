@@ -18,9 +18,6 @@ class ParticipantsList extends MegaRenderMixin {
 
         this.doResizesOnComponentUpdate = SoonFc(function() {
             var self = this;
-            if (!self.isMounted()) {
-                return;
-            }
             var $node = $(self.findDOMNode());
             var scrollHeight = self.contactsListScroll.getContentHeight();
             var fitHeight = scrollHeight;

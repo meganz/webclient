@@ -652,8 +652,9 @@ export class ContactCard extends MegaRenderMixin(React.Component) {
             var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
 
             if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
-                const FOURTY_FIVE_DAYS = 65535; // minutes
-                const timeToLast = lastActivity > FOURTY_FIVE_DAYS ? l[20673] : time2last(lastActivity);
+                const SECONDS = (new Date().getTime() / 1000) - lastActivity;
+                const FORTY_FIVE_DAYS = 3888000; // seconds
+                const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity);
                 presenceRow = (l[19994] || "Last seen %s").replace("%s", timeToLast);
             }
             else {

@@ -48,6 +48,8 @@ var pro = {
                     // The rest of the webclient expects this data in an array format
                     // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
                     var plans = [];
+                    var maxPlan = null;
+                    var minPlan = null;
                     for (var i = 0; i < results.length; i++) {
                         plans.push([
                             results[i]['id'],    // id
@@ -63,11 +65,21 @@ var pro = {
                             results[i]['lps'],   // NEW 'local price symbol'
                             results[i]['lp0']    // NEW 'local price Zero val'
                         ]);
+                        if (results[i]['m'] === 1) {
+                            if (!maxPlan || maxPlan[2] < results[i]['s']) {
+                                maxPlan = plans[plans.length - 1];
+                            }
+                            if (!minPlan || minPlan[2] > results[i]['s']) {
+                                minPlan = plans[plans.length - 1];
+                            }
+                        }
                     }
 
                     // Store globally
                     pro.membershipPlans = plans;
                     pro.lastLoginStatus = u_type;
+                    pro.maxPlan = maxPlan;
+                    pro.minPlan = minPlan;
 
                     // Run the callback function
                     loadedCallback();
@@ -211,7 +223,7 @@ var pro = {
             case 100:
                 return 'Business';    // product name should not be translated
             default:
-                return l[435];      // FREE
+                return l[1150];      // FREE
         }
     },
 

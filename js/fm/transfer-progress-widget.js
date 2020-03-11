@@ -194,13 +194,18 @@ mega.tpw = new function TransferProgressWidget() {
                 $overQuotaBanner.find('.content-txt').safeHTML(l[7014].replace('[A]', '<b>').replace('[/A]', '</b> '));
 
                 var perc = Math.round(acc.space_used * 100 / acc.space);
-
                 $overQuotaBanner.find('.quota-info-pct-txt').text(perc + '%');
-                $overQuotaBanner.find('.quota-info-pr-txt').text(bytesToSize(acc.space_used)
-                    + '/' + bytesToSize(acc.space));
+
+                var spaceInfo = bytesToSize(acc.space_used) + '/' + bytesToSize(acc.space, 0);
+                if (spaceInfo.length >= 15) {
+                    $('.quota-info-pr-txt', $overQuotaBanner).addClass('small-font');
+                }
+                $('.quota-info-pr-txt', $overQuotaBanner).text(spaceInfo);
+
                 $overQuotaBanner.find('.action').removeClass('default-red-button').addClass('default-orange-button');
 
-                $overQuotaBanner.find('.quota-info-pct-circle li.left-c p').rotate(18 * perc / 10);
+                var rotateAngle = 18 * perc / 10 >= 180 ? 180 : 18 * perc / 10;
+                $('.quota-info-pct-circle li.left-c p', $overQuotaBanner).rotate(rotateAngle);
             }
 
             $overQuotaBanner.removeClass('hidden');
@@ -994,7 +999,7 @@ mega.tpw = new function TransferProgressWidget() {
             var $finishedActionsRow = $actionsRow.clone();
             $targetedRow.find('.transfer-complete-actions').remove();
             $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
-            if (M.getNodeRoot(handle) !== 'shares') {
+            if (M.getNodeRoot(handle || dId) !== 'shares') {
                 $finishedAction.find('.tooltips').text(l[59]);
                 $finishedActionsRow.append($finishedAction);
             }

@@ -132,6 +132,26 @@ is_image.raw = {
     "X3F": "Sigma/Foveon RAW"
 };
 
+/**
+ * Global function to Check if the node is for a textual file
+ * @param {MegaNode} node An ufs node.
+ * @returns {Boolean} Whether it's a text/plain file
+ */
+function is_text(node) {
+    'use strict';
+    if (!node || node.fa || node.s === undefined || node.s > 2e7) {
+        return false;
+    }
+
+    if (!fileext(node.name)) {
+        return true;
+    }
+
+    var fType = filetype(node, true)[0];
+    return fType === 'text' || fType === 'web-data' || fType === 'web-lang';
+}
+
+
 var mThumbHandler = {
     sup: Object.create(null),
 
@@ -554,8 +574,20 @@ function getID3CoverArt(entry) {
                     var frame = readFrame(offset);
                     if (frame.id === 'APIC') {
                         offset += 11;
-                        for (var x = 2; x--; offset++) {
-                            while (u8[offset++]) ;
+                        while (u8[offset++]) {}
+                        ++offset;
+                        if (u8[offset] === 0xFF && u8[offset + 1] === 0xFE
+                            || u8[offset] === 0xFE && u8[offset + 1] === 0xFF) {
+
+                            while (u8[offset]) {
+                                offset += 2;
+                            }
+                            offset += 3;
+                            frame.size += offset; // fixme..
+                        }
+                        else {
+                            while (u8[offset++]) {}
+                            ++offset;
                         }
                         result = u8.slice(--offset, frame.size);
                         break;
@@ -829,7 +861,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         var getTimeOffset = function(x) {
-            var maxduration = videoElement.duration;
+            var maxduration = streamer && streamer.duration || 0;
             var position = x - $progress.offset().left; // Click pos
             var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
             var selectedTime = Math.round(maxduration * percentage / 100);
@@ -852,6 +884,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
+        // Special audio volume control for Safari
+        var _setVolumeForSafari = function(v) {
+            // If this is Safari and audio playing
+            if (window.webkitAudioContext && streamer.stream._audioSource) {
+                streamer.stream._audioSource.gain.value = v;
+            }
+        };
+
         // Increase/decrease video volume.
         var setVideoVolume = function(v) {
             if (videoElement.muted) {
@@ -860,6 +900,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
             $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
+
+            _setVolumeForSafari(videoElement.volume);
         };
 
         // Increase/decrease color filter
@@ -1052,6 +1094,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
                 $this.find('span').css('height', percentage + '%');
                 videoElement.volume = percentage / 100;
+
+                _setVolumeForSafari(videoElement.volume);
             }
             else {
                 if (!videoElement.muted) {
@@ -1071,6 +1115,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 videoElement.muted = !videoElement.muted;
                 changeButtonState('mute');
                 updateVolumeBar();
+                _setVolumeForSafari(!videoElement.muted);
             }
             return false;
         });
@@ -1102,6 +1147,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $video.rebind('timeupdate', function() {
             onTimeUpdate(streamer.currentTime, streamer.duration);
+
+            // Store the current time in session storage such that we can restore on reload.
+            sessionStorage.setItem('previewTime', streamer.currentTime);
         });
 
         /* Drag status */
@@ -1289,12 +1337,19 @@ FullScreenManager.prototype.enterFullscreen = function() {
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         var onOverQuotaCT;
+        var videoElement = $('video', $wrapper).get(0);
 
         if (typeof destroy === 'object') {
             options = destroy;
             destroy = null;
         }
         options = Object.assign(Object.create(null), options);
+
+        // If a preview time is set, use it as the starting time.
+        if (sessionStorage.previewNode && sessionStorage.previewTime && sessionStorage.previewNode === node.h) {
+            options.startTime = sessionStorage.previewTime;
+        }
+        sessionStorage.removeItem('previewTime');
 
         if ($.playbackOptions) {
             String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
@@ -1311,6 +1366,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                     options.filter = v.slice(-6).split(/(.{2})/).filter(String);
                 }
+                else if (k === 'a') {
+                    options.autoplay = options.preBuffer = v | 0;
+                }
+                else if (k === 'm') {
+                    options.muted = videoElement.muted = v | 0;
+                }
             });
             $.playbackOptions = null;
         }
@@ -1321,7 +1382,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 options.type = c && c[0];
             }
         }
-        var s = Streamer(node.link || node.h, $wrapper.find('video').get(0), options);
+        var s = Streamer(node.link || node.h, videoElement, options);
 
         _initVideoControls($wrapper, s, node, options);
 
@@ -1969,7 +2030,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 db = new Dexie(dbname);
                 db.version(1).stores({kv: '&k'});
                 db.open().then(read).catch(console.warn.bind(console, dbname));
-                timer = setTimeout(apiReq, 800);
+                timer = setTimeout(apiReq, 1400);
 
                 // save the db name for our getDatabaseNames polyfill
                 localStorage['_$mdb$' + dbname] = 1;
@@ -3180,6 +3241,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
 mBroadcaster.once('startMega', function isAudioContextSupported() {
     'use strict';
+
+    // Safari AudioContext polyfill for audio streaming support
+    if (!window.AudioContext && window.webkitAudioContext) {
+        window.AudioContext = window.webkitAudioContext;
+    }
 
     if ('AudioContext' in window) {
         var ctx;

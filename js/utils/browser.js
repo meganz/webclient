@@ -108,9 +108,12 @@ function browserdetails(useragent) {
         icon = 'linux.png';
         browser = 'SmartTV';
     }
-    else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0) {
+    else if (useragent.indexOf('opera') > 0 || useragent.indexOf(' opr/') > 0 || useragent.indexOf(' opt/') > 0) {
         if (useragent.indexOf(' opr/') > 0) {
             verTag = 'opr';
+        }
+        else if (useragent.indexOf(' opt/') > 0) {
+            verTag = 'opt';
         }
         browser = 'Opera';
     }

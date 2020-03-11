@@ -10,6 +10,29 @@ var dlResumeInfo;
 var mediaCollectFn;
 var maxDownloadSize = Math.pow(2, 53);
 
+function expandDlBar() {
+    'use strict';
+
+    var $topBar = $('.download.top-bar');
+
+    $topBar.addClass('expanded');
+
+    (function _resizer() {
+        // Set height to  top  bar if it doesn't fit min height
+        if ($topBar.hasClass('expanded')) {
+            var contentHeight = $('.download.main-pad', $topBar).outerHeight(true);
+            if (contentHeight > $('.download-content', $topBar).outerHeight()) {
+                $topBar.css({
+                    'height': contentHeight +
+                        $('.download.bar-table', $topBar).outerHeight() +
+                        $('.pages-nav.content-block', $topBar).height()
+                });
+            }
+        }
+        $(window).rebind('resize.download-bar', _resizer);
+    })();
+}
+
 function dlinfo(ph,key,next)
 {
     $('.widget-block').addClass('hidden');
@@ -297,7 +320,7 @@ function dl_g(res) {
 
                         dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
-                            dlResumeInfo.byteLength = size;
+                            dlResumeInfo.byteLength = size >= 0 ? size : null;
 
                             if (isPageRefresh) {
                                 if (d) {
@@ -494,6 +517,40 @@ function dl_g(res) {
                 }
             };
 
+            /** Function to show UI elements if textual files
+             *@returns {Void}           void
+             */
+            var showTextView = function() {
+                if (is_text(dl_node)) {
+                    // there's no jquery parent for this container.
+                    var $containerB = $('.download.main-pad .download.info-block');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
+
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click.txtViewer', function() {
+                            loadingDialog.show();
+
+                            mega.fileTextEditor.getFile(dlpage_ph).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
+                                }
+                            ).fail(function() {
+                                loadingDialog.hide();
+                            });
+                        });
+                }
+            };
+
             if (res.fa) {
                 var promise = Promise.resolve();
 
@@ -530,6 +587,10 @@ function dl_g(res) {
                         showPreviewButton();
                     }
                 });
+            }
+            else {
+                // if it's textual file, then handle the UI.
+                showTextView();
             }
 
             if (prevBut) {
@@ -587,23 +648,11 @@ function dl_g(res) {
     }
     else {
         // Expand top bar
-        setTimeout(function _expand() {
-            var $topBar = $('.download.top-bar').addClass('expanded');
+        setTimeout(function() {
+            var $topBar = $('.download.top-bar');
 
-            (function _resizer() {
-                // Set height to  top  bar if it doesn't fit min height
-                if ($topBar.hasClass('expanded')) {
-                    var contentHeight = $topBar.find('.download.main-pad').outerHeight(true);
-                    if (contentHeight > $topBar.find('.download-content').outerHeight()) {
-                        $topBar.css({
-                            'height': contentHeight +
-                                $topBar.find('.download.bar-table').outerHeight() +
-                                $topBar.find('.pages-nav.content-block').height()
-                        });
-                    }
-                }
-                $(window).rebind('resize.download-bar', _resizer);
-            })();
+            // Expand Download Bar
+            expandDlBar();
 
             // Expand top bar if its clicked
             $topBar.rebind('click', function(e) {
@@ -613,17 +662,17 @@ function dl_g(res) {
                     && $target.not('.button') && !$target.closest('.button').length
                     && !$target.closest('.top-menu-popup').length) {
 
-                    _expand();
+                    expandDlBar();
                 }
             });
 
             // Collapse/Expand top bar events
             $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
                 if ($(this).hasClass('active')) {
-                    $topBar.removeClass('expanded initial').css('height', '');
+                    $topBar.removeClass('expanded initial auto').css('height', '');
                     return $(window).unbind('resize.download-bar');
                 }
-                _expand();
+                expandDlBar();
             });
 
             // Collapse top bar if user scrolls over it
@@ -806,7 +855,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.download.speed-block', $dowloadWrapper).removeClass('hidden');
     $('.download.eta-block', $dowloadWrapper).removeClass('hidden');
     $('.bar-table .progress-block', $dowloadWrapper).removeClass('hidden');
-    $('.download .pause-transfer', $dowloadWrapper).removeClass('hidden');
+
     $('.download.error-text', $dowloadWrapper).addClass('hidden');
     $('.download.main-transfer-error', $dowloadWrapper).addClass('hidden');
     $('.download.overquoata-error', $dowloadWrapper).addClass('hidden');
@@ -906,9 +955,9 @@ function start_import() {
     }
 
     var dialogHeader = l[20751];
-    var dialogTxt = l[20753];
-    var dialogType = 'import_register';
-    var buttonEvent = function() {
+    var dialogTxt = l[20752];
+    var dialogType = 'import_login_or_register';
+    var buttonEventRegister = function() {
         mega.ui.showRegisterDialog({
             body: l[20756],
             showLogin: true,
@@ -924,19 +973,18 @@ function start_import() {
         });
     };
 
-    if (u_wasloggedin()) {
-        dialogTxt = l[20752];
-        dialogType = 'import_login';
-        buttonEvent = function() {
-            mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
-        };
-    }
+    var buttonEventLogin = function() {
+        mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
+    };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === true) {
-            buttonEvent();
+        if (e === 'login') {
+            buttonEventLogin();
         }
-        else if (e === false) {
+        else if (e === 'register') {
+            buttonEventRegister();
+        }
+        else if (e === 'ephemeral') {
             start_anoimport();
         }
         else {

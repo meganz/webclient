@@ -446,7 +446,7 @@
                     $('.file-name', $a2).text(name);
                     $('.file-date', $a1).text('');
                     $('.file-date', $a2).text('');
-                    if (dupsNB > 2) {
+                    if (dupsNB > 2 || M.currentrootid === 'shares') {
                         $a2.addClass('hidden');
                     }
                 }
@@ -520,7 +520,7 @@
             if (remaining) {
                 $chk.removeClass('hidden')
                     .find('.radio-txt')
-                    .safeHTML(escapeHTML(l[16494]).replace('[S]2[/S]', '<span>' + remaining + '</span>'));
+                    .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
             }
 
             uiCheckboxes($dialog);
@@ -699,15 +699,16 @@
                             // keep the newest
                             if (type === 'files') {
                                 if (olderNode) {
-                                    M.safeRemoveNodes(olderNode);
+                                    M.moveToRubbish(olderNode);
                                 }
                                 else {
                                     var nodeToRemove = duplicateEntries[type][name];
                                     nodeToRemove.splice(newestIndex, 1);
-                                    M.safeRemoveNodes(nodeToRemove);
+                                    M.moveToRubbish(nodeToRemove);
                                 }
                                 // hide bar
                                 $('.files-grid-view.fm').removeClass('duplication-found');
+                                $('.fm-blocks-view.fm').removeClass('duplication-found');
                                 $('.duplicated-items-found').addClass('hidden');
                             }
                             else {
@@ -737,6 +738,7 @@
                                                         // no need to updateUI,
                                                         // for optimization we will only hide the bar
                                                         $('.files-grid-view.fm').removeClass('duplication-found');
+                                                        $('.fm-blocks-view.fm').removeClass('duplication-found');
                                                         $('.duplicated-items-found').addClass('hidden');
                                                         resolveDup(duplicateEntries, keys, ++kIndex, type,
                                                             (checked) ? action : null);

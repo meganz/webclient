@@ -140,29 +140,11 @@
             });
         }
     });
-    $(document.body).rebind('mouseleave.simpletip', '.simpletip', function (e) {
-
-        var close = function _closeSimpleTip() {
-            if ($currentNode) {
-                $currentNode.remove();
-            }
+    $(document.body).rebind('mouseover.simpletip', function(e) {
+        if ($currentNode && !e.target.classList.contains('simpletip') && !$(e.target).parents('.simpletip').length > 0
+            && !e.target.classList.contains('tooltip-arrow')) {
+            $currentNode.remove();
             $currentNode = null;
-        };
-
-        // Prevent blinking when mouse is hover on black triangle.
-        var $toElem = $(e.toElement || e.relatedTarget);
-        if ($toElem.is('i.small-icon.icons-sprite.tooltip-arrow')) {
-            $toElem.rebind('mouseleave', function() {
-                close();
-            });
-        }
-        else {
-            close();
         }
     });
-
-    mBroadcaster.addListener('mega:openfolder', function() {
-        $('.simpletip').first().trigger('mouseleave');
-    });
-
 })(jQuery);

@@ -102,6 +102,11 @@ pro.propay = {
                 // Load payment providers and do the rest of the rendering
                 pro.propay.loadPaymentGatewayOptions();
             });
+
+            l[22670] = l[22670].replace('%1', bytesToSize(pro.minPlan[2] * 1024 * 1024 * 1024, 0)).
+                replace('%2', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0));
+
+            $('.storage-txt-small').safeHTML(l[22670]);
         });
     },
 
@@ -204,6 +209,14 @@ pro.propay = {
                 pro.propay.renderPlanDurationOptions();
                 pro.propay.initPlanDurationClickHandler();
                 pro.propay.initRenewalOptionClickHandler();
+
+                // Hide/show Argentian warning message depending on ipcc
+                if (u_attr.ipcc === 'AR') {
+                    $('.argentina-only', $stepTwo).removeClass('hidden');
+                }
+                else {
+                    $('.argentina-only', $stepTwo).addClass('hidden');
+                }
 
                 // If mobile, show all supported options at once and they can scroll vertically
                 if (is_mobile) {

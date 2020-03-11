@@ -103,14 +103,16 @@ var ulmanager = {
 
         // Load and fill membership plans.
         pro.loadMembershipPlans(function() {
+            $('.p-after-icon.msg-overquota', $dialog).text(is_mobile ?
+                l[22673].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                : l[19136]);
             dlmanager.prepareLimitedBandwidthDialogPlans($dialog);
         });
 
         M.safeShowDialog('upload-overquota', function() {
             $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
-            $('.p-after-icon.msg-overquota', $dialog).text(is_mobile ? l[20145] : l[19136]);
-
             $('.reg-st3-membership-bl', $dialog).rebind('click', function() {
                 eventlog(99700, true);
                 open(getAppBaseUrl() + '#propay_' + $(this).data('payment'));
@@ -391,7 +393,9 @@ var ulmanager = {
                 else {
                     errorstr = reason.substr(0, 50) + '...';
                 }
-                $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
+                if (!file.isCreateFile) {
+                    $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
+                }
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
             }
@@ -817,7 +821,9 @@ var ulmanager = {
             }
         }
 
-        M.ulstart(file);
+        if (!file.isCreateFile) {
+            M.ulstart(file);
+        }
         if (file.done_starting) {
             file.done_starting();
         }
@@ -1193,12 +1199,13 @@ ChunkUpload.prototype.updateprogress = function() {
     this.file.progressevents = (this.file.progressevents || 0) + 1;
 
     M.ulprogress(
-            this.file,
-            Math.floor(tp / this.file.size * 100),
-            tp,
-            this.file.size,
-            GlobalProgress[this.gid].speed = (this.file.speedometer ? this.file.speedometer.progress(tp) : 0) // speed
-        );
+        this.file,
+        Math.floor(tp / this.file.size * 100),
+        tp,
+        this.file.size,
+        GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0, // speed
+        this.file.isCreateFile
+    );
 
     if (tp === this.file.size) {
         this.file.complete = true;
@@ -1366,11 +1373,14 @@ ChunkUpload.prototype.onXHRready = function(xhrEvent) {
 }
 
 ChunkUpload.prototype.upload = function() {
+    'use strict';
+
     var url, xhr;
+    var self = this;
+    var logger = self.logger || ulmanager.logger;
 
     if (!this.file) {
         if (d) {
-            var logger = this.logger || ulmanager.logger;
             logger.error('This upload was cancelled while the Encrypter was working,'
                 + ' prevent this aborting it beforehand');
         }
@@ -1400,11 +1410,20 @@ ChunkUpload.prototype.upload = function() {
         this.logger.info("pushing", url);
     }
 
-    xhr.open('POST', url);
-    xhr.responseType = 'arraybuffer';
-    xhr.send(this.bytes.buffer);
-
-    this.xhr = xhr;
+    tryCatch(function() {
+        xhr.open('POST', url);
+        xhr.responseType = 'arraybuffer';
+        xhr.send(self.bytes.buffer);
+        self.xhr = xhr;
+    }, function(ex) {
+        if (self.file) {
+            logger.warn('fatal upload error, attempting to restart...', String(ex.message || ex), [self, ex]);
+            ulmanager.restart(self.file, ex.message || ex);
+        }
+        else {
+            logger.debug('fatal upload error, holding while restarting...', String(ex.message || ex), [self, ex]);
+        }
+    })();
 };
 
 ChunkUpload.prototype.io_ready = function(res) {
@@ -1538,7 +1557,7 @@ FileUpload.prototype.run = function(done) {
     file.ul_lastreason = file.ul_lastreason || 0;
 
     var domNode = document.getElementById('ul_' + file.id);
-    if (ulmanager.ulStartingPhase || !domNode) {
+    if (ulmanager.ulStartingPhase || !(domNode || file.isCreateFile)) {
         done();
         ASSERT(0, "This shouldn't happen");
         return ulQueue.pushFirst(this);
@@ -1551,9 +1570,10 @@ FileUpload.prototype.run = function(done) {
     if (d) {
         ulmanager.logger.info(file.name, "starting upload", file.id);
     }
-
-    domNode.classList.add('transfer-initiliazing');
-    domNode.querySelector('.transfer-status').textContent = (l[1042]);
+    if (!file.isCreateFile) {
+        domNode.classList.add('transfer-initiliazing');
+        domNode.querySelector('.transfer-status').textContent = l[1042];
+    }
 
     ulmanager.ulSize += file.size;
     // ulmanager.ulStartingPhase = true;
@@ -1592,7 +1612,7 @@ FileUpload.prototype.run = function(done) {
         }
         else if (file.hash === result.hash) {
             // Retrying.
-            ulmanager.ulStart(this);
+            setTimeout(ulmanager.ulStart.bind(ulmanager, self), 950 + Math.floor(Math.random() * 4e3));
         }
         else {
             file.ts = result.ts;
@@ -1679,6 +1699,10 @@ ulQueue.poke = function(file, meth) {
     }
 
     if (meth !== 0xdead) {
+        if (!meth && file.isCreateFile && file.size === 0) {
+            meth = 'pushFirst';
+        }
+
         file.sent = 0;
         file.progress = Object.create(null);
         file.owner = new FileUpload(file);
@@ -1695,7 +1719,7 @@ ulQueue.validateTask = function(pzTask) {
 
     if (pzTask instanceof FileUpload
         && !ulmanager.ulStartingPhase
-        && document.getElementById('ul_' + pzTask.file.id)) {
+        && (document.getElementById('ul_' + pzTask.file.id) || pzTask.file.isCreateFile)) {
 
         return true;
     }

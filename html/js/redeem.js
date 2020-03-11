@@ -30,6 +30,21 @@ var redeem = {
             return redeem.goToCloud();
         }
 
+        if (u_attr && u_attr.b) {
+            // business user
+
+            msgDialog(
+                'warninga',
+                l[1578],
+                l[22888],
+                '',
+                function() {
+                    redeem.goToCloud();
+                }
+            );
+            return;
+        }
+
         // Init functionality
         if (localStorage.oldRedeemFlow) {
             return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
@@ -100,6 +115,7 @@ var redeem = {
 
             if (is_mobile) {
                 var $overlay = $('#mobile-ui-error .white-block');
+                $('.third', $overlay).removeClass('hidden');
                 $('.third span', $overlay).text(l[20131]);
                 $('.first', $overlay).addClass('green-button');
             }
@@ -645,7 +661,7 @@ var redeem = {
             $('.close-voucher-redeem', $dlg).off('click').on('click',
                 function() {
                     if (is_mobile) {
-                        loadSubPage('');
+                        loadSubPage('redeem');
                     }
                     else {
                         closeDialog();
@@ -670,9 +686,10 @@ var redeem = {
     },
 
     /**
-     * Function used when accessing '/reddem' without a voucher code in 'localStorage.voucher'
+     * Function used when accessing '/reddem' without a voucher code in 'localStorage.voucher', or
+     * having an existing voucher code but didn't complete login or register before
      */
-    setupVoucherInputbox: function() {
+    setupVoucherInputbox: function(code) {
         'use strict';
         var promoter;
         var path = getSitePath();
@@ -722,6 +739,12 @@ var redeem = {
 
             return false;
         });
+
+        // Auto fill the existing voucher code into input box when accessing '/redeem'
+        // without completion of login or register
+        if (typeof code === 'string' && code.length > 11) {
+            $input.val(code).trigger('input').trigger('focus');
+        }
     },
 
     /**

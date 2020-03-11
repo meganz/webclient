@@ -636,8 +636,11 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
 
     if (this.u[userId].firstName || this.u[userId].lastName) {
         // already loaded.
-        return;
+        return MegaPromise.resolve();
     }
+
+    // eslint-disable-next-line local-rules/hints
+    var promise = new MegaPromise();
 
     var lastName = {name: 'lastname', value: null};
     var firstName = {name: 'firstname', value: null};
@@ -658,6 +661,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
             })
     ]).done(function() {
         if (!self.u[userId]) {
+            promise.reject();
             return;
         }
 
@@ -755,11 +759,17 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
                 );
             }
         }
+        promise.resolve();
     });
+
+    return promise;
 };
 
 MegaData.prototype.syncContactEmail = function(userHash) {
     var promise = new MegaPromise();
+    if (anonymouschat) {
+        return promise.reject();
+    }
 
     if (M.u[userHash]) {
         if (!M.u[userHash].m) {
@@ -987,6 +997,11 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
         if (Object.keys(this.ps[nodeId]).length === 0) {
             delete this.ps[nodeId];
         }
+    }
+
+    // clear pending share history from M.su
+    if (M.su[pcrId] && M.su[pcrId][nodeId] === 2) {
+        delete M.su[pcrId][nodeId];
     }
 
     if (fmdb && !pfkey) {

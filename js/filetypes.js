@@ -21,17 +21,22 @@ var extensions = {
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
-    'raw': [['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'], 'RAW'],
+    'raw': [
+        ['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'],
+        'RAW'
+    ],
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
-    'text': [['txt', 'rtf', 'ans', 'ascii', 'log', 'odt', 'wpd'], 'Text', 'pages'],
+    'text': [['txt', 'rtf', 'ans', 'ascii', 'log', 'wpd'], 'Text', 'pages'],
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
     'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
-    'web-lang': [['php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql',
-        'accdb','db','dbf','mdb','pdb'], 'Web Server Code'],
-    'word': [['doc', 'docx', 'dotx', 'wps'], 'MS Word']
+    'web-lang': [[
+        'php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql', 'accdb','db','dbf','mdb', 'pdb',
+        'c', 'cpp', 'h', 'cs', 'sh', 'vb', 'swift'
+    ], 'Web Server Code'],
+    'word': [['doc', 'docx', 'dotx', 'wps', 'odt'], 'MS Word']
 };
 
 var extdesc = {
@@ -214,7 +219,9 @@ var extdesc = {
     'xltm': l[20391],
     'xml': l[20363],
     'zip': l[20364],
-    'mp4': l[20365]
+    'mp4': l[20365],
+    'vb': l[22676],
+    'swift': l[22677]
 };
 
 var extmime = {
@@ -508,12 +515,22 @@ function filemime(n, def) {
     return extmime[fext] || def || 'application/octet-stream';
 }
 
-function filetype(n) {
+/**
+ * Get file type
+ * @param {Object} n                Node
+ * @param {Boolean} getFullType     Optional to return full detailed array of the type
+ * @returns {String|Array}          Extension Desc, or full type info
+ */
+function filetype(n, getFullType) {
+    "use strict";
     if (typeof n === 'object') {
         n = n.name;
     }
     var fext = fileext(String(n));
     if (ext[fext]) {
+        if (getFullType) {
+            return ext[fext];
+        }
         return ext[fext][1];
     }
     else if (fext && fext.length > 1) {

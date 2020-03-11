@@ -281,6 +281,10 @@
     height: 19px;
     position: relative;
 }
+.message.content-area .message.button:first-child {
+    display: inline-block;
+    vertical-align: top;
+}
 .message.user-card-name {
     display: inline-block;
     padding: 0 10px 0 0;
@@ -944,7 +948,7 @@
 }
 
 .geolocation-icon {
-    background: url('../images/mega/icons-sprite_v33.png') no-repeat -121px -1960px;
+    background: url('../images/mega/icons-sprite_v36.png') no-repeat -121px -1960px;
     width: 10px;
     height: 15px;
     display: inline-block;

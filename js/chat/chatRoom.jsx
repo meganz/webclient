@@ -128,11 +128,12 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     }
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
-        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-            if (self.chatd && self.isOnline() && self.chatIdBin) {
+        if (newState === ChatRoom.STATE.READY) {
+            if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
                 // this should never happen, but just in case...
                 self.getChatIdMessages().resend();
             }
+            self.loadContactNames();
         }
     });
 
@@ -233,7 +234,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     // also add to our list
                     self.members[eventData.userId] = eventData.priv;
 
-                    ChatdIntegration._ensureNamesAreLoaded([eventData.userId], self.publicChatHandle);
+                    ChatdIntegration._ensureContactExists([eventData.userId]);
                     self.trigger('onMembersUpdatedUI', eventData);
                 };
 
@@ -279,7 +280,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     /**
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
-    var membersSnapshot = {};
     self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function(e, eventData) {
         var roomRequiresUpdate = false;
 
@@ -297,26 +297,23 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             }
             roomRequiresUpdate = true;
         }
-
-        Object.keys(membersSnapshot).forEach(function(u_h) {
-            var contact = M.u[u_h];
-            if (contact) {
-                contact.removeChangeListener(membersSnapshot[u_h]);
-                if (!self.members[u_h]) {
+        else {
+            var contact = M.u[eventData.userId];
+            if (contact && contact.addChangeListener && contact.removeChangeListener) {
+                if (eventData.priv === 255 || eventData.priv === -1) {
+                    if (contact._onMembUpdUIListener) {
+                        contact.removeChangeListener(contact._onMembUpdUIListener);
+                        roomRequiresUpdate = true;
+                    }
+                }
+                else if (!contact._onMembUpdUIListener) {
+                    contact._onMembUpdUIListener = contact.addChangeListener(function() {
+                        self.trackDataChange.apply(self, arguments);
+                    });
                     roomRequiresUpdate = true;
                 }
             }
-            delete membersSnapshot[u_h];
-        });
-
-        Object.keys(self.members).forEach(function(u_h) {
-            var contact = M.u[u_h];
-            if (contact && contact.addChangeListener) {
-                membersSnapshot[u_h] = contact.addChangeListener(function() {
-                    self.trackDataChange.apply(self, arguments);
-                });
-            }
-        });
+        }
 
         if (roomRequiresUpdate) {
             self.trackDataChange();
@@ -326,7 +323,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {
         var contact = M.u[userHandle];
-        if (contact) {
+        if (contact && contact.c) {
             getLastInteractionWith(contact.u);
         }
     });
@@ -386,7 +383,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                 console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
             self.initialMessageHistLoaded.reject();
-        }, 5000);
+        }, 30000);
     });
 
 
@@ -445,6 +442,24 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
     'OPERATOR': 2,
     'READONLY': 0,
     'LEFT': -1
+};
+
+ChatRoom.encryptTopic = function(protocolHandler, newTopic, participants, isPublic = false) {
+    if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
+        const topic = protocolHandler.embeddedEncryptTo(
+            newTopic,
+            strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+            participants,
+            undefined,
+            isPublic
+        );
+
+        if (topic) {
+            return base64urlencode(topic)
+        }
+    }
+
+    return false;
 };
 
 ChatRoom.MembersSet.prototype.trackFromActionPacket = function(ap, isMcf) {
@@ -794,13 +809,15 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
 /**
  * Get room title
  *
+ * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
+ * @param {Boolean} [encapsTopicInQuotes] add quotes for the returned topic
  * @returns {string}
  */
 ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
     var self = this;
-
+    var participants;
     if (self.type === "private") {
-        var participants = self.getParticipantsExceptMe();
+        participants = self.getParticipantsExceptMe();
         return M.getNameByHandle(participants[0]) || "";
     }
     else {
@@ -808,17 +825,24 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
             return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
         }
 
-        var participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
+        participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
         var names = [];
-        participants.forEach(function(contactHash) {
+        for (var i = 0; i < Math.min(participants.length, 5); i++) {
+            var contactHash = participants[i];
+
             if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
+                var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
                 names.push(
-                    M.u[contactHash] ? M.getNameByHandle(contactHash) : "non contact"
+                    name
                 );
             }
-        });
-        return names.length > 0 ? names.join(", ")
-                                : __(l[19077]).replace('%s1', (new Date(self.ctime * 1000)).toLocaleString());
+        }
+        var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+        if (names.length === 0) {
+            return def;
+        }
+
+        return names.length > 0 ? names.join(", ") : def;
     }
 };
 
@@ -833,7 +857,7 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
     var masterPromise = new MegaPromise();
 
     if (
-        (allowEmpty || $.trim(newTopic).length > 0) &&
+        (allowEmpty || newTopic.trim().length > 0) &&
         newTopic !== self.getRoomTitle()
     ) {
         self.scrolledToBottom = true;
@@ -1272,7 +1296,14 @@ ChatRoom.prototype.appendMessage = function(message) {
                 );
             }
             else {
-                message.orderValue = prevMsg.orderValue + 0.1;
+                var nextVal = prevMsg.orderValue + 0.1;
+                if (!prevMsg.sent) {
+                    var cid = megaChat.plugins.chatdIntegration.chatd.chatIdMessages[self.chatIdBin];
+                    if (cid && cid.highnum) {
+                        nextVal = ++cid.highnum;
+                    }
+                }
+                message.orderValue = nextVal;
             }
         }
     }
@@ -1437,7 +1468,7 @@ ChatRoom.prototype.attachNodes = function(ids) {
     ids.forEach(function(nodeId) {
         var proxyPromise = new MegaPromise();
 
-        if (M.d[nodeId] && M.d[nodeId].u !== u_handle) {
+        if (M.d[nodeId] && (M.d[nodeId].u !== u_handle || M.getNodeRoot(nodeId) === "shares")) {
             // I'm not the owner of this file.
             // can be a d&d to a chat or Send to contact from a share
             M.myChatFilesFolder.get(true)
@@ -1704,14 +1735,14 @@ ChatRoom.prototype.didInteraction = function(user_handle, ts) {
     if (user_handle === u_handle) {
         Object.keys(self.members).forEach(function (user_handle) {
             var contact = M.u[user_handle];
-            if (contact && user_handle !== u_handle) {
+            if (contact && user_handle !== u_handle && contact.c === 1) {
                 setLastInteractionWith(contact.u, "1:" + newTs);
             }
         });
     }
     else {
         var contact = M.u[user_handle];
-        if (contact && user_handle !== u_handle) {
+        if (contact && user_handle !== u_handle && contact.c === 1) {
             setLastInteractionWith(contact.u, "1:" + newTs);
         }
     }
@@ -1887,6 +1918,22 @@ ChatRoom.prototype.onPublicChatRoomInitialized = function() {
             localStorage.removeItem("autoJoinOnLoginChat");
         }
 
+    }
+};
+
+ChatRoom.prototype.loadContactNames = function() {
+    var contacts = this.getParticipantsExceptMe();
+    for (var i = 0; i < Math.min(5, contacts.length); i++) {
+        var handle = contacts[i];
+        if (!M.u[handle]) {
+            continue;
+        }
+        if (!M.u[handle].name) {
+            M.syncUsersFullname(handle, this.publicChatHandle);
+        }
+        if (!M.u[handle].m && !anonymouschat) {
+            M.syncContactEmail(handle);
+        }
     }
 };
 

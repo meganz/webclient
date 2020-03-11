@@ -140,9 +140,9 @@ MegaData.prototype.sortByEmail = function(d) {
 MegaData.prototype.sortByModTime = function(d) {
     this.sortfn = function(a, b, d) {
 
-        // folder not having mtime, so sort by added time.
+        // folder not having mtime, so sort by Name.
         if (!a.mtime || !b.mtime) {
-            return M.getSortByDateTimeFn()(a, b, d);
+            return M.doFallbackSortWithName(a, b, d);
         }
 
         var time1 = a.mtime - a.mtime % 60;
@@ -449,6 +449,41 @@ MegaData.prototype.getSortByStatusFn = function(d) {
 
 MegaData.prototype.sortByStatus = function(d) {
     this.sortfn = this.getSortByStatusFn(d);
+    this.sortd = d;
+    this.sort();
+};
+
+MegaData.prototype.getSortByVersionFn = function() {
+    'use strict';
+    var sortfn;
+
+    sortfn = function(a, b, d) {
+
+        var av = a.tvf || 0;
+        var ab = a.tvb || 0;
+        var bv = b.tvf || 0;
+        var bb = b.tvb || 0;
+
+        if (av < bv) {
+            return -1 * d;
+        }
+        else if (av > bv) {
+            return d;
+        }
+        else if (ab < bb) {
+            return -1 * d;
+        }
+        else if (ab > bb) {
+            return d;
+        }
+    };
+
+    return sortfn;
+};
+
+MegaData.prototype.sortByVersion = function(d) {
+    'use strict';
+    this.sortfn = this.getSortByVersionFn();
     this.sortd = d;
     this.sort();
 };

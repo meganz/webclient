@@ -10,7 +10,7 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
-    this.columnsWidth.cloud.label = { max: 130, min: 70, curr: 70, viewed: false };
+    this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
@@ -137,7 +137,10 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.default-white-button.l-pane-visibility').removeClass('active');
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
-        if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
+        if ($.dialog === 'pro-login-dialog'
+            || String($.dialog).startsWith('verify-email')
+            || localStorage.awaitingConfirmationAccount) {
+
             return false;
         }
         showWarningTokenInputLose().done(function() {
@@ -519,8 +522,45 @@ FileManager.prototype.initFileManagerUI = function() {
     M.initUIKeyEvents();
     M.onFileManagerReady(topmenuUI);
 
+    // disabling right click, default contextmenu.
+    var alwaysShowContextMenu = Boolean(localStorage.contextmenu);
+    $(document).rebind('contextmenu.doc', function(ev) {
+        var target = ev.target;
+        var ALLOWED_IDS = {'embed-code-field': 1};
+        var ALLOWED_NODES = {INPUT: 1, TEXTAREA: 1, VIDEO: 1};
+        var ALLOWED_CLASSES = [
+            'contact-details-user-name',
+            'contact-details-email',
+            'nw-conversations-name'
+        ];
+        var ALLOWED_PARENTS =
+            '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs';
+        var ALLOWED_CLOSEST =
+            '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
+            '.messages.content-area, .chat-right-pad .user-card-data';
+
+        if (ALLOWED_NODES[target.nodeName] || ALLOWED_IDS[target.id] || alwaysShowContextMenu) {
+            return;
+        }
+
+        for (var i = ALLOWED_CLASSES.length; i--;) {
+            if (target.classList.contains(ALLOWED_CLASSES[i])) {
+                return;
+            }
+        }
+
+        var $target = $(target);
+        if (!is_fm() || $target.parents(ALLOWED_PARENTS).length || $target.closest(ALLOWED_CLOSEST).length) {
+            return;
+        }
+
+        $.hideContextMenu();
+        return false;
+    });
+
     var thElm;
     var startOffset;
+    var $fmholder = $('#fmholder');
     $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
         var $me = $(this);
         var th = $me.closest('th');
@@ -528,7 +568,7 @@ FileManager.prototype.initFileManagerUI = function() {
         startOffset = th.outerWidth() - col.pageX;
     });
 
-    $('#fmholder').off('mousemove.colresize').on('mousemove.colresize', function(col) {
+    $fmholder.rebind('mousemove.colresize', function(col) {
         if (M.chat) {
             return;
         }
@@ -566,7 +606,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    $('#fmholder').off('mouseup.colresize').on('mouseup.colresize', function() {
+    $fmholder.rebind('mouseup.colresize', function() {
         if (M.chat) {
             return;
         }
@@ -580,9 +620,8 @@ FileManager.prototype.initFileManagerUI = function() {
         $('#fmholder').css('cursor', '');
     });
 
-    $('#fmholder')
-        .off('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll')
-        .on('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
+    $fmholder
+        .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
                 console.warn(e);
@@ -678,7 +717,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).off('resize.ccmui');
     };
 
-    $('#fmholder').rebind('click.contextmenu', function(e) {
+    $fmholder.rebind('click.contextmenu', function(e) {
         $.hideContextMenu(e);
         if ($.hideTopMenu) {
             $.hideTopMenu(e);
@@ -1351,6 +1390,10 @@ FileManager.prototype.initContextUI = function() {
         }
         createFolderDialog();
     });
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.newfile-item').rebind('click', function() {
+        createFileDialog();
+    });
 
     $(c + '.fileupload-item').rebind('click', function() {
         // check if this is a business expired account
@@ -1522,6 +1565,25 @@ FileManager.prototype.initContextUI = function() {
         propertiesDialog();
     });
 
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.edit-file-item').rebind('click', function() {
+        var nodeHandle = $.selected && $.selected[0];
+        if (!nodeHandle) {
+            return;
+        }
+
+        loadingDialog.show('common', l[23130]);
+
+        mega.fileTextEditor.getFile(nodeHandle).done(
+            function(data) {
+                loadingDialog.hide();
+                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
+            }
+        ).fail(function() {
+            loadingDialog.hide();
+        });
+    });
+
     $(c + '.properties-versions').rebind('click', function() {
         fileversioning.fileVersioningDialog();
     });
@@ -1569,8 +1631,6 @@ FileManager.prototype.initContextUI = function() {
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
             M.labeling($.selected, labelId);
         }
-
-        M.labelDomUpdate();
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -1822,16 +1882,16 @@ FileManager.prototype.createFolderUI = function() {
             loadingDialog.pshow();
             var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
-            M.createFolder(currentdirid, name, new MegaPromise())
-                .done(function(h) {
+            M.createFolder(currentdirid, name)
+                .then(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', currentdirid, h);
                     }
                     loadingDialog.phide();
                 })
-                .fail(function(error) {
+                .catch(function(ex) {
                     loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
                 });
         }
 
@@ -1955,14 +2015,16 @@ FileManager.prototype.createFolderUI = function() {
     });
 };
 
+/* eslint-disable id-length */
+
 /**
  * Initialize file and folder select dialog from chat.
  * This will fill up $.selected with what user selected on the dialog.
  * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
  */
-FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
+FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
     'use strict';
-
+    /* eslint-enable id-length */
     // If chat is not ready.
     if (!megaChatIsReady) {
         if (megaChatIsDisabled) {
@@ -1993,10 +2055,37 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
                 $.selected = selected;
                 M.getLinkAction();
             }
+        },
+        'openFile': {
+            title: l[22666],
+            classes: 'no-incoming', // Hide incoming share tab
+            selectLabel: l[865],
+            folderSelectNotAllowed: true,
+            folderSelectable: false, // Can select folder(s)
+            customFilterFn: function(node) {
+                if (node.t) {
+                    return true;
+                }
+                if (node.s >= 20971520) {
+                    return false;
+                }
+
+                if (is_text(node)) {
+                    return true;
+                }
+                return false;
+            },
+            onAttach: function() {
+                closeDialog();
+                $.selected = selected;
+                if (OnSelectCallback) {
+                    OnSelectCallback(selected);
+                }
+            }
         }
     };
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
+    var prop = {
         title: options[type].title,
         folderSelectable: options[type].folderSelectable,
         selectLabel: options[type].selectLabel,
@@ -2010,7 +2099,15 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
             selected = node;
         },
         onAttachClicked: options[type].onAttach,
-    });
+    };
+    if (options[type].folderSelectNotAllowed) {
+        prop.folderSelectNotAllowed = options[type].folderSelectNotAllowed;
+    }
+    if (options[type].customFilterFn) {
+        prop.customFilterFn = options[type].customFilterFn;
+    }
+
+    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
 };
@@ -2104,7 +2201,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // up in grid/table
@@ -2115,7 +2212,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // down in grid/table
@@ -2185,7 +2282,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
             addressDialog.closeDialog();
         }
-        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.copyrightsDialog)) {
+        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog
+            || $.copyrightsDialog || $.saveAsDialog)) {
             closeDialog();
         }
         else if (e.keyCode == 27 && $.topMenu) {
@@ -2240,7 +2338,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
 
-        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
+        if (sl && String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1) {
             // if something is selected, scroll to that item
             var jsp = $($.selectddUIgrid).data('jsp');
             if (jsp) {
@@ -3553,6 +3651,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
+        else if (is_text(n)) {
+            $.selected = [h];
+            // there's no jquery parent for this container.
+            // eslint-disable-next-line local-rules/jquery-scopes
+            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        }
         else {
             M.addDownload([h]);
         }
@@ -3875,6 +3979,16 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     'use strict'; /* jshint -W074 */
 
     var promise = new MegaPromise();
+
+    if (!pro.membershipPlans || !pro.membershipPlans.length) {
+        pro.loadMembershipPlans(function() {
+            M.showOverStorageQuota(quota, options);
+        });
+        // no caller relay on the promise really, 1 call has .always
+        return promise.reject();
+    }
+
+
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('fm-notification almost-full full');
 
@@ -3884,26 +3998,38 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
     this.showOverStorageQuotaPromise = promise;
 
     if (quota === -1) {
-        quota = {percent: 100};
+        quota = { percent: 100 };
         quota.isFull = quota.isAlmostFull = true;
-        options = {custom: 1};
+        options = { custom: 1 };
     }
+
+    var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+    $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
+        replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+    $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+
+    $('.fm-notification-block.almost-full')
+        .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
 
     if (Object(u_attr).p) {
         // update texts with "for free accounts" sentences removed.
-        $('.fm-notification-block.full').safeHTML(l[16358]);
-        $('.fm-notification-block.almost-full')
-            .safeHTML('<div class="fm-notification-close"></div>' + l[16359]);
+
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
+
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
             .safeHTML(l[16361] + ' ' + l[16314]);
     }
     else {
+        var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
+            .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
+
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()));
+            .safeHTML(minStorage);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(l[16313].replace('%1', (4.99).toLocaleString()) + ' ' + l[16314]);
+            .safeHTML(minStorage + ' ' + l[16314]);
     }
 
     if (quota.isAlmostFull || Object(options).custom) {
@@ -4074,11 +4200,12 @@ FileManager.prototype.getLinkAction = function() {
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
         copy: ['createfolder'],
         move: ['createfolder'],
         register: ['terms'],
-        selectFolder: ['createfolder']
+        selectFolder: ['createfolder'],
+        saveAs: ['createfolder']
     };
 
     var _openDialog = function(name, dsp) {
@@ -4172,4 +4299,21 @@ FileManager.prototype.getLinkAction = function() {
 
         _openDialog(dialogName, dispatcher);
     };
+
+    Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
+        value: function _abort() {
+            if (d && $.dialog) {
+                console.info('Aborting dialogs dispatcher while on %s, queued: ', $.dialog, _cdialogq);
+            }
+
+            delete $.dialog;
+            loadingDialog.hide('force');
+            _cdialogq = Object.create(null);
+
+            $('html, body').removeClass('overlayed');
+            $('.fm-dialog-overlay').addClass('hidden');
+            $('.fm-dialog:visible, .overlay:visible').addClass('hidden');
+        }
+    });
+
 })(self);

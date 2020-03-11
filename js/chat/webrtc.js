@@ -11,6 +11,7 @@
 // jshint -W098
 // jshint -W074
 // jshint -W073
+/* no-eq-null: "off" */
 
 var CallDataType = Object.freeze({
     kNotRinging: 0,
@@ -39,6 +40,9 @@ function RtcModule(chatd, crypto, handler, allIceServers, iceServers) {
         throw new RtcModule.NotSupportedError(
             "Attempted to create RtcModule, but there is no webRTC support in this browser"
         );
+    }
+    if (!RtcModule.cfg) {
+        RtcModule.setupCfg();
     }
     var self = this;
     self.setupLogger();
@@ -80,7 +84,7 @@ RtcModule.kApiTimeout = 20000;
 RtcModule.kCallAnswerTimeout = 40000;
 RtcModule.kRingOutTimeout = 30000;
 RtcModule.kIncallPingInterval = 4000;
-RtcModule.kMediaGetTimeout = 20000;
+RtcModule.kMediaGetTimeout = 20000000;
 RtcModule.kSessSetupTimeout = 25000;
 RtcModule.kCallSetupTimeout = 35000;
 RtcModule.kCallRecoveryTimeout = 30000;
@@ -88,6 +92,7 @@ RtcModule.kStreamRenegTimeout = 10000;
 // If sess setup times out and the time elapsed since the SDP handshake completed
 // till the timeout is more than this, then fail the session with kErrIceTimeout
 RtcModule.kIceTimeout = 18000;
+RtcModule.kMediaConnRecoveryTimeout = 15000;
 
 RtcModule.kMaxCallReceivers = 20;
 RtcModule.kMaxCallAudioSenders = RtcModule.kMaxCallReceivers;
@@ -96,6 +101,36 @@ RtcModule.kMicInputDetectTimeout = 10000;
 RtcModule.kSessTermAckTimeout = 1000;
 RtcModule.kSessRetryDelay = 0;
 RtcModule.kEnableStreamReneg = true;
+
+// Local storage settings cache
+RtcModule.setupCfg = function() {
+    var keys = ["forceRelay", "maxBr", "maxGroupBr", "showStats", "tearSessOnMediaDisconn"];
+    var cache = {};
+    var cfg = RtcModule.cfg = {};
+    keys.forEach(function(k) {
+        Object.defineProperty(cfg, k, {
+            get: function() {
+                if (!cache.hasOwnProperty(k)) {
+                    cache[k] = localStorage["rtc:" + k]; // cache first if available
+                }
+                return cache[k];
+            },
+            set: function(val) {
+                if (val == null) {
+                    delete cache[k];
+                    localStorage.removeItem("rtc:" + k);
+                    console.warn("Deleted config value '" + k + "' from localStorage");
+                }
+                else {
+                    cache[k] = val;
+                    localStorage["rtc:" + k] = val;
+                    console.warn("Saved config value '" + k + "' to localStorage");
+                }
+            },
+            configurable: false
+        });
+    });
+};
 
 RtcModule.prototype.logToServer = function(type, data) {
     if (typeof data !== 'object') {
@@ -119,21 +154,15 @@ RtcModule.prototype.logToServer = function(type, data) {
 };
 
 RtcModule.prototype.setupLogger = function() {
-    var loggerDebug = localStorage['webrtcDebug'] === "1";
-    var minLogLevel = loggerDebug ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
     var self = this;
     self._loggerOpts = {
         minLogLevel: function() {
-            return MegaLogger.LEVELS.DEBUG; // minLogLevel;
+            return MegaLogger.LEVELS.DEBUG;
         },
         transport: function(level, args) {
             if (level === MegaLogger.LEVELS.ERROR || level === MegaLogger.LEVELS.CRITICAL) {
                 console.error.apply(console, args);
                 self.logToServer('e', args.join(' '));
-                return;
-            }
-            if (loggerDebug) {
-                console.error.apply(console, args);
                 return;
             }
             var fn;
@@ -278,6 +307,8 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
             data: data
         };
 
+        this.crypto.preloadCryptoForPeer(userid);
+
         var call = self.calls[parsedCallData.chatid];
         if (call) {
             if (parsedCallData.callid !== call.id) {
@@ -285,7 +316,14 @@ RtcModule.prototype.handleCallData = function(shard, msg, payloadLen) {
                     // Incoming while outgoing call request
                     self._updatePeerAvState(parsedCallData);
                     self.handleCallRequest(parsedCallData); // decides which call to honor
-                } else {
+                }
+                else if ((call.state === CallState.kRingIn) && (userid === self.chatd.userId) && ringing) {
+                    self.logger.warn("Our user sent a call request while we already have an incoming one." +
+                        "Possibly buggy client sent call request without checking if there is already a call." +
+                        "Nevertheless, destroying the previous incoming call");
+                    call._destroy(Term.kCallRejected);
+                }
+                else {
                     self.logger.error("Ignoring CALLDATA because its callid is different " +
                         "than the call that we have in that chatroom");
                 }
@@ -527,7 +565,7 @@ RtcModule.prototype.handleCallRequest = function(parsedCallData) {
                     // so we must take care ourselves of the previous call
                     // If we don't delete activeCall.incallPingTimer, activeCall._destroy() will send an ENDCALL,
                     // server will reply with an ENDCALL, which will terminate the other (surviving) call
-                    delete activeCall._inCallPingTimer;
+                    activeCall._stopIncallPingTimer(true);
                     activeCall._destroy(Term.kCancelOutAnswerIn, false)
                     .then(function() {
                         // Create an incoming call from the packet, and auto answer it
@@ -625,6 +663,11 @@ Call.prototype._initialGetLocalStream = function(av) {
     }, 2000);
 
     var pms;
+    var gumErrorDevices = 0;
+    function addGumError(msg, what) {
+        gumErrorDevices |= what;
+        self.logger.warn(msg);
+    }
     // We always get audio, and then mute it if we don't need it
     if (needVideo) {
         if (av & Av.Screen) {
@@ -633,7 +676,7 @@ Call.prototype._initialGetLocalStream = function(av) {
             // from different APIs
             var pmsAudio = RTC.getUserMedia({audio: true})
             .catch(function(err) {
-                self.logger.warn("Error getting audio:", err);
+                addGumError("Error getting audio: " + err, Av.Audio);
                 return null;
             });
             var pmsScreen = RTC.getDisplayMedia({
@@ -643,7 +686,7 @@ Call.prototype._initialGetLocalStream = function(av) {
                 }
             })
             .catch(function(err) {
-                self.logger.warn("Error getting screen:", err);
+                addGumError("Error getting screen: " + err, Av.Screen);
                 return null;
             });
             pms = Promise.all([pmsAudio, pmsScreen])
@@ -676,24 +719,38 @@ Call.prototype._initialGetLocalStream = function(av) {
             });
         } else {
             var vidOpts = (self.isGroup && !RTC.isFirefox) ? RTC.mediaConstraintsResolution("low") : true;
+            var bothFailed = false;
             pms = RTC.getUserMedia({audio: true, video: vidOpts})
             .catch(function(error) {
-                self.logger.warn("getUserMedia: Failed to get audio+video, trying audio-only...");
+                bothFailed = true;
+                addGumError("Failed to get audio+video, trying audio-only...", Av.Audio | Av.Video);
                 return RTC.getUserMedia({audio: true, video: false});
             })
             .catch(function(error) {
-                self.logger.warn("getUserMedia: Failed to get audio only, trying video-only...");
+                addGumError("Failed to get audio-only, trying video-only...", Av.Audio);
                 return RTC.getUserMedia({audio: false, video: vidOpts});
+            })
+            .catch(function(error) {
+                addGumError("Failed to get video-only", Av.Video);
+                return Promise.reject(error);
+            })
+            .then(function(stream) {
+                if (bothFailed) {
+                    var succeededAv = Av.fromStream(stream);
+                    if (succeededAv) {
+                        gumErrorDevices &= ~succeededAv;
+                    }
+                }
+                return stream;
             });
         }
     } else { // need only audio
-        pms = RTC.getUserMedia({audio: true, video: false});
+        pms = RTC.getUserMedia({audio: true, video: false})
+        .catch(function(err) {
+            addGumError("Failed to get audio-only", Av.Audio);
+            return Promise.reject(err);
+        });
     }
-    pms = pms.catch(function(error) {
-        var msg = RtcModule.gumErrorToString(error);
-        self.logger.warn("getUserMedia failed:", msg);
-        return Promise.reject(msg);
-    });
 
     return new Promise(function(resolve, reject) {
         pms.then(function(stream) {
@@ -710,22 +767,18 @@ Call.prototype._initialGetLocalStream = function(av) {
             if (!needAudio) {
                 Av.enableAudio(stream, false);
             }
+            if (gumErrorDevices) {
+                self._fire("onLocalMediaFail", gumErrorDevices);
+            }
             assert(!self.gLocalStream); // assure nobody set it meanwhile
             self.gLocalStream = stream;
             self._fire('onLocalMediaObtained', stream);
-
-            if (!self.manager.audioInputDetected) {
-                if (!self._audioMutedChecker) {
-                    self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
-                }
-                if (needAudio) {
-                    self._audioMutedChecker.start(stream);
-                } // otherwise it should be started when user unmutes audio
-            }
             delete self._obtainingLocalStream;
             resolve(stream);
-        }).catch(function(err) { // silence DOMException logging
+        })
+        .catch(function(err) { // silence DOMException logging
         });
+
         pms.catch(function(err) {
             resolved = true;
             reject(err);
@@ -738,12 +791,23 @@ Call.prototype._initialGetLocalStream = function(av) {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        if (notified) {
-            self._fire('onLocalMediaFail', err);
-        }
+        self._fire('onLocalMediaFail', gumErrorDevices, err);
         delete self._obtainingLocalStream;
         return Promise.reject(err);
     });
+};
+
+Call.prototype._checkStartMicMonitor = function() {
+    var self = this;
+    if (self.manager.audioInputDetected) {
+        return;
+    }
+    if (!self._audioMutedChecker) {
+        self._audioMutedChecker = new AudioMutedChecker(self, RtcModule.kMicInputDetectTimeout);
+    }
+    if (self.localAv() & Av.Audio) {
+        self._audioMutedChecker.start(self.gLocalStream);
+    } // otherwise it should be started when user unmutes audio
 };
 
 Call.prototype._getLocalVideo = function(screenCapture) {
@@ -806,7 +870,7 @@ Call.prototype._getLocalVideo = function(screenCapture) {
         }, RtcModule.kMediaGetTimeout);
     })
     .catch(function(err) {
-        self._fire('onLocalMediaFail', err);
+        self._fire('onLocalMediaFail', Av.Video, err);
         return Promise.reject(err);
     });
 };
@@ -911,6 +975,10 @@ RtcModule.prototype.onClientLeftCall = function(chat, userid, clientid) {
         this.logger.log("Notifying about last client leaving call");
     }
     this._fire('onClientLeftCall', chatid, userid, clientid);
+    var call = this.calls[chatid];
+    if (call) {
+        call._onClientLeftCall(userid, clientid);
+    }
 };
 
 RtcModule.prototype.onClientJoinedCall = function(chat, userid, clientid) {
@@ -939,17 +1007,23 @@ RtcModule.prototype.onShutdown = function() {
 RtcModule.prototype.onChatOnline = function(chat) {
     var chatid = chat.chatId;
     var recovery = this.callRecoveries[chatid];
-    if (recovery) {
-        // we have a call to recover on this chatid
-        var callInfo = chat.callInfo;
-        if (!callInfo.participantCount() || recovery.callid !== callInfo.callId) {
-            this.logger.log("We reconnected, but call is gone, aborting recovery...");
-            this.abortCallRecovery(chatid);
-            return;
-        }
-        this.logger.log("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
-        this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
+    if (!recovery) {
+        return;
     }
+    // we have a call to recover on this chatid
+    if (this.calls[chatid]) {
+        this.logger.log("We reconnected, but there is already another call, aborting recovery...");
+        recovery.abort(Term.kErrAlready);
+        return;
+    }
+    var callInfo = chat.callInfo;
+    if (!callInfo.participantCount() || recovery.callid !== callInfo.callId) {
+        this.logger.log("We reconnected, but call is gone or replaced, aborting recovery...");
+        recovery.abort(Term.kErrCallRecoveryFailed);
+        return;
+    }
+    this.logger.log("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
+    this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
 };
 
 RtcModule.prototype._startStatsTimer = function() {
@@ -1365,9 +1439,30 @@ Call.prototype.msgSession = function(packet) {
         return;
     }
 
-    var sess = self._addNewSession(packet);
-    sess.peerSupportsReneg = ((packet.data.charCodeAt(64) & Caps.kSupportsStreamReneg) !== 0);
-    sess.createRtcConnSendOffer();
+    self._addNewSession(packet) // handles errors on its own
+    .then(function(sess) {
+        sess._startAsJoiner();
+    });
+};
+
+Session.prototype._startAsJoiner = function() {
+    var self = this;
+    assert(self.isJoiner); // the joiner sends the SDP offer
+    try {
+        self._processInputQueue();
+    }
+    catch(e) {
+        return;
+    }
+    if (self.state === SessState.kWaitSdpAnswer) {
+        self.sendOffer()
+        .catch(function(err) {
+            // should not happen, errors should already be handled
+            if (sess.state < SessState.kTerminating) {
+                sess.terminateAndDestroy(Term.kErrInternal);
+            }
+        });
+    }
 };
 
 Call.prototype._notifyNewSession = function(sess) {
@@ -1407,15 +1502,16 @@ Call.prototype.msgJoin = function(packet) {
         // If the last peer that dropped out of the call reconnects, clear the timer that would hold our call open
         // in case everyone leaves
         if (self._lastErrPeerOffline && (self._lastErrPeerOffline.peerId === packet.fromUser + packet.fromClient)) {
+            self._clearCallRecoveryTimer();
             delete self._lastErrPeerOffline;
         }
         for (var sid in self.sessions) {
             var s = self.sessions[sid];
             if (s.peer === packet.fromUser && s.peerClient === packet.fromClient) {
                 // we have a session to that peer
-                if (s.state === SessState.kTerminating) {
+                if (s.state >= SessState.kTerminating) {
                     // but session is terminating, force its removal and handle the join
-                    s._forceDestroy();
+                    s._destroy(s._terminateReason);
                     assert(!self.sessions[sid]);
                 } else {
                     self.logger.warn("Ignoring JOIN from", base64urlencode(packet.fromUser),
@@ -1428,6 +1524,7 @@ Call.prototype.msgJoin = function(packet) {
         if (self.state === CallState.kReqSent) {
             self._setCallInProgress();
             if (!self.isGroup) {
+                delete self.isRingingOut;
                 if (!self._bcastCallData(CallDataType.kNotRinging)) {
                     return;
                 }
@@ -1442,18 +1539,21 @@ Call.prototype.msgJoin = function(packet) {
         delete self._sentSessions[peerId];
         var ownHashKey = self.manager.crypto.random(32);
 
-        // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
-        // flags contains a flag whether we support stream renegotiation
-        self.manager.cmdEndpoint(RTCMD.SESSION, packet,
-            packet.callid +
-            newSid +
-            self.manager.ownAnonId +
-            self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
-            self.id +
-            String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
-        );
-        var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
-        self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        self.manager.crypto.loadCryptoForPeer(packet.fromUser)
+        .then(function() {
+            // SESSION callid.8 sid.8 anonId.8 encHashKey.32 actualCallId.8 flags.1
+            // flags contains a flag whether we support stream renegotiation
+            self.manager.cmdEndpoint(RTCMD.SESSION, packet,
+                packet.callid +
+                newSid +
+                self.manager.ownAnonId +
+                self.manager.crypto.encryptNonceTo(packet.fromUser, ownHashKey) +
+                self.id +
+                String.fromCharCode(RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)
+            );
+            var supportsReneg = ((packet.data.charCodeAt(16) & Caps.kSupportsStreamReneg) !== 0);
+            self._sentSessions[peerId] = { sid: newSid, ownHashKey: ownHashKey, peerSupportsReneg: supportsReneg };
+        });
     } else {
         self.logger.log("Ignoring JOIN while in state", constStateToText(CallState, self.state));
         return;
@@ -1581,11 +1681,7 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
         self._stopIncallPingTimer();
-        if (self._peerCallRecoveryWaitTimer) {
-            clearTimeout(self._peerCallRecoveryWaitTimer);
-            // Just in case, keep state consistent if someone acceeses us after being destroyed
-            delete self._peerCallRecoveryWaitTimer;
-        }
+        self._clearCallRecoveryTimer();
         self._setState(CallState.kDestroyed);
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, willRecover);
         self.manager._removeCall(self);
@@ -1648,7 +1744,7 @@ function CallRecovery(call) {
             var call = manager.calls[self.chatid];
             if (call && call.id === self.callid && call.state !== CallState.kCallInProgress) {
                 // call is being recovered, but not yet established - we have to terminate it
-                self.logger.log("Call recovery timed out while recovery call is being set up - destroying call");
+                call.logger.log("Call recovery timed out while recovery call is being set up - destroying call");
                 call._destroy(Term.kErrCallRecoveryFailed, true);
             }
             assert(!self.localStream); // we are not in callRecoveries, localStream must be either moved to a call or closed
@@ -1751,14 +1847,18 @@ Call.prototype._startIncallPingTimer = function() {
     func();
 };
 
-Call.prototype._stopIncallPingTimer = function() {
+Call.prototype._stopIncallPingTimer = function(dontSendEndcall) {
     var self = this;
-    if (self._inCallPingTimer) {
-        clearInterval(self._inCallPingTimer);
-        delete self._inCallPingTimer;
+    if (!self._inCallPingTimer) {
+        return;
+    }
+    clearInterval(self._inCallPingTimer);
+    delete self._inCallPingTimer;
+    if (!dontSendEndcall) {
         self.shard.cmd(Chatd.Opcode.ENDCALL, self.chatid + '\0\0\0\0\0\0\0\0\0\0\0\0');
     }
 };
+
 Call.prototype.hasNoSessions = function() {
     return (Object.keys(this.sessions).length === 0);
 };
@@ -1834,10 +1934,24 @@ Call.prototype._removeSession = function(sess, reason, msg) {
         return;
     }
 // Retry session
+    var reconnCnt;
+    var tsLastMedia = sess._tsLastMedia;
+    if (sess._reconnInfo) {
+        reconnCnt = sess._reconnInfo.reconnCnt + 1;
+        // Only if we did not have any media, get tsLastMedia from the previous session
+        if (!tsLastMedia && !sess._tsIceConn) {
+            tsLastMedia = sess._reconnInfo.tsLastMedia;
+        }
+    }
+    else {
+        reconnCnt = 1; // needed for stats, during the next session it will be 1 already
+    }
     var sessRetries = self.sessRetries;
     sessRetries[peerId] = {
         start: Date.now(),
         oldSid: delSid,
+        reconnCnt: reconnCnt,
+        tsLastMedia: tsLastMedia,
         termReason: reasonNoPeer
     };
     self.logger.warn("Scheduling session reconnect for session " + base64urlencode(sess.sid) +
@@ -1948,6 +2062,10 @@ Call.prototype._startOrJoin = function(av) {
         self.logger.warn("Couldn't get local stream, continuing as receive-only");
     })
     .then(function() {
+        if (self.state >= CallState.kTerminating) {
+            self.logger.warn("Call killed while getting local stream, aborting start/join");
+            return Promise.reject();
+        }
         if (self.isJoiner) {
             if (!self._join()) {
                 return Promise.reject();
@@ -1971,7 +2089,6 @@ Call.prototype._join = function() {
         (RtcModule.kEnableStreamReneg ? Caps.kSupportsStreamReneg : 0)));
     self._setState(CallState.kJoining);
     if (!self.cmdBroadcast(RTCMD.JOIN, data)) {
-        setTimeout(function() { self._destroy(Term.kErrNetSignalling, true); }, 0);
         return false;
     }
     if (self.recovery) {
@@ -2010,9 +2127,10 @@ Call.prototype.answer = function(av) {
     var self = this;
     assert(self.isJoiner);
     if (self.state !== CallState.kRingIn) {
-        self.logger.warn("answer: Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
-            "), nothing to answer");
-        return false;
+        var errMsg = "Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
+            "), nothing to answer";
+        self.logger.error(errMsg);
+        return Promise.reject(errMsg);
     }
     var calls = self.manager.calls;
     if (Object.keys(calls).length <= 1) {
@@ -2106,9 +2224,9 @@ Call.prototype._reject = function(reason) {
 };
 
 Call.prototype._onClientLeftCall = function(userid, clientid) {
+    // We received an ENDCALL
     var self = this;
     if (userid === self.manager.chatd.userId && clientid === self.shard.clientId) {
-        // We received an ENDCALL
         if (self.recovery && self.state === CallState.kJoining) {
             // We may receive a parasitic ENDCALL after we reconnect to chatd, which is about the previous connection
             self.logger.warn("Ignoring ENDCALL received for a reconnect call while in kJoining state");
@@ -2131,7 +2249,7 @@ Call.prototype._onClientLeftCall = function(userid, clientid) {
         for (var sid in sessions) {
             var sess = sessions[sid];
             if (sess.peer === userid && sess.peerClient === clientid) {
-                if (sess.state === SessState.kTerminating) {
+                if (sess.state >= SessState.kTerminating) {
                     // The termination reason is not kErrPeerOffline, so don't consider the session
                     // for call recovery
                     // Destroy and remove it immediately, as the peer may immediately reconnect
@@ -2142,7 +2260,6 @@ Call.prototype._onClientLeftCall = function(userid, clientid) {
                     self._deleteRetry(peerId);
                     return;
                 } else {
-                    assert(sess.state !== SessState.kTerminated);
                     // peer abruptly went offline
                     didSetLastErrPeerOffline = true;
                     self._lastErrPeerOffline = { peerId: peerId, ts: Date.now() };
@@ -2247,6 +2364,14 @@ Call.prototype._removeRetry = function(reason, userid, clientid) {
     return true;
 };
 
+Call.prototype._clearCallRecoveryTimer = function() {
+    if (!this._peerCallRecoveryWaitTimer) {
+        return;
+    }
+    clearTimeout(this._peerCallRecoveryWaitTimer);
+    delete this._peerCallRecoveryWaitTimer;
+};
+
 Call.prototype._notifySessionConnected = function(sess) {
     /*
     var url = this.manager.statsUrl;
@@ -2256,11 +2381,8 @@ Call.prototype._notifySessionConnected = function(sess) {
     }
     */
     var self = this;
-    if (this._peerCallRecoveryWaitTimer) {
-        clearTimeout(this._peerCallRecoveryWaitTimer);
-        delete this._peerCallRecoveryWaitTimer;
-    }
 
+    self._clearCallRecoveryTimer();
     self._deleteRetry(sess.peer + sess.peerClient);
     self._checkLocalMuteCompleted();
     // handle first connected session
@@ -2289,6 +2411,7 @@ Call.prototype._notifySessionConnected = function(sess) {
         delete self._renegotiateAfterInitialConnect;
         self.sendOffer();
     }
+    self._checkStartMicMonitor();
 };
 
 Call.prototype.enableAudio = function(enable) {
@@ -2319,6 +2442,7 @@ Call.prototype.enableAudio = function(enable) {
     self._notifyLocalMuteComplete();
     if (!success) {
         self.logger.warn("Failed to enable audio: there is no local stream or no audio tracks in it");
+        self._fire('onLocalMediaFail', Av.Audio);
         return;
     }
     self._bcastLocalAvChange();
@@ -2780,7 +2904,10 @@ function Session(call, packet, sessParams) {
     self.peerClient = packet.fromClient;
     self.crypto = call.manager.crypto;
     self._networkQuality = -1;
+    self._mediaHiccups = 0;
+    self._mediaHiccupMaxDur = 0;
     self._terminatePromise = createPromiseWithResolveMethods();
+    self.inputQueue = []; // packets are queued here until asyncInit() (i.e. crypto) is ready
     if (packet.type === RTCMD.SDP_OFFER) { // peer's offer
         assert(sessParams);
         // SDP_OFFER sid.8 anonId.8 encHashKey.32 fprHash.32 av.1 sdpLen.2 sdpOffer.sdpLen
@@ -2796,7 +2923,7 @@ function Session(call, packet, sessParams) {
         // but we can't process them until setRemoteDescription is ready, so
         // we have to store them in a queue
         self.peerHash = data.substr(48, 32);
-        self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, data.substr(16, 32));
+        self._encryptedPeerHashKey = data.substr(16, 32);
         self.peerAv = data.charCodeAt(80);
         var sdpLen = Chatd.unpack16le(data.substr(81, 2));
         assert(data.length >= 83 + sdpLen);
@@ -2810,7 +2937,8 @@ function Session(call, packet, sessParams) {
         assert(data.length >= 56);
         self.ownHashKey = self.crypto.random(32);
         self.peerAnonId = data.substr(16, 8);
-        self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, data.substr(24, 32));
+        self._encryptedPeerHashKey = data.substr(24, 32);
+        self.peerSupportsReneg = ((packet.data.charCodeAt(64) & Caps.kSupportsStreamReneg) !== 0);
     } else {
         assert(false, "Attempted to create a Session object with packet of type",
             constStateToText(RTCMD, packet.type));
@@ -2841,6 +2969,64 @@ function Session(call, packet, sessParams) {
         self.terminateAndDestroy(term);
     }, RtcModule.kSessSetupTimeout);
 }
+
+Session.prototype._processInputQueue = function() {
+    var queue = this.inputQueue;
+    if (!queue) {
+        return;
+    }
+    // Keep input queue, so that if somehow we get passed a new packet while processing the queue,
+    // it gets enqueued and processed in order
+    if (queue.length === 0) {
+        delete this.inputQueue;
+        return;
+    }
+    this.logger.warn("Packets were queued while crypto was being initialized, processing them...");
+    try {
+        do {
+            this.processMsg(queue.shift());
+        } while (queue.length > 0);
+        this.logger.warn("Done processing queued packets");
+    } catch(e) {
+        if (this.state < Term.kTerminating) {
+            this.terminateAndDestroy(Term.kErrInternal);
+        }
+        throw e;
+    }
+    finally {
+        delete this.inputQueue;
+    }
+};
+
+Session.prototype._asyncInit = function() {
+    var self = this;
+    assert(self._encryptedPeerHashKey);
+    return self.crypto.loadCryptoForPeer(self.peer)
+    .catch(function(err) {
+        if (self.state < SessState.kTerminating) {
+            self.terminateAndDestroy(Term.kErrCrypto);
+        }
+        return Promise.reject(err);
+    })
+    .then(function() {
+        if (self.state >= SessState.kTerminating) {
+            return Promise.reject();
+        }
+        try {
+            self.peerHashKey = self.crypto.decryptNonceFrom(self.peer, self._encryptedPeerHashKey);
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrCrypto);
+            return Promise.reject();
+        }
+        try {
+            self._createRtcConn();
+        } catch(e) {
+            self.terminateAndDestroy(Term.kErrInternal);
+            return Promise.reject();
+        }
+        return self;
+    });
+};
 
 Session.prototype._setState = function(newState) {
     var oldState = this.state;
@@ -2955,6 +3141,17 @@ Session.prototype._updatePeerNetworkQuality = function(q) {
 };
 
 Session.prototype.handleMsg = function(packet) {
+    if (this.inputQueue) {
+        this.inputQueue.push(packet);
+        this.logger.log("Session not ready, queueing RTCMD.%s packet", constStateToText(RTCMD, packet.type));
+     }
+     else {
+        this.processMsg(packet);
+     }
+};
+
+Session.prototype.processMsg = function(packet) {
+    this.logger.log("Processing RTCMD." + constStateToText(RTCMD, packet.type));
     switch (packet.type) {
         case RTCMD.SDP_ANSWER:
             this.msgSdpAnswer(packet);
@@ -2998,7 +3195,7 @@ Session.prototype._createRtcConn = function() {
         this.logger.log("Using ICE servers:", JSON.stringify(iceServers[0].urls));
     }
     var pcOptions = { iceServers: iceServers, sdpSemantics: 'unified-plan' };
-    if (localStorage.forceRelay) {
+    if (RtcModule.cfg.forceRelay) {
         pcOptions.iceTransportPolicy = 'relay';
     }
     var conn = self.rtcConn = new RTCPeerConnection(pcOptions);
@@ -3020,7 +3217,7 @@ Session.prototype._createRtcConn = function() {
             self.cmd(RTCMD.END_ICE_CANDIDATES);
             return;
         }
-        if (localStorage.forceRelay) {
+        if (RtcModule.cfg.forceRelay) {
         // "manual" match, in theory should not be needed, as we specify iceTransportPolicy=relay
         // but just in case iceTransportPolicy is not recognized
             var m = candString.match(/typ\s([^\s]+)/);
@@ -3114,12 +3311,37 @@ Session.prototype._createRtcConn = function() {
             return;
         }
         if (state === 'disconnected') {
-            self.terminateAndDestroy(Term.kErrIceDisconn);
-        } else if (state === 'failed') {
-            self.terminateAndDestroy(Term.kErrIceFail);
-        } else if (state === 'connected') {
+            // Firefox appears to continue showing / sending video even after 'disconnected',
+            // may switch back to 'connected', but that may take longer that our timer, so we ignore this event
+            // The side effect is that we don't have a safety timer to prevent a stuck 'disconnected' state,
+            // but it appears to reliably fire a 'failed' event if it can't recover. After 'failed', the video
+            // finally stops
+            if (RtcModule.cfg.tearSessOnMediaDisconn) {
+                self.terminateAndDestroy(Term.kErrIceDisconn);
+                return;
+            }
+            if (!RTC.isFirefox) {
+                self._handleMediaConnDisconnected();
+            }
+        }
+        else if (state === 'failed') {
+            self._handleMediaConnFailed();
+        }
+        else if (state === 'connected') {
+            if (self.state === SessState.kSessInProgress) {
+                if (RTC.isFirefox) {
+                    assert(!self._tsLastMedia);
+                }
+                else {
+                    self._handleMediaConnRecovered();
+                }
+                return;
+            }
+            assert(self.state !== SessState.kSessInProgress);
             self._setState(SessState.kSessInProgress);
             self._tsIceConn = Date.now();
+            // We may have had a previous connect-disconnect cycle, clear the end of the previous
+            delete self._tsLastMedia;
             self._fire("onConnect");
             if (RTC.Stats) {
                 self._lostAudioPktAvg = 0;
@@ -3139,10 +3361,63 @@ Session.prototype._createRtcConn = function() {
             */
         }
     };
+    conn.onconnectionstatechange = function(event) {
+        self.logger.log("Connstate changed to", conn.connectionState);
+        if (conn.connectionState === "failed") {
+            self._handleMediaConnFailed();
+        }
+    };
     // RTC.Stats will be set to 'false' if stats are not available for this browser
     if ((typeof RTC.Stats === 'undefined') && (typeof statsGlobalInit === 'function')) {
         statsGlobalInit(conn);
     }
+};
+
+Session.prototype._handleMediaConnDisconnected = function() {
+    var self = this;
+    self._clearMediaRecoveryTimer();
+    self._tsLastMedia = Date.now(); // needed for stats about media stall time
+    self._mediaRecoveryTimer = setTimeout(function() {
+        if (self.state < SessState.kTerminating && self.rtcConn.iceConnectionState !== 'connected') {
+            self.logger.warn("Timed out waiting for media connection to recover, terminating session");
+            self.terminateAndDestroy(Term.kErrIceDisconn);
+        }
+    }, RtcModule.kMediaConnRecoveryTimeout);
+};
+
+Session.prototype._handleMediaConnRecovered = function() {
+    var self = this;
+    self._clearMediaRecoveryTimer();
+    if (self._tsLastMedia) {
+        self._mediaHiccups++;
+        var hiccupDur = Date.now() - self._tsLastMedia;
+        delete self._tsLastMedia;
+        if (hiccupDur > self._mediaHiccupMaxDur) {
+            self._mediaHiccupMaxDur = hiccupDur;
+        }
+        self.logger.log("Incoming media stalled for " + hiccupDur + " ms");
+    }
+    self.logger.log("Media stream successfully recovered by webRTC");
+};
+
+Session.prototype._handleMediaConnFailed = function() {
+    var self = this;
+    if (RTC.isFirefox) {
+        self._tsLastMedia = Date.now();
+    }
+    self.terminateAndDestroy(self.state === SessState.kSessInProgress
+        ? Term.kErrIceDisconn // We can have 'failed' when webRTC gives up trying to recoved after 'disconnected'
+        : Term.kErrIceFail // or when initial ICE discovery fails
+    );
+};
+
+Session.prototype._clearMediaRecoveryTimer = function() {
+    var self = this;
+    if (!self._mediaRecoveryTimer) {
+        return;
+    }
+    clearTimeout(self._mediaRecoveryTimer);
+    delete self._mediaRecoveryTimer;
 };
 
 Session.prototype._setStreamRenegTimeout = function() {
@@ -3170,11 +3445,13 @@ Session.prototype.onStatCommonInfo = function(info) {
 };
 
 Session.prototype.onStatSample = function(sample, added) {
-    // pollStats() initiates this call, and is called on the session only if
-    // it has a statRecorder, but onStatSample() is called back asynchronously,
-    // so meanwhile statRecorder may be gone
+    // pollStats() calls us, and does it only if the session has a statRecorder
+    // Note that the call is asynchronous, so the statRecorder may be gone meanwhile
     if (!this.statRecorder) {
         return -1;
+    }
+    if (RtcModule.cfg.showStats) {
+        this._sendTextStats(sample);
     }
     var ret = this.calcNetworkQuality(sample);
     if (Date.now() - this.statRecorder.getStartTime() >= 6000) {
@@ -3182,22 +3459,82 @@ Session.prototype.onStatSample = function(sample, added) {
     }
     return ret;
 };
-// ====
+
+function relayType(rly) {
+    if (rly == null) {
+        return "?";
+    }
+    else if (rly) {
+        return "relay";
+    }
+    return "direct";
+}
+
+Session.prototype._sendTextStats = function(sample) {
+    var basic = this.statRecorder.basicStats;
+    var a = sample.a;
+    var v = sample.v;
+    var str = "conn: " + relayType(basic.rly) + "-" + relayType(basic.rrly) +
+        ", quality: " + this.getPeerNetworkQuality();
+    var sub = "\nrtt: " + ((a.rtt != null) ? (a.rtt + " ms") : "?");
+    var as = a.s;
+    var ar = a.r;
+    if (ar.kbps) {
+        if (ar.jtr) {
+            sub += ", jtr: " + ar.jtr + " ms";
+        }
+        sub += "\nrx: " + ar.kbps + " kbps";
+        if (ar.pl) {
+            sub += ", " + ar.pl + " pkt lost";
+        }
+        if (ar.nacktx) {
+            sub += "nacktx: " + ar.nacktx;
+        }
+    }
+    if (as.kbps) {
+        sub += "\ntx: " + as.kbps + " kbps";
+    }
+    if (sub.length) {
+        str += "\n  -- audio --" + sub;
+    }
+
+    var vr = v.r;
+    var vs = v.s;
+    sub = '';
+    if (v.rtt != null) {
+        sub += "\nrtt: " + v.rtt +  "ms";
+    }
+    if (vr.kbps) {
+        sub += "\nrx: ";
+        if (vr.width) {
+            sub += vr.width + "x" + vr.height + ", ";
+        }
+        sub += vr.fps + "fps, " + vr.kbps + "kbps";
+        if (vr.pl) {
+            sub += ", " + vr.pl + " pkt lost";
+        }
+    }
+    if (vs.kbps) {
+        sub += "\ntx: ";
+        if (vs.width) {
+            sub += vs.width + "x" + vs.height + ", ";
+        }
+        sub += vs.fps + "fps, " + vs.kbps + "kbps";
+    }
+    if (sub.length) {
+        str += "\n\n  -- video --" + sub;
+    }
+    // bypass ._fire because it will log the stats string
+    this.handler.onStats(str);
+};
 
 Session.prototype._sendAv = function(av) {
     this.cmd(RTCMD.MUTE, String.fromCharCode(av));
 };
 
-Session.prototype.createRtcConnSendOffer = function() {
-    var self = this;
-    assert(self.isJoiner); // the joiner sends the SDP offer
-    assert(self.state === SessState.kWaitSdpAnswer);
-    self._createRtcConn();
-    return self.sendOffer(true);
-};
-
 Session.prototype.sendOffer = function() {
     var self = this;
+    assert(self.peerHashKey);
     assert(self.peerAnonId);
     var isInitial = self.state < SessState.kSessInProgress;
     return self.rtcConn.createOffer(self.pcConstraints())
@@ -3228,7 +3565,8 @@ Session.prototype.sendOffer = function() {
         }
         self.terminateAndDestroy(self._streamRenegTimer ? Term.kErrStreamReneg : Term.kErrSdp,
             "Error creating SDP offer: " + err);
-        self.logger.error("failed SDP offer: ", self.ownSdpOffer);
+        self.logger.error("Error creating SDP offer. Failed SDP offer: ", self.ownSdpOffer);
+        return Promise.reject();
     });
 };
 
@@ -3254,10 +3592,25 @@ Call.prototype.msgSdpOffer = function(packet) {
     }
 
     // create session to this peer
-    var sess = self._addNewSession(packet, sentParams);
-    assert(sess.sid === sentParams.sid);
-    sess._createRtcConn();
-    sess.processSdpOfferSendAnswer();
+    self._addNewSession(packet, sentParams)
+    .then(function(sess) {
+        assert(sess.sid === sentParams.sid);
+        sess._startAsNonJoiner();
+    });
+};
+
+Session.prototype._startAsNonJoiner = function() {
+    var self = this;
+    assert(!self.isJoiner);
+    self.processSdpOfferSendAnswer()
+    .then(function() {
+        self._processInputQueue();
+    })
+    .catch(function(err) {
+        if (self.state < SessState.kTerminating) {
+            self.terminateAndDestroy(kErrInternal);
+        }
+    });
 };
 
 Session.prototype.msgSdpOfferRenegotiate = function(packet) {
@@ -3281,9 +3634,13 @@ Session.prototype.msgSdpOfferRenegotiate = function(packet) {
 
 Call.prototype._addNewSession = function(packet, params) {
     var sess = new Session(this, packet, params);
+    var retry = this.sessRetries[sess.peer + sess.peerClient];
+    if (retry) {
+        sess._reconnInfo = retry;
+    }
     this.sessions[sess.sid] = sess;
     this._notifyNewSession(sess);
-    return sess;
+    return sess._asyncInit();
 };
 
 Session.prototype.msgSdpAnswer = function(packet) {
@@ -3325,7 +3682,7 @@ Session.prototype._setRemoteAnswerSdp = function(packet) {
     .catch(function(err) {
         var msg = "Error setting SDP answer: " + err;
         self.terminateAndDestroy(self._streamRenegTimer ? Term.kErrStreamReneg : Term.kErrSdp, msg);
-        return err;
+        return Promise.reject(err);
     });
 };
 
@@ -3368,6 +3725,7 @@ Session.prototype.terminateAndDestroy = function(code, msg) {
     }
     self._terminateReason = code;
     self._setState(SessState.kTerminating);
+    self._clearMediaRecoveryTimer();
     // Send SESS_TERMINATE synchronously (in case of tab close, the event loop will exit,
     // so no chance of doing it async), but destroy async so that we have dont have the
     // sessions object of a call altered if destroyed from a loop
@@ -3436,6 +3794,9 @@ Session.prototype.msgSessTerminate = function(packet) {
             "it should have been removed from the sessions map of the call");
         return;
     }
+    if (reason === Term.kErrIceDisconn && this._tsIceConn) {
+        this._tsLastMedia = Date.now();
+    }
     if (self.state === SessState.kTerminating && this._terminateAckCallback) {
         // handle terminate as if it were an ack - in both cases the peer is terminating
         self.msgSessTerminateAck(packet); // the ack handler should destroy it
@@ -3443,12 +3804,11 @@ Session.prototype.msgSessTerminate = function(packet) {
     if (self.state === SessState.kDestroyed) {
         return;
     }
-    self._setState(SessState.kTerminating); // need this before destroy sets the state to kDestroyed
     self._destroy(reason | Term.kPeer);
 };
 
 /** Terminates a session without the signalling terminate handshake.
-  * This should normally not be called directly, but via terminate(),
+  * This should normally not be called directly, but via terminateAndDestroy(),
   * unless there is a network error
   */
 Session.prototype._destroy = function(code, msg) {
@@ -3463,7 +3823,7 @@ Session.prototype._destroy = function(code, msg) {
     if (msg) {
         this.logger.log("Destroying session due to:", msg);
     }
-
+    this._clearMediaRecoveryTimer();
     this.submitStats(code, msg);
 
     if (this.rtcConn) {
@@ -3476,6 +3836,11 @@ Session.prototype._destroy = function(code, msg) {
     this._fire("onRemoteStreamRemoved");
     this.call._removeSession(this, code);
     this._terminatePromise.resolve(code);
+};
+
+Session.prototype._terminateAndDestroyNow = function() {
+    assert(this.state === SessState.kTerminating);
+    this._destroy(this._terminateReason);
 };
 
 Session.prototype.submitStats = function(termCode, errInfo) {
@@ -3518,6 +3883,22 @@ Session.prototype.submitStats = function(termCode, errInfo) {
     if (errInfo) {
         stats.errInfo = errInfo;
     }
+    if (this._mediaHiccups) {
+        stats.hicc = {
+            cnt: this._mediaHiccups,
+            maxDur: this._mediaHiccupMaxDur
+        };
+    }
+    var rcInfo = this._reconnInfo;
+    if (rcInfo) {
+        var reconn = stats.reconn = {
+            cnt: rcInfo.reconnCnt,
+            prevSid: base64urlencode(rcInfo.oldSid)
+        };
+        if (rcInfo.tsLastMedia && this._tsIceConn) {
+            reconn.tStall = this._tsIceConn - rcInfo.tsLastMedia;
+        }
+    }
     var url = this.call.manager.statsUrl;
     if (url) {
         M.xhr(url + "/stats", JSON.stringify(stats));
@@ -3558,7 +3939,15 @@ Session.prototype.msgIceCandidate = function(packet) {
             sdpMid: mid,
             candidate: data.substr(midLen + 12, candLen)
     });
-
+    if (!self.rtcConn) { // crypto is not ready yet
+        if (!self.peerCandidates) {
+            self._queuedPeerCandidates = [cand];
+        }
+        else {
+            self._queuedPeerCandidates.push(cand);
+        }
+        return;
+    }
     self.rtcConn.addIceCandidate(cand)
     .catch(function(err) {
         self.logger.error("addIceCandidate() failed: " + (err.stack || err.message || err) +
@@ -3611,7 +4000,7 @@ Session.prototype._fire = function(evName) {
 
 Session.prototype._mungeSdp = function(sdp) {
     try {
-        var maxbr = this.call.isGroup ? localStorage.webrtcMaxGroupBr : localStorage.webrtcMaxBr;
+        var maxbr = this.call.isGroup ? RtcModule.cfg.maxGroupBr : RtcModule.cfg.maxBr;
         if (maxbr) {
             maxbr = parseInt(maxbr);
             assert(!isNaN(maxbr));
@@ -3662,7 +4051,7 @@ Session.prototype.calcNetworkQualityChrome = function(sample) {
         if (bwav != null && width != null) {
             if (width >= 480) {
                 if (bwav < 30) {
-                    this.logger.log("Width >= 480, bu bwav < 30, returning link quality 0");
+                    this.logger.log("Width >= 480, but bwav < 30, returning link quality 0");
                     return 0;
                 } else if (bwav < 64) {
                     return 1;
@@ -3976,7 +4365,9 @@ var Term = Object.freeze({
     kErrStreamRenegTimeout: 42, // < Timed out waiting for completion of offer-answer exchange
                                 // < during stream renegotiation
     kErrCallRecoveryFailed: 43, // < Timed out waiting for call to recover after own or peers' network drop
-    kErrorLast: 43,         // < Last enum indicating call termination due to error
+    kErrCrypto: 44,         // < An error was returned from the crypto subsystem used for MiTM attack protection
+                            // < Typically this means that the Cu25519 pubkey of the peer wasn't found
+    kErrorLast: 44,         // < Last enum indicating call termination due to error
     kLast: 43,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
                             // < not at our side
@@ -4340,7 +4731,7 @@ function AudioLevelMonitor(stream, handler, changeThreshold) {
         var lastLevel = self._lastLevel;
         // console.warn('max=', max);
         if (Math.abs(max - lastLevel) >= self._changeThreshold ||
-           (max <= 0.001 && lastLevel >= 0.005)) { // return to zero
+           (max <= 0.0001 && lastLevel >= 0.0005)) { // return to zero
             self._lastLevel = max;
             handler.onAudioLevelChange(max);
         }
@@ -4444,9 +4835,8 @@ AudioMutedChecker.prototype.destroy = function() {
 
 AudioMutedChecker.prototype.onAudioLevelChange = function(level) {
     var self = this;
-    if (level <= 0.001) {
+    if (level <= 0.0001) {
         // if we disconnect, there will be an artificial change to 0
-        // console.warn("AudioMutedChecker: Received level change to", level, "- should be > 0");
         return;
     }
     self._handler.audioInputDetected = true;

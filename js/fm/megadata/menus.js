@@ -216,6 +216,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     items['.clearprevious-versions'] = 1;
                 }
             }
+
             if (is_image2(selNode)) {
                 items['.preview-item'] = 1;
             }
@@ -228,6 +229,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     if (mediaType === 1 && sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
                         items['.embedcode-item'] = 1;
                     }
+                }
+                else if (is_text(selNode)) {
+                    items['.edit-file-item'] = 1;
                 }
             }
         }
@@ -428,7 +432,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                     ignoreGrideExtras = true;
                 }
                 else {
-                    $(menuCMI).filter('.fileupload-item,.newfolder-item').show();
+                    $(menuCMI).filter('.fileupload-item,.newfolder-item,.newfile-item').show();
 
                     if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
                         $(menuCMI).filter('.folderupload-item').show();

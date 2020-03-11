@@ -8,7 +8,8 @@ function init_reset() {
     recoverycode = page.replace('recover', '');
     api_req({
         a: 'erv',
-        c: recoverycode
+        c: recoverycode,
+        v: 2
     }, {
         callback: function(res) {
             loadingDialog.hide();
@@ -26,6 +27,15 @@ function init_reset() {
             }
             else {
                 if (res[0] === 9) {
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22817], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
                     $('.main-mid-pad.backup-recover.withkey').removeClass('hidden');
 
@@ -61,9 +71,31 @@ function init_reset() {
                     });
                 }
                 else if (res[0] === 10) {
+
+                    if (u_type || u_type === 0) {
+
+                        msgDialog("warninga", '', l[22818], '', function() {
+                            loadSubPage('fm');
+                        });
+
+                        return;
+                    }
+
                     recoveryemail = res[1];
-                    $('.main-mid-pad.backup-recover.withoutkey').removeClass('hidden');
+                    var $wKey = $('.main-mid-pad.backup-recover.withoutkey').removeClass('hidden');
                     $('.backup-notification-block').removeClass('hidden');
+                    if (res[6] && res[6].b) {
+                        $wKey.find('.step-main-question').text(l[23050]);
+                        $wKey.find('#step-p1').text(l[23051]);
+                        $wKey.find('#step-p2').safeHTML(l[23052]);
+                        $wKey.find('#lbl-reset-confirm-txt').text(l[23053]);
+                    }
+                    else {
+                        $wKey.find('.step-main-question').text(l[19841]);
+                        $wKey.find('#step-p1').text(l[19842]);
+                        $wKey.find('#step-p2').safeHTML(l[19843]);
+                        $wKey.find('#lbl-reset-confirm-txt').text(l[1950]);
+                    }
                 }
             }
         }
@@ -256,7 +288,8 @@ function init_reset_pw() {
     $passwords.add($confirms).rebind('keyup.initresetpw, input.initresetpw', function(e) {
         var valid = _checkInput($(this));
         if (e.keyCode === 13 && valid) {
-            if ($('.restore-verify-button').hasClass('reset-account')) {
+            var $button = $('.restore-verify-button', $(this).parents('.content-wrapper'));
+            if ($button.hasClass('reset-account')) {
                 delete_reset_pw();
             }
             else {

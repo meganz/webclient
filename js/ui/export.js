@@ -1404,13 +1404,18 @@ var exportExpiry = {
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
         if ($.itemExportEmbed || is_video(n) === 1) {
             var link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
-            var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen></iframe>\n';
+            var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
             var setCode = function() {
                 var time = 0;
                 var width = 0;
                 var height = 0;
+                var autoplay = false;
+                var muted = false;
+                var optionAdded = false;
                 var $time = $('.start-video-at .embed-setting', $linksDialog);
                 var $vres = $('.change-video-resolution .embed-setting', $linksDialog);
+                var $enauto = $('.enable-autoplay .checkdiv', $linksDialog);
+                var $muted = $('.mute-video .checkdiv', $linksDialog);
                 var getValue = function(s, c) {
                     var $input = $(s, c);
                     var value = String($input.val() || '').replace(/\.\d*$/g, '').replace(/\D/g, '');
@@ -1420,15 +1425,27 @@ var exportExpiry = {
                 };
                 if (!$time.hasClass('disabled')) {
                     time = getValue('input', $time);
+                    optionAdded = true;
                 }
                 if (!$vres.hasClass('disabled')) {
                     width = getValue('.width-video input', $vres);
                     height = getValue('.height-video input', $vres);
                 }
+                if ($enauto.hasClass('checkboxOn')) {
+                    autoplay = true;
+                    optionAdded = true;
+                }
+                if ($muted.hasClass('checkboxOn')) {
+                    muted = true;
+                    optionAdded = true;
+                }
+
                 var code = iframe
                     .replace('%w', width > 0 && height > 0 ? width : 640)
                     .replace('%h', width > 0 && height > 0 ? height : 360)
-                    .replace('%s', link + (time > 0 ? '!' + time + 's' : ''));
+                    .replace('%s', link + (optionAdded ? '!' : '') + (time > 0 ? time + 's' : '') +
+                        (autoplay ? '1a' : '') + (muted ? '1m' : ''))
+                    .replace('%a', autoplay ? 'allow="autoplay;"' : '');
                 $('.code-field .code', $linksDialog).text(code);
             };
 
@@ -1443,6 +1460,13 @@ var exportExpiry = {
                     $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
                 }
                 setCode();
+            });
+            // Reset all numeric inputs under Share Options
+            $('.embed-code-container .settings-container .embed-setting').addClass('disabled');
+            $('.embed-code-container .settings-container input[type=number]').get().forEach(function(e) {
+                var $this = $(e);
+                $this.val($this.attr('value'));
+                $this.prop('readonly', true);
             });
             $('.fm-dialog-tab', $linksDialog).removeClass('hidden');
 

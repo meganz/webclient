@@ -1280,10 +1280,12 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
  * */
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
-    if (M.getNodeRoot(id) === 'shares') {
-        if (M.getNodeRights(id) < 2) {
-            return;
-        }
+    if (M.currentrootid === M.RubbishID
+        || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
+        return;
+    }
+    if (folderlink) {
+        return;
     }
 
     // at this point we have V prepared.
@@ -1337,9 +1339,13 @@ MegaUtils.prototype.checkForDuplication = function(id) {
             }
         }
 
-        if (d && !Object.keys(dups).length && !Object.keys(dupsFolders).length) {
-            console.error("Strange case, no Duplications were found in the time when" +
-                "we have a mismatch in length " + id);
+        if (!Object.keys(dups).length && !Object.keys(dupsFolders).length) {
+            if (d) {
+                console.warn("No Duplications were found in the time when"
+                    + "we have a mismatch in lengths "
+                    + id + '. We have names intersected between files and folders');
+            }
+            return;
         }
 
         var resultObject = Object.create(null);
@@ -1390,18 +1396,23 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             // If the user is already logged in but with a different account just load that account instead. The
             // hash they came from e.g. a folder link may not be valid for this account so just load the file manager.
             else if (u_k && (JSON.stringify(u_k) !== JSON.stringify(urlParts[0]))) {
-                if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
-                    loadSubPage('fm');
-                    return false;
-                }
-                else {
-                    loadSubPage(toPage);
-                    // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
-                    if (String(urlParts[2]).startsWith('pro')) {
-                        later(msgDialog.bind(null, 'warninga', l[882], l[19341]));
+                // if user click MEGAsync pro upgrade button and logged in as different account on webclient.
+                msgDialog(
+                    'warninga',
+                    l[882],
+                    l[19341],
+                    '',
+                    function() {
+                        if (!urlParts[2] || String(urlParts[2]).match(/^fm/)) {
+                            loadSubPage('fm');
+                            return false;
+                        }
+                        loadSubPage(toPage);
+                        return false;
                     }
-                    return false;
-                }
+                );
+
+                return false;
             }
 
             // Likely that they have never logged in here before so we must set this
@@ -1472,30 +1483,6 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
     }
 };
 
-/** Don't report `newmissingkeys` unless there are *new* missing keys */
-MegaUtils.prototype.checkNewMissingKeys = function() {
-    var result = true;
-
-    try {
-        var keys = Object.keys(missingkeys).sort();
-        var hash = MurmurHash3(JSON.stringify(keys));
-        var prop = u_handle + '_lastMissingKeysHash';
-        var oldh = parseInt(localStorage[prop]);
-
-        if (oldh !== hash) {
-            localStorage[prop] = hash;
-        }
-        else {
-            result = false;
-        }
-    }
-    catch (ex) {
-        console.error(ex);
-    }
-
-    return result;
-};
-
 /**
  * Sanitise filename so that saving to local disk won't cause any issue...
  * @param {String} name The filename
@@ -1528,9 +1515,10 @@ MegaUtils.prototype.getSafeName = function(name) {
  *
  * this method will be called to control, renamings from webclient UI.
  * @param {String} name The filename
+ * @param {Boolean} [allowPathSep] whether to allow ether / or \ as a mean for nested folder creation requirements.
  * @returns {Boolean}
  */
-MegaUtils.prototype.isSafeName = function (name) {
+MegaUtils.prototype.isSafeName = function(name, allowPathSep) {
     'use strict';
     // below are mainly denied in windows or android.
     // we can enhance this as much as we can as
@@ -1540,10 +1528,7 @@ MegaUtils.prototype.isSafeName = function (name) {
     if (name.trim().length <= 0) {
         return false;
     }
-    if (name.search(/[\\\/<>:*\"\|?]/) >= 0 || name.length > 250) {
-        return false;
-    }
-    return true;
+    return !(name.search(allowPathSep ? /["*:<>?|]/ : /["*/:<>?\\|]/) >= 0 || name.length > 250);
 };
 
 /**

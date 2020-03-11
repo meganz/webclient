@@ -238,6 +238,12 @@ pro.proplan = {
         pro.propay.preloadAnimation();
         pro.propay.hideLoadingOverlay();
 
+        /*
+        * Hide the successful payment modal dialog of cardDialog, voucherDialog and redeem
+        * if click back after making the payment successfully
+        * */
+        $('.payment-result.success', $(document.body)).addClass('hidden');
+
         // Load the membership plans
         pro.loadMembershipPlans(function() {
 
@@ -246,6 +252,11 @@ pro.proplan = {
 
             // Check which plans are applicable or grey them out if not
             pro.proplan.checkApplicablePlans();
+
+            l[22670] = l[22670].replace('%1', bytesToSize(pro.minPlan[2] * 1024 * 1024 * 1024, 0)).
+                replace('%2', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0));
+
+            $('.storage-txt-small').safeHTML(l[22670]);
 
             // Close loading spinner
             loadingDialog.hide();
@@ -371,7 +382,7 @@ pro.proplan = {
                 var $bandwidthAmount = $pricingBox.find('.bandwidth-amount');
                 var $bandwidthUnit = $pricingBox.find('.bandwidth-unit');
                 var $euroPrice = $('.euro-price', $price);
-                var $currncyAbbrev = $('.local-currency-code', $price);
+                var $currncyAbbrev = $('.local-currency-code', $pricingBoxes);
                 var monthlyBasePrice;
                 var monthlyBasePriceCurrencySign;
                 var $planName;
@@ -651,13 +662,19 @@ pro.proplan = {
         if (!is_mobile) {
 
             var $plansBlock = $('.plans-block');
-            var $currPlan = $plansBlock.find('[data-payment="' + u_attr.p + '"]').addClass('current');
+            var $currPlan = $('[data-payment="' + data.utype + '"]', $plansBlock).addClass('current');
 
             // Current plan
             if (data.srenew) { // This is subscription plan
 
                 var renewTimestamp = data.srenew[0];
-                $currPlan.addClass('renew').find('.plan-tag-description.renew b').text(time2date(renewTimestamp, 2));
+                if (renewTimestamp === 0) {
+                    $currPlan.addClass('renew').addClass('no-pops');
+                }
+                else {
+                    $currPlan.addClass('renew');
+                    $('.plan-tag-description.renew b', $currPlan).text(time2date(renewTimestamp, 2));
+                }
             }
             else {
                 var currentExpireTimestamp = data.nextplan ? data.nextplan.t : data.suntil;
@@ -718,6 +735,18 @@ function showLoginDialog(email, password) {
         $('.input-email', $dialog).val(email || '');
         $('.input-password', $dialog).val(password || '');
 
+        $('.top-login-forgot-pass', $dialog).rebind('click.forgetPass', function() {
+
+            var email = document.getElementById('login-name').value;
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
+            loadSubPage('recovery');
+        });
+
+
         $inputs.rebind('keydown.initdialog', function(e) {
             if (e.keyCode === 13) {
                 doProLogin($dialog);
@@ -752,7 +781,7 @@ var doProLogin = function($dialog) {
     var $passwordInput = $dialog.find('input#login-password3');
     var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-    var email = $emailInput.val();
+    var email = $emailInput.val().trim();
     var password = $passwordInput.val();
     var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
     var twoFactorPin = null;

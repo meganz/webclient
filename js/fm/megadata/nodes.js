@@ -435,15 +435,16 @@ MegaData.prototype.injectNodes = function(nodes, target, callback) {
     return nodes.length;
 };
 
-// jshint maxdepth:10
 /**
  * @param {Array}       cn            Array of nodes that needs to be copied
  * @param {String}      t             Destination node handle
  * @param {Boolean}     [del]         Should we delete the node after copying? (Like a move operation)
  * @param {MegaPromise} [promise]     promise to notify completion on (Optional)
  * @param {Array}       [tree]        optional tree from M.getCopyNodes
+ * @returns {MegaPromise} The promise provided to this function, if any.
  */
 MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
+    'use strict';
     var todel = [];
 
     if (typeof promise === 'function') {
@@ -559,20 +560,29 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
     if (del && !tree.safeToDel) {
         tree.safeToDel = true;
 
-        var mdList = mega.megadrop.isDropExist(cn);
-        if (mdList.length) {
+        var shared = mega.megadrop.isDropExist(cn);
+        for (var i = tree.length; i--;) {
+            var n = M.d[tree[i].h] || false;
+
+            console.assert(n, 'Node not found... (%s)', tree[i].h);
+
+            if (n.shares || M.ps[n.h]) {
+                shared.push(n.h);
+            }
+        }
+
+        if (shared.length) {
             loadingDialog.phide();
-            mega.megadrop.showRemoveWarning(mdList)
-                .done(function() {
-                    // No MEGAdrop folders found, proceed with copy+del
-                    M.copyNodes(cn, t, del, promise, tree);
-                })
-                .fail(function() {
-                    // The user didn't want to disable MEGAdrop folders
-                    if (promise) {
-                        promise.reject(EBLOCKED);
-                    }
-                });
+
+            // Confirm with the user the operation will revoke shares and he wants to
+            msgDialog('confirmation', l[870], l[34] + ' ' + l[7410], l[6994], function(yes) {
+                if (yes) {
+                    M.revokeShares(shared).always(M.copyNodes.bind(M, cn, t, del, promise, tree));
+                }
+                else if (promise) {
+                    promise.reject(EBLOCKED);
+                }
+            });
             return promise;
         }
     }
@@ -1526,6 +1536,7 @@ MegaData.prototype.revokeShares = function(handles) {
     if (!Array.isArray(handles)) {
         handles = [handles];
     }
+    handles = array.unique(handles);
 
     if (d) {
         console.group('revokeShares for %s nodes...', handles.length, handles);
@@ -1740,6 +1751,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 }
             }
         }
+        // if node in cached mode in editor, clear it
+        if (mega && mega.fileTextEditor) {
+            mega.fileTextEditor.clearCachedFileData(n.h);
+        }
+
         // Update versioning dialog if it is open and the folder is its parent folder,
         // the purpose of the following code is to update permisions of historical files.
         if ($.selected
@@ -1764,14 +1780,13 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
  */
 MegaData.prototype.onFolderSizeChangeUIUpdate = function(node) {
     "use strict";
-    if (!node || !node.t) {
+    if (!node || !node.t || typeof M.currentdirid !== 'string') {
         return;
     }
 
     var needCheck = false;
 
     var currDir = M.currentdirid;
-
     if (currDir.indexOf(node.p) > -1) {
         needCheck = true;
     }
@@ -1929,7 +1944,7 @@ MegaData.prototype.colourLabelcmUpdate = function(node) {
     var $items = $('.files-menu .dropdown-colour-item');
     var value;
 
-    value = node.lbl;
+    value = node.lbl | 0;
 
     // Reset label submenu
     $items.removeClass('active');
@@ -1963,11 +1978,13 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
         var prefixTree = M.currentCustomView.prefixTree || '';
+        var $treeElements = $('#treea_' + handle).add('#treea_os_' + handle).add('#treea_pl_' + handle);
 
         // Remove all colour label classes
         $('#' + handle).removeClass(removeClasses);
         $('#' + handle + ' a').removeClass(removeClasses);
-        $('#treea_' + prefixTree + handle).removeClass('labeled').find('.colour-label-ind').remove();
+        $treeElements.removeClass('labeled');
+        $('.colour-label-ind', $treeElements).remove();
 
         if (labelId) {
             // Add colour label classes.
@@ -1975,7 +1992,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $('#' + handle).addClass(colourClass);
             $('#' + handle + ' a').addClass(colourClass);
-            $('#treea_' + prefixTree + handle).append(color.replace('%1', M.getLabelClassFromId(labelId)))
+            $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
         }
 
@@ -1992,26 +2009,20 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
             }
         }
 
-
         // make filter enable/disable depending on filter availabilty.
         $('.dropdown-section .dropdown-item-label')
             .add('.dropdown-section.filter-by .labels')
             .addClass('disabled static');
-        if (M.checkFilterAvailable()) {
+
+        if (M.isLabelExistNodeList(M.v)) {
             $('.dropdown-section .dropdown-item-label')
                 .add('.dropdown-section.filter-by .labels')
                 .removeClass('disabled static');
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            var curDir = M.currentdirid.replace('out-shares/', '').replace('public-links/', '');
-            var refresh = false;
-            if (curDir === 'public-links') {
-                if (M.v.indexOf(n) !== -1) {
-                    refresh = true;
-                }
-            }
-            if (refresh || n.p === curDir) {
+            // We only required to re-render if there is filter on the page.
+            if (M.filterLabel[M.currentCustomView.type]) {
 
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');
@@ -2032,35 +2043,50 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
  * @param {Integer} labelId Numeric value of label
  */
 MegaData.prototype.labeling = function(handles, labelId) {
-
-    var newLabelState = 0;
+    'use strict';
 
     if (fminitialized && handles) {
         if (!Array.isArray(handles)) {
             handles = [handles];
         }
 
-        $.each(handles, function(index, handle) {
-
+        for (var i = handles.length; i--;) {
+            var newLabelState = labelId | 0;
+            var handle = handles[i];
             var node = M.d[handle];
-            newLabelState = labelId;
+            if (!node) {
+                if (d) {
+                    console.warn('Node not found.', handle);
+                }
+                continue;
+            }
 
-            if (node.lbl === labelId) {
+            if (node.lbl === newLabelState) {
                 newLabelState = 0;
             }
             node.lbl = newLabelState;
+            if (!node.lbl) {
+                delete node.lbl;
+            }
+
             if (node.tvf) {
                 fileversioning.labelVersions(handle, newLabelState);
             }
+
             api_setattr(node, mRandomToken('lbl'));
 
             // sync with global tree
             if (node.t > 0) {
-                M.tree[node.p][node.h].lbl = node.lbl;
+                var tn = M.tree[node.p][node.h];
+
+                tn.lbl = node.lbl;
+                if (!tn.lbl) {
+                    delete tn.lbl;
+                }
             }
 
             M.labelDomUpdate(handle, newLabelState);
-        });
+        }
 
         M.initLabelFilter(M.v);
     }
@@ -2258,10 +2284,9 @@ MegaData.prototype.applyLabelFilter = function (e) {
 MegaData.prototype.isLabelExistNodeList = function(nodelist) {
     "use strict";
 
-    for (var i = 0; i < nodelist.length; i++) {
-        if (typeof nodelist[i] !== 'undefined'
-            && (typeof nodelist[i].lbl !== 'undefined'
-                && nodelist[i].lbl !== 0)){
+    for (var i = nodelist.length; i--;) {
+        var lbl = (nodelist[i] || {}).lbl | 0;
+        if (lbl) {
             return true;
         }
     }
@@ -2335,7 +2360,10 @@ MegaData.prototype.favourite = function(handles, newFavState) {
             var node = M.getNodeByHandle(handle);
 
             if (node && !exportLink.isTakenDown(handle)) {
-                node.fav = newFavState;
+                node.fav = newFavState | 0;
+                if (!node.fav) {
+                    delete node.fav;
+                }
                 api_setattr(node, mRandomToken('fav'));
                 if (node.tvf) {
                     fileversioning.favouriteVersions(handle, newFavState);
@@ -2616,8 +2644,8 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
 
         // check it need to clear node attribute
         if ($.clearCopyNodeAttr) {
-            n.lbl = 0;
-            n.fav = 0;
+            delete n.lbl;
+            delete n.fav;
         }
 
         // regardless to where the copy is remove rr
@@ -3023,107 +3051,99 @@ MegaData.prototype.isFolder = function(nodesId) {
 
 /**
  * Create new folder on the cloud
- * @param {String} toid The handle where the folder will be created.
+ * @param {String} target The handle where the folder will be created.
  * @param {String|Array} name Either a string with the folder name to create, or an array of them.
- * @param {Object|MegaPromise} ulparams Either an old-fashion object with a `callback` function or a MegaPromise.
- * @return {Object} The `ulparams`, whatever it is.
+ * @return {Promise} the handle of the deeper created folder.
  */
-MegaData.prototype.createFolder = function(toid, name, ulparams) {
+MegaData.prototype.createFolder = promisify(function(resolve, reject, target, name) {
     "use strict";
+    var self = this;
+    var inflight = self.cfInflightR;
 
-    // This will be called when the folder creation succeed, pointing
-    // the caller with the handle of the deeper created folder.
-    var resolve = function(folderHandle) {
-        if (ulparams) {
-            if (ulparams instanceof MegaPromise) {
-                ulparams.resolve(folderHandle);
-            }
-            else {
-                ulparams.callback(ulparams, folderHandle);
-            }
-        }
-        return ulparams;
-    };
+    target = String(target || M.RootID);
 
-    // This will be called when the operation failed.
-    var reject = function(error) {
-        if (ulparams instanceof MegaPromise) {
-            ulparams.reject(error);
-        }
-        else {
-            msgDialog('warninga', l[135], l[47], api_strerror(error));
-        }
-        return ulparams;
-    };
-
-    toid = toid || M.RootID;
-
-    // Prevent unneeded API calls if toid is not a valid handle
-    if ([8, 11].indexOf(String(toid).length) === -1) {
+    // Prevent unneeded API calls if target is not a valid handle
+    if (target.length !== 8 && target.length !== 11) {
         return reject(EACCESS);
     }
 
     if (Array.isArray(name)) {
         name = name.map(String.trim).filter(String).slice(0);
 
-        if (!name.length) {
-            name = undefined;
-        }
-        else {
+        if (name.length) {
             // Iterate through the array of folder names, creating one at a time
-            var next = function(target, folderName) {
-                M.createFolder(target, folderName, new MegaPromise())
-                    .done(function(folderHandle) {
-                        if (!name.length) {
-                            resolve(folderHandle);
-                        }
-                        else {
+            (function next(target, folderName) {
+                self.createFolder(target, folderName)
+                    .then(function(folderHandle) {
+                        if (name.length) {
                             next(folderHandle, name.shift());
                         }
+                        else {
+                            resolve(folderHandle);
+                        }
                     })
-                    .fail(function(error) {
-                        reject(error);
-                    });
-            };
-            next(toid, name.shift());
-            return ulparams;
+                    .catch(reject);
+            })(target, name.shift());
+            return;
         }
+
+        name = null;
     }
 
     if (!name) {
-        return resolve(toid);
+        return resolve(target);
     }
+
+    if (!inflight[target]) {
+        inflight[target] = Object.create(null);
+    }
+    if (!inflight[target][name]) {
+        inflight[target][name] = [];
+    }
+
+    if (inflight[target][name].push([resolve, reject]) > 1) {
+        if (d) {
+            console.debug('deduplicated folder creation attempt on %s for "%s"...', target, name);
+        }
+        return;
+    }
+
+    var _dispatch = function(idx, result) {
+        var queue = inflight[target][name];
+
+        delete inflight[target][name];
+        if (!$.len(inflight[target])) {
+            delete inflight[target];
+        }
+
+        for (var i = 0; i < queue.length; i++) {
+            queue[i][idx](result);
+        }
+    };
+    reject = _dispatch.bind(null, 1);
+    resolve = _dispatch.bind(null, 0);
 
     var _done = function cfDone() {
 
-        if (M.c[toid]) {
+        if (M.c[target]) {
             // Check if a folder with the same name already exists.
-            for (var handle in M.c[toid]) {
+            for (var handle in M.c[target]) {
                 if (M.d[handle] && M.d[handle].t && M.d[handle].name === name) {
                     return resolve(M.d[handle].h);
                 }
             }
         }
 
-        var n = { name: name };
+        var n = {name: name};
         var attr = ab_to_base64(crypto_makeattr(n));
         var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
-        var req = { a: 'p', t: toid, n: [{ h: 'xxxxxxxx', t: 1, a: attr, k: key }], i: requesti };
-        var sn = M.getShareNodesSync(toid);
+        var req = {a: 'p', t: target, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
+        var sn = M.getShareNodesSync(target);
 
         if (sn.length) {
             req.cr = crypto_makecr([n], sn, false);
             req.cr[1][0] = 'xxxxxxxx';
         }
-
-        if (!ulparams) {
-            loadingDialog.pshow();
-        }
-        var hideOverlay = function() {
-            if (!ulparams) {
-                loadingDialog.phide();
-            }
-        };
 
         api_req(req, {
             callback: function(res) {
@@ -3136,7 +3156,6 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                     var n = Array.isArray(res.f) && res.f[0];
 
                     if (typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
-                        hideOverlay();
                         return reject(EINTERNAL);
                     }
 
@@ -3157,10 +3176,9 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                         $('.create-new-folder input').val('');
 
                         M.updFileManagerUI().always(function() {
-                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog) {
+                            if ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog) {
                                 refreshDialogContent();
                             }
-                            hideOverlay();
 
                             for (var i = M._cfUIUpdateQ.length; i--;) {
                                 var q = M._cfUIUpdateQ[i];
@@ -3171,22 +3189,19 @@ MegaData.prototype.createFolder = function(toid, name, ulparams) {
                     });
                 }
                 else {
-                    hideOverlay();
                     reject(res);
                 }
             }
         });
     };
 
-    if (M.c[toid]) {
+    if (M.c[target]) {
         _done();
     }
     else {
-        dbfetch.get(toid, new MegaPromise()).always(_done);
+        dbfetch.get(target).always(_done);
     }
-
-    return ulparams;
-};
+});
 
 /**
  * Create new folder on the cloud
@@ -3225,7 +3240,7 @@ MegaData.prototype.createFolders = function(paths, target) {
             logger.debug('mkdir under %s (%s) for...', t, M.getNodeByHandle(t).name, s);
         }
         Object.keys(s).forEach(function(name) {
-            M.createFolder(t, name, new MegaPromise()).always(function(res) {
+            M.createFolder(t, name).always(function(res) {
                 if (res.length !== 8) {
                     var err = 'Failed to create folder "%s" on target %s(%s)';
                     logger.warn(err, name, t, M.getNodeByHandle(t).name, res);
@@ -3723,6 +3738,77 @@ MegaData.prototype.getNodeParent = function(node) {
 };
 
 /**
+ * Retrieve media properties for a file node.
+ * @param {MegaNode|String} node An ufs node or handle
+ * @return {Object} Media properties.
+ */
+MegaData.prototype.getMediaProperties = function(node) {
+    'use strict';
+    node = typeof node === 'string' ? this.getNodeByHandle(node) : node;
+
+    var isText = false;
+    var isImage = is_image2(node);
+    var mediaType = is_video(node);
+    var isVideo = mediaType > 0;
+    var isAudio = mediaType > 1;
+    var isPreviewable = isImage || isVideo;
+
+    if (!isPreviewable && is_text(node)) {
+        isText = isPreviewable = true;
+    }
+
+    return {
+        isText: isText,
+        isImage: isImage,
+        isVideo: isVideo,
+        isAudio: isAudio,
+        icon: fileIcon(node),
+        isPreviewable: isPreviewable,
+        showThumbnail: String(node.fa).indexOf(':1*') > 0
+    };
+};
+
+/**
+ * Preview a node in-browser.
+ * @param {MegaNode|String} node An ufs node or handle
+ * @return {Boolean} whether it was shown.
+ */
+MegaData.prototype.viewMediaFile = function(node) {
+    'use strict';
+    node = typeof node === 'string' ? this.getNodeByHandle(node) : node;
+    var prop = M.getMediaProperties(node);
+    var handle = node.ch || node.h;
+    var result = true;
+
+    console.assert(prop.isPreviewable, 'This is not viewable..');
+
+    if (prop.isText) {
+        loadingDialog.show();
+        mega.fileTextEditor.getFile(handle)
+            .then(function(data) {
+                loadingDialog.hide();
+                mega.textEditorUI.setupEditor(node.name, data, handle, true);
+            })
+            .catch(function(ex) {
+                console.warn(ex);
+                loadingDialog.hide();
+            });
+    }
+    else if (typeof slideshow === 'function') {
+        if (prop.isVideo) {
+            $.autoplay = node.h;
+        }
+        slideshow(handle, 0, true);
+    }
+    else {
+        console.assert(is_mobile, 'Where are we?...');
+        result = false;
+    }
+
+    return result;
+};
+
+/**
  * Retrieve dashboard statistics data
  */
 MegaData.prototype.getDashboardData = function() {
@@ -3930,8 +4016,8 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             $.saveToDialogPromise = reject;
 
             // Remove original fav and lbl for new node.
-            srcNode.fav = 0;
-            srcNode.lbl = 0;
+            delete srcNode.fav;
+            delete srcNode.lbl;
 
             n.a = ab_to_base64(crypto_makeattr(srcNode));
 
@@ -3972,7 +4058,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             });
         }
         else {
-            _import(M.RootID ? M.RootID : undefined);
+            _import(!folderlink && M.RootID ? M.RootID : undefined);
         }
     });
 };

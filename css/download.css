@@ -1050,6 +1050,15 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     line-height: 0;
     padding: 0 8px 12px 0;
 }
+.download.file-info .txt-view-button {
+    margin-left: 15px;
+}
+.download.file-info .txt-view-button .icons-sprite.edit-file{
+    background-position: -143px -2138px;
+}
+.download.info-block .file-type-wrapper.clickable {
+    cursor: pointer;
+}
 .download.img-preview-button:not(.hidden) {
     vertical-align: top;
     margin: 0 -36px -5px 0;
@@ -1184,6 +1193,9 @@ background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1
     padding: 0 0 0 16px;
     position: relative;
     text-align: left;
+}
+.download.error-list-item a, .download.error-list-item a:visited {
+    color: #D90007;
 }
 .download.error-list-item::before {
     display: block;

@@ -95,6 +95,9 @@
 .loading-spinner.active .loading-info {
     padding: 101px 0 0 0;
 }
+.loading-spinner.active .loading-info {
+    padding: 101px 0 0 0;
+}
 .loading-info li {
     font-size: 24px;
     line-height: 50px;
@@ -114,6 +117,12 @@
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+}
+.loading-info li.status-txt {
+    font-size: 17px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    margin-top: -40px;
+    overflow: hidden;
 }
 .loading-info li.loaded, .loading-info li.loading {
     height: 50px;

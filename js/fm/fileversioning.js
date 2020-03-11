@@ -163,10 +163,13 @@ var versiondialogid;
          * @param {Number} newFavState Favourites state 0 or 1
          */
         favouriteVersions: function (h, newFavState) {
-             fileversioning.getAllVersions(h).done(
+            fileversioning.getAllVersions(h).done(
                 function(versions) {
                     for (var i = 1; i < versions.length; i++) {
-                        versions[i].fav = newFavState;
+                        versions[i].fav = newFavState | 0;
+                        if (!versions[i].fav) {
+                            delete versions[i].fav;
+                        }
                         api_setattr(versions[i], mRandomToken('fav'));
                     }
                 });
@@ -178,10 +181,13 @@ var versiondialogid;
          * @param {Number} labelId Numeric value of label
          */
         labelVersions: function (h, labelId) {
-             fileversioning.getAllVersions(h).done(
+            fileversioning.getAllVersions(h).done(
                 function(versions) {
                     for (var i = 1; i < versions.length; i++) {
-                        versions[i].lbl = labelId;
+                        versions[i].lbl = labelId | 0;
+                        if (!versions[i].lbl) {
+                            delete versions[i].lbl;
+                        }
                         api_setattr(versions[i], mRandomToken('lbl'));
                     }
                 });
@@ -254,31 +260,14 @@ var versiondialogid;
                     k: file.k
                 };
 
-                if (file.fav && file.lbl) {
-                    n = {
-                        name: file.name,
-                        hash: file.hash,
-                        fav: file.fav,
-                        lbl: file.lbl,
-                        k: file.k
-                    };
+                if (file.fav) {
+                    n.fav = file.fav;
                 }
-                else if (file.fav) {
-                    n = {
-                        name: file.name,
-                        hash: file.hash,
-                        fav: file.fav,
-                        k: file.k
-                    };
+
+                if (file.lbl) {
+                    n.lbl = file.lbl;
                 }
-                else if (file.lbl) {
-                    n = {
-                        name: file.name,
-                        hash: file.hash,
-                        lbl: file.lbl,
-                        k: file.k
-                    };
-                }
+
                 var ea = ab_to_base64(crypto_makeattr(n));
                 var dir = M.d[current_node].p || M.RootID;
                 var share = M.getShareNodesSync(dir);
@@ -344,7 +333,7 @@ var versiondialogid;
                         html += '<div class="fm-versioning data"><span>' + curTimeMarker + '</span></div>';
                     }
                     var actionHtml = (v.u === u_handle) ? l[16480]
-                                    : l[16476].replace('%1', M.u[v.u].m);
+                        : l[16476].replace('%1', M.u[v.u] && M.u[v.u].m || l[7381]);
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
                             actionHtml = l[17156].replace('%1',

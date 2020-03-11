@@ -216,7 +216,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -263,7 +263,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0;
@@ -279,7 +279,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -332,7 +332,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -473,12 +473,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v30.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v33.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v30.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v33.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -742,7 +742,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -1044,8 +1044,11 @@ ul, li {
     background-position: -3px -2931px;
     display: none;
 }
+.mobile.fm-item .fm-icon.versions {
+    display: none;
+}
 .mobile.fm-item.taken-down .fm-icon.taken-down,
-.mobile.fm-item.taken-down .fm-icon.taken-down {
+.mobile.fm-item.versions .fm-icon.versions {
     display: unset;
 }
 /** End Taken down Status **/
@@ -1059,7 +1062,7 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -1143,8 +1146,12 @@ ul, li {
 .mobile.fm-icon.taken-down {
     background-position: -205px -1072px;
 }
+.mobile.fm-icon.versions {
+    background-position: -156px -3088px;
+}
 .mobile.fm-item .fm-icon.link,
-.mobile.fm-item .fm-icon.taken-down {
+.mobile.fm-item .fm-icon.taken-down,
+.mobile.fm-item .fm-icon.versions {
     margin-top: 8px;
     width: 24px;
 }
@@ -1369,7 +1376,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1492,7 +1499,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1699,7 +1706,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1843,7 +1850,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1987,7 +1994,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -130px -1149px;
     position: absolute;
@@ -2238,7 +2245,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2535,7 +2542,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -3618,7 +3625,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
 }
 .mobile.membership-step2 .provider-details .provider-icon {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     height: 32px;
     vertical-align: middle;
@@ -3943,7 +3950,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v30@2x.png);
+    background: url(../images/mobile/mobile-sprite_v33@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
@@ -4395,7 +4402,7 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: right -2351px;
     -webkit-box-sizing: border-box;
@@ -4856,7 +4863,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -5016,7 +5023,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -5454,7 +5461,7 @@ div.checkboxOn, div.checkboxOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5501,7 +5508,7 @@ div.checkboxOn, div.checkboxOff {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite_v30.png);
+    background: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -81px -2275px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -5821,7 +5828,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -5879,6 +5886,7 @@ select.mobile.dropdown-style {
     letter-spacing: .1px;
     margin: 0 auto;
     font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+    padding: 0 15px;
 }
 .securitypractice .mobile.cta-button {
     margin: 0 auto;
@@ -6269,7 +6277,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -7343,7 +7351,7 @@ textarea.mobile.support-text-field {
     -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 }
-.mobile .mobile.red-button.dl-browser, .mobile .unsub .default-white-button {
+.mobile .mobile.red-button.dl-browser, .mobile .unsub .default-white-button, .mobile.password-reminder-overlay .default-white-button {
     background: #FFFFFF;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.75) 100%);
     border: 1px solid #DFDFDF;
@@ -7353,7 +7361,7 @@ textarea.mobile.support-text-field {
     border-radius: 4px;
     color: #555;
 }
-.mobile .mobile.red-button.dl-browser.disabled {
+.mobile .mobile.red-button.dl-browser.disabled, .mobile.password-reminder-overlay .default-white-button.disabled {
     background: #eee;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.20) 0%, rgba(238,238,238,0.50) 100%);
     border: 1px solid #eee;
@@ -7484,7 +7492,7 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -236px -293px;
     background-repeat: no-repeat;
     background-size: 280px auto;
@@ -8327,7 +8335,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     background-position: -6px -773px;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mega/top-sprite_v7.png);
+    background-image: url(../images/mega/top-sprite_v8.png);
     background-repeat: no-repeat;
     padding-left: 29px;
     margin: -16px 2px 2px 3px;
@@ -8428,7 +8436,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v33.png);
+    background-image: url(../images/mega/icons-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -8615,6 +8623,42 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.upload-progress.complete {
     float: left;
 }
+
+/* Default dropdowns */
+.dropdown.body {
+    padding: 8px;
+    position: absolute;
+    z-index: 150;
+    background-color: white;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    -moz-box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.1);
+    min-width: 160px;
+    min-height: 32px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dropdown.body:not(.white-context-menu):not(.fm-dialog):not(.dark)::before {
+    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    -moz-border-radius: inherit;
+    -webkit-border-radius: inherit;
+    border-radius: inherit;
+}
+/* end of Default dropdowns */
+
 /* Default buttons */
 .default-white-button, .default-grey-button, .default-red-button, .default-green-button {
     display: block;
@@ -8623,7 +8667,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     border-radius: 4px;
     line-height: 31px;
     font-size: 16px;
-    line-height: 33px;
+    line-height: 34px;
     height: 34px;
     color: #666666;
     background-color: #FAFAFA;
@@ -8693,6 +8737,32 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     -webkit-box-shadow: 0px 0px 0px 1px #666666;
     -moz-box-shadow: 0px 0px 0px 1px #666666;
     box-shadow: 0px 0px 0px 1px #666666;
+}
+.default-green-button {
+    background-color: #00BFA5;
+    color: white;
+    -webkit-box-shadow: 0 0.5px 1px 0px rgba(0,0,0,0.05);
+    -moz-box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+    box-shadow: 0px 0.5px 1px 0px rgba(0,0,0,0.05);
+}
+.default-green-button.contrast {
+    background-color: #00BFA5;
+}
+.default-green-button.gradient {
+    background: #00bfa5;
+    background: -moz-linear-gradient(top, #00bfa5 0%, #00a690 100%);
+    background: -webkit-linear-gradient(top, #00bfa5 0%,#00a690 100%);
+    background: linear-gradient(to bottom, #00bfa5 0%,#00a690 100%);
+}
+.default-white-button.lato, .default-green-button.lato {
+    font-size: 14px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+}
+.default-green-button.height-48 {
+    height: 48px;
+    line-height: 48px;
+    font-size: 15px;
+    display: inline-block;
 }
 .reg-st3-bott-title.price .green-star-img {
     background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAjdJREFUSA3VVUFrE0EUfm+yiUcFkXryFilaFApWRWq3jehBGpqDHgXFJld/gOjFP5Fa6l3BxhQPCtKVHpQqBQ96MILgpZYg6k1rdp7vxZ1hk8zq7NGBYd5+7/u+NzM7OwuQo80+XJqRnkMCQR5yDHAr4Vd8dcqXOPto+QwBzUmX2FfnXSCO9W1jmo4NljViViKNh+27p+KefpHGCoE6HVUXX6YxV+y1Ah2T2Xvr4cJsMhX8cwUz7aUTukebKY0NVYBTz6v1VxZwBLbAJbpf2Fn7fghiXQZUZdD6MCCWWTNJRGMOLadxh/EtIOqAUu+BdAcKqjM2v/fTA7zMhw4Aw8f3Duqfv9oEcByASi6j/Bju8szfqD3FqoouXv0MCm4A0o/8RhkK8WJP8bZbNL26PIWgn/B27MuQecG8bd8I1IWN2vX+e7MFRD291pzEHjwlgv1ebkMkRPhCAZzfmG9smdTAMZVEUak5fjVdQ/AfsSvatLloB1ZgzCqtlSO7uhfxSz9gsL+P2C2pIHy2cO3dMG9gBSaZELfNs8e47TIXnbNAuL4ut+y4h7GhjCca82xHZwH99QN/YHm+CSr90VhfGzgL8HGdsAzPIEvjLEAIR4d9+XxvBlg4J13i4bxLI5yMPxryCvjy6Dd8W0C6GdXqrQSQ4WS42lyICe8wL5mMaEabewVAEzzLjwrxSqW2eCyqNdLmfRfBJCcc4fKfzllgpCRfFXi21WzUXzeLI8kMQLiiEW0G5T+GfwMQdbz1JI11qwAAAABJRU5ErkJggg==');
@@ -8984,7 +9054,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -9079,7 +9149,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 32px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -9313,7 +9383,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 28px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-repeat: no-repeat;
     position: absolute;
     left: 10px;
@@ -9942,7 +10012,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11553,7 +11623,26 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
     background-position: -17px -1091px;
 }
-
+.new-bottom-pages.dev-nw .new-left-menu-block {
+    display: none;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul {
+    list-style: unset;
+}
+.new-bottom-pages.dev-nw .new-right-content-block ul li {
+    background-image: unset;
+    background-size: unset;
+    list-style: unset;
+}
+code, c {
+    font-family: "Courier New", Courier, monospace;
+}
+.mobile .dev-new-button {
+    margin-top: 10px;
+}
+.mobile .key-management {
+    display: none;
+}
 /** Developer Settings Page **/
 .bottom-page.developer-settings .developer-settings-table {
     margin: auto;
@@ -11616,7 +11705,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     padding: 32px 0 0;
 }
 .mobile .bus-reg-icon {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
     width: 24px;
     height: 24px;
     opacity: 0.6;
@@ -11632,6 +11721,18 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile .bus-reg-icon.number-of-user {
     background-position: -158px -3025px;
 }
+.mobile .bus-reg-icon.phone {
+    background-position: -217px -3058px;
+}
+.mobile .bus-reg-icon.pw {
+    background-position: 0px -3367px;
+}
+.bus-reg-icon.pw1 {
+    background-position: -32px -3367px;
+}
+.bus-reg-icon.pw2 {
+    background-position: -66px -3367px;
+}
 .mobile .payment-address-dialog .bus-plan-icon64 {
     height: auto;
     width: auto;
@@ -11641,7 +11742,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     background-position: -121px -3095px;
 }
 .mobile .card-container .dialog-heading-img {
-    background-image: url(../images/mobile/mobile-sprite_v30.png);
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
 }
 .mobile .payment-reminder-logo {
     background-position: -56px -2946px;
@@ -11670,6 +11771,80 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     width: 67%;
     min-width: 182px;
 }
+/** Password Reminder Overlay **/
+.mobile.password-reminder-overlay .dont-show-again-container {
+    margin-top: 12px;
+    text-align: center;
+}
+
+.mobile.password-reminder-overlay .dont-show-again-container .checkbox-container {
+    display: inline-block;
+}
+
+.mobile.password-reminder-overlay .try-password-container .signin-input {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.mobile.password-reminder-overlay .export-button {
+    margin-top: 30px;
+}
+
+.mobile.password-reminder-overlay .pass-reminder-container .result-text {
+    font-size: 12px;
+    letter-spacing: 0;
+    text-align: left;
+    line-height: 1.5;
+    white-space: normal;
+    display: inline-block;
+    width: calc(100% - 32px);
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+
+.mobile.password-reminder-overlay .pass-reminder-container .result-txt.wrong .result-text {
+    color: #D90007;
+}
+
+.mobile.password-reminder-overlay .pass-reminder-container .tiny-icon {
+    margin-right: 8px;
+}
+.mobile.password-reminder-overlay .mobile.buttons .dialog-body-text {
+    margin-top: 24px;
+    position: relative;
+    padding-top: 16px;
+    color: #999;
+}
+.mobile.password-reminder-overlay .mobile.buttons .dialog-body-text::before {
+    content: "";
+    height: 1px;
+    width: 100%;
+    left: 0;
+    background-color: rgba(0,0,0,0.1);
+    position: absolute;
+    display: inline-block;
+    top: 0;
+}
+.mobile.password-reminder-overlay .mobile.text-button {
+    margin: 0 auto;
+}
+.mobile.password-reminder-overlay .mobile.head-icon {
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-repeat: no-repeat;
+    background-position: -11px -3247px;
+    width: 88px;
+    height: 88px;
+    display: inline-block;
+}
+
+.mobile.password-reminder-overlay .mobile.change-password-button {
+    display: none;
+}
+.mobile.password-reminder-overlay.wrong .mobile.change-password-button {
+    display: block;
+}
+
+
+/** End Password Reminder Overlay **/
 
 .voucher-info-redeem {
     padding-top: 50%;
@@ -11861,7 +12036,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     transition: margin 0.15s linear;
 }
 /** //End Mobile Notifications Page **/
-
+@media screen and (orientation: landscape) {
+    .mobile.toast-notification.active {
+        margin-bottom: 0;
+    }
+}
 /** Mobile Blog **/
 @media only screen and (max-width: 568px), only screen and (max-width: 800px) and (orientation: landscape) {
     .mobile .blog-new-item p,
@@ -12416,6 +12595,12 @@ img.blog-new-logos {
     width: 140px;
     margin-bottom: 33px
 }
+#blogarticle_post .blog-table-scroll {
+    overflow-x: scroll;
+}
+#blogarticle_post sup {
+    font-size: 13px;
+}
 .blog-article-divider {
     height: 2px;
 }
@@ -12605,14 +12790,75 @@ p a.blog-new-read-more {
         background-size:350px auto;
     }
 }
+
 .mobile .blog-new-right {
     display: none;
 }
-
 /** End Mobile Blog **/
+
 .mobile .horizontal-plans .bottom-page .reg-st3-membership-bl.pro3 {
     margin-right: 20px;
 }
+
+.button.disabled,
+.default-white-button.disabled,
+.default-grey-button.disabled,
+.default-red-button.disabled,
+.default-orange-button.disabled,
+.default-green-button.disabled {
+    cursor: default;
+    -moz-opacity: 0.3;
+    -khtml-opacity: 0.3;
+    opacity: 0.3;
+}
+
+.orange-notification .fvnotice {
+    background-position: -233px -1666px;
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    margin-top: 4px;
+}
+.orange-notification.body {
+    display: table;
+    background-color: rgba(191,74,0,0.05);
+    -webkit-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(191, 104, 0, 0.2);
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 0 16px 0 12px;
+    margin-left: 1px;
+    margin-top: 20px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    max-width: calc(100% - 2px);
+}
+.orange-notification.body.hidden {
+    display: none;
+}
+.orange-notification.cell {
+    display: table-cell;
+    vertical-align: middle;
+    color: #FF6F00;
+    font-size: 13px;
+    line-height: 18px;
+}
+.argentina-only .orange-notification.cell {
+    padding: 6px;
+}
+.orange-notification.cell.text {
+    padding: 5px 0;
+}
+.orange-notification .fvnotice {
+    background-position: -3px -1727px;
+}
+.membership-info-pad .orange-notification.body {
+    margin-top: 130px;
+}
+
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.
@@ -12630,7 +12876,7 @@ p a.blog-new-read-more {
         background-image: url(../images/mobile/android@2x.png);
     }
     .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon, .mobile .payment-address-dialog .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v30@2x.png) !important;
+        background-image: url(../images/mobile/mobile-sprite_v33@2x.png) !important;
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -12646,11 +12892,11 @@ p a.blog-new-read-more {
         background-size: 250px auto;
     }
     .mobile .improved-recovery-steps .list-point b.megasync-logo {
-        background-image: url(../images/mega/top-sprite_v7@2x.png);
+        background-image: url(../images/mega/top-sprite_v8@2x.png);
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
         background-size: 280px auto;
     }
     .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
@@ -12666,11 +12912,11 @@ p a.blog-new-read-more {
         background-size: 755px auto;
     }
     .mobile .bus-reg-icon {
-        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
         background-size: 280px auto;
     }
     .mobile .card-container .dialog-heading-img {
-        background-image: url(../images/mobile/mobile-sprite_v30@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
         background-size: 280px auto;
     }
 }

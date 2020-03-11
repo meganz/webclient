@@ -136,6 +136,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
         else if ($.selectFolderDialog) {
             prefix = 'SelectFolder' + stype;
         }
+        else if ($.saveAsDialog) {
+            prefix = 'SaveAs' + stype;
+        }
     }
 
     var btd = d > 1;
@@ -326,7 +329,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
                     node.setAttribute('title', titleTooltip.map(escapeHTML).join("\n"));
                 }
 
-                if (folders[idx].lbl){
+                if (folders[idx].lbl) {
                     var labelClass = M.getLabelClassFromId(folders[idx].lbl);
 
                     if (!labelClass) {
@@ -409,21 +412,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             if (buildnode) {
                 M.buildtree(folders[idx], dialog, stype, sDeepIndex + 1);
             }
-
-            /**
-             * XXX: if this was really needed, add it at DOM node creation
-             * if (fminitialized) {
-             *     var currNode = M.d[curItemHandle];
-             *
-             *     if ((currNode && currNode.shares) || M.ps[curItemHandle]) {
-             *         sharedUInode(curItemHandle);
-             *     }
-             *
-             *     if (currNode && currNode.lbl) {
-             *         M.labelDomUpdate(curItemHandle, currNode.lbl);
-             *     }
-             * }
-             */
         }// END of for folders loop
 
         for (var h in labelhash) {
@@ -453,7 +441,7 @@ MegaData.prototype.initTreePanelSorting = function() {
         'shared-with-me', 'cloud-drive', 'rubbish-bin', 'out-shares', 'public-links' // Sorting sections for tree parts
     ];
     var byType = ['name', 'status', 'last-interaction', 'label'];
-    var dialogs = ['Copy', 'Move', 'SelectFolder'];
+    var dialogs = ['Copy', 'Move', 'SelectFolder', 'SaveAs'];
     var byDefault;
     var type;
 
@@ -1047,35 +1035,6 @@ MegaData.prototype.addTreeUI = function() {
         },
         out: function(e, ui) {
             $.doDD(e, ui, 'out', 1);
-        }
-    });
-
-    // disabling right click, default contextmenu.
-    $(document).rebind('contextmenu', function(e) {
-        var $target = $(e.target);
-
-        if (!is_fm() ||
-            $target.parents('#startholder').length ||
-            $target.is('input') ||
-            $target.is('textarea') ||
-            $target.is('#embed-code-field') ||
-            $target.is('.download.info-txt') ||
-            $target.closest('.multiple-input').length ||
-            $target.closest('.create-folder-input-bl').length ||
-            $target.closest('.content-panel.conversations').length ||
-            $target.closest('.messages.content-area').length ||
-            $target.closest('.chat-right-pad .user-card-data').length ||
-            $target.parents('.fm-account-main').length ||
-            $target.parents('.export-link-item').length ||
-            $target.parents('.contact-fingerprint-txt').length ||
-            $target.parents('.fm-breadcrumbs').length ||
-            $target.hasClass('contact-details-user-name') ||
-            $target.hasClass('contact-details-email') ||
-            $target.hasClass('nw-conversations-name')) {
-        }
-        else if (!localStorage.contextmenu) {
-            $.hideContextMenu();
-            return false;
         }
     });
 

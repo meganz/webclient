@@ -224,7 +224,7 @@ Message.getContactForMessage = function(message) {
     else if (message.userId) {
         if (!M.u[message.userId]) {
             // data is still loading!
-            return null;
+            ChatdIntegration._ensureContactExists([message.userId]);
         }
         contact = M.u[message.userId];
     }
@@ -352,6 +352,8 @@ Message.prototype._onAttachmentReceived = function(data) {
         this.chatRoom.messagesBuff.sharedFiles.push(this);
         this.chatRoom.messagesBuff.sharedFiles.trackDataChange();
     }
+
+    this.trackDataChange();
 };
 
 /**
@@ -1516,6 +1518,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 key    : keys[i].key
             };
         }
+
+        chatRoom._keysAreSeeding = new MegaPromise();
+
         var seedKeys = function() {
             for (var i=0;i < keys.length;i++) {
                 if (chatRoom.protocolHandler.seedKeys([keys[i]])) {
@@ -1523,7 +1528,9 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     delete  chatRoom.notDecryptedKeys[cacheKey];
                 }
             }
+            chatRoom._keysAreSeeding.resolve();
         };
+
         ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
             ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
         });
@@ -2125,8 +2132,8 @@ MessagesBuff.prototype.restoreMessage = function(msgObject) {
     );
 
     if (msgObject.dialogType === "alterParticipants" && msgObject.meta) {
-        ChatdIntegration._ensureNamesAreLoaded(msgObject.meta.included);
-        ChatdIntegration._ensureNamesAreLoaded(msgObject.meta.excluded);
+        ChatdIntegration._ensureContactExists(msgObject.meta.included);
+        ChatdIntegration._ensureContactExists(msgObject.meta.excluded);
     }
     self.haveMessages = true;
 

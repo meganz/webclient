@@ -39,7 +39,7 @@ ESLINT_RULES = '-f compact'
 JSCS_RULES = ''
 JSCPD_RULES = '-l 13 -r console'
 HTMLHINT_RULES = '--config ./.htmlhintrc'
-VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js']
+VALIDATOR_IGNORE_FILES = ['js/cmsSnapshot.js', 'js/chat/bundle.js', 'nacl-fast.js', 'makecache.js', 'pdf.worker.js']
 VALIDATOR_LINELEN_THRESHOLD = 120 # Max chars per line to trigger.
 
 # Vera++ rules like this should be superseded by a "profile", but it

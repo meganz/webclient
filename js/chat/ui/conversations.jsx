@@ -5,7 +5,7 @@ var ReactDOM = require("react-dom");
 import utils from './../../ui/utils.jsx';
 var getMessageString = require('./messages/utils.jsx').getMessageString;
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-import MegaRenderMixin from './../../stores/mixins.js';
+import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import ContactsUI  from './../ui/contacts.jsx';
@@ -111,8 +111,8 @@ var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
 
-class ConversationsListItem extends MegaRenderMixin(React.Component) {
-    specificShouldComponentUpdate() {
+class ConversationsListItem extends MegaRenderMixin {
+    specShouldComponentUpdate() {
         if (
             this.loadingShown ||
             (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
@@ -457,7 +457,7 @@ class ConversationsListItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
+class ArchConversationsListItem extends MegaRenderMixin {
     render() {
         var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
 
@@ -599,7 +599,7 @@ class ArchivedConversationsListItem extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConversationsList extends MegaRenderMixin(React.Component) {
+class ConversationsList extends MegaRenderMixin {
     static defaultProps = {
         'manualDataChangeTracking': true
     }
@@ -753,7 +753,7 @@ class ConversationsList extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
+class ArchivedConversationsList extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = this.getInitialState();
@@ -874,7 +874,7 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
             }
 
             currConvsList.push(
-                <ArchivedConversationsListItem
+                <ArchConversationsListItem
                     key={chatRoom.roomId}
                     chatRoom={chatRoom}
                     contact={contact}
@@ -945,7 +945,7 @@ class ArchivedConversationsList extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConversationsApp extends MegaRenderMixin(React.Component) {
+class ConversationsApp extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
@@ -991,6 +991,7 @@ class ConversationsApp extends MegaRenderMixin(React.Component) {
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||
                     e.keyCode === 27 /* esc */ ||
+                    e.altKey ||  e.metaKey || e.ctrlKey || e.shiftKey ||
                     ($('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block')) ||
                     $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') ||
                     document.querySelector('textarea:focus,select:focus,input:focus')

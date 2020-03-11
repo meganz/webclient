@@ -126,7 +126,8 @@ function MegaData() {
         'fav': this.sortByFav.bind(this),
         'email': this.sortByEmail.bind(this),
         'label': this.sortByLabel.bind(this),
-        'sharedwith': this.sortBySharedWith.bind(this)
+        'sharedwith': this.sortBySharedWith.bind(this),
+        'versions': this.sortByVersion.bind(this)
     };
 
     /** EventListener interface. */
@@ -151,6 +152,7 @@ function MegaData() {
     };
 
     if (is_mobile) {
+        /* eslint-disable no-useless-concat */
         var dummy = function() {
             return MegaPromise.resolve();
         };
@@ -158,18 +160,49 @@ function MegaData() {
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
 
+        this['addWeb' + 'Download'] = function(nodes) {
+            // @see filesystem.js/abortAndStartOver
+            if (d) {
+                console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
+            }
+            M.resetUploadDownload();
+            later(function() {
+                mobile.downloadOverlay.startDownload(nodes[0]);
+            });
+        };
+
         // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = function(data) {
             if (data.isAlmostFull) {
                 var ab = mobile.alertBanner;
                 var isPro = Object(u_attr).p;
 
-                if (data.isFull) {
-                    ab.showError(isPro ? l[16358] : l[16315]); // Your account is full
-                    mobile.overStorageQuotaOverlay.show();
+                var action = function() {
+                    var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+                        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+                    var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
+                        l[22671].replace('%1', mStoragePossible)
+
+                    if (data.isFull) {
+
+                        ab.showError(msg); // Your account is full
+
+                        mobile.overStorageQuotaOverlay.show(msg);
+                    }
+                    else {
+                        ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
+                            l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                                .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                        ); // Your account is almost full.
+                    }
+                };
+
+                if (!pro.membershipPlans || !pro.membershipPlans.length) {
+                    pro.loadMembershipPlans(action);
                 }
                 else {
-                    ab.showWarning(isPro ? l[16359] : l[19486]); // Your account is almost full.
+                    action();
                 }
 
                 // When the banner is taped, show pro page.

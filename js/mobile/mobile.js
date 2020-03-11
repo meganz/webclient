@@ -211,13 +211,13 @@ var mobile = {
 
     /**
      * Initialise checkbox on click/tap functionality which has special styling and requires extra code
-     * @param {String} className The container class name which contains the checkbox input and label
+     * @param {String|jQuery} container The container class name which contains the checkbox input and label
      */
-    initCheckbox: function(className) {
+    initCheckbox: function(container) {
 
         'use strict';
 
-        var $container = $('.mobile.' + className);
+        var $container = container instanceof jQuery ? container : $('.mobile.' + container);
         var $checkboxWrapper = $container.find('.square');
         var $checkboxInput = $checkboxWrapper.find('.checkbox');
 
@@ -389,6 +389,17 @@ var mobile = {
         // Show white background overlay behind the dialog
         $('.light-overlay').removeClass('hidden');
         $('.mobile.common-check-email-dialog').removeClass('hidden');
+
+        // Assgn history to make back button working
+        pushHistoryState(page);
+
+        $(window).rebind('popstate.mega-mobile', function() {
+            $(this).off('popstate.mega-mobile');
+            history.back();
+            $('.light-overlay').addClass('hidden');
+            $('.mobile.common-check-email-dialog').addClass('hidden');
+            $('#startholder').removeClass('no-scroll');
+        });
     },
 
     /**
@@ -628,8 +639,13 @@ mega.tpw = {
     finishDownloadUpload: function() {},
     errorDownloadUpload: function() {},
     pauseDownloadUpload: function() {},
+    resumeDownloadUpload: function() {},
     removeRow: function() {},
     showWidget: function() { return false;},
+    resetErrorsAndQuotasUI: function() {
+        'use strict';
+        return false;
+    },
     isWidgetVisibile: function() {
         'use strict';
         return false;
@@ -794,6 +810,22 @@ function removeUInode(nodeHandle, parentHandle) {
 function showToast(type, msg) {
     'use strict';
     mobile.showToast(msg);
+}
+
+function bottomPageDialog() {
+    'use strict';
+    // TODO: mobile version
+    loadSubPage('fm');
+}
+
+function previewimg() {
+    'use strict';
+    console.warn('TBD, watch 99665');
+}
+
+function openRecents() {
+    'use strict';
+    loadSubPage('fm');
 }
 
 // Not required for mobile

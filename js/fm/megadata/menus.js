@@ -210,16 +210,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
         else {
-            if (selNode.s < 20971520 && isTextual(selNode)) { // 20 MB
-                items['.edit-file-item'] = 1;
-            }
-
             if ((selNode.tvf > 0) && !folderlink) {
                 items['.properties-versions'] = 1;
                 if (M.getNodeRights(selNode.h) > 1) {
                     items['.clearprevious-versions'] = 1;
                 }
             }
+
             if (is_image2(selNode)) {
                 items['.preview-item'] = 1;
             }
@@ -232,6 +229,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     if (mediaType === 1 && sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
                         items['.embedcode-item'] = 1;
                     }
+                }
+                else if (is_text(selNode)) {
+                    items['.edit-file-item'] = 1;
                 }
             }
         }

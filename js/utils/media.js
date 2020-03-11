@@ -132,6 +132,26 @@ is_image.raw = {
     "X3F": "Sigma/Foveon RAW"
 };
 
+/**
+ * Global function to Check if the node is for a textual file
+ * @param {MegaNode} node An ufs node.
+ * @returns {Boolean} Whether it's a text/plain file
+ */
+function is_text(node) {
+    'use strict';
+    if (!node || node.fa || node.s === undefined || node.s > 2e7) {
+        return false;
+    }
+
+    if (!fileext(node.name)) {
+        return true;
+    }
+
+    var fType = filetype(node, true)[0];
+    return fType === 'text' || fType === 'web-data' || fType === 'web-lang';
+}
+
+
 var mThumbHandler = {
     sup: Object.create(null),
 

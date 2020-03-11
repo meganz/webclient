@@ -464,12 +464,14 @@ class ConversationAVPanel extends MegaRenderMixin {
             self.setState({'muteInProgress': false});
         });
 
-        if (self.initialRender === false && ReactDOM.findDOMNode(self)) {
+        if (self.initialRender === false && $container) {
             self.bindInitialEvents();
         }
 
         self.resizePanes();
         self.resizeVideos();
+
+        $('.simpletip', $container).trigger('simpletipUpdated');
     }
     resizePanes() {
         var self = this;
@@ -536,6 +538,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             if (predefHeight) {
                 $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
             }
+            $('.simpletip', $container).trigger('simpletipClose');
         }
 
         this.setState({
@@ -553,7 +556,9 @@ class ConversationAVPanel extends MegaRenderMixin {
         e.stopPropagation();
 
         var newVal = !this.state.fullScreenModeEnabled;
+        var $container = $(ReactDOM.findDOMNode(this));
         $(document).fullScreen(newVal);
+        $('.simpletip', $container).trigger('simpletipClose');
 
         this.setState({
             'fullScreenModeEnabled': newVal,
@@ -1097,7 +1102,12 @@ class ConversationAVPanel extends MegaRenderMixin {
                 <div className={"button call left" + (unreadDiv ? " unread" : "")}
                     onClick={this.toggleMessages.bind(this)}>
                     {unreadDiv}
-                    <i className="big-icon conversations"></i>
+                    <i
+                        className="big-icon conversations simpletip"
+                        data-simpletip={this.state.messagesBlockEnabled ? l[22892] : l[22891]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
                 <div className={"button call " + (this.state.muteInProgress ? " disabled" : "")} onClick={function(e) {
                     if (self.state.muteInProgress || $(this).is(".disabled")) {
@@ -1110,9 +1120,15 @@ class ConversationAVPanel extends MegaRenderMixin {
                         callManagerCall.unmuteAudio();
                     }
                 }}>
-                    <i className={
-                        "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone")
-                    }></i>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (callManagerCall.getMediaOptions().audio ? "microphone" : "crossed-microphone")
+                        }
+                        data-simpletip={callManagerCall.getMediaOptions().audio ? l[16214] : l[16708]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
                 <div className={
                     "button call" + (callManagerCall.hasVideoSlotLimitReached() === true &&
@@ -1133,10 +1149,15 @@ class ConversationAVPanel extends MegaRenderMixin {
                         callManagerCall.unmuteVideo();
                     }
                 }}>
-                    <i className={
-                        "big-icon " +
-                        (callManagerCall.videoMode() === Av.Video ? " videocam" : " crossed-videocam")
-                    }></i>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (callManagerCall.videoMode() === Av.Video ? "videocam" : "crossed-videocam")
+                        }
+                        data-simpletip={callManagerCall.videoMode() === Av.Video ? l[22894] : l[22893]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
 
                 <div className={
@@ -1152,10 +1173,17 @@ class ConversationAVPanel extends MegaRenderMixin {
                         }
                     }
                 }}>
-                    <i className={"big-icon " + (
-                        callManagerCall.isScreenCaptureEnabled() ?
-                            "screenshare" : "crossed-screenshare"
-                    )}></i>
+                    <i
+                        className={
+                            "big-icon simpletip " +
+                            (callManagerCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare")
+                        }
+                        data-simpletip={
+                            callManagerCall.isScreenCaptureEnabled() ? l[22890] : l[22889]
+                        }
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
 
                 <div className="button call" onClick={function(e) {
@@ -1163,12 +1191,19 @@ class ConversationAVPanel extends MegaRenderMixin {
                         chatRoom.callManagerCall.endCall();
                     }
                 }}>
-                    <i className="big-icon horizontal-red-handset"></i>
+                    <i
+                        className="big-icon horizontal-red-handset simpletip"
+                        data-simpletip={l[5884]}
+                        data-simpletipoffset="5"
+                    >
+                    </i>
                 </div>
 
-
                 <div className="button call right" onClick={this.fullScreenModeToggle.bind(this)}>
-                    <i className="big-icon nwse-resize"></i>
+                    <i
+                        className="big-icon nwse-resize simpletip"
+                        data-simpletip={this.state.fullScreenModeEnabled ? l[22895] : l[17803]}>
+                    </i>
                 </div>
             </div>
         </div>;

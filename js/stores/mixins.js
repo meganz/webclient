@@ -810,7 +810,7 @@ export class MegaRenderMixin extends React.Component {
         });
     }
     addDataStructListenerForProperties(obj, properties) {
-        if (!obj) {
+        if (!obj || !obj.addChangeListener) {
             // this should not happen, but in rare cases it does...so we should just skip.
             return;
         }

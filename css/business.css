@@ -759,7 +759,8 @@ img.bottom-page.business4 {
 }
 .business-page .bottom-menu.pad {
     max-width: 1230px;
-    padding: 0 30px;
+    padding-left: 30px;
+    padding-right: 30px;
 }
 .top-buttons.business .default-white-button.small i.white-mega {
     margin: 3px 3px 1px -0px;

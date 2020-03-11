@@ -131,6 +131,15 @@ ul, li {
 .left {
     float: left;
 }
+.left-textalign {
+    text-align: left !important;
+}
+.right-textalign {
+    text-align: right !important;
+}
+.centered-textalign {
+    text-align: center;
+}
 /* text for mobile*/
 .txt-bold {
      font-weight: 700;
@@ -181,7 +190,7 @@ ul, li {
     table-layout: fixed;
     position: relative;
     background-color: #fafafa;
-    font-family: 'LatoWeb';
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 16px;
     color: #666666;
     line-height: 28px;
@@ -216,7 +225,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -263,7 +272,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0;
@@ -279,7 +288,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -332,7 +341,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -473,12 +482,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v33.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v36.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v33.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v36.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -742,7 +751,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -959,8 +968,14 @@ ul, li {
     overflow-y: scroll;
     overflow-x: hidden;
     position: relative;
+    max-height: 100vh;
+    max-height: -webkit-calc(100vh - 126px);
+    max-height: -moz-ccalc(100vh - 126px);
     max-height: calc(100vh - 126px);
     -webkit-overflow-scrolling: touch;
+}
+.bottom-pages .fm-scrolling, .mobile.fm-content .fm-scrolling {
+    max-height: none;
 }
 .mobile.fm-block.disable-scroll .fm-scrolling {
     overflow: hidden;
@@ -996,14 +1011,14 @@ ul, li {
     padding: 0 10px;
 }
 .mobile.bottom-action-bar .fm-icon.scroll-to-top {
-    background-position: -240px -1709px;
+    background-position: -238px -1708px;
     margin-left: -10px;
 }
 .mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
-    background-position: -240px -1750px;
+    background-position: -240px -1748px;
 }
 .mobile.bottom-action-bar .fm-icon.upload-file {
-    background-position: 10px -1749px;
+    background-position: 10px -1748px;
 }
 .mobile.fm-row {
     display: table-row;
@@ -1062,17 +1077,21 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
 }
+.mobile.fm-icon.small {
+    width: 16px;
+    height: 16px;
+}
 .mobile.fm-icon.folder {
     background-position: -8px -1572px;
     width: 44px;
     height: 34px;
-    margin: 59px auto 0 auto;
+    margin: 59px auto 0 auto !important;
 }
 .mobile.fm-icon.mega {
     background-position: -93px -1076px;
@@ -1096,31 +1115,23 @@ ul, li {
     opacity: .9;
 }
 .mobile.fm-icon.cloud-dark {
-    background-position: -52px -2010px;
+    background-position: -52px -2009px;
 }
 .mobile.fm-header .fm-icon.cloud {
     cursor: default;
-    margin: 14px 6px 0 7px;
-    background-position: -199px -1138px;
+    background-position: -200px -1137px;
 }
 .mobile.fm-header .fm-icon.rubbish-bin {
     cursor: default;
-    margin: 14px 6px 0 7px;
 }
 .mobile.fm-icon.menu {
-    background-position: -1px -1138px;
+    background-position: -1px -1137px;
 }
-.mobile.fm-header .fm-icon.menu {
-    margin: 12px 6px 0 7px;
+.mobile.fm-header .fm-icon {
+    margin: 13px 6px 0 7px;
 }
-.mobile.fm-header .fm-icon.view-options.grid-icon {
-    margin: 11px 6px 0 6px;
-}
-.mobile.fm-header .fm-icon.view-options.list-icon {
-    margin: 11px 6px 0 6px;
-}
-.mobile.fm-header .fm-icon.download-zip {
-    margin: 11px 6px 0 6px;
+.mobile.fm-header .fm-icon.left {
+    margin-left: 10px;
 }
 .mobile.fm-icon.plus {
     background-position: -126px -1239px;
@@ -1128,17 +1139,11 @@ ul, li {
 .mobile.fm-icon.back {
     background-position: -35px -1138px;
 }
-.mobile.fm-header .fm-icon.back {
-    margin: 13px 6px 0 7px;
-}
 .mobile.fm-icon.up {
     background-position: -211px -2101px;
 }
-.mobile.fm-header .fm-icon.up {
-    margin: 13px 6px 0 7px;
-}
 .mobile.fm-icon.close {
-    background-position: -76px -1139px;
+    background-position: -76px -1138px;
 }
 .mobile.fm-icon.link {
     background-position: -205px -1072px;
@@ -1147,7 +1152,8 @@ ul, li {
     background-position: -205px -1072px;
 }
 .mobile.fm-icon.versions {
-    background-position: -156px -3088px;
+    background-position: -156px -3087px;
+    opacity: 0.6;
 }
 .mobile.fm-item .fm-icon.link,
 .mobile.fm-item .fm-icon.taken-down,
@@ -1155,41 +1161,47 @@ ul, li {
     margin-top: 8px;
     width: 24px;
 }
+.grid-view .mobile.fm-item .fm-icon.link,
+.grid-view .mobile.fm-item .fm-icon.taken-down,
+.grid-view .mobile.fm-item .fm-icon.versions {
+    margin-top: 0;
+}
 .mobile.fm-icon.manage-link {
-    background-position: 0px -1708px;
+    background-position: 0px -1707px;
 }
 .mobile.fm-icon.open-context-menu {
-    background-position: -197px -1661px;
+    background-position: -197px -1660px;
     height: 100%;
     margin: 0;
     width: 40px;
 }
 .mobile.fm-icon.preview {
-    background-position: -202px -1789px;
+    background-position: -202px -1788px;
 }
 .mobile.fm-icon.playvideo {
-    background-position: -247px -1626px;
+    background-position: -247px -1625px;
 }
 .mobile.fm-icon.playaudio {
-    background-position: -198px -1626px;
+    background-position: -198px -1625px;
 }
 .mobile.fm-icon.open-folder {
-    background-position: -201px -1750px;
+    background-position: -200px -1749px;
 }
 .mobile.fm-icon.download {
-    background-position: -51px -1626px;
+    background-position: -50px -1625px;
 }
 .mobile.fm-icon.delete {
-    background-position: -203px -1828px;
+    background-position: -203px -1827px;
 }
 .mobile.fm-icon.account {
-    background-position: -250px -1895px;
+    background-position: -250px -1894px;
+    opacity: 0.6;
 }
 .mobile.fm-icon.credit-card {
-    background-position: -148px -2138px;
+    background-position: -148px -2136px;
 }
 .mobile.fm-icon.rocket {
-    background-position: -149px -2102px;
+    background-position: -148px -2101px;
 }
 .mobile.fm-icon.currency-sign-filled {
     background-position: -222px -2144px;
@@ -1207,7 +1219,7 @@ ul, li {
     height: 22px;
 }
 .mobile.fm-icon.cancel-subscription {
-    background-position: -150px -1962px;
+    background-position: -148px -1959px;
 }
 .mobile.fm-icon.recovery-key {
     background-position: -147px -2028px;
@@ -1216,37 +1228,44 @@ ul, li {
     background-position: 2px -2161px;
 }
 .mobile.fm-icon.right-arrow {
-    background-position: -98px -1962px;
+    background-position: -98px -1961px;
+}
+.mobile.fm-icon.right-arrow.big {
+    background-position: -108px -3582px;
+}
+.mobile.fm-icon.down-arrow {
+    background-position: -222px -3581px;
 }
 .mobile.fm-icon.info {
-    background-position: -151px -1626px;
+    background-position: -150px -1625px;
 }
 .mobile.fm-icon.info-white-nofill {
     background-position: -190px -196px;
 }
 .mobile.fm-icon.red-warning {
-    background-position: 12px -2114px;
+    background-position: 13px -2113px;
 }
 .mobile.fm-icon.scroll-to-top {
-    background-position: -250px -1709px;
+    background-position: -247px -1708px;
 }
 .mobile.fm-icon.broken-heart {
-    background-position: -50px -1667px
+    background-position: -50px -1667px;
 }
 .mobile.fm-icon.notification {
-    background-position: 0 -3087px;
-    height: 30px;
-    transform: scale(1.1);
-    width: 30px;
+    background-position: 5px -3123px;
 }
 .mobile.fm-icon.grid-icon {
-    background-position: -150px -1787px
+    background-position: -150px -1788px
 }
 .mobile.fm-icon.list-icon {
-    background-position: -100px -1787px;
+    background-position: -100px -1788px;
 }
 .mobile.fm-icon.download-zip {
-    background-position: 8px -2856px;
+    background-position: 8px -2859px;
+}
+.mobile.fm-icon.dollar {
+    background-position: 9px -3534px;
+    opacity: 0.6;
 }
 .mobile.fm-icon.white {
     filter: brightness(0) invert(1);
@@ -1256,10 +1275,10 @@ ul, li {
     opacity: .9;
 }
 .mobile.fm-icon.device {
-    background-position: -148px -2209px;
+    background-position: -148px -2208px;
 }
 .mobile.fm-icon.phone {
-    background-position: -85px -2029px;
+    background-position: -84px -2027px;
 }
 .mobile.fm-icon.tfa-lock {
     background-position: -0px -2239px;
@@ -1291,7 +1310,6 @@ ul, li {
 }
 .mobile.fm-icon.dropdown-handle {
     background-position: -212px -2062px;
-    margin: 11px 6px 0 6px;
     -webkit-transform: rotate(0deg);
     -moz-transform: rotate(0deg);
     -ms-transform: rotate(0deg);
@@ -1304,18 +1322,18 @@ ul, li {
     transition:transform 100ms linear;
 }
 .mobile.fm-icon.dropdown-handle.open {
-    background-position: -212px -2065px;
    -webkit-transform: rotate(180deg);
     -moz-transform: rotate(180deg);
     -ms-transform: rotate(180deg);
     -o-transform: rotate(180deg);
     transform: rotate(180deg);
 }
-.mobile.fm-icon.rubbish-bin {
-    background-position: 0px -1828px;
-}
 .mobile.fm-icon.rubbish-bin-highlight {
     background-position: -193px -1827px;
+}
+.mobile.fm-icon.rubbish-bin {
+    background-position: -143px -3534px;
+    opacity: 0.6;
 }
 .mobile.fm-icon.small-gray-arrow {
     background-position: -260px -2114px;
@@ -1333,7 +1351,7 @@ ul, li {
     background-position: -203px -1827px;
 }
 .mobile.fm-icon.restore {
-    background-position: -212px -2029px;
+    background-position: -211px -2027px;
 }
 .mobile.green-check, .mobile.red-check {
     background-color: white;
@@ -1360,6 +1378,56 @@ ul, li {
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
 }
+.mobile.fm-icon.stairs {
+    background-position: -31px -3534px;
+    opacity: 0.6;
+}
+.mobile.fm-icon.dollar-file {
+    background-position: -69px -3534px;
+    opacity: 0.6;
+}
+.mobile.fm-icon.box {
+    background-position: -108px -3534px;
+    opacity: 0.6;
+}
+.mobile.fm-icon.map-pointer {
+    background-position: -215px -3017px;
+    width: 36px;
+    opacity: 0.6;
+}
+.mobile .button-block .fm-icon.map-pointer {
+    left: 13px;
+}
+.mobile.fm-icon.small.top-green-arrow {
+    background-position: -200px -3595px;
+}
+.mobile.fm-icon.shining-chain {
+    background-position: -1px -3417px;
+}
+.mobile.fm-icon.big-linked-folder {
+    background-position: -59px -3417px;
+}
+.mobile.fm-icon.big-linked-chat {
+    background-position: -116px -3416px;
+}
+.mobile.fm-icon.big-new-user {
+    background-position: -175px -3417px;
+}
+.mobile.fm-icon.green-tick {
+    background-position: 8px -3583px;
+}
+.mobile.fm-icon.small.grey-down-arrow {
+    background-position: -43px -3594px;
+}
+.mobile.fm-icon.big-shining-chain {
+    width: 65px;
+    height: 48px;
+    background-position: -66px -3476px;
+}
+.mobile.fm-icon.light {
+    opacity: 0.53;
+}
+
 .mobile.content-cell .mobile.menu.dl-page, .mobile#mobile-ui-notFound .menu, .mobile.error-overlay .menu  {
     position: absolute;
     top: 20px;
@@ -1376,7 +1444,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1395,7 +1463,7 @@ ul, li {
     line-height: 24px;
     padding: 0 30px;
     color: #495057;
-    padding: 22px 00px 0 00px;
+    padding: 20px 0 0 0;
     text-overflow: ellipsis;
     overflow: hidden;
     text-align: left;
@@ -1425,7 +1493,7 @@ ul, li {
     text-align: center;
 }
 .mobile.fm-item-img {
-    margin: 0 0 0 12px;
+    margin: 0 0 0 14px;
     text-align: left;
     position: relative;
     height: 56px;
@@ -1459,7 +1527,7 @@ ul, li {
     border-radius: 4px;
 }
 .mobile.fm-item-info {
-    padding: 11px 40px 0 63px;
+    padding: 11px 40px 0 60px;
 }
 .mobile.session-history-page .mobile.fm-item-info {
     padding: 8px 108px 8px 20px;
@@ -1499,7 +1567,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1515,7 +1583,7 @@ ul, li {
     display: table-cell;
 }
 .mobile.session-history-page .bottom-action-bar .sh-round-button::before {
-    background-position: -263px -1964px;
+    background-position: -263px -1963px;
 }
 .mobile.session-history-page .sh-item-date {
     opacity: 0.6;
@@ -1588,7 +1656,7 @@ ul, li {
     position: relative;
 }
 .mobile.session-history-page .sh-round-button span {
-    padding-left: 4px;
+    padding-left: 6px;
     display: table-cell;
     vertical-align: middle;
 }
@@ -1706,7 +1774,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1850,7 +1918,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -1923,7 +1991,7 @@ ul, li {
     clear: both;
     text-align: center;
     font-size: 0;
-    line-height: 54px;
+    line-height: 0;
     border-bottom: 1px solid #eee;
     border-top: 1px solid #eee;
     background-color: #fff;
@@ -1970,9 +2038,6 @@ ul, li {
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
-.mobile.signin-input {
-    padding-top: 12px;
-}
 .mobile.country-input, .mobile.phone-number-input {
     margin: 6px auto;
     padding-right: 46px;
@@ -1994,15 +2059,15 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
-    background-position: -130px -1149px;
+    background-position: -130px -1148px;
     position: absolute;
     left: 16px;
     top: 13px;
 }
 .mobile.country-input span {
-    background-position: -93px -2072px;
+    background-position: -93px -2071px;
     width: 24px;
     height: 24px;
     margin: -2px;
@@ -2016,7 +2081,7 @@ ul, li {
     opacity: .6;
 }
 .mobile.country-input span.show-country-icon {
-    background-position: -46px -1147px;
+    background-position: -46px -1146px;
     left: initial;
     right: 16px;
     opacity: 1;
@@ -2031,16 +2096,16 @@ ul, li {
     background-position: -130px -1220px;
 }
 .mobile.signin-input.first-name span, .mobile.signin-input.last-name span {
-    background-position: -253px -1148px;
+    background-position: -253px -1147px;
 }
 .mobile.signin-input.first-name.incorrect span, .mobile.signin-input.last-name.incorrect span {
-    background-position: -253px -1218px;
+    background-position: -253px -1217px;
 }
 .mobile.signin-input.password span, .mobile.signin-input.password-confirm span {
-    background-position: -164px -1149px;
+    background-position: -164px -1148px;
 }
 .mobile.signin-input.password.incorrect span, .mobile.signin-input.password-confirm.incorrect span {
-    background-position: -164px -1219px;
+    background-position: -164px -1218px;
 }
 .mobile.signin-input input, .mobile.country-input input, .mobile.phone-number-input input {
     background-color: #F8F8F8;
@@ -2048,11 +2113,12 @@ ul, li {
     padding: 0;
     margin: 0;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 26px;
     color: #666666;
-    height: 20px;
+    height: 26px;
     width: 100%;
     font-family: 'LatoWeb';
+    display: block;
 }
 .mobile.signin-input input::-webkit-input-placeholder, .mobile.country-input input::-webkit-input-placeholder, .mobile.phone-number-input input::-webkit-input-placeholder  {
     color: #999;
@@ -2115,31 +2181,31 @@ ul, li {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px;
+    line-height: 62px;
 }
 .verify-login-page .mobile.signin-input input::-webkit-input-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px;
+    line-height: 62px;
 }
 .verify-login-page .mobile.signin-input input::-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input::-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px;
+    line-height: 62px;
 }
 .verify-login-page .mobile.signin-input input:-moz-placeholder, .mobile.verify-number .vn-input-wrapper .verify-number-code input:-moz-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px;
+    line-height: 62px;
 }
 .verify-login-page .mobile.signin-input input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code input:-ms-input-placeholder {
     color: #bbb;
     font-size: 24px;
     letter-spacing: 0px;
-    line-height: 64px;
+    line-height: 62px;
 }
 body.es .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder,
 body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::-webkit-input-placeholder {
@@ -2245,7 +2311,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2542,7 +2608,7 @@ div.checkboxOn, div.checkboxOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -3351,240 +3417,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-step2 .membership-radio input {
     display: none;
 }
-.provider-icon {
-    background-image: url("../images/mega/payment-provider-icons-v3.png");
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    display: inline-block;
-    height: 20px;
-    vertical-align: middle;
-    width: 20px;
-}
-.provider-icon.astropay {
-    background-position: 0 0;
-}
-.provider-icon.astropayAE {
-    background-position: 0 -60px;
-}
-.provider-icon.astropayAK {
-    background-position: 0 -120px;
-}
-.provider-icon.astropayAG {
-    background-position: 0 -180px;
-}
-.provider-icon.astropayAU {
-    background-position: 0 -240px;
-}
-.provider-icon.astropayB {
-    background-position: 0 -300px;
-}
-.provider-icon.astropayBB {
-    background-position: 0 -360px;
-}
-.provider-icon.astropayBG {
-    background-position: 0 -420px;
-}
-.provider-icon.astropayBL {
-    background-position: 0 -480px;
-}
-.provider-icon.astropayBM {
-    background-position: 0 -540px;
-}
-.provider-icon.astropayBN {
-    background-position: 0 -600px;
-}
-.provider-icon.astropayBV {
-    background-position: 0 -660px;
-}
-.provider-icon.astropayBX {
-    background-position: 0 -720px;
-}
-.provider-icon.astropayCA {
-    background-position: 0 -780px;
-}
-.provider-icon.astropayCL {
-    background-position: 0 -840px;
-}
-.provider-icon.astropayCM {
-    background-position: 0 -900px;
-}
-.provider-icon.astropayCR {
-    background-position: 0 -960px;
-}
-.provider-icon.astropayCS {
-    background-position: 0 -1020px;
-}
-.provider-icon.astropayDA {
-    background-position: 0 -1080px;
-}
-.provider-icon.astropayDC {
-    background-position: 0 -1140px;
-}
-.provider-icon.astropayDD {
-    background-position: 0 -1200px;
-}
-.provider-icon.astropayDM {
-    background-position: 0 -1260px;
-}
-.provider-icon.astropayDS {
-    background-position: 0 -1320px;
-}
-.provider-icon.astropayEL {
-    background-position: 0 -1380px;
-}
-.provider-icon.astropayEQ {
-    background-position: 0 -1440px;
-}
-.provider-icon.astropayEX {
-    background-position: 0 -1500px;
-}
-.provider-icon.astropayEY {
-    background-position: 0 -1560px;
-}
-.provider-icon.astropayGA {
-    background-position: 0 -1620px;
-}
-.provider-icon.astropayH {
-    background-position: 0 -1680px;
-}
-.provider-icon.astropayHI {
-    background-position: 0 -1740px;
-}
-.provider-icon.astropayI {
-    background-position: 0 -1800px;
-}
-.provider-icon.astropayIS {
-    background-position: 0 -1860px;
-}
-.provider-icon.astropayJC {
-    background-position: 0 -1920px;
-}
-.provider-icon.astropayMC {
-    background-position: 0 -1980px;
-}
-.provider-icon.astropayMD {
-    background-position: 0 -2040px;
-}
-.provider-icon.astropayMG {
-    background-position: 0 -2100px;
-}
-.provider-icon.astropayML {
-    background-position: 0 -2160px;
-}
-.provider-icon.astropayNJ {
-    background-position: 0 -2220px;
-}
-.provider-icon.astropayNT {
-    background-position: 0 -2280px;
-}
-.provider-icon.astropayOC {
-    background-position: 0 -2340px;
-}
-.provider-icon.astropayOX {
-    background-position: 0 -2400px;
-}
-.provider-icon.astropayPC {
-    background-position: 0 -2460px;
-}
-.provider-icon.astropayPF {
-    background-position: 0 -2520px;
-}
-.provider-icon.astropayPR {
-    background-position: 0 -2580px;
-}
-.provider-icon.astropayRE {
-    background-position: 0 -2640px;
-}
-.provider-icon.astropayRL {
-    background-position: 0 -2700px;
-}
-.provider-icon.astropayRP {
-    background-position: 0 -2760px;
-}
-.provider-icon.astropaySB {
-    background-position: 0 -2820px;
-}
-.provider-icon.astropaySI {
-    background-position: 0 -2880px;
-}
-.provider-icon.astropaySM {
-    background-position: 0 -2940px;
-}
-.provider-icon.astropaySP {
-    background-position: 0 -3000px;
-}
-.provider-icon.astropaySX {
-    background-position: 0 -3060px;
-}
-.provider-icon.astropayTS {
-    background-position: 0 -3120px;
-}
-.provider-icon.astropayTT {
-    background-position: 0 -3180px;
-}
-.provider-icon.astropayVA {
-    background-position: 0 -3240px;
-}
-.provider-icon.astropayVD {
-    background-position: 0 -3300px;
-}
-.provider-icon.astropayVI {
-    background-position: 0 -3360px;
-}
-.provider-icon.astropayWP {
-    background-position: 0 -3420px;
-}
-.provider-icon.bitcoin {
-    background-position: 0 -3480px;
-}
-.provider-icon.perfunctio {
-    background-position: 0 -3540px;
-}
-.provider-icon.dynamicpay {
-    background-position: 0 -3600px;
-}
-.provider-icon.fortumo {
-    background-position: 0 -3660px;
-}
-.provider-icon.infobip {
-    background-position: 0 -3720px;
-}
-.provider-icon.paysafecard {
-    background-position: 0 -3780px;
-}
-.provider-icon.tpay {
-    background-position: 0 -3840px;
-}
-.provider-icon.voucher {
-    background-position: -94px -1075px;
-}
-.provider-icon.ecp {
-    background-position: 0 -3540px;
-}
-.provider-icon.ecpVI {
-    background-position: -199px -1516px;
-}
-.provider-icon.ecpMC {
-    background-position: -243px -1516px;
-}
-.provider-icon.wiretransfer {
-    background-position: 0 -3960px;
-}
-.provider-icon.directreseller {
-    background-position: 0 -3540px;
-}
-.provider-icon.directresellerAlipay {
-    background-position: 0 -4020px;
-}
-.provider-icon.sabadell {
-    background-position: 0 -4080px;
-}
-.provider-icon.sabadellVI {
-    background-position: 0 -3360px;
-}
-.provider-icon.sabadellMC {
-    background-position: 0 -1980px;
-}
+
 .mobile.membership-step2 .right-banner-block {
     display: inline-block;
 }
@@ -3600,6 +3433,7 @@ div.checkboxOn, div.checkboxOff {
     left: 0;
     right: 0;
     bottom: 0;
+    padding: 0 10px;
 }
 .mobile.membership-step2 .provider-details.checked {
     color: #495057;
@@ -3620,16 +3454,27 @@ div.checkboxOn, div.checkboxOff {
     width: 100%;
     text-align: center;
 }
-.mobile.membership-step2 .provider-details .provider-icon {
-    margin: 17px auto 4px auto;
-    display: block;
+.mobile.membership-step2 .provider-icon {
+    margin: 23px auto 10px auto;
 }
-.mobile.membership-step2 .provider-details .provider-icon {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+.mobile.membership-step2 .provider-icon.voucher, .mobile.membership-step2 .provider-icon.ecpVI, .mobile.membership-step2 .provider-icon.ecpMC {
+    margin: 17px auto 4px auto;
+    height: 32px;
+    display: block;
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     height: 32px;
     vertical-align: middle;
     width: 32px;
+}
+.mobile.membership-step2 .provider-icon.voucher {
+    background-position: -94px -1075px;
+}
+.mobile.membership-step2 .provider-icon.ecpVI {
+    background-position: -199px -1516px;
+}
+.mobile.membership-step2 .provider-icon.ecpMC {
+    background-position: -243px -1516px;
 }
 .mobile.membership-step2 .payment-duration .duration {
     font-size: 16px;
@@ -3950,7 +3795,7 @@ div.checkboxOn, div.checkboxOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v33@2x.png);
+    background: url(../images/mobile/mobile-sprite_v36@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
@@ -4402,7 +4247,7 @@ div.checkboxOn, div.checkboxOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: right -2351px;
     -webkit-box-sizing: border-box;
@@ -4863,7 +4708,7 @@ div.checkboxOn, div.checkboxOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -4930,6 +4775,9 @@ div.checkboxOn, div.checkboxOff {
     font-size: 15px;
     line-height: 26px;
 }
+.mobile.top-menu-popup .top-menu-item.submenu-item::before {
+    top: 10px;
+}
 .bottom-menu.copyrights {
     position: static;
     margin: 20px 0 0 0;
@@ -4963,12 +4811,13 @@ div.checkboxOn, div.checkboxOff {
     text-align: left;
     top: 0;
     right: 0;
+    font-size: 0;
     z-index: 1;
 }
 .mobile.slideshow-header .mobile.fm-dialog-close {
     position: static;
     display: inline-block;
-    margin: 12px 5px 13px 12px;
+    margin: 12px 7px 13px 10px;
     left: 0;
     top: 0;
     right: 0;
@@ -5023,7 +4872,7 @@ div.checkboxOn, div.checkboxOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -5063,10 +4912,10 @@ div.checkboxOn, div.checkboxOff {
     height: 60px;
 }
 .mobile.slideshow-buttons .fm-icon.delete-button {
-    background-position: -195px -1819px;
+    background-position: -195px -1818px;
 }
 .mobile.slideshow-buttons .fm-icon.download-button {
-    background-position: -42px -1616px;
+    background-position: -42px -1615px;
 }
 .mobile.slideshow-buttons .fm-icon.manage-link-button {
     background-position: 9px -1698px;
@@ -5273,7 +5122,7 @@ div.checkboxOn, div.checkboxOff {
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-    padding-left: 8px;
+    padding-left: 10px;
     border-radius: 0px 0px 10px 10px;
 }
 .mobile.title-menu-container.closed {
@@ -5289,26 +5138,28 @@ div.checkboxOn, div.checkboxOff {
 .mobile.title-menu-container .title-menu-item {
     color: #676D75;
     cursor: pointer;
-    font-size: 16px;
-    line-height: 20px;
+    font-size: 0;
     margin-top: 10px;
-    vertical-align: middle;
+}
+.mobile.title-menu-container .title-menu-item .text {
+    display: inline-block;
+    vertical-align: top;
+    font-size: 16px;
+    line-height: 40px;
 }
 .mobile.title-menu-container .title-menu-item:first-of-type {
     margin-top: 20px;
 }
-.mobile.title-menu-container .title-menu-item.open-rubbish-bin {
-    margin-bottom: 10px;
-}
 .mobile.title-menu-container .fm-icon {
     display: inline-block;
-    margin-right: 7px;
-    vertical-align: middle;
+    margin-right: 8px;
+    vertical-align: top;
 }
 .mobile.title-menu-container .light-grey-bar {
     background-color: #eee;
     height: 1px;
-    margin-left: 52px;
+    margin-left: 50px;
+    margin-top: 10px;
 }
 /* Cloud drive context menu */
 .fmholder {
@@ -5355,20 +5206,34 @@ div.checkboxOn, div.checkboxOff {
     -webkit-border-radius: 16px;
     border-radius: 16px;
 }
+.mobile.context-menu-container.small {
+    padding-left: 0;
+    padding-bottom: 8px;
+}
 .mobile.context-menu-container.folder {
     border-top: 1px solid #eee;
 }
 .mobile.context-menu-container .context-menu-item {
     color: #676D75;
     cursor: pointer;
-    font-size: 15px;
-    line-height: 20px;
+    font-size: 0;
     margin-top: 10px;
-    vertical-align: middle;
+    vertical-align: top;
+}
+.mobile.context-menu-container.small .context-menu-item {
+    margin-top: 0;
 }
 .mobile.context-menu-container .context-menu-item.delete-button {
     color: #eb4444;
-    margin-bottom: 10px;
+}
+.mobile.context-menu-container .text {
+    font-size: 15px;
+    line-height: 40px;
+    display: inline-block;
+    vertical-align: top;
+}
+.mobile.context-menu-container .active .text {
+    color: #333;
 }
 .mobile.context-menu-container .fm-icon {
     display: inline-block;
@@ -5377,8 +5242,8 @@ div.checkboxOn, div.checkboxOff {
     margin: 0 8px 0 8px;
 }
 .mobile.context-menu-container .item-info {
-    padding-bottom: 14px;
-    padding-top: 11px
+    padding-bottom: 4px;
+    padding-top: 11px;
 }
 .mobile.context-menu-container.countries .item-info {
     font-family: 'source_sans_prosemibold';
@@ -5397,7 +5262,38 @@ div.checkboxOn, div.checkboxOff {
 .mobile.context-menu-container .light-grey-bar {
     background-color: #eee;
     height: 1px;
-    margin-left: 62px;
+    margin-left: 60px;
+    margin-top: 10px;
+}
+.mobile.context-menu-container.small .light-grey-bar {
+    margin-bottom: 8px;
+    margin-top: 0;
+}
+.mobile.context-menu-header {
+    padding: 18px 20px 14px 20px;
+    font-size: 16px;
+    line-height: 24px;
+    color: #333;
+    border-bottom: 1px solid #EEE;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+}
+.mobile.colored-label {
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    display: inline-block;
+    margin: 15px 24px 0 24px;
+    background-color: #999999;
+    vertical-align: top;
+}
+.mobile.colored-label.green {
+    background-color: #00BFA5;
+}
+.mobile.colored-label.orange {
+    background-color: #FF6F00;
+}
+.mobile.colored-label.red {
+    background-color: #D90007;
 }
 /* My Account page */
 .mobile.main-block.my-account-page, .mobile.main-block.verify-login-page {
@@ -5408,9 +5304,6 @@ div.checkboxOn, div.checkboxOff {
     position: fixed;
     width: 100%;
 }
-.mobile.my-account-page .fm-header .fm-icon.account {
-    margin: 15px 0 0 11px;
-}
 .mobile.my-account-page .content-cell {
     vertical-align: top;
 }
@@ -5420,12 +5313,13 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
     padding: 20px 0;
     margin-top: 68px;
+    box-shadow: 0 1px 0 0 #DADADA;
 }
 .mobile.my-account-page .main-avatar {
     text-align: center;
     position: absolute;
-    top: 18px;
-    left: 14px;
+    top: 23px;
+    left: 13px;
 }
 .mobile.my-account-page .main-avatar .avatar span {
     color: #fff;
@@ -5461,7 +5355,7 @@ div.checkboxOn, div.checkboxOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5508,7 +5402,7 @@ div.checkboxOn, div.checkboxOff {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite_v33.png);
+    background: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -81px -2275px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -5524,6 +5418,7 @@ div.checkboxOn, div.checkboxOff {
     margin-top: 6px;
     padding: 17px 0 2px;
     position: relative;
+    box-shadow: 0 -1px 0px 0 #DADADA;
 }
 .mobile.my-account-page .account-type-text {
     color: #262F3B;
@@ -5555,6 +5450,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .mobile.icon.pro-mini {
     position: absolute;
     left: 22px;
+    margin-top: 2px;
 }
 .mobile.icon.pro-mini.free {
     background-position: -2px -2000px;
@@ -5572,7 +5468,7 @@ div.checkboxOn, div.checkboxOff {
     background-position: -2px -1960px;
 }
 .mobile.icon.pro-mini.pro100 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     background-position: -149px -415px;
     height: 22px;
@@ -5581,6 +5477,7 @@ div.checkboxOn, div.checkboxOff {
     background-color: #fff;
     padding: 21px 0;
     position: relative;
+    box-shadow: 0 0 1px 0 #DADADA;
 }
 .mobile.my-account-page .fm-icon.cloud {
     left: 10px;
@@ -5630,22 +5527,12 @@ div.checkboxOn, div.checkboxOff {
 .mobile.my-account-page .storage-usage .used {
     font-family: 'LatoWebBold';
 }
-.mobile.my-account-page .account-upgrade-block .fm-icon.credit-card,  .mobile.my-account-page .fm-icon.device {
-    left: 10px;
-    position: absolute;
-    top: 9px;
-}
 .mobile.my-account-page .account-upgrade-text {
     color: #495057;
     font-size: 17px;
     line-height: 22px;
     margin-left: 60px;
     text-align: left;
-}
-.mobile.my-account-page .account-achievements-block .fm-icon.rocket {
-    left: 10px;
-    position: absolute;
-    top: 18px;
 }
 .mobile.my-account-page .account-achievements-block .achievements-heading {
     color: #262F3B;
@@ -5658,14 +5545,8 @@ div.checkboxOn, div.checkboxOff {
     color: #939DA3;
     font-size: 14px;
     line-height: 18px;
-    margin: 2px 0 0 60px;
+    margin: 2px 40px 0 60px;
     text-align: left;
-}
-.mobile.my-account-page .button-block {
-    background-color: #fff;
-    margin-top: 6px;
-    padding: 17px 0;
-    position: relative;
 }
 .mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
     left: 10px;
@@ -5686,44 +5567,19 @@ div.checkboxOn, div.checkboxOff {
     margin-left: 60px;
     text-align: left;
 }
-.mobile.my-account-page .account-recovery-key-block .fm-icon.recovery-key, .fm-icon.recovery-key, .mobile.my-account-page .fm-icon.lock {
-    position: absolute;
-    left: 9px;
-    top: 16px;
-}
-.mobile.my-account-page .acount-cancellation-block .fm-icon.broken-heart {
-    position: absolute;
-    left: 9px;
-    top: 7px;
-}
-.mobile.my-account-page .account-notifications-block .fm-icon.notification {
-    position: absolute;
-    left: 13px;
-    top: 11px;
-}
-.mobile.my-account-page .fm-icon.right-arrow {
-    right: 4px;
-    position: absolute;
-    top: 9px;
-}
 .mobile.my-account-page .account-recovery-key-block .fm-icon.right-arrow, .mobile.my-account-page .account-achievements-block .fm-icon.right-arrow , .mobile.my-account-page .account-twofactor-block .fm-icon.right-arrow {
-    right: 4px;
-    position: absolute;
     top: 18px;
+    margin-top: auto;
 }
 .mobile.my-account-page .account-change-password-block {
     position: relative;
 }
 .mobile.my-account-page .account-change-password-block .fm-icon.password {
     left: 18px;
-    position: absolute;
-    top: 17px;
+    margin-top: -11px;
 }
 .mobile.my-account-page .account-add-phone-block .fm-icon.phone {
-    left: 11px;
     opacity: 0.8;
-    position: absolute;
-    top: 8px;
 }
 
 /* Help centre header */
@@ -5828,7 +5684,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -5991,7 +5847,7 @@ textarea.mobile.support-text-field {
     padding: 0 0;
 }
 .mobile.grid-view .mobile.folder .mobile.fm-item-img {
-    height: 48px;
+    height: 100%;
     width: 36px;
     text-align: left;
     margin: 0 4px  0 12px;
@@ -5999,12 +5855,12 @@ textarea.mobile.support-text-field {
 }
 .mobile.grid-view .file .fm-item-img {
     height: 177px;
-    margin: 4px 11px 0 4px;
+    margin: 4px 4px 0 4px;
     overflow: hidden;
     width: 100%;
-    width: -webkit-calc(100% - 10px);
-    width: -moz-calc(100% - 10px);
-    width: calc(100% - 10px);
+    width: -webkit-calc(100% - 8px);
+    width: -moz-calc(100% - 8px);
+    width: calc(100% - 8px);
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius:  2px;
@@ -6036,18 +5892,19 @@ textarea.mobile.support-text-field {
     display: none;
 }
 .mobile.grid-view .mobile.fm-item.file .fm-icon.link {
-    margin-top: -1px;
+    margin-top: 1px;
     width: 27px;
     height: 36px;
 }
 .mobile.grid-view .file.thumb .fm-item-img img {
     position: relative;
     margin: 0 0;
-    width: 100%;
-    height: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
 }
 .mobile.grid-view .mobile.fm-icon.open-context-menu {
-    background-position: -196px -1665px;
+    background-position: -196px -1664px;
     height: 100%;
     margin: 0;
     width: 37px;
@@ -6056,7 +5913,7 @@ textarea.mobile.support-text-field {
     padding: 0 0;
 }
 .mobile.grid-view .mobile.file .mobile.fm-icon.open-context-menu {
-    background-position: -197px -1669px;
+    background-position: -197px -1667px;
     height: 100%;
     margin: 0;
     width: 36px;
@@ -6066,7 +5923,7 @@ textarea.mobile.support-text-field {
     margin-bottom: 32px;
 }
 .mobile.grid-view .mobile.fm-item .fm-icon.link {
-    margin-top: 5px;
+    margin-top: 4px;
     width: 27px;
 }
 .mobile.grid-view .mobile.fm-item.line-break {
@@ -6092,7 +5949,7 @@ textarea.mobile.support-text-field {
     padding-right: 5px;
 }
 .mobile.grid-view .folder .mobile.fm-item-name {
-    line-height: 48px;
+    line-height: 46px;
     padding-left: 6px;
 }
 .support-form {
@@ -6277,7 +6134,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -6385,7 +6242,7 @@ textarea.mobile.support-text-field {
     position: relative;
 }
 .mobile.achievements-page .invite-friends-block .fm-icon.invite {
-    left: 9px;
+    left: 11px;
     position: absolute;
     top: 14px;
 }
@@ -6676,7 +6533,7 @@ textarea.mobile.support-text-field {
     position: relative;
 }
 .mobile.achievements-invite-friends-page .invite-friends-block .fm-icon.invite {
-    left: 9px;
+    left: 11px;
     position: absolute;
     top: 14px;
 }
@@ -7473,8 +7330,8 @@ textarea.mobile.support-text-field {
     max-width: 540px;
 }
 .mobile.mega-app-icon {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     background: #eb4444;
     background-color: #eb4444;
     border: 1px solid #D82928;
@@ -7492,13 +7349,13 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
-    background-position: -236px -293px;
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
+    background-position: -236px -292px;
     background-repeat: no-repeat;
     background-size: 280px auto;
     position: absolute;
-    margin-left: 5px;
-    margin-top: 5px;
+    margin-left: 6px;
+    margin-top: 6px;
     display: block;
 }
 .mobile.app-advertisement-text {
@@ -7507,7 +7364,7 @@ textarea.mobile.support-text-field {
     width: -moz-calc(100% - 80px);
     width: calc(100% - 80px);
     display: table-cell;
-    line-height: 12px;
+    line-height: 16px;
     text-align: left;
     padding-left: 12px;
     vertical-align: middle;
@@ -7549,7 +7406,6 @@ body.key .reg-st3-membership-bl.free.hidden {
     padding: 0 0;
     height: 100%;
     display: block;
-    float: left;
     margin: 0 auto;
 }
 .mobile .improved-recovery-steps .main-right-block {
@@ -8033,27 +7889,25 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile .improved-recovery-steps .register-st2-txt-block {
     display: table;
-    min-height: 720px;
     height: 100%;
     width: 100%;
 }
 .mobile .improved-recovery-steps .vert-container-aligner {
     vertical-align: middle;
     display: table-cell;
+    text-align: center;
 }
 .mobile .improved-recovery-steps .card-container {
-    width: 100%;
-    width: -webkit-calc(100% - 24px);
-    width: -moz-calc(100% - 24px);
-    width: calc(100% - 24px);
     max-width: 640px;
-    margin: 80px auto 24px;
+    margin: 80px 12px 12px 12px;
+    display: inline-block;
     background-color: #fff;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
     border: 1px solid rgba(0, 40, 100, 0.12);
     height: auto;
+    text-align: left;
 }
 .mobile .improved-recovery-steps .hidden {
     display: none;
@@ -8436,7 +8290,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     width: 18px;
     height: 16px;
     display: inline-block;
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-repeat: no-repeat;
     background-position: -204px -196px;
     background-size: 262px auto;
@@ -8896,6 +8750,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     text-align: left;
     margin-left: 60px;
     line-height: 18px;
+    font-size: 0;
 }
 .mobile.two-factor-indicator {
     background-color: #eb4444;
@@ -8904,7 +8759,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     border-radius: 6px;
     display: inline-block;
     height: 8px;
-    margin-right: 6px;
+    margin: 5px 8px 0 0;
     position: relative;
     width: 8px;
 }
@@ -8913,6 +8768,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 }
 .mobile.my-account-page .two-factor-text {
     margin-left: 0px;
+    display: inline-block;
+    vertical-align: top;
 }
 .mobile.my-account-page .two-factor-heading.enabled,
 .mobile.my-account-page .two-factor-text.enabled {
@@ -9054,7 +8911,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -9149,7 +9006,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 32px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -9383,7 +9240,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 28px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     position: absolute;
     left: 10px;
@@ -10012,7 +9869,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -10173,12 +10030,16 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     text-decoration: underline;
 }
 /* Fix the header while on PRO pages */
-.bottom-pages.mobile.pro .mobile.fm-header, .bottom-pages.mobile.key .mobile.fm-header, .mobile.main-block.my-account-page .fm-header {
+.bottom-pages.mobile.pro .mobile.fm-header, .bottom-pages.mobile.key .mobile.fm-header, .mobile.main-block.my-account-page .fm-header, .mobile.fm-header.mobile.fm-header.fixed {
     position: fixed;
     width: 100%;
     background-color: #fff;
     z-index: 99;
     box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);
+}
+.mobile.top-hr-pad {
+    padding-top: 66px;
+    vertical-align: top;
 }
 .mobile .horizontal-plans.nav-dots-container .nav-dot-style {
     display: block;
@@ -11240,16 +11101,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     }
     .mobile.signin-input {
         height: 54px;
-        padding-top: 16px;
+        padding-top: 13px;
     }
     .mobile.signin-input.two-factor-seed-input {
         height: 64px;
     }
     .mobile.signin-input span {
-        top: 17px;
-    }
-    .mobile.my-account-change-password-page .signin-input {
-
+        top: 16px;
     }
     .new-registration {
         margin-left: 24px;
@@ -11605,7 +11463,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     text-align: center;
 }
 .mobile .bottom-page.unsub .icon64 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width:64px;
     height: 64px;
@@ -11616,7 +11474,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     margin-top: 8px;
 }
 .mobile .sent-email-logo {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width: 86px;
     height: 44px;
@@ -11705,7 +11563,7 @@ code, c {
     padding: 32px 0 0;
 }
 .mobile .bus-reg-icon {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     width: 24px;
     height: 24px;
     opacity: 0.6;
@@ -11742,7 +11600,7 @@ code, c {
     background-position: -121px -3095px;
 }
 .mobile .card-container .dialog-heading-img {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
 }
 .mobile .payment-reminder-logo {
     background-position: -56px -2946px;
@@ -11828,11 +11686,12 @@ code, c {
     margin: 0 auto;
 }
 .mobile.password-reminder-overlay .mobile.head-icon {
-    background-image: url(../images/mobile/mobile-sprite_v33.png);
+    background-image: url(../images/mobile/mobile-sprite_v36.png);
     background-repeat: no-repeat;
     background-position: -11px -3247px;
     width: 88px;
     height: 88px;
+    margin-top: 30px;
     display: inline-block;
 }
 
@@ -11987,9 +11846,6 @@ code, c {
     padding: 10px 20px;
     border-bottom: 1px rgba(0,0,0,0.1) solid;
     position: relative;
-}
-.mobile.account-notifications-page .fm-content .fm-scrolling {
-    max-height: 100vh;
 }
 .section-block .block-text {
     font-size: 14px;
@@ -12859,6 +12715,516 @@ p a.blog-new-read-more {
     margin-top: 130px;
 }
 
+
+/* Common classes, Default components */
+.mobile.main-block.grey-bg {
+    background-color: #F5F6F7;
+}
+.mobile .content-cell.top-align {
+    vertical-align: top;
+}
+.mobile.button-block {
+    background-color: #fff;
+    margin-top: 6px;
+    padding: 16px 0;
+    position: relative;
+    box-shadow: 0 0 0 1px #DADADA;
+    -webkit-transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+    transition: background-color 200ms ease-in-out, box-shadow 200ms ease-in-out;
+}
+.mobile.button-block:first-child {
+    box-shadow: 0 1px 0 0 #DADADA;
+    margin-top: 0;
+}
+.mobile.button-block .label {
+    color: #333333;
+    font-size: 16px;
+    line-height: 24px;
+    margin-left: 60px;
+    margin-right: 40px;
+    margin: 0 40px 0 60px;
+    text-align: left;
+    display: inline-block;
+    position: relative;
+}
+.mobile.button-block .label.no-icon, .mobile.button-block .label-info.no-icon {
+    margin-left: 16px;
+    margin-right: 16px;
+}
+.mobile.button-block .label.small {
+    font-size: 14px;
+}
+.mobile.button-block .label.grey {
+    color: #999;
+}
+.mobile.button-block .label.grey strong {
+    display: block;
+    font-weight: normal;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-size: 16px;
+    line-height: 24px;
+    color: #333;
+    padding: 0 0 4px 0;
+}
+.mobile.label-info {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
+    margin: 2px 40px 0 60px;
+}
+.mobile.label-info .note {
+    font-size: 11px;
+    color: #777;
+    line-height: 15px;
+    margin-top: 4px;
+}
+.mobile.button-block .label + .mobile.label-info {
+    margin-top: 4px;
+}
+.mobile.label-info strong, .mobile.label-info a, .mobile.label-info a:visited, .mobile.label a, .mobile.label a:visited {
+    color: #00BFA5;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+}
+.mobile.label-info a, .mobile.label a {
+    text-decoration: underline;
+}
+.mobile .button-block .fm-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    margin-top: -20px;
+}
+.mobile.button-block.no-bg .fm-icon {
+    top:  8px;
+    margin-top: 0;
+}
+.mobile .button-block .fm-icon.right-arrow {
+    left: auto;
+    right: 4px;
+}
+.mobile.button-block .content {
+    position: relative;
+}
+.mobile.button-number {
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    background-color: #3C434D;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+    font-size: 13px;
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    margin-top: -10px;
+}
+.mobile.button-block .full-info {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+    margin: 16px 0 -16px 0;
+}
+.mobile.button-block.expanded .full-info {
+    max-height: unset;
+    opacity: 1;
+    visibility: visible;
+}
+.mobile.button-block.no-bg {
+    margin-top: -8px;
+}
+.mobile.button-block.expaned, .mobile.button-block.no-bg {
+    background-color: transparent;
+    box-shadow: none;
+}
+.mobile.button-block.expandable .fm-icon.right-arrow {
+    -webkit-transition: transform 200ms ease-in-out;
+    transition: transform 200ms ease-in-out;
+}
+.mobile.button-block.expanded .content .fm-icon.right-arrow {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+.mobile.fm-white-button, .mobile.fm-green-button {
+    font-size: 16px;
+    line-height: 40px;
+    color: #333;
+    text-align: center;
+    height: 40px;
+    background-color: white;
+    border-radius: 3px;
+    text-align: center;
+    max-width: 280px;
+    margin: 0 auto;
+    webkit-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.05);
+}
+.mobile.fm-green-button {
+    background: #00BFA5;
+    color: white;
+}
+.mobile.fm-green-button.gradient {
+    background: -moz-linear-gradient(top, #00b6aa 0%, #009883 100%);
+    background: -webkit-linear-gradient(top, #00b6aa 0%,#009883 100%);
+    background: linear-gradient(to bottom, #00b6aa 0%,#009883 100%);
+}
+.mobile.fm-white-button span, .mobile.fm-green-button span {
+    display: block;
+    border-radius: 3px;
+    height: 100%;
+    webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+.mobile.fm-white-button.disabled, .mobile.fm-green-button.disabled {
+    opacity: 0.6;
+}
+/* end of Default components */
+
+/* Affiliate program */
+.mobile.affiliate-comission .commission-info {
+    left: auto;
+    right: -40px;
+    opacity: 50%;
+}
+.mobile.affiliate-comission-bl {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    margin: 18px 0 -17px 0;
+}
+.mobile.affiliate-comission-bl .cell {
+    display: table-cell;
+    width: 33.333333%;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 16px 0 20px 0;
+    text-align: center;
+    vertical-align: middle;
+    color: #999;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    box-shadow: 0 -1px 0 0 rgba(0,0,0,0.05);
+    position: relative;
+}
+.mobile.affiliate-comission-bl .cell.active {
+    background: #00BFA5;
+    background: -moz-linear-gradient(top, #00b6aa 0%, #009883 100%);
+    background: -webkit-linear-gradient(top, #00b6aa 0%,#009883 100%);
+    background: linear-gradient(to bottom, #00b6aa 0%,#009883 100%);
+    color: white;
+}
+.mobile.affiliate-comission-bl .cell .info {
+    display: block;
+    padding: 0 15px;
+}
+.mobile.affiliate-comission-bl .cell .price {
+    font-size: 15px;
+    color: #333;
+    display: block;
+    bottom: 54px;
+    width: 100%;
+    padding-top: 14px;
+}
+.mobile.affiliate-comission-bl .cell .price.euro {
+    bottom: 20px;
+    color: #999999;
+    opacity: 80%;
+    padding-top: 8px;
+}
+.mobile.affiliate-comission-bl .cell.active .price {
+    color: white;
+}
+
+.mobile.affiliate-comission-bl .cell .local-currency-code {
+    display: block;
+}
+.mobile.affiliate-redeem {
+    padding: 9px 10px 4px 10px;
+}
+.mobile.affiliate-number {
+    float: right;
+    font-size: 16px;
+    line-height: 24px;
+    color: #00BFA5;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    padding: 0 22px 0 0;
+}
+.mobile.affiliate-compare {
+    font-size: 13px;
+    line-height: 16px;
+    color: #999;
+    text-align: right;
+    padding: 5px 22px 0 0;
+    margin: 0 0 -6px 0;
+    clear: both;
+}
+.mobile.affiliate-compare span {
+    display: inline-block;
+    vertical-align: top;
+    color: #00BFA5;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+}
+.mobile.affiliate-compare .fm-icon {
+    display: inline-block;
+    vertical-align: top;
+    position: static;
+    margin: 0;
+}
+.affiliate-history-page .mobile.top-hr-pad {
+    padding-top: 106px;
+}
+.mobile.affiliate-history-dropdown {
+    font-size: 0;
+    line-height: 40px;
+    color: #939DA3;
+    padding: 0 18px;
+    position: fixed;
+    z-index: 10;
+    top: 66px;
+    background-color: #F5F6F7;
+    width: 100%;
+}
+.mobile.affiliate-history-dropdown span {
+    font-size: 13px;
+    display: inline-block;
+    vertical-align: top;
+}
+.mobile.affiliate-history-dropdown i {
+    display: inline-block;
+    vertical-align: top;
+}
+.mobile.affiliate-empty-data {
+    text-align: center;
+    font-size: 13px;
+    line-height: 16px;
+    color: #999;
+    padding: 12px 0;
+    background-color: white;
+}
+.mobile.fm-affiliate.distribution-head {
+    box-shadow: inset 0 -1px 0 0 rgba(0,0,0,0.1);
+    padding: 20px 35px 20px 36px;
+    position: relative;
+    font-size: 0;
+    line-height: 0;
+    position: fixed;
+    width: 100%;
+    z-index: 10;
+    top: 66px;
+    background-color: white;
+}
+.affiliate-distrib-page .mobile.top-hr-pad {
+    padding-top: 130px;
+}
+.mobile.fm-affiliate.tab-button {
+    display: inline-block;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    margin-right: 12px;
+    font-size: 13px;
+    line-height: 24px;
+    height: 24px;
+    color: #999;
+    cursor: pointer;
+    -webkit-transition: all 250ms ease-in-out;
+    transition: all 250ms ease-in-out;
+    border-radius: 12px;
+    padding: 0 12px;
+}
+.mobile.fm-affiliate.tab-button.active {
+    background-color: #3C434D;
+    color: white;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+.mobile.fm-affiliate.list {
+    padding: 7px 28px;
+}
+.mobile.fm-affiliate.list-item img {
+    display: inline-block;
+    width: 24px;
+    height: 16px;
+    margin: 1px 5px 0 0;
+    vertical-align: top;
+    background: grey;
+}
+.mobile.fm-affiliate.list-item {
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.08);
+    height: 41px;
+    box-sizing: border-box;
+    padding: 12px 0 11px 0;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+}
+.mobile.fm-affiliate.list-item .num {
+    font-size: 14px;
+    color: #333;
+    float: right;
+}
+
+@media only screen and (max-width: 350px) {
+    .mobile.affiliate-comission .cell .info {
+        padding: 0 5px 0 5px;
+    }
+}
+/* end of Affiliate program */
+
+/* Generate your unique MEGA referral URL */
+.mobile.generate-url .mobile.content-cell {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.mobile.generate-url.white-block {
+    white-space: normal;
+    padding: 20px 0;
+}
+.mobile.generate-url.header {
+    font-size: 16px;
+    line-height: 24px;
+    padding: 22px 0 0 0;
+    color: #444;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+}
+.mobile.generate-url.input-label {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666666;
+    padding: 27px 0 6px 0;
+    letter-spacing: -0.15px;
+}
+.mobile.generate-url.info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666;
+    padding: 24px 0 9px 0;
+}
+.mobile.generate-url.url-block {
+    border-radius: 3px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 1px #dadbdd;
+    background-color: #fafafa;
+    font-size: 14px;
+    line-height: 24px;
+    color: #333;
+    text-align: left;
+    white-space: nowrap;
+}
+.mobile.generate-url.url-block.expanded {
+    margin-bottom: -120px;
+}
+.mobile.generate-url.url-block .url {
+    color: #676D75;
+    display: block;
+    margin: 0 15px;
+    padding: 9px 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.mobile.generate-url.url-block .url span {
+    color: #00C0A6;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+.mobile.generate-url.url-block i {
+    display: block;
+    float: right;
+    margin: 13px 6px 0 0;
+}
+.mobile.generate-url.button {
+    box-shadow: 0 0 0 1px rgba(0,153,133,1);
+    font-size: 14px;
+    line-height: 42px;
+    color: white;
+    height: 42px;
+    padding: 0 20px;
+    border-radius: 4px;
+    background: #00bfa5;
+    margin: 10px 0 0 0;
+}
+.url-block .mobile.generate-url.button {
+    box-shadow: none;
+    border-radius: 0 0 4px 4px;
+    margin: 0 -1px -1px -1px;
+    text-align: center;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+    display: none;
+}
+.url-block.expanded .mobile.generate-url.button {
+    display: block;
+}
+.mobile.generate-url.page-names {
+    height: 143px;
+    overflow-y: auto;
+    margin: 5px 0 0 0;
+    display: none;
+}
+.expanded .mobile.generate-url.page-names {
+    display: block;
+}
+.mobile.generate-url.page-names span {
+    display: block;
+    font-size: 14px;
+    line-height: 48px;
+    text-align: center;
+    color: #9DA5AB;
+    margin: 0 12px;
+    border-bottom: 1px solid #D8D8D8;
+    box-sizing: border-box;
+    height: 48px;
+}
+.mobile.generate-url.page-names span:last-child {
+    border-color: transparent;
+}
+.mobile.generate-url.page-names span.active {
+    color: #444444;
+    font-size: 15px;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
+}
+.mobile.generate-url.bottom-lnk {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 24px;
+    color: #818993;
+    text-decoration: underline;
+    margin: 30px 0 0 0;
+}
+.mobile .generate-icon {
+    margin: 0 auto;
+}
+.mobile.commission-overlay.info {
+    font-size: 14px;
+    line-height: 18px;
+    color: #666;
+    padding: 24px 0 9px 0;
+    white-space: pre-line;
+    text-align: left;
+}
+.mobile.commission-overlay.info a {
+    text-decoration: underline;
+    color: #666;
+    font-family: 'LatoWebbold', 'source_sans_probold', Arial;
+}
+.mobile.commission-overlay.info b {
+    color: #333;
+}
+.mobile.commission-overlay.info .note {
+    font-size: 11px;
+}
+/* ennd of Generate your unique MEGA referral URL */
+
+
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.
@@ -12875,8 +13241,10 @@ p a.blog-new-read-more {
     .android .mobile.tablet-img {
         background-image: url(../images/mobile/android@2x.png);
     }
-    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.membership-step2 .provider-details .provider-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon, .mobile .payment-address-dialog .reg-st3-membership-icon {
-        background-image: url(../images/mobile/mobile-sprite_v33@2x.png) !important;
+    .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon, .mobile .payment-address-dialog .reg-st3-membership-icon, .mobile.signin-input span, .mobile.country-input span, .mobile.phone-number-input span,
+        .mobile.membership-step2 .provider-icon.voucher, .mobile.membership-step2 .provider-icon.ecpVI, .mobile.membership-step2 .provider-icon.ecpMC
+    {
+        background-image: url(../images/mobile/mobile-sprite_v36@2x.png) !important;
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -12896,7 +13264,7 @@ p a.blog-new-read-more {
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v36@2x.png);
         background-size: 280px auto;
     }
     .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
@@ -12912,11 +13280,11 @@ p a.blog-new-read-more {
         background-size: 755px auto;
     }
     .mobile .bus-reg-icon {
-        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v36@2x.png);
         background-size: 280px auto;
     }
     .mobile .card-container .dialog-heading-img {
-        background-image: url(../images/mobile/mobile-sprite_v33@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v36@2x.png);
         background-size: 280px auto;
     }
 }

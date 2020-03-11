@@ -247,6 +247,10 @@
                     prefixPath = this.currentCustomView.prefixPath;
                 }
 
+                if (treeid.indexOf('/') > -1) {
+                    treeid = treeid.split('/')[0];
+                }
+
                 if ($('#treea_' + treeid).length === 0) {
                     n = this.d[nodeid];
                     if (n && n.p) {
@@ -509,6 +513,9 @@
         }
         else if (id && id.substr(0, 7) === 'recents') {
             M.onFileManagerReady(openRecents);
+        }
+        else if (id && id.substr(0, 9) === 'refer') {
+            M.onFileManagerReady(affiliateUI);
         }
         else if (id && id.substr(0, 13) === 'notifications') {
             M.addNotificationsUI();

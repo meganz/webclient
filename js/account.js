@@ -401,6 +401,9 @@ function u_setrsa(rsakey) {
                         M.onFileManagerReady(function() {
                             M.showRecoveryKeyDialog(1);
                         });
+
+                        // No affiliate guide dialog for new users.
+                        $.noAffGuide = 1;
                     }
 
                     if (u_attr['^!promocode']) {

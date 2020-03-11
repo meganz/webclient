@@ -1203,6 +1203,17 @@ var attribCache = false;
         uaPacketParserHandler['^!enotif'] = function() {
             mega.enotif.handleAttributeUpdate();
         };
+        uaPacketParserHandler['^!affid'] = function(userHandle) {
+            mega.attr.get(userHandle, 'affid', -2, 1, function(res) {
+                u_attr['^!affid'] = res;
+                if (fminitialized) {
+                    M.affiliate.id = res;
+                }
+            });
+        };
+        uaPacketParserHandler['^!afficon'] = function() {
+            u_attr['^!afficon'] = 1;
+        };
 
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;

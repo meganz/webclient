@@ -827,6 +827,7 @@
 }
 .help-home-page {
     background-color: #F8F9FA !important;
+    overflow-x: hidden;
 }
 #help2-main .popular-question-items li {
     font-size: 15px;

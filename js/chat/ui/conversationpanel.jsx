@@ -612,7 +612,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
             }, 350, 15000)
                 .always(function() {
-                    if (self.props.chatRoom.isActive) {
+                    if (self.props.chatRoom.isCurrentlyActive) {
                         self.setState({
                             'chatLinkDialog': true
                         });
@@ -639,6 +639,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 self.setState({'nonLoggedInJoinChatDialog': true});
             }, rand_range(5, 10) * 1000);
         }
+        self.props.chatRoom._uiIsMounted = true;
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -737,6 +738,7 @@ export class ConversationPanel extends MegaRenderMixin {
         var chatRoom = self.props.chatRoom;
         var megaChat = chatRoom.megaChat;
 
+        chatRoom._uiIsMounted = true;
         if (this._messagesBuffChangeHandler) {
             chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
             delete this._messagesBuffChangeHandler;

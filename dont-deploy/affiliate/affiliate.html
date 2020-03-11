@@ -1,0 +1,668 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/business.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/affiliate-program.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../js/vendor/Chart.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {  
+
+            function initAffiliateScroll() {
+              $('.fm-affiliate.body').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+            }
+
+            // Init Redeem content scrolling
+            function initRedeemScroll() {
+              $('.fm-affiliate.redeem-scroll').jScrollPane({enableKeyboardNavigation:false,showArrows:true, arrowSize:5,animateScroll: true});
+            }
+
+            // Init redeem table header resizing
+            function initRedeemResize() {
+                $('.fm-affiliate.redeem-table.main th').each(function (k) {
+                    var $clonedHeader = $('.fm-affiliate.redeem-table.clone th');
+
+                    if ($clonedHeader.eq(k).length) {
+                        $clonedHeader.eq(k).outerWidth($(this).outerWidth());
+                    }
+                });
+            }
+
+             // Init redeem view link click
+            $('.fm-affiliate.redeem-table .link').bind('click', function () {
+                var $this = $(this);
+                var $table= $this.closest('.redeem-scroll');
+
+                if ($this.hasClass('open')) {
+                    $table.addClass('expanded-item');
+                    $('.expanded', $table).removeClass('expanded');
+                    $this.closest('tr').addClass('expanded');
+                }
+                else {
+                    $table.removeClass('expanded-item');
+                    $this.closest('tr').prev().removeClass('expanded');
+                }
+
+                 initRedeemScroll();
+            });
+
+
+            initAffiliateScroll();
+            initRedeemScroll();
+            initRedeemResize()
+
+            $(window).bind('resize.affiliate', function () {
+                initAffiliateScroll();
+                initRedeemScroll();
+                initRedeemResize()
+            });
+
+            $('.default-select').bind('click', function() {
+                if ($(this).hasClass('opened')) {
+                    $(this).removeClass('opened').next().addClass('hidden');
+                }
+                else {
+                    $(this).addClass('opened').next().removeClass('hidden');
+                }
+            });
+
+            $('.mega-data-box th.sortable').bind('click', function() {
+                if ($(this).hasClass('desc')) {
+                    $(this).removeClass('desc').addClass('asc');
+                }
+                else if ($(this).hasClass('asc')) {
+                    $(this).removeClass('asc').addClass('desc');
+                }
+                else {
+                    $('.mega-data-box th.sortable').removeClass('asc desc');
+                    $(this).addClass('asc');
+                }
+            });
+
+            var purchase = document.getElementById('purchase-chart');
+            var purchaseChart = new Chart(purchase, {
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        data: [9, 2, 1, 0, 1],
+                        backgroundColor: [
+                            '#FFC240',
+                            '#FF6F00',
+                            '#FF0003',
+                            '#CC0049',
+                            '#408EC9'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    events: [],
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+
+            var register = document.getElementById('register-chart');
+            var registerChart = new Chart(register, {
+                type: 'bar',
+                data: {
+                    labels: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [12, 20, 0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(101,187,226,0.5)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    events: [],
+                    legend: {
+                        display: false
+                    },
+                    responsive: true,
+                    scales: {
+                        xAxes: [{
+                            barThickness : 8,
+                            gridLines : {
+                                display : false
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            ticks: {
+                                max: 40,
+                                min: 0,
+                                stepSize: 10
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+        
+        
+
+    </script>
+</head>
+<body id="bodyel" class="logged fontsize2 en lite">
+    
+    <!-- Please add "affiliate-program" classname !-->
+    <div id="fmholder" class="fmholder affiliate-program">
+
+        <div class="main-blur-block">
+
+            <div class="fm-main default">
+                
+                <div class="nw-fm-left-icons-panel">
+                    <a class="logo hidden"></a>
+                    <div class="nw-fm-left-icon dashboard ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="dark-tooltip">Dashboard</div>
+                    </div>
+                    <div class="nw-fm-left-icon cloud-drive ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="dark-tooltip">Cloud Drive</div>
+                    </div>
+                    <div class="nw-fm-left-icon recents ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="dark-tooltip">Recents</div>
+                    </div>
+                    <div class="nw-fm-left-icon inbox ui-droppable hidden">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="dark-tooltip">Inbox</div>
+                    </div>
+                    <div class="nw-fm-left-icon shared-with-me ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="dark-tooltip">Shared with me</div>
+                    </div>
+                    <div class="nw-fm-left-icon contacts ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="contacts-indicator hidden"></div>
+                        <div class="dark-tooltip">Contacts</div>
+                    </div>
+                    <div class="nw-fm-left-icon conversations ui-droppable">
+                        <div class="nw-fm-left-border"></div>
+                        <div class="new-messages-indicator hidden">
+                            <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
+                            <span class="chat-unread-count hidden"></span>
+                        </div>
+                        <div class="dark-tooltip">Conversations</div>
+                        <div class="beta-text"></div>
+                    </div>
+                    <div class="bottom-icons">
+                        <div class="nw-fm-left-icon user-management">
+                            <div class="nw-fm-left-border"></div>
+                            <div class="dark-tooltip">[$18677]</div>
+                            <div class="beta-text"></div>
+                        </div>
+                        <!-- Please add "filled" classname if user have deleted items !-->
+                        <div class="nw-fm-left-icon rubbish-bin">
+                            <div class="nw-fm-left-border"></div>
+                            <div class="dark-tooltip">[$168]</div>
+                        </div>
+                        <div class="nw-fm-left-icon affiliate active">
+                            <div class="nw-fm-left-border"></div>
+                            <div class="dark-tooltip">Affiliate program</div>
+                        </div>
+                        <div class="nw-fm-left-icon account">
+                            <div class="nw-fm-left-border"></div>
+                            <div class="dark-tooltip">[$823]</div>
+                        </div>
+                        <div class="nw-fm-left-icon transfers">
+                            <div class="nw-fm-left-border file-transfer-icon"></div>
+                            <div class="dark-tooltip">[$104]</div>
+                            <div class="nw-fm-percentage download">
+                                <ul>
+                                    <li class="nw-fm-chart0 right-c">
+                                        <p>
+                                            <span></span>
+                                        </p>
+                                    </li>
+                                    <li class="nw-fm-chart0 left-c">
+                                        <p>
+                                            <span></span>
+                                        </p>
+                                    </li>
+                                </ul>
+                                <div class="transfer-bar-overlay"></div>
+                            </div>
+
+                            <div class="nw-fm-percentage upload">
+                                <ul>
+                                    <li class="nw-fm-chart0 right-c">
+                                        <p>
+                                            <span></span>
+                                        </p>
+                                    </li>
+                                    <li class="nw-fm-chart0 left-c">
+                                        <p>
+                                            <span></span>
+                                        </p>
+                                    </li>
+                                </ul>
+                                <div class="transfer-bar-overlay">
+                                    <div></div>
+                                </div>
+                            </div>
+                            <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
+                                <i class="dropdown-white-arrow"></i>
+                                <div class="fm-dialog-close small"></div>
+
+                                <div class="transfer-widget body">
+                                    <div class="transfer-widget transfer-block download hidden">
+                                        <i class="small-icon green-arrow"></i>
+                                        <span class="transfer-filetype-icon audio file"></span>
+                                        <span class="tranfer-filetype-txt"></span>
+                                        <!--file.name-->
+                                        <div class="transfer-widget progress">
+                                            <span></span>
+                                        </div>
+                                        <div class="transfer-widget info-block left">
+                                            <span class="current dark"></span>
+                                            <span class="of">[$5528]</span>
+                                            <span class="number dark"></span>
+                                        </div>
+                                        <div class="transfer-widget info-block right">
+                                            <span class="speed dark"></span>
+                                            <span class="speed-txt"></span>
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+
+                                    <div class="transfer-widget transfer-block upload hidden">
+                                        <i class="small-icon blue-arrow left"></i>
+                                        <span class="transfer-filetype-icon audio file"></span>
+                                        <span class="tranfer-filetype-txt"></span>
+                                        <!--file.name-->
+                                        <div class="transfer-widget progress">
+                                            <span></span>
+                                        </div>
+                                        <div class="transfer-widget info-block left">
+                                            <span class="current dark"></span>
+                                            <span class="of">[$5528]</span>
+                                            <span class="number dark"></span>
+                                        </div>
+                                        <div class="transfer-widget info-block right">
+                                            <span class="speed dark"></span>
+                                            <span class="speed-txt"></span>
+                                        </div>
+                                        <div class="clear"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fm-left-panel">
+                    
+                    <div class="fm-left-menu">
+                        <form id="search-fake-form-2" autocomplete="disabled">
+                            <div class="nw-fm-tree-header affiliate">
+                                <span>Affiliate program</span>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+
+                <div id="topmenu">
+                    <div class="top-head">
+                        <div class="top-centered-margin">
+                            <a class="top-icon menu"><div class="dark-tooltip top">Menu</div></a>
+                            <div class="top-search-bl">
+                                <div class="top-icon search"><div class="dark-tooltip top">Search</div></div>
+                                <div class="top-search-clear">
+                                    <div class="top-search-button hidden"></div>
+                                    <div class="top-clear-button hidden"></div>
+
+                                    <form autocomplete="disabled" id="search-fake-form">
+                                        <input type="text" placeholder="Search" autocomplete="disabled" class="top-search-input">
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="membership-status-block"><i class="tiny-icon membership-status lite"></i></div>
+                            <a class="user-name">saed awf</a>
+                            <div class="activity-status-block">
+                                <div class="loading-animation"></div>
+                                <div class="activity-status top online"></div>
+                            </div>
+                            <a class="fm-avatar"><div data-color="color12" class="P_i8xb7_qSQ color12 avatar-wrapper small-rounded-avatar"><i class="verified_icon"></i>S</div></a>
+                            </div>
+                    </div>
+                </div>
+
+                <!-- Affiliate block. Init scrolling here !-->
+                <div class="fm-affiliate body">
+                    <div class="fm-affiliate content">
+                        <div class="fm-affiliate grey-lnk">Program guide</div>
+                        <div class="clear"></div>
+                        
+                        <!-- Refer user block !-->
+                        <div class="subtitle-txt">
+                            Refer users
+                        </div>
+                        <div class="mega-data-box refer-users">
+                            <div class="fm-affiliate refer-block">
+                                <i class="big-icon icon40 big-icons-sprite chain"></i>
+                                <div class="fm-affiliate info">
+                                    <strong>Generic referral URL</strong> to any product page
+                                </div>
+                                <div class="fm-affiliate green-link">
+                                    <span>Generate</span>
+                                    <i class="small-icon icons-sprite right-green-arrow"></i>
+                                </div>
+                            </div>
+                            <div class="fm-affiliate refer-block">
+                                <i class="big-icon icon40 big-icons-sprite folder-with-chain"></i>
+                                <div class="fm-affiliate info">
+                                    <strong>Share content</strong> create a file/folder link or embed video
+                                </div>
+                                <div class="fm-affiliate green-link">
+                                    <span>Create file link</span>
+                                    <i class="small-icon icons-sprite right-green-arrow"></i>
+                                </div>
+                            </div>
+                            <div class="fm-affiliate refer-block">
+                                <i class="big-icon icon40 big-icons-sprite chat-with-chain"></i>
+                                <div class="fm-affiliate info">
+                                    <strong>Create chat link </strong> to attract new users 
+                                </div>
+                                <div class="fm-affiliate green-link">
+                                    <span>Create chat link</span>
+                                    <i class="small-icon icons-sprite right-green-arrow"></i>
+                                </div>
+                            </div>
+                            <div class="fm-affiliate refer-block">
+                                <i class="big-icon icon40 big-icons-sprite user-with-chain"></i>
+                                <div class="fm-affiliate info">
+                                    <strong>Add new users</strong> by inviting them directly
+                                </div>
+                                <div class="fm-affiliate green-link">
+                                    <span>Add contact</span>
+                                    <i class="small-icon icons-sprite right-green-arrow"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Commission index !-->
+                        <div class="subtitle-txt">
+                            Commission index
+                        </div>
+                        <div class="mega-data-box commission">
+                            <div class="fm-affiliate commission-header">
+                                <div class="fm-affiliate commission-block active">
+                                    <div class="title">Total commission</div>
+                                    <div class="price">&#36;75</div>
+                                </div>
+                                <div class="fm-affiliate commission-block">
+                                    <div class="title">Pending commission<sup>1</sup></div>
+                                    <div class="price">&#36;18</div> 
+                                </div>
+                                <div class="fm-affiliate commission-block">
+                                    <div class="title">Available commission<sup>3</sup></div>
+                                    <div class="price">&#36;57<sup>3</sup></div>
+                                </div>
+                            </div>
+                            <div class="fm-affiliate commission-body">
+                                1.  A qualifying commission will have a 90 day grace period before being redeemable.<br>
+                                2.  You must have earned at least €50 to qualify for a redemption.  You will also need to make at least one payment to MEGA before you can make redemptions. Click <a href="/pro">here</a> to go to the PRO page.  <br>
+                                3. This price is converted to show the approximate in the your local currency, you will pay in Euro. The exchange rate may change when you redeem.
+                            </div>
+                        </div>
+                        
+                        <!-- Redemtion block !-->
+                       <div  class="fm-affiliate dropdown-wrap">
+                            <div class="default-select affilite-redemtion">All redemptions</div>
+                            <!-- Unhide by click on select !-->
+                            <div class="default-select-dropdown hidden">
+                                <div class="default-dropdown-item active">All redemptions</div>
+                                <div class="default-dropdown-item label orange">Processing</div>
+                                <div class="default-dropdown-item label green">Completed</div>
+                                <div class="default-dropdown-item label red">Failed</div>
+                            </div>
+                        </div>
+
+                        <div class="subtitle-txt">
+                            Redemption history
+                        </div>
+                         <div class="clear"></div>
+                        <div class="mega-data-box">
+                            <table class="fm-affiliate redeem-table clone">
+                                <tr>
+                                    <th class="sortable">Receipt</th>
+                                    <th class="sortable">Date</th>
+                                    <th class="sortable">Method</th>
+                                    <th class="sortable">Amount</th>
+                                    <th class="sortable asc">Status</th>
+                                    <th></th>
+                                </tr>
+                            </table>
+                            <!-- Redeem content block. Init scrolling here. Please add ".expanded-item" to increase maax height !-->
+                            <div class="fm-affiliate redeem-scroll expanded-item">
+                                <table class="fm-affiliate redeem-table main">
+                                    <tr>
+                                        <th>Receipt</th>
+                                        <th>Date</th>
+                                        <th>Method</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                    <!-- Add class ".expanded" if ".open" link is clicked !-->
+                                    <tr class="expanded">
+                                        <td>IEM394W</td>
+                                        <td>03-11-2018</td>
+                                        <td>Bank transfer</td>
+                                        <td>$512</td>
+                                        <td><span class="colored-label orange">Processing</span></td>
+                                        <td><a class="link open">View</a></td>
+                                    </tr>
+                                    <tr class="fm-affiliate redeem-details">
+                                        <td colspan="6">
+                                            <div class="fm-affiliate redeem-cell">
+                                                <div class="fm-affiliate redeem-data">
+                                                    <span class="strong">Receipt:</span>
+                                                    <span>N39#MK03</span>
+                                                </div>
+                                                <div class="fm-affiliate redeem-data">
+                                                    <span class="strong">Method:</span>
+                                                    <span>Bank Transfer</span>
+                                                </div>
+                                                 <div class="fm-affiliate redeem-data">
+                                                    <span class="strong full-size">Withdraw info:</span>
+                                                    <span class="grey">Country</span>
+                                                    <span>New Zealand</span>
+                                                     <span class="grey">Currency</span>
+                                                    <span>$NZD</span>
+                                                </div>
+                                                <div class="fm-affiliate redeem-data">
+                                                    <span class="strong full-size">Bank account:</span>
+                                                    <span class="grey">Account name</span>
+                                                    <span>Jay Chongn</span>
+                                                    <span class="grey">Account number</span>
+                                                    <span>1947 2837 3833 9458 3333</span>
+                                                    <span class="grey">Account type</span>
+                                                    <span>Save account</span>
+                                                    <span class="grey">SWIFT BIC</span>
+                                                    <span>2934 - B9384</span>
+                                                </div>
+                                            </div>
+                                            <div class="fm-affiliate redeem-cell">
+                                                <div class="fm-affiliate redeem-data">
+                                                    <span class="strong full-size">Amount:</span>
+                                                    <span class="grey">Request amount</span>
+                                                    <span>NZD $57.00</span>
+                                                    <span class="grey">Fee charged</span>
+                                                    <span>NZD $3.22 <span class="euro">&euro;3.00</span></span>
+                                                    <span class="grey">Received amount</span>
+                                                    <span>NZD $53.78</span>
+                                                </div>
+                                                <div class="fm-affiliate redeem-data">
+                                                    <span class="strong full-size">Status: <span class="status red">Failed</span></span>
+                                                    <span class="grey full-size">
+                                                        The funds from this failed redemption were returned to your MEGA available commission balance. Please check your withdraw details carefully before future redemptions.
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="clear"></div>
+                                            <a class="link close">Close</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>IEM394W</td>
+                                        <td>03-11-2018</td>
+                                        <td>Bank transfer</td>
+                                        <td>$512</td>
+                                        <td><span class="colored-label green">Completed</span></td>
+                                        <td><a class="link open">View</a></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+        
+                         <!-- Registration index block !-->
+                        <div class="fm-affiliate half-sized-box left">
+                            <div class="subtitle-txt">
+                                Registration index
+                            </div>
+                            <div class="mega-data-box registration">
+                                <div class="fm-affiliate charts-head">
+                                    <div class="fm-affiliate charts-head-cell name">
+                                        Total registrations:
+                                    </div>
+                                    <div class="fm-affiliate charts-head-cell">
+                                        <div class="number">
+                                            175
+                                        </div>
+                                        <div class="compare">
+                                            <i class="small-icon icons-sprite top-blue-arrow"></i><span>54</span>  over last month
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fm-affiliate chart-body">
+                                    <div class="fm-affiliate chart-period active">Week</div>
+                                    <div class="fm-affiliate chart-period">Month</div>
+                                    <div class="fm-affiliate chart-period">Year</div>
+                                    <div class="fm-affiliate chart-dates">
+                                        <i class="small-icon icons-sprite prev-arrow"></i>
+                                        <span class="dates">3 - 9 November 2019</span>
+                                        <i class="small-icon icons-sprite next-arrow"></i>
+                                    </div>
+                                    <div class="fm-affiliate register-chart">
+                                         <canvas id="register-chart" height="186"></canvas>
+                                     </div>
+                                    <div class="button default-green-button  inline">
+                                        Refer users
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                       <!-- Purchase index block !-->
+                        <div class="fm-affiliate half-sized-box right">
+                            <div class="subtitle-txt">
+                                Purchase index
+                            </div>
+                            <div class="mega-data-box purchase">
+                                <div class="fm-affiliate charts-head">
+                                    <div class="fm-affiliate charts-head-cell name">
+                                        Total purchases:
+                                    </div>
+                                    <div class="fm-affiliate charts-head-cell">
+                                        <div class="number">
+                                            13
+                                        </div>
+                                        <div class="compare dark">
+                                            <i class="small-icon icons-sprite top-blue-arrow"></i><span>1</span>  over last month
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="fm-affiliate chart-body">
+                                     <div class="fm-affiliate purchase-chart">
+                                         <canvas id="purchase-chart" width="100%" height="100%"></canvas>
+                                     </div>
+                                      <div class="fm-affiliate list">
+                                          <div class="fm-affiliate list-item">
+                                              <span class="label yellow">74%</span> Pro L Purchase <span class="num">9</span>
+                                          </div>
+                                           <div class="fm-affiliate list-item">
+                                              <span class="label orange">11%</span> Pro I Purchase <span class="num">2</span>
+                                          </div>
+                                           <div class="fm-affiliate list-item">
+                                              <span class="label red">5%</span> Pro II Purchase <span class="num">1</span>
+                                          </div>
+                                           <div class="fm-affiliate list-item">
+                                              <span class="label violet">0%</span> Pro III Purchase <span class="num">0</span>
+                                          </div>
+                                           <div class="fm-affiliate list-item">
+                                              <span class="label blue">5%</span> Business Purchase <span class="num">1</span>
+                                          </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                       <!-- Geographic distribution block !-->
+                        <div class="fm-affiliate half-sized-box left">
+                            <div class="subtitle-txt">
+                                Geographic distribution
+                            </div>
+                            <div class="mega-data-box distribution">
+                                <div class="fm-affiliate distribution-head">
+                                    <div class="fm-affiliate tab-button active">
+                                        Registrations
+                                    </div>
+                                    <div class="fm-affiliate tab-button">
+                                        Purchases
+                                    </div>
+                                </div>
+                                 <div class="fm-affiliate chart-body">
+                                      <div class="fm-affiliate list">
+                                          <div class="fm-affiliate list-item">
+                                              <img src="" alt=""> UK <span class="num">9</span>
+                                          </div>
+                                           <div class="fm-affiliate list-item">
+                                              <img src="" alt=""> France <span class="num">2</span>
+                                          </div>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="clear"></div>
+                        
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

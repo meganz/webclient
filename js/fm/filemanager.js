@@ -794,8 +794,8 @@ FileManager.prototype.initFileManagerUI = function() {
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
         treesearch = false;
-        var mySelf = $(this);
-        var clickedClass = mySelf.attr('class');
+        var $mySelf = $(this);
+        var clickedClass = $mySelf.attr('class');
 
         if (!clickedClass) {
             return;
@@ -813,7 +813,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 'recents':         {root: 'recents',   prev: null},
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null},
-                'user-management':      {root: 'user-management', prev: null}
+                'user-management': {root: 'user-management', prev: null},
+                'affiliate':       {root: 'affiliate', prev: null}
             };
         }
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
@@ -835,7 +836,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         isMegaSyncTransfer = false;
                     }
-                    mySelf.click();
+                    $mySelf.click();
 
                 });
                 return false;
@@ -863,7 +864,7 @@ FileManager.prototype.initFileManagerUI = function() {
             return !!fmTabState[c];
         })[0];
 
-        if (mySelf.hasClass('contacts') && !mySelf.find('.contacts-indicator').is('.hidden')) {
+        if ($mySelf.hasClass('contacts') && !$('.contacts-indicator', $mySelf).is('.hidden')) {
              M.openFolder('ipc');
              return false;
         }
@@ -881,7 +882,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if (mySelf.hasClass('account') || mySelf.hasClass('dashboard')) {
+        if ($mySelf.hasClass('account') || $mySelf.hasClass('dashboard') || $mySelf.hasClass('affiliate')) {
             if (u_type === 0) {
                 if ($(this).hasClass('account')) {
                     ephemeralDialog(l[7687]);
@@ -894,6 +895,9 @@ FileManager.prototype.initFileManagerUI = function() {
             else if ($(this).hasClass('dashboard')) {
                 loadSubPage('fm/dashboard');
             }
+            else if ($(this).hasClass('affiliate')) {
+                loadSubPage('fm/refer');
+            }
             else {
                 loadSubPage('fm/account');
                 if ($('.fm-account-main').data('jsp')) {
@@ -902,7 +906,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             return false;
         }
-        // else if (mySelf.hasClass('recents')) {
+        // else if ($mySelf.hasClass('recents')) {
         //     loadSubPage('fm/recents');
         // }
 
@@ -2091,7 +2095,9 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            ReactDOM.unmountComponentAtNode(constructor.domNode);
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            constructor.domNode.remove();
+            dialogPlacer.remove();
             selected = [];
             closeDialog();
         },
@@ -2110,6 +2116,39 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
     var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
+};
+
+FileManager.prototype.initNewChatlinkDialog = function() {
+    'use strict';
+
+    // If chat is not ready.
+    if (!megaChatIsReady) {
+        if (megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed');
+        }
+        else {
+            // Waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            mBroadcaster.once('chat_initialized', this.initNewChatlinkDialog.bind(this));
+        }
+        return false;
+    }
+
+    loadingDialog.hide();
+
+    var dialogPlacer = document.createElement('div');
+
+    var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
+        name: "start-group-chat",
+        flowType: 2,
+        onClose: function() {
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            dialogPlacer.remove();
+            closeDialog();
+        }
+    });
+
+    ReactDOM.render(dialog, dialogPlacer);
 };
 
 FileManager.prototype.initUIKeyEvents = function() {
@@ -3747,11 +3786,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +
-        'conversations opc ipc inbox account dashboard transfers recents user-management'
+        'conversations opc ipc inbox account dashboard transfers recents user-management affiliate'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
+    $('#fmholder').removeClass('affiliate-program');
     $('.fm-main').removeClass('active-folder-link');
     $('.nw-fm-left-icons-panel .logo').addClass('hidden');
     $('.fm-products-nav').text('');
@@ -3897,6 +3937,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             M.addTransferPanelUI();
         }
         $.transferOpen(true);
+    }
+
+    if (id === 'affiliate') {
+        $('#fmholder').addClass('affiliate-program');
     }
 
     var headertxt = '';

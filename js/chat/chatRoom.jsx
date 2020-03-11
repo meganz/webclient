@@ -1921,6 +1921,10 @@ ChatRoom.prototype.onPublicChatRoomInitialized = function() {
     }
 };
 
+ChatRoom.prototype.isUIMounted = function() {
+    return this._uiIsMounted;
+};
+
 ChatRoom.prototype.loadContactNames = function() {
     var contacts = this.getParticipantsExceptMe();
     for (var i = 0; i < Math.min(5, contacts.length); i++) {

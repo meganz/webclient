@@ -3522,6 +3522,9 @@ var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
       $('textarea:focus').trigger("blur");
       document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
       document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
+      $('.fm-dialog-overlay').rebind('click.modalDialogOv' + this.getUniqueId(), function () {
+        self.onBlur();
+      });
       $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function (e) {
         if (e.keyCode == 27) {
           // escape key maps to keycode `27`
@@ -3549,6 +3552,7 @@ var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
       $(document.body).removeClass('overlayed');
       $('.fm-dialog-overlay').addClass('hidden');
       $(window).off('resize.modalDialog' + this.getUniqueId());
+      $('.fm-dialog-overlay').unbind('click.modalDialogOv' + this.getUniqueId());
     }
   }, {
     key: "onCloseClicked",
@@ -14302,6 +14306,8 @@ var chatlinkDialog_ChatlinkDialog = /*#__PURE__*/function (_MegaRenderMixin) {
       if (this.props.onClose) {
         this.props.onClose();
       }
+
+      affiliateUI.registeredDialog.show();
     }
   }, {
     key: "onTopicFieldChanged",
@@ -16081,7 +16087,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         createTimeoutPromise(function () {
           return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
         }, 350, 15000).always(function () {
-          if (self.props.chatRoom.isActive) {
+          if (self.props.chatRoom.isCurrentlyActive) {
             self.setState({
               'chatLinkDialog': true
             });
@@ -16111,6 +16117,8 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
           });
         }, rand_range(5, 10) * 1000);
       }
+
+      self.props.chatRoom._uiIsMounted = true;
     }
   }, {
     key: "eventuallyInit",
@@ -16202,6 +16210,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var self = this;
       var chatRoom = self.props.chatRoom;
       var megaChat = chatRoom.megaChat;
+      chatRoom._uiIsMounted = true;
 
       if (this._messagesBuffChangeHandler) {
         chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
@@ -22096,6 +22105,10 @@ ChatRoom.prototype.onPublicChatRoomInitialized = function () {
   }
 };
 
+ChatRoom.prototype.isUIMounted = function () {
+  return this._uiIsMounted;
+};
+
 ChatRoom.prototype.loadContactNames = function () {
   var contacts = this.getParticipantsExceptMe();
 
@@ -22658,7 +22671,7 @@ var startGroupChatWizard_StartGroupChatWizard = /*#__PURE__*/function (_MegaRend
 
       return startGroupChatWizard_React.makeElement(modalDialogs["a" /* default */].ModalDialog, {
         step: self.state.step,
-        title: l[19483],
+        title: self.state.createChatLink ? l[20638] : l[19483],
         className: classes,
         selected: self.state.selected,
         onClose: function onClose() {
@@ -22693,6 +22706,12 @@ startGroupChatWizard_StartGroupChatWizard.defaultProps = {
   'flowType': 1
 };
 ;
+window.StartGroupChatDialogUI = {
+  StartGroupChatWizard: startGroupChatWizard_StartGroupChatWizard
+};
+/* harmony default export */ var startGroupChatWizard = __webpack_exports__["default"] = ({
+  StartGroupChatWizard: startGroupChatWizard_StartGroupChatWizard
+});
 
 /***/ })
 /******/ ]);

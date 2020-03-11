@@ -107,8 +107,13 @@ function MegaData() {
                 }
                 return maf;
             }
-        })
+        });
     })(this);
+
+    // Initialize affiliate dataset on-demand
+    lazy(this, 'affiliate', function() {
+        return new AffiliateData();
+    });
 
     this.sortRules = {
         'name': this.sortByName.bind(this),

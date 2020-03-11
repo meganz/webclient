@@ -683,7 +683,14 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
                     }, 500, 10000)
                         .done(function() {
                             if (setAsActive.createChatLink) {
-                                chatRoom.trigger('showGetChatLinkDialog');
+                                // in case of CPU throttling, the UI of the dialog may not yet be shown
+                                // so lets delay this a bit
+                                createTimeoutPromise(function() {
+                                    return !!chatRoom.isUIMounted();
+                                }, 300, 2000)
+                                    .always(function() {
+                                        chatRoom.trigger('showGetChatLinkDialog');
+                                    });
                             }
                         })
                         .fail(function() {

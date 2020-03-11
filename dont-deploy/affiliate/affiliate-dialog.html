@@ -1,0 +1,227 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/business.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/affiliate-program.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../js/vendor/Chart.js"></script>
+    <script type="text/javascript">
+        /* !!!! Only a DEMO to show how it works */
+        $(document).ready(function() {  
+            var $dialog = $('.fm-dialog.affiliate-guide');
+            var $secondStepBlock = $('.affiliate-guide.step2', $($dialog ));
+            var slidesLength = $('.content', $secondStepBlock).length;
+
+            // Step1. Welcome dialog, How it works button click - > show step 2.
+            $('.default-green-button.how-it-works', $dialog).bind('click', function() {
+                $('.affiliate-guide.step1', $dialog).removeClass('active');
+                $('.affiliate-guide.step2', $dialog).addClass('active');
+
+                // We should reposition Step2 dialog
+                $dialog.css('margin-top', '-' + $($dialog).outerHeight()/2 + 'px');
+            });
+
+            // Step 2. Show Slides.
+            function showAffiliateSlide(num) {
+                var $secondStepBlock = $('.affiliate-guide.step2', $($dialog ));
+
+                if(num) {
+                    $('.content.active', $secondStepBlock).removeClass('active');
+                    $('.content.slide' + num, $secondStepBlock).addClass('active');
+
+                    // Show/hide Back button
+                    if (num === 1) {
+                        $('.bottom-button.back', $secondStepBlock).addClass('hidden');
+                    }
+                    else {
+                         $('.bottom-button.back', $secondStepBlock).removeClass('hidden');
+                    }
+
+                    // Show/hide Affiliate Dashboard button/Next button
+                    if (num == slidesLength) {
+                        $('.default-green-button', $secondStepBlock).removeClass('hidden');
+                        $('.bottom-button.next', $secondStepBlock).addClass('hidden');
+                    }
+                    else {
+                        $('.default-green-button', $secondStepBlock).addClass('hidden');
+                        $('.bottom-button.next', $secondStepBlock).removeClass('hidden');
+                    }
+                }
+
+                // Change top buttons state
+                $('.nav-button.active', $secondStepBlock).removeClass('active');
+                $('.nav-button.slide' + num,  $secondStepBlock).addClass('active');
+            }
+
+            // Step 2. Back/Next buttons
+            $('.affiliate-guide.bottom-button', $dialog).bind('click', function() {
+                var currentSlide = $('.nav-button.active', $($dialog)).data('slide');
+                
+                if ($(this).hasClass('next') && currentSlide +1 <= slidesLength) {
+                    showAffiliateSlide(currentSlide +1);
+                }
+                else if ($(this).hasClass('back') && currentSlide -1 >=  0) {
+                    showAffiliateSlide(currentSlide - 1);
+                }
+            });
+
+            // Step 2.Top nav buttons
+            $('.affiliate-guide.nav-button', $dialog).bind('click', function() {
+                showAffiliateSlide($(this).attr('data-slide'));
+            });
+
+        });
+    </script>
+</head>
+<body id="bodyel" class="logged fontsize2 en lite">
+    <div class="fm-dialog-overlay"></div>
+    <div class="fm-dialog affiliate-guide" style="display: block;">
+        <div class="fm-dialog-close"></div>
+        <div class="affiliate-guide body step1 active">
+            <div class="fm-dialog-title small">Affiliate Program</div>
+            <div class="affiliate-guide big-illustration"></div>
+            <div class="affiliate-guide big-header">
+                Earn 20% of the revenue from each purchase made by a user you have referred to MEGA
+            </div>
+            <div class="affiliate-guide content active">
+                <div class="affiliate-guide cell">
+                    <div class="half-sized">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                        <div class="affiliate-guide header">Any MEGA user can participate</div>
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                        <div class="affiliate-guide header">Mutiple ways to refer</div>
+                    </div>
+                    <div class="half-sized">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                        <div class="affiliate-guide header">No upfront cost to join the program</div>
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                        <div class="affiliate-guide header">Unlimited Referrals</div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="default-green-button height-40 right how-it-works">
+                <span>How it works</span>
+                <i class="small-icon icons-sprite white-right-arrow"></i>
+            </div>
+            <a href="/pro" class="affiliate-guide grey-link clickurl" target="_blank">Read more on product page</a>
+            <div class="clear"></div>
+        </div>
+        <div class="affiliate-guide body step2">
+            <div class="affiliate-guide top-block">
+                <div class="fm-dialog-title">Guide to MEGA's Affiliate Program</div>
+                <div class="affiliate-guide nav-button slide1 active" data-slide="1">
+                    <span class="num">1</span>
+                    <span class="txt">Ways to refer users to MEGA</span>
+                </div>
+                <div class="affiliate-guide nav-button slide2" data-slide="2">
+                    <span class="num">2</span>
+                    <span class="txt">Referral qualification</span>
+                </div>
+                <div class="affiliate-guide nav-button slide3" data-slide="3">
+                    <span class="num">3</span>
+                    <span class="txt">Redeem commission</span>
+                </div>
+                <div class="affiliate-guide nav-button slide4" data-slide="4">
+                    <span class="num">4</span>
+                    <span class="txt">Important rules</span>
+                </div>
+            </div>
+            <div class="affiliate-guide slides">
+            <div class="affiliate-guide content slide1 active">
+                <div class="affiliate-guide cell">
+                    <div class="affiliate-guide feature-block">
+                        <i class="semi-huge-icon big-icons-sprite chain"></i>
+                        <strong>Personal referral URLs</strong> Generate your unique referral URLs to any MEGA page.
+                    </div>
+                    <div class="affiliate-guide feature-block">
+                        <i class="semi-huge-icon big-icons-sprite folder-with-chain"></i>
+                        <strong>Share content</strong>  You automatically refer people when sharing file/folder links or from embedded video
+                    </div>
+                    <div class="affiliate-guide feature-block">
+                        <i class="semi-huge-icon big-icons-sprite chat-with-chain"></i>
+                        <strong>Create a chat link</strong> and get users to join MEGA
+                    </div>
+                    <div class="affiliate-guide feature-block">
+                        <i class="semi-huge-icon big-icons-sprite user-with-chain"></i>
+                        <strong>Add new users to MEGA</strong> by inviting them directly
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div class="affiliate-guide content slide2">
+                <div class="affiliate-guide cell">
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">For new users:</div>
+                    <div class="affiliate-guide info">New users who register through your affiliate URLs are your referrals. When your referred users subsequently purchase within 12 months, you will qualify for a commission.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide header">Any MEGA user can participate</div>
+                    <div class="affiliate-guide info">Existing MEGA users who purchase within 24 hours after having most recently visited any of your affiliate URLs will qualify you for a commission.</div>
+                </div>
+            </div>
+            <div class="affiliate-guide content slide3">
+                <div class="affiliate-guide cell">
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">Depending on your country, we offer a variety of redemption methods, including bank transfers & Bitcoin.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">You must have earned <strong>at least €50</strong> to qualify for a redemption.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">You must make <strong>at least one real payment</strong> to MEGA to qualify for a redemption.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">Depending on your country and redemption method, we may charge you a redemption fee.</div>
+                </div>
+            </div>
+            <div class="affiliate-guide content slide4">
+                <div class="affiliate-guide cell">
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">You must agree and comply with the <a href="/terms" target="_blank" class="clickurl">Terms of Service</a>.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">For file or folder links to qualify you must own worldwide commercial usage rights to the data you share. If your file or folder links contain content created by someone else, you must have their written permission to use it.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">A qualifying commission will have a <strong>90 day grace period</strong> before it is redeemable.</div>
+                    <i class="small-icon icons-sprite bold-green-tick"></i>
+                    <div class="affiliate-guide info">A legally valid takedown notice will reverse the commissions earned against the relevant file or folder URL(s).</div>
+                    <div class="affiliate-guide info">A copyright strike will disqualify your account from participation for 90 days.</div>
+                    <div class="affiliate-guide info">Repeated strikes will permanently disqualify you from participation.</div>
+                </div>
+            </div>
+            </div>
+            <div class="affiliate-guide bottom-button back hidden">
+                <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+                <span>Back</span>
+            </div>
+            <div class="affiliate-guide bottom-button next">
+                <span>Next</span>
+                <i class="semi-big-icon icons-sprite grey-right-arrow"></i>
+            </div>
+            <div class="default-green-button height-40 right dashboard hidden">
+                <span>Affiliate Dashboard</span>
+            </div>
+            <div class="clear"></div>
+            
+        </div>
+
+    </div>
+
+</body>
+</html>

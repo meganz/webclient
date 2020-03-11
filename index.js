@@ -261,6 +261,7 @@ function init_page() {
             return false;
         }
     }
+
     // cleaning local-storage used attr for business signup
     if (localStorage.businessSubAc && page !== 'register') {
         delete localStorage.businessSubAc;
@@ -560,6 +561,7 @@ function init_page() {
         && (page.substr(0, 3) !== 'pro')
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
+        && (page !== 'refer')
         && (page !== 'contact')
         && (page !== 'mobileapp')
         && (page !== 'uwp')
@@ -997,6 +999,30 @@ function init_page() {
         loadSubPage('fm/account/plan');
         return false;
     }
+    else if (!mega.flags.refpr && page.substr(0, 8) === 'fm/refer') {
+        loadSubPage('fm');
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/refer') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initMainPage();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/refer/guide') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initGuidePage();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/refer/history') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initHistoryPage();
+        return false;
+    }
+    else if (is_mobile && u_type && page === 'fm/refer/distribution') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initDistributionPage();
+        return false;
+    }
     else if (is_mobile && page.substr(0, 9) === 'twofactor') {
 
         parsepage(pages['mobile']);
@@ -1430,22 +1456,6 @@ function init_page() {
     }
     else if (page.substr(0, 3) === 'pro') {
         /* jshint -W018 */
-        var tmp = page.split(/(\/\w+=)/);
-        if (tmp.length > 1) {
-            for (var s = 1; s < tmp.length; s += 2) {
-                tmp[String(tmp[s]).replace(/\W/g, '')] = mURIDecode(tmp[s + 1]);
-            }
-            if (tmp.uao) {
-                mega.uaoref = tmp.uao;
-            }
-            if (tmp.aff && (tmp.aff_time *= 1000) && !(localStorage.affts > tmp.aff_time)) {
-                localStorage.affid = tmp.aff;
-                localStorage.affts = tmp.aff_time;
-            }
-            loadSubPage(tmp[0]);
-            return;
-        }
-
         if (page.substr(0, 6) === 'propay') {
             parsepage(pages[is_mobile ? 'mobile' : 'propay']);
             pro.propay.init();
@@ -1505,6 +1515,10 @@ function init_page() {
             // Scroll to the Windows Phone section
             $('.uwp-windows-section').get(0).scrollIntoView({behavior: "smooth"});
         });
+    }
+    else if (page === 'refer') {
+        parsepage(pages.affiliate);
+        affiliateprogram.init();
     }
     else if (page === 'extensions') {
         parsepage(pages['browsers']);
@@ -1958,6 +1972,7 @@ function topmenuUI() {
     $topMenu.find('.top-menu-item.register,.top-menu-item.login').addClass('hidden');
     $topMenu.find('.top-menu-item.account').addClass('hidden');
     $topMenu.find('.top-menu-item.refresh-item').addClass('hidden');
+    $('.top-menu-item.affiliate', $topMenu).addClass('hidden');
     $topHeader.find('.top-icon.warning').addClass('hidden');
     $topHeader.find('.activity-status-block .activity-status,.activity-status-block').addClass('hidden');
     $topHeader.find('.membership-status-block i').attr('class', 'tiny-icon membership-status free');
@@ -1995,6 +2010,13 @@ function topmenuUI() {
         section = page.split('/')[1];
     }
 
+    if (page.indexOf('fm/refer') === 0) {
+        section = 'affiliate-dashboard';
+    }
+    else if (page === 'refer') {
+        section = 'affiliate';
+    }
+
     // Get all menu items
     var $topMenuItems = $topMenu.find('.top-menu-item');
 
@@ -2025,6 +2047,10 @@ function topmenuUI() {
 
     if (u_type === 3 && u_attr.fullname) {
         $topHeader.find('.user-name').text(u_attr.fullname).removeClass('hidden');
+    }
+
+    if (mega.flags.refpr) {
+        $('.top-menu-item.affiliate', $topMenu).removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2353,9 +2379,9 @@ function topmenuUI() {
                 'copyright', 'corporate', 'credits', 'doc', 'extensions',
                 'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
                 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp'
+                'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate'
             ];
-            var moveTo = {'account': 'fm/account'};
+            var moveTo = {'account': 'fm/account', 'affiliate': 'refer'};
 
             for (var i = subPages.length; i--;) {
                 if (className.indexOf(subPages[i]) > -1) {
@@ -2648,7 +2674,10 @@ function getTemplate(name) {
 function pagemetadata() {
     var mega_desc = false;
 
-    if (page === 'uwp') {
+    if (page === 'refer') {
+        mega_title = 'MEGA Referral Program';
+    }
+    else if (page === 'uwp') {
         mega_title = 'Windows 10 app - MEGA';
     }
     else if (page === 'mobileapp') {
@@ -2782,6 +2811,8 @@ function parsetopmenu() {
 
 
 function loadSubPage(tpage, event) {
+    'use strict';
+
     pagemetadata();
     tpage = getCleanSitePath(tpage);
 
@@ -2846,7 +2877,11 @@ function loadSubPage(tpage, event) {
     if (hashLogic || isPublicLink(page)) {
         document.location.hash = '#' + page;
     }
-    else if (!event || event.type !== 'popstate') {
+    else if (event && event.type === 'popstate') {
+        // In case we navigated to a location.hash, clean it up replacing the current history entry.
+        history.replaceState({subpage: page}, "", '/' + page);
+    }
+    else {
         var isSearch = page.indexOf('fm/search/');
         if (isSearch >= 0) {
             var searchString = page.substring(isSearch + 10);
@@ -2874,7 +2909,7 @@ function loadSubPage(tpage, event) {
     else {
         init_page();
     }
-    mBroadcaster.sendMessage('pagechange');
+    mBroadcaster.sendMessage('pagechange', tpage);
 }
 
 

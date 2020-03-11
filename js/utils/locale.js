@@ -83,14 +83,36 @@ function setDateTimeFormat(locales, format) {
     "use strict";
 
     // Set date format
-    var options = {year: 'numeric', hour12: false};
-    options.month = format >= 2 ? 'long' : 'numeric';
-    options.day = format === 3 ? undefined : 'numeric';
-    options.weekday = format === 4 ? 'long' : undefined;
+    var options = {hour12: false};
 
-    if (format === 0) {
-        options.minute = 'numeric';
-        options.hour = 'numeric';
+    if (format < 10) {
+        options.year = 'numeric';
+        options.month = format >= 2 ? 'long' : 'numeric';
+        options.day = format === 3 ? undefined : 'numeric';
+        options.weekday = format === 4 ? 'long' : undefined;
+
+        if (format === 0) {
+            options.minute = 'numeric';
+            options.hour = 'numeric';
+        }
+
+    }
+    // Set non full date format
+    else {
+        switch (format) {
+            case 10:
+                options.weekday = 'short';
+                break;
+            case 11:
+                options.weekday = 'long';
+                break;
+            case 12:
+                options.month = 'short';
+                break;
+            case 13:
+                options.month = 'long';
+                break;
+        }
     }
 
     // Create new DateTimeFormat object if it is not exist
@@ -126,27 +148,28 @@ function setDateTimeFormat(locales, format) {
  *       2: yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format)
  *       3: yyyy fmn (fmn: Full month name, based on the locale) (Long Date format without day)
  *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
+ *
+ * Non full date formats:
+ *       10: Mon (Only day of the week long version)
+ *       11: Monday (Only day of the week short version)
+ *       12: Jan (Only month long version)
+ *       13: January (Only month short version)
  */
 function time2date(unixTime, format) {
 
     var date = new Date(unixTime * 1000 || 0);
     var result;
     var dateFunc;
-    var country = '';
+    var countryAndLocales = getCountryAndLocales();
 
     format = format || 0;
-    if (u_attr) {
-        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
-    }
-
-    var locales = country ? locale + '-' + country : locale;
 
     // If dateTimeFormat is not set with the current locale set it.
-    if ($.dateTimeFormat[locales + '-' + format] === undefined) {
-        setDateTimeFormat(locales, format);
+    if ($.dateTimeFormat[countryAndLocales.locales + '-' + format] === undefined) {
+        setDateTimeFormat(countryAndLocales.locales, format);
     }
 
-    var dFObj = $.dateTimeFormat[locales + '-' + format];
+    var dFObj = $.dateTimeFormat[countryAndLocales.locales + '-' + format];
 
     // print time as ISO date format
     var printISO = function _printISO() {
@@ -159,7 +182,7 @@ function time2date(unixTime, format) {
     dateFunc = dFObj === 'ISO' ? printISO : dFObj.format;
 
     // if it is short date format and user selected to use ISO format
-    if ((fmconfig.uidateformat || country === 'ISO') && format < 2) {
+    if ((fmconfig.uidateformat || countryAndLocales.country === 'ISO') && format < 2) {
         result = printISO();
     }
     else {
@@ -209,11 +232,7 @@ function setAccDateTimeFormat(locales) {
 function acc_time2date(unixtime, yearIsOptional) {
 
     var MyDate = new Date(unixtime * 1000);
-    var country;
-    if (u_attr) {
-        country = u_attr.country ? u_attr.country : u_attr.ipcc;
-    }
-    var locales = country ? locale + '-' + country : locale;
+    var locales = getCountryAndLocales().locales;
     var currYear = (new Date()).getFullYear();
     var result;
 
@@ -284,6 +303,61 @@ function time2last(timestamp) {
     }
 }
 
+/*
+ * Calculate start and end of calendar on the week/month/year contains time passed or today.
+ *
+ * @param {String} type  type of calendar to calculate. 'w' for week, 'm' for month, 'y' for year
+ * @param {Number} [unixTime]  The UNIX timestamp in seconds e.g. 1464829467
+ * @returns {Object}
+ */
+function calculateCalendar(type, unixTime) {
+
+    'use strict';
+
+    unixTime = unixTime * 1000 || Date.now();
+
+    var time = new Date(unixTime);
+    var startDate;
+    var endDate;
+
+    if (type === 'w') {
+        var timeDay = time.getDay();
+
+        startDate = new Date(unixTime - 86400000 * timeDay);
+        endDate = new Date(unixTime + 86400000 * (6 - timeDay));
+    }
+    else if (type === 'm') {
+        var timeMonth = time.getMonth();
+
+        startDate = new Date(unixTime);
+        startDate.setDate(1);
+
+        endDate = new Date(unixTime);
+
+        // End date of months can be vary and cause issue when update month, lets set it for 15 for now.
+        endDate.setDate(15);
+        endDate.setMonth(timeMonth + 1);
+        endDate.setDate(0); // -1 day from next month
+    }
+    else if (type === 'y') {
+        var timeYear = time.getFullYear();
+
+        startDate = new Date(unixTime);
+        startDate.setDate(1);
+        startDate.setMonth(0);
+
+        endDate = new Date(unixTime);
+        endDate.setFullYear(timeYear + 1);
+        endDate.setMonth(0);
+        endDate.setDate(0);
+    }
+
+    startDate = startDate.setHours(0, 0, 0, 0) / 1000;
+    endDate = endDate.setHours(23, 59, 59, 0) / 1000;
+
+    return {start: startDate, end: endDate};
+}
+
 /**
  * Function to get date time structure for current locale.
  * @returns {String|Boolean} result Date structure as 'ymd', 'dmy', or 'mdy' or false if errored.
@@ -309,11 +383,7 @@ function getDateStructure() {
     }
     else {
         // Arabic special
-        var country;
-        if (u_attr) {
-            country = u_attr.country ? u_attr.country : u_attr.ipcc;
-        }
-        var locales = country ? locale + '-' + country : locale;
+        var locales = getCountryAndLocales().locales;
 
         var options_y = {year: 'numeric'}; // Format only Day
         var options_m = {month: 'numeric'}; // Format only Month
@@ -487,6 +557,62 @@ function daysSince(dateStr) {
 function daysSince1Jan2000() {
     'use strict';
     return daysSince('2000-01-01');
+}
+
+/**
+ * Function to format currency with current locale
+ * @param {Number} value Value to format
+ * @param {String} [currency] Currency to use in currency formatting. Default: 'EUR'
+ * @param {String} [display] display type of currency format, supporting types are below:
+ *                  'symbol' - use a localized currency symbol such as "$" - Default,
+ *                  'code' - use the ISO currency code such as "NZD",
+ *                  'name' - use a localized currency name such as "dollar"
+ * @returns {String} formated currency value
+ */
+function formatCurrency(value, currency, display) {
+
+    'use strict';
+
+    currency = currency || 'EUR';
+    display = display || 'symbol';
+
+    var locales = getCountryAndLocales().locales;
+    var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
+
+    return value.toLocaleString(locales, options);
+}
+
+/**
+ * Function to return percentage structure as it is difference on some locale.
+ * @param {Number} value Value to format
+ * @returns {String} Formateed percentage value with curreny locales
+ */
+function formatPercentage(value) {
+
+    'use strict';
+
+    var locales = getCountryAndLocales().locales;
+
+    return value.toLocaleString(locales, {'style': 'percent'});
+}
+
+/**
+ * Function to return locales(e.g. en-GB, en-NZ...) and country code
+ * @returns {Object} currently selected country and locales that user chosen
+ */
+function getCountryAndLocales() {
+
+    'use strict';
+
+    var country;
+
+    if (u_attr) {
+        country = u_attr.country ? u_attr.country : u_attr.ipcc || 'ISO';
+    }
+
+    var locales = country ? locale + '-' + country : locale;
+
+    return {country: country, locales: locales};
 }
 
 //----------------------------------------------------------------------------
@@ -933,7 +1059,55 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[22094] = l[22094].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[22095] = l[22095].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[22247] = l[22247].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22685] = l[22685].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22687] = l[22687].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22688] = l[22688].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22689] = l[22689].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22696] = l[22696].replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
+        .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>');
+    l[22700] = l[22700].replace('[S]', '<span>').replace('[/S]', '</span>').replace('%1', '');
+    l['22723.a'] = l[22723].replace('[B]', '').replace('[/B]', '');
+    l[22723] = l[22723].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22724.a'] = l[22724].replace('[B]', '').replace('[/B]', '');
+    l[22724] = l[22724].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22725.m'] = l[22725].replace('[B]', '<strong>').replace('[/B]', '*</strong>');
+    l[22725] = l[22725].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22726.m'] = l[22726].replace('[B]', '<strong>').replace('[/B]', '*</strong>');
+    l[22726] = l[22726].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22731.a'] = l[22731].replace('[B]', '').replace('[/B]', '');
+    l[22731] = l[22731].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22732.a'] = l[22732].replace('[B]', '').replace('[/B]', '');
+    l[22732] = l[22732].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22734] = l[22734].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
+    l[22736] = l[22736].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22762] = l[22762].replace('[S1]%1[/S1]', '<span class="dropdown-lnk" data-type="number">10</span>')
+        .replace('[S2]%2[/S2]', '<span class="dropdown-lnk" data-type="plan">PRO I</span>')
+        .replace('[S3]%3[/S3]', '<span class="dropdown-lnk" data-type="time">' + l[16292] + '</span>');
+    l[22764] = l[22764].replace('[S]', '<span class="calc-price-week">').replace('[/S]', '</span>').replace('%1', '');
+    l['22771.a'] = l[22771].replace('[B]', '').replace('[/B]', '');
+    l[22771] = l[22771].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22772.a'] = l[22772].replace('[B]', '').replace('[/B]', '');
+    l[22772] = l[22772].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22773.a'] = l[22773].replace('[B]', '').replace('[/B]', '');
+    l[22773] = l[22773].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l['22774.a'] = l[22774].replace('[B]', '').replace('[/B]', '');
+    l[22774] = l[22774].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22786] = l[22786].replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
+    l[22791] = l[22791].replace('[A]', '<a class="to-aff-dash">').replace('[/A]', '</a>');
+    l[22793] = l[22793].replace('[A1]', '<a class="clickurl" href="/business">').replace('[/A1]', '</a>')
+        .replace('[A2]', '<a class="clickurl" href="/pro">').replace('[/A2]', '</a>');
+    l[22795] = l[22795].replace('[A]', '<a class="to-aff-dash">').replace('[/A]', '</a>')
+        .replace(/\[BR]/g, '<br/>');
+    l[22796] = l[22796].replace('[A]', '<a href="/contact" target="_blank">').replace('[/A]', '</a>');
+    l[22882] = l[22882].replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
+        .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>')
+        .replace('[B]', '<b>').replace('[/B]', '</b>');
+    l[22898] = l[22898].replace('[A]', '<a class="clickurl" href="/mobile">').replace('[/A]', '</a>')
+        .replace('[BR]', '<br>');
     l[22900] = l[22900].replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
+    l[23048] = l[23048].replace('[S1]1[/S1]', '<span class="dropdown-lnk" data-type="number">1</span>')
+        .replace('[S2]%2[/S2]', '<span class="dropdown-lnk" data-type="plan"></span>')
+        .replace('[S3]%3[/S3]', '<span class="dropdown-lnk" data-type="time"></span>');
     l[23066] = l[23066].replace('[A]', '<a href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[23075] = l[23075].replace('[A1]', '<a href="/terms" '
@@ -944,14 +1118,31 @@ mBroadcaster.once('boot_done', function populate_l() {
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|\"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|\"/g, '%1')).replace(/\[BR\]/g, '<br/>').replace(/%1/g, '"');
+    l['23181.d'] = escapeHTML(l[23181]).replace(/\[P\]/g, '').replace(/\[\/P\]/g, '')
+        .replace(/\[L\]/g, '<i class="small-icon icons-sprite bold-green-tick"></i><div class="affiliate-guide info">')
+        .replace(/\[\/L\]/g, '</div>').replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>')
+        .replace(/\[BLOCK\]/g, '').replace(/\[\/BLOCK\]/g, '').replace(/\[BR\]/g, '<br>');
+    l['23181.m'] = escapeHTML(l[23181])
+        .replace(/\[P\]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
+        .replace(/\[\/P\]/g, '</div></div>')
+        .replace(/\[L\]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
+            '</div><div class="mobile label-info">').replace(/\[\/L\]/g, '</div></div>')
+        .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>')
+        .replace(/\[BLOCK\]/g, '').replace(/\[\/BLOCK\]/g, '').replace(/\[BR\]/g, '');
+    l[23181] = escapeHTML(l[23181]).replace(/\[P\]/g, '').replace(/\[\/P\]/g, '')
+        .replace(/\[L\]/g, '<div class="bottom-page list-item">' +
+            '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L\]/g, '</div>')
+        .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>').replace(/\[BR\]/g, '<br>')
+        .replace(/\[BLOCK\]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
+        .replace(/\[\/BLOCK\]/g, '</div></div>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
-        19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973,
-        22117, 22667, 22668, 22674, 22669, 22671, 23098
+        19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
+        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098
     ];
     for (i = common.length; i--;) {
         var num = common[i];

@@ -38,6 +38,11 @@ class ModalDialog extends MegaRenderMixin {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
+        $('.fm-dialog-overlay').rebind('click.modalDialogOv' + this.getUniqueId(), function() {
+            self.onBlur();
+        });
+
+
         $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function(e) {
             if (e.keyCode == 27) { // escape key maps to keycode `27`
                 self.onBlur();
@@ -61,7 +66,7 @@ class ModalDialog extends MegaRenderMixin {
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
         $(window).off('resize.modalDialog' + this.getUniqueId());
-
+        $('.fm-dialog-overlay').unbind('click.modalDialogOv' + this.getUniqueId());
     }
     onCloseClicked(e) {
         var self = this;

@@ -81,6 +81,7 @@ class ChatlinkDialog extends MegaRenderMixin {
         if (this.props.onClose) {
             this.props.onClose();
         }
+        affiliateUI.registeredDialog.show();
     }
     onTopicFieldChanged(e) {
         this.setState({'newTopic': e.target.value});

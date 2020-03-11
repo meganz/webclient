@@ -168,6 +168,8 @@ accountUI.renderAccountPage = function(account) {
     // Reinitialize Scroll bar
     initAccountScroll();
     mBroadcaster.sendMessage('settingPageReady');
+    fmtopUI();
+
     loadingDialog.hide();
 };
 

@@ -432,3 +432,139 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
 .register-loading-icon img {
     width: 16px;
 }
+
+/* Data boxes and tables */
+/*
+ * Data box '.mega-data-box' is used mostly for account data. Its white block with border, shadow.
+ * Data box may contain table with data. Usage:
+ * <div class="mega-data-box">
+ * *<table>
+ * **<tr><th></th></tr>
+ * **<tr><td></td></tr>
+ * *</table>
+ * </div>
+* Each sortable table header should have '.sortable' class and addition 'asc' or '.desc' if active
+ *
+ * There are two default components:
+ * 1. '.link' for default link with underline
+ * 2.  '.colored-label' for any statuses. Can be '.green', '.orange' and '.red'
+ */
+.mega-data-box {
+    border-radius: 4px;
+    line-height: 31px;
+    position: relative;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.05);
+    background-color: white;
+}
+.mega-data-box::before {
+    content: '';
+    position: absolute;
+    border-radius: inherit;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+}
+.mega-data-box table {
+    border: 0;
+    border-spacing: 0;
+    border-radius: inherit;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.mega-data-box table tr:first-child {
+    background-color: #FAFAFC;
+    border-radius: 4px 4px 0 0;
+    padding: 0;
+    line-height: 32px;
+}
+.mega-data-box table th, .mega-data-box table td {
+    padding: 11px 12px 3px 12px;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+    text-align: left;
+    position: relative;
+    box-sizing: border-box;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    font-weight: normal;
+    box-sizing: border-box;
+}
+.mega-data-box table th::before {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 20px;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.1);
+}
+.mega-data-box table th:first-child::before {
+    display: none;
+}
+.mega-data-box table th.sortable {
+    cursor: pointer;
+    padding-right: 24px;
+}
+.mega-data-box table th.sortable.asc::after, .mega-data-box table th.sortable.desc::after {
+    content: '';
+    position: absolute;
+    width: 13px;
+    height: 10px;
+    right: 7px;
+    top: 17px;
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-position: -25px -8371px;
+    background-repeat: no-repeat;
+    -webkit-transition: transform 200ms ease-in-out;
+    transition: transform 200ms ease-in-out;
+}
+.mega-data-box table th.sortable.desc::after {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.mega-data-box table th {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.mega-data-box table td {
+    padding: 7px 12px;
+    line-height: 24px;
+    height: 40px;
+    color: #999;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+.mega-data-box table tr:nth-child(2) td {
+    border: 0;
+}
+.mega-data-box .colored-label {
+    font-size: 13px;
+    display: inline-block;
+    line-height: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 4px;
+    background-color: #00BFA5;
+    box-shadow: inset 0 0 1px 0 rgba(0,0,0,0.1);
+    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+    color: white;
+}
+.mega-data-box .colored-label.orange {
+    background-color: #FF6F00;
+}
+.mega-data-box .colored-label.red {
+    background-color: #D90007;
+}
+.mega-data-box .link {
+    display: inline-block;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.mega-data-box .link:hover {
+    text-decoration: none;
+}
+

@@ -856,6 +856,13 @@ function fmtopUI() {
 
         $icon.removeClass('filled glow');
     }
+
+    if (mega.flags.refpr) {
+        $('.nw-fm-left-icon.affiliate').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.affiliate').addClass('hidden');
+    }
 }
 
 function doClearbin(all) {
@@ -3403,6 +3410,9 @@ function fm_resize_handler(force) {
             $mainBlock.addClass('ultra low-width');
         }
         initDashboardScroll();
+    }
+    else if (M.currentdirid === 'refer') {
+        initAffiliateScroll();
     }
     else if (!M.chat) {
         if (M.viewmode) {

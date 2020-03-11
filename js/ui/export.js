@@ -1370,6 +1370,9 @@ var exportExpiry = {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
                 delete window.onCopyEventHandler;
             }
+
+            affiliateUI.registeredDialog.show();
+
             return true;
         }
 

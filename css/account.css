@@ -608,11 +608,11 @@ body.ar .sms-verification-number-input {
 }
 
 /* New register page */
-.big-illustration.register, .big-illustration.login {
+.big-illustration {
     width: 400px;
     height: 142px;
     display: inline-block;
-    background-image: url(../images/mega/register-sprite_v2.png);
+    background-image: url(../images/mega/register-sprite_v3.png);
     background-repeat: no-repeat;
 }
 .big-illustration.register.shield {

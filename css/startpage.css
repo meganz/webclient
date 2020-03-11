@@ -123,6 +123,37 @@ body:not(.en) .download .startpage.top-header {
 .startpage.img-wrap::after {
     right: 0;
 }
+.bottom-page.banners {
+    position: relative;
+}
+.bottom-page.top-banner {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+}
+.bottom-page.top-banner.active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+}
+.bottom-page.top-banner.banner2 {
+    padding-bottom: 71px;
+}
+.bottom-page.banner-control {
+    position: absolute;
+    top: 470px;
+    left: 90px;
+    z-index: 3;
+    cursor: pointer;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 90px;
+}
 .startpage.plan-wrapper {
     max-width: 848px;
     margin: 0 auto;
@@ -910,6 +941,13 @@ body:not(.en) .download .startpage.top-header {
 .startpage.img-wrap::before {
     display: none;
 }
+.bottom-page.banner-control {
+    left: 10px;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 10px;
+}
 }
 
 @media only screen and (max-width: 1020px) {
@@ -1010,6 +1048,9 @@ body:not(.en) .download .startpage.top-header {
     width: auto;
     max-width: 100%;
     max-height: 100%;
+}
+.bottom-page.top-banner.banner2 {
+    padding-bottom: 0;
 }
 }
 
@@ -1175,6 +1216,9 @@ body:not(.en) .download .startpage.top-header {
 .startpage.italic-text {
     font-size: 14px;
 }
+.affiliate-page.top-banner .bottom-page.top-bl {
+    margin-bottom: 60px;
+}
 }
 @media only screen and (max-width: 705px) {
 .startpage.square-block.top-margin, .chaotic .startpage.square-block:nth-child(odd) {
@@ -1275,6 +1319,13 @@ body:not(.en) .download .startpage.top-header {
     opacity: 0;
     left: 0;
 }
+.bottom-page.banner-control {
+    left: 5px;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 5px;
+}
 }
 
 @media only screen and (max-width: 420px) {
@@ -1348,5 +1399,8 @@ body:not(.en) .download .startpage.top-header {
 }
 .ar .startpage.plan-block .startpage.button-48-height {
     font-size: 13px;
+}
+.bottom-page.banner-control {
+    top: 430px;
 }
 }

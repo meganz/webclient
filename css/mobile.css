@@ -13134,7 +13134,7 @@ p a.blog-new-read-more {
     position: fixed;
     width: 100%;
     z-index: 10;
-    top: 66px;
+    margin-top: 66px;
     background-color: white;
 }
 .affiliate-distrib-page .mobile.top-hr-pad {

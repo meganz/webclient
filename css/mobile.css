@@ -974,7 +974,7 @@ ul, li {
     max-height: calc(100vh - 126px);
     -webkit-overflow-scrolling: touch;
 }
-.bottom-pages .fm-scrolling, .mobile.fm-content .fm-scrolling {
+.bottom-pages .fm-scrolling {
     max-height: none;
 }
 .mobile.fm-block.disable-scroll .fm-scrolling {

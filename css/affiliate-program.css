@@ -376,7 +376,9 @@
     line-height: 20px;
     height: 20px;
     display: inline-block;
-    min-width: 270px;
+    min-width: -webkit-calc(100% - 40px);
+    min-width: -moz-calc(100% - 40px);
+    min-width: calc(100% - 40px);
     box-sizing: border-box;
     padding: 0 10px;
 }

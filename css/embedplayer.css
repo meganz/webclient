@@ -74,6 +74,7 @@ input, textarea {
 }
 .embedplayer.video .video-wrapper {
 	height: 100%;
+    line-height: 0;
 }
 .embedplayer.video .download.video-block video {
 	width: 100%;
@@ -1581,8 +1582,15 @@ input, textarea {
 }
 
 /* ICONS */
+.small-icon.icons-sprite {
+    background-image: url(../images/mega/embed-sprite_v2.png);
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: top;
+}
 .medium-icon.icons-img, .small-icon.context, .video .play-video-button {
-	background-image: url(../images/mega/embed-sprite.png);
+	background-image: url(../images/mega/embed-sprite_v2.png);
 	background-size: 144px auto;
 }
 .embedplayer.video .dropdown.body.context.mobile-mode .dropdown-item i {
@@ -1654,6 +1662,9 @@ input, textarea {
 .small-icon.context.mega {
 	background-position: -114px -6px;
 }
+.small-icon.icons-sprite.skip {
+    background-position: -116px -219px;
+}
 .dropdown-item:hover .small-icon.context.login {
 	background-position: -78px -42px;
 }
@@ -1675,7 +1686,7 @@ input, textarea {
 	height: 24px;
 	background-position: -17px -150px;
 	background-repeat: no-repeat;
-	background-image: url(../images/mega/embed-sprite.png);
+	background-image: url(../images/mega/embed-sprite_v2.png);
 	background-size: 144px auto;
 }
 .video-theatre-mode .embedplayer .logo-container {
@@ -1697,12 +1708,116 @@ input, textarea {
 	padding: 20px 100px 0 110px;
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-	.medium-icon.icons-img, .small-icon.context, .video .play-video-button, .logo-container .logo-icon  {
-		background-image: url(../images/mega/embed-sprite@2x.png);
-		background-size: 144px auto;
-	}
+/*Video Ad*/
+.viewer-vad-control {
+    position: absolute;
+    min-width: 120px;
+    height: 48px;
+    background-color: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+    border-radius: 3px;
+    bottom: 66px;
+    right: 12px;
+    z-index: 10;
+    color: rgba(255,255,255,0.8);
+    font-size: 18px;
+    line-height: 48px;
+    white-space: nowrap;
+    text-align: center;
+    text-transform: capitalize;
+    -webkit-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    cursor: default;
 }
+.mouse-idle .viewer-vad-control {
+    bottom: 16px;
+}
+.viewer-vad-control.skip {
+    cursor: pointer;
+}
+.viewer-vad-control.skip:hover {
+    color: rgba(255,255,255,1);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.7);
+}
+.viewer-vad-control .thumb {
+    float: right;
+    width: 76px;
+    height: 48px;
+    line-height: 0;
+    display: none;
+    overflow: hidden;
+}
+.viewer-vad-control .thumb.active {
+    display: block;
+}
+.viewer-vad-control .thumb img, .video .download.video-block .viewer-vad-control .thumb img {
+    height: auto;
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 86px;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    position: relative;
+    left: 50%;
+    top: 50%;
+}
+.viewer-vad-control .counter {
+    padding: 0 10px;
+    display: inline-block;
+}
+.viewer-vad-control .label, .viewer-vad-control.skip .thumb.active, .viewer-vad-control.skip .counter {
+    display: none;
+}
+.viewer-vad-control.skip .label {
+    display: block;
+    padding: 0 14px;
+}
+.viewer-vad-control .label i {
+    margin: 14px -3px 0 11px;
+    opacity: 0.8;
+    -webkit-transition:  opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.viewer-vad-control.skip:hover .label i {
+     opacity: 1;
+}
+.video-progress-bar.vad {
+    -webkit-transition:  opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    left: 0;
+    bottom: 0;
+    z-index: 10;
+    border-radius: 0;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 0;
+    margin: 0;
+}
+.vad.mouse-idle .video-progress-bar.vad,  .mouse-idle .vad .video-progress-bar.vad {
+    opacity: 1;
+    visibility: visible;
+}
+.vad .video-time-bar, .vad .video-buffer-bar {
+    background-color: #FFA500;
+}
+.vad .video-progress-block:hover .video-progress-bar {
+    height: 2px;
+    margin-top: 2px;
+    cursor: default;
+}
+.vad .video-time-bar::before {
+    display: none;
+}
+
+
 .useravatar {
 	height: 28px;
 	width: 28px;
@@ -1776,6 +1891,30 @@ input, textarea {
 }
 .video-theatre-mode .no-grad {
 	opacity: 1;
+}
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+	.medium-icon.icons-img,
+    .small-icon.context,
+    .video .play-video-button,
+    .logo-container .logo-icon,
+    .small-icon.icons-sprite  {
+		background-image: url(../images/mega/embed-sprite_v2@2x.png);
+		background-size: 144px auto;
+	}
+}
+@media only screen and (orientation:portrait) and (max-width: 640px) {
+    .viewer-vad-control {
+        min-width: 120px;
+        height: 38px;
+        font-size: 16px;
+        line-height: 38px;
+    }
+    .viewer-vad-control .thumb {
+        height: 38px;
+    }
+    .viewer-vad-control .label i {
+     margin-top: 9px;
+    }
 }
 @media only screen and (orientation:portrait) and (max-width: 420px) {
 	.embedplayer.video .viewer-button.useravatar {

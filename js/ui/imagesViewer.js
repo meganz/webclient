@@ -1071,7 +1071,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev3);
                     mBroadcaster.removeListener(preqs[n.h].ev4);
 
-                    preqs[n.h].destroy();
+                    preqs[n.h].kill();
                     preqs[n.h] = false;
                 }
             };

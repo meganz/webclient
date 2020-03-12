@@ -322,6 +322,16 @@ mBroadcaster.once('startMega', function() {
         return String(new Error().stack);
     };
     M.hasPendingTransfers = dummy;
+    M.req = promisify(function(resolve, reject, params, ch) {
+        api_req(typeof params === 'string' ? {a: params} : params, {
+            callback: function(res) {
+                if (typeof res === 'number' && res < 0) {
+                    return reject(res);
+                }
+                resolve(res);
+            }
+        }, ch | 0);
+    });
 
     dlmanager = Object.create(null);
     dlmanager._quotaTasks = [];

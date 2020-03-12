@@ -1356,6 +1356,9 @@
     width: 22px;
     height: 22px;
 }
+.small-icon.icons-sprite.skip {
+    background-position: -231px -1396px;
+}
 .dropdown-item:hover .small-icon.icons-sprite.grey-plus {
     background-position: -240px -391px;
 }

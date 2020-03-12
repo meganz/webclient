@@ -14997,6 +14997,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     bottom: 0;
     display: none;
     width: 100%;
+    z-index: 12;
 }
 .search-bottom-menu {
     min-width: 100%;

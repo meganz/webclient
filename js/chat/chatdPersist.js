@@ -1643,24 +1643,26 @@
             });
 
 
-        promise.always(function() {
-            var chatRoom = self.chatd.megaChat.getChatById(chatId);
+        var chatRoom = self.chatd.megaChat.getChatById(chatId);
+        if (chatRoom && chatRoom.type !== "public") {
+            promise.always(function() {
 
-            if (
-                chatRoom &&
-                chatRoom.messagesBuff.isDecrypting &&
-                chatRoom.messagesBuff.isDecrypting.state() === 'pending'
-            ) {
-                chatRoom.messagesBuff.isDecrypting.done(function() {
-                    Soon(function() {
-                        self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
+                if (
+                    chatRoom &&
+                    chatRoom.messagesBuff.isDecrypting &&
+                    chatRoom.messagesBuff.isDecrypting.state() === 'pending'
+                ) {
+                    chatRoom.messagesBuff.isDecrypting.done(function() {
+                        Soon(function() {
+                            self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
+                        });
                     });
-                });
-            }
-            else {
-                self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
-            }
-        });
+                }
+                else {
+                    self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
+                }
+            });
+        }
 
         return promise;
     };

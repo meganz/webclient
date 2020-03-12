@@ -194,7 +194,9 @@ if (localStorageProfileRenderFns) {
 }
 
 var ID_CURRENT = 0;
-var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
+var MegaRenderMixin =
+/*#__PURE__*/
+function (_React$Component) {
   _inherits(MegaRenderMixin, _React$Component);
 
   function MegaRenderMixin(props) {
@@ -957,7 +959,9 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_1___default.a.Component);
 ;
 var _noAvatars = {};
-var ContactAwareComponent = /*#__PURE__*/function (_MegaRenderMixin) {
+var ContactAwareComponent =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(ContactAwareComponent, _MegaRenderMixin);
 
   function ContactAwareComponent(props) {
@@ -1069,7 +1073,9 @@ var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
   this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
 };
 
-var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
+var ContactsListItem =
+/*#__PURE__*/
+function (_ContactAwareComponen) {
   _inherits(ContactsListItem, _ContactAwareComponen);
 
   function ContactsListItem() {
@@ -1122,7 +1128,9 @@ ContactsListItem.defaultProps = {
 ContactsListItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
 };
-var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
+var ContactButton =
+/*#__PURE__*/
+function (_ContactAwareComponen2) {
   _inherits(ContactButton, _ContactAwareComponen2);
 
   function ContactButton() {
@@ -1408,7 +1416,9 @@ ContactButton.defaultProps = {
 ContactButton.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactVerified = /*#__PURE__*/function (_MegaRenderMixin) {
+var ContactVerified =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(ContactVerified, _MegaRenderMixin);
 
   function ContactVerified() {
@@ -1465,7 +1475,9 @@ ContactVerified.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactPresence = /*#__PURE__*/function (_MegaRenderMixin2) {
+var ContactPresence =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(ContactPresence, _MegaRenderMixin2);
 
   function ContactPresence() {
@@ -1498,7 +1510,9 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactFingerprint = /*#__PURE__*/function (_MegaRenderMixin3) {
+var ContactFingerprint =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(ContactFingerprint, _MegaRenderMixin3);
 
   function ContactFingerprint() {
@@ -1573,7 +1587,9 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var Avatar = /*#__PURE__*/function (_ContactAwareComponen3) {
+var Avatar =
+/*#__PURE__*/
+function (_ContactAwareComponen3) {
   _inherits(Avatar, _ContactAwareComponen3);
 
   function Avatar() {
@@ -1684,7 +1700,9 @@ Avatar.defaultProps = {
 Avatar.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
+var ContactCard =
+/*#__PURE__*/
+function (_ContactAwareComponen4) {
   _inherits(ContactCard, _ContactAwareComponen4);
 
   function ContactCard() {
@@ -1882,7 +1900,9 @@ ContactCard.defaultProps = {
 ContactCard.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactItem = /*#__PURE__*/function (_ContactAwareComponen5) {
+var ContactItem =
+/*#__PURE__*/
+function (_ContactAwareComponen5) {
   _inherits(ContactItem, _ContactAwareComponen5);
 
   function ContactItem() {
@@ -1950,7 +1970,9 @@ ContactItem.defaultProps = {
 ContactItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
+var ContactPickerWidget =
+/*#__PURE__*/
+function (_MegaRenderMixin4) {
   _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
   function ContactPickerWidget(props) {
@@ -2541,7 +2563,9 @@ var ReactDOM = __webpack_require__(4);
  * @type {*|Function}
  */
 
-var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
+var JScrollPane =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(JScrollPane, _MegaRenderMixin);
 
   function JScrollPane() {
@@ -2741,7 +2765,9 @@ JScrollPane.defaultProps = {
  * so that we can render Dialogs into the body or other child element, different then the current component's child.
  */
 
-var RenderTo = /*#__PURE__*/function (_React$Component) {
+var RenderTo =
+/*#__PURE__*/
+function (_React$Component) {
   _inherits(RenderTo, _React$Component);
 
   function RenderTo() {
@@ -2811,7 +2837,9 @@ var RenderTo = /*#__PURE__*/function (_React$Component) {
 
 ;
 
-var EmojiFormattedContent = /*#__PURE__*/function (_React$Component2) {
+var EmojiFormattedContent =
+/*#__PURE__*/
+function (_React$Component2) {
   _inherits(EmojiFormattedContent, _React$Component2);
 
   function EmojiFormattedContent() {
@@ -2963,7 +2991,9 @@ var React = __webpack_require__(0);
 
 
 
-var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
+var Dropdown =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(Dropdown, _MegaRenderMixin);
 
   function Dropdown(props) {
@@ -3227,7 +3257,9 @@ var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var DropdownContactsSelector = /*#__PURE__*/function (_MegaRenderMixin2) {
+var DropdownContactsSelector =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(DropdownContactsSelector, _MegaRenderMixin2);
 
   function DropdownContactsSelector(props) {
@@ -3320,7 +3352,9 @@ var DropdownContactsSelector = /*#__PURE__*/function (_MegaRenderMixin2) {
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
-var DropdownItem = /*#__PURE__*/function (_MegaRenderMixin3) {
+var DropdownItem =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(DropdownItem, _MegaRenderMixin3);
 
   function DropdownItem(props) {
@@ -3474,7 +3508,9 @@ var ReactDOM = __webpack_require__(4);
 
 var ContactsUI = __webpack_require__(2);
 
-var ExtraFooterElement = /*#__PURE__*/function (_MegaRenderMixin) {
+var ExtraFooterElement =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(ExtraFooterElement, _MegaRenderMixin);
 
   function ExtraFooterElement() {
@@ -3495,7 +3531,9 @@ var ExtraFooterElement = /*#__PURE__*/function (_MegaRenderMixin) {
 
 ;
 
-var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
+var ModalDialog =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(ModalDialog, _MegaRenderMixin2);
 
   function ModalDialog(props) {
@@ -3650,7 +3688,9 @@ ModalDialog.defaultProps = {
 };
 ;
 
-var SelectContactDialog = /*#__PURE__*/function (_MegaRenderMixin3) {
+var SelectContactDialog =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(SelectContactDialog, _MegaRenderMixin3);
 
   function SelectContactDialog(props) {
@@ -3746,7 +3786,9 @@ SelectContactDialog.defaultProps = {
 };
 ;
 
-var ConfirmDialog = /*#__PURE__*/function (_MegaRenderMixin4) {
+var ConfirmDialog =
+/*#__PURE__*/
+function (_MegaRenderMixin4) {
   _inherits(ConfirmDialog, _MegaRenderMixin4);
 
   function ConfirmDialog(props) {
@@ -3938,7 +3980,9 @@ var utils = __webpack_require__(3);
 
 
 var _buttonGroups = {};
-var Button = /*#__PURE__*/function (_MegaRenderMixin) {
+var Button =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(Button, _MegaRenderMixin);
 
   function Button(props) {
@@ -4190,7 +4234,9 @@ var React = __webpack_require__(0);
 
 
 
-var ConversationMessageMixin = /*#__PURE__*/function (_ContactAwareComponen) {
+var ConversationMessageMixin =
+/*#__PURE__*/
+function (_ContactAwareComponen) {
   _inherits(ConversationMessageMixin, _ContactAwareComponen);
 
   function ConversationMessageMixin(props) {
@@ -4375,7 +4421,9 @@ var x = 0;
  * @type {*|Function}
  */
 
-var PerfectScrollbar = /*#__PURE__*/function (_MegaRenderMixin) {
+var PerfectScrollbar =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(PerfectScrollbar, _MegaRenderMixin);
 
   function PerfectScrollbar(props) {
@@ -4803,7 +4851,9 @@ var utils = __webpack_require__(3);
 
 
 
-var Handler = /*#__PURE__*/function (_MegaRenderMixin) {
+var Handler =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(Handler, _MegaRenderMixin);
 
   function Handler() {
@@ -4832,7 +4882,9 @@ Handler.defaultProps = {
 };
 ;
 
-var Contents = /*#__PURE__*/function (_MegaRenderMixin2) {
+var Contents =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(Contents, _MegaRenderMixin2);
 
   function Contents() {
@@ -4867,7 +4919,9 @@ Contents.defaultProps = {
 };
 ;
 
-var Tooltip = /*#__PURE__*/function (_MegaRenderMixin3) {
+var Tooltip =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(Tooltip, _MegaRenderMixin3);
 
   function Tooltip(props) {
@@ -5243,7 +5297,9 @@ var getRoomName = function getRoomName(chatRoom) {
   return chatRoom.getRoomTitle();
 };
 
-var ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
+var ConversationsListItem =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(ConversationsListItem, _MegaRenderMixin);
 
   function ConversationsListItem() {
@@ -5559,7 +5615,9 @@ var ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
 
 ;
 
-var ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
+var ArchConversationsListItem =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(ArchConversationsListItem, _MegaRenderMixin2);
 
   function ArchConversationsListItem() {
@@ -5699,7 +5757,9 @@ var ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
 
 ;
 
-var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
+var ConversationsList =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(ConversationsList, _MegaRenderMixin3);
 
   _createClass(ConversationsList, [{
@@ -5877,7 +5937,9 @@ ConversationsList.defaultProps = {
 };
 ;
 
-var ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
+var ArchivedConversationsList =
+/*#__PURE__*/
+function (_MegaRenderMixin4) {
   _inherits(ArchivedConversationsList, _MegaRenderMixin4);
 
   function ArchivedConversationsList(props) {
@@ -6098,7 +6160,9 @@ var ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
 
 ;
 
-var ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
+var ConversationsApp =
+/*#__PURE__*/
+function (_MegaRenderMixin5) {
   _inherits(ConversationsApp, _MegaRenderMixin5);
 
   function ConversationsApp(props) {
@@ -6621,7 +6685,9 @@ var utils = __webpack_require__(3);
 
 
 
-var Checkbox = /*#__PURE__*/function (_MegaRenderMixin) {
+var Checkbox =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(Checkbox, _MegaRenderMixin);
 
   function Checkbox(props) {
@@ -6719,7 +6785,9 @@ var React = __webpack_require__(0);
 
 var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
+var MetaRichpreviewLoading =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   _inherits(MetaRichpreviewLoading, _ConversationMessageM);
 
   function MetaRichpreviewLoading() {
@@ -6831,7 +6899,9 @@ function BrowserCol(_ref) {
 
 ;
 
-var cloudBrowserModalDialog_BrowserEntries = /*#__PURE__*/function (_MegaRenderMixin) {
+var cloudBrowserModalDialog_BrowserEntries =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(BrowserEntries, _MegaRenderMixin);
 
   function BrowserEntries(props) {
@@ -7545,7 +7615,9 @@ cloudBrowserModalDialog_BrowserEntries.defaultProps = {
 };
 ;
 
-var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
+var cloudBrowserModalDialog_CloudBrowserDialog =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(CloudBrowserDialog, _MegaRenderMixin2);
 
   function CloudBrowserDialog(props) {
@@ -8162,7 +8234,9 @@ var DropdownsUI = __webpack_require__(6);
 
 var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var DropdownEmojiSelector = /*#__PURE__*/function (_MegaRenderMixin) {
+var DropdownEmojiSelector =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   emojiDropdown_inherits(DropdownEmojiSelector, _MegaRenderMixin);
 
   function DropdownEmojiSelector(props) {
@@ -8707,7 +8781,9 @@ var ReactDOM = __webpack_require__(4);
 
 var ButtonsUI = __webpack_require__(8);
 
-var EmojiAutocomplete = /*#__PURE__*/function (_MegaRenderMixin) {
+var EmojiAutocomplete =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   emojiAutocomplete_inherits(EmojiAutocomplete, _MegaRenderMixin);
 
   function EmojiAutocomplete(props) {
@@ -9021,7 +9097,9 @@ var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
-var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 = /*#__PURE__*/function (_MegaRenderMixin) {
+var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   typingArea_inherits(TypingArea, _MegaRenderMixin);
 
   function TypingArea(props) {
@@ -9971,7 +10049,9 @@ var whosTyping_ReactDOM = __webpack_require__(4);
 
 var RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var WhosTyping = /*#__PURE__*/function (_MegaRenderMixin) {
+var WhosTyping =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   whosTyping_inherits(WhosTyping, _MegaRenderMixin);
 
   function WhosTyping(props) {
@@ -10154,7 +10234,9 @@ var accordion_ReactDOM = __webpack_require__(4);
 
 var accordion_RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var AccordionPanel = /*#__PURE__*/function (_MegaRenderMixin) {
+var AccordionPanel =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   accordion_inherits(AccordionPanel, _MegaRenderMixin);
 
   function AccordionPanel() {
@@ -10188,7 +10270,9 @@ var AccordionPanel = /*#__PURE__*/function (_MegaRenderMixin) {
 
 ;
 
-var Accordion = /*#__PURE__*/function (_MegaRenderMixin2) {
+var Accordion =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   accordion_inherits(Accordion, _MegaRenderMixin2);
 
   function Accordion(props) {
@@ -10322,7 +10406,9 @@ var ContactsUI = __webpack_require__(2);
 
 var participantsList_PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var participantsList_ParticipantsList = /*#__PURE__*/function (_MegaRenderMixin) {
+var participantsList_ParticipantsList =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   participantsList_inherits(ParticipantsList, _MegaRenderMixin);
 
   function ParticipantsList(props) {
@@ -10471,7 +10557,9 @@ participantsList_ParticipantsList.defaultProps = {
 };
 ;
 
-var participantsList_ParticipantsListInner = /*#__PURE__*/function (_MegaRenderMixin2) {
+var participantsList_ParticipantsListInner =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   participantsList_inherits(ParticipantsListInner, _MegaRenderMixin2);
 
   function ParticipantsListInner() {
@@ -10677,7 +10765,9 @@ var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var MetaRichPreviewLoading = __webpack_require__(15).MetaRichpreviewLoading;
 
-var MetaRichpreview = /*#__PURE__*/function (_ConversationMessageM) {
+var MetaRichpreview =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   metaRichpreview_inherits(MetaRichpreview, _ConversationMessageM);
 
   function MetaRichpreview() {
@@ -10771,6 +10861,7 @@ var MetaRichpreview = /*#__PURE__*/function (_ConversationMessageM) {
 
         output.push(metaRichpreview_React.makeElement("div", {
           key: meta.url,
+          className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
           onClick: function (url) {
             if (!message.meta.isLoading) {
               window.open(url, "_blank");
@@ -10815,7 +10906,9 @@ var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
 var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichprevConfirmation = /*#__PURE__*/function (_ConversationMessageM) {
+var MetaRichprevConfirmation =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   metaRichpreviewConfirmation_inherits(MetaRichprevConfirmation, _ConversationMessageM);
 
   function MetaRichprevConfirmation() {
@@ -10940,7 +11033,9 @@ function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLink
 
 
 
-var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks = /*#__PURE__*/function (_ConversationMessageM) {
+var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   metaRichpreviewMegaLinks_inherits(MetaRichpreviewMegaLinks, _ConversationMessageM);
 
   function MetaRichpreviewMegaLinks() {
@@ -11130,7 +11225,9 @@ function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.
 
 
 
-var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
+var AudioPlayer_AudioPlayer =
+/*#__PURE__*/
+function (_React$Component) {
   AudioPlayer_inherits(AudioPlayer, _React$Component);
 
   function AudioPlayer(props) {
@@ -11396,7 +11493,9 @@ function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = O
 
 
 
-var AudioContainer_AudioContainer = /*#__PURE__*/function (_React$Component) {
+var AudioContainer_AudioContainer =
+/*#__PURE__*/
+function (_React$Component) {
   AudioContainer_inherits(AudioContainer, _React$Component);
 
   function AudioContainer(props) {
@@ -11587,7 +11686,9 @@ var generic_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT =
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big,' + ' .data-block-view.medium';
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMessageM) {
+var generic_GenericConversationMessage =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   generic_inherits(GenericConversationMessage, _ConversationMessageM);
 
   function GenericConversationMessage(props) {
@@ -13012,7 +13113,9 @@ var alterParticipants_ContactsUI = __webpack_require__(2);
 
 var alterParticipants_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var AltPartsConvMessage = /*#__PURE__*/function (_ConversationMessageM) {
+var AltPartsConvMessage =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   alterParticipants_inherits(AltPartsConvMessage, _ConversationMessageM);
 
   function AltPartsConvMessage() {
@@ -13192,7 +13295,9 @@ var truncated_ContactsUI = __webpack_require__(2);
 
 var truncated_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TruncatedMessage = /*#__PURE__*/function (_ConversationMessageM) {
+var TruncatedMessage =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   truncated_inherits(TruncatedMessage, _ConversationMessageM);
 
   function TruncatedMessage() {
@@ -13285,7 +13390,9 @@ var privilegeChange_ContactsUI = __webpack_require__(2);
 
 var privilegeChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var PrivilegeChange = /*#__PURE__*/function (_ConversationMessageM) {
+var PrivilegeChange =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   privilegeChange_inherits(PrivilegeChange, _ConversationMessageM);
 
   function PrivilegeChange() {
@@ -13405,7 +13512,9 @@ var topicChange_ContactsUI = __webpack_require__(2);
 
 var topicChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TopicChange = /*#__PURE__*/function (_ConversationMessageM) {
+var TopicChange =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   topicChange_inherits(TopicChange, _ConversationMessageM);
 
   function TopicChange() {
@@ -13512,7 +13621,9 @@ var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFileItem = /*#__PURE__*/function (_MegaRenderMixin) {
+var SharedFileItem =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   sharedFilesAccordionPanel_inherits(SharedFileItem, _MegaRenderMixin);
 
   function SharedFileItem() {
@@ -13567,7 +13678,9 @@ var SharedFileItem = /*#__PURE__*/function (_MegaRenderMixin) {
   return SharedFileItem;
 }(mixins["MegaRenderMixin"]);
 
-var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = /*#__PURE__*/function (_MegaRenderMixin2) {
+var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   sharedFilesAccordionPanel_inherits(SharedFilesAccordionPanel, _MegaRenderMixin2);
 
   function SharedFilesAccordionPanel() {
@@ -13832,7 +13945,9 @@ var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFolderItem = /*#__PURE__*/function (_MegaRenderMixin) {
+var SharedFolderItem =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   incomingSharesAccordionPanel_inherits(SharedFolderItem, _MegaRenderMixin);
 
   function SharedFolderItem() {
@@ -13872,7 +13987,9 @@ var SharedFolderItem = /*#__PURE__*/function (_MegaRenderMixin) {
 
 ;
 
-var IncSharesAccordionPanel = /*#__PURE__*/function (_MegaRenderMixin2) {
+var IncSharesAccordionPanel =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   incomingSharesAccordionPanel_inherits(IncSharesAccordionPanel, _MegaRenderMixin2);
 
   function IncSharesAccordionPanel() {
@@ -14029,7 +14146,9 @@ var closeOpenMode_ContactsUI = __webpack_require__(2);
 
 var closeOpenMode_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var CloseOpenModeMessage = /*#__PURE__*/function (_ConversationMessageM) {
+var CloseOpenModeMessage =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   closeOpenMode_inherits(CloseOpenModeMessage, _ConversationMessageM);
 
   function CloseOpenModeMessage() {
@@ -14127,7 +14246,9 @@ var chatHandle_ConversationMessageMixin = __webpack_require__(9).ConversationMes
 
 var getMessageString = __webpack_require__(12).getMessageString;
 
-var ChatHandleMessage = /*#__PURE__*/function (_ConversationMessageM) {
+var ChatHandleMessage =
+/*#__PURE__*/
+function (_ConversationMessageM) {
   chatHandle_inherits(ChatHandleMessage, _ConversationMessageM);
 
   function ChatHandleMessage() {
@@ -14222,7 +14343,9 @@ function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = O
 
 
 
-var chatlinkDialog_ChatlinkDialog = /*#__PURE__*/function (_MegaRenderMixin) {
+var chatlinkDialog_ChatlinkDialog =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   chatlinkDialog_inherits(ChatlinkDialog, _MegaRenderMixin);
 
   function ChatlinkDialog(props) {
@@ -14468,7 +14591,9 @@ var VIEW_MODES = {
   "CAROUSEL": 2
 };
 
-var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_MegaRenderMixin) {
+var conversationaudiovideopanel_ConversationAVPanel =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   conversationaudiovideopanel_inherits(ConversationAVPanel, _MegaRenderMixin);
 
   function ConversationAVPanel(props) {
@@ -15571,7 +15696,9 @@ function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototype
 var ENABLE_GROUP_CALLING_FLAG = true; // eslint-disable-next-line id-length
 
 var MAX_USERS_CHAT_PRIVATE = 100;
-var conversationpanel_JoinCallNotification = /*#__PURE__*/function (_MegaRenderMixin) {
+var conversationpanel_JoinCallNotification =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   conversationpanel_inherits(JoinCallNotification, _MegaRenderMixin);
 
   function JoinCallNotification() {
@@ -15621,7 +15748,9 @@ var conversationpanel_JoinCallNotification = /*#__PURE__*/function (_MegaRenderM
   return JoinCallNotification;
 }(mixins["MegaRenderMixin"]);
 ;
-var conversationpanel_ConversationRightArea = /*#__PURE__*/function (_MegaRenderMixin2) {
+var conversationpanel_ConversationRightArea =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   conversationpanel_inherits(ConversationRightArea, _MegaRenderMixin2);
 
   function ConversationRightArea() {
@@ -16015,7 +16144,9 @@ var conversationpanel_ConversationRightArea = /*#__PURE__*/function (_MegaRender
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 = /*#__PURE__*/function (_MegaRenderMixin3) {
+var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   conversationpanel_inherits(ConversationPanel, _MegaRenderMixin3);
 
   function ConversationPanel(props) {
@@ -17602,7 +17733,9 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
   return ConversationPanel;
 }(mixins["MegaRenderMixin"]), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
-var conversationpanel_ConversationPanels = /*#__PURE__*/function (_MegaRenderMixin4) {
+var conversationpanel_ConversationPanels =
+/*#__PURE__*/
+function (_MegaRenderMixin4) {
   conversationpanel_inherits(ConversationPanels, _MegaRenderMixin4);
 
   function ConversationPanels() {
@@ -22242,7 +22375,9 @@ var ReactDOM = __webpack_require__(4);
 
 
 
-var ToggleCheckbox = /*#__PURE__*/function (_MegaRenderMixin) {
+var ToggleCheckbox =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   _inherits(ToggleCheckbox, _MegaRenderMixin);
 
   function ToggleCheckbox(props) {
@@ -22291,7 +22426,9 @@ var ToggleCheckbox = /*#__PURE__*/function (_MegaRenderMixin) {
 
 ;
 
-var Checkbox = /*#__PURE__*/function (_MegaRenderMixin2) {
+var Checkbox =
+/*#__PURE__*/
+function (_MegaRenderMixin2) {
   _inherits(Checkbox, _MegaRenderMixin2);
 
   function Checkbox(props) {
@@ -22353,7 +22490,9 @@ var Checkbox = /*#__PURE__*/function (_MegaRenderMixin2) {
 
 ;
 
-var IntermediateCheckbox = /*#__PURE__*/function (_MegaRenderMixin3) {
+var IntermediateCheckbox =
+/*#__PURE__*/
+function (_MegaRenderMixin3) {
   _inherits(IntermediateCheckbox, _MegaRenderMixin3);
 
   function IntermediateCheckbox(props) {
@@ -22460,7 +22599,9 @@ var startGroupChatWizard_ReactDOM = __webpack_require__(4);
 
 
 
-var startGroupChatWizard_StartGroupChatWizard = /*#__PURE__*/function (_MegaRenderMixin) {
+var startGroupChatWizard_StartGroupChatWizard =
+/*#__PURE__*/
+function (_MegaRenderMixin) {
   startGroupChatWizard_inherits(StartGroupChatWizard, _MegaRenderMixin);
 
   function StartGroupChatWizard(props) {

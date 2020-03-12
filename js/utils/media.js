@@ -1514,7 +1514,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     if (count < 1) {
                         clearInterval(timer);
                         $control.addClass('skip');
-                        $control.rebind('click.ctl', dsp);
+                        $control.rebind('click.ctl', function(ev) {
+                            eventlog(99731);
+                            return dsp(ev);
+                        });
                     }
                 }, 1000);
 
@@ -1527,6 +1530,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     vad.addEventListener('click', onclick, true);
                 }
                 $('.viewer-pending', $wrapper).addClass('hidden');
+
+                eventlog(99730);
             });
 
             if (opt.autoplay) {

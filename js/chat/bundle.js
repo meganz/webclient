@@ -14886,12 +14886,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         });
       });
 
-      if (self.initialRender === false && external_ReactDOM_default.a.findDOMNode(self)) {
+      if (self.initialRender === false && $container) {
         self.bindInitialEvents();
       }
 
       self.resizePanes();
       self.resizeVideos();
+      $('.simpletip', $container).trigger('simpletipUpdated');
     }
   }, {
     key: "resizePanes",
@@ -14962,6 +14963,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         if (predefHeight) {
           $container.height(parseInt(localStorage.chatAvPaneHeight, 10));
         }
+
+        $('.simpletip', $container).trigger('simpletipClose');
       }
 
       this.setState({
@@ -14980,7 +14983,9 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       e.preventDefault();
       e.stopPropagation();
       var newVal = !this.state.fullScreenModeEnabled;
+      var $container = $(external_ReactDOM_default.a.findDOMNode(this));
       $(document).fullScreen(newVal);
+      $('.simpletip', $container).trigger('simpletipClose');
       this.setState({
         'fullScreenModeEnabled': newVal,
         'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
@@ -15427,7 +15432,9 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         className: "button call left" + (unreadDiv ? " unread" : ""),
         onClick: this.toggleMessages.bind(this)
       }, unreadDiv, external_React_default.a.createElement("i", {
-        className: "big-icon conversations"
+        className: "big-icon conversations simpletip",
+        "data-simpletip": this.state.messagesBlockEnabled ? l[22892] : l[22891],
+        "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call " + (this.state.muteInProgress ? " disabled" : ""),
         onClick: function onClick(e) {
@@ -15442,7 +15449,9 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon " + (callManagerCall.getMediaOptions().audio ? " microphone" : " crossed-microphone")
+        className: "big-icon simpletip " + (callManagerCall.getMediaOptions().audio ? "microphone" : "crossed-microphone"),
+        "data-simpletip": callManagerCall.getMediaOptions().audio ? l[16214] : l[16708],
+        "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : "") + (this.state.muteInProgress ? " disabled" : ""),
         onClick: function onClick(e) {
@@ -15459,7 +15468,9 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon " + (callManagerCall.videoMode() === Av.Video ? " videocam" : " crossed-videocam")
+        className: "big-icon simpletip " + (callManagerCall.videoMode() === Av.Video ? "videocam" : "crossed-videocam"),
+        "data-simpletip": callManagerCall.videoMode() === Av.Video ? l[22894] : l[22893],
+        "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call" + (RTC.supportsScreenCapture && chatRoom.callManagerCall && callManagerCall.rtcCall && !this.state.muteInProgress ? "" : " disabled"),
         onClick: function onClick(e) {
@@ -15472,7 +15483,9 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon " + (callManagerCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare")
+        className: "big-icon simpletip " + (callManagerCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare"),
+        "data-simpletip": callManagerCall.isScreenCaptureEnabled() ? l[22890] : l[22889],
+        "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call",
         onClick: function onClick(e) {
@@ -15481,12 +15494,15 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon horizontal-red-handset"
+        className: "big-icon horizontal-red-handset simpletip",
+        "data-simpletip": l[5884],
+        "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call right",
         onClick: this.fullScreenModeToggle.bind(this)
       }, external_React_default.a.createElement("i", {
-        className: "big-icon nwse-resize"
+        className: "big-icon nwse-resize simpletip",
+        "data-simpletip": this.state.fullScreenModeEnabled ? l[22895] : l[17803]
       }))));
     }
   }]);

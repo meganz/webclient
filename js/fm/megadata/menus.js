@@ -710,7 +710,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         if (items['.play-item']) {
                             var $playItem = $menuCMI.filter('.play-item');
 
-                            if (is_video(M.d[id]) === 2) {
+                            if (is_audio(M.d[id])) {
                                 $playItem.find('i').removeClass('videocam').addClass('play')
                                     .end().find('span').text(l[17828]);
                             }

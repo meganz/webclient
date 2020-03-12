@@ -35,6 +35,16 @@ if (!isMediaSourceSupported()) {
 }
 
 /**
+ * Check whether a node is an streamable audio file.
+ * @param {MegaNode} n The node.
+ * @returns {Boolean} whether it is
+ */
+function is_audio(n) {
+    'use strict';
+    return is_video(n) === 2;
+}
+
+/**
  * Returns a truthy value whenever we can get a previewable image for a file/node.
  * @param {String|MegaNode|Object} n An ufs-node, or filename
  * @param {String} [ext] Optional filename extension
@@ -807,11 +817,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $videoContainer = $video.parent();
         var $videoControls = $wrapper.find('.video-controls');
         var $document = $(document);
+        var duration;
         var timer;
         var filters = Object.create(null);
-
-        // Hide the default controls
-        videoElement.controls = false;
 
         // Show the volume icon until we found the video has no audio track
         $('.volume-control', $wrapper).removeClass('no-audio');
@@ -823,6 +831,53 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $progressBar = $videoControls.find('.video-time-bar');
         var $fullscreen = $videoControls.find('.fs');
         var $volumeBar = $videoControls.find('.volume-bar');
+
+        // time-update elements and helpers.
+        var onTimeUpdate;
+        var setTimeUpdate;
+        var progressBarElementStyle = $progressBar.get(0).style;
+        var videoTimingElement = $('.video-timing.current', $wrapper).get(0);
+
+        // set idle state, i.e. hide controls
+        var setIdle = function(value) {
+            if (setIdle.value !== value) {
+                setIdle.value = value;
+                onTimeUpdate.last = null;
+
+                if (value) {
+                    $wrapper.addClass('mouse-idle');
+                }
+                else {
+                    setTimeUpdate();
+                    $wrapper.removeClass('mouse-idle');
+                }
+            }
+        };
+
+        // As the video is playing, update the progress bar
+        onTimeUpdate = function(offset, length) {
+            offset = (offset > length ? length : offset) | 0;
+
+            if (offset !== onTimeUpdate.last) {
+                onTimeUpdate.last = offset;
+
+                if (!setIdle.value) {
+                    videoTimingElement.textContent = secondsToTimeShort(offset, 1);
+                    progressBarElementStyle.setProperty('width', Math.round(100 * offset / length) + '%');
+                }
+
+                if (offset % 2) {
+                    // Store the current time in session storage such that we can restore on reload.
+                    sessionStorage.previewTime = offset;
+                }
+            }
+        };
+
+        // programmatic timeupdate helper
+        setTimeUpdate = function() {
+            onTimeUpdate(streamer.currentTime, duration || streamer.duration);
+        };
+        $video.rebind('timeupdate.xyz', setTimeUpdate);
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
@@ -849,12 +904,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         var hideControls = function() {
-            $wrapper.removeClass('mouse-idle');
+            setIdle(false);
             if (dlmanager.isStreaming) {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     if (videoElement && !(videoElement.paused || videoElement.ended)) {
-                        $wrapper.addClass('mouse-idle');
+                        setIdle(true);
                     }
                 }, 2600);
             }
@@ -870,6 +925,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Set video duration in progress bar
         var setDuration = function(value) {
+            duration = value;
             $wrapper.find('.video-timing.duration').text(secondsToTimeShort(value, 1));
         };
 
@@ -884,24 +940,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
-        // Special audio volume control for Safari
-        var _setVolumeForSafari = function(v) {
-            // If this is Safari and audio playing
-            if (window.webkitAudioContext && streamer.stream._audioSource) {
-                streamer.stream._audioSource.gain.value = v;
-            }
-        };
-
         // Increase/decrease video volume.
         var setVideoVolume = function(v) {
             if (videoElement.muted) {
                 videoElement.muted = false;
                 changeButtonState('mute');
             }
-            videoElement.volume = Math.min(1.0, Math.max(videoElement.volume + v, 0.1));
-            $volumeBar.find('span').css('height', Math.round(videoElement.volume * 100) + '%');
-
-            _setVolumeForSafari(videoElement.volume);
+            streamer.volume += v;
+            $('span', $volumeBar).css('height', Math.round(streamer.volume * 100) + '%');
         };
 
         // Increase/decrease color filter
@@ -947,6 +993,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $wrapper.removeClass('paused').find('.video-timing').text('00:00');
         $progressBar.removeAttr('style');
         $volumeBar.find('style').removeAttr('style');
+        setDuration(0);
+        onTimeUpdate(0, 1);
 
         // Add event listeners for video specific events
         $video.rebind('play pause', function() {
@@ -1006,9 +1054,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $video.rebind('ended.idle pause.idle', function() {
+            setIdle(false);
             clearTimeout(timer);
-            $wrapper.removeClass('mouse-idle');
             $document.off('mousemove.idle');
+            if (streamer.currentTime >= streamer.duration) {
+                delete sessionStorage.previewTime;
+                progressBarElementStyle.setProperty('width', '100%');
+            }
             // playevent = false;
         });
 
@@ -1093,13 +1145,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 changeButtonState('mute');
                 $this.find('span').css('height', percentage + '%');
-                videoElement.volume = percentage / 100;
-
-                _setVolumeForSafari(videoElement.volume);
+                streamer.volume = percentage / 100;
             }
             else {
                 if (!videoElement.muted) {
-                    var currentVolume = videoElement.volume * 100;
+                    var currentVolume = streamer.volume * 100;
                     $this.find('span').css('height', currentVolume + '%');
                 }
                 else {
@@ -1112,26 +1162,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         // Bind Mute button
         $mute.rebind('click', function() {
             if (!$(this).parent('.volume-control').hasClass('no-audio')) {
-                videoElement.muted = !videoElement.muted;
+                streamer.muted = -1; // swap state
                 changeButtonState('mute');
                 updateVolumeBar();
-                _setVolumeForSafari(!videoElement.muted);
             }
             return false;
         });
-
-        var progressBarElementStyle = $progressBar.get(0).style;
-        var videoTimingElement = $wrapper.find('.video-timing.current').get(0);
-
-        // As the video is playing, update the progress bar
-        var onTimeUpdate = function(offset, length) {
-            if (offset > length) {
-                offset = length;
-            }
-
-            videoTimingElement.textContent = secondsToTimeShort(offset, 1);
-            progressBarElementStyle.setProperty('width', Math.round(100 * offset / length) + '%');
-        };
 
         if (options.startTime) {
             var playtime = MediaAttribute(node).data.playtime;
@@ -1144,13 +1180,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
         if (options.filter) {
             applyVideoFilter.apply(this, options.filter.map(function(v) { return v / 10; }));
         }
-
-        $video.rebind('timeupdate', function() {
-            onTimeUpdate(streamer.currentTime, streamer.duration);
-
-            // Store the current time in session storage such that we can restore on reload.
-            sessionStorage.setItem('previewTime', streamer.currentTime);
-        });
 
         /* Drag status */
         var timeDrag = false;
@@ -1189,14 +1218,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Update Progress Bar control
         var updatebar = function(x) {
-            var o = getTimeOffset(x);
+            if (streamer) {
+                var o = getTimeOffset(x);
 
-            //Update progress bar and video currenttime
-            $progressBar.css('width', o.percent + '%');
-            $wrapper.find('.video-timing.current').text(secondsToTimeShort(o.time, 1));
+                // Update progress bar and video current time
+                progressBarElementStyle.setProperty('width', o.percent + '%');
+                videoTimingElement.textContent = secondsToTimeShort(o.time, 1);
 
-            if (!timeDrag) {
-                streamer.currentTime = o.time;
+                if (!timeDrag) {
+                    streamer.currentTime = o.time;
+                }
             }
         };
 
@@ -1300,6 +1331,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
         window.addEventListener('keydown', videoKeyboardHandler, true);
 
+        if (options.vad) {
+            $progress.off();
+            window.removeEventListener('keydown', videoKeyboardHandler, true);
+            onTimeUpdate = function(offset, length) {
+                offset = offset > length ? length : offset;
+                videoTimingElement.textContent = secondsToTimeShort(offset, 1);
+                $('.video-time-bar', $wrapper).css('width', Math.round(100 * offset / length) + '%');
+            };
+        }
+
         $wrapper.rebind('is-over-quota', function() {
             fullScreenManager.exitFullscreen();
             videoElement.pause();
@@ -1313,8 +1354,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $playpause.off();
             $volumeBar.off();
             clearTimeout(timer);
+
             if (videoElement) {
                 videoElement.style.filter = 'none';
+            }
+            if (options.vad) {
+                return false;
             }
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video')
@@ -1323,6 +1368,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $document.off('mouseup.videoprogress');
             $document.off('mousemove.volumecontrol');
             $document.off('mouseup.volumecontrol');
+            $document.off('mousemove.idle');
             $(window).off('video-destroy.main');
             videoElement = streamer = null;
             dlmanager.isStreaming = false;
@@ -1334,6 +1380,225 @@ FullScreenManager.prototype.enterFullscreen = function() {
         dlmanager.isStreaming = true;
     };
 
+    // @private get additional video instance..
+    var _getVideoAdInstance = function(node, $wrapper, videoElement, options) {
+        var vAdInstance = Object.create(null);
+        var opt = {autoplay: options.autoplay};
+        var pan = videoElement.parentNode;
+        var vad = videoElement.cloneNode();
+        var $control = $('.viewer-vad-control', $wrapper).removeClass('skip');
+        var $thumb = $('.thumb', $control).removeClass('active');
+        var nop = function(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        };
+        var dsp = function(ev) {
+            nop(ev);
+            if (vAdInstance) {
+                vAdInstance.skip();
+            }
+            return false;
+        };
+
+        vAdInstance.skip = function() {
+            this.kill();
+
+            if (this.parent) {
+                videoElement.classList.remove('hidden');
+                _initVideoControls($wrapper, this.parent, node, options);
+
+                var error = this.parent.error;
+                if (error) {
+                    onIdle(function() {
+                        msgDialog('warninga', l[135], l[47], error);
+                    });
+                    this.abort();
+                }
+                else if (opt.autoplay) {
+                    this.parent.play();
+                }
+                else {
+                    this.start = this.parent.play.bind(this.parent);
+                }
+                this.parent = null;
+            }
+        };
+
+        vAdInstance.kill = function() {
+            if (pan) {
+                $wrapper.removeClass('vad');
+                $control.addClass('hidden');
+                $thumb.removeClass('active');
+                pan.removeChild(vad);
+                pan = null;
+            }
+
+            if (vAdInstance) {
+                if (vAdInstance.stream) {
+                    $wrapper.trigger('video-destroy');
+                    vAdInstance.stream.destroy();
+                    vAdInstance.stream = null;
+                }
+                vAdInstance = null;
+            }
+        };
+
+        vAdInstance.start = function() {
+            if (this.stream) {
+                this.stream.play();
+            }
+            opt.autoplay = true;
+        };
+
+        if (options.vad === false || is_audio(node)) {
+            pan = null;
+            vAdInstance.disabled = true;
+            return vAdInstance;
+        }
+
+        getImage(node, 1)
+            .then(function(uri) {
+                $('img', $thumb.addClass('active')).attr('src', vad.poster = uri);
+            });
+        vad.id = '';
+        vad.style.zIndex = 9;
+        pan.insertBefore(vad, videoElement);
+        videoElement.classList.add('hidden');
+        vad.addEventListener('ended', dsp);
+        vad.addEventListener('click', nop, true);
+        vad.addEventListener('contextmenu', nop, true);
+        $wrapper.addClass('vad');
+
+        var rs = {};
+        var ts = 15807e5;
+        var now = Date.now() / 1e3;
+        var pra = JSON.parse(localStorage.pra || '{}');
+        var ids = Object.keys(pra);
+        for (var i = ids.length; i--;) {
+            var t = pra[ids[i]] + ts;
+
+            if (now > t + 3600) {
+                delete pra[ids[i]];
+            }
+            else {
+                rs[ids[i]] = t;
+            }
+        }
+
+        var req = {a: 'pra', rs: rs, d: d ? 1e3 : undefined};
+        if (node.ph) {
+            req.ph = node.ph;
+        }
+        else if (node.h) {
+            req.h = node.h;
+        }
+        M.req(req).always(function(res) {
+            if (d) {
+                console.debug('pra', res, [vAdInstance]);
+            }
+            if (!vAdInstance || !res || res < 0 || typeof res !== 'object') {
+                return vAdInstance && vAdInstance.skip();
+            }
+            pra[res.id] = now - ts | 0;
+            localStorage.pra = JSON.stringify(pra);
+
+            vAdInstance.stream = Streamer(res.l, vad, opt);
+            vAdInstance.stream.on('playing', function() {
+                var count = parseInt(res.cds) | 0;
+                if (count < 1) {
+                    count = Math.min(this.duration | 0, 9);
+                }
+                var $counter = $('.counter', $control.removeClass('hidden')).text(count);
+                var timer = setInterval(function() {
+                    $counter.text(--count);
+                    if (count < 1) {
+                        clearInterval(timer);
+                        $control.addClass('skip');
+                        $control.rebind('click.ctl', dsp);
+                    }
+                }, 1000);
+
+                if (res.aurl) {
+                    var onclick = function(ev) {
+                        nop(ev);
+                        open(res.aurl);
+                    };
+                    vad.removeEventListener('click', nop, true);
+                    vad.addEventListener('click', onclick, true);
+                }
+                $('.viewer-pending', $wrapper).addClass('hidden');
+            });
+
+            if (opt.autoplay) {
+                vAdInstance.start();
+            }
+
+            vAdInstance.stream.abort = vAdInstance.abort;
+            _initVideoControls($wrapper, vAdInstance.stream, node, {vad: true});
+        });
+
+        if (options.autoplay) {
+            $('.viewer-pending', $wrapper).removeClass('hidden');
+        }
+        options.autoplay = false;
+
+        return vAdInstance;
+    };
+
+    // @private obtain streamer instance with as needed expanded methods at runtime.
+    var _getStreamerInstance = function(node, $wrapper, videoElement, options) {
+        var vAdInstance = _getVideoAdInstance.apply(this, arguments);
+        var vStream = Streamer(node.link || node.h, videoElement, options);
+
+        console.assert(!vStream.kill);
+        console.assert(!vStream.start);
+
+        vStream.kill = function() {
+            if (vAdInstance) {
+                vAdInstance.kill();
+                vAdInstance = null;
+            }
+
+            if (vStream) {
+                var abort = vStream.abort;
+                vStream.abort = null;
+
+                if (typeof abort === 'function') {
+                    abort.call(vStream);
+                }
+
+                if (vStream) {
+                    vStream.destroy();
+                }
+                vStream = null;
+            }
+        };
+
+        vStream.start = function() {
+            if (vAdInstance) {
+                vAdInstance.start();
+            }
+            else if (vStream) {
+                vStream.play();
+            }
+        };
+
+        vAdInstance.parent = vStream;
+        vAdInstance.abort = vStream.kill;
+
+        if (d) {
+            window.vStream = vStream;
+            window.vAdInstance = vAdInstance;
+        }
+
+        if (vAdInstance.disabled) {
+            vAdInstance.skip();
+            vAdInstance = null;
+        }
+
+        return vStream;
+    };
+
     // @private Launch video streaming
     var _initVideoStream = function(node, $wrapper, destroy, options) {
         var onOverQuotaCT;
@@ -1343,13 +1608,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
             options = destroy;
             destroy = null;
         }
-        options = Object.assign(Object.create(null), options);
+        options = Object.assign(Object.create(null), {autoplay: true}, options);
+
+        // Hide the default controls
+        videoElement.controls = false;
 
         // If a preview time is set, use it as the starting time.
-        if (sessionStorage.previewNode && sessionStorage.previewTime && sessionStorage.previewNode === node.h) {
-            options.startTime = sessionStorage.previewTime;
+        if (sessionStorage.previewTime) {
+            if (node.h && sessionStorage.previewNode === node.h) {
+                options.startTime = sessionStorage.previewTime;
+            }
+            sessionStorage.removeItem('previewTime');
         }
-        sessionStorage.removeItem('previewTime');
 
         if ($.playbackOptions) {
             String($.playbackOptions).replace(/(\d+)(\w)/g, function(m, v, k) {
@@ -1382,12 +1652,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 options.type = c && c[0];
             }
         }
-        var s = Streamer(node.link || node.h, videoElement, options);
-
-        _initVideoControls($wrapper, s, node, options);
+        var s = _getStreamerInstance(node, $wrapper, videoElement, options);
 
         destroy = destroy || function() {
-            s.destroy();
+            s.kill();
             $wrapper.trigger('video-destroy');
         };
         s.abort = destroy;
@@ -1545,7 +1813,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         $(window).rebind('video-destroy.main', function() {
             $('.mobile.filetype-img').removeClass('hidden');
-            s.abort();
+            s.kill();
         });
 
         return s;
@@ -1562,7 +1830,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var _initHideMobileVideoControlsAnimation = function($wrapper) {
         clearTimeout(hideMobileVideoControlsAnimation);
         hideMobileVideoControlsAnimation = setTimeout(function () {
-            $wrapper.find('.video-controls').addClass('invisible');
+            $('.video-controls', $wrapper).addClass('invisible');
+            $('.viewer-vad-control', $wrapper).addClass('bottom');
         }, 3000);
     };
 
@@ -1574,14 +1843,17 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var _initMobileVideoControlsToggle = function($wrapper) {
         var $video = $wrapper.find('.video-block');
         var $videoControl = $wrapper.find('.video-controls');
+        var $adControl = $('.viewer-vad-control', $wrapper);
 
         $video.off().on('tap', function (ev) {
             if ($(ev.target).is('.mobile-gallery, #video')) {
                 if ($videoControl.hasClass('invisible')) {
+                    $adControl.removeClass('bottom');
                     $videoControl.removeClass('invisible');
                     _initHideMobileVideoControlsAnimation($wrapper);
                 } else {
                     $videoControl.addClass('invisible');
+                    $adControl.addClass('bottom');
                 }
             }
             else if ($(ev.target).closest('.video-controls').length) {
@@ -1694,7 +1966,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         if (is_embed) {
                             node.stream = stream;
                         }
-                        stream.play();
+                        stream.start();
                     }).fail(console.warn.bind(console));
 
                     $wrapper.addClass('video-theatre-mode');

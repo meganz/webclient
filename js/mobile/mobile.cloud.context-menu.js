@@ -240,7 +240,7 @@ mobile.cloud.contextMenu = {
         }
         else if (is_video(node)) {
             // If the file is playable, show play button
-            if (is_video(node) === 2) {
+            if (is_audio(node)) {
                 // This is an audio file
                 $previewButton.find('.fm-icon').removeClass('playvideo preview').addClass('playaudio');
                 $previewButton.find('.text').text(l[17828]); // Play audio

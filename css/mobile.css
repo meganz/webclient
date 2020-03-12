@@ -1340,6 +1340,11 @@ ul, li {
     width: 16px;
     height: 16px;
 }
+.mobile.fm-icon.small-skip-icon {
+    width: 20px;
+    height: 20px;
+    background-position: -2px -3626px;
+}
 .mobile.voucher-dialog .fm-icon.small-gray-arrow {
     top: 4px;
     left: 0;
@@ -7044,11 +7049,12 @@ textarea.mobile.support-text-field {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     z-index: 10;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
+    -webkit-transition: opacity 200ms linear, visibility 200ms linear;
+    -moz-transition: opacity 200ms linear, visibility 200ms linear;
+    -o-transition: opacity 200ms linear, visibility 200ms linear;
+    -ms-transition: opacity 200ms linear, visibility 200ms linear;
+    transition: opacity 200ms linear, visibility 200ms linear;
+    visibility: hidden;
 }
 .mobile.video .video-controls {
     display: block;
@@ -7297,6 +7303,121 @@ textarea.mobile.support-text-field {
 }
 .mobile.download.video .video-block {
     display: block;
+}
+/*  Video Ad */
+.mobile  .viewer-vad-control {
+    position: absolute;
+    min-width: 120px;
+    height: 38px;
+    background-color: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+    border-radius: 3px;
+    bottom: 58px;
+    right: 12px;
+    z-index: 11;
+    color: rgba(255,255,255,0.8);
+    font-size: 16px;
+    line-height: 38px;
+    white-space: nowrap;
+    text-align: center;
+    text-transform: capitalize;
+    -webkit-transition: all 200ms linear;
+    transition: all 200ms linear;
+    cursor: default;
+}
+.mobile .slides-bl .viewer-vad-control {
+    bottom: 119px;
+}
+.mobile .slides-bl .viewer-vad-control.bottom {
+    bottom: 77px;
+}
+.mobile .slideshow-header.hidden + .slides-bl .viewer-vad-control {
+    bottom: 58px;
+}
+.mobile .slideshow-header.hidden + .slides-bl .viewer-vad-control.bottom, .viewer-vad-control.bottom.bottom {
+    bottom: 16px;
+}
+
+.mobile .viewer-vad-control.skip {
+    cursor: pointer;
+}
+.mobile .viewer-vad-control .thumb {
+    float: right;
+    width: 76px;
+    height: 38px;
+    line-height: 0;
+    display: none;
+    overflow: hidden;
+}
+.mobile .viewer-vad-control .thumb.active {
+    display: block;
+}
+.mobile .viewer-vad-control .thumb img, .mobile.video .download.video-block  .viewer-vad-control img {
+    height: auto;
+    display: block;
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 86px;
+    -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    -o-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    position: relative;
+    left: 50%;
+    top: 50%;
+}
+.mobile .viewer-vad-control .counter {
+    padding: 0 10px;
+    display: inline-block;
+}
+.mobile .viewer-vad-control .label, .mobile .viewer-vad-control.skip .thumb.active, .mobile .viewer-vad-control.skip .counter {
+    display: none;
+}
+.mobile .viewer-vad-control.skip .label {
+    display: block;
+    padding: 0 14px;
+}
+.mobile .viewer-vad-control .label i {
+    margin: 9px -3px 0 11px;
+    opacity: 0.8;
+    display: inline-block;
+    vertical-align: top;
+}
+.mobile .viewer-vad-control.skip:hover .label i {
+     opacity: 1;
+}
+.mobile .video-progress-bar.vad {
+    -webkit-transition:  opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    left: 0;
+    bottom: 0;
+    z-index: 11;
+    border-radius: 0;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 0;
+    margin: 0;
+}
+.mobile .slides-bl .video-progress-bar.vad {
+    bottom: 61px;
+}
+.mobile .slideshow-header.hidden + .slides-bl .video-progress-bar.vad {
+    bottom: 0;
+}
+.mobile.vad .viewer-vad-control.bottom + .video-progress-bar.vad {
+    opacity: 1;
+    visibility: visible;
+}
+.mobile.video.vad .video-time-bar,  .mobile.video.vad .video-buffer-bar {
+    background-color: #FFA500;
+}
+.mobile .vad .video-time-bar::before {
+    display: none;
 }
 /* Slide gallery video player */
 .mobile.video.slideshow-video {
@@ -8292,13 +8413,7 @@ body.key .reg-st3-membership-bl.free.hidden {
     display: inline-block;
     background-image: url(../images/mega/icons-sprite_v37.png);
     background-repeat: no-repeat;
-    background-position: -204px -196px;
-    background-size: 262px auto;
-   -webkit-transform: scaleX(-1);
-    -moz-transform: scaleX(-1);
-    -ms-transform: scaleX(-1);
-    -o-transform: scaleX(-1);
-    transform: scaleX(-1);
+    background-position: -263px -3592px;
     margin: 4px 8px  0 -30px;
     display: none;
 }
@@ -13242,7 +13357,8 @@ p a.blog-new-read-more {
         background-image: url(../images/mobile/android@2x.png);
     }
     .mobile.logo, .mobile.white-mega-logo, .mobile.download-speed, .mobile.upload-speed, .mobile.download-percents, .mobile.red-button.disabled i, .mobile.warning-icon, .mobile.fm-icon, .mobile.fm-item-link, .mobile.empty-icon, .mobile.signin-input span, .mobile.loader, .mobile.homepage .feature-icon, .mobile.homepage .company-logo, .checkboxOn.square i, .mobile.fm-dialog-close, .mobile.top-menu-popup .top-icon.close, .mobile.slideshow-back-arrow, .mobile.slideshow-forward-arrow, .default-select, .ui-selectmenu-button, .mobile.select-wrapper::after, #mobile-ui-contact-card .contact-verification i, .mobile.auth-app-select-dialog .cancel-button-icon, .mobile.voucher-dialog .reg-st3-membership-icon, .mobile.voucher-redeem-dialog .reg-st3-membership-icon, .mobile .horizontal-plans .reg-st3-membership-icon, .mobile .payment-address-dialog .reg-st3-membership-icon, .mobile.signin-input span, .mobile.country-input span, .mobile.phone-number-input span,
-        .mobile.membership-step2 .provider-icon.voucher, .mobile.membership-step2 .provider-icon.ecpVI, .mobile.membership-step2 .provider-icon.ecpMC
+        .mobile.membership-step2 .provider-icon.voucher, .mobile.membership-step2 .provider-icon.ecpVI, .mobile.membership-step2 .provider-icon.ecpMC,
+        .mobile .improved-recovery-steps .nav-back-icon
     {
         background-image: url(../images/mobile/mobile-sprite_v36@2x.png) !important;
         background-size: 280px auto;

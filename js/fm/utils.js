@@ -37,13 +37,29 @@ MegaApi.prototype.prod = function(aSave) {
 MegaApi.prototype._apiReqInflight = Object.create(null);
 MegaApi.prototype._apiReqPollCache = Object.create(null);
 
+MegaApi.prototype._apiReqReplyCache = Object.create(null);
+MegaApi.prototype._apiReqCacheIndex = {
+    g: function(req) {
+        'use strict';
+
+        if (req.g) {
+            // cache for four seconds.
+            return -4;
+        }
+
+        // cache for the session lifetime
+        return true;
+    }
+};
+
 /**
  * Perform an API request, with capability of de-duplicating pending requests.
  * @param {Object|String} params The request parameters as an object.
  *                               If an string is provided, assumes a plain request with no additional parameters.
+ * @param {Number} [ch] The channel to fire the request on.
  * @returns {MegaPromise} The promise is rejected if API gives a negative number.
  */
-MegaApi.prototype.req = function(params) {
+MegaApi.prototype.req = function(params, ch) {
     'use strict';
 
     if (typeof params === 'string') {
@@ -59,7 +75,25 @@ MegaApi.prototype.req = function(params) {
         return this._apiReqInflight[key];
     }
 
+    var self = this;
     var promise = new MegaPromise();
+
+    if (this._apiReqReplyCache[key]) {
+        var entry = this._apiReqReplyCache[key];
+
+        if (Date.now() > entry[1]) {
+            delete this._apiReqReplyCache[key];
+        }
+        else {
+            onIdle(function() {
+                if (d) {
+                    console.info('Returning cached api request...', params, entry);
+                }
+                promise.resolve(entry[0]);
+            });
+            return promise;
+        }
+    }
     this._apiReqInflight[key] = promise;
 
     promise.always(function() {
@@ -72,10 +106,19 @@ MegaApi.prototype.req = function(params) {
                 promise.reject.apply(promise, arguments);
             }
             else {
+                var cIdx = self._apiReqCacheIndex[params.a];
+
+                if (cIdx) {
+                    if (typeof cIdx === 'function') {
+                        cIdx = cIdx(params);
+                    }
+
+                    self._apiReqReplyCache[key] = [clone(res), cIdx < 0 ? Date.now() + -cIdx * 1e3 : Infinity];
+                }
                 promise.resolve.apply(promise, arguments);
             }
         }, promise.reject.bind(promise, EFAILED))
-    });
+    }, ch | 0);
 
     return promise;
 };
@@ -180,8 +223,13 @@ MegaApi.prototype.req.poll = function(seconds, params) {
 MegaApi.prototype.reqA = function(params) {
     'use strict';
 
+    var self = this;
     var promise = new MegaPromise();
-    MegaPromise.allDone(params.map(this.req.bind(this))).unpack(promise.resolve.bind(promise));
+    var mapfn = function(v) {
+        return self.req(v);
+    };
+
+    MegaPromise.allDone(params.map(mapfn)).unpack(promise.resolve.bind(promise));
 
     return promise;
 };

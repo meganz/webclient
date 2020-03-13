@@ -1137,6 +1137,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>').replace(/\[BR]/g, '<br>')
         .replace(/\[BLOCK]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
         .replace(/\[\/BLOCK]/g, '</div></div>');
+    l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

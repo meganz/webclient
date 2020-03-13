@@ -474,25 +474,3 @@ mBroadcaster.once('startMega', function _affTagger(tpage) {
     });
 });
 
-mBroadcaster.addListener('fm:initialized', function() {
-    'use strict';
-
-    // If user is not fully registered or this is public link without login do not load affiliate data yet
-    if (!folderlink && u_type > 2 && u_attr.flags.refpr) {
-
-        // If user is newly registered user,
-        if ($.noAffGuide) {
-
-            // Just mark him as he already saw the guide dialog and icon animation so it never happens to the user
-            delete $.noAffGuide;
-            M.affiliate.setUA('icon', 1);
-        }
-        else if (!M.affiliate.icon) {
-            // else if user is existing user who did not see dialog show it.
-            affiliateUI.guideDialog.show();
-        }
-
-        // we reached our goal, stop listening for fminitialized
-        return 0xDEAD;
-    }
-});

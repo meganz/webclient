@@ -374,33 +374,31 @@ affiliateUI.registeredDialog = {
 
         'use strict';
 
-        // This user is not eligible with referral programme, lets not show this dialog.
-        if (!u_attr.flags.refpr) {
-            return false;
-        }
+        if (u_type > 2 && mega.flags.refpr && !pfid) {
 
-        var self = this;
-        this.$dialog = $('.fm-dialog.joined-to-affiliate');
+            var self = this;
+            this.$dialog = $('.fm-dialog.joined-to-affiliate');
 
-        var _showRegisteredDialog = function() {
-            self.bindDialogEvents();
-            M.safeShowDialog('joined-to-affiliate', self.$dialog);
-        };
+            var _showRegisteredDialog = function() {
+                self.bindDialogEvents();
+                M.safeShowDialog('joined-to-affiliate', self.$dialog);
+            };
 
-        if (M.currentdirid === 'refer') {
-            $('.default-green-button span', this.$dialog).text(l[81]);
-            $('.cancel-button', this.$dialog).addClass('hidden');
-        }
+            if (M.currentdirid === 'refer') {
+                $('.default-green-button span', this.$dialog).text(l[81]);
+                $('.cancel-button', this.$dialog).addClass('hidden');
+            }
 
-        // After referal url dialog.
-        if (skipReq) {
-            _showRegisteredDialog();
-        }
-        // User never see this dialog before.
-        else if (!M.affiliate.id) {
-            M.affiliate.getID().then(function() {
+            // After referal url dialog.
+            if (skipReq) {
                 _showRegisteredDialog();
-            });
+            }
+            // User never see this dialog before.
+            else if (!M.affiliate.id) {
+                M.affiliate.getID().then(function() {
+                    _showRegisteredDialog();
+                });
+            }
         }
     },
 
@@ -1078,3 +1076,27 @@ affiliateUI.animateIcon = function() {
         });
     }
 };
+
+mBroadcaster.addListener('fm:initialized', function() {
+
+    'use strict';
+
+    // If user is not fully registered or this is public link without login do not load affiliate data yet
+    if (!folderlink && u_type > 2 && u_attr.flags.refpr) {
+
+        // If user is newly registered user,
+        if ($.noAffGuide) {
+
+            // Just mark him as he already saw the guide dialog and icon animation so it never happens to the user
+            delete $.noAffGuide;
+            M.affiliate.setUA('icon', 1);
+        }
+        else if (!M.affiliate.icon) {
+            // else if user is existing user who did not see dialog show it.
+            affiliateUI.guideDialog.show();
+        }
+
+        // we reached our goal, stop listening for fminitialized
+        return 0xDEAD;
+    }
+});

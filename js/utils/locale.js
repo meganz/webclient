@@ -1116,25 +1116,27 @@ mBroadcaster.once('boot_done', function populate_l() {
             + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a href="https://mega.nz/blog_59" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
-    l[23120] = escapeHTML(l[23120].replace(/&quot;|\"/g, '%1')).replace(/%1/g, '"');
-    l[23126] = escapeHTML(l[23126].replace(/&quot;|\"/g, '%1')).replace(/\[BR\]/g, '<br/>').replace(/%1/g, '"');
-    l['23181.d'] = escapeHTML(l[23181]).replace(/\[P\]/g, '').replace(/\[\/P\]/g, '')
-        .replace(/\[L\]/g, '<i class="small-icon icons-sprite bold-green-tick"></i><div class="affiliate-guide info">')
-        .replace(/\[\/L\]/g, '</div>').replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>')
-        .replace(/\[BLOCK\]/g, '').replace(/\[\/BLOCK\]/g, '').replace(/\[BR\]/g, '<br>');
-    l['23181.m'] = escapeHTML(l[23181])
-        .replace(/\[P\]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
-        .replace(/\[\/P\]/g, '</div></div>')
-        .replace(/\[L\]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
-            '</div><div class="mobile label-info">').replace(/\[\/L\]/g, '</div></div>')
+    l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
+    l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
+    l['23181.d'] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+        .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
+        .replace(/\[L]/g, '<i class="small-icon icons-sprite bold-green-tick"></i><div class="affiliate-guide info">')
+        .replace(/\[\/L]/g, '</div>').replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>')
+        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '<br>');
+    l['23181.m'] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+        .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
+        .replace(/\[\/P]/g, '</div></div>')
+        .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
+            '</div><div class="mobile label-info">').replace(/\[\/L]/g, '</div></div>')
         .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>')
-        .replace(/\[BLOCK\]/g, '').replace(/\[\/BLOCK\]/g, '').replace(/\[BR\]/g, '');
-    l[23181] = escapeHTML(l[23181]).replace(/\[P\]/g, '').replace(/\[\/P\]/g, '')
-        .replace(/\[L\]/g, '<div class="bottom-page list-item">' +
-            '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L\]/g, '</div>')
-        .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>').replace(/\[BR\]/g, '<br>')
-        .replace(/\[BLOCK\]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
-        .replace(/\[\/BLOCK\]/g, '</div></div>');
+        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '');
+    l[23181] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+        .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
+        .replace(/\[L]/g, '<div class="bottom-page list-item">' +
+            '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L]/g, '</div>')
+        .replace('[A]', '<a href="/terms" target="_blank">').replace('[/A]', '</a>').replace(/\[BR]/g, '<br>')
+        .replace(/\[BLOCK]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
+        .replace(/\[\/BLOCK]/g, '</div></div>');
     l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
         .replace('[/A]', '</a>');
 

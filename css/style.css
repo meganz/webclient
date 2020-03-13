@@ -5251,7 +5251,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     animation-name: iconBounce;
     animation-duration: 5s;
     opacity: 1;
-    background-position: 1px -13379px;    
+    background-position: 1px -13379px;
 }
 @keyframes iconBounce {
     from, 20% ,40%, 60%, 80%, to {
@@ -14989,6 +14989,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow.asc {
     background-position: right -1225px;
+}
+.arrow.label:not(.asc):not(.desc) {
+    background-image: none;
 }
 .search-bottom-wrapper {
     background-color: #EEEEEE;

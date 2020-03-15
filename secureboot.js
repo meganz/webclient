@@ -137,7 +137,8 @@ function getCleanSitePath(path) {
         }
 
         if (path.uao) {
-            window.uaoref = path.uao;
+            var target = window.mega || window;
+            target.uaoref = path.uao;
         }
         if (path.aff) {
             if (path.aff_time) {

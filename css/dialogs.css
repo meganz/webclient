@@ -177,6 +177,9 @@
     width: 360px;
     margin: -275px 0 0 -180px;
 }
+.fr.fontsize2 .fm-dialog.new-group-chat {
+    width: 382px;
+}
 body.de .fm-dialog.new-group-chat {
     width: 440px;
 }

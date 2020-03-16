@@ -1525,6 +1525,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     var onclick = function(ev) {
                         nop(ev);
                         open(res.aurl);
+                        eventlog(99732);
                     };
                     vad.style.cursor = 'pointer';
                     vad.removeEventListener('click', nop, true);

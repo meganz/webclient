@@ -1981,19 +1981,25 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var $treeElements = $('#treea_' + handle).add('#treea_os_' + handle).add('#treea_pl_' + handle);
 
         // Remove all colour label classes
-        $('#' + handle).removeClass(removeClasses);
-        $('#' + handle + ' a').removeClass(removeClasses);
+        var $item = $('#' + handle);
+        $item.removeClass(removeClasses);
+        $('a', $item).removeClass(removeClasses);
+        $('.label', $item).text('');
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
         if (labelId) {
             // Add colour label classes.
-            var colourClass = 'colour-label ' + M.getLabelClassFromId(labelId);
+            var lblColor = M.getLabelClassFromId(labelId);
+            var colourClass = 'colour-label ' + lblColor;
 
-            $('#' + handle).addClass(colourClass);
-            $('#' + handle + ' a').addClass(colourClass);
+            $item.addClass(colourClass);
+            $('a', $item).addClass(colourClass);
             $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
+            if (M.megaRender) {
+                $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
+            }
         }
 
         var currentTreeLabel = M.filterTreePanel[M.currentTreeType + '-label'];

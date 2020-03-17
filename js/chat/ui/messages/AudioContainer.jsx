@@ -44,6 +44,10 @@ class AudioContainer extends React.Component {
         return true;
     }
 
+    componentWillUnmount() {
+        URL.revokeObjectURL(this.state.audioBlobUrl);
+    }
+
     render() {
         const self = this;
         const { audioBlobUrl, loading } = self.state;

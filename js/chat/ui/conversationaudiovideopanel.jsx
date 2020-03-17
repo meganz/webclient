@@ -1021,7 +1021,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         var networkQualityBar = null;
 
         if (chatRoom.megaChat.networkQuality <= 1) {
-            var networkQualityMessage = "Slow connection.";
+            var networkQualityMessage = l[23213];
 
             networkQualityBar = <div className={"in-call-notif yellow" + (notifBar ? " after-green-notif" : "") }>
                 {networkQualityMessage}

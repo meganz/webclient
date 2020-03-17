@@ -176,7 +176,7 @@ CallNotificationsEngine.ACTIONS_META = {
     ),
     'SLOW_CONNECTION': new CallNotificationsEngine.ActionMeta(
         'green',
-        'Slow connection',
+        l[23213],
         undefined,
         false,
         false

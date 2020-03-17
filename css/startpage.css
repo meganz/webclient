@@ -890,6 +890,9 @@ body:not(.en) .download .startpage.top-header {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.startpage.italic-text span {
+    padding: 0 8px;
+}
 .startpage.quote-icon {
     position: absolute;
     width: 36px;

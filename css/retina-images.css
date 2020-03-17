@@ -65,7 +65,7 @@ body.pro:after {
     background-size: 130px auto;
 }
 .widget-circle, .widget-arrows, .widget-icon, .widget-arrow {
-    background-image: url(../images/mega/widjet-progress@2x.png);
+    background-image: url(../images/mega/widget-progress@2x.png);
     background-size: 40px auto;
 }
 .image-explorer-container .image-explorer-scale-slider-minus, .image-explorer-container .image-explorer-scale-slider-plus {
@@ -378,7 +378,7 @@ i.small-icon.icons-sprite,
 }
 
 .bottom-page.about-sprite, i.bottom-page.about-sprite {
-    background-image: url(../images/mega/about-sprite_v1@2x.png) !important;
+    background-image: url(../images/mega/about-sprite_v2@2x.png) !important;
     background-size: 525px auto;
 }
 }

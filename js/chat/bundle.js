@@ -7028,9 +7028,17 @@ var cloudBrowserModalDialog_BrowserEntries = /*#__PURE__*/function (_MegaRenderM
         var charTyped = false;
         var keyCode = e.which || e.keyCode;
         var selectionIncludeShift = e.shiftKey;
+        var $searchField = $('div.fm-files-search input');
+        var $typingArea = $('textarea.messages-textarea'); // prevent further behavior if currently interacting w/ the dialog search field
 
-        if ($('input:focus, textarea:focus').length > 0) {
+        if ($searchField.is(':focus')) {
           return;
+        } // remove the focus from the chat typing area to prevent
+        // unnecessary character insertion while interacting with the dialog
+
+
+        if ($typingArea.is(':focus')) {
+          $typingArea.trigger('blur');
         }
 
         var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";

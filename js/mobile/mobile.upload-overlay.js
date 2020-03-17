@@ -201,9 +201,9 @@ mobile.uploadOverlay = {
         var currentTime = new Date().getTime();
         var secondsElapsed = (currentTime - mobile.uploadOverlay.startTime) / 1000;
         var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
-        var speed = numOfBytes(bytesPerSecond);
+        var speed = numOfBytes(bytesPerSecond, 2, true);
         var speedSizeRounded = Math.round(speed.size);
-        var speedText = speedSizeRounded + ' ' + speed.unit + '/s';
+        var speedText = speedSizeRounded + ' ' + speed.unit;
 
         // Display the upload progress and speed
         $uploadPercent.text(percentCompleteRounded + '%');

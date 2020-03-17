@@ -1108,6 +1108,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23048] = l[23048].replace('[S1]1[/S1]', '<span class="dropdown-lnk" data-type="number">1</span>')
         .replace('[S2]%2[/S2]', '<span class="dropdown-lnk" data-type="plan"></span>')
         .replace('[S3]%3[/S3]', '<span class="dropdown-lnk" data-type="time"></span>');
+    l['23062.k'] = l[23062].replace('[%s]', l[7049]);
     l[23066] = l[23066].replace('[A]', '<a href="/security" '
         + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[23075] = l[23075].replace('[A1]', '<a href="/terms" '

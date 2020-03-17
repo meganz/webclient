@@ -96,16 +96,20 @@ var aboutus = {
                 loadingDialog.hide();
 
                 var muser = 175;
+                var dactive = 10;
                 var bfiles = 75;
+                var mcountries = 200;
 
                 if (typeof res === 'object') {
-                    var muser = res.confirmedusers.total / 1000000 | 0;
-                    var bfiles = res.files.total / 1000000000 | 0;
+                    muser = res.confirmedusers.total / 1000000 | 0;
+                    bfiles = res.files.total / 1000000000 | 0;
                 }
 
                 // Locale of million and biliion will comes
-                $('#about-register-count', $page).text(muser + 'M+');
-                $('#about-files-count', $page).text(bfiles + 'B+');
+                $('.about-register-count .num span', $page).text(muser);
+                $('.about-daily-active .num span', $page).text(dactive);
+                $('.about-files-count .num span', $page).text(bfiles);
+                $('.about-mega-countries .num span', $page).text(mcountries);
             }
         });
     }

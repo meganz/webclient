@@ -2517,7 +2517,7 @@ bottom-page.top-title.uwp::before {
     background-repeat: no-repeat;
 }
 .bottom-page.about-sprite, i.bottom-page.about-sprite {
-    background-image: url(../images/mega/about-sprite_v1.png);
+    background-image: url(../images/mega/about-sprite_v2.png);
     background-repeat: no-repeat;
 }
 .bottom-page.large-icon.camera {
@@ -2630,32 +2630,102 @@ bottom-page.top-title.uwp::before {
     margin: 0 auto;
 }
 .bottom-page.icon-136.about-sprite.snackbox {
-    background-position: 3px -361px;
+    background-position: 3px -365px;
 }
 .bottom-page.icon-136.about-sprite.chrismas {
-    background-position: -199px -361px;
+    background-position: -199px -365px;
 }
 .bottom-page.icon-136.about-sprite.cinema {
-    background-position: -399px -361px;
+    background-position: -399px -365px;
 }
 .bottom-page.icon-136.about-sprite.bbq {
-    background-position: 2px -554px;
+    background-position: 2px -559px;
 }
 .bottom-page.icon-136.about-sprite.birthday {
-    background-position: -202px -554px;
+    background-position: -202px -559px;
 }
 .bottom-page.icon-136.about-sprite.sport {
-    background-position: -410px -554px;
+    background-position: -410px -559px;
 }
 .bottom-page.icon-32 {
     width: 32px;
     height: 32px;
 }
-.bottom-page.icon-32.about-sprite.open-quote {
-    background-position: -255px -801px;
+.icon-32.about-sprite.quote {
+    background-position: -26px -1918px;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: -32px;
 }
-.bottom-page.icon-32.about-sprite.close-quote {
-    background-position: -451px -807px;
+.icon-32.about-sprite.quote.close {
+    background-position: -98px -1918px;
+    margin: 0 -32px 0 0;
+}
+.italic-text .icon-32.about-sprite.quote {
+    background-position: -26px -1920px;
+}
+.italic-text .icon-32.about-sprite.quote.close {
+    background-position: -98px -1920px;
+}
+.ar .icon-32.about-sprite.quote, .it .icon-32.about-sprite.quote, .es .icon-32.about-sprite.quote, .fr .icon-32.about-sprite.quote, .ru .icon-32.about-sprite.quote {
+    background-position: -167px -1915px;
+    width: 22px;
+    margin:  0 0 0 -26px;
+}
+.ar .icon-32.about-sprite.quote.close, .it .icon-32.about-sprite.quote.close, .es .icon-32.about-sprite.quote.close, .fr .icon-32.about-sprite.quote.close, .ru .icon-32.about-sprite.quote.close {
+    background-position: -239px -1915px;
+    margin: 0 -26px 0 0;
+}
+
+.de .icon-32.about-sprite.quote, .nl .icon-32.about-sprite.quote, .pl .icon-32.about-sprite.quote, .ro .icon-32.about-sprite.quote  {
+    background-position: -98px -1914px;
+    margin-top: 8px;
+    margin-bottom: -8px;
+}
+.de .italic-text .icon-32.about-sprite.quote, .nl .italic-text .icon-32.about-sprite.quote, .pl .italic-text .icon-32.about-sprite.quote, .ro .italic-text .icon-32.about-sprite.quote {
+    background-position: -98px -1916px;
+}
+.de .icon-32.about-sprite.quote.close  {
+    background-position: -26px -1920px;
+    margin-top: 0;
+}
+.nl .icon-32.about-sprite.quote.close, .pl .icon-32.about-sprite.quote.close, .ro .icon-32.about-sprite.quote.close {
+    background-position: -98px -1920px;
+    margin-top: 0;
+}
+.icon-32.about-sprite.quote.small {
+    background-position: -17px -1315px;
+    background-size: 360px auto;
+    width: 24px;
+    height: 24px;
+    margin-left: -28px;
+}
+.icon-32.about-sprite.quote.small.close {
+    background-position: -66px -1316px;
+    margin-right: -32px;
+    margin-left: 4px;
+}
+.ar .icon-32.about-sprite.quote.small, .it .icon-32.about-sprite.quote.small, .es .icon-32.about-sprite.quote.small, .fr .icon-32.about-sprite.quote.small, .ru .icon-32.about-sprite.quote.small {
+    background-position: -167px -1920px;
+    background-size: 525px auto;
+    margin:  1px 0 0 -26px;
+}
+.ar .icon-32.about-sprite.quote.close.small, .it .icon-32.about-sprite.quote.close.small, .es .icon-32.about-sprite.quote.close.small, .fr .icon-32.about-sprite.quote.close.small, .ru .icon-32.about-sprite.quote.close.small {
+    background-position: -239px -1920px;
+    margin: 2px -26px 0 0;
+}
+.de .icon-32.about-sprite.quote.small, .nl .icon-32.about-sprite.quote.small, .pl .icon-32.about-sprite.quote.small, .ro .icon-32.about-sprite.quote.small {
+    background-position: -66px -1314px;
+    margin-top: 6px;
+    margin-bottom: -6px;
+}
+.de .icon-32.about-sprite.quote.close.small  {
+    background-position: -17px -1314px;
+    margin-top: 0;
+}
+.nl .icon-32.about-sprite.quote.close.small, .pl .icon-32.about-sprite.quote.close.small, .ro .icon-32.about-sprite.quote.close.small {
+    background-position: -66px -1315px;
+    margin-top: 0;
 }
 .cropped-page .bottom-page.big-icon {
     width: 96px;

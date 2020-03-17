@@ -13334,7 +13334,7 @@ strong, b {
 .widget-circle, .widget-arrows {
     width: 40px;
     height: 40px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: left top;
     background-repeat: no-repeat;
 }
@@ -13368,7 +13368,7 @@ strong, b {
     line-height: 18px;
     padding-left: 27px;
     min-height: 18px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: -11px -1132px;
     background-repeat: no-repeat;
     color: #666666;
@@ -13398,7 +13398,7 @@ strong, b {
     position: absolute;
     bottom: 50px;
     left: 14px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: center -1261px;
     width: 12px;
     height: 8px;

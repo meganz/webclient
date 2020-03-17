@@ -604,6 +604,11 @@ table.arc-chat-messages-block {
 .chat-dropdown.empty-txt.loading-initial {
     min-height: 120px;
 }
+.chat-dropdown .link-button.light span,
+.chat-dropdown .dropdown-item.link-button.light span {
+    padding-left: 32px;
+    padding-right: 0px;
+}
 .chat-shared-block {
     padding: 5px 0;
     position: relative;

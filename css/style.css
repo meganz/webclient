@@ -29816,14 +29816,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     visibility: hidden;
     -webkit-transition: none;
     -moz-transition: none;
     -o-transition: none;
     -ms-transition: none;
     transition: none;
-
 }
 
 .transfer-progress-bar, .transfer-progress-bar-pct {

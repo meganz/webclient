@@ -15357,7 +15357,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       var networkQualityBar = null;
 
       if (chatRoom.megaChat.networkQuality <= 1) {
-        var networkQualityMessage = "Slow connection.";
+        var networkQualityMessage = l[23213];
         networkQualityBar = external_React_default.a.createElement("div", {
           className: "in-call-notif yellow" + (notifBar ? " after-green-notif" : "")
         }, networkQualityMessage);
@@ -18870,7 +18870,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   type = type || "private";
   setAsActive = setAsActive === true;
   var roomId = chatId;
-  var publicChatKey;
 
   if (!publicChatKey && chatHandle && self.publicChatKeys[chatHandle]) {
     if (type !== "public") {

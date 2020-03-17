@@ -1035,7 +1035,6 @@ class ConversationsApp extends MegaRenderMixin {
                 if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
                     $typeArea.trigger("focus");
                     e.megaChatHandled = true;
-                    moveCursortoToEnd($typeArea[0]);
                 }
 
             }

@@ -479,7 +479,7 @@ mega.tpw = new function TransferProgressWidget() {
     var setProgressCircle = function($headerSection, total, done) {
         var perc = done / total;
 
-        perc = Math.round(perc * 100);
+        perc = isNaN(perc) ? 0 : Math.round(perc * 100);
 
         $headerSection.find('.transfer-progress-pct').text(perc + '%');
     };

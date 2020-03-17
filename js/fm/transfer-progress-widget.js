@@ -942,7 +942,7 @@ mega.tpw = new function TransferProgressWidget() {
 
         var prog = perc * rowProgressWidth / 100;
         $targetedRow.find('.transfer-progress-bar-pct').width(prog);
-        $targetedRow.find('.transfer-task-status').text(bytesToSize(speed) + '/s');
+        $('.transfer-task-status', $targetedRow).text(bytesToSpeed(speed));
 
         setProgressCircle($header, all_bytes, done_bytes);
     };

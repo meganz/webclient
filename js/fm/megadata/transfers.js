@@ -645,7 +645,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             $tr.find('.downloaded-size').html(bytesToSize(bl, 1, 1));
             if (bps > 0) {
                 $tr.removeClass('transfer-error');
-                $tr.find('.speed').html(bytesToSize(bps, 1, 1) + '/s').removeClass('unknown');
+                $('.speed', $tr).safeHTML(bytesToSpeed(bps, 1, 1)).removeClass('unknown');
             }
             else {
                 $tr.find('.speed').addClass('unknown').text('');
@@ -1524,7 +1524,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
         if (!domElement._elmSpeed.textContent) {
             domElement._elmSpeed.classList.remove('unknown');
         }
-        domElement._elmSpeed.textContent = bytesToSize(bps, 1) + '/s';
+        domElement._elmSpeed.textContent = bytesToSpeed(bps, 1);
     }
     else {
         domElement._elmSpeed.classList.add('unknown');
@@ -2036,7 +2036,7 @@ function fm_tfspause(gid, overquota) {
             $('.download.eta-block .dark-numbers').text('');
             $('.download.eta-block .light-txt').text(l[1651]);
             $('.download.speed-block .dark-numbers').text('');
-            $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
+            $('.download.speed-block .light-txt').safeHTML('&mdash; ' + l['23062.k']);
         }
         else {
             var $tr = $('.transfer-table tr#' + gid);
@@ -2101,7 +2101,7 @@ function fm_tfsresume(gid) {
             if (page === 'download') {
                 $('.download .pause-transfer').removeClass('active').find('span').text(l[9112]);
                 $('.download.top-bar').removeClass('paused-transfer');
-                $('.download.speed-block .light-txt').safeHTML('&mdash; KB/s');
+                $('.download.speed-block .light-txt').safeHTML('&mdash; ' + l['23062.k']);
             }
             else {
                 $tr.removeClass('transfer-paused');

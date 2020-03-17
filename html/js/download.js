@@ -495,7 +495,7 @@ function dl_g(res) {
                 $('.download.top-bar').addClass('paused-transfer');
                 $('.download.eta-block .dark-numbers').text('');
                 $('.download.eta-block .light-txt').text(l[1651]);
-                $('.download.speed-block .dark-numbers').safeHTML('&mdash; KB/s');
+                $('.download.speed-block .dark-numbers').safeHTML('&mdash; ' + l['23062.k']);
                 $('.download.speed-block .light-txt').text('');
             }
 
@@ -899,6 +899,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.mobile.download-percents').text(perc + '%');
     }
 
+    var bps = kbps * 1000;
+
     if (bytesloaded === bytestotal) {
         $('.download.eta-block .dark-numbers', $dowloadWrapper).text('');
         $('.download.eta-block .light-txt', $dowloadWrapper).text(l[8579] + '\u2026');
@@ -909,16 +911,15 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         }
     }
     else if (bytesloaded && (now - (fdl_starttime || Object(dl_queue[dl_queue_num]).st)) / 1000) {
-        var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
-        var speed  = numOfBytes(bps, 1);
+        var speed  = numOfBytes(bps, 1, true);
         $('.download.speed-block .dark-numbers', $dowloadWrapper).text(speed.size);
-        $('.download.speed-block .light-txt', $dowloadWrapper).text(speed.unit + '/s');
+        $('.download.speed-block .light-txt', $dowloadWrapper).text(speed.unit);
         $('.download.eta-block .dark-numbers', $dowloadWrapper).safeHTML(secondsToTime(retime, 1));
         $('.download.eta-block .light-txt', $dowloadWrapper).text('');
 
         if (is_mobile) {
-            $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit + '/s');
+            $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit);
         }
     }
     if (page !== 'download' || $.infoscroll)
@@ -927,7 +928,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.widget-block').show();
         $('.widget-circle').attr('class','widget-circle percents-'+perc);
         $('.widget-icon.downloading').removeClass('hidden');
-        $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) +'/s');
+        $('.widget-speed-block.dlspeed').text(bytesToSpeed(bps, 1));
         $('.widget-block').addClass('active');
     }
 }

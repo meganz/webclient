@@ -1755,7 +1755,7 @@ mega.megadrop = (function() {
 
         var updateItem = function uiUpdateItem(id, bps, time, perc, bl) {
             var retime = secondsToTimeShort(time);
-            var speed = numOfBytes(bps, 1);
+            var speed = numOfBytes(bps, 1, true);
             var ulSize = uiOpts.window.queueItems['#ul_' + id].ulSize;
             var $item = _cacheUploadItem('#ul_' + id);
 
@@ -1773,7 +1773,7 @@ mega.megadrop = (function() {
             $item.$.size.removeClass('hidden');
 
             if (parseFloat(speed.size)) {
-                uiOpts.window.$.totalSpeed.text(speed.size + ' ' + speed.unit + '/s');
+                uiOpts.window.$.totalSpeed.text(speed.size + ' ' + speed.unit);
             }
         };
 

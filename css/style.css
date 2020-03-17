@@ -22848,16 +22848,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .withoutkey .new-registration-checkbox.reset-pass .radio-txt {
     padding-right: 0;
 }
-
-
-
-
-
-
-
-
 /* codes for user-management */
-
 .top-head .top-buttons {
     display: block;
 }
@@ -23166,7 +23157,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     line-height: 26px;
 }
 .user-management-main-page-buttons .default-white-button-user-management .icon, .user-management-main-page-buttons .default-green-button-user-management .icon{
-    margin:1px 8px 1px 0px;
+    margin:1px 8px 1px -3px;
 }
 .fm-files-view-icon-user-management {
     width: 18px;

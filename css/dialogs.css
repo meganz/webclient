@@ -3651,7 +3651,7 @@ li.token-input-token-invite .input-close {
 
 /* Two Factor Authentication dialogs */
 .fm-dialog.two-factor-dialog {
-    width: 482px;
+    width: 520px;
     margin: -172px 0 0 -240px;
 }
 .fm-dialog.two-factor-dialog.verify-two-factor-login {

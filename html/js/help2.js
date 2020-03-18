@@ -468,7 +468,9 @@ var Help = (function() {
                 $('.main-search-pad,.sidebar-menu-container').hide();
             } else {
                 $('.search-404-block').hide();
-                $('.main-search-pad,.sidebar-menu-container').show();
+                if (!is_mobile) {
+                    $('.main-search-pad,.sidebar-menu-container').show();
+                }
             }
 
             articles.reverse().map(function(article) {

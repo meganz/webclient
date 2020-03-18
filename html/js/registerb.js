@@ -144,9 +144,9 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
         var $paymentBlock = $('.bus-reg-radio-block', $pageContainer);
 
-        var radioHtml = '<div class="bus-reg-radio payment-[x] checkOff"></div>';
+        var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] checkOff"></div>';
         var textHtml = '<div class="provider">[x]</div>';
-        var iconHtml = '<div class="provider-icon [x]"></div>';
+        var iconHtml = '<div class="provider-icon [x]"></div> </div>';
 
         if (!list.length) {
             return failureExit(l[20431]);
@@ -169,9 +169,10 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             .addClass('checkOn');
 
         // event handler for radio buttons
-        $('.bus-reg-radio', $paymentBlock)
+        $('.bus-reg-radio-option', $paymentBlock)
             .off('click.suba').on('click.suba', function businessRegisterationCheckboxClick() {
                 var $me = $(this);
+                $me = $me.find('.bus-reg-radio');
                 if ($me.hasClass('checkOn')) {
                     return;
                 }

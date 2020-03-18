@@ -92,6 +92,10 @@
 	top: 2px;
 	content: " ";
 }
+.bus-reg-body .bus-reg-radio-option {
+    display: inline-block;
+    cursor: pointer;
+}
 .bus-reg-body .bus-reg-radio.checkOn::before, .card-container.bus-repay .bus-reg-radio.checkOn::before {
 	background: rgb(0,191,165);
 

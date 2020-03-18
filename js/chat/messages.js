@@ -761,7 +761,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             chatRoom.trigger('onMessagesBuffAppend', msg);
         }
 
-        if (self.chatRoom.scrolledToBottom === true) {
+        if (self.chatRoom.scrolledToBottom === true && self.chatRoom.activeSearches === 0) {
             if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
                 self.detachMessages();
             }
@@ -1876,8 +1876,11 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
 MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var self = this;
 
-    var len = isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT;
-
+    var len = (
+        Number.isInteger(isInitialRetrivalCall) ?
+            isInitialRetrivalCall :
+            isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT
+    );
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
     }

@@ -75,7 +75,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.callRequest = null;
     this.shownMessages = {};
-
+    this.activeSearches = 0;
     self.members = {};
 
     if (type === "private") {
@@ -128,12 +128,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     }
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
-        if (newState === ChatRoom.STATE.READY) {
-            if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
+        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
+            if (self.chatd && self.isOnline() && self.chatIdBin) {
                 // this should never happen, but just in case...
                 self.getChatIdMessages().resend();
             }
-            self.loadContactNames();
         }
     });
 
@@ -1924,22 +1923,16 @@ ChatRoom.prototype.isUIMounted = function() {
     return this._uiIsMounted;
 };
 
-ChatRoom.prototype.loadContactNames = function() {
-    var contacts = this.getParticipantsExceptMe();
-    for (var i = 0; i < Math.min(5, contacts.length); i++) {
-        var handle = contacts[i];
-        if (!M.u[handle]) {
-            continue;
-        }
-        if (!M.u[handle].name) {
-            M.syncUsersFullname(handle, this.publicChatHandle);
-        }
-        if (!M.u[handle].m && !anonymouschat) {
-            M.syncContactEmail(handle);
-        }
-    }
+ChatRoom.prototype.attachSearch = function() {
+    this.activeSearches++;
 };
 
+ChatRoom.prototype.detachSearch = function() {
+    if (--this.activeSearches === 0) {
+        this.messagesBuff.detachMessages();
+        this.trackDataChange();
+    }
+};
 window.ChatRoom = ChatRoom;
 
 export default {

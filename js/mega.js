@@ -3935,6 +3935,7 @@ function fmviewmode(id, e)
 }
 
 var thumbnails = Object.create(null);
+var th_pending = Object.create(null);
 var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
 var fa_reqcnt = 0;
@@ -3972,6 +3973,7 @@ function fm_thumbnails(mode, nodeList, callback)
                             k: n.k
                         };
                     th_requested[n.h] = 1;
+                    th_pending[n.h] = [];
 
                     if (u == a)
                         y = n.h;
@@ -3985,6 +3987,15 @@ function fm_thumbnails(mode, nodeList, callback)
                 else if (n.seen && n.seen !== 2)
                 {
                     fm_thumbnail_render(n);
+                }
+
+                if (mode === 'standalone' && typeof callback === 'function') {
+                    if (thumbnails[n.h]) {
+                        onIdle(callback.bind(null, n.h));
+                    }
+                    else if (th_pending[n.h]) {
+                        th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
+                    }
                 }
             }
         }
@@ -4002,6 +4013,12 @@ function fm_thumbnails(mode, nodeList, callback)
             {
                 if (mode === 'standalone' && typeof callback === 'function') {
                     onIdle(callback.bind(null, node));
+                }
+                if (th_pending[node]) {
+                    for (var t = th_pending[node].length; t--;) {
+                        th_pending[node][t]();
+                    }
+                    delete th_pending[node];
                 }
                 if (uint8arr === 0xDEAD)
                 {

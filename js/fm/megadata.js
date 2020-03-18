@@ -165,6 +165,14 @@ function MegaData() {
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
 
+        this['initFile' + 'ManagerUI'] = function() {
+            if (typeof window.InitFileDrag === 'function') {
+                window.InitFileDrag();
+                delete window.InitFileDrag;
+            }
+        };
+        mobile.uploadOverlay.shim(this);
+
         this['addWeb' + 'Download'] = function(nodes) {
             // @see filesystem.js/abortAndStartOver
             if (d) {
@@ -225,10 +233,6 @@ function MegaData() {
                 mobile.cloud.renderLayout();
             }
             return true;
-        };
-
-        this['ul' + 'progress'] = function() {
-            return mobile.uploadOverlay.showUploadProgress.apply(mobile.uploadOverlay, arguments);
         };
 
         var tf = [

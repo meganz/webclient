@@ -3448,7 +3448,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         updateLeftSubUserPanel(subuser);
     }
 
-    if ($('.files-grid-view.user-management-view').hasClass('hidden')) {
+    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
         return;
     }
 

@@ -828,6 +828,8 @@ function openRecents() {
     loadSubPage('fm');
 }
 
+/* eslint-disable strict, no-empty-function */
+
 // Not required for mobile
 function fmtopUI() {}
 function sharedUInode() {}
@@ -835,6 +837,7 @@ function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
 function dashboardUI() {}
+function affiliateUI() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},
@@ -842,5 +845,7 @@ accountUI.account = {
     renderCountry: function() {},
     renderRubsched: function() {},
 };
+/* eslint-enable strict, no-empty-function */
+
 /* jshint +W098 */
 /* jshint +W007 */

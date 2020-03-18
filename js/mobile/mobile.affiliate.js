@@ -274,10 +274,18 @@ mobile.affiliate = {
         // Init Select URL tag
         $('.page-names span', $urlBar).rebind('tap', function() {
             var $this = $(this);
+            var page = $this.data('page');
 
             $('.page-names span.active', $urlBar).removeClass('active');
-            $('.url span').text('#' + $this.data('page'));
             $this.addClass('active');
+
+            if (page === 'start') {
+                page = '';
+            }
+
+            M.affiliate.getURL(page).then(function(url) {
+                $('.url', $urlBar).safeHTML(url.replace(page, '<span>' + page + '</span>'));
+            });
         });
 
         $('.copy-button', $dialog).rebind('tap.copy-to-clipboard', function() {
@@ -286,9 +294,7 @@ mobile.affiliate = {
             copyToClipboard(links, toastTxt);
         });
 
-        M.affiliate.getURL('startpage').then(function(url) {
-            $('.url', $urlBar).safeHTML(url.replace('#startpage', '<span>#startpage</span>'));
-        });
+        $('.page-names span:first', $urlBar).trigger('tap');
     },
 
     /**

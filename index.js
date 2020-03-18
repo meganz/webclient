@@ -1913,7 +1913,7 @@ function init_page() {
         pagemetadata();
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
-        if (loggedout || u_type === false) {
+        if (loggedout || (u_type === false && page !== 'fm/refer')) {
             loadSubPage('start');
             return false;
         }

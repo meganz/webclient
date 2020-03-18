@@ -1059,6 +1059,12 @@ var dlmanager = {
             var abDup = dl.data && (is_chrome_firefox & 4) && new Uint8Array(task.data);
 
             var ready = function _onWriterReady() {
+                if (dl.cancelled || oIsFrozen(dl.writer)) {
+                    if (d) {
+                        logger.debug('Download canceled while writing to disk...', dl.cancelled, [dl]);
+                    }
+                    return;
+                }
                 dl.writer.pos += abLen;
 
                 if (dl.data) {

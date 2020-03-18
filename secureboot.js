@@ -2320,6 +2320,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/business.html', n: 'business',j:0});
     jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
@@ -2340,7 +2341,6 @@ else if (!browserUpdate) {
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
-        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});

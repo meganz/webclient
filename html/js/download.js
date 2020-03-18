@@ -700,7 +700,9 @@ function dl_g(res) {
 
     if ($.doFireDownload) {
         delete $.doFireDownload;
-        dlPageStartDownload();
+        if (fdl_queue_var) {
+            dlPageStartDownload();
+        }
     }
 }
 

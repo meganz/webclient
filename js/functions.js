@@ -382,12 +382,20 @@ function bytesToSize(bytes, precision, format) {
  * Very Similar function as bytesToSize due to it is just simple extended version of it by making it as speed.
  * @returns {String} Returns a string that build with value entered and speed unit e.g. 100 KB/s
  */
-function bytesToSpeed() {
-
+var bytesToSpeed = function bytesToSpeed() {
+    'use strict';
+    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
+};
+mBroadcaster.once('startMega', function() {
     'use strict';
 
-    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
-}
+    if (lang === 'en' || lang === 'es') {
+        bytesToSpeed = function(bytes, precision, format) {
+            return bytesToSize(bytes, precision, format) + '/s';
+        };
+    }
+});
+
 
 function makeid(len) {
     var text = "";
@@ -1023,7 +1031,6 @@ function str_mtrunc(str, len) {
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
 
-
 function getTransfersPercent() {
     var dl_r = 0;
     var dl_t = 0;
@@ -1079,7 +1086,8 @@ function getTransfersPercent() {
 }
 
 function percent_megatitle() {
-
+    'use strict';
+    var t;
     var transferStatus = getTransfersPercent();
 
     var x_ul = Math.floor(transferStatus.ul_done / transferStatus.ul_total * 100) || 0;

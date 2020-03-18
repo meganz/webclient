@@ -21806,11 +21806,10 @@ ChatRoom.prototype.attachContacts = function (ids) {
   var nodesMeta = [];
   $.each(ids, function (k, nodeId) {
     var node = M.u[nodeId];
-    var name = M.getNameByHandle(node.u);
     nodesMeta.push({
       'u': node.u,
       'email': node.m,
-      'name': name || node.m
+      'name': node.name || node.m
     });
   }); // 1b, 1b, JSON
 

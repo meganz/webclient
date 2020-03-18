@@ -6749,7 +6749,14 @@ var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
+__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -11117,8 +11124,6 @@ var prop_types_default = /*#__PURE__*/__webpack_require__.n(prop_types);
 // CONCATENATED MODULE: ./js/chat/ui/messages/AudioPlayer.jsx
 function AudioPlayer_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { AudioPlayer_typeof = function _typeof(obj) { return typeof obj; }; } else { AudioPlayer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return AudioPlayer_typeof(obj); }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function AudioPlayer_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function AudioPlayer_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -11171,8 +11176,11 @@ var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
         var result = audio.play();
 
         if (result instanceof Promise) {
-          result.catch(function (e) {
-            console.error(e);
+          result.catch(function (ex) {
+            // We may get AbortError (in Safari, at least) when the src is changed after play has been issued.
+            if (ex.name !== 'AbortError') {
+              console.error(ex);
+            }
           });
         }
 
@@ -11285,8 +11293,7 @@ var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this,
-          _React$createElement;
+      var _this2 = this;
 
       var self = this;
       var _self$props = self.props,
@@ -11319,12 +11326,10 @@ var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
       var controls = external_React_default.a.createElement("span", {
         className: btnClass,
         onClick: function onClick() {
+          self.play();
+
           if (self.props.source === null) {
-            self.props.getAudioFile().then(function () {
-              self.play();
-            });
-          } else {
-            self.play();
+            self.props.getAudioFile();
           }
         }
       });
@@ -11357,16 +11362,18 @@ var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
       })), external_React_default.a.createElement("span", {
         className: "audio-player__time",
         style: playtimeStyles
-      }, currentTime ? currentTime : secondsToTimeShort(playtime)), external_React_default.a.createElement("audio", (_React$createElement = {
+      }, currentTime ? currentTime : secondsToTimeShort(playtime)), external_React_default.a.createElement("audio", {
         src: source,
         className: "audio-player__player",
-        onPause: self.handleOnPause,
         id: audioId,
         ref: function ref(audio) {
           _this2.audioEl = audio;
         },
-        onPlaying: self.handleOnPlaying
-      }, _defineProperty(_React$createElement, "onPause", self.handleOnPause), _defineProperty(_React$createElement, "onEnded", self.handleOnEnded), _defineProperty(_React$createElement, "onTimeUpdate", self.handleOnTimeUpdate), _React$createElement)));
+        onPlaying: self.handleOnPlaying,
+        onPause: self.handleOnPause,
+        onEnded: self.handleOnEnded,
+        onTimeUpdate: self.handleOnTimeUpdate
+      }));
     }
   }]);
 
@@ -11428,36 +11435,35 @@ var AudioContainer_AudioContainer = /*#__PURE__*/function (_React$Component) {
       var _this$props = this.props,
           mime = _this$props.mime,
           h = _this$props.h;
-      var blobUrl = null;
       self.setState({
         loading: true
       });
 
-      if (mime === 'audio/mp4') {
-        blobUrl = new Promise(function (resolve, reject) {
-          M.gfsfetch(h, 0, -1, null).done(function (data) {
-            resolve({
-              buffer: data.buffer
-            });
-          }).fail(function (e) {
-            reject(e);
-          });
-        }).then(function (_ref) {
-          var buffer = _ref.buffer;
-          var uint8Array = new Uint8Array(buffer);
-          var arrayBuffer = uint8Array.buffer;
-          self.setState(function (prevState) {
-            return {
-              audioBlobUrl: mObjectURL([arrayBuffer], 'audio/mp4'),
-              loading: false
-            };
-          });
-        }).catch(function (e) {
-          console.error(e);
-        });
+      if (mime !== 'audio/mp4') {
+        if (d) {
+          console.warn('cannot play this file type (%s)', mime, h, [self]);
+        }
+
+        return false;
       }
 
-      return blobUrl;
+      M.gfsfetch(h, 0, -1).then(function (_ref) {
+        var buffer = _ref.buffer;
+        self.setState(function () {
+          return {
+            audioBlobUrl: mObjectURL([buffer], 'audio/mp4'),
+            loading: false
+          };
+        });
+      }).catch(function (ex) {
+        console.error(ex);
+      });
+      return true;
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      URL.revokeObjectURL(this.state.audioBlobUrl);
     }
   }, {
     key: "render",
@@ -15520,10 +15526,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
@@ -22206,7 +22208,11 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -22437,7 +22443,6 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
 function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }

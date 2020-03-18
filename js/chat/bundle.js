@@ -933,7 +933,7 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "addDataStructListenerForProperties",
     value: function addDataStructListenerForProperties(obj, properties) {
-      if (!obj) {
+      if (!obj || !obj.addChangeListener) {
         // this should not happen, but in rare cases it does...so we should just skip.
         return;
       }
@@ -10352,6 +10352,11 @@ var participantsList_ParticipantsList = /*#__PURE__*/function (_MegaRenderMixin)
     };
     _this.doResizesOnComponentUpdate = SoonFc(function () {
       var self = this;
+
+      if (!self.isMounted()) {
+        return;
+      }
+
       var $node = $(self.findDOMNode());
       var scrollHeight = self.contactsListScroll.getContentHeight();
       var fitHeight = scrollHeight;

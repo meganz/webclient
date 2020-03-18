@@ -642,10 +642,10 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             else {
                 $tr.find('.eta').addClass('unknown').text('');
             }
-            $tr.find('.downloaded-size').html(bytesToSize(bl, 1, 1));
+            $('.downloaded-size', $tr).text(bytesToSize(bl, 1));
             if (bps > 0) {
                 $tr.removeClass('transfer-error');
-                $('.speed', $tr).safeHTML(bytesToSpeed(bps, 1, 1)).removeClass('unknown');
+                $('.speed', $tr).text(bytesToSpeed(bps, 1)).removeClass('unknown');
             }
             else {
                 $tr.find('.speed').addClass('unknown').text('');

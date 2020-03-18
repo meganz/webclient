@@ -244,7 +244,7 @@
         return new Promise(function(resolve, reject) {
 
             var _formatURL = function() {
-                targetPage = targetPage ? '/#' + targetPage + '/' : '/#';
+                targetPage = targetPage ? '/' + targetPage + '/' : '/';
                 return getBaseUrl() + targetPage + 'aff=' + M.affiliate.id;
             };
 

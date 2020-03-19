@@ -37,6 +37,16 @@ mobile.uploadOverlay = {
                 return false;
             });
 
+        this._uploadAbortListener = mBroadcaster.addListener('upload:abort', function(id, res) {
+            var gid = ulmanager.getGID({id: id});
+
+            self.logger.debug('upload:abort[%s]', gid, id, res);
+
+            if (ulmanager.isUploadActive(gid)) {
+                onIdle(self._dispatchNextUpload.bind(self));
+            }
+        });
+
         this._clickHandler = function(ev) {
             var target = ev.target;
             var tr = target.closest('tr');
@@ -54,11 +64,9 @@ mobile.uploadOverlay = {
                     var gid = tr.id.substr(tr.id[0] === '$');
 
                     $(tr).fadeOut(function() {
-                        $(this).remove();
-                        if (ulmanager.isUploadActive(gid)) {
-                            onIdle(self._dispatchNextUpload.bind(self));
-                        }
                         ulmanager.abort(gid);
+                        $(this).remove();
+
                         if (!table.querySelector('tr')) {
                             self.close();
                         }
@@ -74,6 +82,10 @@ mobile.uploadOverlay = {
      */
     showUploadStarting: function(ul) {
         'use strict';
+
+        if (d) {
+            this.logger.debug('showUploadStarting', ul.id, [ul]);
+        }
 
         // Cache selectors
         var $overlay = this.$overlay;
@@ -180,6 +192,10 @@ mobile.uploadOverlay = {
         'use strict';
         var self = this;
         var $overlay = self.$overlay;
+
+        if (d) {
+            this.logger.debug('showUploadComplete', ul.id, h, this.startTime, [ul]);
+        }
         eventlog(99678, h ? 'OK' : lang === 'en' ? status : 'FAIL');
 
         if (!this.startTime) {
@@ -259,8 +275,6 @@ mobile.uploadOverlay = {
     initGetLinkButton: function(node) {
         'use strict';
 
-        // Cache selectors
-        var self = this;
         var $overlay = this.$overlay;
         var $getLinkButton = $('.upload-progress', $overlay).removeClass('disabled');
 
@@ -269,17 +283,10 @@ mobile.uploadOverlay = {
             return false;
         }
 
-        // Initialise the button to go to the file preview if it an image or file download for other files
         $getLinkButton.rebind('tap.gl', function() {
 
-            // Hide the overlay
-            self.close();
-
-            // Get the node handle
-            var nodeHandle = node.h;
-
             // Show the Get Link overlay
-            mobile.linkOverlay.show(nodeHandle);
+            mobile.linkOverlay.show(node.h);
 
             // Prevent double taps
             return false;
@@ -359,9 +366,15 @@ mobile.uploadOverlay = {
             delete this.$ttable;
         }
 
+        this.startTime = null;
         this.uploading = false;
         $('body').removeClass('uploading');
         $('.mobile-transfer-table', $overlay).empty();
+
+        if (this._uploadAbortListener) {
+            mBroadcaster.removeListener(this._uploadAbortListener);
+            delete this._uploadAbortListener;
+        }
 
         if (this.doReRender) {
             var target = this.doReRender;
@@ -438,6 +451,24 @@ mobile.uploadOverlay = {
             return res;
         };
 
+        ctx['openTrans' + 'fersPanel'] = function() {
+            onIdle(function() {
+                if (ulmanager.isUploading) {
+                    var ul = ul_queue[0] || false;
+                    console.assert(ul.id);
+
+                    if (ul.id) {
+                        if (d) {
+                            self.logger.debug('Initializing upload(s)...', ul.id, [ul]);
+                        }
+
+                        self.showUploadStarting(ul);
+                        self.startTime = null;
+                    }
+                }
+            });
+        };
+
         ctx['addToTran' + 'sferTable'] = function(gid, f) {
             var template =
                 '<tr id="$' + gid + '" class="transfer-queued transfer-upload"><td>' +
@@ -455,7 +486,7 @@ mobile.uploadOverlay = {
             $('.mobile-transfer-table', self.$overlay).safeAppend(template);
 
             if (!self.uploading) {
-                loadingDialog.show();
+                // loadingDialog.show();
                 self.uploading = true;
                 self._dispatchNextUpload();
             }

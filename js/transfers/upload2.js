@@ -204,7 +204,8 @@ var ulmanager = {
 
     isUploadActive: function(id) {
         'use strict';
-        return this.getUploadByID(typeof id === 'object' ? this.getGID(id) : id).starttime > 0;
+        var gid = typeof id === 'object' ? this.getGID(id) : id;
+        return document.getElementById(gid) || this.getUploadByID(gid).starttime > 0;
     },
 
     /**

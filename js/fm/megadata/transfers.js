@@ -1644,8 +1644,8 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
 
 MegaData.prototype.ulfinalize = function(ul, status, h) {
     'use strict';
-    if (ul_queue[ul.pos].promiseToInvoke) {
-        ul_queue[ul.pos].promiseToInvoke.resolve(h);
+    if (ul.promiseToInvoke) {
+        ul.promiseToInvoke.resolve(h);
         ul_queue[ul.pos] = Object.freeze({});
         percent_megatitle();
         return;

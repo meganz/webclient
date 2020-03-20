@@ -10866,6 +10866,7 @@ function (_ConversationMessageM) {
 
         output.push(metaRichpreview_React.makeElement("div", {
           key: meta.url,
+          className: "message richpreview container " + (meta.i ? "have-preview" : "no-preview") + " " + (meta.d ? "have-description" : "no-description") + " " + (isLoading ? "is-loading" : "done-loading"),
           onClick: function (url) {
             if (!message.meta.isLoading) {
               window.open(url, "_blank");

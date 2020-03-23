@@ -1817,7 +1817,11 @@ function (_ContactAwareComponen4) {
         var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
 
         if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
-          presenceRow = (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity));
+          var SECONDS = new Date().getTime() / 1000 - lastActivity;
+          var FORTY_FIVE_DAYS = 3888000; // seconds
+
+          var timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity);
+          presenceRow = (l[19994] || "Last seen %s").replace("%s", timeToLast);
         } else {
           presenceRow = M.onlineStatusClass(contact.presence)[0];
         }

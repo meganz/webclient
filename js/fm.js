@@ -1193,7 +1193,7 @@ function renameDialog() {
                     else if (M.isSafeName(value)) {
                         var targetFolder = n.p;
                         if (duplicated(value, targetFolder)) {
-                            errMsg = nodeType ? l[17579] : l[17578];
+                            errMsg = l[23219];
                         }
                         else {
                             M.rename(n.h, value);
@@ -2954,7 +2954,7 @@ function createFileDialog(close, action, params) {
             $input.addClass('error');
             return;
         }
-        else if (duplicated(0, v, target)) {
+        else if (duplicated(v, target)) {
             $dialog.addClass('duplicate');
             $input.addClass('error');
 

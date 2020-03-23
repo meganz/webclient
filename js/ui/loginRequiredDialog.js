@@ -170,7 +170,7 @@
         var $passwordInput = $dialog.find('#login-password3');
         var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-        var email = $emailInput.val();
+        var email = $emailInput.val().trim();
         var password = $passwordInput.val();
         var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
         var twoFactorPin = null;

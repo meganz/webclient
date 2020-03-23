@@ -1,12 +1,12 @@
-// jscs: disable validateIndentation
 // jshint -W116
 // jshint -W089
 // jshint -W074
 // jshint -W004
 // jscs:disable disallowImplicitTypeConversion
+/* eslint block-scoped-var: "off", no-eq-null: "off" */
 
 mBroadcaster.once('startMega', function() {
-if (!window.RTC || (!RTC.isChrome || !RTC.supportsRxTxGetStats)) {
+if (!window.RTC || (!RTC.isChrome && !RTC.supportsRxTxGetStats)) {
     if (window.RTC) {
         console.warn("No webrtc stats support for this browser");
     }
@@ -64,15 +64,19 @@ function addSampleToArrays(sample, arrs, len) {
                 sub = arrs[k] = {};
             }
             addSampleToArrays(val, sub, len); // this points to the object owning the cloneObject() method
-        } else { // val is a primitive value
+        }
+        else { // val is a primitive value
             if (isNaN(val)) {
                 val = -1;
             }
             var arr = arrs[k];
             if (arr == null) { // there is no array for this propery, create one
                 arr = arrs[k] = createArrayWithValue(len);
-            } else if (len > arr.length) {
-                appendEmptyValuesToArray(arr, len);
+            }
+            else {
+                if (len > arr.length) {
+                    appendEmptyValuesToArray(arr, len);
+                }
             }
             if (!arr.push) {
                 console.error("arr.push is not a function. arr is", JSON.stringify(arr));
@@ -153,7 +157,7 @@ function Recorder(rtcConn, maxSamplePeriod, handler) {
     self._stats = createStatSample();
     // isNull is used to detect if there was actually a previous sample
     self._stats.isNull = true;
-    self._commonStats = {};
+    self.basicStats = {};
     self._maxSamplePeriod = maxSamplePeriod * 1000;
     self._handler = handler;
 
@@ -182,11 +186,11 @@ Recorder.prototype.pollStats = function() {
     if (!pc || (pc.state === 'ended')) {
         return;
     }
-    self._waitingForStats = true;
     if (RTC.isChrome) {
         var streams = pc.getRemoteStreams();
         if (streams && streams.length) {
             pc.getStats(self.onStats.bind(self), streams);
+            self._waitingForStats = true;
         }
     }
     else if (RTC.supportsRxTxGetStats) {
@@ -194,21 +198,24 @@ Recorder.prototype.pollStats = function() {
         var statsMap = {};
         var promises = [];
         var senders = pc.getSenders();
-        var len = senders.length;
-        for (var i = 0; i < len; i++) {
-            promises.push(senders[i].getStats().then(function(stats) {
-                for (var k in stats) {
-                    statsMap[k] = stats.get(k);
-                }
+        var receivers = pc.getReceivers();
+        var slen = senders.length;
+        var rlen = receivers.length;
+        if (slen > 0  || rlen > 0) {
+            self._waitingForStats = true;
+        }
+        for (var i = 0; i < slen; i++) {
+            promises.push(senders[i].getStats().then(function(reports) {
+                reports.forEach(function(report) {
+                    statsMap[report.id] = report;
+                });
             }));
         }
-        var receivers = pc.getReceivers();
-        len = receivers.length;
-        for (var i = 0; i < len; i++) {
-            promises.push(receivers[i].getStats().then(function(stats) {
-                for (var k in stats) {
-                    statsMap[k] = stats.get(k);
-                }
+        for (var j = 0; j < rlen; j++) {
+            promises.push(receivers[j].getStats().then(function(reports) {
+                reports.forEach(function(report) {
+                    statsMap[report.id] = report;
+                });
             }));
         }
         Promise.all(promises).then(function() {
@@ -216,6 +223,7 @@ Recorder.prototype.pollStats = function() {
         });
     }
     else if (RTC.isFirefox) { // old versions
+        self._waitingForStats = true;
         pc.getStats(null, self.onStats.bind(self));
     }
     else {
@@ -254,7 +262,7 @@ Recorder.prototype.boolStat = function(stat, name) {
 };
 
 Recorder.prototype.onStats = function(rtcStats) {
-  // console.log("stats:", rtcStats);
+    // console.log("stats:", rtcStats);
   try {
     var self = this;
     var now = Date.now();
@@ -382,7 +390,7 @@ Recorder.prototype.onStats = function(rtcStats) {
 
     if (addSample) {
         if (!prevSample) {
-            self._handler.onStatCommonInfo(self._commonStats);
+            self._handler.onStatCommonInfo(self.basicStats);
         }
         stats.lq = self._handler.onStatSample(stats, true);
         astatr.pa = (stats._peerAudioLevel >= 10) ? 1 : 0;
@@ -400,15 +408,15 @@ Recorder.prototype.onStats = function(rtcStats) {
 Recorder.prototype.parseChromeStat = function(period, item, prevSample) {
     function stat(name) {
         var val = item.stat(name);
-        if (typeof val === 'string') {
+        if (typeof val === 'string' && val.length) {
             return parseInt(val);
         } else {
-            return null;
+            return undefined;
         }
     }
     var self = this;
     var stats = self._stats;
-    var commonStats = self._commonStats;
+    var commonStats = self.basicStats;
     var vstat = stats.v;
     var astat = stats.a;
     if (item.type === 'ssrc') {
@@ -509,10 +517,34 @@ function setIfPresent(val, obj, key) {
     obj[key] = val;
 }
 
+Recorder.prototype.getRemoteTrack = function(kind) {
+    var receivers = this._rtcConn.getReceivers();
+    var len = receivers.length;
+    for (var i = 0; i < len; i++) {
+        var track = receivers[i].track;
+        if (track && track.kind === kind) {
+            return track;
+        }
+    }
+    return null;
+};
+
+Recorder.prototype.getLocalTrack = function(kind) {
+    var senders = this._rtcConn.getSenders();
+    var len = senders.length;
+    for (var i = 0; i < len; i++) {
+        var track = senders[i].track;
+        if (track && track.kind === kind) { // track can be null if we used replaceTrack(null)
+            return track;
+        }
+    }
+    return null;
+};
+
 Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSample) {
     var self = this;
     var stats = self._stats;
-    var commonStats = self._commonStats;
+    var commonStats = self.basicStats;
     var type = item.type;
     if (type === 'candidate-pair' && item.selected) {
         /*
@@ -524,43 +556,76 @@ Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSampl
             return;
         }
         self._hadConnItem = true;
-        var cand = allStats.get ? allStats.get([item.localCandidateId]) : allStats[item.localCandidateId];
+        // get local candidate
+        var cand = allStats[item.localCandidateId];
         assert(cand);
         assert(cand.type === 'local-candidate');
+        commonStats.proto = cand.protocol;
+
         commonStats.rly = (cand.candidateType === 'relay') ? 1 : 0;
         if (commonStats.rly) {
             commonStats.rlySvr = cand.address + ':' + cand.port;
             commonStats.rlyProto = cand.relayProtocol;
         }
-        commonStats.proto = cand.protocol;
+
+        cand = allStats[item.remoteCandidateId];
+        assert(cand);
+        assert(cand.type === 'remote-candidate');
+        commonStats.rrly = (cand.candidateType === 'relay') ? 1 : 0;
+        if (commonStats.rrly) {
+            commonStats.rrlySvr = cand.address + ':' + cand.port;
+            commonStats.rrlyProto = cand.relayProtocol;
+        }
     } else {
-        var isInbound = (type === "inbound-rtp");
-        var isOutbound = (type === "outbound-rtp");
-        var isRemote = item.isRemote;
-        var kind = item.kind;
+        var isInbound, isRemote;
+        if (type.substr(0, 7) === "remote-") {
+            isRemote = true;
+            type = type.substr(7);
+        }
+        else {
+            isRemote = false;
+        }
+        if (type === "inbound-rtp") {
+            isInbound = true;
+        }
+        else if (type === "outbound-rtp") {
+            isInbound = false;
+        }
+        else {
+            return;
+        }
+
         var x;
         var prevX;
-        var isAudio;
-        var isVideo;
-        if (kind === "audio") {
-            x = stats.a;
-            prevX = prevSample.a;
-            isAudio = true;
-        } else if (kind === "video") {
+        var isVideo = (item.kind === "video");
+        if (isVideo) {
             x = stats.v;
             prevX = prevSample.v;
-            isVideo = true;
-        } else {
-            return;
+        }
+        else {
+            if (item.kind !== "audio") {
+                return;
+            }
+            x = stats.a;
+            prevX = prevSample.a;
         }
         if (isInbound) {
             if (isRemote) {
                 var rtt = item.roundTripTime;
                 if (isNaN(rtt)) {
-                    rtt = -1;
+                    if (prevX.rtt != null) {
+                        rtt = prevX.rtt;
+                    }
+                    else {
+                        rtt = undefined;
+                    }
+                }
+                else {
+                    rtt *= 1000;
                 }
                 x.rtt = rtt;
-            } else { // local receive
+            }
+            else { // local receive
                 var xr = x.r;
                 var jtr = item.jitter;
                 if (!isNaN(jtr)) {
@@ -574,20 +639,40 @@ Recorder.prototype.parseFirefoxStat = function(period, allStats, item, prevSampl
                     if (!isNaN(rfps)) {
                         xr.fps = Math.round(rfps * 10) / 10;
                     }
+                    // get received video resolution from remote stream, there is stats data for this
+                    // This doesn't currently work on Firefox - it provides settings only on gUM streams.
+                    // For remote streams it returns an empty object
+                    var videoTrack = self.getRemoteTrack("video");
+                    if (videoTrack) {
+                        var props = videoTrack.getSettings();
+                        setIfPresent(props.width, xr, 'width');
+                        setIfPresent(props.height, xr, 'height');
+                    }
                     setIfPresent(item.firCount, xr, 'firtx');
                     setIfPresent(item.nackCount, xr, 'nacktx');
                     setIfPresent(item.pliCount, xr, 'plitx');
                     setIfPresent(item.discardedPackets, xr, 'pd');
                 }
             }
-        } else if (isOutbound && !isRemote) { // nothing interesting in 'remote outbound' stats
-            var xs = x.s;
-            calcBwAverage(xs, period, item.bytesSent, prevX.s);
-            if (isVideo) {
-                setIfPresent(item.droppedFrames, xs, 'fd');
-                var sfps = item.framerateMean;
-                if (!isNaN(sfps)) {
-                    xs.fps = Math.round(sfps * 10) / 10;
+        }
+        else { // outbound
+            if (!isRemote) { // nothing interesting in 'remote outbound' stats
+                // outbound local
+                var xs = x.s;
+                calcBwAverage(xs, period, item.bytesSent, prevX.s);
+                setIfPresent(item.nackCount, xs, 'nackrx'); // there are also pli and fir
+                if (isVideo) {
+                    setIfPresent(item.droppedFrames, xs, 'fd');
+                    var sfps = item.framerateMean;
+                    if (!isNaN(sfps)) {
+                        xs.fps = Math.round(sfps * 10) / 10;
+                    }
+                    var videoTrack = self.getLocalTrack("video");
+                    if (videoTrack) {
+                        var props = videoTrack.getSettings();
+                        setIfPresent(props.width, xs, 'width');
+                        setIfPresent(props.height, xs, 'height');
+                    }
                 }
             }
         }
@@ -601,7 +686,8 @@ function alignSampleArrays(samples, len) {
         // sub can also be a number, in case the whole array was filled with the same numeric value
         if (sub instanceof Object) {
             alignSampleArrays(sub, len);
-        } else if ((sub instanceof Array) && (sub.length < len)) {
+        }
+        else if (Array.isArray(sub) && (sub.length < len)) {
             appendEmptyValuesToArray(sub, len);
         }
     }
@@ -672,12 +758,14 @@ Recorder.prototype.getStats = function(cid, sid) {
         samples: this.sampleArrays,
         bws: RTC.getBrowserId()
     }
-    var cmn = this._commonStats;
+    var cmn = this.basicStats;
     for (var k in cmn)
-        if (stats[k])
+        if (stats[k]) {
             console.error("Common stats property name overlaps with stats property name, not including");
-          else
+        }
+        else {
             stats[k] = cmn[k];
+        }
 
     return stats;
 };
@@ -687,7 +775,7 @@ Recorder.prototype.getStartTime = function() {
 };
 
 Recorder.prototype.isRelay = function() {
-    return this._commonStats.rly;
+    return this.basicStats.rly;
 };
 
 RTC.Stats = {

@@ -1,19 +1,20 @@
 var React = require("react");
 
-var utils = require('./../../../ui/utils.jsx');
-import MegaRenderMixin from '../../../stores/mixins.js';
+import {ContactAwareComponent} from '../../../stores/mixins.js';
 
-class ConversationMessageMixin extends MegaRenderMixin(React.Component) {
+class ConversationMessageMixin extends ContactAwareComponent {
     constructor(props) {
         super(props);
         this.onAfterRenderWasTriggered = false;
     }
     componentWillMount() {
+        if (super.componentWillMount) {
+            super.componentWillMount();
+        }
+
         var self = this;
-        var chatRoom = self.props.message.chatRoom;
-        var megaChat = chatRoom.megaChat;
         var contact = self.getContact();
-        var changedCb = function(contact, oldData, k, v) {
+        var changedCb = function(contact, oldData, k) {
             if (k === "ts" || k === "ats") {
                 // no updates needed in case of 'ts' change
                 // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
@@ -34,7 +35,7 @@ class ConversationMessageMixin extends MegaRenderMixin(React.Component) {
                         if (M.u[handle] && M.u[handle].addChangeListener) {
                             self._contactChangeListeners.push(
                                 [M.u[handle], M.u[handle].addChangeListener(changedCb)]
-                            )
+                            );
                         }
                     });
                 }

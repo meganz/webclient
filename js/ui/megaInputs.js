@@ -109,11 +109,21 @@
      * MegaInputs
      * @constructor
      * @param {Object} $input - jQuery object of target input element.
-     * @param {Object} options - addon options upon initialization.
+     * @param {Object} [options] addon options upon initialization.
      *
      * @return {Object} megaInput - Created MegaInput object
      */
     var MegaInputs = function($input, options) {
+        if (!(this instanceof MegaInputs)) {
+            return new MegaInputs($input, options);
+        }
+
+        if (!$input || !$input.length) {
+            if (d) {
+                console.debug('MegaInputs: nothing to apply here...', $input);
+            }
+            return;
+        }
 
         // Support if $input is multiple elements
         if ($input.length > 1) {

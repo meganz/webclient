@@ -32,6 +32,7 @@ mobile.cloud = {
         }
 
         // jQuery selectors
+        var $otherPages = $('#fmholder > div:not(.hidden)');
         var $fileManager = $('.mobile.file-manager-block');
 
 
@@ -58,6 +59,9 @@ mobile.cloud = {
         // Hide the loading progress
         loadingDialog.hide();
         loadingInitDialog.hide();
+
+        // Hide other pages that may be showing and show the Cloud Drive
+        $otherPages.addClass('hidden');
 
         // Show the file manager after everything is ready
         $fileManager.removeClass('hidden');
@@ -629,6 +633,16 @@ mobile.cloud = {
         // If a file row is tapped
         $fileRows.off('tap').on('tap', function() {
 
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
             // Get the node handle and node
             var $currentFileRow = $(this);
             var nodeHandle = $currentFileRow.data('handle');
@@ -883,9 +897,9 @@ mobile.cloud = {
      */
     scrollToFile: function(handle, animationTime) {
         'use strict';
+        var elm = document.getElementById(handle);
+
         animationTime = animationTime === 0 ? 0 : (animationTime || 500);
-        $('.mobile.fm-scrolling').animate({
-            scrollTop: document.getElementById(handle).offsetTop
-        }, animationTime);
+        $('.mobile.fm-scrolling').animate({scrollTop: elm && elm.offsetTop || 0}, animationTime);
     }
 };

@@ -24,7 +24,9 @@ MegaData.prototype.avatars = function(userPurgeList) {
 
     var waitingPromises = [];
     M.u.forEach(function(c, u) {
-        if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0 || M.u[u].c === undefined)) {
+        // don't load non-contact avatars...such call would be dangerous and should be done by the UI only when
+        // needed
+        if (!avatars[u] && (M.u[u].c === 1 || M.u[u].c === 2 || M.u[u].c === 0)) {
 
             waitingPromises.push(useravatar.loadAvatar(u));
         }

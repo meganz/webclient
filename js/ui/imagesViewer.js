@@ -16,6 +16,7 @@ var slideshowid;
     var _hideCounter = false;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
+    var _pdfSeen = false;
 
     function slideshow_handle(raw) {
         var result;
@@ -203,7 +204,7 @@ var slideshowid;
         var root = M.getNodeRoot(n && n.h || false);
 
         if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
-            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
+            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');
         }
@@ -573,6 +574,24 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
+    /** Adding the current page to history if needed to preserve navigation correctness
+     * @returns {Void}      No return value should be expected
+     */
+    global.addingFakeHistoryState = function() {
+        // then pushing fake states of history/hash
+        if (!hashLogic) {
+            var isSearch = page.indexOf('fm/search/');
+            if (isSearch >= 0) {
+                var searchString = page.substring(isSearch + 10);
+                var tempPage = page.substring(0, isSearch + 10);
+                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
+            }
+            else {
+                history.pushState({ subpage: page }, '', '/' + page);
+            }
+        }
+    };
+
     // Viewer Init
     function slideshow(id, close, hideCounter) {
         if (!close && u_attr && u_attr.b && u_attr.b.s === -1) {
@@ -590,6 +609,8 @@ var slideshowid;
         }
 
         if (close) {
+            sessionStorage.removeItem('previewNode');
+            sessionStorage.removeItem('previewTime');
             zoom_mode = false;
             switchedSides = false;
             slideshowid = false;
@@ -618,6 +639,18 @@ var slideshowid;
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
 
+            if (_pdfSeen) {
+                _pdfSeen = false;
+
+                tryCatch(function() {
+                    var doc = document.getElementById('pdfpreviewdiv1');
+                    if (doc && (doc = doc.contentWindow.document)) {
+                        doc.open();
+                        doc.close();
+                    }
+                })();
+            }
+
             return false;
         }
 
@@ -629,17 +662,7 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            if (!hashLogic && !location.hash) {
-                var isSearch = page.indexOf('fm/search/');
-                if (isSearch >= 0) {
-                    var searchString = page.substring(isSearch + 10);
-                    var tempPage = page.substring(0, isSearch + 10);
-                    history.pushState({subpage: tempPage, searchString: searchString}, "", "/" + tempPage);
-                }
-                else {
-                    history.pushState({subpage: page}, '', '/' + page);
-                }
-            }
+            addingFakeHistoryState();
 
             _hideCounter = hideCounter;
         }
@@ -653,6 +676,7 @@ var slideshowid;
             $.selected = [n.h];
         }
         mBroadcaster.sendMessage('slideshow:open', n);
+        sessionStorage.setItem('previewNode', id);
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -1060,7 +1084,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev3);
                     mBroadcaster.removeListener(preqs[n.h].ev4);
 
-                    preqs[n.h].destroy();
+                    preqs[n.h].kill();
                     preqs[n.h] = false;
                 }
             };
@@ -1201,6 +1225,7 @@ var slideshowid;
             doc.open();
             doc.write(myPage);
             doc.close();
+            _pdfSeen = true;
         });
     }
 
@@ -1485,6 +1510,9 @@ var slideshowid;
         }
     }
 
+    /**
+     * @global
+     */
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;

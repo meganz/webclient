@@ -344,6 +344,12 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
         return $breadCrumb;
     };
 
+    if (!action || !Array.isArray(action.path) || !action.path.length) {
+        // FIXME: check out where this does originates...
+        console.warn('Invalid parameters, cannot render breadcrumb...', action);
+        return;
+    }
+
     for (var k = action.path.length - 1; k >= 1; k--) {
         $container.append(newBreadCrumb(action.path[k]));
         $container.append('<i class=" tiny-icon icons-sprite grey-arrow"></i>');

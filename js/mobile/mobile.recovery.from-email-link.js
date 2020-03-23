@@ -33,9 +33,9 @@ mobile.recovery.fromEmailLink = {
     verifyRecoveryCode: function() {
 
         'use strict';
-        
+
         // Get the code from the URL
-        this.recoveryCode = page.replace('recover', '');
+        this.recoveryCode = sessionStorage.recoveryCode = page.replace('recover', '');
 
         // Show loading spinner
         loadingDialog.show();
@@ -66,8 +66,16 @@ mobile.recovery.fromEmailLink = {
                     // If recovering with key
                     if (result[0] === 9) {
 
+                        if (u_type || u_type === 0) {
+
+                            msgDialog("warninga", '', l[22817], '', function() {
+                                loadSubPage('fm');
+                            });
+
+                            return;
+                        }
                         // Store the email from the request
-                        mobile.recovery.fromEmailLink.recoveryEmail = result[1];
+                        mobile.recovery.fromEmailLink.recoveryEmail = sessionStorage.recoveryEmail = result[1];
 
                         // Load the page to enter or upload their Master/Recovery Key
                         loadSubPage('recoveryenterkey');
@@ -76,8 +84,18 @@ mobile.recovery.fromEmailLink = {
                     // Otherwise if they don't have the key and will park their account
                     else if (result[0] === 10) {
 
+                        if (u_type || u_type === 0) {
+                            debugger;
+
+                            msgDialog("warninga", '', l[22818], '', function() {
+                                loadSubPage('fm');
+                            });
+
+                            return;
+                        }
+
                         // Store the email from the request
-                        mobile.recovery.fromEmailLink.recoveryEmail = result[1];
+                        mobile.recovery.fromEmailLink.recoveryEmail = sessionStorage.recoveryEmail = result[1];
 
                         // Load the page to change their password and complete the parking process
                         loadSubPage('recoveryparkchangepass');

@@ -216,6 +216,10 @@
         });
 
         $(self.passwordField).rebind('keypress.prd', function(e) {
+            if (!self.dialog) {
+                console.warn('This event should no longer be reached...');
+                return;
+            }
             if (e.which === 13 || e.keyCode === 13) {
                 $(self.dialog.querySelector('.button-prd-confirm')).triggerHandler('click');
                 return false;
@@ -268,21 +272,15 @@
 
         this.resetUI();
 
-        // If the user's Account Authentication Version is set for the new registration process (version 2)
-        if (u_attr.aav === 2) {
-
-            // Derive the keys from the password
-            security.getDerivedEncryptionKey(enteredPassword, function(derivedEncryptionKeyArray32) {
-                self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
+        // Derive the keys from the password
+        security.getDerivedEncryptionKey(enteredPassword)
+            .then(function(derivedKey) {
+                self.completeOnConfirmClicked(derivedKey);
+            })
+            .catch(function(ex) {
+                console.warn(ex);
+                self.completeOnConfirmClicked('');
             });
-        }
-        else {
-            // Derive the key from the password using the old registration method (version 1)
-            var derivedEncryptionKeyArray32 = prepare_key_pw(enteredPassword);
-
-            // Continue the verification
-            self.completeOnConfirmClicked(derivedEncryptionKeyArray32);
-        }
     };
 
     PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
@@ -730,6 +728,7 @@
 
         $(window).off('resize.prd');
         $(document.body).off(MouseDownEvent);
+        $(this.passwordField).off('keypress.prd');
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {

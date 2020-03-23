@@ -1,10 +1,10 @@
 var React = require("react");
 var utils = require("./utils.jsx");
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
-export class DropdownEmojiSelector extends MegaRenderMixin(React.Component) {
+export class DropdownEmojiSelector extends MegaRenderMixin {
 
     static defaultProps = {
         'requiresUpdateOnResize': true,

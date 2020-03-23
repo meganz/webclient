@@ -581,7 +581,14 @@
                                 }, onError);
 
                                 logger.debug('Truncating file to offset ' + dl_position);
-                                dl_fw.truncate(dl_position);
+                                onIdle(tryCatch(function() {
+                                    dl_fw.truncate(dl_position);
+                                }, function(ex) {
+                                    logger.warn(ex);
+                                    if (!canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                        dlFatalError(dl, ex);
+                                    }
+                                }));
                             }
                         };
                         zfileEntry = fileEntry;
@@ -763,7 +770,10 @@
         };
 
         this.download = function(name, path) {
-            logger.debug('download', name, path, dl_fw, zfileEntry);
+            if (d) {
+                var _logger = logger || dlmanager.logger;
+                _logger.debug('download', name, path, dl_fw, zfileEntry);
+            }
 
             var saveLink = function(objectURL) {
                 var node = document.getElementById('dllink');

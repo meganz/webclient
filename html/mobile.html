@@ -6,7 +6,7 @@
         <div class="top-menu-content">
             <div class="top-menu-item start">[$1888]</div>
             <div class="top-menu-item fm">[$164]</div>
-            <div class="top-menu-item account"><span class="right-el">[$435]</span><span>[$187]</span></div>
+            <div class="top-menu-item account"><span class="right-el">[$1150]</span><span>[$187]</span></div>
             <div class="top-menu-item upgrade-your-account not-mobile-ready">[$433]</div>
             <div class="top-menu-item backup not-mobile-ready"><span class="right-el"><i class="semi-small-icon yellow-triangle"></i></span><span>[$8921]</span></div>
             <div class="top-menu-item refresh-item not-mobile-ready">[$85]</div>
@@ -21,6 +21,7 @@
             <div class="top-menu-item support not-mobile-ready">[$516]</div>
             <div class="top-menu-item upgrade-your-account pro">[$16111]</div>
             <div class="top-menu-item resellers not-mobile-ready">[$391]</div>
+            <div class="top-menu-item affiliate">[$22682]</div>
             <div class="top-menu-item submenu-item languages"><span class="right-el">EN</span><span>[$670]</span></div>
             <div class="top-submenu language-items">
                 <div class="top-menu-item language-template">
@@ -28,10 +29,9 @@
                     <span class="beta-text">[$5907]</span>
                 </div>
             </div>
-            <div class="top-menu-divider not-mobile-ready"></div>
+            <div class="top-menu-divider"></div>
 
-            <div class="top-menu-item about not-mobile-ready">[$16112]</div>
-            <div class="top-menu-item privacycompany not-mobile-ready">[$16113]</div>
+            <div class="top-menu-item about">[$16112]</div>
             <div class="top-menu-item contact">[$399]</div>
             <div class="top-menu-item feedback not-mobile-ready">[$1356]</div>
             <div class="top-menu-divider"></div>
@@ -255,7 +255,7 @@
         <div class="mobile bottom-action-bar">
             <div class="mobile fm-icon scroll-to-top left hidden"></div>
             <div class="mobile fm-icon upload-file right">
-                <input class="upload-select-file hidden" type="file">
+                <input class="upload-select-file hidden" id="fileselect1" multiple type="file"/>
             </div>
             <div class="mobile fm-icon mobile-create-new-folder right"></div>
             <div class="mobile fm-icon rubbish-bin-highlight empty-rubbish-bin right hidden"></div>
@@ -300,7 +300,11 @@
             <a class="mobile logo"></a>
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile ul-status-header">
+                    <span>[$1155], [$1607]</span>
+                    <a class="mobile text-button third see-all"><span>[$19284]</span></a>
+                </div>
+                <img alt="" class="mobile filetype-img" src="{staticpath}images/mobile/extensions/image.png"/>
                 <div class="mobile filename"><em>[$5533]</em></div>
                 <div class="mobile file-upload-info">
                     <div class="mobile upload-speed"></div>
@@ -314,37 +318,30 @@
                     <span class="mobile text">[$6110]</span>
                 </a>
                 <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
-                <a class="mobile text-button third close-button"><span>[$148]</span> </a>
+                <a class="mobile text-button third close-button"><span>[$1597]</span> </a>
                 <!-- This remains hidden, only used as a template so the desktop upload code works -->
-                <table class="upload-table hidden">
-                    <tr id="ul_8001" class="transfer-queued transfer-upload">
-                        <td>
-                            <div class="transfer-type upload">
-                                <ul>
-                                    <li class="right-c"><p><span></span></p></li>
-                                    <li class="left-c"><p><span></span></p></li>
-                                </ul>
+                <div class="mobile mobile-transfer-table-wrapper fm-block hidden">
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-header fm-hr">
+                            <div class="mobile fm-icon up left"></div>
+                            <div class="mobile fm-header-txt"><span>[$1346]</span></div>
+                        </div>
+                    </div>
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-content">
+                            <div class="mobile-transfer-scrolling-table fm-scrolling">
+                                <div class="mobile folders-files-text">5 files, 124 KB/s</div>
+                                <table class="mobile-transfer-table">
+                                    <tr class="transfer-queued transfer-upload" id="ul_8001">
+                                        <td>
+                                            <div class="transfer-type upload"></div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <span class="transfer-filetype-icon"></span>
-                            <span class="tranfer-filetype-txt">fileName</span>
-                        </td>
-                        <td>fileName</td>
-                        <td>fileSize</td>
-                        <td>
-                            <span class="eta"></span><span class="speed">pauseTxt</span>
-                        </td>
-                        <td>
-                            <span class="transfer-status">$[7227]</span>
-                        </td>
-                        <td class="grid-url-field">
-                            <a class="grid-url-arrow"></a>
-                            <a class="clear-transfer-icon"></a>
-                        </td>
-                        <td><span class="row-number"></span></td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -424,6 +421,36 @@
         </div>
     </div>
 </div>
+
+
+<!-- Affiliate  redemtion history context menu -->
+<div class="mobile context-menu-container small affliate-history hidden">
+    <div class="mobile context-menu-header">
+        [$22821]
+    </div>
+    <div class="context-menu-item active" data-filter="1">
+        <div class="mobile colored-label"></div>
+        <span class="mobile text">[$22820]</span>
+    </div>
+     <div class="context-menu-item" data-filter="2">
+        <div class="mobile colored-label green"></div>
+        <span class="mobile text">[$1418]</span>
+    </div>
+     <div class="context-menu-item" data-filter="3">
+        <div class="mobile colored-label orange"></div>
+        <span class="mobile text">[$22833]</span>
+    </div>
+     <div class="context-menu-item"  data-filter="4">
+        <div class="mobile colored-label red"></div>
+        <span class="mobile text">[$22819]</span>
+    </div>
+    <div class="light-grey-bar"></div>
+    <div class="context-menu-item close-button">
+        <div class="mobile fm-icon close"></div>
+        <span class="mobile text">[$82]</span>
+    </div>
+</div>
+
 
 <!-- Folder context menu with extra options -->
 <div class="mobile context-menu-container folder hidden">
@@ -507,11 +534,15 @@
         <span class="mobile text">[$164]</span>
     </div>
     <div class="title-menu-item open-my-account">
-        <div class="mobile fm-icon account"></div>
+        <div class="mobile fm-icon account light"></div>
         <span class="mobile text">[$187]</span>
     </div>
+    <div class="title-menu-item open-affiliate">
+        <div class="mobile fm-icon dollar light"></div>
+        <span class="mobile text">[$22682]</span>
+    </div>
     <div class="title-menu-item open-rubbish-bin">
-        <div class="mobile fm-icon rubbish-bin"></div>
+        <div class="mobile fm-icon rubbish-bin light"></div>
         <span class="mobile text">[$167]</span>
     </div>
     <div class="light-grey-bar"></div>
@@ -578,7 +609,6 @@
         <div class="mobile fm-icon top-icon menu right"></div>
         <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
         <div class="mobile fm-header-txt"><span>[$187]</span></div>
-
     </div>
     <div class="mobile content-row">
         <div class="mobile content-cell">
@@ -681,6 +711,276 @@
     </div>
 </div>
 
+<!-- Affiliate main page -->
+<div class="mobile main-block affiliate-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon dollar left"></div>
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon top-icon dropdown-handle open-title-menu right"></div>
+        <div class="mobile fm-header-txt"><span>[$22682]</span></div>
+    </div>
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile button-block affiliate-guide clickable" data-link="guide">
+            <div class="mobile fm-icon stairs"></div>
+            <div class="mobile label">[$22683]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+        <div class="mobile button-block affiliate-comission">
+            <div class="content">
+                <div class="mobile fm-icon dollar"></div>
+                <div class="mobile label">[$22690]<div class="mobile fm-icon info commission-info"></div></div>
+            </div>
+            <div class="mobile affiliate-comission-bl">
+                <div class="cell active">
+                    <span class="info">[$22692]</span>
+                    <span class="total price local"></span>
+                    <span class="total price euro"></span>
+                </div>
+                <div class="cell">
+                    <span class="info">[$22693]</span>
+                    <span class="pending price local"></span>
+                    <span class="pending price euro"></span>
+                </div>
+                <div class="cell">
+                    <span class="info">[$22694]</span>
+                    <span class="available price local"></span>
+                    <span class="available price euro"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile affiliate-redeem">
+            <div class="mobile fm-green-button gradient redeem disabled">
+                <span>[$458]</span>
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-history clickable" data-link="history">
+            <div class="mobile fm-icon dollar-file"></div>
+            <div class="mobile label">[$22808]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+        <div class="mobile button-block affiliate-registration">
+            <div class="mobile affiliate-number"></div>
+            <div class="content">
+                <div class="mobile fm-icon account"></div>
+                <div class="mobile label">[$22699]</div>
+            </div>
+            <div class="mobile affiliate-compare">
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-purchases">
+             <div class="mobile affiliate-number"></div>
+            <div class="content">
+                <div class="mobile fm-icon box"></div>
+                <div class="mobile label">[$22703]</div>
+            </div>
+            <div class="mobile affiliate-compare">
+            </div>
+        </div>
+
+        <div class="mobile button-block affiliate-distribution clickable" data-link="distribution">
+            <div class="mobile fm-icon map-pointer"></div>
+            <div class="mobile label">[$22709]</div>
+            <div class="mobile fm-icon right-arrow"></div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Affiliate guide page -->
+<div class="mobile main-block affiliate-guide-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22683]</span></div>
+    </div>
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">1</div>
+                <div class="mobile label">[$22719]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                <div class="mobile button-block no-bg generate">
+                    <div class="mobile fm-icon shining-chain"></div>
+                    <div class="mobile label grey">[$22771][$22723]</div>
+                    <div class="mobile fm-icon right-arrow big"></div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-linked-folder"></div>
+                    <div class="mobile label grey">[$22772][$22724]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-linked-chat"></div>
+                    <div class="mobile label grey">[$22725.m]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon big-new-user"></div>
+                    <div class="mobile label grey">[$22726.m]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile label grey no-icon small">
+                        *[$22898]
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">2</div>
+                <div class="mobile label">[$22824]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon green-tick"></div>
+                    <div class="mobile label">[$22727]</div>
+                    <div class="mobile label-info">[$22728]</div>
+                </div>
+
+                <div class="mobile button-block no-bg">
+                    <div class="mobile fm-icon green-tick"></div>
+                    <div class="mobile label">[$22757]</div>
+                    <div class="mobile label-info">[$22729]</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile button-block expandable">
+            <div class="content">
+                <div class="mobile button-number">3</div>
+                <div class="mobile label">[$23180]</div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+            <div class="full-info">
+                [$23181.m]
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate history page -->
+<div class="mobile main-block affiliate-history-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22808]</span></div>
+    </div>
+
+    <div class="mobile affiliate-history-dropdown">
+        <span>[$22820]</span>
+        <i class="mobile fm-icon down-arrow"></i>
+    </div>
+    <div class="mobile top-hr-pad">
+         <div class="mobile affiliate-empty-data">
+            [$22822]
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate guide page -->
+<div class="mobile main-block affiliate-distrib-page hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$22709]</span></div>
+    </div>
+    <div class="mobile fm-affiliate distribution-head">
+        <div class="mobile fm-affiliate tab-button active" data-table="geo-dist-reg">
+            [$22710]
+        </div>
+        <div class="mobile fm-affiliate tab-button" data-table="geo-dist-pur">
+            [$22711]
+        </div>
+    </div>
+    <div class="mobile top-hr-pad">
+        <div class="mobile content geo-dist-reg">
+             <div class="mobile fm-affiliate list"></div>
+        </div>
+        <div class="mobile content geo-dist-pur hidden">
+             <div class="mobile fm-affiliate list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate your unique MEGA referral URL !-->
+<div class="mobile main-block generate-url overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile generate-url white-block">
+                <div class="mobile generate-icon fm-icon big-shining-chain"></div>
+                <div class="mobile generate-url header">[$22741]</div>
+                <div class="mobile generate-url info">
+                    [$22742]
+                </div>
+                <div class="mobile generate-url input-label">
+                    [$22743]
+                </div>
+                <div class="mobile generate-url url-block">
+                    <i class="mobile fm-icon small grey-down-arrow"></i>
+                    <div class="url"></div>
+                    <div class="mobile generate-url page-names">
+                        <span data-page="start" class="active">[$22744]</span>
+                        <span data-page="business">[$19530]</span>
+                        <span data-page="mobile">[$955]</span>
+                        <span data-page="sync">[$956]</span>
+                        <span data-page="uwp">UWP</span>
+                        <span data-page="security">[$7337]</span>
+                        <span data-page="privacycompany">[$16113]</span>
+                        <span data-page="bird">MEGAbird</span>
+                        <span data-page="pro">[$16111]</span>
+                        <span data-page="help">[$384]</span>
+                        <span data-page="about">[$16112]</span>
+                        <span data-page="extensions">[$16541]</span>
+                        <span data-page="refer">[$22745]</span>
+                    </div>
+                    <div class="mobile generate-url button done">
+                        [$726]
+                    </div>
+                </div>
+
+                <div class="mobile generate-url button copy-button">
+                    [$22823]
+                </div>
+
+                <div class="mobile generate-url bottom-lnk">
+                    [$82]
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliation commission info overlay -->
+<div class="mobile main-block commission-overlay overlay hidden">
+    <div class="mobile content-row first">
+        <div class="mobile content-cell">
+            <div class="mobile fm-dialog-close"></div>
+            <div class="mobile commission-overlay white-block">
+                <div class="mobile generate-url header">[$22690]</div>
+                <div class="mobile commission-overlay info">
+                    [$22881]<br>
+                    [$22882]
+                    <span class="note">[$22875]</span><br>
+                    <span class="non-euro-only">[$22883]</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Cancel subscription information overlay for Google/Apple subscriptions -->
 <div class="mobile main-block cancel-subscription-information-overlay hidden">
@@ -1562,6 +1862,22 @@
                             <div class="bounce2"></div>
                             <div class="bounce3"></div>
                         </div>
+
+                        <div class="viewer-vad-control lato hidden">
+                            <div  class="thumb">
+                                <img alt="" />
+                            </div>
+                            <div class="counter">
+                                0
+                            </div>
+                            <div class="label">
+                                <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
+                            </div>
+                        </div>
+                        <div class="video-progress-bar vad" title="">
+                            <div class="video-time-bar"></div>
+                        </div>
+
                         <div class="viewer-bottom-bl">
                             <div id="video-controls" class="video-controls" data-state="hidden">
                                 <div data-state="play" class="viewer-button left playpause">
@@ -2208,6 +2524,14 @@
                                                         <div class="save-money hidden">
                                                             [$16649]
                                                         </div>
+                                                    </div>
+                                                </div>
+                                                <div class="orange-notification body with-btn argentina-only hidden">
+                                                    <div class="orange-notification">
+                                                        <i class="icons-sprite fvnotice"></i>
+                                                    </div>
+                                                    <div class="orange-notification cell text-cell">
+                                                        <div class="versioning-body-text">[$23132]</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -3851,6 +4175,20 @@
     <div class="download video-block hidden">
         <div class="download play-video-button"></div>
         <video data-autoplayvideo="false" class="mobile-gallery" data-playvideoonclick="false"></video>
+        <div class="viewer-vad-control lato hidden">
+            <div  class="thumb">
+                <img alt="" />
+            </div>
+            <div class="counter">
+                0
+            </div>
+            <div class="label">
+                <span>[$22879]</span><i class="mobile fm-icon small-skip-icon"></i>
+            </div>
+        </div>
+        <div class="video-progress-bar vad" title="">
+            <div class="video-time-bar"></div>
+        </div>
         <div class="viewer-bottom-bl">
             <div class="video-controls" data-state="hidden">
                 <div data-state="play" class="viewer-button left playpause">

@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import utils from "./../../ui/utils.jsx";
-import MegaRenderMixin from "./../../stores/mixins.js";
+import {MegaRenderMixin} from "./../../stores/mixins.js";
 import Tooltips from "./../../ui/tooltips.jsx";
 import Forms from "./../../ui/forms.jsx";
 import MiniUI from "./../../ui/miniui.jsx";
@@ -9,7 +9,7 @@ import {ContactPickerWidget} from './contacts.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
-export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
+export class StartGroupChatWizard extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': __(l[1940]),
@@ -233,7 +233,7 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
         return (
             <ModalDialogsUI.ModalDialog
                 step={self.state.step}
-                title={l[19483]}
+                title={self.state.createChatLink ? l[20638] : l[19483]}
                 className={classes}
                 selected={self.state.selected}
                 onClose={() => {
@@ -259,4 +259,12 @@ export class StartGroupChatWizard extends MegaRenderMixin(React.Component) {
             </ModalDialogsUI.ModalDialog>
         );
     }
+};
+
+window.StartGroupChatDialogUI = {
+    StartGroupChatWizard,
+};
+
+export default {
+    StartGroupChatWizard
 };

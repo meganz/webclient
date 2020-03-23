@@ -815,9 +815,13 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype._parseAndExtractKeys = function(message) {
         var self = this;
+
         var parsedMessage = ns._parseMessageContent(message.message);
         var result = { parsedMessage: parsedMessage, senderKeys: {}};
 
+        if (this.chatMode === CHAT_MODE.PUBLIC) {
+            return MegaPromise.resolve(result);
+        }
 
         if (parsedMessage === false) {
             logger.error('Can not parse the message content.');
@@ -856,19 +860,26 @@ var strongvelope = {};
                             (parsedMessage.keys[keyIndex].length >= strongvelope._RSA_ENCRYPTION_THRESHOLD)) ?
                                 parsedMessage.ownKey : parsedMessage.keys[keyIndex];
 
-                        var decryptedKeys = self._legacyDecryptKeysFor(encryptedKey,
-                            parsedMessage.nonce,
-                            otherHandle,
-                            isOwnMessage);
+                        tryCatch(function() {
+                            var decryptedKeys = self._legacyDecryptKeysFor(
+                                encryptedKey,
+                                parsedMessage.nonce,
+                                otherHandle,
+                                isOwnMessage
+                            );
 
-                        // Update local sender key cache.
-                        if (!self.participantKeys[message.userId]) {
-                            self.participantKeys[message.userId] = {};
-                        }
+                            // Update local sender key cache.
+                            if (!self.participantKeys[message.userId]) {
+                                self.participantKeys[message.userId] = {};
+                            }
 
-                        for (var i = 0; i < decryptedKeys.length; i++) {
-                            result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
-                        }
+                            for (var i = 0; i < decryptedKeys.length; i++) {
+                                result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
+                            }
+                        }, function(e) {
+                            console.error("_legacyDecryptKeysFor failed: ", e);
+                            proxyPromise.reject();
+                        })();
                     }
                     proxyPromise.resolve(result);
                 })
@@ -1027,6 +1038,7 @@ var strongvelope = {};
      *       the recipient.
      *
      * @method
+     * @throws Error
      * @param userhandle {String}
      *     Mega user handle for user to send to or receive from.
      * @return {String}
@@ -1165,6 +1177,7 @@ var strongvelope = {};
      *       to be loaded already.
      *
      * @method
+     * @throws Error
      * @param {String} encryptedKeys
      *     Encrypted Key(s).
      * @param {String} otherParty
@@ -1848,7 +1861,7 @@ var strongvelope = {};
         if (parsedMessage) {
             var proxyPromise = new MegaPromise();
 
-            var verifyPromise = ns._verifyMessage(
+            var verifyPromise = self.chatMode === CHAT_MODE.PUBLIC ? MegaPromise.resolve(true) : ns._verifyMessage(
                 String.fromCharCode(parsedMessage.protocolVersion) +
                     String.fromCharCode(parsedMessage.type) + senderKey + parsedMessage.signedContent,
                 parsedMessage.signature,
@@ -2191,22 +2204,29 @@ var strongvelope = {};
      * @param keys {Array}
      *     Key arrary from chatd.
      * @returns {Boolean}
-     *     True if no errors and False if error happened.
+     *     Always True even if there was an error when seeding some/all of the keys
      */
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) {
-        for (var i=0; i<keys.length;i++) {
+        for (var i = 0; i < keys.length; i++) {
 
             var keyidStr = a32_to_str([keys[i].keyid]);
             var key = keys[i].key;
             var isOwnKey = (keys[i].userId === this.ownHandle);
 
-            var decryptedKeys = this._decryptKeysFrom(key,
-                                         keys[i].userId,
-                                         isOwnKey);
-            if (!this.participantKeys[keys[i].userId]) {
-                this.participantKeys[keys[i].userId] = {};
-            }
-            this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
+            tryCatch(function(key, i, isOwnKey, keyidStr) {
+                var decryptedKeys = this._decryptKeysFrom(
+                    key,
+                    keys[i].userId,
+                    isOwnKey
+                );
+                if (!this.participantKeys[keys[i].userId]) {
+                    this.participantKeys[keys[i].userId] = {};
+                }
+                this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
+
+            }.bind(this), function(e) {
+                console.error('_decryptKeysFrom thrown an error:', e);
+            })(key, i, isOwnKey, keyidStr);
         }
         return true;
     };

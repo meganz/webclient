@@ -53,6 +53,11 @@ function AccountRecoveryControl() {
         window.open("https://mega.nz/help");
     });
 
+    if ($.prefillEmail) {
+        this.$emailInput.val($.prefillEmail);
+        delete $.prefillEmail;
+    }
+
     var emailMegaInput = new mega.ui.MegaInputs(this.$emailInput);
 
     this.$emailInput.rebind('keydown.recoverpageemail', function (e) {
@@ -657,8 +662,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         .removeClass('checkboxOn').addClass('checkboxOff');
     $('.parkbtn', $dialog).addClass('disabled');
     $('.checkbox-block.park-account-checkbox', $dialog).removeClass('hidden');
-    var enteredEmail = $('#recover-input1', self.$recoveryContents).val();
-    var $emailInput = $('#recover-input1-di', $dialog).val(enteredEmail).blur();
+    var $emailInput = $('#recover-input1-di', $dialog);
     var warn2 = l[18311];
     var warn1 = l[18312];
     $('#warn2-check', $dialog).safeHTML(warn2);

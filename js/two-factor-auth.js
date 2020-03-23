@@ -145,7 +145,7 @@ twofactor.loginDialog = {
             var pinCode = $.trim($pinCodeInput.val());
 
             // Get cached data from the login form
-            var email = security.login.email;
+            var email = security.login.email.trim();
             var password = security.login.password;
             var rememberMe = security.login.rememberMe;
 

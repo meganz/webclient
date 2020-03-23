@@ -81,6 +81,16 @@ mobile.downloadOverlay = {
         // On Open in Browser button click/tap
         this.$overlay.find('.second.dl-browser').off('tap').on('tap', function() {
 
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
             // Start the download
             mobile.downloadOverlay.startDownload(nodeHandle);
 
@@ -252,23 +262,22 @@ mobile.downloadOverlay = {
      * Initialises the close button on the overlay with download button options and also the download progress overlay
      */
     initOverlayCloseButton: function() {
-
         'use strict';
 
+        var self = this;
         var $closeButton = this.$overlay.find('.fm-dialog-close, .text-button');
 
         // Show close button for folder links
         $closeButton.removeClass('hidden');
 
         // Add tap handler
-        $closeButton.off('tap').on('tap', function(e) {
+        $closeButton.rebind('tap.close-download', function(e) {
             // If the tap originates from a direct human input, then instead pop the history which will re-trigger this
             // In the event that this is triggered from a generated event, just close the dialog ignoring the state.
             if (e.originalEvent !== undefined) {
                 history.back();
-            } else {
-                mobile.downloadOverlay.close();
             }
+            onIdle(self.close.bind(self));
             return false;
         });
     },
@@ -308,11 +317,17 @@ mobile.downloadOverlay = {
         'use strict';
 
         var n = M.d[nodeHandle] || false;
-        if (n.t === 1) {
-            this.startDownloadAsZip(nodeHandle);
-        } else {
-            this.startFileDownload(nodeHandle);
+
+        if (!n) {
+            this.close();
+            return mobile.messageOverlay.show(l[16872]);
         }
+
+        if (n.t) {
+            return this.startDownloadAsZip(nodeHandle);
+        }
+
+        this.startFileDownload(nodeHandle);
     },
 
     /**
@@ -590,9 +605,9 @@ mobile.downloadOverlay = {
 
         // Calculate the download speed
         var percentCompleteRounded = Math.round(percentComplete);
-        var speed = numOfBytes(bytesPerSecond);
+        var speed = numOfBytes(bytesPerSecond, 2, true);
         var speedSizeRounded = Math.round(speed.size);
-        var speedText = speedSizeRounded + ' ' + speed.unit + '/s';
+        var speedText = speedSizeRounded + ' ' + speed.unit;
 
         // Display the download progress and speed
         $downloadPercent.text(percentCompleteRounded + '%');

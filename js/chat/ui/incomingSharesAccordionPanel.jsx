@@ -1,30 +1,30 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../../stores/mixins.js";
+import {MegaRenderMixin} from "../../stores/mixins.js";
 
-class SharedFolderItem extends MegaRenderMixin(React.Component) {
+class SharedFolderItem extends MegaRenderMixin {
     render() {
         var self = this;
         var node = this.props.node;
 
-        return (<div className={"chat-shared-block incoming " + (self.props.isLoading ? "is-loading" : "")}
-                     key={node.h}
-                     onClick={function(e) {
-                         M.openFolder(node.h);
-                    }}
-                    onDoubleClick={function(e) {
-                        M.openFolder(node.h);
-                    }}>
-                    <div className={"medium-file-icon inbound-share"}></div>
-                    <div className="chat-shared-info">
-                        <span className="txt">{node.name}</span>
-                        <span className="txt small">{fm_contains(node.tf, node.td)}</span>
-                    </div>
-                </div>);
+        return <div className={"chat-shared-block incoming " + (self.props.isLoading ? "is-loading" : "")}
+            key={node.h}
+            onClick={function() {
+                M.openFolder(node.h);
+            }}
+            onDoubleClick={function() {
+                M.openFolder(node.h);
+            }}>
+            <div className={"medium-file-icon inbound-share"}></div>
+            <div className="chat-shared-info">
+                <span className="txt">{node.name}</span>
+                <span className="txt small">{fm_contains(node.tf, node.td)}</span>
+            </div>
+        </div>;
     }
 };
 
-class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
+class IncSharesAccordionPanel extends MegaRenderMixin {
     componentWillMount() {
         this.hadLoaded = false;
     }
@@ -59,7 +59,7 @@ class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
                                 self.safeForceUpdate();
                             }
                         }, 5000);
-                    }.bind(this));
+                    });
             }
             var incomingSharesContainer = null;
             var sharedFolders = M.c[contactHandle] && Object.keys(M.c[contactHandle]) || [];
@@ -88,24 +88,24 @@ class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
                     }
                     renderNodes.push(
                         <SharedFolderItem key={node.h} isLoading={self.isLoadingMore}
-                                        node={node}
-                                        chatRoom={room} s/>
+                            node={node}
+                            chatRoom={room} />
                     );
                 }
 
                 incomingSharesContainer =  <div>
                     {renderNodes}
                     {haveMore ?
-                    <div className="chat-share-nav body">
-                        <div className="chat-share-nav show-all" onClick={function(e) {
-                               M.openFolder(contactHandle);
-                        }}>
-                                    <span className="transfer-filetype-icon inbound-share">
-                                        <span className="transfer-filetype-icon inbound-share"></span>
-                                    </span>
-                            <span className="txt">{__(l[19797]) ? __(l[19797]) : "Show All"}</span>
-                        </div>
-                    </div> : null}
+                        <div className="chat-share-nav body">
+                            <div className="chat-share-nav show-all" onClick={function() {
+                                M.openFolder(contactHandle);
+                            }}>
+                                <span className="transfer-filetype-icon inbound-share">
+                                    <span className="transfer-filetype-icon inbound-share"></span>
+                                </span>
+                                <span className="txt">{__(l[19797]) ? __(l[19797]) : "Show All"}</span>
+                            </div>
+                        </div> : null}
                 </div>;
             }
             contents = <div className="chat-dropdown content have-animation">
@@ -136,5 +136,5 @@ class IncomingSharesAccordionPanel extends MegaRenderMixin(React.Component) {
 
 export {
     SharedFolderItem,
-    IncomingSharesAccordionPanel
+    IncSharesAccordionPanel
 };

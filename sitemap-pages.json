@@ -1,0 +1,35 @@
+{
+    "root": "https://mega.nz/",
+    "languages": [
+        "pt-br", "pt", "zh", "zh-cn", "zh-hk", "zh-sg", "zh-tw", "ja", "ko", "ru-mo", "tr", "en-ph", "vn"
+    ],
+    "pages": [
+        ["start"],
+        ["business"],
+        ["mobile", "ios", "android"],
+        ["sync"],
+        ["cmd"],
+        ["extensions", "chrome", "firefox"],
+        ["bird"],
+        ["uwp"],
+        ["about"],
+        ["pro"],
+        ["resellers"],
+        ["corporate/page-1"],
+        ["corporate/page-2"],
+        ["corporate/page-3"],
+        ["contact"],
+        ["blog"],
+        ["security"],
+        ["credits"],
+        ["terms"],
+        ["privacy"],
+        ["copyright"],
+        ["takedown"],
+        ["gdpr"],
+        ["sourcecode"],
+        ["sdk"],
+        ["doc"],
+        ["Mega_Transparency_Report_201909.pdf"]
+    ]
+}

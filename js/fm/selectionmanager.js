@@ -376,6 +376,11 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this._select_ptr_grid = function(ptr, shiftKey, scrollTo) {
+        if (!Object(M.v).length) {
+            // Nothing to do here.
+            return;
+        }
+
         if (this.selected_list.length === 0) {
             this.set_currently_selected(SelectionManager.dynamicNodeIdRetriever(M.v[0]), scrollTo);
             return;

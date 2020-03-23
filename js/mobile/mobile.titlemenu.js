@@ -9,7 +9,8 @@ mobile.titleMenu = {
     pageMenuItemMap: {
         "fm": ".open-cloud-drive",
         "fm/account": ".open-my-account",
-        "fm/rubbish": ".open-rubbish-bin"
+        "fm/rubbish": ".open-rubbish-bin",
+        "fm/refer": ".open-affiliate"
     },
 
     /**
@@ -23,12 +24,18 @@ mobile.titleMenu = {
     init: function() {
         'use strict';
 
-        var $openHandle = $(".open-title-menu");
-        var $closeHandle = $(".mobile.title-menu-container .close-button");
-        var $accountLink = $(".mobile.title-menu-container .open-my-account");
-        var $cloudDriveLink = $(".mobile.title-menu-container .open-cloud-drive");
-        var $rubbishBinLink = $(".mobile.title-menu-container .open-rubbish-bin");
+        var $openHandle = $('.open-title-menu');
+        var $menuHeader =  $('.fm-header-txt');
+        var $closeHandle = $('.mobile.title-menu-container .close-button');
+        var $accountLink = $('.mobile.title-menu-container .open-my-account');
+        var $cloudDriveLink = $('.mobile.title-menu-container .open-cloud-drive');
+        var $rubbishBinLink = $('.mobile.title-menu-container .open-rubbish-bin');
+        var $affiliateLink = $('.mobile.title-menu-container .open-affiliate');
 
+        $menuHeader.rebind('tap', function() {
+            mobile.titleMenu.open();
+            return false;
+        });
         $openHandle.off('tap').on('tap', function() {
             mobile.titleMenu.open();
             return false;
@@ -53,6 +60,12 @@ mobile.titleMenu = {
         $rubbishBinLink.off('tap').on('tap', function() {
             mobile.titleMenu.close();
             loadSubPage("fm/rubbish");
+            return false;
+        });
+
+        $affiliateLink.rebind('tap', function() {
+            mobile.titleMenu.close();
+            loadSubPage("fm/refer");
             return false;
         });
     },
@@ -97,8 +110,15 @@ mobile.titleMenu = {
      * Automatically hide menu items based on the current view.
      */
     showHideMenuItems: function($titleMenuContainer) {
+
         'use strict';
+
         $titleMenuContainer.find(".title-menu-item").removeClass("hidden");
+
+        if (!u_attr.flags.refpr) {
+            $(".title-menu-item.open-affiliate", $titleMenuContainer).addClass('hidden');
+        }
+
         if (mobile.titleMenu.pageMenuItemMap.hasOwnProperty(page)) {
             $titleMenuContainer.find(mobile.titleMenu.pageMenuItemMap[page]).addClass("hidden");
         } else if (is_fm()) {

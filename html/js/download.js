@@ -72,7 +72,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api_req({a: 'g', p: ph, 'ad': showAd()}, {callback: tryCatch(dl_g)});
+        M.req({a: 'g', p: ph, 'ad': showAd()}).always(dl_g);
     }
 
     if (is_mobile) {
@@ -320,7 +320,7 @@ function dl_g(res) {
 
                         dlmanager.getFileSizeOnDisk(dlpage_ph, filename).always(function(size) {
                             var perc = Math.floor(dlResumeInfo.byteOffset * 100 / fdl_filesize);
-                            dlResumeInfo.byteLength = size;
+                            dlResumeInfo.byteLength = size >= 0 ? size : null;
 
                             if (isPageRefresh) {
                                 if (d) {
@@ -495,7 +495,7 @@ function dl_g(res) {
                 $('.download.top-bar').addClass('paused-transfer');
                 $('.download.eta-block .dark-numbers').text('');
                 $('.download.eta-block .light-txt').text(l[1651]);
-                $('.download.speed-block .dark-numbers').safeHTML('&mdash; KB/s');
+                $('.download.speed-block .dark-numbers').safeHTML('&mdash; ' + l['23062.k']);
                 $('.download.speed-block .light-txt').text('');
             }
 
@@ -513,6 +513,40 @@ function dl_g(res) {
                                 onIdle(mediaCollectFn);
                                 mediaCollectFn = null;
                             }
+                        });
+                }
+            };
+
+            /** Function to show UI elements if textual files
+             *@returns {Void}           void
+             */
+            var showTextView = function() {
+                if (is_text(dl_node)) {
+                    // there's no jquery parent for this container.
+                    var $containerB = $('.download.main-pad .download.info-block');
+                    var $viewBtns = $('.file-type-wrapper, .txt-view-button', $containerB);
+
+                    $viewBtns.addClass('clickable').removeClass('hidden')
+                        .rebind('click.txtViewer', function() {
+                            loadingDialog.show();
+
+                            mega.fileTextEditor.getFile(dlpage_ph).done(
+                                function(data) {
+                                    loadingDialog.hide();
+                                    var fName;
+                                    if (dl_node && dl_node.name) {
+                                        fName = dl_node.name;
+                                    }
+                                    else {
+                                        var $fileinfoBlock = $('.download.file-info', $containerB);
+                                        fName = $('.big-txt', $fileinfoBlock).attr('title');
+                                    }
+
+                                    mega.textEditorUI.setupEditor(fName, data, dlpage_ph, true);
+                                }
+                            ).fail(function() {
+                                loadingDialog.hide();
+                            });
                         });
                 }
             };
@@ -553,6 +587,10 @@ function dl_g(res) {
                         showPreviewButton();
                     }
                 });
+            }
+            else {
+                // if it's textual file, then handle the UI.
+                showTextView();
             }
 
             if (prevBut) {
@@ -662,7 +700,9 @@ function dl_g(res) {
 
     if ($.doFireDownload) {
         delete $.doFireDownload;
-        dlPageStartDownload();
+        if (fdl_queue_var) {
+            dlPageStartDownload();
+        }
     }
 }
 
@@ -835,18 +875,24 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         $dowloadWrapper.removeClass('temporary-na');
         $('.download.progress-bar', $dowloadWrapper).width(perc + '%');
-        $('.file-info .download.info-txt.small-txt', $dowloadWrapper)
-            .safeHTML(
+
+        var $sizeBlock = $('.file-info .download.info-txt.small-txt', $dowloadWrapper);
+        var $topbarSizeBlock = $('.bar-cell .download.bar-filesize', $dowloadWrapper);
+
+        if ($('.dark', $sizeBlock).length === 0) {
+            $sizeBlock.safeHTML(
                 '<span class="dark">' +
-                    bytesToSize(bytesloaded) +
                 '</span>' +
                 '<hr />' +
-                '<span>' +
+                '<span class="fs">' +
                     fileSize +
                 '</span>'
             );
-        $('.bar-cell .download.bar-filesize', $dowloadWrapper)
-            .safeHTML('<span class="green">' + bytesToSize(bytesloaded) + '</span><hr />' + fileSize);
+            $topbarSizeBlock.safeHTML('<span class="green"></span><hr />' + fileSize);
+        }
+
+        $('.dark', $sizeBlock).add($('.green', $topbarSizeBlock)).text(bytesToSize(bytesloaded));
+
         megatitle(' ' + perc + '%');
     }
 
@@ -861,6 +907,8 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.mobile.download-percents').text(perc + '%');
     }
 
+    var bps = kbps * 1000;
+
     if (bytesloaded === bytestotal) {
         $('.download.eta-block .dark-numbers', $dowloadWrapper).text('');
         $('.download.eta-block .light-txt', $dowloadWrapper).text(l[8579] + '\u2026');
@@ -871,16 +919,15 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         }
     }
     else if (bytesloaded && (now - (fdl_starttime || Object(dl_queue[dl_queue_num]).st)) / 1000) {
-        var bps = kbps*1000;
         var retime = (bytestotal-bytesloaded)/bps;
-        var speed  = numOfBytes(bps, 1);
+        var speed  = numOfBytes(bps, 1, true);
         $('.download.speed-block .dark-numbers', $dowloadWrapper).text(speed.size);
-        $('.download.speed-block .light-txt', $dowloadWrapper).text(speed.unit + '/s');
+        $('.download.speed-block .light-txt', $dowloadWrapper).text(speed.unit);
         $('.download.eta-block .dark-numbers', $dowloadWrapper).safeHTML(secondsToTime(retime, 1));
         $('.download.eta-block .light-txt', $dowloadWrapper).text('');
 
         if (is_mobile) {
-            $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit + '/s');
+            $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit);
         }
     }
     if (page !== 'download' || $.infoscroll)
@@ -889,7 +936,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.widget-block').show();
         $('.widget-circle').attr('class','widget-circle percents-'+perc);
         $('.widget-icon.downloading').removeClass('hidden');
-        $('.widget-speed-block.dlspeed').text(bytesToSize(bps, 1) +'/s');
+        $('.widget-speed-block.dlspeed').text(bytesToSpeed(bps, 1));
         $('.widget-block').addClass('active');
     }
 }
@@ -917,9 +964,9 @@ function start_import() {
     }
 
     var dialogHeader = l[20751];
-    var dialogTxt = l[20753];
-    var dialogType = 'import_register';
-    var buttonEvent = function() {
+    var dialogTxt = l[20752];
+    var dialogType = 'import_login_or_register';
+    var buttonEventRegister = function() {
         mega.ui.showRegisterDialog({
             body: l[20756],
             showLogin: true,
@@ -935,19 +982,18 @@ function start_import() {
         });
     };
 
-    if (u_wasloggedin()) {
-        dialogTxt = l[20752];
-        dialogType = 'import_login';
-        buttonEvent = function() {
-            mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
-        };
-    }
+    var buttonEventLogin = function() {
+        mega.ui.showLoginRequiredDialog({minUserType: 3, skipInitialDialog: 1}).then(start_import);
+    };
 
     msgDialog(dialogType, l[1193], dialogHeader, dialogTxt, function(e) {
-        if (e === true) {
-            buttonEvent();
+        if (e === 'login') {
+            buttonEventLogin();
         }
-        else if (e === false) {
+        else if (e === 'register') {
+            buttonEventRegister();
+        }
+        else if (e === 'ephemeral') {
             start_anoimport();
         }
         else {

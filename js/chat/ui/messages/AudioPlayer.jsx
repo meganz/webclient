@@ -26,9 +26,12 @@ class AudioPlayer extends React.Component {
         if (audio.paused) {
             const result = audio.play();
             if (result instanceof Promise) {
-                result.catch(e => {
-                    console.error(e);
-                })
+                result.catch(ex => {
+                    // We may get AbortError (in Safari, at least) when the src is changed after play has been issued.
+                    if (ex.name !== 'AbortError') {
+                        console.error(ex);
+                    }
+                });
             }
 
             const audios = document.getElementsByClassName('audio-player__player');
@@ -160,12 +163,9 @@ class AudioPlayer extends React.Component {
             <span
                 className={btnClass}
                 onClick={() => {
+                    self.play();
                     if (self.props.source === null) {
                         self.props.getAudioFile()
-                        .then(() => {self.play()});
-                    }
-                    else {
-                        self.play()
                     }
                 }}>
             </span>
@@ -198,7 +198,6 @@ class AudioPlayer extends React.Component {
                 <audio
                     src={source}
                     className="audio-player__player"
-                    onPause={self.handleOnPause}
                     id={audioId}
                     ref={(audio) => {this.audioEl = audio;}}
                     onPlaying={self.handleOnPlaying}

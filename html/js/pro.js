@@ -223,7 +223,7 @@ var pro = {
             case 100:
                 return 'Business';    // product name should not be translated
             default:
-                return l[435];      // FREE
+                return l[1150];      // FREE
         }
     },
 

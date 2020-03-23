@@ -1,9 +1,9 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-import MegaRenderMixin from "../../stores/mixins.js";
+import {MegaRenderMixin} from "../../stores/mixins.js";
 import utils from './../../ui/utils.jsx';
 
-class SharedFileItem extends MegaRenderMixin(React.Component) {
+class SharedFileItem extends MegaRenderMixin {
     render() {
         var self = this;
         var message = this.props.message;
@@ -13,35 +13,29 @@ class SharedFileItem extends MegaRenderMixin(React.Component) {
         var node = this.props.node;
         var icon = this.props.icon;
 
-        return (<div className={"chat-shared-block " + (self.props.isLoading ? "is-loading" : "")}
-                     key={message.messageId + "_" + node.h}
-                     onClick={function(e) {
-                         if (self.props.isPreviewable) {
-                             slideshow(node.ch, undefined, true);
-                         }
-                         else {
-                             M.addDownload([node]);
-                         }
-                    }}
-                    onDoubleClick={function(e) {
-                        M.addDownload([node]);
-                    }}>
-                    <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
-                        <div className={"medium-file-icon " + icon}></div>
-                        <div className="img-wrapper" id={this.props.imgId}>
-                            <img alt="" src={thumbnails[node.h] || ""} />
-                        </div>
+        return (
+            <div
+                className={"chat-shared-block " + (self.props.isLoading ? "is-loading" : "")}
+                key={message.messageId + "_" + node.h}
+                onClick={() => this.props.isPreviewable ? M.viewMediaFile(node) : M.addDownload([node])}
+                onDoubleClick={() => M.addDownload([node])}>
+                <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
+                    <div className={"medium-file-icon " + icon}></div>
+                    <div className="img-wrapper" id={this.props.imgId}>
+                        <img alt="" src={thumbnails[node.h] || ""}/>
                     </div>
-                    <div className="chat-shared-info">
-                        <span className="txt">{node.name}</span>
-                        <span className="txt small">{name}</span>
-                        <span className="txt small grey">{timestamp}</span>
-                    </div>
-                </div>);
+                </div>
+                <div className="chat-shared-info">
+                    <span className="txt">{node.name}</span>
+                    <span className="txt small">{name}</span>
+                    <span className="txt small grey">{timestamp}</span>
+                </div>
+            </div>
+        );
     }
-};
+}
 
-class SharedFilesAccordionPanel extends MegaRenderMixin(React.Component) {
+class SharedFilesAccordionPanel extends MegaRenderMixin {
     @utils.SoonFcWrap(350)
     eventuallyRenderThumbnails() {
         if (this.allShownNodes) {
@@ -183,13 +177,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin(React.Component) {
                     }
                     var nodes = message.getAttachmentMeta();
                     nodes.forEach(function(node) {
-                        var icon = fileIcon(node);
-                        var mediaType = is_video(node);
-                        var isImage = is_image2(node);
-                        var isVideo = mediaType > 0;
-                        var showThumbnail = String(node.fa).indexOf(':0*') > 0;
-                        var isPreviewable = isImage || isVideo;
                         var imgId = "sharedFiles!" + node.ch;
+                        const {icon, showThumbnail, isPreviewable} = M.getMediaProperties(node);
 
                         files.push(
                             <SharedFileItem message={message} key={node.h + "_" + message.messageId}

@@ -668,7 +668,13 @@ pro.proplan = {
             if (data.srenew) { // This is subscription plan
 
                 var renewTimestamp = data.srenew[0];
-                $currPlan.addClass('renew').find('.plan-tag-description.renew b').text(time2date(renewTimestamp, 2));
+                if (renewTimestamp === 0) {
+                    $currPlan.addClass('renew').addClass('no-pops');
+                }
+                else {
+                    $currPlan.addClass('renew');
+                    $('.plan-tag-description.renew b', $currPlan).text(time2date(renewTimestamp, 2));
+                }
             }
             else {
                 var currentExpireTimestamp = data.nextplan ? data.nextplan.t : data.suntil;
@@ -729,6 +735,18 @@ function showLoginDialog(email, password) {
         $('.input-email', $dialog).val(email || '');
         $('.input-password', $dialog).val(password || '');
 
+        $('.top-login-forgot-pass', $dialog).rebind('click.forgetPass', function() {
+
+            var email = document.getElementById('login-name').value;
+
+            if (isValidEmail(email)) {
+                $.prefillEmail = email;
+            }
+
+            loadSubPage('recovery');
+        });
+
+
         $inputs.rebind('keydown.initdialog', function(e) {
             if (e.keyCode === 13) {
                 doProLogin($dialog);
@@ -763,7 +781,7 @@ var doProLogin = function($dialog) {
     var $passwordInput = $dialog.find('input#login-password3');
     var $rememberMeCheckbox = $dialog.find('.login-check input');
 
-    var email = $emailInput.val();
+    var email = $emailInput.val().trim();
     var password = $passwordInput.val();
     var rememberMe = $rememberMeCheckbox.is('.checkboxOn');  // ToDo check if correct
     var twoFactorPin = null;

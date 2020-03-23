@@ -10,7 +10,7 @@ function FileManager() {
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
     this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
-    this.columnsWidth.cloud.label = { max: 130, min: 70, curr: 70, viewed: false };
+    this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
@@ -51,9 +51,7 @@ FileManager.prototype.initFileManager = function() {
         console.time('renderfm');
     }
 
-    if (!is_mobile) {
-        this.initFileManagerUI();
-    }
+    this.initFileManagerUI();
     this.sortByName();
 
     if (is_mobile) {
@@ -137,7 +135,10 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.default-white-button.l-pane-visibility').removeClass('active');
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
-        if ($.dialog === 'pro-login-dialog' || localStorage.awaitingConfirmationAccount) {
+        if ($.dialog === 'pro-login-dialog'
+            || String($.dialog).startsWith('verify-email')
+            || localStorage.awaitingConfirmationAccount) {
+
             return false;
         }
         showWarningTokenInputLose().done(function() {
@@ -791,8 +792,8 @@ FileManager.prototype.initFileManagerUI = function() {
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
         treesearch = false;
-        var mySelf = $(this);
-        var clickedClass = mySelf.attr('class');
+        var $mySelf = $(this);
+        var clickedClass = $mySelf.attr('class');
 
         if (!clickedClass) {
             return;
@@ -810,7 +811,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 'recents':         {root: 'recents',   prev: null},
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null},
-                'user-management':      {root: 'user-management', prev: null}
+                'user-management': {root: 'user-management', prev: null},
+                'affiliate':       {root: 'affiliate', prev: null}
             };
         }
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
@@ -832,7 +834,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         isMegaSyncTransfer = false;
                     }
-                    mySelf.click();
+                    $mySelf.click();
 
                 });
                 return false;
@@ -860,7 +862,7 @@ FileManager.prototype.initFileManagerUI = function() {
             return !!fmTabState[c];
         })[0];
 
-        if (mySelf.hasClass('contacts') && !mySelf.find('.contacts-indicator').is('.hidden')) {
+        if ($mySelf.hasClass('contacts') && !$('.contacts-indicator', $mySelf).is('.hidden')) {
              M.openFolder('ipc');
              return false;
         }
@@ -878,7 +880,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if (mySelf.hasClass('account') || mySelf.hasClass('dashboard')) {
+        if ($mySelf.hasClass('account') || $mySelf.hasClass('dashboard') || $mySelf.hasClass('affiliate')) {
             if (u_type === 0) {
                 if ($(this).hasClass('account')) {
                     ephemeralDialog(l[7687]);
@@ -891,6 +893,9 @@ FileManager.prototype.initFileManagerUI = function() {
             else if ($(this).hasClass('dashboard')) {
                 loadSubPage('fm/dashboard');
             }
+            else if ($(this).hasClass('affiliate')) {
+                loadSubPage('fm/refer');
+            }
             else {
                 loadSubPage('fm/account');
                 if ($('.fm-account-main').data('jsp')) {
@@ -899,7 +904,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             return false;
         }
-        // else if (mySelf.hasClass('recents')) {
+        // else if ($mySelf.hasClass('recents')) {
         //     loadSubPage('fm/recents');
         // }
 
@@ -1051,9 +1056,12 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
         }
-        if (newNode.p === this.currentdirid || newNode.h === this.currentdirid ||
-            newNode.p === this.currentCustomView.nodeID || newNode.h === this.currentCustomView.nodeID) {
-            UImain = true;
+        if (newNode.p === this.currentdirid
+            || newNode.h === this.currentdirid
+            || newNode.p === this.currentCustomView.nodeID
+            || newNode.h === this.currentCustomView.nodeID) {
+
+            UImain = M.v.length || !is_mobile || !mobile.uploadOverlay.uploading;
 
             if ($.onRenderNewSelectNode === newNode.h) {
                 delete $.onRenderNewSelectNode;
@@ -1387,6 +1395,10 @@ FileManager.prototype.initContextUI = function() {
         }
         createFolderDialog();
     });
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.newfile-item').rebind('click', function() {
+        createFileDialog();
+    });
 
     $(c + '.fileupload-item').rebind('click', function() {
         // check if this is a business expired account
@@ -1556,6 +1568,25 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.properties-item').rebind('click', function() {
         propertiesDialog();
+    });
+
+    // eslint-disable-next-line local-rules/jquery-scopes
+    $(c + '.edit-file-item').rebind('click', function() {
+        var nodeHandle = $.selected && $.selected[0];
+        if (!nodeHandle) {
+            return;
+        }
+
+        loadingDialog.show('common', l[23130]);
+
+        mega.fileTextEditor.getFile(nodeHandle).done(
+            function(data) {
+                loadingDialog.hide();
+                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
+            }
+        ).fail(function() {
+            loadingDialog.hide();
+        });
     });
 
     $(c + '.properties-versions').rebind('click', function() {
@@ -1856,16 +1887,16 @@ FileManager.prototype.createFolderUI = function() {
             loadingDialog.pshow();
             var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
-            M.createFolder(currentdirid, name, new MegaPromise())
-                .done(function(h) {
+            M.createFolder(currentdirid, name)
+                .then(function(h) {
                     if (d) {
                         console.log('Created new folder %s->%s.', currentdirid, h);
                     }
                     loadingDialog.phide();
                 })
-                .fail(function(error) {
+                .catch(function(ex) {
                     loadingDialog.phide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(error));
+                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
                 });
         }
 
@@ -1989,14 +2020,16 @@ FileManager.prototype.createFolderUI = function() {
     });
 };
 
+/* eslint-disable id-length */
+
 /**
  * Initialize file and folder select dialog from chat.
  * This will fill up $.selected with what user selected on the dialog.
  * @param {String} type Type of dialog for select default options, e.g. newLink for New public link
  */
-FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
+FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCallback) {
     'use strict';
-
+    /* eslint-enable id-length */
     // If chat is not ready.
     if (!megaChatIsReady) {
         if (megaChatIsDisabled) {
@@ -2027,16 +2060,45 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
                 $.selected = selected;
                 M.getLinkAction();
             }
+        },
+        'openFile': {
+            title: l[22666],
+            classes: 'no-incoming', // Hide incoming share tab
+            selectLabel: l[865],
+            folderSelectNotAllowed: true,
+            folderSelectable: false, // Can select folder(s)
+            customFilterFn: function(node) {
+                if (node.t) {
+                    return true;
+                }
+                if (node.s >= 20971520) {
+                    return false;
+                }
+
+                if (is_text(node)) {
+                    return true;
+                }
+                return false;
+            },
+            onAttach: function() {
+                closeDialog();
+                $.selected = selected;
+                if (OnSelectCallback) {
+                    OnSelectCallback(selected);
+                }
+            }
         }
     };
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, {
+    var prop = {
         title: options[type].title,
         folderSelectable: options[type].folderSelectable,
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            ReactDOM.unmountComponentAtNode(constructor.domNode);
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            constructor.domNode.remove();
+            dialogPlacer.remove();
             selected = [];
             closeDialog();
         },
@@ -2044,9 +2106,50 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type) {
             selected = node;
         },
         onAttachClicked: options[type].onAttach,
-    });
+    };
+    if (options[type].folderSelectNotAllowed) {
+        prop.folderSelectNotAllowed = options[type].folderSelectNotAllowed;
+    }
+    if (options[type].customFilterFn) {
+        prop.customFilterFn = options[type].customFilterFn;
+    }
+
+    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
+};
+
+FileManager.prototype.initNewChatlinkDialog = function() {
+    'use strict';
+
+    // If chat is not ready.
+    if (!megaChatIsReady) {
+        if (megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed');
+        }
+        else {
+            // Waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            mBroadcaster.once('chat_initialized', this.initNewChatlinkDialog.bind(this));
+        }
+        return false;
+    }
+
+    loadingDialog.hide();
+
+    var dialogPlacer = document.createElement('div');
+
+    var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
+        name: "start-group-chat",
+        flowType: 2,
+        onClose: function() {
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            dialogPlacer.remove();
+            closeDialog();
+        }
+    });
+
+    ReactDOM.render(dialog, dialogPlacer);
 };
 
 FileManager.prototype.initUIKeyEvents = function() {
@@ -2138,7 +2241,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 38 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // up in grid/table
@@ -2149,7 +2252,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             e.keyCode == 40 &&
-            $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1 &&
+            String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1 &&
             !$.dialog
         ) {
             // down in grid/table
@@ -2219,7 +2322,8 @@ FileManager.prototype.initUIKeyEvents = function() {
         else if ((e.keyCode === 27) && !$('.payment-address-dialog').hasClass('hidden')) {
             addressDialog.closeDialog();
         }
-        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.copyrightsDialog)) {
+        else if (e.keyCode === 27 && ($.copyDialog || $.moveDialog || $.selectFolderDialog
+            || $.copyrightsDialog || $.saveAsDialog)) {
             closeDialog();
         }
         else if (e.keyCode == 27 && $.topMenu) {
@@ -2274,7 +2378,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             }
         }
 
-        if (sl && $.selectddUIgrid.indexOf('.grid-scrolling-table') > -1) {
+        if (sl && String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1) {
             // if something is selected, scroll to that item
             var jsp = $($.selectddUIgrid).data('jsp');
             if (jsp) {
@@ -3587,6 +3691,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
+        else if (is_text(n)) {
+            $.selected = [h];
+            // there's no jquery parent for this container.
+            // eslint-disable-next-line local-rules/jquery-scopes
+            $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        }
         else {
             M.addDownload([h]);
         }
@@ -3677,11 +3787,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +
-        'conversations opc ipc inbox account dashboard transfers recents user-management'
+        'conversations opc ipc inbox account dashboard transfers recents user-management affiliate'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
+    $('#fmholder').removeClass('affiliate-program');
     $('.fm-main').removeClass('active-folder-link');
     $('.nw-fm-left-icons-panel .logo').addClass('hidden');
     $('.fm-products-nav').text('');
@@ -3829,6 +3940,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $.transferOpen(true);
     }
 
+    if (id === 'affiliate') {
+        $('#fmholder').addClass('affiliate-program');
+    }
+
     var headertxt = '';
     switch (id) {
         case 'contacts':
@@ -3947,7 +4062,7 @@ FileManager.prototype.showOverStorageQuota = function(quota, options) {
         // update texts with "for free accounts" sentences removed.
 
         $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-        
+
         $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
         $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
             .safeHTML(l[16361] + ' ' + l[16314]);
@@ -4130,11 +4245,12 @@ FileManager.prototype.getLinkAction = function() {
     // Define what dialogs can be opened from other dialogs
     var diagInheritance = {
         'recovery-key-dialog': ['recovery-key-info'],
-        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share'],
+        properties: ['links', 'rename', 'copyrights', 'copy', 'move', 'share', 'saveAs'],
         copy: ['createfolder'],
         move: ['createfolder'],
         register: ['terms'],
-        selectFolder: ['createfolder']
+        selectFolder: ['createfolder'],
+        saveAs: ['createfolder']
     };
 
     var _openDialog = function(name, dsp) {
@@ -4228,4 +4344,21 @@ FileManager.prototype.getLinkAction = function() {
 
         _openDialog(dialogName, dispatcher);
     };
+
+    Object.defineProperty(FileManager.prototype.safeShowDialog, 'abort', {
+        value: function _abort() {
+            if (d && $.dialog) {
+                console.info('Aborting dialogs dispatcher while on %s, queued: ', $.dialog, _cdialogq);
+            }
+
+            delete $.dialog;
+            loadingDialog.hide('force');
+            _cdialogq = Object.create(null);
+
+            $('html, body').removeClass('overlayed');
+            $('.fm-dialog-overlay').addClass('hidden');
+            $('.fm-dialog:visible, .overlay:visible').addClass('hidden');
+        }
+    });
+
 })(self);

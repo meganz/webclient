@@ -81,12 +81,12 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
     if (this.viewmode === 1) {
         M.addIconUI(u, refresh);
-        if (!u) {
-            fm_thumbnails();
-        }
     }
     else {
         M.addGridUIDelayed(refresh);
+    }
+    if (!u) {
+        fm_thumbnails();
     }
     Soon(fmtopUI);
 
@@ -521,7 +521,7 @@ MegaData.prototype.searchPath = function() {
         if ($searchPath.outerWidth() > wrapWidth) {
             $searchWrap.addClass('long-path');
         }
-        
+
         while ($($searchPath).outerWidth() > wrapWidth) {
             if (i < $el.length - 1) {
                 $($el[i]).addClass('short-foldername');

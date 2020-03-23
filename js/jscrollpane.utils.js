@@ -66,6 +66,22 @@ function initAccountScroll(scroll) {
     }
 }
 
+function initAffiliateScroll(scroll) {
+
+    "use strict";
+
+    $('.fm-affiliate.body:visible').jScrollPane({
+        enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: true
+    });
+    jScrollFade('.fm-affiliate.body:visible');
+    if (scroll) {
+        var jsp = $('.fm-affiliate.body:visible').data('jsp');
+        if (jsp) {
+            jsp.scrollToBottom();
+        }
+    }
+}
+
 function initGridScrolling() {
     $('.grid-scrolling-table:visible')
         .filter(":not(.megaList,.megaListContainer)")

@@ -95,6 +95,9 @@
 .loading-spinner.active .loading-info {
     padding: 101px 0 0 0;
 }
+.loading-spinner.active .loading-info {
+    padding: 101px 0 0 0;
+}
 .loading-info li {
     font-size: 24px;
     line-height: 50px;
@@ -114,6 +117,12 @@
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+}
+.loading-info li.status-txt {
+    font-size: 17px;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    margin-top: -40px;
+    overflow: hidden;
 }
 .loading-info li.loaded, .loading-info li.loading {
     height: 50px;
@@ -633,13 +642,16 @@ background-color:#1DA2E9
  100% {
 }
 }
+
+
+
 .viewer-pending {
     margin: -8px 0 0 -48px;
     width: 96px;
     top: 50%;
     left: 50%;
     text-align: center;
-    z-index: 10;
+    z-index: 99999;
     position: absolute;
     font-size: 0;
     line-height: 0;

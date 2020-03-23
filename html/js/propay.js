@@ -210,6 +210,14 @@ pro.propay = {
                 pro.propay.initPlanDurationClickHandler();
                 pro.propay.initRenewalOptionClickHandler();
 
+                // Hide/show Argentian warning message depending on ipcc
+                if (u_attr.ipcc === 'AR') {
+                    $('.argentina-only', $stepTwo).removeClass('hidden');
+                }
+                else {
+                    $('.argentina-only', $stepTwo).addClass('hidden');
+                }
+
                 // If mobile, show all supported options at once and they can scroll vertically
                 if (is_mobile) {
                     pro.propay.renderPaymentProviderOptions(pro.propay.allGateways, 'primary');

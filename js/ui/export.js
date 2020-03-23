@@ -1370,6 +1370,9 @@ var exportExpiry = {
                 document.removeEventListener('copy', window.onCopyEventHandler, false);
                 delete window.onCopyEventHandler;
             }
+
+            affiliateUI.registeredDialog.show();
+
             return true;
         }
 
@@ -1402,7 +1405,7 @@ var exportExpiry = {
 
         // Embed code handling
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
-        if ($.itemExportEmbed || is_video(n) === 1) {
+        if ($.itemExportEmbed || is_video(n) === 1 && !folderlink) {
             var link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
             var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
             var setCode = function() {
@@ -1460,6 +1463,13 @@ var exportExpiry = {
                     $setting.addClass('disabled').find('input').prop('readonly', true).off('input');
                 }
                 setCode();
+            });
+            // Reset all numeric inputs under Share Options
+            $('.embed-code-container .settings-container .embed-setting').addClass('disabled');
+            $('.embed-code-container .settings-container input[type=number]').get().forEach(function(e) {
+                var $this = $(e);
+                $this.val($this.attr('value'));
+                $this.prop('readonly', true);
             });
             $('.fm-dialog-tab', $linksDialog).removeClass('hidden');
 

@@ -277,11 +277,12 @@ function countrydetails(isocode) {
  * similar to `bytesToSize` but this function returns an object
  * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
  *
- * @param {Number} bytes        Size in bytes to convert
- * @param {Number} precision    Precision to show the decimal number
+ * @param {Number} bytes Size in bytes to convert
+ * @param {Number} [precision] Precision to show the decimal number
+ * @param {Boolean} [isSpd] True if this is a speed, unit will be returned as speed unit like KB/s
  * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
  */
-function numOfBytes(bytes, precision) {
+function numOfBytes(bytes, precision, isSpd) {
 
     'use strict';
 
@@ -290,7 +291,8 @@ function numOfBytes(bytes, precision) {
         precision = 2;
     }
 
-    var parts = bytesToSize(bytes, precision).split(' ');
+    var fn = isSpd ? bytesToSpeed : bytesToSize;
+    var parts = fn(bytes, precision).split(' ');
 
     return { size: parts[0], unit: parts[1] || 'B' };
 }
@@ -298,21 +300,12 @@ function numOfBytes(bytes, precision) {
 function bytesToSize(bytes, precision, format) {
     'use strict'; /* jshint -W074 */
 
-    var s_b = 'B';
-    var s_kb = 'KB';
-    var s_mb = 'MB';
-    var s_gb = 'GB';
-    var s_tb = 'TB';
-    var s_pb = 'PB';
-
-    if (lang === 'fr') {
-        s_b = 'O';
-        s_kb = 'Ko';
-        s_mb = 'Mo';
-        s_gb = 'Go';
-        s_tb = 'To';
-        s_pb = 'Po';
-    }
+    var s_b = l[20158];
+    var s_kb = l[7049];
+    var s_mb = l[20159];
+    var s_gb = l[17696];
+    var s_tb = l[20160];
+    var s_pb = l[23061];
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
@@ -384,6 +377,25 @@ function bytesToSize(bytes, precision, format) {
         return resultSize + ' ' + resultUnit;
     }
 }
+
+/*
+ * Very Similar function as bytesToSize due to it is just simple extended version of it by making it as speed.
+ * @returns {String} Returns a string that build with value entered and speed unit e.g. 100 KB/s
+ */
+var bytesToSpeed = function bytesToSpeed() {
+    'use strict';
+    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
+};
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    if (lang === 'en' || lang === 'es') {
+        bytesToSpeed = function(bytes, precision, format) {
+            return bytesToSize(bytes, precision, format) + '/s';
+        };
+    }
+});
+
 
 function makeid(len) {
     var text = "";
@@ -546,6 +558,25 @@ function makeMetaAware(kls) {
             }
         }
     };
+}
+
+/**
+ * Gets UAO parameter from the URL if exists and store it
+ * @param {String} url          URL
+ * @param {String} page         Page
+ */
+function getUAOParameter(url, page) {
+    'use strict';
+    var pageLen = page.length;
+    if (url.length > pageLen) {
+        var urlParams = url.substr(pageLen);
+        if (urlParams.length > 14) {
+            var uaoParam = urlParams.indexOf('/uao=');
+            if (uaoParam > -1) {
+                mega.uaoref = urlParams.substr(uaoParam + 5);
+            }
+        }
+    }
 }
 
 /**
@@ -784,7 +815,7 @@ function srvlog(msg, data, silent) {
         console.error(msg, data);
     }
     if (typeof window.onerror === 'function') {
-        window.onerror(msg, '', data ? 1 : -1, 0, data || null);
+        window.onerror(msg, '@srvlog', data ? 1 : -1, 0, data || null);
     }
 }
 
@@ -1000,7 +1031,6 @@ function str_mtrunc(str, len) {
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
 
-
 function getTransfersPercent() {
     var dl_r = 0;
     var dl_t = 0;
@@ -1056,7 +1086,8 @@ function getTransfersPercent() {
 }
 
 function percent_megatitle() {
-
+    'use strict';
+    var t;
     var transferStatus = getTransfersPercent();
 
     var x_ul = Math.floor(transferStatus.ul_done / transferStatus.ul_total * 100) || 0;
@@ -2804,9 +2835,9 @@ function blockChromePasswordManager() {
         var switchReadonly = function __switchReadonly(input) {
 
             input.setAttribute('readonly', true);
-            setTimeout(function() {
+            onIdle(function() {
                 input.removeAttribute('readonly');
-            }, 200);
+            });
         };
 
         $newPasswordField.rebind('focus.blockAutofill, mousedown.blockAutofill', function() {
@@ -2845,3 +2876,4 @@ function registerLinuxDownloadButton($links) {
         return false;
     });
 }
+

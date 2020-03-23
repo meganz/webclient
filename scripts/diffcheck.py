@@ -233,6 +233,7 @@ def reduce_eslint(file_line_mapping, **extra):
     # Go through output and collect only relevant lines to the result.
     result = ['\nESLint output:\n==============\n']
     eslint_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
+    warning_result = []
     for line in output:
         parse_result = eslint_expression.findall(line)
         # Check if we've got a relevant line.
@@ -241,16 +242,22 @@ def reduce_eslint(file_line_mapping, **extra):
             file_name = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list.
             if line_no in file_line_mapping[file_name]:
-                result.append(line)
-
                 if re.search(r': line \d+, col \d+, Warning - ', line):
                     warnings += 1
+                    warning_result.append(line)
+                else:
+                    result.append(line)
+
+    result = result + warning_result;
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
     if error_count == 0:
         return '', 0
-    result.append('\n{} issue(s)'.format(error_count))
+    if warnings:
+        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+    else:
+        result.append('\n{} error(s) found.'.format(error_count))
     return '\n'.join(result), error_count - warnings
 
 def strip_ansi_codes(s):
@@ -391,8 +398,8 @@ def analyse_files_for_special_chars(filename, result):
                 for column, character in enumerate(line):
                     code = ord(character)
                     if code >= 128:
-                        result.append('Found non-ASCII character {} ({}) at file {}, line {}, column {}'
-                                     .format(code, character.encode("utf-8"), filename, linenumber + 1, column))
+                        result.append(u'Found non-ASCII character {} ({}) at file {}, line {}, column {}'
+                                     .format(code, character, filename, linenumber + 1, column))
                         test_fail = True
 
     return test_fail
@@ -466,7 +473,7 @@ def reduce_validator(file_line_mapping, **extra):
     """
 
     exclude = ['vendor', 'asm', 'sjcl', 'dont-deploy', 'secureboot', 'test']
-    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy']
+    special_chars_exclude = ['secureboot', 'test', 'emoji', 'dont-deploy', 'pdf.worker']
     logging.info('Analyzing modified files ...')
     result = ['\nValidator output:\n=================']
     warning = 'This is a security product. Do not add unverifiable code to the repository!'
@@ -476,7 +483,7 @@ def reduce_validator(file_line_mapping, **extra):
     diff_files = get_git_diff_files()
     if any(['images/mega' in f for f in diff_files]):
         base_sprites = get_sprite_images()
-        target_sprites = map_list_to_dict([split_sprite_name(f) for f in filter_list(diff_files, r'@2x')])
+        target_sprites = get_sprite_images(get_current_branch())
         for file, version in target_sprites.iteritems():
             if file in base_sprites and base_sprites[file] > version:
                 fatal += 1
@@ -763,7 +770,7 @@ def main(base, target, norules, branch, jscpd):
     warnings = count - total_errors
     if count:
         logging.info('Output of reduced results ...')
-        print('\n\n'.join(results).rstrip())
+        print('\n\n'.join(results).rstrip().encode("utf-8"))
 
     if jscpd and copypaste_detector(file_line_mapping):
         total_errors += 1
@@ -778,7 +785,7 @@ def main(base, target, norules, branch, jscpd):
             print('WARNING: {} authors have contributed in this branch, '
                   'consider squashing your commits only\n         by manually running '
                   '"git rebase -i --autosquash {}", unless they do not care.'.format(authors, base))
-        sys.exit(1)
+        sys.exit(0)
 
     if warnings:
         print('\nAll fine, but there were some warnings you may want to look into.')

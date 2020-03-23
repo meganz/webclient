@@ -1,19 +1,19 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 import utils  from "./utils.jsx";
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 import Tooltips from "./tooltips.jsx";
 import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-class ExtraFooterElement extends MegaRenderMixin(React.Component) {
+class ExtraFooterElement extends MegaRenderMixin {
     render() {
         return this.props.children;
     }
 };
 
-class ModalDialog extends MegaRenderMixin(React.Component) {
+class ModalDialog extends MegaRenderMixin {
     static defaultProps = {
         'hideable': true
     };
@@ -38,6 +38,11 @@ class ModalDialog extends MegaRenderMixin(React.Component) {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
+        $('.fm-dialog-overlay').rebind('click.modalDialogOv' + this.getUniqueId(), function() {
+            self.onBlur();
+        });
+
+
         $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function(e) {
             if (e.keyCode == 27) { // escape key maps to keycode `27`
                 self.onBlur();
@@ -61,7 +66,7 @@ class ModalDialog extends MegaRenderMixin(React.Component) {
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
         $(window).off('resize.modalDialog' + this.getUniqueId());
-
+        $('.fm-dialog-overlay').unbind('click.modalDialogOv' + this.getUniqueId());
     }
     onCloseClicked(e) {
         var self = this;
@@ -161,7 +166,7 @@ class ModalDialog extends MegaRenderMixin(React.Component) {
 
 
 
-class SelectContactDialog extends MegaRenderMixin(React.Component) {
+class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': __(l[1940]),
@@ -243,7 +248,7 @@ class SelectContactDialog extends MegaRenderMixin(React.Component) {
     }
 };
 
-class ConfirmDialog extends MegaRenderMixin(React.Component) {
+class ConfirmDialog extends MegaRenderMixin {
     static defaultProps = {
         'confirmLabel': __(l[6826]),
         'cancelLabel': __(l[82]),

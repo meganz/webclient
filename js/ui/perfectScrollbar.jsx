@@ -1,21 +1,25 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import MegaRenderMixin from "../stores/mixins.js";
+import {MegaRenderMixin} from "../stores/mixins.js";
 var x = 0;
 /**
  * perfect-scrollbar React helper
  * @type {*|Function}
  */
-export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
-    static isUserScroll = true;
-    static scrollEventIncId = 0;
+export class PerfectScrollbar extends MegaRenderMixin {
     static defaultProps = {
         className: "perfectScrollbarContainer",
         requiresUpdateOnResize: true
     };
     static MAX_BOTTOM_POS = 9999999;
 
+    constructor(props) {
+        super(props);
+
+        this.isUserScroll = true;
+        this.scrollEventIncId = 0;
+    }
     get$Node() {
         if (!this.$Node) {
             this.$Node = $(this.findDOMNode());
@@ -69,7 +73,8 @@ export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
 
 
         var options = $.extend({}, {
-            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection']
+            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+            'minScrollbarLength': 20
         }, self.props.options);
 
         Ps.initialize($elem[0], options);
@@ -238,7 +243,7 @@ export class PerfectScrollbar extends MegaRenderMixin(React.Component) {
     }
     getContentHeight() {
         var $elem = this.get$Node();
-        return $elem[0].children[0].offsetHeight;
+        return $elem[0].scrollHeight;
     }
     setCssContentHeight(h) {
         var $elem = this.get$Node();

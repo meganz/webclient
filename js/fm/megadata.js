@@ -107,8 +107,13 @@ function MegaData() {
                 }
                 return maf;
             }
-        })
+        });
     })(this);
+
+    // Initialize affiliate dataset on-demand
+    lazy(this, 'affiliate', function() {
+        return new AffiliateData();
+    });
 
     this.sortRules = {
         'name': this.sortByName.bind(this),
@@ -126,7 +131,8 @@ function MegaData() {
         'fav': this.sortByFav.bind(this),
         'email': this.sortByEmail.bind(this),
         'label': this.sortByLabel.bind(this),
-        'sharedwith': this.sortBySharedWith.bind(this)
+        'sharedwith': this.sortBySharedWith.bind(this),
+        'versions': this.sortByVersion.bind(this)
     };
 
     /** EventListener interface. */
@@ -151,12 +157,32 @@ function MegaData() {
     };
 
     if (is_mobile) {
+        /* eslint-disable no-useless-concat */
         var dummy = function() {
             return MegaPromise.resolve();
         };
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
+
+        this['initFile' + 'ManagerUI'] = function() {
+            if (typeof window.InitFileDrag === 'function') {
+                window.InitFileDrag();
+                delete window.InitFileDrag;
+            }
+        };
+        mobile.uploadOverlay.shim(this);
+
+        this['addWeb' + 'Download'] = function(nodes) {
+            // @see filesystem.js/abortAndStartOver
+            if (d) {
+                console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
+            }
+            M.resetUploadDownload();
+            later(function() {
+                mobile.downloadOverlay.startDownload(nodes[0]);
+            });
+        };
 
         // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = function(data) {
@@ -207,10 +233,6 @@ function MegaData() {
                 mobile.cloud.renderLayout();
             }
             return true;
-        };
-
-        this['ul' + 'progress'] = function() {
-            return mobile.uploadOverlay.showUploadProgress.apply(mobile.uploadOverlay, arguments);
         };
 
         var tf = [

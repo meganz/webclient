@@ -333,7 +333,7 @@ var versiondialogid;
                         html += '<div class="fm-versioning data"><span>' + curTimeMarker + '</span></div>';
                     }
                     var actionHtml = (v.u === u_handle) ? l[16480]
-                                    : l[16476].replace('%1', M.u[v.u].m);
+                        : l[16476].replace('%1', M.u[v.u] && M.u[v.u].m || l[7381]);
                     if (i < versionList.length - 1) {
                         if (v.name !== versionList[i + 1].name) {
                             actionHtml = l[17156].replace('%1',

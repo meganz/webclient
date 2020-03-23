@@ -164,6 +164,16 @@ mobile.cloud.actionBar = {
         // On clicking the Create Folder icon
         $createFolderIcon.off('tap').on('tap', function() {
 
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
             // Show the create folder overlay
             mobile.createFolderOverlay.init();
 
@@ -187,6 +197,16 @@ mobile.cloud.actionBar = {
 
         // On the upload icon click/tap
         $uploadIcon.off('tap').on('tap', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
 
             if (ulmanager.ulOverStorageQuota) {
                 ulmanager.ulShowOverStorageQuotaDialog();

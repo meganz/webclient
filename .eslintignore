@@ -22,6 +22,7 @@ keygen.js
 makecache.js
 karma.conf.js
 nacl-fast.js
+pdf.worker.js
 js/cmsSnapshot.js
 js/chat/bundle.js
 js/transfers/meths/firefox-extension.js

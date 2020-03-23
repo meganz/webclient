@@ -30,6 +30,21 @@ var redeem = {
             return redeem.goToCloud();
         }
 
+        if (u_attr && u_attr.b) {
+            // business user
+
+            msgDialog(
+                'warninga',
+                l[1578],
+                l[22888],
+                '',
+                function() {
+                    redeem.goToCloud();
+                }
+            );
+            return;
+        }
+
         // Init functionality
         if (localStorage.oldRedeemFlow) {
             return this.showConfirmAccountDialog().then(this.addVoucher.bind(this)).catch(this.goToCloud.bind(this));
@@ -100,6 +115,7 @@ var redeem = {
 
             if (is_mobile) {
                 var $overlay = $('#mobile-ui-error .white-block');
+                $('.third', $overlay).removeClass('hidden');
                 $('.third span', $overlay).text(l[20131]);
                 $('.first', $overlay).addClass('green-button');
             }
@@ -479,12 +495,13 @@ var redeem = {
         var price = vd.price;
         var currency = vd.currency;
         var gatewayId = 0;                                  // Prepay / account balance
+        var aff = mega.affid;
 
         // Start loading spinner
         loadingDialog.show();
 
         // User Transaction Sale API call
-        api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency }, {
+        api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff }, {
             callback: function (utsResult) {
 
                 // Store the sale ID to check with API later
@@ -645,7 +662,7 @@ var redeem = {
             $('.close-voucher-redeem', $dlg).off('click').on('click',
                 function() {
                     if (is_mobile) {
-                        loadSubPage('');
+                        loadSubPage('redeem');
                     }
                     else {
                         closeDialog();

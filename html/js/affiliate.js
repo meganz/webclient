@@ -30,6 +30,7 @@ var affiliateprogram = {
         this.calculateEarn();
         this.bindFourWaysToRefer();
         this.bindDashboardLink();
+        this.dynamicCount();
     },
 
     /**
@@ -352,6 +353,42 @@ var affiliateprogram = {
 
                     loadSubPage('/fm/refer');
                 });
+            }
+        });
+    },
+
+    /**
+     * Dynamic count update for affiliate product page, this is rely on translation of string 22759 on babel.
+     * If there is any error, it will be stay as default 150 million count.
+     * @returns {void}
+     */
+    dynamicCount: function() {
+
+        'use strict';
+
+        M.req("dailystats").then(function(res) {
+
+            var text = l[22759];
+            var userCount = res.confirmedusers.total / 1000000 | 0;
+            var eastAsianCount = (userCount / 100).toFixed(1);
+
+            // Special way of counting number in Korean and Janpanese
+            if (locale === 'ko' || locale === 'jp') {
+                userCount = eastAsianCount.toString().split('.');
+                text = text.replace('1', userCount[0]).replace('5', userCount[1]);
+            }
+            else if (locale === 'zh-Hans' || locale === 'zh-Hant') {
+                text = text.replace('1.5', eastAsianCount);
+            }
+            else {
+                text = text.replace('150', userCount);
+            }
+
+            $('.affiliate-page.top-info').text(text);
+        }).catch(function(ex) {
+            // We do not need to do anything here, over 150 million is still valid.
+            if (d) {
+                console.error('Dynamic count update failed.', ex);
             }
         });
     }

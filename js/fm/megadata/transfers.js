@@ -642,10 +642,10 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             else {
                 $tr.find('.eta').addClass('unknown').text('');
             }
-            $tr.find('.downloaded-size').html(bytesToSize(bl, 1, 1));
+            $('.downloaded-size', $tr).text(bytesToSize(bl, 1));
             if (bps > 0) {
                 $tr.removeClass('transfer-error');
-                $('.speed', $tr).safeHTML(bytesToSpeed(bps, 1, 1)).removeClass('unknown');
+                $('.speed', $tr).text(bytesToSpeed(bps, 1)).removeClass('unknown');
             }
             else {
                 $tr.find('.speed').addClass('unknown').text('');
@@ -1115,7 +1115,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             f.id = ul_id;
 
             var gid = 'ul_' + ul_id;
-            this.addToTransferTable(gid, ttl,
+            var template = (
                 '<tr id="' + gid + '" class="transfer-queued transfer-upload ' + pause + '">'
                 + '<td><div class="transfer-type upload">'
                 + '<ul><li class="right-c"><p><span></span></p></li>'
@@ -1132,6 +1132,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 + '<a class="clear-transfer-icon"></a></td>'
                 + '<td><span class="row-number"></span></td>'
                 + '</tr>');
+            this.addToTransferTable(gid, ttl || f, template);
 
             if (typeof f._replaces === 'number') {
                 // We need to create a version for a pending upload, hold it up until it finishes.
@@ -1141,7 +1142,10 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             else {
                 ul_queue.push(f);
             }
-            ttl.left--;
+
+            if (ttl) {
+                ttl.left--;
+            }
             added++;
 
             // When dragging files to create an ephemeral, uldl_hold is set at the time of showing the terms dialog.
@@ -1443,15 +1447,9 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
     return addFilePromise;
 };
 
-
-
-MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
+// eslint-disable-next-line complexity
+MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
     'use strict';
-
-    if (skipUIUpdate) {
-        return;
-    }
-
     var id = ul.id;
     var domElement = ul.domElement;
 
@@ -1462,7 +1460,8 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
         $tr.find('.transfer-status').text('');
         $tr.removeClass('transfer-initiliazing transfer-queued');
         $tr.addClass('transfer-started');
-        $('.transfer-table').prepend($tr);
+        // eslint-disable-next-line local-rules/jquery-replacements
+        $($tr.closest('table')).prepend($tr);
 
         domElement = ul.domElement = document.getElementById('ul_' + id);
         if (!domElement) {
@@ -1482,56 +1481,66 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps, skipUIUpdate) {
         return false;
     }
 
-    mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, id, perc, bl, bt, bps, ul.pos, ul.starttime);
-
     $.transferprogress['ul_' + id] = [bl, bt, bps];
-
-    var retime = bps > 1000 ? (bt - bl) / bps : -1;
-    var transferDeg = 360 * perc / 100;
-
-    if (transferDeg <= 180) {
-        domElement._elmRProgress.style.transform = 'rotate(' + transferDeg + 'deg)';
-    }
-    else {
-        domElement._elmRProgress.style.transform = 'rotate(180deg)';
-        domElement._elmLProgress.style.transform = 'rotate(' + (transferDeg - 180) + 'deg)';
-    }
-    domElement._elmStatus.textContent = perc + '%';
-
-    if (perc > 99) {
-        domElement._elmSentSize.textContent = bytesToSize(bt, 2);
-    }
-    else {
-        domElement._elmSentSize.textContent = bytesToSize(bl, 1, -1);
-    }
-
-    if (retime > 0) {
-        if (!domElement._elmTimeLeft.textContent) {
-            domElement._elmTimeLeft.classList.remove('unknown');
-        }
-        domElement._elmTimeLeft.textContent = secondsToTime(retime);
-    }
-    else {
-        domElement._elmTimeLeft.classList.add('unknown');
-        domElement._elmTimeLeft.textContent = '';
-    }
-
-    if (bps > 0) {
-        if (ul._gotTransferError) {
-            ul._gotTransferError = false;
-            domElement.classList.remove('transfer-error');
-        }
-        if (!domElement._elmSpeed.textContent) {
-            domElement._elmSpeed.classList.remove('unknown');
-        }
-        domElement._elmSpeed.textContent = bytesToSpeed(bps, 1);
-    }
-    else {
-        domElement._elmSpeed.classList.add('unknown');
-        domElement._elmSpeed.textContent = '';
-    }
-
     delay('percent_megatitle', percent_megatitle, 50);
+
+    if (domElement._elmRProgress) {
+        var transferDeg = 360 * perc / 100;
+        if (transferDeg <= 180) {
+            domElement._elmRProgress.style.transform = 'rotate(' + transferDeg + 'deg)';
+        }
+        else {
+            domElement._elmRProgress.style.transform = 'rotate(180deg)';
+            domElement._elmLProgress.style.transform = 'rotate(' + (transferDeg - 180) + 'deg)';
+        }
+    }
+
+    if (domElement._elmStatus) {
+        domElement._elmStatus.textContent = perc + '%';
+    }
+
+    if (domElement._elmSentSize) {
+        if (perc > 99) {
+            domElement._elmSentSize.textContent = bytesToSize(bt, 2);
+        }
+        else {
+            domElement._elmSentSize.textContent = bytesToSize(bl, 1, -1);
+        }
+    }
+
+    if (domElement._elmTimeLeft) {
+        var retime = bps > 1000 ? (bt - bl) / bps : -1;
+        if (retime > 0) {
+            if (!domElement._elmTimeLeft.textContent) {
+                domElement._elmTimeLeft.classList.remove('unknown');
+            }
+            domElement._elmTimeLeft.textContent = secondsToTime(retime);
+        }
+        else {
+            domElement._elmTimeLeft.classList.add('unknown');
+            domElement._elmTimeLeft.textContent = '';
+        }
+    }
+
+    if (domElement._elmSpeed) {
+        if (bps > 0) {
+            if (!domElement._elmSpeed.textContent) {
+                domElement._elmSpeed.classList.remove('unknown');
+            }
+            domElement._elmSpeed.textContent = bytesToSpeed(bps, 1);
+        }
+        else {
+            domElement._elmSpeed.classList.add('unknown');
+            domElement._elmSpeed.textContent = '';
+        }
+    }
+
+    if (ul._gotTransferError && bps > 0) {
+        ul._gotTransferError = false;
+        domElement.classList.remove('transfer-error');
+    }
+
+    mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, id, perc, bl, bt, bps, ul.pos, ul.starttime);
 };
 
 // Handle upload error
@@ -1635,13 +1644,12 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
 
 MegaData.prototype.ulfinalize = function(ul, status, h) {
     'use strict';
-    if (ul_queue[ul.pos].promiseToInvoke) {
-        ul_queue[ul.pos].promiseToInvoke.resolve(h);
+    if (ul.promiseToInvoke) {
+        ul.promiseToInvoke.resolve(h);
         ul_queue[ul.pos] = Object.freeze({});
         percent_megatitle();
         return;
     }
-
 
     var id = ul.id;
     var $tr = $('#ul_' + id);
@@ -1650,8 +1658,7 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
     $tr.find('.transfer-status').text(status);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
-    $tr.find('.uploaded-size').html($tr.find('.transfer-size').text());
-
+    $('.uploaded-size', $tr).text(bytesToSize(ul.size, 2));
     ul_queue[ul.pos] = Object.freeze({});
 
     if ($.transferprogress && $.transferprogress['ul_' + id]) {
@@ -1684,14 +1691,11 @@ MegaData.prototype.ulstart = function(ul) {
         $.transferprogress = Object.create(null);
     }
 
-    $('.transfer-table #ul_' + id)
-        .addClass('transfer-initiliazing')
-        .find('.transfer-status').text(l[1042]);
+    $('.transfer-status', $('#ul_' + id).addClass('transfer-initiliazing')).text(l[1042]);
 
     ul.starttime = new Date().getTime();
     fm_tfsupdate();// this will call $.transferHeader()
     this.ulprogress(ul, 0, 0, 0);
-
 };
 
 MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
@@ -1867,7 +1871,7 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
     'use strict';
 
-    if (slideshowid) {
+    if (window.slideshowid) {
         var $toast;
         var $second_toast;
         var timer = 0;
@@ -1956,8 +1960,8 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
     mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, isOverQuota);
 
     ul._gotTransferError = true;
-    $('.transfer-table #ul_' + ul.id).addClass('transfer-error');
-    $('.transfer-table #ul_' + ul.id + ' .transfer-status').text(errorstr);
+    $('#ul_' + ul.id).addClass('transfer-error');
+    $('#ul_' + ul.id + ' .transfer-status').text(errorstr);
 }
 
 
@@ -2039,7 +2043,7 @@ function fm_tfspause(gid, overquota) {
             $('.download.speed-block .light-txt').safeHTML('&mdash; ' + l['23062.k']);
         }
         else {
-            var $tr = $('.transfer-table tr#' + gid);
+            var $tr = $('#' + gid);
 
             if ($tr.hasClass('transfer-started')) {
                 $tr.find('.eta').text('').addClass('unknown');
@@ -2079,7 +2083,7 @@ function fm_tfsresume(gid) {
         else {
             mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: gid.split('_').pop() });
 
-            var $tr = $('.transfer-table tr#' + gid);
+            var $tr = $('#' + gid);
 
             if (page === 'download'
                 && $('.download.top-bar').hasClass('overquota')
@@ -2106,13 +2110,11 @@ function fm_tfsresume(gid) {
             else {
                 $tr.removeClass('transfer-paused');
 
-                if (!$('.transfer-table tr.transfer-started, .transfer-table tr.transfer-initiliazing').length) {
-
-                    $tr.addClass('transfer-initiliazing')
-                        .find('.transfer-status').text(l[1042]);
+                if ($('tr.transfer-started, tr.transfer-initiliazing', $tr.closest('table')).length) {
+                    $('.speed, .eta', $tr).removeClass('unknown').text('');
                 }
                 else {
-                    $tr.find('.speed, .eta').removeClass('unknown').text('');
+                    $('.transfer-status', $tr.addClass('transfer-initiliazing')).text(l[1042]);
                 }
             }
         }

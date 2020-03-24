@@ -798,13 +798,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 return true;
             };
 
-            if (is_video(n) !== 2) {
-                stream.on('playing', onVideoPlaying);
-            }
-            else {
+            if (is_audio(n)) {
                 stream.on('audio-buffer', function(ev, buffer) {
                     getID3CoverArt(buffer).then(setImage.bind(null, n)).catch(console.debug.bind(console));
                 });
+            }
+            else {
+                stream.on('playing', onVideoPlaying);
             }
         }
     };

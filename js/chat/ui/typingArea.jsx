@@ -23,33 +23,28 @@ export class TypingArea extends MegaRenderMixin {
             textareaHeight: 20
         };
     }
-    onEmojiClicked(e, slug, meta) {
+    onEmojiClicked(e, slug) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        var self = this;
+        slug = (slug.substr(0, 1) === ':' || slug.substr(-1) === ':') ? slug : `:${slug}:`;
 
-        var txt = ":" + slug + ":";
-        if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
-            txt = slug;
-        }
+        const textarea = $('.messages-textarea', this.$container)[0];
+        const cursorPosition = this.getCursorPosition(textarea);
 
-        self.setState({
-            typedMessage: self.state.typedMessage + " " + txt + " "
+        this.setState({
+            typedMessage:
+                this.state.typedMessage.slice(0, cursorPosition) +
+                slug +
+                this.state.typedMessage.slice(cursorPosition)
+        }, () => {
+            // `Sample |message` -> `Sample :smile:| message`
+            textarea.selectionEnd = cursorPosition + slug.length;
         });
-
-        var $container = $(ReactDOM.findDOMNode(this));
-        var $textarea = $('.chat-textarea:visible textarea:visible', $container);
-
-        setTimeout(function () {
-            $textarea.click();
-            moveCursortoToEnd($textarea[0]);
-        }, 100);
     }
-
     stoppedTyping() {
         if (this.props.disabled) {
             return;
@@ -104,8 +99,7 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (!shouldTriggerUpdate) {
-            var $container = $(ReactDOM.findDOMNode(this));
-            var $textarea = $('.chat-textarea:visible textarea:visible', $container);
+            var $textarea = $('.chat-textarea:visible textarea:visible', self.$container);
             if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
                 self._lastTextareaHeight = $textarea.height();
                 shouldTriggerUpdate = true;
@@ -143,8 +137,7 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
 
-        var $container = $(ReactDOM.findDOMNode(self));
-        var val = $.trim($('.chat-textarea:visible textarea:visible', $container).val());
+        var val = $.trim($('.chat-textarea:visible textarea:visible', self.$container).val());
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
@@ -412,30 +405,31 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
 
-        var $container = $(ReactDOM.findDOMNode(this));
-        if ($('.chat-textarea:visible textarea:visible', $container).length > 0) {
-            if (!$('.chat-textarea:visible textarea:visible:first', $container).is(":focus")) {
-                moveCursortoToEnd($('.chat-textarea:visible:first textarea', $container)[0]);
-            }
+        if (
+            $('.chat-textarea:visible textarea:visible', this.$container).length > 0 &&
+            !$('.chat-textarea:visible textarea:visible:first', this.$container).is(":focus")
+        ) {
+            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.$container)[0]);
         }
     }
     componentDidMount() {
         super.componentDidMount();
         var self = this;
+        this.$container = $(ReactDOM.findDOMNode(this));
+
         $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this));
 
-        var $container = $(ReactDOM.findDOMNode(this));
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
         self._lastTextareaHeight = 20;
         if (self.props.initialText) {
             self.lastTypedMessage = this.props.initialText;
         }
 
-        $('.jScrollPaneContainer', $container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
+        $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
             self.updateScroll(false);
         });
         self.triggerOnUpdate(true);
-        if ($container.is(":visible")) {
+        if (self.$container.is(":visible")) {
             self.updateScroll(false);
         }
 
@@ -511,8 +505,7 @@ export class TypingArea extends MegaRenderMixin {
             this.updateScroll();
         }
         if (self.onUpdateCursorPosition) {
-            var $container = $(ReactDOM.findDOMNode(this));
-            var el = $('.chat-textarea:visible:first textarea:visible', $container)[0];
+            var el = $('.chat-textarea:visible:first textarea:visible', self.$container)[0];
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
             self.onUpdateCursorPosition = false;
         }

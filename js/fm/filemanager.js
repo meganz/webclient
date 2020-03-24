@@ -51,9 +51,7 @@ FileManager.prototype.initFileManager = function() {
         console.time('renderfm');
     }
 
-    if (!is_mobile) {
-        this.initFileManagerUI();
-    }
+    this.initFileManagerUI();
     this.sortByName();
 
     if (is_mobile) {
@@ -1058,9 +1056,12 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
         }
-        if (newNode.p === this.currentdirid || newNode.h === this.currentdirid ||
-            newNode.p === this.currentCustomView.nodeID || newNode.h === this.currentCustomView.nodeID) {
-            UImain = true;
+        if (newNode.p === this.currentdirid
+            || newNode.h === this.currentdirid
+            || newNode.p === this.currentCustomView.nodeID
+            || newNode.h === this.currentCustomView.nodeID) {
+
+            UImain = M.v.length || !is_mobile || !mobile.uploadOverlay.uploading;
 
             if ($.onRenderNewSelectNode === newNode.h) {
                 delete $.onRenderNewSelectNode;
@@ -1871,7 +1872,7 @@ FileManager.prototype.createFolderUI = function() {
             }, 2000);
         }
         else {
-            if (duplicated(1, name)) {// Check if folder name already exists
+            if (duplicated(name)) {// Check if folder name already exists
                 $inputWrapper.addClass('duplicate');
                 $input.addClass('error');
 

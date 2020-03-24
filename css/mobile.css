@@ -400,11 +400,24 @@ ul, li {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    line-height: 16px; /* max-height / line-height should be equal to -webkit-line-clamp to limit lines */
-    max-height: 48px;
+    font-size: 17px;
+    line-height: 21px; /* max-height / line-height should be equal to -webkit-line-clamp to limit lines */
+    max-height: 64px;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
-
+}
+.mobile.upload-overlay .mobile.ul-status-header {
+    padding: 0;
+    color: #495057;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    font-size: 18px;
+    line-height: 22px;
+    max-height: 64px;
+    font-family: 'LatoWebBold';
+    -webkit-box-orient: vertical;
 }
 .mobile.rb-empty-overlay-title {
     font-size: 15px;
@@ -527,6 +540,22 @@ ul, li {
 }
 .upload-overlay .mobile.text-button {
     margin: 72px auto 0;
+}
+.upload-overlay .mobile.text-button.see-all {
+    margin: 0;
+}
+.upload-overlay .ul-status-header {
+    margin: 0 0 36px;
+}
+.upload-overlay.see-all .ul-status-header {
+    margin: 0;
+}
+.upload-overlay .mobile.text-button.see-all {
+    display: none;
+}
+.upload-overlay.see-all .mobile.text-button.see-all {
+    display: block;
+    z-index: 9;
 }
 .mobile.inline-buttons {
     width: 100%;
@@ -13338,6 +13367,48 @@ p a.blog-new-read-more {
     font-size: 11px;
 }
 /* ennd of Generate your unique MEGA referral URL */
+
+
+
+.mobile-transfer-table-wrapper {
+    top: 0;
+    left: 0;
+    position: fixed;
+    height: calc(100vh);
+    z-index: 101;
+}
+.mobile-transfer-table {
+    width: 100%;
+}
+.mobile-transfer-table .fm-item-info {
+    padding: 11px 0 0 63px;
+}
+.mobile-transfer-table tr:nth-child(odd) .fm-item {
+    background-color: #fff;
+}
+.mobile-transfer-table .fm-icon.right {
+    margin: 8px 16px;
+    background-position: -76px -1138px;
+    background-image: url(../images/mobile/mobile-sprite_v33.png);
+}
+.mobile-transfer-table tr.transfer-completed .fm-icon.right {
+    background-position: 0 -1708px;
+}
+.mobile-transfer-table td {
+    max-width: calc(100vw);
+}
+.mobile-transfer-table .fm-item-info {
+    text-align: left;
+}
+.mobile-transfer-scrolling-table.fm-scrolling {
+    max-height: calc(100vh);
+}
+.upload-overlay .mobile.filetype-img {
+    width: 96px;
+}
+body.landscape .upload-overlay .mobile.filetype-img {
+    width: 48px;
+}
 
 
 /*

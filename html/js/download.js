@@ -700,7 +700,9 @@ function dl_g(res) {
 
     if ($.doFireDownload) {
         delete $.doFireDownload;
-        dlPageStartDownload();
+        if (fdl_queue_var) {
+            dlPageStartDownload();
+        }
     }
 }
 
@@ -873,18 +875,24 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     {
         $dowloadWrapper.removeClass('temporary-na');
         $('.download.progress-bar', $dowloadWrapper).width(perc + '%');
-        $('.file-info .download.info-txt.small-txt', $dowloadWrapper)
-            .safeHTML(
+
+        var $sizeBlock = $('.file-info .download.info-txt.small-txt', $dowloadWrapper);
+        var $topbarSizeBlock = $('.bar-cell .download.bar-filesize', $dowloadWrapper);
+
+        if ($('.dark', $sizeBlock).length === 0) {
+            $sizeBlock.safeHTML(
                 '<span class="dark">' +
-                    bytesToSize(bytesloaded) +
                 '</span>' +
                 '<hr />' +
-                '<span>' +
+                '<span class="fs">' +
                     fileSize +
                 '</span>'
             );
-        $('.bar-cell .download.bar-filesize', $dowloadWrapper)
-            .safeHTML('<span class="green">' + bytesToSize(bytesloaded) + '</span><hr />' + fileSize);
+            $topbarSizeBlock.safeHTML('<span class="green"></span><hr />' + fileSize);
+        }
+
+        $('.dark', $sizeBlock).add($('.green', $topbarSizeBlock)).text(bytesToSize(bytesloaded));
+
         megatitle(' ' + perc + '%');
     }
 

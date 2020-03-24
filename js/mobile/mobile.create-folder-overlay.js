@@ -76,7 +76,7 @@ mobile.createFolderOverlay = {
 
                 // Otherwise if the folder name already exists, show an error
                 $folderNameWarningBlock.removeClass('hidden');
-                $folderNameWarningText.text(l[5644]);           // Folder already exists
+                $folderNameWarningText.text(l[23219]);           // Folder already exists
             }
             else {
 
@@ -183,11 +183,10 @@ mobile.createFolderOverlay = {
         for (var i = 0; i < M.v.length; i++) {
 
             var node = M.v[i];
-            var nodeType = node.t;
             var nodeName = node.name;
 
             // If the node is a folder and the new folder name matches an existing folder name
-            if (nodeType === 1 && nodeName === newFolderName) {
+            if (nodeName === newFolderName) {
                 return true;
             }
         }

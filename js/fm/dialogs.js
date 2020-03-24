@@ -1636,7 +1636,7 @@
 
                     return false;
                 }
-                if (duplicated(0, saveAsName, $.mcselected)) {
+                if (duplicated(saveAsName, $.mcselected)) {
                     // ui things
                     $nameInput.addClass('error');
                     $dialog.addClass('duplicate');

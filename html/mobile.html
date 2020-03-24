@@ -255,7 +255,7 @@
         <div class="mobile bottom-action-bar">
             <div class="mobile fm-icon scroll-to-top left hidden"></div>
             <div class="mobile fm-icon upload-file right">
-                <input class="upload-select-file hidden" type="file">
+                <input class="upload-select-file hidden" id="fileselect1" multiple type="file"/>
             </div>
             <div class="mobile fm-icon mobile-create-new-folder right"></div>
             <div class="mobile fm-icon rubbish-bin-highlight empty-rubbish-bin right hidden"></div>
@@ -300,7 +300,11 @@
             <a class="mobile logo"></a>
             <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
-                <img alt="" src="{staticpath}images/mobile/extensions/image.png" class="mobile filetype-img" />
+                <div class="mobile ul-status-header">
+                    <span>[$1155], [$1607]</span>
+                    <a class="mobile text-button third see-all"><span>[$19284]</span></a>
+                </div>
+                <img alt="" class="mobile filetype-img" src="{staticpath}images/mobile/extensions/image.png"/>
                 <div class="mobile filename"><em>[$5533]</em></div>
                 <div class="mobile file-upload-info">
                     <div class="mobile upload-speed"></div>
@@ -314,37 +318,30 @@
                     <span class="mobile text">[$6110]</span>
                 </a>
                 <a class="mobile red-button upload-another-file hidden"> <i></i> <span>[$17618]</span> </a>
-                <a class="mobile text-button third close-button"><span>[$148]</span> </a>
+                <a class="mobile text-button third close-button"><span>[$1597]</span> </a>
                 <!-- This remains hidden, only used as a template so the desktop upload code works -->
-                <table class="upload-table hidden">
-                    <tr id="ul_8001" class="transfer-queued transfer-upload">
-                        <td>
-                            <div class="transfer-type upload">
-                                <ul>
-                                    <li class="right-c"><p><span></span></p></li>
-                                    <li class="left-c"><p><span></span></p></li>
-                                </ul>
+                <div class="mobile mobile-transfer-table-wrapper fm-block hidden">
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-header fm-hr">
+                            <div class="mobile fm-icon up left"></div>
+                            <div class="mobile fm-header-txt"><span>[$1346]</span></div>
+                        </div>
+                    </div>
+                    <div class="mobile fm-row">
+                        <div class="mobile fm-content">
+                            <div class="mobile-transfer-scrolling-table fm-scrolling">
+                                <div class="mobile folders-files-text">5 files, 124 KB/s</div>
+                                <table class="mobile-transfer-table">
+                                    <tr class="transfer-queued transfer-upload" id="ul_8001">
+                                        <td>
+                                            <div class="transfer-type upload"></div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                        </td>
-                        <td>
-                            <span class="transfer-filetype-icon"></span>
-                            <span class="tranfer-filetype-txt">fileName</span>
-                        </td>
-                        <td>fileName</td>
-                        <td>fileSize</td>
-                        <td>
-                            <span class="eta"></span><span class="speed">pauseTxt</span>
-                        </td>
-                        <td>
-                            <span class="transfer-status">$[7227]</span>
-                        </td>
-                        <td class="grid-url-field">
-                            <a class="grid-url-arrow"></a>
-                            <a class="clear-transfer-icon"></a>
-                        </td>
-                        <td><span class="row-number"></span></td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -723,7 +720,7 @@
         <div class="mobile fm-header-txt"><span>[$22682]</span></div>
     </div>
     <div class="mobile top-hr-pad">
-                
+
         <div class="mobile button-block affiliate-guide clickable" data-link="guide">
             <div class="mobile fm-icon stairs"></div>
             <div class="mobile label">[$22683]</div>
@@ -791,7 +788,7 @@
             <div class="mobile label">[$22709]</div>
             <div class="mobile fm-icon right-arrow"></div>
         </div>
-                
+
     </div>
 </div>
 
@@ -803,7 +800,7 @@
         <div class="mobile fm-header-txt"><span>[$22683]</span></div>
     </div>
     <div class="mobile top-hr-pad">
-                
+
         <div class="mobile button-block expandable">
             <div class="content">
                 <div class="mobile button-number">1</div>
@@ -870,7 +867,7 @@
             <div class="full-info">
                 [$23181.m]
             </div>
-        </div>  
+        </div>
     </div>
 </div>
 
@@ -936,7 +933,7 @@
                     <i class="mobile fm-icon small grey-down-arrow"></i>
                     <div class="url"></div>
                     <div class="mobile generate-url page-names">
-                        <span data-page="startpage" class="active">[$22744]</span>
+                        <span data-page="start" class="active">[$22744]</span>
                         <span data-page="business">[$19530]</span>
                         <span data-page="mobile">[$955]</span>
                         <span data-page="sync">[$956]</span>
@@ -958,7 +955,7 @@
                 <div class="mobile generate-url button copy-button">
                     [$22823]
                 </div>
-                
+
                 <div class="mobile generate-url bottom-lnk">
                     [$82]
                 </div>

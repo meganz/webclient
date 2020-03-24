@@ -85,7 +85,14 @@ class MetaRichpreview  extends ConversationMessageMixin {
             }
 
             output.push(
-                <div key={meta.url}
+                <div
+                    key={meta.url}
+                    className={
+                        "message richpreview container " +
+                        (meta.i ? "have-preview" : "no-preview") + " " +
+                        (meta.d ? "have-description" : "no-description") + " " +
+                        (isLoading ? "is-loading" : "done-loading")
+                    }
                     onClick={function(url) {
                         if (!message.meta.isLoading) {
                             window.open(url, "_blank");

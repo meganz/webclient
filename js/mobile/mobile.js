@@ -605,8 +605,22 @@ mBroadcaster.once('startMega:mobile', function() {
         return !window.orientation || window.orientation === 180 ? 'portrait' : 'landscape';
     };
 
+    var setBodyClass = function() {
+        if (mobile.orientation === 'landscape') {
+            $('body').addClass('landscape');
+        }
+        else {
+            $('body').removeClass('landscape');
+        }
+    };
+
     $(window).on('orientationchange.moboc', function(ev) {
         mobile.orientation = ev.orientation || getOrientation();
+
+        if (d) {
+            console.debug('Device orientation changed to "%s"', mobile.orientation);
+        }
+        setBodyClass();
 
         if (dlmanager.isOverQuota) {
             onIdle(function() {
@@ -624,14 +638,17 @@ mBroadcaster.once('startMega:mobile', function() {
     });
 
     mobile.orientation = getOrientation();
+
+    if (d) {
+        console.debug('Device orientation is "%s"', mobile.orientation);
+    }
+    onIdle(setBodyClass);
 });
 
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-/* jshint -W098 */
-/* jshint -W007 */
-/* jshint strict: false */
+/* eslint-disable strict */
 
 mega.tpw = {
     addDownloadUpload: function() {},
@@ -706,8 +723,6 @@ var alarm = {
     },
     hideAllWarningPopups: function() {}
 };
-
-/* jshint strict: true */
 
 function accountUI() {
     'use strict';
@@ -799,6 +814,49 @@ mega.loadReport = {};
 var previews = {};
 var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!
 
+function fm_tfsupdate() {
+    'use strict';
+    var overlay = document.querySelector('.mobile.upload-overlay');
+    var table = overlay.querySelector('.mobile-transfer-table');
+
+    if (M.pendingTransfers) {
+        // Move completed transfers to the bottom
+        var domCompleted = table.querySelectorAll('tr.transfer-completed');
+        var completedLen = domCompleted.length;
+        if (completedLen) {
+            var first = domCompleted[0];
+            var last = domCompleted[completedLen - 1];
+
+            if (!first.previousElementSibling || last.nextElementSibling) {
+                var parent = first.parentNode;
+                while (completedLen--) {
+                    parent.appendChild(domCompleted[completedLen]);
+                }
+            }
+        }
+    }
+
+    M.pendingTransfers = table.querySelectorAll('tr:not(.transfer-completed)').length;
+
+    if (M.pendingTransfers && ul_queue.length > 1) {
+        var val = ul_queue.length - M.pendingTransfers + 1;
+
+        overlay.classList.add('see-all');
+        overlay.querySelector('.ul-status-header span')
+            .textContent = l[1155] + ' ' + String(l[1607]).replace('%1', val).replace('%2', ul_queue.length);
+    }
+
+    var speed = 0;
+    for (var p in GlobalProgress) {
+        if (p[0] === 'u') {
+            speed += GlobalProgress[p].speed | 0;
+        }
+    }
+
+    overlay.querySelector('.folders-files-text')
+        .textContent = String(l[23182]).replace('%d', M.pendingTransfers).replace('%s', bytesToSize(speed, 1));
+}
+
 function removeUInode(nodeHandle, parentHandle) {
 
     'use strict';
@@ -828,6 +886,8 @@ function openRecents() {
     loadSubPage('fm');
 }
 
+/* eslint-disable strict, no-empty-function */
+
 // Not required for mobile
 function fmtopUI() {}
 function sharedUInode() {}
@@ -835,6 +895,7 @@ function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
 function dashboardUI() {}
+function affiliateUI() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},
@@ -842,5 +903,3 @@ accountUI.account = {
     renderCountry: function() {},
     renderRubsched: function() {},
 };
-/* jshint +W098 */
-/* jshint +W007 */

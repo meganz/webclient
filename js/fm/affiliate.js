@@ -204,7 +204,7 @@ affiliateUI.referralUrlDialog = {
         this.$dialog = $('.fm-dialog.generate-url');
 
         this.bindDialogEvents();
-        $('.page-names span[data-page="startpage"]', this.$dialog).click();
+        $('.page-names span[data-page="start"]', this.$dialog).click();
 
         var showWelcome = !M.affiliate.id;
 
@@ -346,7 +346,10 @@ affiliateUI.referralUrlDialog = {
             return Promise.resolve();
         }
 
-        if (targetPage === 'more' && this.customTargetPage !== undefined) {
+        if (targetPage === 'start') {
+            targetPage = '';
+        }
+        else if (targetPage === 'more' && this.customTargetPage !== undefined) {
             targetPage = this.customTargetPage;
 
             if (targetPage.charAt(0) === '/') {
@@ -358,7 +361,7 @@ affiliateUI.referralUrlDialog = {
         }
 
         return M.affiliate.getURL(targetPage).then(function(url) {
-            var urlWithoutAfftag = getBaseUrl() + (targetPage === '' ? '' : '/#' + targetPage);
+            var urlWithoutAfftag = getBaseUrl() + (targetPage === '' ? '' : '/' + targetPage);
             $urlBlock.safeHTML(url.replace(urlWithoutAfftag, '<span>' + urlWithoutAfftag + '</span>'));
         });
     },

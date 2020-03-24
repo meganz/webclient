@@ -2811,9 +2811,9 @@
             padding-left: 80px;
             padding-right: 80px;
         }
-        #help2-main .support-section-header {
+/*        #help2-main .support-section-header {
             display: none !important;
-        }
+        }*/
         #help2-main .first-support-block {
             padding-left: 80px;
             padding-right: 80px;
@@ -2887,9 +2887,9 @@
         margin: 0 auto;
         width: 700px;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none !important;
-    }
+    }*/
     #help2-main .support-section-header-clone {
         display: none !important;
     }
@@ -3078,9 +3078,9 @@
         display: block;
         height: auto;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none !important;
-    }
+    }*/
     #help2-main .support-section-header-clone {
         display: none !important;
     }
@@ -3236,9 +3236,9 @@
     body {
         min-width: 376px;
     }
-    #help2-main .support-section-header {
+/*    #help2-main .support-section-header {
         display: none;
-    }
+    }*/
     #help2-main .support-image-instructions {
         padding-top: 0px;
     }
@@ -3588,9 +3588,9 @@
         font-family: 'source_sans_prosemibold';
         line-height: 26px;
     }
-    #help2-main .support-section-header, #help2-main .support-section-header-clone {
+/*    #help2-main .support-section-header, #help2-main .support-section-header-clone {
         display: none !important;
-    }
+    }*/
     #help2-main .support-article-info li {
         margin-left: 32px;
         margin-right: 32px;
@@ -4346,10 +4346,11 @@
     #help2-main .getstart-subheading, #help2-main .usemega-subheading, #help2-main .support-block-subheading {
         margin: 0 24px;
         width: auto;
-    }
+   }
+   /* 
     #help2-main .support-section-header, #help2-main .support-section-header-clone {
         display: none !important;
-    }
+    }*/
     #help2-main .browsearticle-button span {
         font-size: 14px;
         margin-top: 20px;

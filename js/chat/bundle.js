@@ -194,9 +194,7 @@ if (localStorageProfileRenderFns) {
 }
 
 var ID_CURRENT = 0;
-var MegaRenderMixin =
-/*#__PURE__*/
-function (_React$Component) {
+var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
   _inherits(MegaRenderMixin, _React$Component);
 
   function MegaRenderMixin(props) {
@@ -959,9 +957,7 @@ function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_1___default.a.Component);
 ;
 var _noAvatars = {};
-var ContactAwareComponent =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ContactAwareComponent = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ContactAwareComponent, _MegaRenderMixin);
 
   function ContactAwareComponent(props) {
@@ -1073,9 +1069,7 @@ var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
   this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
 };
 
-var ContactsListItem =
-/*#__PURE__*/
-function (_ContactAwareComponen) {
+var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
   _inherits(ContactsListItem, _ContactAwareComponen);
 
   function ContactsListItem() {
@@ -1128,9 +1122,7 @@ ContactsListItem.defaultProps = {
 ContactsListItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
 };
-var ContactButton =
-/*#__PURE__*/
-function (_ContactAwareComponen2) {
+var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
   _inherits(ContactButton, _ContactAwareComponen2);
 
   function ContactButton() {
@@ -1416,9 +1408,7 @@ ContactButton.defaultProps = {
 ContactButton.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactVerified =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ContactVerified = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ContactVerified, _MegaRenderMixin);
 
   function ContactVerified() {
@@ -1475,9 +1465,7 @@ ContactVerified.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactPresence =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ContactPresence = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ContactPresence, _MegaRenderMixin2);
 
   function ContactPresence() {
@@ -1510,9 +1498,7 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactFingerprint =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var ContactFingerprint = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ContactFingerprint, _MegaRenderMixin3);
 
   function ContactFingerprint() {
@@ -1587,9 +1573,7 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var Avatar =
-/*#__PURE__*/
-function (_ContactAwareComponen3) {
+var Avatar = /*#__PURE__*/function (_ContactAwareComponen3) {
   _inherits(Avatar, _ContactAwareComponen3);
 
   function Avatar() {
@@ -1700,9 +1684,7 @@ Avatar.defaultProps = {
 Avatar.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactCard =
-/*#__PURE__*/
-function (_ContactAwareComponen4) {
+var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
   _inherits(ContactCard, _ContactAwareComponen4);
 
   function ContactCard() {
@@ -1904,9 +1886,7 @@ ContactCard.defaultProps = {
 ContactCard.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactItem =
-/*#__PURE__*/
-function (_ContactAwareComponen5) {
+var ContactItem = /*#__PURE__*/function (_ContactAwareComponen5) {
   _inherits(ContactItem, _ContactAwareComponen5);
 
   function ContactItem() {
@@ -1974,9 +1954,7 @@ ContactItem.defaultProps = {
 ContactItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactPickerWidget =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
   function ContactPickerWidget(props) {
@@ -2567,9 +2545,7 @@ var ReactDOM = __webpack_require__(4);
  * @type {*|Function}
  */
 
-var JScrollPane =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(JScrollPane, _MegaRenderMixin);
 
   function JScrollPane() {
@@ -2769,9 +2745,7 @@ JScrollPane.defaultProps = {
  * so that we can render Dialogs into the body or other child element, different then the current component's child.
  */
 
-var RenderTo =
-/*#__PURE__*/
-function (_React$Component) {
+var RenderTo = /*#__PURE__*/function (_React$Component) {
   _inherits(RenderTo, _React$Component);
 
   function RenderTo() {
@@ -2841,9 +2815,7 @@ function (_React$Component) {
 
 ;
 
-var EmojiFormattedContent =
-/*#__PURE__*/
-function (_React$Component2) {
+var EmojiFormattedContent = /*#__PURE__*/function (_React$Component2) {
   _inherits(EmojiFormattedContent, _React$Component2);
 
   function EmojiFormattedContent() {
@@ -2995,9 +2967,7 @@ var React = __webpack_require__(0);
 
 
 
-var Dropdown =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Dropdown, _MegaRenderMixin);
 
   function Dropdown(props) {
@@ -3261,9 +3231,7 @@ function (_MegaRenderMixin) {
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var DropdownContactsSelector =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var DropdownContactsSelector = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(DropdownContactsSelector, _MegaRenderMixin2);
 
   function DropdownContactsSelector(props) {
@@ -3356,9 +3324,7 @@ function (_MegaRenderMixin2) {
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
-var DropdownItem =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var DropdownItem = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(DropdownItem, _MegaRenderMixin3);
 
   function DropdownItem(props) {
@@ -3512,9 +3478,7 @@ var ReactDOM = __webpack_require__(4);
 
 var ContactsUI = __webpack_require__(2);
 
-var ExtraFooterElement =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ExtraFooterElement = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ExtraFooterElement, _MegaRenderMixin);
 
   function ExtraFooterElement() {
@@ -3535,9 +3499,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var ModalDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ModalDialog, _MegaRenderMixin2);
 
   function ModalDialog(props) {
@@ -3692,9 +3654,7 @@ ModalDialog.defaultProps = {
 };
 ;
 
-var SelectContactDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var SelectContactDialog = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(SelectContactDialog, _MegaRenderMixin3);
 
   function SelectContactDialog(props) {
@@ -3790,9 +3750,7 @@ SelectContactDialog.defaultProps = {
 };
 ;
 
-var ConfirmDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ConfirmDialog = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ConfirmDialog, _MegaRenderMixin4);
 
   function ConfirmDialog(props) {
@@ -3984,9 +3942,7 @@ var utils = __webpack_require__(3);
 
 
 var _buttonGroups = {};
-var Button =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Button = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Button, _MegaRenderMixin);
 
   function Button(props) {
@@ -4238,9 +4194,7 @@ var React = __webpack_require__(0);
 
 
 
-var ConversationMessageMixin =
-/*#__PURE__*/
-function (_ContactAwareComponen) {
+var ConversationMessageMixin = /*#__PURE__*/function (_ContactAwareComponen) {
   _inherits(ConversationMessageMixin, _ContactAwareComponen);
 
   function ConversationMessageMixin(props) {
@@ -4425,9 +4379,7 @@ var x = 0;
  * @type {*|Function}
  */
 
-var PerfectScrollbar =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var PerfectScrollbar = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(PerfectScrollbar, _MegaRenderMixin);
 
   function PerfectScrollbar(props) {
@@ -4855,9 +4807,7 @@ var utils = __webpack_require__(3);
 
 
 
-var Handler =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Handler = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Handler, _MegaRenderMixin);
 
   function Handler() {
@@ -4886,9 +4836,7 @@ Handler.defaultProps = {
 };
 ;
 
-var Contents =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Contents = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(Contents, _MegaRenderMixin2);
 
   function Contents() {
@@ -4923,9 +4871,7 @@ Contents.defaultProps = {
 };
 ;
 
-var Tooltip =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var Tooltip = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(Tooltip, _MegaRenderMixin3);
 
   function Tooltip(props) {
@@ -5301,9 +5247,7 @@ var getRoomName = function getRoomName(chatRoom) {
   return chatRoom.getRoomTitle();
 };
 
-var ConversationsListItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ConversationsListItem, _MegaRenderMixin);
 
   function ConversationsListItem() {
@@ -5560,22 +5504,29 @@ function (_MegaRenderMixin) {
         var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
         var mutedMicrophone = null;
         var activeCamera = null;
+        var onHold = null;
 
-        if (!mediaOptions.audio) {
-          mutedMicrophone = React.makeElement("i", {
-            className: "small-icon grey-crossed-mic"
+        if (chatRoom.callManagerCall.rtcCall.isOnHold()) {
+          onHold = React.makeElement("i", {
+            className: "small-icon grey-call-on-hold"
           });
-        }
+        } else {
+          if (!mediaOptions.audio) {
+            mutedMicrophone = React.makeElement("i", {
+              className: "small-icon grey-crossed-mic"
+            });
+          }
 
-        if (mediaOptions.video) {
-          activeCamera = React.makeElement("i", {
-            className: "small-icon grey-videocam"
-          });
+          if (mediaOptions.video) {
+            activeCamera = React.makeElement("i", {
+              className: "small-icon grey-videocam"
+            });
+          }
         }
 
         inCallDiv = React.makeElement("div", {
           className: "call-duration"
-        }, mutedMicrophone, activeCamera, React.makeElement("span", {
+        }, mutedMicrophone, activeCamera, onHold, React.makeElement("span", {
           className: "call-counter",
           "data-room-id": chatRoom.chatId
         }, secondsToTimeShort(chatRoom._currentCallCounter)));
@@ -5619,9 +5570,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var ArchConversationsListItem =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ArchConversationsListItem, _MegaRenderMixin2);
 
   function ArchConversationsListItem() {
@@ -5761,9 +5710,7 @@ function (_MegaRenderMixin2) {
 
 ;
 
-var ConversationsList =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ConversationsList, _MegaRenderMixin3);
 
   _createClass(ConversationsList, [{
@@ -5941,9 +5888,7 @@ ConversationsList.defaultProps = {
 };
 ;
 
-var ArchivedConversationsList =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ArchivedConversationsList, _MegaRenderMixin4);
 
   function ArchivedConversationsList(props) {
@@ -6164,9 +6109,7 @@ function (_MegaRenderMixin4) {
 
 ;
 
-var ConversationsApp =
-/*#__PURE__*/
-function (_MegaRenderMixin5) {
+var ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
   _inherits(ConversationsApp, _MegaRenderMixin5);
 
   function ConversationsApp(props) {
@@ -6688,9 +6631,7 @@ var utils = __webpack_require__(3);
 
 
 
-var Checkbox =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Checkbox = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Checkbox, _MegaRenderMixin);
 
   function Checkbox(props) {
@@ -6788,9 +6729,7 @@ var React = __webpack_require__(0);
 
 var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichpreviewLoading =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
   _inherits(MetaRichpreviewLoading, _ConversationMessageM);
 
   function MetaRichpreviewLoading() {
@@ -6820,14 +6759,7 @@ function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
-__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
-__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
-__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -6909,9 +6841,7 @@ function BrowserCol(_ref) {
 
 ;
 
-var cloudBrowserModalDialog_BrowserEntries =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var cloudBrowserModalDialog_BrowserEntries = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(BrowserEntries, _MegaRenderMixin);
 
   function BrowserEntries(props) {
@@ -7633,9 +7563,7 @@ cloudBrowserModalDialog_BrowserEntries.defaultProps = {
 };
 ;
 
-var cloudBrowserModalDialog_CloudBrowserDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(CloudBrowserDialog, _MegaRenderMixin2);
 
   function CloudBrowserDialog(props) {
@@ -8252,9 +8180,7 @@ var DropdownsUI = __webpack_require__(6);
 
 var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var DropdownEmojiSelector =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var DropdownEmojiSelector = /*#__PURE__*/function (_MegaRenderMixin) {
   emojiDropdown_inherits(DropdownEmojiSelector, _MegaRenderMixin);
 
   function DropdownEmojiSelector(props) {
@@ -8799,9 +8725,7 @@ var ReactDOM = __webpack_require__(4);
 
 var ButtonsUI = __webpack_require__(8);
 
-var EmojiAutocomplete =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var EmojiAutocomplete = /*#__PURE__*/function (_MegaRenderMixin) {
   emojiAutocomplete_inherits(EmojiAutocomplete, _MegaRenderMixin);
 
   function EmojiAutocomplete(props) {
@@ -9115,9 +9039,7 @@ var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
-var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 = /*#__PURE__*/function (_MegaRenderMixin) {
   typingArea_inherits(TypingArea, _MegaRenderMixin);
 
   function TypingArea(props) {
@@ -10053,9 +9975,7 @@ var whosTyping_ReactDOM = __webpack_require__(4);
 
 var RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var WhosTyping =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var WhosTyping = /*#__PURE__*/function (_MegaRenderMixin) {
   whosTyping_inherits(WhosTyping, _MegaRenderMixin);
 
   function WhosTyping(props) {
@@ -10238,9 +10158,7 @@ var accordion_ReactDOM = __webpack_require__(4);
 
 var accordion_RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var AccordionPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var AccordionPanel = /*#__PURE__*/function (_MegaRenderMixin) {
   accordion_inherits(AccordionPanel, _MegaRenderMixin);
 
   function AccordionPanel() {
@@ -10274,9 +10192,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var Accordion =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Accordion = /*#__PURE__*/function (_MegaRenderMixin2) {
   accordion_inherits(Accordion, _MegaRenderMixin2);
 
   function Accordion(props) {
@@ -10410,9 +10326,7 @@ var ContactsUI = __webpack_require__(2);
 
 var participantsList_PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var participantsList_ParticipantsList =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var participantsList_ParticipantsList = /*#__PURE__*/function (_MegaRenderMixin) {
   participantsList_inherits(ParticipantsList, _MegaRenderMixin);
 
   function ParticipantsList(props) {
@@ -10566,9 +10480,7 @@ participantsList_ParticipantsList.defaultProps = {
 };
 ;
 
-var participantsList_ParticipantsListInner =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var participantsList_ParticipantsListInner = /*#__PURE__*/function (_MegaRenderMixin2) {
   participantsList_inherits(ParticipantsListInner, _MegaRenderMixin2);
 
   function ParticipantsListInner() {
@@ -10774,9 +10686,7 @@ var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var MetaRichPreviewLoading = __webpack_require__(15).MetaRichpreviewLoading;
 
-var MetaRichpreview =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichpreview = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreview_inherits(MetaRichpreview, _ConversationMessageM);
 
   function MetaRichpreview() {
@@ -10915,9 +10825,7 @@ var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
 var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichprevConfirmation =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichprevConfirmation = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreviewConfirmation_inherits(MetaRichprevConfirmation, _ConversationMessageM);
 
   function MetaRichprevConfirmation() {
@@ -11042,9 +10950,7 @@ function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLink
 
 
 
-var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreviewMegaLinks_inherits(MetaRichpreviewMegaLinks, _ConversationMessageM);
 
   function MetaRichpreviewMegaLinks() {
@@ -11232,9 +11138,7 @@ function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.
 
 
 
-var AudioPlayer_AudioPlayer =
-/*#__PURE__*/
-function (_React$Component) {
+var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
   AudioPlayer_inherits(AudioPlayer, _React$Component);
 
   function AudioPlayer(props) {
@@ -11502,9 +11406,7 @@ function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = O
 
 
 
-var AudioContainer_AudioContainer =
-/*#__PURE__*/
-function (_React$Component) {
+var AudioContainer_AudioContainer = /*#__PURE__*/function (_React$Component) {
   AudioContainer_inherits(AudioContainer, _React$Component);
 
   function AudioContainer(props) {
@@ -11694,9 +11596,7 @@ var generic_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT =
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big,' + ' .data-block-view.medium';
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-var generic_GenericConversationMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMessageM) {
   generic_inherits(GenericConversationMessage, _ConversationMessageM);
 
   function GenericConversationMessage(props) {
@@ -13121,9 +13021,7 @@ var alterParticipants_ContactsUI = __webpack_require__(2);
 
 var alterParticipants_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var AltPartsConvMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var AltPartsConvMessage = /*#__PURE__*/function (_ConversationMessageM) {
   alterParticipants_inherits(AltPartsConvMessage, _ConversationMessageM);
 
   function AltPartsConvMessage() {
@@ -13303,9 +13201,7 @@ var truncated_ContactsUI = __webpack_require__(2);
 
 var truncated_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TruncatedMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var TruncatedMessage = /*#__PURE__*/function (_ConversationMessageM) {
   truncated_inherits(TruncatedMessage, _ConversationMessageM);
 
   function TruncatedMessage() {
@@ -13398,9 +13294,7 @@ var privilegeChange_ContactsUI = __webpack_require__(2);
 
 var privilegeChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var PrivilegeChange =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var PrivilegeChange = /*#__PURE__*/function (_ConversationMessageM) {
   privilegeChange_inherits(PrivilegeChange, _ConversationMessageM);
 
   function PrivilegeChange() {
@@ -13520,9 +13414,7 @@ var topicChange_ContactsUI = __webpack_require__(2);
 
 var topicChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TopicChange =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var TopicChange = /*#__PURE__*/function (_ConversationMessageM) {
   topicChange_inherits(TopicChange, _ConversationMessageM);
 
   function TopicChange() {
@@ -13629,9 +13521,7 @@ var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFileItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var SharedFileItem = /*#__PURE__*/function (_MegaRenderMixin) {
   sharedFilesAccordionPanel_inherits(SharedFileItem, _MegaRenderMixin);
 
   function SharedFileItem() {
@@ -13686,9 +13576,7 @@ function (_MegaRenderMixin) {
   return SharedFileItem;
 }(mixins["MegaRenderMixin"]);
 
-var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = /*#__PURE__*/function (_MegaRenderMixin2) {
   sharedFilesAccordionPanel_inherits(SharedFilesAccordionPanel, _MegaRenderMixin2);
 
   function SharedFilesAccordionPanel() {
@@ -13953,9 +13841,7 @@ var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFolderItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var SharedFolderItem = /*#__PURE__*/function (_MegaRenderMixin) {
   incomingSharesAccordionPanel_inherits(SharedFolderItem, _MegaRenderMixin);
 
   function SharedFolderItem() {
@@ -13995,9 +13881,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var IncSharesAccordionPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var IncSharesAccordionPanel = /*#__PURE__*/function (_MegaRenderMixin2) {
   incomingSharesAccordionPanel_inherits(IncSharesAccordionPanel, _MegaRenderMixin2);
 
   function IncSharesAccordionPanel() {
@@ -14154,9 +14038,7 @@ var closeOpenMode_ContactsUI = __webpack_require__(2);
 
 var closeOpenMode_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var CloseOpenModeMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var CloseOpenModeMessage = /*#__PURE__*/function (_ConversationMessageM) {
   closeOpenMode_inherits(CloseOpenModeMessage, _ConversationMessageM);
 
   function CloseOpenModeMessage() {
@@ -14254,9 +14136,7 @@ var chatHandle_ConversationMessageMixin = __webpack_require__(9).ConversationMes
 
 var getMessageString = __webpack_require__(12).getMessageString;
 
-var ChatHandleMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var ChatHandleMessage = /*#__PURE__*/function (_ConversationMessageM) {
   chatHandle_inherits(ChatHandleMessage, _ConversationMessageM);
 
   function ChatHandleMessage() {
@@ -14351,9 +14231,7 @@ function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = O
 
 
 
-var chatlinkDialog_ChatlinkDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var chatlinkDialog_ChatlinkDialog = /*#__PURE__*/function (_MegaRenderMixin) {
   chatlinkDialog_inherits(ChatlinkDialog, _MegaRenderMixin);
 
   function ChatlinkDialog(props) {
@@ -14562,6 +14440,8 @@ chatlinkDialog_ChatlinkDialog.defaultProps = {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationaudiovideopanel.jsx
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function conversationaudiovideopanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationaudiovideopanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationaudiovideopanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationaudiovideopanel_typeof(obj); }
 
 function conversationaudiovideopanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14588,6 +14468,7 @@ function conversationaudiovideopanel_setPrototypeOf(o, p) { conversationaudiovid
 
 
 
+
  // eslint-disable-next-line id-length
 
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1; // 7+1 for myself  = 8
@@ -14599,25 +14480,194 @@ var VIEW_MODES = {
   "CAROUSEL": 2
 };
 
-var conversationaudiovideopanel_ConversationAVPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
-  conversationaudiovideopanel_inherits(ConversationAVPanel, _MegaRenderMixin);
+function muteOrHoldIconStyle(opts) {
+  if (opts.onHold) {
+    return "small-icon icon-audio-muted"; // on-hold";
+  } else if (!opts.audio) {
+    return "small-icon icon-audio-muted";
+  }
+
+  return "small-icon hidden";
+}
+
+var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_MegaRenderMixin) {
+  conversationaudiovideopanel_inherits(RemoteVideoPlayer, _MegaRenderMixin);
+
+  function RemoteVideoPlayer(props) {
+    var _this;
+
+    conversationaudiovideopanel_classCallCheck(this, RemoteVideoPlayer);
+
+    _this = conversationaudiovideopanel_possibleConstructorReturn(this, conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer).call(this, props));
+    _this.state = {};
+    return _this;
+  }
+
+  conversationaudiovideopanel_createClass(RemoteVideoPlayer, [{
+    key: "render",
+    value: function render() {
+      var self = this;
+      var sess = self.props.sess;
+      var sid = sess.stringSid;
+      var peerMedia = Av.toMediaOptions(this.props.peerAv);
+      var noVideo = !peerMedia.video || sess.call.isOnHold() || peerMedia.onHold;
+      self.state.noVideo = noVideo;
+
+      if (noVideo) {
+        // Show avatar for remote video
+        var contact = M.u[base64urlencode(sess.peer)];
+        assert(contact);
+        return external_React_default.a.createElement("div", {
+          className: "call user-audio is-avatar " + (self.props.isActive ? "active" : "") + " stream" + sid,
+          onClick: function onClick(e) {
+            var onPlayerClick = self.props.onPlayerClick;
+
+            if (onPlayerClick) {
+              // only set for carousel bottom bar
+              onPlayerClick(sid);
+            }
+          }
+        }, sess.peerNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
+          className: "icon-connection-issues"
+        }) : null, external_React_default.a.createElement("div", {
+          className: "center-avatar-wrapper"
+        }, external_React_default.a.createElement("div", {
+          className: muteOrHoldIconStyle(peerMedia)
+        }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+          contact: contact,
+          className: "avatar-wrapper",
+          simpletip: contact.name,
+          simpletipWrapper: "#call-block",
+          simpletipOffset: 8,
+          simpletipPosition: "top",
+          hideVerifiedBadge: true
+        })), external_React_default.a.createElement("div", {
+          className: "audio-level",
+          ref: function ref(_ref) {
+            self.audioLevelDiv = _ref;
+          }
+        }));
+      } else {
+        // show remote video for that peer
+        return external_React_default.a.createElement("div", {
+          className: "call user-video is-video " + (self.props.isActive ? "active" : "") + " stream" + sid + (peerMedia.screen ? " is-screen" : ""),
+          onClick: function onClick(e) {
+            var onPlayerClick = self.props.onPlayerClick;
+
+            if (onPlayerClick) {
+              // only set for carousel bottom bar
+              onPlayerClick(sid);
+            }
+          }
+        }, sess.peerNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
+          className: "icon-connection-issues"
+        }) : null, external_React_default.a.createElement("div", {
+          className: muteOrHoldIconStyle(peerMedia)
+        }), external_React_default.a.createElement("div", {
+          className: "audio-level",
+          ref: function ref(_ref2) {
+            self.audioLevelDiv = _ref2;
+          }
+        }), external_React_default.a.createElement("video", {
+          autoPlay: true,
+          className: "rmtViewport rmtVideo",
+          ref: "player"
+        }));
+      }
+    }
+  }, {
+    key: "indicateAudioLevel",
+    value: function indicateAudioLevel(level) {
+      if (this.audioLevelDiv) {
+        this.audioLevelDiv.style.width = Math.round(level * 100) + '%';
+      }
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var self = this;
+
+      if (!self.props.noAudioLevel) {
+        self.props.sess.audioIndicator = this;
+      }
+
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidMount", this).call(this);
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentWillUnmount", this).call(this);
+
+      if (this.player) {
+        RTC.detachMediaStream(this.player);
+        delete this.player;
+      }
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      var self = this;
+      var noVideo = self.state.noVideo;
+
+      if (self.state.prevNoVideo === noVideo) {
+        return;
+      }
+
+      self.state.prevNoVideo = noVideo;
+      var player = self.refs.player;
+
+      if (noVideo) {
+        if (player) {
+          RTC.detachMediaStream(player);
+        }
+      } else {
+        assert(player);
+        var sess = self.props.sess;
+
+        if (player.srcObject) {
+          if (player.srcObject.id === sess.remoteStream.id && !player.paused) {
+            // player already connected and playing this stream
+            return;
+          } // player was connected to some other session, detach it
+
+
+          RTC.detachMediaStream(player);
+        }
+
+        RTC.attachMediaStream(player, sess.remoteStream);
+      }
+    }
+  }]);
+
+  return RemoteVideoPlayer;
+}(mixins["MegaRenderMixin"]);
+
+;
+conversationaudiovideopanel_RemoteVideoPlayer.propTypes = {
+  sess: prop_types_default.a.object.isRequired,
+  isActive: prop_types_default.a.bool.isRequired,
+  peerAv: prop_types_default.a.number.isRequired,
+  onPlayerClick: prop_types_default.a.func,
+  noAudioLevel: prop_types_default.a.bool
+};
+
+var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_MegaRenderMixin2) {
+  conversationaudiovideopanel_inherits(ConversationAVPanel, _MegaRenderMixin2);
 
   function ConversationAVPanel(props) {
-    var _this;
+    var _this2;
 
     conversationaudiovideopanel_classCallCheck(this, ConversationAVPanel);
 
-    _this = conversationaudiovideopanel_possibleConstructorReturn(this, conversationaudiovideopanel_getPrototypeOf(ConversationAVPanel).call(this, props));
-    _this.state = {
+    _this2 = conversationaudiovideopanel_possibleConstructorReturn(this, conversationaudiovideopanel_getPrototypeOf(ConversationAVPanel).call(this, props));
+    _this2.state = {
       'messagesBlockEnabled': false,
       'fullScreenModeEnabled': false,
       'localMediaDisplay': true,
       'viewMode': VIEW_MODES.GRID,
       'selectedStreamSid': false
     };
-    return _this;
+    return _this2;
   }
 
   conversationaudiovideopanel_createClass(ConversationAVPanel, [{
@@ -14628,17 +14678,55 @@ function (_MegaRenderMixin) {
       }
     }
   }, {
-    key: "getCurrentStreamId",
-    value: function getCurrentStreamId() {
+    key: "getActiveSid",
+    value: function getActiveSid() {
       var self = this;
       var chatRoom = self.props.chatRoom;
+      var call = chatRoom.callManagerCall;
 
-      if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
+      if (!call || !call.isActive()) {
         return;
       }
 
-      var streams = chatRoom.callManagerCall._streams;
-      return self.state.selectedStreamSid || Object.keys(streams)[0];
+      var selected = self.state.selectedStreamSid;
+
+      if (selected) {
+        return selected;
+      }
+
+      var sess = Object.values(call.rtcCall.sessions)[0];
+      return sess ? sess.stringSid : undefined;
+    }
+  }, {
+    key: "haveScreenSharingPeer",
+    value: function haveScreenSharingPeer() {
+      var chatRoom = this.props.chatRoom;
+      var callManagerCall = chatRoom.callManagerCall;
+
+      if (!callManagerCall) {
+        return false;
+      }
+
+      var rtcCall = callManagerCall.rtcCall;
+
+      if (!rtcCall.sessions) {
+        return false;
+      }
+
+      var sessions = rtcCall.sessions;
+      /* eslint-disable guard-for-in */
+
+      for (var sid in sessions) {
+        var av = sessions[sid].peerAv;
+
+        if (av != null && av & Av.Screen) {
+          return true;
+        }
+      }
+      /* eslint-enable guard-for-in */
+
+
+      return false;
     }
   }, {
     key: "getViewMode",
@@ -14647,7 +14735,11 @@ function (_MegaRenderMixin) {
       var callManagerCall = chatRoom.callManagerCall;
 
       if (callManagerCall) {
-        var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+        var participantsCount = Object.keys(callManagerCall.rtcCall.sessions).length;
+
+        if (DEBUG_PARTICIPANTS_MULTIPLICATOR) {
+          participantsCount *= DEBUG_PARTICIPANTS_MULTIPLICATOR;
+        }
 
         if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
           return VIEW_MODES.CAROUSEL;
@@ -14658,14 +14750,8 @@ function (_MegaRenderMixin) {
         return VIEW_MODES.GRID;
       }
 
-      var streamKeys = Object.keys(callManagerCall._streams);
-
-      for (var i = 0; i < streamKeys.length; i++) {
-        var sid = streamKeys[i];
-
-        if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
-          return VIEW_MODES.CAROUSEL;
-        }
+      if (this.haveScreenSharingPeer()) {
+        return VIEW_MODES.CAROUSEL;
       }
 
       return this.state.viewMode;
@@ -14694,33 +14780,18 @@ function (_MegaRenderMixin) {
       $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).removeClass('visible-panel');
     }
   }, {
-    key: "getRemoteSid",
-    value: function getRemoteSid(sid) {
-      var fullSid = sid || this.state.selectedStreamSid;
-
-      if (!fullSid) {
-        return false;
-      }
-
-      sid = fullSid.split(":")[2];
-
-      if (!sid) {
-        return false;
-      }
-
-      return sid;
-    }
-  }, {
     key: "resizeVideos",
     value: function resizeVideos() {
       var self = this;
       var chatRoom = self.props.chatRoom;
 
-      if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isActive()) {
+      if (chatRoom.type === "private") {
         return;
       }
 
-      if (chatRoom.type === "private") {
+      var callManagerCall = chatRoom.callManagerCall;
+
+      if (!callManagerCall || !callManagerCall.isActive()) {
         return;
       }
 
@@ -14749,16 +14820,14 @@ function (_MegaRenderMixin) {
       if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
         $('.participantsContainer', $container).height('auto');
         var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
-        var callManagerCall = chatRoom.callManagerCall;
         var mediaOpts;
 
         if (this.state.selectedStreamSid === "local") {
           mediaOpts = callManagerCall.getMediaOptions();
         } else {
-          mediaOpts = callManagerCall.getRemoteMediaOptions(self.getRemoteSid());
+          mediaOpts = callManagerCall.getRemoteMediaOptions(self.getActiveSid());
         }
 
-        var audioIsMuted = mediaOpts.audio;
         $('.activeStream', $container).height(activeStreamHeight);
         $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
         $('.user-video, .user-audio, .user-video video', $container).width('').height('');
@@ -14771,10 +14840,10 @@ function (_MegaRenderMixin) {
           if ($video.outerHeight() > 0 && $video[0].videoWidth > 0 && $video[0].videoHeight > 0) {
             var actualWidth = Math.min($video.outerWidth(), $video[0].videoWidth / $video[0].videoHeight * $video.outerHeight());
 
-            if (!audioIsMuted) {
-              $mutedIcon.removeClass('hidden');
-            } else {
+            if (mediaOpts.audio) {
               $mutedIcon.addClass('hidden');
+            } else {
+              $mutedIcon.removeClass('hidden');
             }
 
             $mutedIcon.css({
@@ -14818,8 +14887,9 @@ function (_MegaRenderMixin) {
     value: function componentDidUpdate() {
       var self = this;
       var room = self.props.chatRoom;
+      var callManagerCall = room.callManagerCall;
 
-      if (!room.callManagerCall || !room.callManagerCall.isActive()) {
+      if (!callManagerCall || !callManagerCall.isActive()) {
         return;
       }
 
@@ -14967,47 +15037,11 @@ function (_MegaRenderMixin) {
         self.resizePanes();
         self.resizeVideos();
       });
-      (self.remoteVideoRefs || []).forEach(function (remoteVideo) {
-        if (remoteVideo && remoteVideo.src === "" && remoteVideo.currentTime === 0 && !remoteVideo.srcObject) {
-          var stream = room.callManagerCall._streams[remoteVideo.id.split("remotevideo_")[1]];
-
-          RTC.attachMediaStream(remoteVideo, stream); // attachMediaStream would do the .play call
-        }
-      });
-      var localStream = room.callManagerCall.localStream();
-
-      if (localStream && self.refs.localViewport && self.refs.localViewport.src === "" && self.refs.localViewport.currentTime === 0 && !self.refs.localViewport.srcObject) {
-        RTC.attachMediaStream(self.refs.localViewport, localStream); // attachMediaStream would do the .play call
-      }
-
-      var bigLocalViewport = $('.bigLocalViewport')[0];
-      var smallLocalViewport = $('.smallLocalViewport')[0];
-
-      if (smallLocalViewport && bigLocalViewport && !bigLocalViewport.src && !bigLocalViewport.srcObject && localStream && bigLocalViewport && bigLocalViewport.src === "" && bigLocalViewport.currentTime === 0) {
-        RTC.attachMediaStream(bigLocalViewport, localStream);
-      }
-
       $(room).rebind('toggleMessages.av', function () {
         self.toggleMessages();
       });
       room.messagesBlockEnabled = self.state.messagesBlockEnabled;
-      this.props.chatRoom.callManagerCall.rebind('onAudioLevelChange.ui', function (e, sid, level) {
-        var $elm = $(".stream" + sid.replace(/:/g, "_"));
-
-        if ($elm.length === 0) {
-          return;
-        }
-
-        if (level > 10) {
-          $('.avatar-wrapper', $elm).css({
-            'box-shadow': '0px 0px 0px 3px rgba(255, 255, 255, ' + Math.min(0.90, level / 100) + ')'
-          });
-        } else {
-          $('.avatar-wrapper', $elm).css({
-            'box-shadow': '0px 0px 0px 0px rgba(255, 255, 255, 0)'
-          });
-        }
-      });
+      var self = this;
       this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function () {
         self.setState({
           'muteInProgress': true
@@ -15104,7 +15138,7 @@ function (_MegaRenderMixin) {
         'messagesBlockEnabled': !this.state.messagesBlockEnabled
       });
 
-      if (this.state.messagesBlockEnabled === false) {
+      if (!this.state.messagesBlockEnabled) {
         Soon(function () {
           $(window).trigger('resize');
         });
@@ -15121,7 +15155,7 @@ function (_MegaRenderMixin) {
       $('.simpletip', $container).trigger('simpletipClose');
       this.setState({
         'fullScreenModeEnabled': newVal,
-        'messagesBlockEnabled': newVal === true ? false : this.state.messagesBlockEnabled
+        'messagesBlockEnabled': newVal ? false : this.state.messagesBlockEnabled
       });
     }
   }, {
@@ -15131,147 +15165,101 @@ function (_MegaRenderMixin) {
       e.stopPropagation();
       var $container = $(external_ReactDOM_default.a.findDOMNode(this));
       var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
+      var newVal = !this.state.localMediaDisplay;
       $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
         'width': '',
         'height': '',
         'right': 8,
-        'bottom': !this.state.localMediaDisplay === true ? 8 : 8
+        'bottom': newVal ? 8 : 8
       });
       this.setState({
-        localMediaDisplay: !this.state.localMediaDisplay
+        localMediaDisplay: newVal
       });
     }
   }, {
     key: "render",
     value: function render() {
       var chatRoom = this.props.chatRoom;
-      this.remoteVideoRefs = this.remoteVideoRefs || [];
       var self = this;
+      var callManagerCall = chatRoom.callManagerCall;
 
-      if (!chatRoom.callManagerCall || !chatRoom.callManagerCall.isStarted()) {
+      if (!callManagerCall || !callManagerCall.isStarted()) {
         self.initialRender = false;
         return null;
       }
 
+      var rtcCall = callManagerCall.rtcCall;
+      assert(rtcCall);
       var participants = chatRoom.getParticipantsExceptMe();
       var displayNames = [];
       participants.forEach(function (v) {
         displayNames.push(htmlentities(M.getNameByHandle(v)));
       });
-      var callManagerCall = chatRoom.callManagerCall;
-      var remoteCamEnabled = null;
-
-      if (callManagerCall.getRemoteMediaOptions().video) {
-        remoteCamEnabled = external_React_default.a.createElement("i", {
-          className: "small-icon blue-videocam"
-        });
-      }
-
       var localPlayerElement = null;
-      var remotePlayerElement = null;
-      var activeStreamIdOrPlayer = (chatRoom.type === "group" || chatRoom.type === "public") && self.getViewMode() === VIEW_MODES.CAROUSEL ? self.getCurrentStreamId() : false;
-      var visiblePanelClass = "";
-      var localPlayerStream = callManagerCall.localStream();
+      var remotePlayerElements = [];
+      var onRemotePlayerClick; // handler that exists only for the peer views in the carosel bottom bar
 
-      if (this.visiblePanel === true) {
-        visiblePanelClass += " visible-panel";
+      var isCarousel = self.getViewMode() === VIEW_MODES.CAROUSEL;
+
+      if (isCarousel) {
+        var activeSid = chatRoom.type === "group" || chatRoom.type === "public" ? self.getActiveSid() : false;
+        var activePlayer = null;
+        onRemotePlayerClick = self.onPlayerClick.bind(self);
       }
 
-      remotePlayerElement = [];
-      var realStreams = Object.keys(callManagerCall._streams);
-      var streams = [];
+      var sessions = rtcCall.sessions;
+      var realSids = Object.keys(sessions);
+      var sids = [];
 
       if (!DEBUG_PARTICIPANTS_MULTIPLICATOR) {
-        streams = realStreams;
+        sids = realSids;
       } else {
-        // UI debug mode.
-        var initialCount = realStreams.length;
+        // UI debug mode - simulate more participants
+        // by duplicating each session DEBUG_PARTICIPANTS_MULTIPLICATOR times.
+        var initialCount = realSids.length;
 
-        if (initialCount > 0) {
-          for (var i = 0; i < initialCount * DEBUG_PARTICIPANTS_MULTIPLICATOR; i++) {
-            streams.push(realStreams[(i || 0) % initialCount]);
+        for (var i = 0; i < initialCount; i++) {
+          for (var j = 0; j < DEBUG_PARTICIPANTS_MULTIPLICATOR; j++) {
+            sids.push(realSids[i]);
           }
         }
       }
 
-      streams.forEach(function (streamId, k) {
-        var stream = callManagerCall._streams[streamId];
-        var userId = streamId.split(":")[0];
-        var sessionId = streamId.split(":")[2];
-        var remotePlayerStream = stream;
-        var mediaOpts = callManagerCall.getRemoteMediaOptions(sessionId);
-        var player;
+      var visiblePanelClass = this.visiblePanel ? " visible-panel" : "";
+      var localMedia = Av.toMediaOptions(rtcCall.localAv());
+      var haveAnyRemoteVideo = false;
+      sids.forEach(function (binSid, i) {
+        // we use 'i' to uniquely identify views when we have several views for each peer for debug purposes
+        var sess = sessions[binSid];
+        var sid = sess.stringSid;
+        var playerIsActive = activeSid === sid;
+        var player = external_React_default.a.createElement(conversationaudiovideopanel_RemoteVideoPlayer, {
+          sess: sess,
+          key: sid + "_" + i,
+          peerAv: sess.peerAv(),
+          isActive: playerIsActive,
+          onPlayerClick: onRemotePlayerClick
+        });
 
-        if (!remotePlayerStream || mediaOpts.video === false && mediaOpts.screen === false) {
-          // TODO: When rtc is ready
-          var contact = M.u[userId];
-          player = external_React_default.a.createElement("div", {
-            className: "call user-audio is-avatar " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_"),
-            key: streamId + "_" + k,
-            onClick: function onClick(e) {
-              self.onPlayerClick(streamId);
-            }
-          }, callManagerCall.peerQuality[streamId] === 0 ? external_React_default.a.createElement("div", {
-            className: "icon-connection-issues"
-          }) : null, external_React_default.a.createElement("div", {
-            className: "center-avatar-wrapper"
-          }, callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
-          }), external_React_default.a.createElement(ui_contacts["Avatar"], {
-            contact: contact,
-            className: "avatar-wrapper",
-            simpletip: contact.name,
-            chatRoom: self.props.chatRoom,
-            simpletipWrapper: "#call-block",
-            simpletipOffset: 8,
-            simpletipPosition: "top",
-            hideVerifiedBadge: true
-          })));
-
-          if (activeStreamIdOrPlayer === streamId) {
-            activeStreamIdOrPlayer = player;
-          }
-
-          remotePlayerElement.push(player);
-        } else {
-          player = external_React_default.a.createElement("div", {
-            className: "call user-video is-video " + (activeStreamIdOrPlayer === streamId ? "active" : "") + " stream" + streamId.replace(/:/g, "_") + (mediaOpts.screen ? " is-screen" : ""),
-            key: streamId + "_" + k,
-            onClick: function onClick(e) {
-              self.onPlayerClick(streamId);
-            }
-          }, callManagerCall.peerQuality[streamId] === 0 ? external_React_default.a.createElement("div", {
-            className: "icon-connection-issues"
-          }) : null, callManagerCall.getRemoteMediaOptions(sessionId).audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
-          }), external_React_default.a.createElement("video", {
-            autoPlay: true,
-            className: "rmtViewport rmtVideo",
-            id: "remotevideo_" + streamId,
-            ref: function ref(_ref) {
-              if (_ref && self.remoteVideoRefs.indexOf(_ref) === -1) {
-                self.remoteVideoRefs.push(_ref);
-              }
-            }
-          }));
-
-          if (activeStreamIdOrPlayer === streamId) {
-            activeStreamIdOrPlayer = player;
-          }
-
-          remotePlayerElement.push(player);
+        if (playerIsActive && isCarousel) {
+          activePlayer = external_React_default.a.createElement(conversationaudiovideopanel_RemoteVideoPlayer, {
+            sess: sess,
+            key: "carousel_active",
+            peerAv: sess.peerAv(),
+            isActive: true,
+            noAudioLevel: true
+          });
         }
+
+        remotePlayerElements.push(player);
       });
 
       if (this.getViewMode() === VIEW_MODES.GRID) {
-        if (!localPlayerStream || callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false) {
+        if (!localMedia.video) {
+          // no local video, display our avatar
           localPlayerElement = external_React_default.a.createElement("div", {
             className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass
-          }, chatRoom.megaChat.networkQuality === 0 ? external_React_default.a.createElement("div", {
+          }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
             className: "icon-connection-issues"
           }) : null, external_React_default.a.createElement("div", {
             className: "default-white-button tiny-button call",
@@ -15280,10 +15268,8 @@ function (_MegaRenderMixin) {
             className: "tiny-icon grey-minus-icon"
           })), external_React_default.a.createElement("div", {
             className: "center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden")
-          }, callManagerCall.getMediaOptions().audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
+          }, external_React_default.a.createElement("div", {
+            className: muteOrHoldIconStyle(localMedia)
           }), external_React_default.a.createElement(ui_contacts["Avatar"], {
             contact: M.u[u_handle],
             chatRoom: this.props.chatRoom,
@@ -15291,100 +15277,107 @@ function (_MegaRenderMixin) {
             hideVerifiedBadge: true
           })));
         } else {
+          // we have local video (grid mode)
           localPlayerElement = external_React_default.a.createElement("div", {
-            className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeStreamIdOrPlayer === "local" ? " active " : "") + (callManagerCall.getMediaOptions().screen ? " is-screen" : "")
-          }, chatRoom.megaChat.networkQuality === 0 ? external_React_default.a.createElement("div", {
+            className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : "")
+          }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
             className: "icon-connection-issues"
           }) : null, external_React_default.a.createElement("div", {
             className: "default-white-button tiny-button call",
             onClick: this.toggleLocalVideoDisplay.bind(this)
           }, external_React_default.a.createElement("i", {
             className: "tiny-icon grey-minus-icon"
-          })), callManagerCall.getMediaOptions().audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
+          })), external_React_default.a.createElement("div", {
+            className: muteOrHoldIconStyle(localMedia)
           }), external_React_default.a.createElement("video", {
-            ref: "localViewport",
             className: "localViewport",
             defaultmuted: "true",
             muted: true,
             volume: 0,
-            id: "localvideo_" + callManagerCall.id,
+            id: "localvideo_" + base64urlencode(rtcCall.id),
             style: {
               display: !this.state.localMediaDisplay ? "none" : ""
+            },
+            ref: function ref(_ref3) {
+              if (_ref3 && !RTC.isAttachedToStream(_ref3)) {
+                RTC.attachMediaStream(_ref3, rtcCall.localStream());
+              }
             }
           }));
         }
       } else {
         // carousel
-        var localPlayer;
-
-        if (!localPlayerStream || callManagerCall.getMediaOptions().video === false && callManagerCall.getMediaOptions().screen === false) {
-          localPlayer = external_React_default.a.createElement("div", {
-            className: "call user-audio local-carousel is-avatar" + (activeStreamIdOrPlayer === "local" ? " active " : ""),
+        if (!localMedia.video) {
+          // display avatar for local video
+          var localPlayer = external_React_default.a.createElement("div", {
+            className: "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : ""),
             key: "local",
-            onClick: function onClick() {
+            onClick: function onClick(e) {
               self.onPlayerClick("local");
             }
-          }, chatRoom.megaChat.networkQuality === 0 ? external_React_default.a.createElement("div", {
+          }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
             className: "icon-connection-issues"
           }) : null, external_React_default.a.createElement("div", {
             className: "center-avatar-wrapper"
-          }, callManagerCall.getMediaOptions().audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
+          }, external_React_default.a.createElement("div", {
+            className: muteOrHoldIconStyle(callManagerCall.getMediaOptions())
           }), external_React_default.a.createElement(ui_contacts["Avatar"], {
             contact: M.u[u_handle],
             className: "call avatar-wrapper",
             chatRoom: this.props.chatRoom,
             hideVerifiedBadge: true
           })));
-          remotePlayerElement.push(localPlayer);
+          remotePlayerElements.push(localPlayer);
 
-          if (activeStreamIdOrPlayer === "local") {
-            activeStreamIdOrPlayer = localPlayer;
+          if (activeSid === "local") {
+            activePlayer = localPlayer;
           }
         } else {
-          localPlayer = external_React_default.a.createElement("div", {
-            className: "call user-video local-carousel is-video" + (activeStreamIdOrPlayer === "local" ? " active " : "") + (callManagerCall.getMediaOptions().screen ? " is-screen" : ""),
+          // we have local video (carousel mode)
+          var _localPlayer = external_React_default.a.createElement("div", {
+            className: "call user-video local-carousel is-video" + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : ""),
             key: "local-video",
             onClick: function onClick(e) {
               self.onPlayerClick("local");
             }
-          }, chatRoom.megaChat.networkQuality === 0 ? external_React_default.a.createElement("div", {
+          }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
             className: "icon-connection-issues"
-          }) : null, callManagerCall.getMediaOptions().audio === false ? external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted"
-          }) : external_React_default.a.createElement("div", {
-            className: "small-icon icon-audio-muted hidden"
-          }), external_React_default.a.createElement("video", {
+          }) : null, external_React_default.a.createElement("div", {
+            className: muteOrHoldIconStyle(localMedia)
+          }), external_React_default.a.createElement("video", _defineProperty({
             ref: "localViewport",
             className: "localViewport smallLocalViewport",
             defaultmuted: "true",
             muted: true,
             volume: 0,
-            id: "localvideo_" + callManagerCall.id
-          }));
-          remotePlayerElement.push(localPlayer);
+            id: "localvideo_" + base64urlencode(rtcCall.id)
+          }, "ref", function ref(_ref4) {
+            if (_ref4 && !RTC.isAttachedToStream(_ref4)) {
+              RTC.attachMediaStream(_ref4, rtcCall.localStream());
+            }
+          })));
 
-          if (activeStreamIdOrPlayer === "local") {
-            activeStreamIdOrPlayer = external_React_default.a.createElement("div", {
-              className: "call user-video is-video local-carousel local-carousel-big " + (callManagerCall.getMediaOptions().screen ? " is-screen" : ""),
+          remotePlayerElements.push(_localPlayer);
+
+          if (activeSid === "local") {
+            activePlayer = external_React_default.a.createElement("div", {
+              className: "call user-video is-video local-carousel local-carousel-big " + (localMedia.screen ? " is-screen" : ""),
               key: "local-video2"
-            }, chatRoom.megaChat.networkQuality === 0 ? external_React_default.a.createElement("div", {
+            }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
               className: "icon-connection-issues"
-            }) : null, callManagerCall.getMediaOptions().audio === false ? external_React_default.a.createElement("div", {
-              className: "small-icon icon-audio-muted"
-            }) : external_React_default.a.createElement("div", {
-              className: "small-icon icon-audio-muted hidden"
+            }) : null, external_React_default.a.createElement("div", {
+              className: muteOrHoldIconStyle(localMedia)
             }), external_React_default.a.createElement("video", {
               className: "localViewport bigLocalViewport",
               defaultmuted: "true",
               muted: true,
               volume: 0,
-              id: "localvideo_big_" + callManagerCall.id
+              id: "localvideo_big_" + base64urlencode(rtcCall.id),
+              ref: function ref(_ref5) {
+                if (_ref5 && !RTC.isAttachedToStream(_ref5)) {
+                  RTC.attachMediaStream(_ref5, rtcCall.localStream());
+                }
+              }
             }));
           }
         }
@@ -15400,34 +15393,20 @@ function (_MegaRenderMixin) {
       }
 
       var additionalClass = "";
-      additionalClass = this.state.fullScreenModeEnabled === true ? " full-sized-block" : "";
+      additionalClass = this.state.fullScreenModeEnabled ? " full-sized-block" : "";
 
       if (additionalClass.length === 0) {
-        additionalClass = this.state.messagesBlockEnabled === true ? " small-block" : "";
+        additionalClass = this.state.messagesBlockEnabled ? " small-block" : "";
       }
 
-      var participantsCount = Object.keys(callManagerCall._streams).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
+      var participantsCount = Object.keys(rtcCall.sessions).length * DEBUG_PARTICIPANTS_MULTIPLICATOR;
       additionalClass += " participants-count-" + participantsCount;
       var header = null;
-      var videoSessionCount = 0;
-
-      if (chatRoom.callManagerCall && chatRoom.callManagerCall.getCurrentVideoSlotsUsed) {
-        videoSessionCount = chatRoom.callManagerCall.getCurrentVideoSlotsUsed();
-      }
+      var videoSessionCount = rtcCall.getAudioVideoSenderCount().video;
+      var videoSendersMaxed = videoSessionCount >= RtcModule.kMaxCallVideoSenders;
+      var notifBar = null;
 
       if (chatRoom.type === "group" || chatRoom.type === "public") {
-        var haveScreenShare = false;
-        var streamKeys = Object.keys(callManagerCall._streams);
-
-        for (var x = 0; x < streamKeys.length; x++) {
-          var sid = streamKeys[x];
-
-          if (callManagerCall.getRemoteMediaOptions(sid.split(":")[2]).screen) {
-            haveScreenShare = true;
-            break;
-          }
-        }
-
         header = external_React_default.a.createElement("div", {
           className: "call-header"
         }, external_React_default.a.createElement("div", {
@@ -15435,7 +15414,7 @@ function (_MegaRenderMixin) {
         }, external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, ellipsis(chatRoom.getRoomTitle(), 'end', 70))), external_React_default.a.createElement("div", {
           className: "call-participants-count"
         }, chatRoom.getCallParticipants().length), external_React_default.a.createElement("a", {
-          className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || haveScreenShare ? " disabled" : ""),
+          className: "call-switch-view " + (self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel") + (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE || this.haveScreenSharingPeer() ? " disabled" : ""),
           onClick: function onClick(e) {
             if (participantsCount > MAX_PARTICIPANTS_FOR_GRID_MODE) {
               return;
@@ -15447,22 +15426,18 @@ function (_MegaRenderMixin) {
             });
           }
         }), external_React_default.a.createElement("div", {
-          className: "call-av-counter" + (videoSessionCount >= RtcModule.kMaxCallVideoSenders ? " limit-reached" : "")
+          className: "call-av-counter" + (videoSendersMaxed ? " limit-reached" : "")
         }, videoSessionCount, " / ", RtcModule.kMaxCallVideoSenders), external_React_default.a.createElement("div", {
-          className: "call-video-icon" + (chatRoom.callManagerCall.hasVideoSlotLimitReached() ? " call-video-icon-warn" : "")
+          className: "call-video-icon" + (videoSendersMaxed.video ? " call-video-icon-warn" : "")
         }), external_React_default.a.createElement("div", {
           className: "call-header-duration",
           "data-room-id": chatRoom.chatId
         }, secondsToTimeShort(chatRoom._currentCallCounter)));
-      }
+        var nEngine = callManagerCall.callNotificationsEngine;
+        var notif = nEngine.getCurrentNotification();
 
-      var notifBar = null;
-
-      if (chatRoom.type === "group" || chatRoom.type === "public") {
-        var notif = chatRoom.callManagerCall.callNotificationsEngine.getCurrentNotification();
-
-        if (!chatRoom.callManagerCall.callNotificationsEngine._bound) {
-          chatRoom.callManagerCall.callNotificationsEngine.rebind('onChange.cavp', function () {
+        if (!nEngine._bound) {
+          nEngine.rebind('onChange.cavp', function () {
             if (chatRoom.isCurrentlyActive) {
               self.safeForceUpdate();
               var $notif = $('.in-call-notif:visible');
@@ -15476,7 +15451,7 @@ function (_MegaRenderMixin) {
               });
             }
           });
-          chatRoom.callManagerCall.callNotificationsEngine._bound = true;
+          nEngine._bound = true;
         }
 
         if (notif) {
@@ -15488,8 +15463,9 @@ function (_MegaRenderMixin) {
       }
 
       var networkQualityBar = null;
+      var netq = megaChat.rtc.ownNetworkQuality();
 
-      if (chatRoom.megaChat.networkQuality <= 1) {
+      if (netq != null && netq <= 1) {
         var networkQualityMessage = l[23213];
         networkQualityBar = external_React_default.a.createElement("div", {
           className: "in-call-notif yellow" + (notifBar ? " after-green-notif" : "")
@@ -15506,22 +15482,26 @@ function (_MegaRenderMixin) {
         }, external_React_default.a.createElement("div", {
           className: "participantsContainer",
           key: "partsContainer"
-        }, remotePlayerElement), localPlayerElement);
+        }, remotePlayerElements), localPlayerElement);
       } else {
+        // carousel
         players = external_React_default.a.createElement("div", {
           key: "container"
         }, external_React_default.a.createElement("div", {
           className: "activeStream",
           key: "activeStream"
-        }, activeStreamIdOrPlayer), external_React_default.a.createElement("div", {
+        }, activePlayer), external_React_default.a.createElement("div", {
           className: "participantsContainer",
           key: "partsContainer"
-        }, remotePlayerElement, localPlayerElement));
+        }, remotePlayerElements, localPlayerElement));
       }
 
       var topPanel = null;
 
       if (chatRoom.type !== "group") {
+        var remoteCamEnabled = haveAnyRemoteVideo ? external_React_default.a.createElement("i", {
+          className: "small-icon blue-videocam"
+        }) : null;
         topPanel = external_React_default.a.createElement("div", {
           className: "call top-panel"
         }, external_React_default.a.createElement("div", {
@@ -15544,22 +15524,31 @@ function (_MegaRenderMixin) {
         additionalClass += " participants-a-lot";
       }
 
-      var reconnectingDiv = null;
+      var hugeOverlayDiv = null;
 
-      if (chatRoom.callReconnecting === true) {
-        reconnectingDiv = external_React_default.a.createElement("div", {
+      if (chatRoom.callReconnecting) {
+        hugeOverlayDiv = external_React_default.a.createElement("div", {
           className: "callReconnecting"
         }, external_React_default.a.createElement("i", {
           className: "huge-icon crossed-phone"
         }));
+      } else if (rtcCall.isOnHold()) {
+        hugeOverlayDiv = external_React_default.a.createElement("div", {
+          className: "callReconnecting"
+        }, external_React_default.a.createElement("i", {
+          className: "huge-icon call-on-hold"
+        }));
       }
 
+      var micMuteBtnDisabled = rtcCall.isLocalMuteInProgress() || rtcCall.isRecovery || rtcCall.isOnHold();
+      var camMuteBtnDisabled = micMuteBtnDisabled || !localMedia.video && videoSendersMaxed;
+      var screenShareBtnDisabled = micMuteBtnDisabled || !RTC.supportsScreenCapture;
       return external_React_default.a.createElement("div", {
         className: "call-block" + additionalClass,
         id: "call-block"
       }, external_React_default.a.createElement("div", {
-        className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled === true && this.state.fullScreenModeEnabled === false ? "" : "hidden")
-      }), header, notifBar, networkQualityBar, players, reconnectingDiv, topPanel, external_React_default.a.createElement("div", {
+        className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled && !this.state.fullScreenModeEnabled ? "" : "hidden")
+      }), header, notifBar, networkQualityBar, players, hugeOverlayDiv, topPanel, external_React_default.a.createElement("div", {
         className: "call bottom-panel"
       }, external_React_default.a.createElement("div", {
         className: "button call left" + (unreadDiv ? " unread" : ""),
@@ -15569,35 +15558,31 @@ function (_MegaRenderMixin) {
         "data-simpletip": this.state.messagesBlockEnabled ? l[22892] : l[22891],
         "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
-        className: "button call " + (this.state.muteInProgress ? " disabled" : ""),
+        className: "button call " + (micMuteBtnDisabled ? " disabled" : ""),
         onClick: function onClick(e) {
-          if (self.state.muteInProgress || $(this).is(".disabled")) {
+          if (micMuteBtnDisabled || rtcCall.isLocalMuteInProgress()) {
             return;
           }
 
-          if (callManagerCall.getMediaOptions().audio === true) {
-            callManagerCall.muteAudio();
-          } else {
-            callManagerCall.unmuteAudio();
-          }
+          rtcCall.enableAudio(!localMedia.audio);
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon simpletip " + (callManagerCall.getMediaOptions().audio ? "microphone" : "crossed-microphone"),
-        "data-simpletip": callManagerCall.getMediaOptions().audio ? l[16214] : l[16708],
+        className: "big-icon simpletip " + (localMedia.audio ? "microphone" : "crossed-microphone"),
+        "data-simpletip": localMedia.audio ? l[16214] : l[16708],
         "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
-        className: "button call" + (callManagerCall.hasVideoSlotLimitReached() === true && callManagerCall.getMediaOptions().video === false ? " disabled" : "") + (this.state.muteInProgress ? " disabled" : ""),
+        className: "button call" + (camMuteBtnDisabled ? " disabled" : ""),
         onClick: function onClick(e) {
-          if (self.state.muteInProgress || $(this).is(".disabled")) {
+          if (camMuteBtnDisabled || rtcCall.isLocalMuteInProgress()) {
             return;
           }
 
           var videoMode = callManagerCall.videoMode();
 
           if (videoMode === Av.Video) {
-            callManagerCall.muteVideo();
+            rtcCall.disableVideo().catch(function () {});
           } else {
-            callManagerCall.unmuteVideo();
+            rtcCall.enableCamera().catch(function () {});
           }
         }
       }, external_React_default.a.createElement("i", {
@@ -15605,26 +15590,26 @@ function (_MegaRenderMixin) {
         "data-simpletip": callManagerCall.videoMode() === Av.Video ? l[22894] : l[22893],
         "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
-        className: "button call" + (RTC.supportsScreenCapture && chatRoom.callManagerCall && callManagerCall.rtcCall && !this.state.muteInProgress ? "" : " disabled"),
+        className: "button call" + (screenShareBtnDisabled ? " disabled" : ""),
         onClick: function onClick(e) {
-          if (chatRoom.callManagerCall) {
-            if (callManagerCall.isScreenCaptureEnabled()) {
-              callManagerCall.stopScreenCapture();
-            } else {
-              callManagerCall.startScreenCapture();
-            }
+          if (screenShareBtnDisabled || rtcCall.isLocalMuteInProgress()) {
+            return;
+          }
+
+          if (rtcCall.isScreenCaptureEnabled()) {
+            rtcCall.disableVideo().catch(function () {});
+          } else {
+            rtcCall.enableScreenCapture().catch(function () {});
           }
         }
       }, external_React_default.a.createElement("i", {
-        className: "big-icon simpletip " + (callManagerCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare"),
-        "data-simpletip": callManagerCall.isScreenCaptureEnabled() ? l[22890] : l[22889],
+        className: "big-icon simpletip " + (rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare"),
+        "data-simpletip": rtcCall.isScreenCaptureEnabled() ? l[22890] : l[22889],
         "data-simpletipoffset": "5"
       })), external_React_default.a.createElement("div", {
         className: "button call",
         onClick: function onClick(e) {
-          if (chatRoom.callManagerCall) {
-            chatRoom.callManagerCall.endCall();
-          }
+          callManagerCall.endCall();
         }
       }, external_React_default.a.createElement("i", {
         className: "big-icon horizontal-red-handset simpletip",
@@ -15645,6 +15630,10 @@ function (_MegaRenderMixin) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
@@ -15700,9 +15689,7 @@ function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototype
 var ENABLE_GROUP_CALLING_FLAG = true; // eslint-disable-next-line id-length
 
 var MAX_USERS_CHAT_PRIVATE = 100;
-var conversationpanel_JoinCallNotification =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var conversationpanel_JoinCallNotification = /*#__PURE__*/function (_MegaRenderMixin) {
   conversationpanel_inherits(JoinCallNotification, _MegaRenderMixin);
 
   function JoinCallNotification() {
@@ -15752,9 +15739,7 @@ function (_MegaRenderMixin) {
   return JoinCallNotification;
 }(mixins["MegaRenderMixin"]);
 ;
-var conversationpanel_ConversationRightArea =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var conversationpanel_ConversationRightArea = /*#__PURE__*/function (_MegaRenderMixin2) {
   conversationpanel_inherits(ConversationRightArea, _MegaRenderMixin2);
 
   function ConversationRightArea() {
@@ -16148,9 +16133,7 @@ function (_MegaRenderMixin2) {
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 = /*#__PURE__*/function (_MegaRenderMixin3) {
   conversationpanel_inherits(ConversationPanel, _MegaRenderMixin3);
 
   function ConversationPanel(props) {
@@ -17737,9 +17720,7 @@ function (_MegaRenderMixin3) {
   return ConversationPanel;
 }(mixins["MegaRenderMixin"]), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
-var conversationpanel_ConversationPanels =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var conversationpanel_ConversationPanels = /*#__PURE__*/function (_MegaRenderMixin4) {
   conversationpanel_inherits(ConversationPanels, _MegaRenderMixin4);
 
   function ConversationPanels() {
@@ -19007,7 +18988,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   type = type || "private";
   setAsActive = setAsActive === true;
   var roomId = chatId;
-  var publicChatKey;
 
   if (!publicChatKey && chatHandle && self.publicChatKeys[chatHandle]) {
     if (type !== "public") {
@@ -22335,11 +22315,7 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -22382,9 +22358,7 @@ var ReactDOM = __webpack_require__(4);
 
 
 
-var ToggleCheckbox =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ToggleCheckbox = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ToggleCheckbox, _MegaRenderMixin);
 
   function ToggleCheckbox(props) {
@@ -22433,9 +22407,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var Checkbox =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Checkbox = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(Checkbox, _MegaRenderMixin2);
 
   function Checkbox(props) {
@@ -22497,9 +22469,7 @@ function (_MegaRenderMixin2) {
 
 ;
 
-var IntermediateCheckbox =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var IntermediateCheckbox = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(IntermediateCheckbox, _MegaRenderMixin3);
 
   function IntermediateCheckbox(props) {
@@ -22576,6 +22546,7 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
 function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -22605,9 +22576,7 @@ var startGroupChatWizard_ReactDOM = __webpack_require__(4);
 
 
 
-var startGroupChatWizard_StartGroupChatWizard =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var startGroupChatWizard_StartGroupChatWizard = /*#__PURE__*/function (_MegaRenderMixin) {
   startGroupChatWizard_inherits(StartGroupChatWizard, _MegaRenderMixin);
 
   function StartGroupChatWizard(props) {

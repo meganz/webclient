@@ -624,9 +624,7 @@ var CallManagerCall = function (chatRoom, rtcCall, fromUser) {
     if (fromUser) {
         self.initiator = fromUser;
     }
-    self._streams = {};
     self.callNotificationsEngine = new CallNotificationsEngine(chatRoom, self);
-    self.peerQuality = {};
     self.id = base64urlencode(rtcCall.id); // we need the callid even if rtcCall becomes null during call recovery
 
     var level = localStorage['webrtcDebug'] === "1" ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
@@ -1141,17 +1139,17 @@ CallManagerCall.prototype.onCallTerminated = function () {
     self.renderCallEndedState();
 
     self.room.trackDataChange();
-    self.room.callReconnecting = false;
+    delete self.room.callReconnecting;
     setTimeout(function() {
         // force re-render in case no "remote call ended" is received.
         self.room.trackDataChange();
     }, 1000);
 };
 
-CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, msg, willRecover) {
+CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, msg, recovery) {
     var self = this;
-    if (willRecover) {
-        delete self.rtcCall;
+    if (recovery) {
+        self.rtcCall = recovery;
         self.room.trigger('onCallSessReconnecting', [self]);
         return;
     }
@@ -1159,7 +1157,7 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
     var callMgr = self.getCallManager();
 
     // in case rtcCall is empty, this is a "Call resume timeout"'s destroy event
-    if (self.rtcCall) {
+    if (!self.rtcCall.isRecovery) {
         var state = self.rtcCall.termCodeToUIState(terminationCode);
         self.setState(state);
         if (terminationCode === Term.kCancelOutAnswerIn) {
@@ -1205,23 +1203,14 @@ CallManagerCall.prototype.onDestroy = function(terminationCode, peerTerminates, 
 };
 
 CallManagerCall.prototype.onSessionConnected = function(id) {
-    if (typeof this._streams[id] !== "undefined") {
-        return;
-    }
-    // onRemoteStreamAdded may be called before onConnect, so the stream may be set
-    // there to a valid one. But if not, set it to null. Otherwise we won't have an entry
-    // for that peer in ._streams, and the GUI will not show that peer's avatar at all.
-    this._streams[id] = null;
     this._renderInCallUI();
 };
 
 CallManagerCall.prototype.onRemoteStreamAdded = function (streamId, stream) {
-    this._streams[streamId] = stream;
     this._renderInCallUI();
 };
 
 CallManagerCall.prototype.onRemoteStreamRemoved = function (streamId) {
-    delete this._streams[streamId];
     this.room.trackDataChange();
 };
 
@@ -1247,10 +1236,8 @@ CallManagerCall.prototype.onStateChanged = function (e, session, oldState, newSt
  */
 CallManagerCall.prototype.endCall = function (reason) {
     var self = this;
-    if (!self.rtcCall) { // we don't have a valid call object
-        self.room.megaChat.rtc.abortCallRecovery(self.room.chatIdBin);
-        self.getCallManager().trigger('CallEnded', [self, Term.kUserHangup]);
-        self.onCallTerminated();
+    if (self.rtcCall.isRecovery) {
+        self.rtcCall.hangup(Term.kUserHangup); // will fire onDestroy() with this reason
         return;
     }
     if (
@@ -1330,58 +1317,6 @@ CallManagerCall.prototype.onLocalMediaFail = function (what, err) {
     showToast("warning", deviceMsg + ".<br/>" + l[22185]);
 };
 
-CallManagerCall.prototype.muteAudio = function () {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.enableAudio(false);
-};
-
-CallManagerCall.prototype.unmuteAudio = function () {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.enableAudio(true);
-};
-
-CallManagerCall.prototype.muteVideo = function () {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.disableVideo().catch(function() {
-        /* silence unhandled error console message */
-    });
-};
-
-CallManagerCall.prototype.unmuteVideo = function () {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.enableCamera().catch(function() {
-        /* silence unhandled error console message */
-    });
-};
-CallManagerCall.prototype.startScreenCapture = function () {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.enableScreenCapture()
-    .catch(function(err) {});
-};
-
-CallManagerCall.prototype.stopScreenCapture = function() {
-    var self = this;
-    if (!self.rtcCall) {
-        return;
-    }
-    self.rtcCall.disableVideo().catch(function(err) {});
-};
-
 CallManagerCall.prototype.setState = function (newState) {
     var oldState = this.state;
 
@@ -1447,7 +1382,7 @@ CallManagerCall.prototype.getCallManager = function () {
 
 CallManagerCall.prototype.getPeer = function () {
     var rtcCall = this.rtcCall;
-    if (rtcCall && rtcCall.callerInfo) {
+    if (rtcCall.callerInfo) {
         if (!M.u[base64urlencode(rtcCall.callerInfo.fromUser)]) {
             self.logger.error("this should never happen.");
             return M.u[u_handle];
@@ -1467,9 +1402,6 @@ CallManagerCall.prototype.getPeer = function () {
 };
 
 CallManagerCall.prototype.getMediaOptions = function () {
-    if (!this.rtcCall) {
-        return { audio: false, video: false };
-    }
     var localAv = this.rtcCall.localAv();
     if (typeof localAv === 'undefined') {
         this.logger.log(".getMediaOptions: rtcCall.localAv() returned undefined");
@@ -1479,11 +1411,7 @@ CallManagerCall.prototype.getMediaOptions = function () {
 };
 
 CallManagerCall.prototype.videoMode = function() {
-    var rtcCall = this.rtcCall;
-    if (!rtcCall) {
-        return 0;
-    }
-    var localAv = rtcCall.localAv();
+    var localAv = this.rtcCall.localAv();
     if (localAv & Av.Screen) {
         return Av.Screen;
     }
@@ -1496,7 +1424,7 @@ CallManagerCall.prototype.videoMode = function() {
 };
 
 CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
-    if (!this.rtcCall) {
+    if (this.rtcCall.isRecovery) {
         return { audio: false, video: false };
     }
     var sessions = this.rtcCall.sessions;
@@ -1518,19 +1446,7 @@ CallManagerCall.prototype.getRemoteMediaOptions = function (sessionId) {
             return {audio: false, video: false};
         }
     }
-    if (typeof firstSession.peerAv === 'undefined') {
-        this.logger.log(
-            ".getRemoteMediaOptions could not find .peerAv for session",
-            base64urlencode(firstSession.sid)
-        );
-        return {audio: false, video: false};
-    }
-
-    return Av.toMediaOptions(firstSession.peerAv);
-};
-
-CallManagerCall.prototype.isScreenCaptureEnabled = function() {
-    return this.rtcCall ? this.rtcCall.isScreenCaptureEnabled() : false;
+    return Av.toMediaOptions(firstSession.peerAv());
 };
 
 CallManagerCall.prototype.renderCallStartedState = function () {
@@ -1566,23 +1482,6 @@ CallManagerCall.prototype.renderCallEndedState = function () {
     self.callNotificationsEngine.destroy();
 };
 
-CallManagerCall.prototype.getCurrentVideoSlotsUsed = function() {
-    var self = this;
-    var videoSessionCount = 0; // megaChat.activeCallManagerCall._streams;
-    if (self._streams) {
-        Object.keys(self._streams).forEach(function(k) {
-            var sid = k.split(":")[2];
-            var opts = self.getRemoteMediaOptions(sid);
-            if (opts && opts.video) {
-                videoSessionCount += 1;
-            }
-        });
-
-        videoSessionCount += self.getMediaOptions().video === true ? 1 : 0;
-    }
-    return videoSessionCount;
-};
-
 CallManagerCall.prototype.hasVideoSlotLimitReached = function() {
     return this.getCurrentVideoSlotsUsed() >= RtcModule.kMaxCallVideoSenders;
 };
@@ -1608,10 +1507,9 @@ RtcSessionEventHandler.prototype.onDestroy = function () {
     // unused
 };
 
-RtcSessionEventHandler.prototype.onStats = function (strStats) {
+RtcSessionEventHandler.prototype.onStats = function(strStats) {
     var sess = this.rtcSession;
-    var peerView = document.querySelector('.stream' + base64urlencode(sess.peer) + '_' + base64urlencode(sess.peerClient) +
-                     '_' + base64urlencode(sess.sid));
+    var peerView = document.querySelector('.stream' + sess.stringSid);
     if (!peerView) {
         return;
     }
@@ -1635,12 +1533,12 @@ RtcSessionEventHandler.prototype.onRemoteStreamAdded = function (stream) {
      attachToStream() polyfill function
      stream - the stream object to which a player should be attached
      */
-    this.call.onRemoteStreamAdded(makeStreamId(this.rtcSession), stream);
+    this.call.onRemoteStreamAdded(this.rtcSession, stream);
 };
 
 RtcSessionEventHandler.prototype.onRemoteStreamRemoved = function () {
     //  The peer's stream is about to be removed.
-    this.call.onRemoteStreamRemoved(makeStreamId(this.rtcSession));
+    this.call.onRemoteStreamRemoved(this.rtcSession);
 };
 
 RtcSessionEventHandler.prototype.onRemoteMute = function (av) {
@@ -1653,25 +1551,7 @@ RtcSessionEventHandler.prototype.onRemoteMute = function (av) {
  * @param {Number} q
  */
 RtcSessionEventHandler.prototype.onPeerNetworkQualityChange = function(q) {
-    var idx = makeStreamId(this.rtcSession);
-    var call = this.call;
-    if (call && (call.peerQuality[idx] !== q)) {
-        call.peerQuality[idx] = q;
-        call.room.trackDataChange();
-    }
-};
-
-/**
- * Called on level change of the remote audio level.
- *
- * @param {Number} level 0-100
- */
-RtcSessionEventHandler.prototype.onAudioLevelChange = function(level) {
-    if (this.call) {
-        // call ended?
-        var idx = makeStreamId(this.rtcSession);
-        call.trigger('onAudioLevelChange', [idx, level]);
-    }
+    this.call.room.trackDataChange();
 };
 
 CallManagerCall.prototype.onNewSession = function(rtcCallSession) {

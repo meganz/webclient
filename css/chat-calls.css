@@ -357,7 +357,10 @@ video.localViewport {
     right: 3px;
     z-index: 2;
 }
-
+.call-block .icon-audio-muted.on-hold {
+    /* TODO: Create a real on-hold icon */
+    background-position: -3px -462px;
+}
 .call-header {
     height: 36px;
     background-color: rgb(6, 21, 28, 0.9);
@@ -563,6 +566,12 @@ video.localViewport {
     background-position: -92px -3310px;
     margin: 10px;
 }
+.call-block.grid .participantsContainer .icon-audio-muted.on-hold,
+.call-block.carousel .activeStream .icon-audio-muted.on-hold {
+    /* FIXME: create a real onhold icon */
+    background-position: -153px -2741px;
+}
+
 .call-block.carousel .participantsContainer {
     text-align: right;
     display: block;
@@ -853,4 +862,13 @@ video.localViewport {
     color: white;
     text-align: left;
     z-index: 9; /* Buttons panel has z-index 10, and we need to have it on top of us */
-  }
+}
+.audio-level {
+    position: relative;
+    background-color: aquamarine;
+    height: 1px;
+    width: 0%;
+    z-index: 9;
+    top: 10px;
+    left: 2px;
+}

@@ -215,7 +215,7 @@ class RenderTo extends React.Component {
             super.componentDidMount();
         }
         this.popup = document.createElement("div");
-        this.popup.className = this.props.className ? this.props.className : "";
+        this._setClassNames();
         if (this.props.style) {
             $(this.popup).css(this.props.style);
         }
@@ -226,9 +226,9 @@ class RenderTo extends React.Component {
                 self.props.popupDidMount(self.popup);
             }
         });
-
     }
     componentDidUpdate() {
+        this._setClassNames();
         this._renderLayer();
     }
     componentWillUnmount() {
@@ -240,6 +240,9 @@ class RenderTo extends React.Component {
             this.props.popupWillUnmount(this.popup);
         }
         this.props.element.removeChild(this.popup);
+    }
+    _setClassNames() {
+        this.popup.className = this.props.className ? this.props.className : "";
     }
     _renderLayer(cb) {
         ReactDOM.render(this.props.children, this.popup, cb);

@@ -7,7 +7,7 @@ import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-class ExtraFooterElement extends MegaRenderMixin {
+export class ExtraFooterElement extends MegaRenderMixin {
     render() {
         return this.props.children;
     }
@@ -140,7 +140,9 @@ class ModalDialog extends MegaRenderMixin {
 
             footer = <div className="fm-dialog-footer white">
                 {extraFooterElements}
-                {buttons}
+                <div className="footer-buttons">
+                    {buttons}
+                </div>
                 <div className="clear"></div>
             </div>;
         }
@@ -381,6 +383,5 @@ class ConfirmDialog extends MegaRenderMixin {
 export default {
     ModalDialog,
     SelectContactDialog,
-    ConfirmDialog,
-    ExtraFooterElement
+    ConfirmDialog
 };

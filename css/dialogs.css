@@ -327,6 +327,60 @@ body.de .fm-dialog.new-group-chat {
     max-width: -moz-calc(100% - 302px);
     max-width: calc(100% - 302px);
 }
+
+
+/* Add From Cloud -- bottom breadcrumbs */
+.fm-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
+    height: 552px !important;
+}
+.fm-dialog.add-from-cloud .fm-dialog-footer {
+    padding: 0;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom {
+    position: relative;
+    margin: -4px 0 0 0;
+    width: 100%;
+    max-width: none;
+    background-color: #EEEEEE;
+    z-index: 10;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .fm-breadcrumbs-block {
+    height: 40px;
+    padding: 5px 0 0 5px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .fm-breadcrumbs:first-child {
+    background-color: transparent;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .fm-breadcrumbs:nth-child(2) {
+    margin-left: 45px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .right-arrow-bg {
+    color: #333333;
+}
+/* .fm-dialog.add-from-cloud */
+.fm-dialog .fm-breadcrumbs-wrapper .right-arrow-bg.recycle-item {
+    background-position: 8px -8036px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper .right-arrow-bg.inbox-item {
+    background-position: 4px -6717px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .right-arrow-bg span {
+    padding: 0 2px;
+    margin: -2px 0 0 0;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .search-path-icon-span.folder {
+    background-position: -337px -717px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .search-path-icon-span.folder-shared {
+    background-position: -337px -957px;
+}
+.fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom .search-path-icon-span.puf-folder {
+    background-position: -337px -1077px;
+}
+.fm-dialog.add-from-cloud .fm-dialog-footer .footer-buttons {
+    overflow: hidden;
+    padding: 11px;
+}
 .fm-dialog .fm-breadcrumbs-block {
     height: 46px;
     margin: 0 0 0 0;

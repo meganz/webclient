@@ -1608,6 +1608,11 @@ function openContactInfoLink(contactLink) {
 
                     return false;
                 });
+
+                // This contact link is valid to be affilaited
+                localStorage.affid = contactLink;
+                localStorage.affts = Date.now();
+                localStorage.afftype = 4;
             }
         }
         else {
@@ -1621,7 +1626,9 @@ function openContactInfoLink(contactLink) {
                     openContactInfoLink(contactLink);
                 });
 
-                return loadSubPage(page);
+                login_next = page;
+                login_txt = l[1298];
+                return loadSubPage('login');
             });
         }
         $dialog.removeClass('hidden');

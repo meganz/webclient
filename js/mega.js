@@ -3589,6 +3589,14 @@ function loadfm_callback(res) {
             }
         }
 
+        if (folderlink) {
+
+            // This folderlink is valid to affiliate
+            localStorage.affid = folderlink;
+            localStorage.affts = Date.now();
+            localStorage.afftype = 2;
+        }
+
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {

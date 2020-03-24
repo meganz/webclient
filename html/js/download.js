@@ -596,6 +596,11 @@ function dl_g(res) {
             if (prevBut) {
                 showPreviewButton();
             }
+
+            // This file link is valid to affiliate
+            localStorage.affid = dlpage_ph;
+            localStorage.affts = Date.now();
+            localStorage.afftype = 2;
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile

@@ -2817,7 +2817,7 @@
     display: none;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, #help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .support-section-header-clone .support-search-icon, #help2-main .block-android, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .nav-arrow {
+    #help2-main .getstart-img, #help2-main .usemega-img, #help2-main .browsearticle-button .article-arrow, #help2-main .block-megachat, #help2-main .block-megasync, #help2-main .block-business, #help2-main .feedback-logo, #help2-main .yes-icon, #help2-main .no-icon, #help2-main .support-link-icon, #help2-main .support-email-icon, #help2-main .block-ios-desktop, #help2-main .block-windows-desktop, #help2-main .block-linux-desktop, #help2-main .support-search-icon, #help2-main .support-go-back-icon, #help2-main input.submit, #help2-main .device-menu-icon, #help2-main .result-filter-icon, #help2-main .megachat-icon, #help2-main .megasync-icon, #help2-main .ios-icon, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .windowsphone-icon, #help2-main .android-icon, #help2-main .block-webclient, #help2-main .block-mobile, #help2-main .block-ios, #help2-main .block-windowsphone, #help2-main .block-ios-megasync, #help2-main .block-windows-megasync, #help2-main .block-linux-megasync, #help2-main .close-icon, #help2-main .iOS-mobile-block, #help2-main .android-mobile-block, #help2-main .window-mobile-block, #help2-main .support-section-header-clone .support-go-back-icon, #help2-main .support-section-header-clone .support-search-icon, #help2-main .block-android, #help2-main .cmd-icon, #help2-main .block-cmd, #help2-main .block-uwp, #help2-main .nav-arrow, #help2-main .ui-autocomplete .client, #help2-main .ios-desktop-icon, #help2-main .windows-desktop-icon, #help2-main .linux-desktop-icon, #help2-main .webclient-icon {
         background-image: url(../images/mega/help2/welcome_icons_v3@2x.png);
         background-size: 250px 700px;
     }
@@ -4749,13 +4749,14 @@
     margin-top: 14px;
 }
 #help2-main .ui-autocomplete li {
+    position: relative;
     font-size: 14px;
     color: #444;
     letter-spacing: 0.2px;
-    padding-left: 8px;
+/*    padding-left: 8px;
     padding-right: 5px;
     padding-top: 9px;
-    padding-bottom: 9px;
+    padding-bottom: 9px;*/
     text-decoration: none;
     width: auto;
     text-overflow: ellipsis;
@@ -4797,6 +4798,16 @@
     -webkit-transition-timing-function: ease; /* Safari and Chrome */
     -o-transition-timing-function: ease; /* Opera */
 }
+
+
+
+
+
+
+
+
+
+
 #help2-main .support-images-gallery {
     max-width: 95%;
     margin-left: auto;
@@ -4837,4 +4848,82 @@
 }
 .mobile .mobile-support-images-gallery .img-swap {
     height: auto !important;
+}
+/* icons for search autocomplete */
+#help2-main .ui-autocomplete .label-text {
+    border-radius: 4px;
+    display: block;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    line-height: 20px;
+    overflow: hidden;
+    padding: 9px 9px 9px 40px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+}
+#help2-main .ui-autocomplete .client {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("../images/mega/help2/welcome_icons_v3.png");
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 20px;
+    left: 10px;
+    margin-right: 12px;
+    padding: 0;
+    position: absolute;
+    top: 9px;
+    width: 20px;
+    z-index: 1;
+}
+#help2-main .ui-autocomplete .client.ui-state-active {
+    background-color: rgba(0, 0, 0, 0);
+    border: 0 none;
+    transition-duration: 0.3s;
+    transition-property: border-radius, box-shadow, background-image, background-color;
+    transition-timing-function: ease;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios {
+    background-position: -148px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .ios.ui-state-active {
+    background-position: -201px -300px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows {
+    background-position: -149px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .windows.ui-state-active {
+    background-position: -201px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android {
+    background-position: -148px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .android.ui-state-active {
+    background-position: -201px -366px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .web {
+    background-position: -147px -428px
+}
+#help2-main .ui-autocomplete .ui-menu-item .web.ui-state-active {
+    background-position: -199px -428px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync {
+    background-position: -179px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megasync.ui-state-active {
+    background-position: -231px -302px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat {
+    background-position: -178px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .megachat.ui-state-active {
+    background-position: -230px -333px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd {
+    background-position: -178px -367px;
+}
+#help2-main .ui-autocomplete .ui-menu-item .cmd.ui-state-active,
+#help2-main .ui-autocomplete .ui-menu-item .megacmd.ui-state-active {
+    background-position: -230px -367px;
 }

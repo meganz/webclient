@@ -458,9 +458,7 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
         }
 
         // This chatlink is valid to be affilaited
-        localStorage.affid = publicChatHandle;
-        localStorage.affts = Date.now();
-        localStorage.afftype = 3;
+        M.affiliate.storeAffiliate(publicChatHandle, 3);
     }
     else {
         chatInfo.url = ret;

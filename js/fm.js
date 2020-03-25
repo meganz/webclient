@@ -1610,9 +1610,7 @@ function openContactInfoLink(contactLink) {
                 });
 
                 // This contact link is valid to be affilaited
-                localStorage.affid = contactLink;
-                localStorage.affts = Date.now();
-                localStorage.afftype = 4;
+                M.affiliate.storeAffiliate(contactLink, 4);
             }
         }
         else {

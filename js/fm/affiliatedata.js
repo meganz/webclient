@@ -409,6 +409,20 @@
     };
 
     /**
+     * Function to place Affiliate data when user visit affiliate pages
+     * @param {String} value affiliation id.
+     * @param {Number} type affiliation type. 1: ref-link, 2: public link, 3: chat link, 4: contact link.
+     * @returns {void}
+     */
+    AffiliateData.prototype.storeAffiliate = function(value, type) {
+        /* eslint-disable local-rules/misc-warnings */
+        localStorage.affid = value;
+        localStorage.affts = Date.now();
+        localStorage.afftype = type;
+        /* eslint-enable local-rules/misc-warnings */
+    };
+
+    /**
      * @name window.AffiliateData
      * @global
      */

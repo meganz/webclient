@@ -15087,7 +15087,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: block;
     cursor: pointer;
 }
-.search-path-icon.cloud-drive {
+.search-path-icon.cloud-drive,
+.search-path-icon-span.cloud-drive {
     background-position: -5px -999px;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
@@ -15100,15 +15101,18 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-position: -12px -4369px;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.recycle-item {
+.search-path-icon.recycle-item,
+.search-path-icon-span.recycle-item {
     background-position: -1px -8035px;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.contacts-item {
+.search-path-icon.contacts-item,
+.search-path-icon-span.contacts-item {
     background-position: -12px -4410px;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.inbox-item {
+.search-path-icon.inbox-item,
+.search-path-icon-span.inbox-item {
     background-position: -3px -6717px;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
@@ -15132,9 +15136,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: inline-block;
     position: relative;
 }
+.breadcrumbs-bottom .search-path-txt.ultra-short-foldername,
 .search-bottom-menu .search-path-txt.short-foldername {
     max-width: 110px;
 }
+.breadcrumbs-bottom .search-path-txt.ultra-short-foldername,
 .search-bottom-menu .search-path-txt.ultra-short-foldername {
     max-width: 40px;
 }

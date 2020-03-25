@@ -2788,7 +2788,8 @@ function (_React$Component) {
       }
 
       this.popup = document.createElement("div");
-      this.popup.className = this.props.className ? this.props.className : "";
+
+      this._setClassNames();
 
       if (this.props.style) {
         $(this.popup).css(this.props.style);
@@ -2806,6 +2807,8 @@ function (_React$Component) {
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      this._setClassNames();
+
       this._renderLayer();
     }
   }, {
@@ -2822,6 +2825,11 @@ function (_React$Component) {
       }
 
       this.props.element.removeChild(this.popup);
+    }
+  }, {
+    key: "_setClassNames",
+    value: function _setClassNames() {
+      this.popup.className = this.props.className ? this.props.className : "";
     }
   }, {
     key: "_renderLayer",
@@ -3475,15 +3483,16 @@ DropdownItem.defaultProps = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export ExtraFooterElement */
 /* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
 /* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -3532,7 +3541,6 @@ function (_MegaRenderMixin) {
 
   return ExtraFooterElement;
 }(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
 ;
 
 var ModalDialog =
@@ -3664,7 +3672,9 @@ function (_MegaRenderMixin2) {
         });
         footer = React.makeElement("div", {
           className: "fm-dialog-footer white"
-        }, extraFooterElements, buttons, React.makeElement("div", {
+        }, extraFooterElements, React.makeElement("div", {
+          className: "footer-buttons"
+        }, buttons), React.makeElement("div", {
           className: "clear"
         }));
       }
@@ -3942,8 +3952,7 @@ ConfirmDialog.defaultProps = {
 /* harmony default export */ __webpack_exports__["a"] = ({
   ModalDialog: ModalDialog,
   SelectContactDialog: SelectContactDialog,
-  ConfirmDialog: ConfirmDialog,
-  ExtraFooterElement: ExtraFooterElement
+  ConfirmDialog: ConfirmDialog
 });
 
 /***/ }),
@@ -6820,14 +6829,7 @@ function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
-__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
-__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
-__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -7661,13 +7663,68 @@ function (_MegaRenderMixin2) {
     _this2.onSearchChange = _this2.onSearchChange.bind(_assertThisInitialized(_this2));
     _this2.onSearchIconClick = _this2.onSearchIconClick.bind(_assertThisInitialized(_this2));
     _this2.onSelected = _this2.onSelected.bind(_assertThisInitialized(_this2));
-    _this2.onTabButtonClick = _this2.onTabButtonClick.bind(_assertThisInitialized(_this2));
+    _this2.handleTabChange = _this2.handleTabChange.bind(_assertThisInitialized(_this2));
     _this2.onViewButtonClick = _this2.onViewButtonClick.bind(_assertThisInitialized(_this2));
     _this2.toggleSortBy = _this2.toggleSortBy.bind(_assertThisInitialized(_this2));
     return _this2;
   }
 
   _createClass(CloudBrowserDialog, [{
+    key: "isSearch",
+    value: function isSearch() {
+      return this.state.currentlyViewedEntry === 'search';
+    }
+  }, {
+    key: "clearSelectionAndHighlight",
+    value: function clearSelectionAndHighlight() {
+      this.onSelected([]);
+      this.onHighlighted([]);
+    }
+  }, {
+    key: "getBreadcrumbNodeIcon",
+    value: function getBreadcrumbNodeIcon(nodeId) {
+      switch (nodeId) {
+        case M.RootID:
+          return 'cloud-drive';
+
+        case M.RubbishID:
+          return 'recycle-item';
+
+        case M.InboxID:
+          return 'inbox-item';
+
+        case 'shares':
+          return 'contacts-item';
+
+        default:
+          return nodeId && M.d[nodeId] && fileIcon(M.d[nodeId]);
+      }
+    }
+  }, {
+    key: "getBreadcrumbNodeText",
+    value: function getBreadcrumbNodeText(nodeId, prevNodeId) {
+      switch (nodeId) {
+        case M.RootID:
+          // `Cloud Drive`
+          return __(l[164]);
+
+        case M.RubbishID:
+          // `Rubbish Bin`
+          return __(l[167]);
+
+        case M.InboxID:
+          // `Inbox`
+          return __(l[166]);
+
+        case 'shares':
+          // `username@mega.co.nz` || `Shared with me`
+          return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : __(l[5589]);
+
+        default:
+          return M.d[nodeId] && M.d[nodeId].name;
+      }
+    }
+  }, {
     key: "toggleSortBy",
     value: function toggleSortBy(colId) {
       var newState = {};
@@ -7727,33 +7784,59 @@ function (_MegaRenderMixin2) {
       });
     }
   }, {
-    key: "onTabButtonClick",
-    value: function onTabButtonClick(e, selectedTab) {
-      var $this = $(e.target);
-      $this.parent().find('.active').removeClass("active");
-      $this.addClass("active");
-      var newState = {
-        'selectedTab': selectedTab,
-        'searchValue': ''
-      };
+    key: "onBreadcrumbNodeClick",
+    value: function onBreadcrumbNodeClick(e, nodeId
+    /* , prevNodeId */
+    ) {
+      var _this3 = this;
 
-      if (selectedTab === 'shares') {
-        newState['currentlyViewedEntry'] = 'shares';
-      } else {
-        newState['currentlyViewedEntry'] = M.RootID;
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (nodeId === 'shares') {
+        // [...] TODO: Decide on the correct behavior -- redirect to `Contacts` or stay within the dialog
+        // Open `Contacts` and show the shared folders by the owner of the given breadcrumb node
+        // return prevNodeId && M.d[prevNodeId] && M.openFolder(M.d[prevNodeId].h);
+        // Switch the active tab to `Incoming Shares`
+        return this.handleTabChange('shares');
       }
 
-      newState['isLoading'] = false;
-      this.setState(newState);
-      this.onSelected([]);
-      this.onHighlighted([]);
+      if (nodeId === M.InboxID) {} // [...] TODO: Which tab should be active when we open search result that is contained within `Inbox` --
+      //  `Cloud Drive`, `Incoming Shares` or else?
+      // return this.handleTabChange('inbox');
+      // Click to open allowed only on folders as breadcrumb nodes
+
+
+      if (M.d[nodeId] && M.d[nodeId].t) {
+        this.setState({
+          selectedTab: M.d[nodeId].p ? 'shares' : 'clouddrive',
+          currentlyViewedEntry: nodeId,
+          selected: [],
+          searchValue: ''
+        }, function () {
+          return _this3.clearSelectionAndHighlight();
+        });
+      }
+    }
+  }, {
+    key: "handleTabChange",
+    value: function handleTabChange(selectedTab) {
+      var _this4 = this;
+
+      this.setState({
+        selectedTab: selectedTab,
+        currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
+        searchValue: '',
+        isLoading: false
+      }, function () {
+        return _this4.clearSelectionAndHighlight();
+      });
     }
   }, {
     key: "onSearchChange",
     value: function onSearchChange(e) {
       var searchValue = e.target.value;
       var newState = {
-        'selectedTab': 'search',
         'searchValue': searchValue
       };
 
@@ -7766,17 +7849,18 @@ function (_MegaRenderMixin2) {
       }
 
       this.setState(newState);
-      this.onSelected([]);
-      this.onHighlighted([]);
+      this.clearSelectionAndHighlight();
     }
   }, {
     key: "resizeBreadcrumbs",
     value: function resizeBreadcrumbs() {
+      var _this5 = this;
+
       var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-      var $breadcrumbs = $breadcrumbsWrapper.find('.fm-breadcrumbs-block');
-      setTimeout(function () {
+      var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
+      Soon(function () {
         var wrapperWidth = $breadcrumbsWrapper.outerWidth();
-        var $el = $breadcrumbs.find('.right-arrow-bg');
+        var $el = $(_this5.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
         var i = 0;
         var j = 0;
         $el.removeClass('short-foldername ultra-short-foldername invisible');
@@ -7801,7 +7885,7 @@ function (_MegaRenderMixin2) {
             break;
           }
         }
-      }, 0);
+      });
     }
   }, {
     key: "componentDidUpdate",
@@ -7854,6 +7938,9 @@ function (_MegaRenderMixin2) {
         this.setState({
           entries: this.getEntries()
         });
+      } else if (prevState.highlighted !== this.state.highlighted) {
+        // resize the breadcrumbs on item select
+        this.resizeBreadcrumbs();
       }
     }
   }, {
@@ -7963,55 +8050,66 @@ function (_MegaRenderMixin2) {
       var folderIsHighlighted = false;
       var share = false;
       var breadcrumb = [];
-      M.getPath(self.state.currentlyViewedEntry).forEach(function (breadcrumbNodeId, k) {
-        // skip [share owner handle] when returned by M.getPath.
-        if (M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].h && M.d[breadcrumbNodeId].h.length === 11) {
-          return;
-        }
+      var entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
-        var breadcrumbClasses = "";
+      if (entryId !== undefined) {
+        M.getPath(entryId).forEach(function (nodeId, k, path) {
+          var breadcrumbClasses = "";
 
-        if (breadcrumbNodeId === M.RootID) {
-          breadcrumbClasses += " cloud-drive";
+          if (nodeId === M.RootID) {
+            breadcrumbClasses += " cloud-drive";
 
-          if (self.state.currentlyViewedEntry !== M.RootID) {
+            if (self.state.currentlyViewedEntry !== M.RootID) {
+              breadcrumbClasses += " has-next-button";
+            }
+          } else {
+            breadcrumbClasses += " folder";
+          }
+
+          if (k !== 0) {
             breadcrumbClasses += " has-next-button";
           }
-        } else {
-          breadcrumbClasses += " folder";
-        }
 
-        if (k !== 0) {
-          breadcrumbClasses += " has-next-button";
-        }
+          if (nodeId === "shares") {
+            breadcrumbClasses += " shared-with-me";
+          }
 
-        if (breadcrumbNodeId === "shares") {
-          breadcrumbClasses += " shared-with-me";
-        }
+          var prevNodeId = path[k - 1];
+          var nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
+          var nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
 
-        var folderName = breadcrumbNodeId === M.RootID ? __(l[164]) : breadcrumbNodeId === "shares" ? l[5589] : M.d[breadcrumbNodeId] && M.d[breadcrumbNodeId].name;
+          (function (nodeId, k) {
+            breadcrumb.unshift(self.isSearch() ? external_React_default.a.createElement("div", {
+              className: "search-path-item",
+              key: nodeId,
+              onClick: function onClick(e) {
+                return self.onBreadcrumbNodeClick(e, nodeId, prevNodeId);
+              }
+            }, external_React_default.a.createElement("div", {
+              className: "search-tip simpletip",
+              "data-simpletip": nodeName
+            }, external_React_default.a.createElement("div", {
+              className: "search-path-icon"
+            }, external_React_default.a.createElement("span", {
+              className: "search-path-icon-span ".concat(nodeIcon)
+            })), external_React_default.a.createElement("div", {
+              className: "search-path-txt"
+            }, nodeName)), k !== 0 && external_React_default.a.createElement("div", {
+              className: "search-path-arrow"
+            })) : external_React_default.a.createElement("a", {
+              className: "fm-breadcrumbs contains-directories " + breadcrumbClasses,
+              key: nodeId,
+              onClick: function onClick(e) {
+                return self.onBreadcrumbNodeClick(e, nodeId, prevNodeId);
+              }
+            }, external_React_default.a.createElement("span", {
+              className: "right-arrow-bg simpletip ".concat(nodeIcon),
+              "data-simpletip": nodeName
+            }, external_React_default.a.createElement("span", null, nodeName))));
+          })(nodeId, k);
+        });
+      }
 
-        (function (breadcrumbNodeId) {
-          breadcrumb.unshift(external_React_default.a.createElement("a", {
-            className: "fm-breadcrumbs contains-directories " + breadcrumbClasses,
-            key: breadcrumbNodeId,
-            onClick: function onClick(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              self.setState({
-                'currentlyViewedEntry': breadcrumbNodeId,
-                'selected': [],
-                'searchValue': ''
-              });
-              self.onSelected([]);
-              self.onHighlighted([]);
-            }
-          }, external_React_default.a.createElement("span", {
-            className: "right-arrow-bg simpletip",
-            "data-simpletip": folderName
-          }, external_React_default.a.createElement("span", null, folderName))));
-        })(breadcrumbNodeId);
-      });
       self.state.highlighted.forEach(function (nodeId) {
         if (M.d[nodeId] && M.d[nodeId].t === 1) {
           folderIsHighlighted = true;
@@ -8048,8 +8146,7 @@ function (_MegaRenderMixin2) {
               self.setState({
                 'currentlyViewedEntry': self.state.highlighted[0]
               });
-              self.onSelected([]);
-              self.onHighlighted([]);
+              self.clearSelectionAndHighlight();
               self.browserEntries.setState({
                 'selected': [],
                 'searchValue': '',
@@ -8116,7 +8213,9 @@ function (_MegaRenderMixin2) {
 
       return external_React_default.a.createElement(modalDialogs["a" /* default */].ModalDialog, {
         title: self.props.title || __(l[8011]),
-        className: classes,
+        className: classes + ( // Amend the container height when the bottom breadcrumb is visible,
+        // i.e. in search mode, incl. having file/folder selected
+        self.isSearch() && breadcrumb.length ? 'has-breadcrumbs-bottom' : ''),
         onClose: function onClose() {
           self.props.onClose(self);
         },
@@ -8125,16 +8224,20 @@ function (_MegaRenderMixin2) {
       }, external_React_default.a.createElement("div", {
         className: "fm-dialog-tabs"
       }, external_React_default.a.createElement("div", {
-        className: "fm-dialog-tab cloud active",
-        onClick: function onClick(e) {
-          self.onTabButtonClick(e, 'clouddrive');
+        className: "\n                            fm-dialog-tab cloud\n                            ".concat(self.state.selectedTab === 'clouddrive' ? 'active' : '', "\n                        "),
+        onClick: function onClick() {
+          return self.handleTabChange('clouddrive');
         }
-      }, __(l[164])), external_React_default.a.createElement("div", {
-        className: "fm-dialog-tab incoming",
-        onClick: function onClick(e) {
-          self.onTabButtonClick(e, 'shares');
+      }, __(l[164])
+      /* `Cloud Drive` */
+      ), external_React_default.a.createElement("div", {
+        className: "\n                            fm-dialog-tab incoming\n                            ".concat(self.state.selectedTab === 'shares' ? 'active' : '', "\n                        "),
+        onClick: function onClick() {
+          return self.handleTabChange('shares');
         }
-      }, __(l[5542])), external_React_default.a.createElement("div", {
+      }, __(l[5542])
+      /* `Incoming Shares` */
+      ), external_React_default.a.createElement("div", {
         className: "clear"
       })), external_React_default.a.createElement("div", {
         className: "fm-picker-header"
@@ -8166,7 +8269,7 @@ function (_MegaRenderMixin2) {
         onChange: self.onSearchChange
       }), clearSearchBtn), external_React_default.a.createElement("div", {
         className: "clear"
-      })), external_React_default.a.createElement("div", {
+      })), !self.isSearch() && external_React_default.a.createElement("div", {
         className: "fm-breadcrumbs-wrapper add-from-cloud"
       }, external_React_default.a.createElement("div", {
         className: "fm-breadcrumbs-block"
@@ -8177,8 +8280,7 @@ function (_MegaRenderMixin2) {
         currentlyViewedEntry: self.state.currentlyViewedEntry,
         entries: self.state.entries || [],
         onExpand: function onExpand(node) {
-          self.onSelected([]);
-          self.onHighlighted([]);
+          self.clearSelectionAndHighlight();
           self.setState({
             'currentlyViewedEntry': node.h,
             'searchValue': ''
@@ -8194,7 +8296,13 @@ function (_MegaRenderMixin2) {
         ref: function ref(browserEntries) {
           self.browserEntries = browserEntries;
         }
-      }));
+      }), external_React_default.a.createElement("div", {
+        className: "\n                    fm-breadcrumbs-wrapper add-from-cloud breadcrumbs-bottom\n                    ".concat(self.isSearch() && breadcrumb.length ? '' : 'hidden', "\n                ")
+      }, external_React_default.a.createElement("div", {
+        className: "fm-breadcrumbs-block"
+      }, breadcrumb, external_React_default.a.createElement("div", {
+        className: "clear"
+      }))));
     }
   }]);
 
@@ -15645,6 +15753,10 @@ function (_MegaRenderMixin) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
@@ -22335,11 +22447,7 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -22576,6 +22684,7 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
 function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }

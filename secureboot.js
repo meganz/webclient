@@ -643,7 +643,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
-            params += '&lang=' + lang;
+            params += '&v=2&lang=' + window.lang;
             this._urlParams = params;
         }
 

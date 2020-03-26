@@ -10,6 +10,7 @@ import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import ContactsUI  from './../ui/contacts.jsx';
 import {ConversationPanels} from "./../ui/conversationpanel.jsx";
+import SearchPanel from './SearchPanel/SearchPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 
@@ -949,9 +950,9 @@ class ConversationsApp extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
-            'leftPaneWidth': mega.config.get('leftPaneWidth'),
-            'startGroupChatDialogShown': false,
-            'quickSearchText': ''
+            leftPaneWidth: mega.config.get('leftPaneWidth'),
+            startGroupChatDialogShown: false,
+            searching: false
         };
     }
     startChatClicked(selected) {
@@ -1334,38 +1335,23 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        <div className={"nw-fm-tree-header conversations" + (self.state.quickSearchText ?
-                            ' filled-input' : '')}>
-                            <input type="text" className={"chat-quick-search"}
-                                   onChange={function(e) {
-                                       if (e.target.value) {
-                                           treesearch = e.target.value;
-                                       }
-                                        self.setState({'quickSearchText': e.target.value});
-                                   }}
-                                   onBlur={function(e) {
-                                        if (e.target.value) {
-                                            treesearch = e.target.value;
-                                        }
-                                   }}
-                                   autoComplete='disabled'
-                                   value={self.state.quickSearchText}
-                                   placeholder={l[7997]} />
-                            <div className="small-icon thin-search-icon"></div>
-
-                            <Button
-                                group="conversationsListing"
-                                icon="chat-with-plus"
-                                >
+                        {this.state.searching && <SearchPanel onBlur={() => this.setState({ searching: false })} />}
+                        <div className="nw-fm-tree-header conversations filled-input">
+                            <div
+                                className="small-icon thin-search-icon"
+                                onClick={() => this.setState({ searching: true })}>
+                            </div>
+                            <Button group="conversationsListing" icon="chat-with-plus">
                                 <DropdownContactsSelector
                                     className="main-start-chat-dropdown"
                                     onSelectDone={this.startChatClicked.bind(this)}
                                     multiple={false}
                                     showTopButtons={self.getTopButtonsForContactsPicker()}
-                                    />
+                                />
                             </Button>
                         </div>
                     </div>
+
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
                         <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height"
                                           chats={megaChat.chats}

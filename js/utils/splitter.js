@@ -201,7 +201,7 @@
         var filter;
         var callback;
 
-        if (inputcomplete && json && !this.p && this.tostring(this.sub(json, 0, 7)) === '{"err":') {
+        if (inputcomplete && json && !this.p && json.length > 7 && this.tostring(this.sub(json, 0, 7)) === '{"err":') {
             callback = this.filters['#'];
             node = JSON.parse(this.tostring(json));
 

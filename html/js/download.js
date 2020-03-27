@@ -89,10 +89,14 @@ function dlinfo(ph,key,next)
     });
 }
 
-function dl_g(res) {
+// eslint-disable-next-line complexity
+function dl_g(res, ctx) {
     'use strict';
 
+    var msg;
     var isPageRefresh = false;
+    var $topBar = $('.download.top-bar');
+
     if (Object(fdl_queue_var).lastProgress) {
         dlprogress.apply(this, fdl_queue_var.lastProgress);
         isPageRefresh = true;
@@ -114,6 +118,13 @@ function dl_g(res) {
     showRegisterSidePane(1);
     $('.widget-block').addClass('hidden');
 
+    if (ctx && ctx.v2APIError) {
+        res = ctx.v2APIError;
+    }
+    if (typeof res === 'object' && res.err < 0 && res.u !== 7) {
+        res = res.err;
+    }
+
     if (res === ETOOMANY) {
         $('.download.top-bar').addClass('global-error not-available-user');
         setTransferStatus(0, l[243]);
@@ -121,12 +132,23 @@ function dl_g(res) {
     else if (typeof res === 'number' && res < 0) {
         if (res === -2) {
             $('.download.top-bar').addClass('global-error invalid-url');
-            setTransferStatus(0,l[20198]);
+            setTransferStatus(0, l[20198]);
         }
         else {
             $('.download.top-bar').addClass('global-error na-some-reason');
             setTransferStatus(0, l[243]);
         }
+    }
+    else if (res.err < 0) {
+        msg = l[23242];
+
+        if (res.l !== 2) {
+            msg = l[23243];
+        }
+        console.assert(res.u === 7);
+
+        setTransferStatus(0, msg);
+        $('.deleted-user .error-list-item', $topBar.addClass('global-error not-available-user')).safeHTML(msg);
     }
     else if (res.e === ETEMPUNAVAIL) {
         $('.download.top-bar').addClass('global-error temporary-na');
@@ -136,8 +158,7 @@ function dl_g(res) {
         $('.download.top-bar').addClass('global-error na-some-reason');
         setTransferStatus(0, l[243]);
     }
-    else if (res.at)
-    {
+    else if (res.at) {
         $('.download .pause-transfer').rebind('click', function() {
             if (!$(this).hasClass('active')) {
                 fm_tfspause('dl_' + fdl_queue_var.ph);
@@ -151,8 +172,7 @@ function dl_g(res) {
         var key = dlpage_key;
         var fdl_file = false;
 
-        if (key)
-        {
+        if (key) {
             var base64key = String(key).trim();
             key = base64_to_a32(base64key).slice(0, 8);
             if (key.length === 8) {
@@ -162,13 +182,12 @@ function dl_g(res) {
                 crypto_procattr(fdl_file, key);
             }
         }
-        if (fdl_file.name)
-        {
+        if (fdl_file.name) {
             var $pageScrollBlock = $(is_mobile ? '.bottom-page.scroll-block' : '.download.top-bar')
                 .removeClass('video video-theatre-mode resumable');
             var filename = M.getSafeName(fdl_file.name) || 'unknown.bin';
             var filenameLength = filename.length;
-            var fileExtPos =  filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
+            var fileExtPos = filename.lastIndexOf('.') > 0 ? filename.lastIndexOf('.') : filenameLength;
             var fileTitle = filename.substring(0, fileExtPos);
             var fileExt = filename.substring(fileExtPos).toLowerCase();
             var isVideo = is_video(filename);
@@ -628,7 +647,6 @@ function dl_g(res) {
             // Show file not found overlay
             $('#mobile-ui-notFound').removeClass('hidden');
 
-            var msg;
             if (!dlpage_key) {
                 msg = l[7945] + '<p>' + l[7946];
             }
@@ -639,7 +657,7 @@ function dl_g(res) {
                 msg = l[1191] + '<p>' + l[253];
             }
             else {
-                msg = '<p>' + l[243];
+                msg = '<p>' + (msg || l[243]);
             }
 
             $('.mobile.na-file-txt').safeHTML(msg);
@@ -652,7 +670,6 @@ function dl_g(res) {
     else {
         // Expand top bar
         setTimeout(function() {
-            var $topBar = $('.download.top-bar');
 
             // Expand Download Bar
             expandDlBar();

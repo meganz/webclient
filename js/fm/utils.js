@@ -102,6 +102,8 @@ MegaApi.prototype.req = function(params, ch) {
 
     api_req(params, {
         callback: tryCatch(function(res) {
+            delete this.callback;
+
             if (typeof res === 'number' && res < 0) {
                 promise.reject.apply(promise, arguments);
             }

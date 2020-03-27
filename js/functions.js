@@ -937,7 +937,7 @@ function MurmurHash3(key, seed) {
  * @param {String} keyr If a wrong key was used
  * @return {MegaPromise}
  */
-function mKeyDialog(ph, fl, keyr) {
+function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
@@ -985,17 +985,25 @@ function mKeyDialog(ph, fl, keyr) {
 
             if (key) {
 
-                // Remove the ! from the key which is exported from the export dialog
-                key = key.replace('!', '');
+                // Remove the !,# from the key which is exported from the export dialog
+                key = key.replace('!', '').replace('#', '');
 
                 var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+
+                var currLink = getSitePath();
+
+                if (isPublickLinkV2(currLink)) {
+                    newHash = (fl ? '/folder/' : '/file/') + ph + '#' + key + (selector ? selector : '');
+                }
 
                 if (getSitePath() !== newHash) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
                     $('.fm-dialog.dlkey-dialog').addClass('hidden');
+
                     loadSubPage(newHash);
+
                 }
             }
             else {

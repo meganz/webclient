@@ -47,7 +47,6 @@
             fminitialized = true;
 
             mBroadcaster.sendMessage('fm:initialized');
-
             if (d) {
                 console.log('d%s, c%s, t%s', $.len(this.d), $.len(this.c), $.len(this.tree));
                 console.log('RootID=%s, InboxID=%s, RubbishID=%s', this.RootID, this.InboxID, this.RubbishID);
@@ -277,13 +276,31 @@
             });
         }
 
+        var isLinkV2 = false;
+
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
-            if (this.currentdirid !== this.RootID) {
-                target = '!' + this.currentdirid;
+            var curLink = getSitePath();
+            if (isPublickLinkV2(curLink)) {
+                if (this.currentdirid !== this.RootID) {
+                    target = '/folder/' + this.currentdirid;
+                }
+                else if ($.autoSelectNode) {
+                    var selectedNode = M.getNodeByHandle($.autoSelectNode);
+                    if (selectedNode && selectedNode.p) {
+                        target = '/folder/' + selectedNode.p;
+                    }
+                }
+                newHashLocation = '/folder/' + pfid + '#' + pfkey + target;
+                isLinkV2 = true;
             }
-            newHashLocation = 'F!' + pfid + '!' + pfkey + target;
+            else {
+                if (this.currentdirid !== this.RootID) {
+                    target = '!' + this.currentdirid;
+                }
+                newHashLocation = 'F!' + pfid + '!' + pfkey + target;
+            }
             this.lastSeenFolderLink = newHashLocation;
         }
         else if (id && id !== "chat/archived" && (id.startsWith('chat/') && id[6] !== '/')) {
@@ -302,12 +319,21 @@
                 document.location.hash = '#' + newHashLocation;
             }
             else {
-                if (window.location.pathname !== "/" + newHashLocation && !pfid) {
-                    loadSubPage(newHashLocation);
+                if (!isLinkV2) {
+                    if (window.location.pathname !== "/" + newHashLocation && !pfid) {
+                        loadSubPage(newHashLocation);
+                    }
+                    else if (pfid && document.location.hash !== '#' + newHashLocation) {
+                        history.pushState({fmpage: newHashLocation}, "", "#" + newHashLocation);
+                        page = newHashLocation;
+                    }
                 }
-                else if (pfid && document.location.hash !== '#' + newHashLocation) {
-                    history.pushState({fmpage: newHashLocation}, "", "#" + newHashLocation);
-                    page = newHashLocation;
+                else {
+                    // this is new link.
+                    var currURL = getSitePath();
+                    if (currURL !== newHashLocation) {
+                        loadSubPage(newHashLocation);
+                    }
                 }
             }
         }

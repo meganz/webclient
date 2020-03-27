@@ -206,9 +206,21 @@ mobile.linkOverlay = {
             key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
         }
 
+        var nodeUrlWithPublicHandle;
+        var nodeDecryptionKey;
+
+        if (mega.flags.nlfe) {
+            type = (type) ? '/folder/' : '/file/';
+            nodeUrlWithPublicHandle = getBaseUrl() + type + node.ph + '#';
+            nodeDecryptionKey = (key ? a32_to_base64(key) : '');
+        }
+        else {
+            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
+            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+        }
+
         // Create the URL
-        var nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
-        var nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+        var publicUrl = nodeUrlWithPublicHandle + nodeDecryptionKey;
 
         return nodeUrlWithPublicHandle + nodeDecryptionKey;
     },

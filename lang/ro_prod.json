@@ -662,7 +662,6 @@
     "5612": "Permisiuni:",
     "5622": "Partajeaz\u0103 linkul",
     "5631": "Partajeaz\u0103 folderul",
-    "5644": "Folderul exist\u0103 deja",
     "5645": "Folder creat",
     "5687": "Mod de \u00eenc\u0103rcare",
     "5700": "Am \u00een\u021beles",
@@ -970,7 +969,7 @@
     "7376": "\u0218ters",
     "7379": "\u00cen curs",
     "7381": "Necunoscut",
-    "7388": "Developer",
+    "7388": "Dezvoltator",
     "7392": "Chrome Dev",
     "7399": "Fi\u0219ierul este blocat.",
     "7403": "Plaseaz\u0103 fi\u0219ierele aici pentru a \u00eencepe \u00eenc\u0103rcarea",
@@ -1815,7 +1814,6 @@
     "17576": "Partajarea de foldere",
     "17577": "Pentru a \u00eencepe s\u0103 partajezi folderele cu contactele tale, d\u0103 clic dreapta pe folderul pe care vrei s\u0103-l partajezi \u0219i alege [B]Partajeaz\u0103[\/B] din meniul contextual.",
     "17578": "Exist\u0103 deja un fi\u0219ier cu acela\u0219i nume",
-    "17579": "Exist\u0103 deja un folder cu acela\u0219i nume",
     "17580": "Vezi set\u0103rile de versionare a fi\u0219ierelor",
     "17581": "E\u0219ti pe cale s\u0103 \u0219tergi istoricul versiunilor tuturor fi\u0219ierelor. Te rug\u0103m s\u0103 re\u021bii c\u0103 fi\u0219ierele actuale nu vor fi \u0219terse. Dore\u0219ti s\u0103 continui?",
     "17582": "Ai [X1] versiuni ale fi\u0219ierelor, ocup\u00e2nd un total de [X2].",
@@ -3217,6 +3215,7 @@
     "20670": "Data cre\u0103rii partaj\u0103rii",
     "20671": "Nu ai nicio plat\u0103 restant\u0103.",
     "20672": "A ap\u0103rut o eroare la \u00eencercarea de preluare a detaliilor de plat\u0103 restante. Te rug\u0103m s\u0103 \u00eencerci din nou mai t\u00e2rziu \u0219i dac\u0103 problema persist\u0103, te rug\u0103m s\u0103 ne contactezi la adresa business@mega.nz.",
+    "20673": "cu mult timp \u00een urm\u0103",
     "20694": "Data cre\u0103rii linkului",
     "20695": "Deschide folderul con\u021bin\u0103tor",
     "20697": "Descarc\u0103 aplica\u021bia desktop MEGA",
@@ -3644,5 +3643,8 @@
     "23202": "peste [S]%1 miliarde[\/S] de fi\u0219iere \u00eenc\u0103rcate",
     "23203": "peste [S]%1[\/S] \u021b\u0103ri au utilizatori pe MEGA",
     "23213": "Re\u021bea lent\u0103",
-    "23214": "Not\u0103: Po\u021bi s\u0103 ne consul\u021bi [A]regulamentul programului pentru recomand\u0103ri[\/A] pentru mai multe detalii"
+    "23214": "Not\u0103: Po\u021bi s\u0103 ne consul\u021bi [A]regulamentul programului pentru recomand\u0103ri[\/A] pentru mai multe detalii",
+    "23219": "There is already an item with the same name",
+    "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The user\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
+    "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A]."
 }

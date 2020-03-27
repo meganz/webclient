@@ -3589,6 +3589,12 @@ function loadfm_callback(res) {
             }
         }
 
+        if (folderlink) {
+
+            // This folderlink is valid to affiliate
+            M.affiliate.storeAffiliate(folderlink, 2);
+        }
+
         // If we have shares, and if a share is for this node, record it on the nodes share list
         if (res.s) {
             for (var i in res.s) {

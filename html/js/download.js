@@ -596,6 +596,9 @@ function dl_g(res) {
             if (prevBut) {
                 showPreviewButton();
             }
+
+            // This file link is valid to affiliate
+            M.affiliate.storeAffiliate(dlpage_ph, 2);
         }
         else if (is_mobile) {
             // Load the missing file decryption key dialog for mobile

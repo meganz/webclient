@@ -456,6 +456,9 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
         if (chatRoom && chatRoom.publicChatHandle) {
             chatRoom.onPublicChatRoomInitialized();
         }
+
+        // This chatlink is valid to be affilaited
+        M.affiliate.storeAffiliate(publicChatHandle, 3);
     }
     else {
         chatInfo.url = ret;

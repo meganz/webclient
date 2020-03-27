@@ -128,7 +128,12 @@ function init_embed(ph, key, g) {
 
                 if ($(this).is('.getlink-item, .share-link')) {
                     $('.tab-link.share-link', $block).addClass('active');
-                    $('.tab-content', $block).text(url.replace('/embed', '/'));
+                    if (mega.flags.nlfe) {
+                        $('.tab-content', $block).text(getBaseUrl() + '/file/' + ph + '#' + key);
+                    }
+                    else {
+                        $('.tab-content', $block).text(url.replace('/embed', '/'));
+                    }
                     $('.sharefile-settings', $block).addClass('hidden');
                 }
                 else {

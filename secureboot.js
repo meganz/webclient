@@ -102,6 +102,7 @@ function isMobile() {
 }
 
 function getSitePath() {
+
     var hash = location.hash.replace('#', '');
 
     if (hashLogic || isPublicLink(hash)) {
@@ -113,6 +114,10 @@ function getSitePath() {
         if (m) {
             return '/' + m[1];
         }
+    }
+
+    if (isPublickLinkV2(document.location.pathname)) {
+        return document.location.pathname + document.location.hash;
     }
 
     return (document.location.pathname.substr(0, 6) === '/chat/') ?
@@ -177,6 +182,18 @@ function isPublicLink(page) {
 
     var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
+}
+
+function isPublickLinkV2(page) {
+    if (page.substr(0, 6) === '/file/' || page.substr(0, 5) === 'file/') {
+        return page;
+    }
+    else if (page.substr(0, 8) === '/folder/' || page.substr(0, 7) === 'folder/') {
+        return page;
+    }
+    else {
+        return false;
+    }
 }
 
 // Check whether the provided `page` points to a chat link
@@ -749,6 +766,7 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
+
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
@@ -761,6 +779,10 @@ else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({subpage: page}, "", '#' + page);
+}
+else if (isPublickLinkV2(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
 }
 else {
     if (document.location.hash.length > 0) {

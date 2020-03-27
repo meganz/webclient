@@ -336,7 +336,7 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
                 resultMeta['room'] = room;
                 resultMeta['resultId'] = resultId++;
                 results.push(resultMeta);
-                console.error(room, resultMeta);
+                // console.error(room, resultMeta);
                 onResult && onResult(room.chatId, resultMeta, results);
             },
             'onComplete': function() {
@@ -346,6 +346,7 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
         };
 
         var cs = new ChatSearch(megaChat, false, s, handler);
+        // console.error('search > doSearch() -> cs:', cs);
 
 
         var resultId = 0;
@@ -369,6 +370,9 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
         cs.resume();
     }
 
+    // console.error('search > doSearch() -> megaPromise:', megaPromise);
+    // [...] TODO: temporary, remove;
+    window.megaPromiseTemp = megaPromise;
     return megaPromise;
 };
 ChatSearch.prototype.setupLogger = function() {

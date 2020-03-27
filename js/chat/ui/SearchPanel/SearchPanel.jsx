@@ -3,10 +3,17 @@ import { MegaRenderMixin } from '../../../stores/mixins';
 import SearchField from './SearchField.jsx';
 import { ResultTable } from './ResultTable.jsx';
 
+export const STATUS = {
+    IN_PROGRESS: 1,
+    PAUSED: 2,
+    COMPLETED: 3,
+};
+
 export default class SearchPanel extends MegaRenderMixin {
     state = {
         value: '',
         searching: false,
+        status: undefined,
         recent: [],
         results: []
     };
@@ -26,17 +33,18 @@ export default class SearchPanel extends MegaRenderMixin {
 
     doSearch = s => {
         const self = this;
-
         return new MegaPromise((res, rej) => {
             delay('chat-search', function() {
                 console.error('SearchPanel > doSearch() ->', s);
                 return ChatSearch.doSearch(
                     s,
                     function(room, result, results) {
-                        self.setState({ results });
+                        // console.error('SearchPanel > doSearch() -> onResult');
+                        self.setState({ results, status: STATUS.IN_PROGRESS });
                     },
                     function() {
-                        // [...] onComplete
+                        // console.error('SearchPanel > doSearch() -> onComplete');
+                        self.setState({ status: STATUS.COMPLETED });
                     }).done(res).fail(rej);
             }, 600);
         });
@@ -54,25 +62,36 @@ export default class SearchPanel extends MegaRenderMixin {
         const value = ev.target.value;
         const searching = value.length >= 3;
 
-        this.setState({
-            value,
-            searching
-        }, () =>
+        this.setState({ value, searching, status: STATUS.IN_PROGRESS }, () =>
             searching ? this.doSearch(value) : this.setState({ results: [] })
         );
     };
 
+    handleSearchToggle = () => {
+        const megaPromise = window.megaPromiseTemp;
+
+        if (megaPromise && megaPromise.cs) {
+            const IN_PROGRESS = this.state.status === STATUS.IN_PROGRESS;
+
+            this.setState({ status: IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS }, () =>
+                IN_PROGRESS ? megaPromise.cs.pause() : megaPromise.cs.resume()
+            );
+        }
+    };
+
     render() {
-        const { value, searching, recent, results } = this.state;
+        const { value, searching, status, recent, results } = this.state;
 
         return (
             <div className="search-area">
                 <SearchField
                     value={value}
                     searching={searching}
+                    status={status}
                     onFocus={this.handleFocus}
                     onBlur={this.handleBlur}
-                    onChange={this.handleChange} />
+                    onChange={this.handleChange}
+                    onSearchToggle={this.handleSearchToggle} />
 
                 {!!recent.length && !searching && (
                     <ResultTable heading="Recent" recent={recent} />

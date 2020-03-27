@@ -1,3 +1,8 @@
+/**
+ * @file Browser polyfills
+ * @desc This is the only file where we're allowed to extend native prototypes, as required for polyfills.
+ *//* eslint-disable no-extend-native */
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -169,7 +174,12 @@ mBroadcaster.once('boot_done', function() {
         this.then(fc).catch(fc);
         return this;
     };
-    Promise.prototype.dump = MegaPromise.prototype.dumpToConsole;
+    Promise.prototype.dump = function(tag) {
+        // XXX: No more then/catch after invoking this!
+        this.then(console.debug.bind(console, tag || 'OK'))
+            .catch(console.warn.bind(console, tag || 'FAIL'));
+        return this;
+    };
 });
 
 mBroadcaster.once('boot_done', function() {

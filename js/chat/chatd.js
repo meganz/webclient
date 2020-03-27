@@ -1974,23 +1974,6 @@ Chatd.Messages.prototype._clearCallInfo = function() {
     this.callInfo = new CallInfo();
 };
 
-function CallInfo() {
-    /* callInfo structure when there is a call:
-        callInfo = {
-            callId: binstring,
-            participants: {
-                <peerid1>: av1,
-                <peerid2>: av2
-            }
-        }
-    */
-    this.participants = {};
-};
-
-CallInfo.prototype.participantCount = function() {
-    return Object.keys(this.participants).length;
-};
-
 // send JOIN
 Chatd.Messages.prototype.join = function() {
     var self = this;

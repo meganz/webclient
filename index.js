@@ -70,7 +70,7 @@ mBroadcaster.once('startMega', function() {
             if (state.searchString) {
                 add = state.searchString;
             }
-            loadSubPage((state.subpage || state.fmpage || getCleanSitePath()) + add, event);
+            loadSubPage((state.subpage || state.fmpage || getCleanSitePath() || location.hash) + add, event);
         });
     }
 });

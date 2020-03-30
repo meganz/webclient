@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
 import SearchField from './SearchField.jsx';
-import { ResultTable } from './ResultTable.jsx';
+import { ResultContainer } from './ResultContainer.jsx';
 
 export const STATUS = {
     IN_PROGRESS: 1,
@@ -35,15 +35,19 @@ export default class SearchPanel extends MegaRenderMixin {
         const self = this;
         return new MegaPromise((res, rej) => {
             delay('chat-search', function() {
-                console.error('SearchPanel > doSearch() ->', s);
+                // console.error('SearchPanel > doSearch() ->', s);
                 return ChatSearch.doSearch(
                     s,
                     function(room, result, results) {
-                        // console.error('SearchPanel > doSearch() -> onResult');
-                        self.setState({ results, status: STATUS.IN_PROGRESS });
+                        self.setState({
+                            results,
+                            status: STATUS.IN_PROGRESS
+                        }, () => {
+                            // console.error('SearchPanel > doSearch() > onResult ->', self.state);
+                        });
                     },
                     function() {
-                        // console.error('SearchPanel > doSearch() -> onComplete');
+                        // console.error('SearchPanel > doSearch() > onComplete');
                         self.setState({ status: STATUS.COMPLETED });
                     }).done(res).fail(rej);
             }, 600);
@@ -62,7 +66,11 @@ export default class SearchPanel extends MegaRenderMixin {
         const value = ev.target.value;
         const searching = value.length >= 3;
 
-        this.setState({ value, searching, status: STATUS.IN_PROGRESS }, () =>
+        this.setState({
+            value,
+            searching,
+            status: STATUS.IN_PROGRESS
+        }, () =>
             searching ? this.doSearch(value) : this.setState({ results: [] })
         );
     };
@@ -73,7 +81,9 @@ export default class SearchPanel extends MegaRenderMixin {
         if (megaPromise && megaPromise.cs) {
             const SEARCH_IN_PROGRESS = this.state.status === STATUS.IN_PROGRESS;
 
-            this.setState({ status: SEARCH_IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS }, () =>
+            this.setState({
+                status: SEARCH_IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS
+            }, () =>
                 SEARCH_IN_PROGRESS ? megaPromise.cs.pause() : megaPromise.cs.resume()
             );
         }
@@ -94,11 +104,11 @@ export default class SearchPanel extends MegaRenderMixin {
                     onSearchToggle={this.handleSearchToggle} />
 
                 {!!recent.length && !searching && (
-                    <ResultTable heading="Recent" recent={recent} />
+                    <ResultContainer recent={recent} />
                 )}
 
-                {!!results.length && searching && (
-                    <ResultTable heading="Contacts and chats" results={results} />
+                {searching && (
+                    <ResultContainer status={status} results={results} />
                 )}
             </div>
         );

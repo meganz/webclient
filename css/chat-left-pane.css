@@ -451,6 +451,7 @@ div.result-table div.result-table-heading {
 
 div.result-table div.result-table-row {
     margin: 10px 0;
+    cursor: pointer;
 }
 
 /* --- Result Row: Recent --- */
@@ -503,6 +504,11 @@ div.result-table.messages div.result-table-row span.date {
 /* --- Result Row: No Results --- */
 
 div.result-table.nil {
+    /* […] */
+}
+
+div.result-table.nil div.result-table-row {
+    cursor: default;
     text-align: center;
 }
 

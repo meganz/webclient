@@ -71,10 +71,10 @@ export default class SearchPanel extends MegaRenderMixin {
         const megaPromise = window.megaPromiseTemp;
 
         if (megaPromise && megaPromise.cs) {
-            const IN_PROGRESS = this.state.status === STATUS.IN_PROGRESS;
+            const SEARCH_IN_PROGRESS = this.state.status === STATUS.IN_PROGRESS;
 
-            this.setState({ status: IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS }, () =>
-                IN_PROGRESS ? megaPromise.cs.pause() : megaPromise.cs.resume()
+            this.setState({ status: SEARCH_IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS }, () =>
+                SEARCH_IN_PROGRESS ? megaPromise.cs.pause() : megaPromise.cs.resume()
             );
         }
     };

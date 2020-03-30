@@ -333,7 +333,7 @@ function pageregister() {
 
                             // I need this event handler to be triggered only once after successful sub-user login
                             mBroadcaster.once('fm:initialized', M.importWelcomePDF);
-
+                            delete localStorage.businessSubAc;
                         }
                     },
                     businessUser: $password.val()   // we need the plain enterd password in later stages
@@ -347,7 +347,6 @@ function pageregister() {
                     null,
                     signupcode,
                     $firstName.val() + ' ' + $lastName.val());
-                delete localStorage.businessSubAc;
             }
             else if (u_type === false) {
                 loadingDialog.show();

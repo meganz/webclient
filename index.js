@@ -262,11 +262,6 @@ function init_page() {
         }
     }
 
-    // cleaning local-storage used attr for business signup
-    if (localStorage.businessSubAc && page !== 'register') {
-        delete localStorage.businessSubAc;
-    }
-
     // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
     // site until they validate their account. So if they clicked the browser back button, then they should get logged
     // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not

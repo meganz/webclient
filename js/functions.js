@@ -2442,6 +2442,46 @@ if (typeof sjcl !== 'undefined') {
     };
 })(window);
 
+/**
+ * Transoms the numerical preferences to preferences view object
+ * @param {Number} pref     Integer value representing the preferences
+ * @returns {Object}        View preferences object
+ */
+function getFMColPrefs(pref) {
+    'use strict';
+    if (pref === undefined) {
+        return;
+    }
+    var columnsPreferences = Object.create(null);
+    columnsPreferences.fav = pref & 4;
+    columnsPreferences.label = pref & 1;
+    columnsPreferences.size = pref & 8;
+    columnsPreferences.type = pref & 64;
+    columnsPreferences.timeAd = pref & 32;
+    columnsPreferences.timeMd = pref & 16;
+    columnsPreferences.versions = pref & 2;
+
+    return columnsPreferences;
+}
+
+/**
+ * Get the number needed for bitwise operator
+ * @param {String} colName      Column name
+ * @returns {Number}            Number to be used in bitwise operator
+ */
+function getNumberColPrefs(colName) {
+    'use strict';
+    switch (colName) {
+        case 'fav': return 4;
+        case 'label': return 1;
+        case 'size': return 8;
+        case 'type': return 64;
+        case 'timeAd': return 32;
+        case 'timeMd': return 16;
+        case 'versions': return 2;
+        default: return null;
+    }
+}
 
 // Constructs an extensible hashmap-like class...
 function Hash(a, b, c, d) {

@@ -1414,6 +1414,15 @@ function processEmailChangeActionPacket(ap) {
                     $('body').removeClass('fontsize1 fontsize2')
                         .addClass('fontsize' + fmconfig.font_size);
                 }
+                if (fmconfig.fmColPrefs) {
+                    var prefs = getFMColPrefs(fmconfig.fmColPrefs);
+                    for (var colPref in prefs) {
+                        if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
+                            M.columnsWidth.cloud[colPref].viewed =
+                                prefs[colPref] > 0;
+                        }
+                    }
+                }
                 waiter.resolve();
                 waiter = undefined;
             })

@@ -9,13 +9,13 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
+    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: 'calc(100% - 510px)', viewed: true };
     this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
-    this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false }
+    this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
@@ -3021,6 +3021,18 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.versions.disabled = false;
             M.columnsWidth.cloud.fav.disabled = false;
             M.columnsWidth.cloud.label.disabled = false;
+
+            // if we have FM configuration
+            var storedColumnsPreferences = mega.config.get('fmColPrefs');
+            if (storedColumnsPreferences !== undefined) {
+                var prefs = getFMColPrefs(storedColumnsPreferences);
+                for (var colPref in prefs) {
+                    if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
+                        M.columnsWidth.cloud[colPref].viewed =
+                            prefs[colPref] > 0;
+                    }
+                }
+            }
         }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -3297,20 +3309,41 @@ FileManager.prototype.addGridUI = function(refresh) {
         if ($me.hasClass('notactive')) {
             return false;
         }
+
+        var targetCol = $me.attr('megatype');
+
+        // TODO: fix me (jQuery.show/hide -> jQuery.addClass/removeClass)
+        /* eslint-disable local-rules/jquery-replacements */
         if ($me.attr('isviewed')) {
             $me.removeAttr('isviewed').find('i').removeClass('icons-sprite tiny-grey-tick');
-            M.columnsWidth.cloud[$me.attr('megatype')].viewed = false;
-            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').hide();
-            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').hide();
+            M.columnsWidth.cloud[targetCol].viewed = false;
+            $('.grid-table-header th[megatype="' + targetCol + '"]').hide();
+            $('.grid-table.fm td[megatype="' + targetCol + '"]').hide();
         }
         else {
             $me.attr('isviewed', 'y').find('i').addClass('icons-sprite tiny-grey-tick');
-            M.columnsWidth.cloud[$me.attr('megatype')].viewed = true;
-            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
-            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
+            M.columnsWidth.cloud[targetCol].viewed = true;
+            $('.grid-table-header th[megatype="' + targetCol + '"]').show();
+            $('.grid-table.fm td[megatype="' + targetCol + '"]').show();
         }
+        /* eslint-enable local-rules/jquery-replacements */
 
         M.columnsWidth.makeNameColumnStatic();
+
+        var columnPreferences = mega.config.get('fmColPrefs');
+        if (columnPreferences === undefined) {
+            columnPreferences = 108; // default
+        }
+        var colConfigNb = getNumberColPrefs(targetCol);
+        if (colConfigNb) {
+            if (M.columnsWidth.cloud[targetCol].viewed) {
+                columnPreferences |= colConfigNb;
+            }
+            else {
+                columnPreferences &= ~colConfigNb;
+            }
+        }
+        mega.config.set('fmColPrefs', columnPreferences);
 
         if (M.megaRender && M.megaRender.megaList) {
             if (!M.megaRender.megaList._scrollIsInitialized) {

@@ -1351,12 +1351,6 @@ iframe.security-video-container {
     border-color: #00C0A6;
 }
 /* Bottom pages nav bar */
-.pages-nav-wrap  {
-    min-height: 118px;
-}
-.en .pages-nav-wrap  {
-    min-height: 106px;
-}
 .pages-nav.content-block {
     padding-top: 36px;
     -webkit-box-sizing: border-box;

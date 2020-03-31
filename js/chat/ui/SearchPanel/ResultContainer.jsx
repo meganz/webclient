@@ -1,16 +1,16 @@
 import React from 'react';
-import { Avatar, ContactPresence } from '../contacts.jsx';
 import { STATUS } from './SearchPanel.jsx';
 import { ResultTable } from './ResultTable.jsx';
 import { ResultRow } from './ResultRow.jsx';
 
-const TYPE = {
+export const TYPE = {
     MESSAGE: 1,
     CHAT: 2,
-    MEMBER: 3
+    MEMBER: 3,
+    NIL: 4
 };
 
-const LABEL = {
+export const LABEL = {
     MESSAGES: 'Messages',
     CONTACTS_AND_CHATS: 'Contacts And Chats',
     NO_RESULTS: 'No Results',
@@ -28,14 +28,7 @@ export const ResultContainer = ({ recent, results, status }) => {
         return (
             <ResultTable heading={LABEL.RECENT}>
                 {recent.map(contact =>
-                    <ResultRow key={contact.h}>
-                        <Avatar contact={contact} />
-                        <div className="user-info">
-                            {contact.name}
-                            <ContactPresence contact={contact} />
-                        </div>
-                        <div className="clear"></div>
-                    </ResultRow>
+                    <ResultRow key={contact.h} type={TYPE.MEMBER} result={contact} />
                 )}
             </ResultTable>
         );
@@ -53,14 +46,16 @@ export const ResultContainer = ({ recent, results, status }) => {
             MESSAGES: [],
         };
 
-        results.forEach(result => {
-            const table = result.type === TYPE.MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+        results.forEach(({ type: resultType, resultId, ...result }) => {
+            const { MESSAGE, MEMBER, CHAT } = TYPE;
+            const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
 
             RESULT_TABLE[table] = [
                 ...RESULT_TABLE[table],
-                <ResultRow key={result.resultId}>
-                    {result.text}
-                </ResultRow>
+                <ResultRow
+                    key={resultId}
+                    type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
+                    result={result} />
             ];
         });
 
@@ -77,12 +72,7 @@ export const ResultContainer = ({ recent, results, status }) => {
                             ${HAS_ROWS ? '' : 'nil'}
                         `}
                         heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
-                        {HAS_ROWS ? table.map(row => row) : (
-                            <ResultRow>
-                                <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
-                                <span>{LABEL.NO_RESULTS}</span>
-                            </ResultRow>
-                        )}
+                        {HAS_ROWS ? table.map(row => row) : <ResultRow type={TYPE.NIL} />}
                     </ResultTable>
                 );
             })
@@ -97,10 +87,7 @@ export const ResultContainer = ({ recent, results, status }) => {
     if (!results.length && status === STATUS.COMPLETED) {
         return (
             <ResultTable heading={LABEL.NO_RESULTS} className="nil">
-                <ResultRow>
-                    <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
-                    <span>{LABEL.NO_RESULTS}</span>
-                </ResultRow>
+                <ResultRow type={TYPE.NIL} />
             </ResultTable>
         );
     }

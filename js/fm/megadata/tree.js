@@ -511,11 +511,17 @@ MegaData.prototype.treeSearchUI = function() {
         // Make a search
         !M.chat && $('.nw-fm-search-icon').show().rebind('click', function() {
             var $self = $(this);
+            var $input = $self.prev();
 
-            treesearch = false;
-            M.redrawTree();
-            $self.prev().val('');
-            $self.parent().find('input').trigger("blur").trigger('cleared');
+            if ($input.val() === '') {
+                $input.trigger('focus');
+            }
+            else {
+                treesearch = false;
+                M.redrawTree();
+                $input.val('');
+                $input.trigger('blur').trigger('cleared');
+            }
         });
 
         $('.nw-fm-tree-header input')

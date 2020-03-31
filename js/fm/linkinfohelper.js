@@ -108,7 +108,7 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                 else if (m[5] === "file" || m[5] === "folder") {
                     var handleAndKey = m[6].split("#");
                     var handle = handleAndKey[0];
-                    var key = handleAndKey[1].split("/")[0];
+                    var key = handleAndKey[1] && handleAndKey[1].split("/")[0] || "";
                     var is_dir = m[5] === "folder";
                     var cacheKey = (m[3] || "") + "_" + handle + ":" + key;
 

@@ -330,15 +330,21 @@ body.de .fm-dialog.new-group-chat {
 
 
 /* Add From Cloud -- bottom breadcrumbs */
-.fm-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
-    height: 552px !important;
+.fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
+    height: 588px !important;
 }
+.fm-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
+    height: 572px !important;
+}
+.fm-dialog.add-from-cloud.has-breadcrumbs-bottom .grid-table-header + .fm-dialog-scroll {
+    height: 548px !important;
+}
+
 .fm-dialog.add-from-cloud .fm-dialog-footer {
     padding: 0;
 }
 .fm-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom {
     position: relative;
-    margin: -4px 0 0 0;
     width: 100%;
     max-width: none;
     background-color: #EEEEEE;
@@ -482,9 +488,6 @@ body.de .fm-dialog.new-group-chat {
     right: 10px;
 }
 
-.fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
-    height: 588px !important;
-}
 .fm-dialog-scroll.blocks, .add-from-cloud .dialog-empty-block {
     background-color: #fafafa;
     -webkit-box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
@@ -544,6 +547,12 @@ body.de .fm-dialog.new-group-chat {
     }
     .fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
         height: 388px !important;
+    }
+    .fm-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
+        height: 372px !important;
+    }
+    .fm-dialog.add-from-cloud.has-breadcrumbs-bottom .grid-table-header + .fm-dialog-scroll {
+        height: 348px !important;
     }
 }
 @media only screen and (max-width: 1280px) {
@@ -2002,11 +2011,6 @@ li.token-input-token-invite .input-close {
 .fm-dialog.create-file-dialog {
     width: 402px;
     margin: -96px 0 0 -201px;
-}
-.fm-dialog.chat-rename-dialog {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
 }
 .chat-rename-dialog input {
     padding-left: 10px;

@@ -2290,97 +2290,6 @@ a.nt-settings-button:hover span {
     /* If you do require horizontal scrollbars, don't use jScrollPane - we're deprecating it anyway */
     display: none !important;
 }
-ul.tagit {
-    overflow: auto;
-    margin-left: inherit;
-    margin-right: inherit;
-    padding: 0;
-    margin: 0;
-}
-ul.tagit li {
-    display: block;
-    float: left;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice {
-    position: relative;
-    line-height: inherit;
-}
-ul.tagit li.tagit-choice-read-only {
-    padding: 0 7px 0 7px;
-}
-ul.tagit li.tagit-choice-editable {
-    padding: 0 18px 0 7px;
-}
-ul.tagit li.tagit-new {
-}
-ul.tagit li.tagit-choice a.tagit-label {
-    cursor: pointer;
-    text-decoration: none;
-}
-ul.tagit li.tagit-choice .tagit-close {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    margin-top: -10px;
-}
-ul.tagit li.tagit-choice .tagit-close .text-icon {
-    display: none;
-}
-ul.tagit li.tagit-choice input {
-    display: block;
-    float: left;
-}
-ul.tagit li.tagit-choice {
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border: 1px solid #e7e7e8;
-    font-size: 13px;
-    background: none;
-    background-color: #f2f2f3;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-weight: normal;
-    height: 22px;
-    line-height: 20px;
-    margin: 0 0 2px 2px;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice .tagit-label:not(a) {
-    color: #565a5b;
-    font-size: 13px;
-}
-ul.tagit li.tagit-choice a.tagit-close {
-    text-decoration: none;
-}
-ul.tagit li.tagit-choice .tagit-close {
-    right: .4em;
-}
-ul.tagit li.tagit-choice .ui-icon {
-    display: none;
-}
-ul.tagit li.tagit-choice .tagit-close .text-icon {
-    display: inline-block;
-    height: 8px;
-    width: 8px;
-    background-image: url(../images/mega/send-sprite.png);
-    background-size: 254px 60px;
-    background-repeat: no-repeat;
-    background-position: left top;
-    font-size: 13px;
-    margin: 6px 0 0 0;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice:hover, ul.tagit li.tagit-choice.remove {
-}
-ul.tagit li.tagit-choice a.tagLabel:hover, ul.tagit li.tagit-choice a.tagit-close .text-icon:hover {
-}
-ul.tagit input[type="text"] {
-    color: #565a5b;
-    background: none;
-}
 .ui-widget {
     font-size: 13px;
 }
@@ -2416,10 +2325,6 @@ ul.tagit input[type="text"] {
     height: 30px;
     line-height: 29px;
     padding-left: 42px;
-    background-image: url(../images/mega/send-sprite.png);
-    background-size: 254px 60px;
-    background-repeat: no-repeat;
-    background-position: 10px -34px;
     cursor: pointer;
     color: #383b3d;
     font-size: 13px;
@@ -3982,7 +3887,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display:block;
     position:absolute;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -337px -717px;
     background-repeat: no-repeat;
     left: 0;
@@ -6421,7 +6325,6 @@ table {
     margin: 0 0 0 -1px;
     background-position: -336px -357px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon {
@@ -6429,7 +6332,6 @@ table {
     height: 38px;
     background-position: -216px -3239px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon.word {
@@ -6700,7 +6602,6 @@ table {
     display: block;
     background-position: 0 -3234px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
     position: absolute;
     margin: -42px 0 0 -41px;
@@ -8246,11 +8147,20 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -webkit-background-clip: padding;
     background-clip: padding-box;
 }
-.fm-dialog.fm-modal-dialog {
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%)  !important;
+.fm-modal-dialog {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 1200;
+    display: flex;
+}
+.fm-modal-dialog  .fm-dialog {
+    position: relative;
     margin: auto !important;
+    left: 0;
+    top: 0;
 }
 .fm-dialog.share-dialog {
     z-index: 1100;
@@ -9619,7 +9529,6 @@ body:not(.en) .warning-dialog-a.wide {
     margin: 22px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: 0 0;
 }
 .export-link-text-pad {
@@ -9935,7 +9844,6 @@ span.orange {
     left: 0;
     display: none;
     background-image: url(../images/mega/properties-sprite_v2.png);
-    background-size: 589px 6320px;
     background-position: 29px 40px;
     background-repeat: no-repeat;
     margin: 8px;
@@ -12704,7 +12612,6 @@ h5.main-italic-header {
     float: left;
     margin: 0 0 0 0;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: 0 0;
     background-repeat: no-repeat;
 }
@@ -13291,7 +13198,6 @@ strong, b {
     height: 64px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     margin-top: 3px;
 }
 .share-folder-info {
@@ -15079,7 +14985,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-path-icon-span {
     background-position: 0 0px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -15095,7 +15000,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
 }
 .search-path-icon.shared-folder {
     background-position: -12px -4369px;
@@ -15822,7 +15726,6 @@ span.incoming-call-name {
 }
 .shared-folder-icon {
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -217px -4799px;
     background-repeat: no-repeat;
     width: 40px;
@@ -15958,7 +15861,6 @@ body:not(.de) .contacts-interation {
     background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     margin: 15px 0 0 28px;
 }
 .shared-details-info-block {
@@ -16174,7 +16076,6 @@ body:not(.de) .contacts-interation {
     width:24px;
     height:24px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -297px -877px;
     background-repeat: no-repeat;
     position: absolute;
@@ -20901,7 +20802,7 @@ body.kr .account.chart.data {
 }
 .contact-us .contact-new-title::before {
     content: '';
-    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-image: url(../images/mega/contact-us-sprite@2x.png);
     background-size: 80px auto;
     width: 28px;
     height: 28px;
@@ -22897,7 +22798,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    background-size: 48px 2406px;
     position: absolute;
     width: 12px;
     height: 12px;

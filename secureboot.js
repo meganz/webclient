@@ -37,7 +37,7 @@ if (typeof process !== 'undefined') {
 
 var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
@@ -102,7 +102,7 @@ function isMobile() {
 }
 
 function getSitePath() {
-
+    'use strict';
     var hash = location.hash.replace('#', '');
 
     if (hashLogic || isPublicLink(hash)) {
@@ -185,15 +185,11 @@ function isPublicLink(page) {
 }
 
 function isPublickLinkV2(page) {
-    if (page.substr(0, 6) === '/file/' || page.substr(0, 5) === 'file/') {
-        return page;
-    }
-    else if (page.substr(0, 8) === '/folder/' || page.substr(0, 7) === 'folder/') {
-        return page;
-    }
-    else {
-        return false;
-    }
+    'use strict';
+    page = getCleanSitePath(page);
+
+    var types = {'file': 6, 'folder': 8, 'embed': 7};
+    return page.length > types[page.split('/')[0]];
 }
 
 // Check whether the provided `page` points to a chat link
@@ -783,6 +779,11 @@ else if ((page = isPublicLink(document.location.hash))) {
 else if (isPublickLinkV2(document.location.pathname)) {
     page = getCleanSitePath();
     history.replaceState({ subpage: page }, "", '/' + page);
+
+    if (is_embed) {
+        page = page.split(/[#/]/);
+        page = '!' + page[1] + '!' + page[2];
+    }
 }
 else {
     if (document.location.hash.length > 0) {

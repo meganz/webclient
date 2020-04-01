@@ -3531,6 +3531,7 @@
     "22893": "Ativar v\u00eddeo",
     "22894": "Desativar v\u00eddeo",
     "22895": "Sair do modo tela cheia",
+    "22897": "A sua conta de usu\u00e1rio est\u00e1 corrompida. Por favor, solicite ao administrador da sua conta Business que reenvie o seu link de convite.",
     "22898": "Esses recursos n\u00e3o podem ser usados no navegador de um dispositivo m\u00f3vel.[BR][A]Use o nosso aplicativo para criar links de chat e convidar novos usu\u00e1rios para o MEGA.[\/A]",
     "22899": "De %d1 a %d2",
     "22900": "Se voc\u00ea digitou incorretamente o seu email, clique [A]aqui[\/A] para alterar o email.",
@@ -3645,6 +3646,6 @@
     "23213": "Conex\u00e3o lenta",
     "23214": "Aviso: para mais informa\u00e7\u00f5es, voc\u00ea pode consultar as [A]Regras do Programa de indica\u00e7\u00e3o[\/A].",
     "23219": "J\u00e1 existe um item com este nome",
-    "23242": "Esta pasta\/arquivo foi denunciada por armazenar conte\u00fado censur\u00e1vel, como material relacionado \u00e0 explora\u00e7\u00e3o infantil, extremismo violento ou bestialidade. A conta deste usu\u00e1rio foi encerrada e as informa\u00e7\u00f5es desta conta, incluindo o endere\u00e7o IP, foram proporcionados \u00e0s autoridades.",
+    "23242": "Este arquivo\/pasta foi denunciado por armazenar conte\u00fado censur\u00e1vel, como material relacionado \u00e0 explora\u00e7\u00e3o infantil, extremismo violento ou bestialidade. A conta do usu\u00e1rio que criou este link foi encerrada e as informa\u00e7\u00f5es desta conta, incluindo o endere\u00e7o IP, foram proporcionados \u00e0s autoridades competentes.",
     "23243": "Este link n\u00e3o est\u00e1 dispon\u00edvel porque a conta do usu\u00e1rio que o criou foi encerrada devido a uma grave viola\u00e7\u00e3o dos [A]Termos de servi\u00e7o[\/A] do MEGA."
 }

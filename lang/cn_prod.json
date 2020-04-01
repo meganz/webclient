@@ -3531,6 +3531,7 @@
     "22893": "\u5f00\u542f\u6444\u50cf\u5934",
     "22894": "\u5173\u95ed\u6444\u50cf\u5934",
     "22895": "\u9000\u51fa\u5168\u5c4f",
+    "22897": "\u60a8\u7684\u7528\u6237\u5e10\u6237\u65e0\u6cd5\u88ab\u6fc0\u6d3b\uff0c\u8bf7\u8ba9\u60a8\u7684\u4f01\u4e1a\u5e10\u6237\u7ba1\u7406\u5458\u91cd\u65b0\u53d1\u9001\u9080\u8bf7\u94fe\u63a5\u3002",
     "22898": "\u4ee5\u4e0a\u529f\u80fd\u65e0\u6cd5\u5728\u60a8\u7684\u624b\u673a\u6d4f\u89c8\u5668\u4e2d\u4f7f\u7528\u3002[BR][A]\u8bf7\u4f7f\u7528\u624b\u673aApp\u521b\u5efa\u804a\u5929\u94fe\u63a5\u5e76\u9080\u8bf7\u65b0\u7528\u6237\u52a0\u5165MEGA\u3002[\/A]",
     "22899": "%d1 - %d2",
     "22900": "\u5982\u679c\u60a8\u7684\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u62fc\u5199\u9519\u8bef\uff0c\u8bf7\u70b9\u51fb[A]\u8fd9\u91cc[\/A]\u66f4\u6539\u7535\u5b50\u90ae\u4ef6\u5730\u5740\u3002",
@@ -3645,6 +3646,6 @@
     "23213": "\u7f51\u901f\u8fc7\u6162",
     "23214": "\u6ce8\u610f\uff1a\u60a8\u53ef\u4ee5\u53c2\u8003\u6211\u4eec\u7684[A]\u5f15\u8350\u8ba1\u5212\u89c4\u5219[\/A]\u4e86\u89e3\u66f4\u591a\u8be6\u60c5\u3002",
     "23219": "There is already an item with the same name",
-    "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The user\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
+    "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The link creator\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
     "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A]."
 }

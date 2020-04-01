@@ -3531,6 +3531,7 @@
     "22893": "Enable video",
     "22894": "Disable video",
     "22895": "Exit fullscreen",
+    "22897": "Your user account is corrupted, please ask your business account\u2019s administrator to resend your invitation link.",
     "22898": "C\u00e1c t\u00ednh n\u0103ng n\u00e0y kh\u00f4ng th\u1ec3 d\u00f9ng \u0111\u01b0\u1ee3c tr\u00ean tr\u00ecnh duy\u1ec7t c\u1ee7a \u0111i\u1ec7n tho\u1ea1i.[BR][A]Xin t\u1ea3i v\u1ec1 app d\u00e0nh cho \u0111i\u1ec7n tho\u1ea1i \u0111\u1ec3 t\u1ea1o \u0111\u01b0\u1eddng li\u00ean k\u1ebft cho ph\u00f2ng ch\u00e1t v\u00e0 m\u1eddi th\u00eam ng\u01b0\u1eddi \u0111\u1ec3 tham gia.[\/A]",
     "22899": "%d1 - %d2",
     "22900": "If you have misspelled your email address, please click [A]here[\/A] to change the email address.",
@@ -3645,6 +3646,6 @@
     "23213": "Slow network",
     "23214": "Note: You can refer to our [A]Referral Program Rules[\/A] for more details",
     "23219": "There is already an item with the same name",
-    "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The user\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
+    "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The link creator\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
     "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A]."
 }

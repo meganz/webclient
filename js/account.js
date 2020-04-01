@@ -139,6 +139,13 @@ function u_checklogin3a(res, ctx) {
 
         u_storage.handle = u_handle = u_attr.u;
 
+        delete u_attr.u;
+        Object.defineProperty(u_attr, 'u', {
+            value: u_handle,
+            writable: false,
+            configurable: false
+        });
+
         init_storage(u_storage);
 
         if (u_storage.k) {

@@ -838,6 +838,24 @@ var authring = (function () {
         // The promise to return.
         var masterPromise = new MegaPromise();
 
+        // XXX: u_attr.u is read-only, BUT this is a weak protection unless we make the whole object
+        // read-only as well..tricky, however we may want to still allow this for testing purposes..
+        if (typeof u_attr !== 'object' || u_attr.u !== window.u_handle || u_attr.keyring) {
+            logger.error('Doh! Tampering attempt...', u_handle, [u_attr]);
+
+            if (location.host === 'mega.nz' || is_extension) {
+                return masterPromise.reject(EACCESS);
+            }
+
+            // eslint-disable-next-line no-alert
+            if (!confirm('You are about to overwrite your own account keys - is this intended?')) {
+                location.reload(true);
+                return masterPromise;
+            }
+
+            logger.warn('Good luck!..');
+        }
+
         // Load private keys.
         var attributePromise = mega.attr.get(u_handle, 'keyring', false, false);
         attributePromise.done(function __attributePromiseResolve(result) {

@@ -1487,7 +1487,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             var _rawXHR = function(url, data, callback) {
                 M.xhr(url, JSON.stringify([data]))
                     .always(function(ev, data) {
-                        var resp;
+                        var resp = data | 0;
                         if (typeof data === 'string' && data[0] === '[') {
                             try {
                                 resp = JSON.parse(data)[0];
@@ -1519,14 +1519,9 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                         }
                     }
                 };
-                if (data) {
-                    api_setsid(u_sid);
-                    u_storage.sid = u_sid;
-                    u_checklogin3a(data, ctx);
-                }
-                else {
-                    u_checklogin(ctx, false);
-                }
+                api_setsid(u_sid);
+                u_storage.sid = u_sid;
+                u_checklogin3a(data, ctx);
             });
             return false;
         }

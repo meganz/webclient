@@ -2012,11 +2012,6 @@ li.token-input-token-invite .input-close {
     width: 402px;
     margin: -96px 0 0 -201px;
 }
-.fm-dialog.chat-rename-dialog {
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
 .chat-rename-dialog input {
     padding-left: 10px;
     width: 260px;

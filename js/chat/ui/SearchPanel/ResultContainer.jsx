@@ -28,7 +28,7 @@ export const ResultContainer = ({ recent, results, status }) => {
         return (
             <ResultTable heading={LABEL.RECENT}>
                 {recent.map(contact =>
-                    <ResultRow key={contact.h} type={TYPE.MEMBER} result={contact} />
+                    <ResultRow key={contact.data} type={TYPE.MEMBER} result={contact} />
                 )}
             </ResultTable>
         );
@@ -46,8 +46,10 @@ export const ResultContainer = ({ recent, results, status }) => {
             MESSAGES: [],
         };
 
-        results.forEach(({ type: resultType, resultId, ...result }) => {
+        for (let i = results.length; i--;) {
+            const result = results[i];
             const { MESSAGE, MEMBER, CHAT } = TYPE;
+            const { type: resultType, resultId } = result;
             const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
 
             RESULT_TABLE[table] = [
@@ -57,22 +59,16 @@ export const ResultContainer = ({ recent, results, status }) => {
                     type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
                     result={result} />
             ];
-        });
+        }
 
         return (
             Object.keys(RESULT_TABLE).map((key, index) => {
                 const table = RESULT_TABLE[key];
-                const HAS_ROWS = table.length;
+                const hasRows = table.length;
 
                 return (
-                    <ResultTable
-                        key={index}
-                        className={`
-                            ${key === 'MESSAGES' ? 'messages' : ''}
-                            ${HAS_ROWS ? '' : 'nil'}
-                        `}
-                        heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
-                        {HAS_ROWS ? table.map(row => row) : <ResultRow type={TYPE.NIL} />}
+                    <ResultTable key={index} heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
+                        {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} />}
                     </ResultTable>
                 );
             })
@@ -86,7 +82,7 @@ export const ResultContainer = ({ recent, results, status }) => {
 
     if (!results.length && status === STATUS.COMPLETED) {
         return (
-            <ResultTable heading={LABEL.NO_RESULTS} className="nil">
+            <ResultTable heading={LABEL.NO_RESULTS}>
                 <ResultRow type={TYPE.NIL} />
             </ResultTable>
         );

@@ -2,6 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
 import SearchField from './SearchField.jsx';
 import { ResultContainer } from './ResultContainer.jsx';
+import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 
 export const STATUS = {
     IN_PROGRESS: 1,
@@ -26,7 +27,10 @@ export default class SearchPanel extends MegaRenderMixin {
         megaChat.getFrequentContacts()
             .then(frequentContacts => {
                 this.setState({
-                    recent: frequentContacts.map(frequentContact => M.u[frequentContact.userId])
+                    recent: frequentContacts.map(frequentContact => ({
+                        data: frequentContact.userId,
+                        room: frequentContact.chatRoom
+                    }))
                 });
             });
     };
@@ -35,19 +39,15 @@ export default class SearchPanel extends MegaRenderMixin {
         const self = this;
         return new MegaPromise((res, rej) => {
             delay('chat-search', function() {
-                // console.error('SearchPanel > doSearch() ->', s);
                 return ChatSearch.doSearch(
                     s,
                     function(room, result, results) {
                         self.setState({
                             results,
                             status: STATUS.IN_PROGRESS
-                        }, () => {
-                            // console.error('SearchPanel > doSearch() > onResult ->', self.state);
                         });
                     },
                     function() {
-                        // console.error('SearchPanel > doSearch() > onComplete');
                         self.setState({ status: STATUS.COMPLETED });
                     }).done(res).fail(rej);
             }, 600);
@@ -79,14 +79,24 @@ export default class SearchPanel extends MegaRenderMixin {
         const megaPromise = window.megaPromiseTemp;
 
         if (megaPromise && megaPromise.cs) {
-            const SEARCH_IN_PROGRESS = this.state.status === STATUS.IN_PROGRESS;
+            const inProgress = this.state.status === STATUS.IN_PROGRESS;
 
             this.setState({
-                status: SEARCH_IN_PROGRESS ? STATUS.PAUSED : STATUS.IN_PROGRESS
+                status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
             }, () =>
-                SEARCH_IN_PROGRESS ? megaPromise.cs.pause() : megaPromise.cs.resume()
+                inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume()
             );
         }
+    };
+
+    handleSearchReset = inputRef => {
+        this.setState({
+            value: '',
+            searching: false,
+            status: undefined
+        }, () =>
+            inputRef && inputRef.current.focus()
+        );
     };
 
     render() {
@@ -94,22 +104,25 @@ export default class SearchPanel extends MegaRenderMixin {
 
         return (
             <div className="search-area">
-                <SearchField
-                    value={value}
-                    searching={searching}
-                    status={status}
-                    onFocus={this.handleFocus}
-                    onBlur={this.handleBlur}
-                    onChange={this.handleChange}
-                    onSearchToggle={this.handleSearchToggle} />
+                <PerfectScrollbar>
+                    <SearchField
+                        value={value}
+                        searching={searching}
+                        status={status}
+                        onFocus={this.handleFocus}
+                        onBlur={this.handleBlur}
+                        onChange={this.handleChange}
+                        onSearchToggle={this.handleSearchToggle}
+                        onSearchReset={this.handleSearchReset} />
 
-                {!!recent.length && !searching && (
-                    <ResultContainer recent={recent} />
-                )}
+                    {!!recent.length && !searching && (
+                        <ResultContainer recent={recent} />
+                    )}
 
-                {searching && (
-                    <ResultContainer status={status} results={results} />
-                )}
+                    {searching && (
+                        <ResultContainer status={status} results={results} />
+                    )}
+                </PerfectScrollbar>
             </div>
         );
     }

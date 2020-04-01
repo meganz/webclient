@@ -2529,7 +2529,7 @@ Chat.prototype.getFrequentContacts = function() {
                 contactHandle !== u_handle
             ) {
                 if (!recentContacts[contactHandle] || recentContacts[contactHandle].ts < msg.delay) {
-                    recentContacts[contactHandle] = {'userId': contactHandle, 'ts': msg.delay};
+                    recentContacts[contactHandle] = { 'userId': contactHandle, 'ts': msg.delay, 'chatRoom': r };
                 }
             }
         });

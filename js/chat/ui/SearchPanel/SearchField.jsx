@@ -3,7 +3,7 @@ import { MegaRenderMixin } from '../../../stores/mixins';
 import { STATUS } from './SearchPanel.jsx';
 
 export default class SearchField extends MegaRenderMixin {
-    static input = React.createRef();
+    static inputRef = React.createRef();
 
     constructor(props) {
         super(props);
@@ -11,7 +11,7 @@ export default class SearchField extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        SearchField.input.current.focus();
+        SearchField.inputRef.current.focus();
     }
 
     renderStatus = status => {
@@ -43,8 +43,8 @@ export default class SearchField extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, onFocus, onBlur, onChange, onSearchToggle } = this.props;
-        const HAS_INTERACTIONS = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
+        const { value, searching, status, onFocus, onBlur, onChange, onSearchToggle, onSearchReset } = this.props;
+        const isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
 
         return (
             <div className="search-field">
@@ -54,7 +54,7 @@ export default class SearchField extends MegaRenderMixin {
                     type="text"
                     autoComplete="disabled"
                     placeholder="Search"
-                    ref={SearchField.input}
+                    ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
                     onBlur={onBlur}
@@ -62,10 +62,14 @@ export default class SearchField extends MegaRenderMixin {
 
                 {searching && status && (
                     <div
-                        className={`search-field-status ${HAS_INTERACTIONS ? 'has-interactions' : ''}`}
-                        onClick={() => HAS_INTERACTIONS ? onSearchToggle() : null}>
+                        className={`search-field-status ${isClickable ? 'clickable' : ''}`}
+                        onClick={() => isClickable && onSearchToggle()}>
                         {this.renderStatus(status)}
                     </div>
+                )}
+
+                {searching && (
+                    <i className="small-icon reset-icon" onClick={() => onSearchReset(SearchField.inputRef)}></i>
                 )}
             </div>
         );

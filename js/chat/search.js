@@ -370,8 +370,8 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
         cs.resume();
     }
 
-    // console.error('search > doSearch() -> megaPromise:', megaPromise);
     // [...] TODO: temporary, remove;
+    console.error('@lp -- please, check when possible re: window.megaPromiseTemp');
     window.megaPromiseTemp = megaPromise;
     return megaPromise;
 };

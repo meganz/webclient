@@ -379,12 +379,25 @@ div.search-field {
     position: relative;
 }
 
-div.search-field i.thin-search-icon {
+div.search-field i {
     position: absolute;
-    top: 8px;
-    left: 7px;
     display: block;
     z-index: 10;
+}
+
+div.search-field i.thin-search-icon {
+    top: 8px;
+    left: 7px;
+}
+
+div.search-field i.reset-icon {
+    top: 12px;
+    right: 7px;
+    width: 14px;
+    height: 14px;
+    border-radius: 200px;
+    background: orange;
+    cursor: pointer;
 }
 
 div.search-field input {
@@ -416,7 +429,7 @@ div.search-field div.search-field-status:hover {
     /* […] */
 }
 
-div.search-field div.search-field-status.has-interactions {
+div.search-field div.search-field-status.clickable {
     cursor: pointer;
 }
 
@@ -454,10 +467,16 @@ div.result-table div.result-table-row {
     cursor: pointer;
 }
 
-/* --- Result Row: Recent --- */
+/* --- Result Row: Recent & Members --- */
+
+div.result-table div.result-table-row div.avatar-wrapper {
+    float: left;
+    width: 36px;
+}
 
 div.result-table div.result-table-row div.user-info {
     float: left;
+    width: 190px;
     padding: 5px 0 0 10px;
     font-size: 14px;
 }
@@ -468,56 +487,54 @@ div.result-table div.result-table-row div.user-info div.user-card-presence {
 
 /* --- Result Row: Messages --- */
 
-div.result-table.messages {
-    /* […] */
-}
-
-div.result-table.messages div.result-table-row {
+div.result-table div.result-table-row.message {
     margin: 5px 0;
     padding: 5px 3px;
 }
 
-div.result-table.messages div.result-table-row:nth-child(odd) {
+div.result-table div.result-table-row.message:nth-child(odd) {
     background: #FFF;
 }
 
-div.result-table.messages div.result-table-row span {
+div.result-table div.result-table-row.message span {
     display: block;
     padding: 3px 0;
 }
 
-div.result-table.messages div.result-table-row span.title {
+div.result-table div.result-table-row.message span.title {
     font-size: 14px;
     font-weight: 600;
 }
 
-div.result-table.messages div.result-table-row span.summary {
+div.result-table div.result-table-row.message span.title div.user-card-presence {
+    margin-bottom: 1px;
+}
+
+div.result-table div.result-table-row.message span.summary {
+    overflow: hidden;
+    max-width: 215px;
     font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     color: #666;
 }
 
-div.result-table.messages div.result-table-row span.date {
+div.result-table div.result-table-row.message span.date {
     font-size: 12px;
     color: #999;
 }
 
+
 /* --- Result Row: No Results --- */
 
-div.result-table.nil {
-    /* […] */
-}
-
-div.result-table.nil div.result-table-row {
+div.result-table div.result-table-row.nil {
+    padding: 20px;
     cursor: default;
     text-align: center;
 }
 
-div.result-table.nil span {
+div.result-table div.result-table-row.nil span {
     display: block;
     font-size: 20px;
     color: #333;
-}
-
-div.result-table.nil div.result-table-row {
-    padding: 20px;
 }

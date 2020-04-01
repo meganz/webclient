@@ -434,6 +434,22 @@ var crypt = (function() {
         // Get the pub key and update local variable and the cache.
         var getPubKeyPromise = ns.getPubKeyAttribute(userhandle, keyType);
 
+        // 2020-03-31: nowadays there is no point on verifying non-contacts...
+        var isNonContact = !is_karma && M.getUserByHandle(userhandle).c !== 1;
+        if (isNonContact) {
+            if (d) {
+                logger[d > 1 ? 'warn' : 'info']('Skipping %s verification for non-contact "%s"', keyType, userhandle);
+            }
+
+            getPubKeyPromise.done(function(pubKey) {
+                pubKeyCache[userhandle] = pubKey;
+                masterPromise.resolve(pubKey);
+                __callbackAttachAfterDone(masterPromise);
+            });
+            masterPromise.linkFailTo(getPubKeyPromise);
+            return masterPromise;
+        }
+
         getPubKeyPromise.done(function __resolvePubKey(result) {
             var pubKey = result;
             authMethod = ns._getPubKeyAuthentication(userhandle, pubKey, keyType);

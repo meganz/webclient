@@ -1413,7 +1413,13 @@ var exportExpiry = {
         // Embed code handling
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
         if ($.itemExportEmbed || is_video(n) === 1 && !folderlink) {
-            var link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
+            var link;
+            if (mega.flags.nlfe) {
+                link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
+            }
+            else {
+                link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
+            }
             var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
             var setCode = function() {
                 var time = 0;

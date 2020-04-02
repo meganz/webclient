@@ -18,11 +18,11 @@
     color: #373737;
     padding: 76px 40px 35px 40px;
 }
-.download .startpage.top-header {
-    margin-top: 118px;
-}
-body:not(.en) .download .startpage.top-header {
+.download .startpage.top-header, .download .bottom-page.top-title {
     margin-top: 128px;
+}
+body.en .download .startpage.top-header, body.en .download .bottom-page.top-title {
+    margin-top: 118px;
 }
 .startpage.top-info {
     font-size: 16px;

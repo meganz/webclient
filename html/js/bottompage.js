@@ -403,7 +403,7 @@ var bottompage = {
                 if (topPos > 150 && $topHeader.is('.expanded')) {
                     $topHeader.removeClass('expanded initial').addClass('auto');
                 }
-                else if (topPos < 50 && $topHeader.is('.video-theatre-mode.auto')) {
+                else if (topPos < 50 && $topHeader.is('.auto')) {
                     expandDlBar();
                 }
                 return;

@@ -8153,7 +8153,6 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     right: 0;
     bottom: 0;
     position: absolute;
-    z-index: 1200;
     display: flex;
 }
 .fm-modal-dialog  .fm-dialog {
@@ -8161,6 +8160,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     margin: auto !important;
     left: 0;
     top: 0;
+    z-index: 1200;
 }
 .fm-dialog.share-dialog {
     z-index: 1100;

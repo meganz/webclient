@@ -680,7 +680,8 @@ function dl_g(res, ctx) {
 
                 if ($(this).find('.download-content').height() < 15
                     && $target.not('.button') && !$target.closest('.button').length
-                    && !$target.closest('.top-menu-popup').length) {
+                    && !$target.closest('.top-menu-popup').length
+                    && !$topBar.hasClass('download-complete')) {
 
                     expandDlBar();
                 }
@@ -688,7 +689,11 @@ function dl_g(res, ctx) {
 
             // Collapse/Expand top bar events
             $('.top-expand-button, .top-expand-txt', $topBar).rebind('click', function() {
-                if ($(this).hasClass('active')) {
+                if ($topBar.hasClass('download-complete') && !$topBar.hasClass('expanded')) {
+                    $topBar.addClass('hidden-bar');
+                    return false;
+                }
+                else if ($(this).hasClass('active')) {
                     $topBar.removeClass('expanded initial auto').css('height', '');
                     return $(window).unbind('resize.download-bar');
                 }
@@ -700,7 +705,7 @@ function dl_g(res, ctx) {
                 var $this = $(this);
 
                 if (!$this.is('.expanded.floating') || $this.is('.video-theatre-mode')) {
-                    return;
+                    return false;
                 }
                 var delta = ev.wheelDelta || ev.detail || ev.originalEvent.wheelDelta
                     || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;

@@ -17386,7 +17386,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     opacity: 0.7;
 }
 .share-dialog-contacts .jspVerticalBar, .multiple-input .jspVerticalBar, .fm-dialog-body .jspVerticalBar, .fm-call-dialog .jspVerticalBar {
-    width: 9px;
+    width: 12px;
 }
 .share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .fm-call-dialog .jspDrag {
     width: 6px;

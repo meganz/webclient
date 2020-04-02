@@ -532,7 +532,7 @@ function init_page() {
 
         if (phLen < 0) {
             phLen = page.length;
-            possibleS = page.indexOf('/f', 5);
+            possibleS = page.indexOf('/f', 7);
             if (possibleS > -1) {
                 phLen = possibleS;
             }

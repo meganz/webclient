@@ -11806,6 +11806,25 @@ code, c {
 .mobile.password-reminder-overlay .pass-reminder-container .result-txt.wrong .result-text {
     color: #D90007;
 }
+.mobile.password-reminder-overlay .prd-reset-password-text {
+    font-size: 14px;
+    color: #676D75;
+    letter-spacing: 0;
+    text-align: center;
+    line-height: 1.5;
+    white-space: normal;
+    margin: 12px auto 20px;
+    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif
+}
+.mobile.password-reminder-overlay .prd-reset-password-text .pass-reminder.forgot-password {
+    color: #00BFA5;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 8px;
+    vertical-align: top;
+    font-size: 14px;
+    line-height: 20px;
+}
 
 .mobile.password-reminder-overlay .pass-reminder-container .tiny-icon {
     margin-right: 8px;

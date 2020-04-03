@@ -53,16 +53,12 @@ export default class SearchPanel extends MegaRenderMixin {
         $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
         !$(ev.target).is('i.reset-icon') /* current element !== reset search element */;
 
-    toggleMinimize = ev =>
-        ev && this.clickedOutsideComponent(ev) && this.setState(state => ({ minimized: !state.minimized }));
+    toggleMinimize = ev => {
+        return ev && this.clickedOutsideComponent(ev) && this.setState(state => ({ minimized: !state.minimized }));
+    };
 
     doUnmount = ev => {
-        const clickedOutsideComponent =
-            ev &&
-            $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
-            !$(ev.target).is('i.reset-icon'); /* current element !== reset search element */
-
-        return clickedOutsideComponent && this.props.onUnmount();
+        return this.clickedOutsideComponent(ev) && this.props.onUnmount();
     };
 
     doSearch = s => {

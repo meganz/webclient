@@ -2,31 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './ResultContainer.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 
-const ROW_CLASS = `result-table-row`;
-
-// const highlight = (text, matches) => {
-//     if (matches) {
-//         let highlighted = [];
-//         let textArray = text.split(' ');
-//
-//         for (let i = 0; i < textArray.length; i++) {
-//             let word = textArray[i];
-//
-//             for (let j = 0; j < matches.length; j++) {
-//                 const match = matches[j].str;
-//                 if (word === match) {
-//                     word = `<strong>${word}</strong>`;
-//                 }
-//             }
-//
-//             highlighted = [...highlighted, word];
-//         }
-//
-//         return highlighted.join(' ');
-//     }
-//
-//     return text;
-// };
+const SEARCH_ROW_CLASS = `result-table-row`;
 
 const highlight = (text, matches) => {
     if (matches) {
@@ -48,7 +24,7 @@ const Message = ({ result }) => {
 
     return (
         <div
-            className={`${ROW_CLASS} message`}
+            className={`${SEARCH_ROW_CLASS} message`}
             onClick={() => loadSubPage(room.getRoomUrl())}>
             <span className="title">
                 {nicknames.getNicknameAndName(data.userId)}
@@ -68,7 +44,7 @@ const Message = ({ result }) => {
 const Chat = ({ result }) => {
     return (
         <div
-            className={ROW_CLASS}
+            className={SEARCH_ROW_CLASS}
             onClick={() => loadSubPage(result.room.getRoomUrl())}>
             {/* TODO: add static DOM re: group chats avatar */}
             <div style={{
@@ -92,7 +68,7 @@ const Member = ({ result }) => {
     const contact = M.u[result.data];
     return (
         <div
-            className={ROW_CLASS}
+            className={SEARCH_ROW_CLASS}
             onClick={() => loadSubPage(result.room.getRoomUrl())}>
             <Avatar contact={contact} />
             <div className="user-info">
@@ -108,7 +84,7 @@ const Member = ({ result }) => {
 };
 
 const Nil = () => (
-    <div className={`${ROW_CLASS} nil`}>
+    <div className={`${SEARCH_ROW_CLASS} nil`}>
         <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
         <span>{LABEL.NO_RESULTS}</span>
     </div>
@@ -128,7 +104,7 @@ export const ResultRow = ({ type, result, children }) => {
             return <Nil />;
         default:
             return (
-                <div className={ROW_CLASS}>
+                <div className={SEARCH_ROW_CLASS}>
                     {children}
                 </div>
             );

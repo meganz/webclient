@@ -7,20 +7,33 @@ import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 export const STATUS = {
     IN_PROGRESS: 1,
     PAUSED: 2,
-    COMPLETED: 3,
+    COMPLETED: 3
 };
+
+const SEARCH_PANEL_CLASS = `search-panel`;
 
 export default class SearchPanel extends MegaRenderMixin {
     state = {
         value: '',
         searching: false,
         status: undefined,
+        minimized: false,
         recent: [],
         results: []
     };
 
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        $(document).rebind('click.searchPanel', ev => this.doUnmount(ev));
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        $(document).unbind('click.searchPanel');
     }
 
     getRecent = () => {
@@ -33,6 +46,23 @@ export default class SearchPanel extends MegaRenderMixin {
                     }))
                 });
             });
+    };
+
+    clickedOutsideComponent = ev =>
+        ev &&
+        $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
+        !$(ev.target).is('i.reset-icon') /* current element !== reset search element */;
+
+    toggleMinimize = ev =>
+        ev && this.clickedOutsideComponent(ev) && this.setState(state => ({ minimized: !state.minimized }));
+
+    doUnmount = ev => {
+        const clickedOutsideComponent =
+            ev &&
+            $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
+            !$(ev.target).is('i.reset-icon'); /* current element !== reset search element */
+
+        return clickedOutsideComponent && this.props.onUnmount();
     };
 
     doSearch = s => {
@@ -56,10 +86,6 @@ export default class SearchPanel extends MegaRenderMixin {
 
     handleFocus = () => {
         this.getRecent();
-    };
-
-    handleBlur = () => {
-        // this.props.onBlur();
     };
 
     handleChange = ev => {
@@ -100,17 +126,19 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, recent, results } = this.state;
+        const { value, searching, status, minimized, recent, results } = this.state;
 
         return (
-            <div className="search-area">
+            <div className={`
+                ${SEARCH_PANEL_CLASS}
+                ${minimized ? 'hidden' : ''}
+            `}>
                 <PerfectScrollbar>
                     <SearchField
                         value={value}
                         searching={searching}
                         status={status}
                         onFocus={this.handleFocus}
-                        onBlur={this.handleBlur}
                         onChange={this.handleChange}
                         onSearchToggle={this.handleSearchToggle}
                         onSearchReset={this.handleSearchReset} />

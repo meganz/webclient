@@ -1335,7 +1335,7 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        {this.state.searching && <SearchPanel onBlur={() => this.setState({ searching: false })} />}
+                        {this.state.searching && <SearchPanel onUnmount={() => this.setState({ searching: false })} />}
                         <div className="nw-fm-tree-header conversations filled-input">
                             <div
                                 className="small-icon thin-search-icon"

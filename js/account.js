@@ -816,6 +816,32 @@ function processEmailChangeActionPacket(ap) {
     }
 }
 
+/**
+ * Contains a list of permitted landing pages.
+ * @var {array} allowedLandingPages
+ */
+var allowedLandingPages = ['fm', 'recents', 'chat'];
+
+/**
+ * Fetch the landing page.
+ * @return {string|int} The user selected landing page.
+ */
+function getLandingPage() {
+    'use strict';
+    return allowedLandingPages[mega.config.get('uhp')] || 'fm';
+}
+
+/**
+ * Set the landing page.
+ * @param {string} page The user selected landing page from the `allowedLandingPages` array.
+ * @return {void}
+ */
+function setLandingPage(page) {
+    'use strict';
+    var index = allowedLandingPages.indexOf(page);
+    mega.config.set('uhp', index < 0 ? 0 : index);
+}
+
 (function(exportScope) {
     "use strict";
     var _lastUserInteractionCache = {};

@@ -13,6 +13,7 @@ var _attchRerenderCbContacts = function() {
         'firstName',
         'lastName',
         'nickname',
+        'presence',
         'm',
         'avatar'
     ]);

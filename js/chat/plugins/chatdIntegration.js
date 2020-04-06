@@ -961,7 +961,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             }
             self.waitingChatIdPromises[chatRoom.roomId] = asyncApiReq({
                 'a': 'mcc',
-                'g': chatRoom.type === "group" ? 1 : 0,
+                'g': (chatRoom.type === "group" || chatRoom.type === "public") ? 1 : 0,
                 'u': userHashes,
                 'm': chatRoom.type === "public" ? 1 : 0,
                 'v': Chatd.VERSION

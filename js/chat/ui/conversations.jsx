@@ -952,7 +952,8 @@ class ConversationsApp extends MegaRenderMixin {
         this.state = {
             leftPaneWidth: mega.config.get('leftPaneWidth'),
             startGroupChatDialogShown: false,
-            searching: false
+            searchActive: false,
+            searchMinimized: true
         };
     }
     startChatClicked(selected) {
@@ -1335,11 +1336,25 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        {this.state.searching && <SearchPanel onUnmount={() => this.setState({ searching: false })} />}
+                        {this.state.searchActive && (
+                            <SearchPanel
+                                minimized={this.state.searchMinimized}
+                                onToggle={() =>
+                                    this.setState(state => ({
+                                        searchMinimized: !state.searchMinimized
+                                    }))
+                                }
+                            />
+                        )}
                         <div className="nw-fm-tree-header conversations filled-input">
                             <div
                                 className="small-icon thin-search-icon"
-                                onClick={() => this.setState({ searching: true })}>
+                                onClick={() =>
+                                    this.setState(state => ({
+                                        searchActive: true,
+                                        searchMinimized: !state.searchMinimized
+                                    }))
+                                }>
                             </div>
                             <Button group="conversationsListing" icon="chat-with-plus">
                                 <DropdownContactsSelector

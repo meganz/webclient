@@ -17,7 +17,6 @@ export default class SearchPanel extends MegaRenderMixin {
         value: '',
         searching: false,
         status: undefined,
-        minimized: false,
         recent: [],
         results: []
     };
@@ -28,7 +27,16 @@ export default class SearchPanel extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        $(document).rebind('click.searchPanel', ev => this.doUnmount(ev));
+        $(document).rebind('click.searchPanel', (ev) =>
+            this.clickedOutsideComponent(ev) && !this.props.minimized && this.toggleMinimize()
+        );
+    }
+
+    componentWillReceiveProps(nextProps, nextContext) {
+        super.componentWillReceiveProps(nextProps, nextContext);
+        if (nextProps.minimized !== this.props.minimized) {
+            this.safeForceUpdate();
+        }
     }
 
     componentWillUnmount() {
@@ -51,14 +59,11 @@ export default class SearchPanel extends MegaRenderMixin {
     clickedOutsideComponent = ev =>
         ev &&
         $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
-        !$(ev.target).is('i.reset-icon') /* current element !== reset search element */;
+        !$(ev.target).is('i.reset-icon') && /* current element !== reset search element */
+        !$(ev.target).is('.small-icon.thin-search-icon'); /* current element !== toggle search icon */
 
-    toggleMinimize = ev => {
-        return ev && this.clickedOutsideComponent(ev) && this.setState(state => ({ minimized: !state.minimized }));
-    };
-
-    doUnmount = ev => {
-        return this.clickedOutsideComponent(ev) && this.props.onUnmount();
+    toggleMinimize = () => {
+        this.props.onToggle();
     };
 
     doSearch = s => {
@@ -122,12 +127,12 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, minimized, recent, results } = this.state;
+        const { value, searching, status, recent, results } = this.state;
 
         return (
             <div className={`
                 ${SEARCH_PANEL_CLASS}
-                ${minimized ? 'hidden' : ''}
+                ${this.props.minimized ? 'hidden' : ''}
             `}>
                 <PerfectScrollbar>
                     <SearchField

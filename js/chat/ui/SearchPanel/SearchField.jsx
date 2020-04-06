@@ -43,7 +43,7 @@ export default class SearchField extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, onFocus, onBlur, onChange, onSearchToggle, onSearchReset } = this.props;
+        const { value, searching, status, onFocus, onChange, onSearchToggle, onSearchReset } = this.props;
         const isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
 
         return (
@@ -57,7 +57,6 @@ export default class SearchField extends MegaRenderMixin {
                     ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
-                    onBlur={onBlur}
                     onChange={onChange} />
 
                 {searching && status && (

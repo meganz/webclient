@@ -131,7 +131,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (newState === ChatRoom.STATE.READY) {
             if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
                 // this should never happen, but just in case...
-                self.getChatIdMessages().resend();
+                var cim = self.getChatIdMessages();
+                cim.restore();
+                cim.resend();
             }
             self.loadContactNames();
         }

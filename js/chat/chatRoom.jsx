@@ -639,7 +639,7 @@ ChatRoom.prototype.persistToFmdb = function() {
             var roomInfo = {
                 'id': self.chatId,
                 'cs': self.chatShard,
-                'g' : (self.type === "group") ? 1 : 0,
+                'g': self.type === "group" || self.type === "public" ? 1 : 0,
                 'u' : users,
                 'ts': self.ctime,
                 'ct': self.ct,

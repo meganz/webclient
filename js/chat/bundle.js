@@ -19359,10 +19359,19 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
 
         $promise.resolve(roomId, self.chats[roomId]);
         return;
+      } else {
+        if (setAsActive === true) {
+          // duplicated 1on1 chats (diff ids, both marked as private) found, while init loading
+          // the chat w/ currentUrl=one of those dup chats
+          loadSubPage('fm/chat');
+        } else {
+          if (d) {
+            console.error("ChatRoom not found. This should never happen.");
+          }
+        }
       }
 
-      var res = self.openChat(userHandles, ap.m === 1 ? "public" : ap.g === 1 ? "group" : "private", ap.id, ap.cs, ap.url, setAsActive, chatHandle, publicChatKey, ck);
-      $promise.linkDoneAndFailTo(res[2]);
+      $promise.reject();
     }).fail(function () {
       $promise.reject(arguments[0]);
     });
@@ -21323,7 +21332,7 @@ ChatRoom.prototype.persistToFmdb = function () {
       var roomInfo = {
         'id': self.chatId,
         'cs': self.chatShard,
-        'g': self.type === "group" ? 1 : 0,
+        'g': self.type === "group" || self.type === "public" ? 1 : 0,
         'u': users,
         'ts': self.ctime,
         'ct': self.ct,

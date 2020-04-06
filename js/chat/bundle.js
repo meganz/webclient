@@ -103,7 +103,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -194,9 +194,7 @@ if (localStorageProfileRenderFns) {
 }
 
 var ID_CURRENT = 0;
-var MegaRenderMixin =
-/*#__PURE__*/
-function (_React$Component) {
+var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
   _inherits(MegaRenderMixin, _React$Component);
 
   function MegaRenderMixin(props) {
@@ -959,9 +957,7 @@ function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_1___default.a.Component);
 ;
 var _noAvatars = {};
-var ContactAwareComponent =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ContactAwareComponent = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ContactAwareComponent, _MegaRenderMixin);
 
   function ContactAwareComponent(props) {
@@ -1036,7 +1032,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
@@ -1073,9 +1069,7 @@ var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
   this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
 };
 
-var ContactsListItem =
-/*#__PURE__*/
-function (_ContactAwareComponen) {
+var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
   _inherits(ContactsListItem, _ContactAwareComponen);
 
   function ContactsListItem() {
@@ -1128,9 +1122,7 @@ ContactsListItem.defaultProps = {
 ContactsListItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object.isRequired
 };
-var ContactButton =
-/*#__PURE__*/
-function (_ContactAwareComponen2) {
+var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
   _inherits(ContactButton, _ContactAwareComponen2);
 
   function ContactButton() {
@@ -1416,9 +1408,7 @@ ContactButton.defaultProps = {
 ContactButton.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactVerified =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ContactVerified = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ContactVerified, _MegaRenderMixin);
 
   function ContactVerified() {
@@ -1475,9 +1465,7 @@ ContactVerified.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactPresence =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ContactPresence = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ContactPresence, _MegaRenderMixin2);
 
   function ContactPresence() {
@@ -1510,9 +1498,7 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var ContactFingerprint =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var ContactFingerprint = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ContactFingerprint, _MegaRenderMixin3);
 
   function ContactFingerprint() {
@@ -1587,9 +1573,7 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var Avatar =
-/*#__PURE__*/
-function (_ContactAwareComponen3) {
+var Avatar = /*#__PURE__*/function (_ContactAwareComponen3) {
   _inherits(Avatar, _ContactAwareComponen3);
 
   function Avatar() {
@@ -1700,9 +1684,7 @@ Avatar.defaultProps = {
 Avatar.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactCard =
-/*#__PURE__*/
-function (_ContactAwareComponen4) {
+var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
   _inherits(ContactCard, _ContactAwareComponen4);
 
   function ContactCard() {
@@ -1904,9 +1886,7 @@ ContactCard.defaultProps = {
 ContactCard.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactItem =
-/*#__PURE__*/
-function (_ContactAwareComponen5) {
+var ContactItem = /*#__PURE__*/function (_ContactAwareComponen5) {
   _inherits(ContactItem, _ContactAwareComponen5);
 
   function ContactItem() {
@@ -1974,9 +1954,7 @@ ContactItem.defaultProps = {
 ContactItem.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactPickerWidget =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
   function ContactPickerWidget(props) {
@@ -2535,7 +2513,7 @@ ContactPickerWidget.defaultProps = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -2567,9 +2545,7 @@ var ReactDOM = __webpack_require__(4);
  * @type {*|Function}
  */
 
-var JScrollPane =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(JScrollPane, _MegaRenderMixin);
 
   function JScrollPane() {
@@ -2769,9 +2745,7 @@ JScrollPane.defaultProps = {
  * so that we can render Dialogs into the body or other child element, different then the current component's child.
  */
 
-var RenderTo =
-/*#__PURE__*/
-function (_React$Component) {
+var RenderTo = /*#__PURE__*/function (_React$Component) {
   _inherits(RenderTo, _React$Component);
 
   function RenderTo() {
@@ -2849,9 +2823,7 @@ function (_React$Component) {
 
 ;
 
-var EmojiFormattedContent =
-/*#__PURE__*/
-function (_React$Component2) {
+var EmojiFormattedContent = /*#__PURE__*/function (_React$Component2) {
   _inherits(EmojiFormattedContent, _React$Component2);
 
   function EmojiFormattedContent() {
@@ -2976,7 +2948,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -3003,9 +2975,7 @@ var React = __webpack_require__(0);
 
 
 
-var Dropdown =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Dropdown, _MegaRenderMixin);
 
   function Dropdown(props) {
@@ -3269,9 +3239,7 @@ function (_MegaRenderMixin) {
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var DropdownContactsSelector =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var DropdownContactsSelector = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(DropdownContactsSelector, _MegaRenderMixin2);
 
   function DropdownContactsSelector(props) {
@@ -3364,9 +3332,7 @@ function (_MegaRenderMixin2) {
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
-var DropdownItem =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var DropdownItem = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(DropdownItem, _MegaRenderMixin3);
 
   function DropdownItem(props) {
@@ -3488,7 +3454,7 @@ DropdownItem.defaultProps = {
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
 /* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
 
@@ -3521,9 +3487,7 @@ var ReactDOM = __webpack_require__(4);
 
 var ContactsUI = __webpack_require__(2);
 
-var ExtraFooterElement =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ExtraFooterElement = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ExtraFooterElement, _MegaRenderMixin);
 
   function ExtraFooterElement() {
@@ -3543,9 +3507,7 @@ function (_MegaRenderMixin) {
 }(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
 ;
 
-var ModalDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ModalDialog, _MegaRenderMixin2);
 
   function ModalDialog(props) {
@@ -3705,9 +3667,7 @@ ModalDialog.defaultProps = {
 };
 ;
 
-var SelectContactDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var SelectContactDialog = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(SelectContactDialog, _MegaRenderMixin3);
 
   function SelectContactDialog(props) {
@@ -3803,9 +3763,7 @@ SelectContactDialog.defaultProps = {
 };
 ;
 
-var ConfirmDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ConfirmDialog = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ConfirmDialog, _MegaRenderMixin4);
 
   function ConfirmDialog(props) {
@@ -3966,7 +3924,7 @@ ConfirmDialog.defaultProps = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -3996,9 +3954,7 @@ var utils = __webpack_require__(3);
 
 
 var _buttonGroups = {};
-var Button =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Button = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Button, _MegaRenderMixin);
 
   function Button(props) {
@@ -4224,7 +4180,7 @@ function (_MegaRenderMixin) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationMessageMixin", function() { return ConversationMessageMixin; });
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4250,9 +4206,7 @@ var React = __webpack_require__(0);
 
 
 
-var ConversationMessageMixin =
-/*#__PURE__*/
-function (_ContactAwareComponen) {
+var ConversationMessageMixin = /*#__PURE__*/function (_ContactAwareComponen) {
   _inherits(ConversationMessageMixin, _ContactAwareComponen);
 
   function ConversationMessageMixin(props) {
@@ -4404,7 +4358,7 @@ function (_ContactAwareComponen) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PerfectScrollbar", function() { return PerfectScrollbar; });
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4437,9 +4391,7 @@ var x = 0;
  * @type {*|Function}
  */
 
-var PerfectScrollbar =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var PerfectScrollbar = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(PerfectScrollbar, _MegaRenderMixin);
 
   function PerfectScrollbar(props) {
@@ -4841,7 +4793,7 @@ PerfectScrollbar.MAX_BOTTOM_POS = 9999999;
 
 "use strict";
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4867,9 +4819,7 @@ var utils = __webpack_require__(3);
 
 
 
-var Handler =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Handler = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Handler, _MegaRenderMixin);
 
   function Handler() {
@@ -4898,9 +4848,7 @@ Handler.defaultProps = {
 };
 ;
 
-var Contents =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Contents = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(Contents, _MegaRenderMixin2);
 
   function Contents() {
@@ -4935,9 +4883,7 @@ Contents.defaultProps = {
 };
 ;
 
-var Tooltip =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var Tooltip = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(Tooltip, _MegaRenderMixin3);
 
   function Tooltip(props) {
@@ -5099,7 +5045,7 @@ Tooltip.defaultProps = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getMessageString", function() { return getMessageString; });
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 /**
  * The most dummiest lazy load ever... but no need for something more complicated
@@ -5189,7 +5135,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -5313,9 +5259,7 @@ var getRoomName = function getRoomName(chatRoom) {
   return chatRoom.getRoomTitle();
 };
 
-var ConversationsListItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ConversationsListItem, _MegaRenderMixin);
 
   function ConversationsListItem() {
@@ -5638,9 +5582,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var ArchConversationsListItem =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(ArchConversationsListItem, _MegaRenderMixin2);
 
   function ArchConversationsListItem() {
@@ -5780,9 +5722,7 @@ function (_MegaRenderMixin2) {
 
 ;
 
-var ConversationsList =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ConversationsList, _MegaRenderMixin3);
 
   _createClass(ConversationsList, [{
@@ -5960,9 +5900,7 @@ ConversationsList.defaultProps = {
 };
 ;
 
-var ArchivedConversationsList =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ArchivedConversationsList, _MegaRenderMixin4);
 
   function ArchivedConversationsList(props) {
@@ -6183,9 +6121,7 @@ function (_MegaRenderMixin4) {
 
 ;
 
-var ConversationsApp =
-/*#__PURE__*/
-function (_MegaRenderMixin5) {
+var ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
   _inherits(ConversationsApp, _MegaRenderMixin5);
 
   function ConversationsApp(props) {
@@ -6681,7 +6617,7 @@ if (false) {}
 
 "use strict";
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6707,9 +6643,7 @@ var utils = __webpack_require__(3);
 
 
 
-var Checkbox =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var Checkbox = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(Checkbox, _MegaRenderMixin);
 
   function Checkbox(props) {
@@ -6785,7 +6719,7 @@ function (_MegaRenderMixin) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MetaRichpreviewLoading", function() { return MetaRichpreviewLoading; });
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6807,9 +6741,7 @@ var React = __webpack_require__(0);
 
 var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichpreviewLoading =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
   _inherits(MetaRichpreviewLoading, _ConversationMessageM);
 
   function MetaRichpreviewLoading() {
@@ -6839,7 +6771,14 @@ function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
+__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -6865,7 +6804,7 @@ var modalDialogs = __webpack_require__(7);
 var tooltips = __webpack_require__(11);
 
 // CONCATENATED MODULE: ./js/ui/cloudBrowserModalDialog.jsx
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6921,9 +6860,7 @@ function BrowserCol(_ref) {
 
 ;
 
-var cloudBrowserModalDialog_BrowserEntries =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var cloudBrowserModalDialog_BrowserEntries = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(BrowserEntries, _MegaRenderMixin);
 
   function BrowserEntries(props) {
@@ -7645,9 +7582,7 @@ cloudBrowserModalDialog_BrowserEntries.defaultProps = {
 };
 ;
 
-var cloudBrowserModalDialog_CloudBrowserDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(CloudBrowserDialog, _MegaRenderMixin2);
 
   function CloudBrowserDialog(props) {
@@ -8340,7 +8275,7 @@ var ui_dropdowns = __webpack_require__(6);
 var ui_contacts = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./js/ui/emojiDropdown.jsx
-function emojiDropdown_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { emojiDropdown_typeof = function _typeof(obj) { return typeof obj; }; } else { emojiDropdown_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return emojiDropdown_typeof(obj); }
+function emojiDropdown_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { emojiDropdown_typeof = function _typeof(obj) { return typeof obj; }; } else { emojiDropdown_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return emojiDropdown_typeof(obj); }
 
 function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 
@@ -8370,9 +8305,7 @@ var DropdownsUI = __webpack_require__(6);
 
 var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var DropdownEmojiSelector =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var DropdownEmojiSelector = /*#__PURE__*/function (_MegaRenderMixin) {
   emojiDropdown_inherits(DropdownEmojiSelector, _MegaRenderMixin);
 
   function DropdownEmojiSelector(props) {
@@ -8887,7 +8820,7 @@ DropdownEmojiSelector.defaultProps = {
 };
 ;
 // CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
-function emojiAutocomplete_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { emojiAutocomplete_typeof = function _typeof(obj) { return typeof obj; }; } else { emojiAutocomplete_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return emojiAutocomplete_typeof(obj); }
+function emojiAutocomplete_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { emojiAutocomplete_typeof = function _typeof(obj) { return typeof obj; }; } else { emojiAutocomplete_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return emojiAutocomplete_typeof(obj); }
 
 function emojiAutocomplete_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8917,9 +8850,7 @@ var ReactDOM = __webpack_require__(4);
 
 var ButtonsUI = __webpack_require__(8);
 
-var EmojiAutocomplete =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var EmojiAutocomplete = /*#__PURE__*/function (_MegaRenderMixin) {
   emojiAutocomplete_inherits(EmojiAutocomplete, _MegaRenderMixin);
 
   function EmojiAutocomplete(props) {
@@ -9199,7 +9130,7 @@ EmojiAutocomplete.defaultProps = {
 // CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 var _dec, _class, _class2, _temp;
 
-function typingArea_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { typingArea_typeof = function _typeof(obj) { return typeof obj; }; } else { typingArea_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return typingArea_typeof(obj); }
+function typingArea_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { typingArea_typeof = function _typeof(obj) { return typeof obj; }; } else { typingArea_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return typingArea_typeof(obj); }
 
 function typingArea_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -9233,9 +9164,7 @@ var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
-var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 = /*#__PURE__*/function (_MegaRenderMixin) {
   typingArea_inherits(TypingArea, _MegaRenderMixin);
 
   function TypingArea(props) {
@@ -10141,7 +10070,7 @@ function (_MegaRenderMixin) {
 }, _temp), (_applyDecoratedDescriptor(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype)), _class));
 ;
 // CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
-function whosTyping_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { whosTyping_typeof = function _typeof(obj) { return typeof obj; }; } else { whosTyping_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return whosTyping_typeof(obj); }
+function whosTyping_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { whosTyping_typeof = function _typeof(obj) { return typeof obj; }; } else { whosTyping_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return whosTyping_typeof(obj); }
 
 function whosTyping_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -10171,9 +10100,7 @@ var whosTyping_ReactDOM = __webpack_require__(4);
 
 var RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var WhosTyping =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var WhosTyping = /*#__PURE__*/function (_MegaRenderMixin) {
   whosTyping_inherits(WhosTyping, _MegaRenderMixin);
 
   function WhosTyping(props) {
@@ -10330,7 +10257,7 @@ function accordion_get(target, property, receiver) { if (typeof Reflect !== "und
 
 function accordion_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = accordion_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function accordion_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { accordion_typeof = function _typeof(obj) { return typeof obj; }; } else { accordion_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return accordion_typeof(obj); }
+function accordion_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { accordion_typeof = function _typeof(obj) { return typeof obj; }; } else { accordion_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return accordion_typeof(obj); }
 
 function accordion_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -10356,9 +10283,7 @@ var accordion_ReactDOM = __webpack_require__(4);
 
 var accordion_RenderDebugger = __webpack_require__(1).RenderDebugger;
 
-var AccordionPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var AccordionPanel = /*#__PURE__*/function (_MegaRenderMixin) {
   accordion_inherits(AccordionPanel, _MegaRenderMixin);
 
   function AccordionPanel() {
@@ -10392,9 +10317,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var Accordion =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Accordion = /*#__PURE__*/function (_MegaRenderMixin2) {
   accordion_inherits(Accordion, _MegaRenderMixin2);
 
   function Accordion(props) {
@@ -10501,7 +10424,7 @@ function (_MegaRenderMixin2) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
-function participantsList_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { participantsList_typeof = function _typeof(obj) { return typeof obj; }; } else { participantsList_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return participantsList_typeof(obj); }
+function participantsList_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { participantsList_typeof = function _typeof(obj) { return typeof obj; }; } else { participantsList_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return participantsList_typeof(obj); }
 
 function participantsList_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -10528,9 +10451,7 @@ var ContactsUI = __webpack_require__(2);
 
 var participantsList_PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
-var participantsList_ParticipantsList =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var participantsList_ParticipantsList = /*#__PURE__*/function (_MegaRenderMixin) {
   participantsList_inherits(ParticipantsList, _MegaRenderMixin);
 
   function ParticipantsList(props) {
@@ -10684,9 +10605,7 @@ participantsList_ParticipantsList.defaultProps = {
 };
 ;
 
-var participantsList_ParticipantsListInner =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var participantsList_ParticipantsListInner = /*#__PURE__*/function (_MegaRenderMixin2) {
   participantsList_inherits(ParticipantsListInner, _MegaRenderMixin2);
 
   function ParticipantsListInner() {
@@ -10868,7 +10787,7 @@ var messages_utils = __webpack_require__(12);
 var mixin = __webpack_require__(9);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/metaRichpreview.jsx
-function metaRichpreview_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreview_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreview_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreview_typeof(obj); }
+function metaRichpreview_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreview_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreview_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreview_typeof(obj); }
 
 function metaRichpreview_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -10892,9 +10811,7 @@ var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
 var MetaRichPreviewLoading = __webpack_require__(15).MetaRichpreviewLoading;
 
-var MetaRichpreview =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichpreview = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreview_inherits(MetaRichpreview, _ConversationMessageM);
 
   function MetaRichpreview() {
@@ -11011,7 +10928,7 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/metaRichpreviewConfirmation.jsx
-function metaRichpreviewConfirmation_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreviewConfirmation_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreviewConfirmation_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreviewConfirmation_typeof(obj); }
+function metaRichpreviewConfirmation_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreviewConfirmation_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreviewConfirmation_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreviewConfirmation_typeof(obj); }
 
 function metaRichpreviewConfirmation_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11033,9 +10950,7 @@ var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
 var metaRichpreviewConfirmation_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichprevConfirmation =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var MetaRichprevConfirmation = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreviewConfirmation_inherits(MetaRichprevConfirmation, _ConversationMessageM);
 
   function MetaRichprevConfirmation() {
@@ -11136,7 +11051,7 @@ function (_ConversationMessageM) {
 var metaRichPreviewLoading = __webpack_require__(15);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/metaRichpreviewMegaLinks.jsx
-function metaRichpreviewMegaLinks_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreviewMegaLinks_typeof(obj); }
+function metaRichpreviewMegaLinks_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreviewMegaLinks_typeof(obj); }
 
 function metaRichpreviewMegaLinks_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11160,9 +11075,7 @@ function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLink
 
 
 
-var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var metaRichpreviewMegaLinks_MetaRichpreviewMegaLinks = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreviewMegaLinks_inherits(MetaRichpreviewMegaLinks, _ConversationMessageM);
 
   function MetaRichpreviewMegaLinks() {
@@ -11329,7 +11242,7 @@ var prop_types = __webpack_require__(5);
 var prop_types_default = /*#__PURE__*/__webpack_require__.n(prop_types);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/AudioPlayer.jsx
-function AudioPlayer_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { AudioPlayer_typeof = function _typeof(obj) { return typeof obj; }; } else { AudioPlayer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return AudioPlayer_typeof(obj); }
+function AudioPlayer_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { AudioPlayer_typeof = function _typeof(obj) { return typeof obj; }; } else { AudioPlayer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return AudioPlayer_typeof(obj); }
 
 function AudioPlayer_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11350,9 +11263,7 @@ function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.
 
 
 
-var AudioPlayer_AudioPlayer =
-/*#__PURE__*/
-function (_React$Component) {
+var AudioPlayer_AudioPlayer = /*#__PURE__*/function (_React$Component) {
   AudioPlayer_inherits(AudioPlayer, _React$Component);
 
   function AudioPlayer(props) {
@@ -11598,7 +11509,7 @@ AudioPlayer_AudioPlayer.propTypes = {
 };
 /* harmony default export */ var messages_AudioPlayer = (AudioPlayer_AudioPlayer);
 // CONCATENATED MODULE: ./js/chat/ui/messages/AudioContainer.jsx
-function AudioContainer_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { AudioContainer_typeof = function _typeof(obj) { return typeof obj; }; } else { AudioContainer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return AudioContainer_typeof(obj); }
+function AudioContainer_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { AudioContainer_typeof = function _typeof(obj) { return typeof obj; }; } else { AudioContainer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return AudioContainer_typeof(obj); }
 
 function AudioContainer_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11620,9 +11531,7 @@ function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = O
 
 
 
-var AudioContainer_AudioContainer =
-/*#__PURE__*/
-function (_React$Component) {
+var AudioContainer_AudioContainer = /*#__PURE__*/function (_React$Component) {
   AudioContainer_inherits(AudioContainer, _React$Component);
 
   function AudioContainer(props) {
@@ -11766,7 +11675,7 @@ GeoLocation.propTypes = {
 };
 /* harmony default export */ var messages_geoLocation = (GeoLocation);
 // CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
-function generic_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { generic_typeof = function _typeof(obj) { return typeof obj; }; } else { generic_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return generic_typeof(obj); }
+function generic_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { generic_typeof = function _typeof(obj) { return typeof obj; }; } else { generic_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return generic_typeof(obj); }
 
 function generic_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -11812,9 +11721,7 @@ var generic_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT =
 var CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big,' + ' .data-block-view.medium';
 var NODE_DOESNT_EXISTS_ANYMORE = {};
 
-var generic_GenericConversationMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMessageM) {
   generic_inherits(GenericConversationMessage, _ConversationMessageM);
 
   function GenericConversationMessage(props) {
@@ -13215,7 +13122,7 @@ function (_ConversationMessageM) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/alterParticipants.jsx
-function alterParticipants_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { alterParticipants_typeof = function _typeof(obj) { return typeof obj; }; } else { alterParticipants_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return alterParticipants_typeof(obj); }
+function alterParticipants_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { alterParticipants_typeof = function _typeof(obj) { return typeof obj; }; } else { alterParticipants_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return alterParticipants_typeof(obj); }
 
 function alterParticipants_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13239,9 +13146,7 @@ var alterParticipants_ContactsUI = __webpack_require__(2);
 
 var alterParticipants_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var AltPartsConvMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var AltPartsConvMessage = /*#__PURE__*/function (_ConversationMessageM) {
   alterParticipants_inherits(AltPartsConvMessage, _ConversationMessageM);
 
   function AltPartsConvMessage() {
@@ -13397,7 +13302,7 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/truncated.jsx
-function truncated_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { truncated_typeof = function _typeof(obj) { return typeof obj; }; } else { truncated_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return truncated_typeof(obj); }
+function truncated_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { truncated_typeof = function _typeof(obj) { return typeof obj; }; } else { truncated_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return truncated_typeof(obj); }
 
 function truncated_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13421,9 +13326,7 @@ var truncated_ContactsUI = __webpack_require__(2);
 
 var truncated_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TruncatedMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var TruncatedMessage = /*#__PURE__*/function (_ConversationMessageM) {
   truncated_inherits(TruncatedMessage, _ConversationMessageM);
 
   function TruncatedMessage() {
@@ -13492,7 +13395,7 @@ function (_ConversationMessageM) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/privilegeChange.jsx
-function privilegeChange_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { privilegeChange_typeof = function _typeof(obj) { return typeof obj; }; } else { privilegeChange_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return privilegeChange_typeof(obj); }
+function privilegeChange_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { privilegeChange_typeof = function _typeof(obj) { return typeof obj; }; } else { privilegeChange_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return privilegeChange_typeof(obj); }
 
 function privilegeChange_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13516,9 +13419,7 @@ var privilegeChange_ContactsUI = __webpack_require__(2);
 
 var privilegeChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var PrivilegeChange =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var PrivilegeChange = /*#__PURE__*/function (_ConversationMessageM) {
   privilegeChange_inherits(PrivilegeChange, _ConversationMessageM);
 
   function PrivilegeChange() {
@@ -13614,7 +13515,7 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/topicChange.jsx
-function topicChange_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { topicChange_typeof = function _typeof(obj) { return typeof obj; }; } else { topicChange_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return topicChange_typeof(obj); }
+function topicChange_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { topicChange_typeof = function _typeof(obj) { return typeof obj; }; } else { topicChange_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return topicChange_typeof(obj); }
 
 function topicChange_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13638,9 +13539,7 @@ var topicChange_ContactsUI = __webpack_require__(2);
 
 var topicChange_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var TopicChange =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var TopicChange = /*#__PURE__*/function (_ConversationMessageM) {
   topicChange_inherits(TopicChange, _ConversationMessageM);
 
   function TopicChange() {
@@ -13722,7 +13621,7 @@ function sharedFilesAccordionPanel_superPropBase(object, property) { while (!Obj
 
 function sharedFilesAccordionPanel_applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
 
-function sharedFilesAccordionPanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return sharedFilesAccordionPanel_typeof(obj); }
+function sharedFilesAccordionPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return sharedFilesAccordionPanel_typeof(obj); }
 
 function sharedFilesAccordionPanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -13747,9 +13646,7 @@ var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFileItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var SharedFileItem = /*#__PURE__*/function (_MegaRenderMixin) {
   sharedFilesAccordionPanel_inherits(SharedFileItem, _MegaRenderMixin);
 
   function SharedFileItem() {
@@ -13804,9 +13701,7 @@ function (_MegaRenderMixin) {
   return SharedFileItem;
 }(mixins["MegaRenderMixin"]);
 
-var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = /*#__PURE__*/function (_MegaRenderMixin2) {
   sharedFilesAccordionPanel_inherits(SharedFilesAccordionPanel, _MegaRenderMixin2);
 
   function SharedFilesAccordionPanel() {
@@ -14047,7 +13942,7 @@ function (_MegaRenderMixin2) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
-function incomingSharesAccordionPanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { incomingSharesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { incomingSharesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return incomingSharesAccordionPanel_typeof(obj); }
+function incomingSharesAccordionPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { incomingSharesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { incomingSharesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return incomingSharesAccordionPanel_typeof(obj); }
 
 function incomingSharesAccordionPanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14071,9 +13966,7 @@ var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
-var SharedFolderItem =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var SharedFolderItem = /*#__PURE__*/function (_MegaRenderMixin) {
   incomingSharesAccordionPanel_inherits(SharedFolderItem, _MegaRenderMixin);
 
   function SharedFolderItem() {
@@ -14113,9 +14006,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var IncSharesAccordionPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var IncSharesAccordionPanel = /*#__PURE__*/function (_MegaRenderMixin2) {
   incomingSharesAccordionPanel_inherits(IncSharesAccordionPanel, _MegaRenderMixin2);
 
   function IncSharesAccordionPanel() {
@@ -14248,7 +14139,7 @@ function (_MegaRenderMixin2) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
-function closeOpenMode_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { closeOpenMode_typeof = function _typeof(obj) { return typeof obj; }; } else { closeOpenMode_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return closeOpenMode_typeof(obj); }
+function closeOpenMode_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { closeOpenMode_typeof = function _typeof(obj) { return typeof obj; }; } else { closeOpenMode_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return closeOpenMode_typeof(obj); }
 
 function closeOpenMode_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14272,9 +14163,7 @@ var closeOpenMode_ContactsUI = __webpack_require__(2);
 
 var closeOpenMode_ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var CloseOpenModeMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var CloseOpenModeMessage = /*#__PURE__*/function (_ConversationMessageM) {
   closeOpenMode_inherits(CloseOpenModeMessage, _ConversationMessageM);
 
   function CloseOpenModeMessage() {
@@ -14342,7 +14231,7 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
-function chatHandle_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { chatHandle_typeof = function _typeof(obj) { return typeof obj; }; } else { chatHandle_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return chatHandle_typeof(obj); }
+function chatHandle_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { chatHandle_typeof = function _typeof(obj) { return typeof obj; }; } else { chatHandle_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return chatHandle_typeof(obj); }
 
 function chatHandle_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14372,9 +14261,7 @@ var chatHandle_ConversationMessageMixin = __webpack_require__(9).ConversationMes
 
 var getMessageString = __webpack_require__(12).getMessageString;
 
-var ChatHandleMessage =
-/*#__PURE__*/
-function (_ConversationMessageM) {
+var ChatHandleMessage = /*#__PURE__*/function (_ConversationMessageM) {
   chatHandle_inherits(ChatHandleMessage, _ConversationMessageM);
 
   function ChatHandleMessage() {
@@ -14442,7 +14329,7 @@ function (_ConversationMessageM) {
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/chatlinkDialog.jsx
-function chatlinkDialog_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { chatlinkDialog_typeof = function _typeof(obj) { return typeof obj; }; } else { chatlinkDialog_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return chatlinkDialog_typeof(obj); }
+function chatlinkDialog_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { chatlinkDialog_typeof = function _typeof(obj) { return typeof obj; }; } else { chatlinkDialog_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return chatlinkDialog_typeof(obj); }
 
 function chatlinkDialog_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14469,9 +14356,7 @@ function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = O
 
 
 
-var chatlinkDialog_ChatlinkDialog =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var chatlinkDialog_ChatlinkDialog = /*#__PURE__*/function (_MegaRenderMixin) {
   chatlinkDialog_inherits(ChatlinkDialog, _MegaRenderMixin);
 
   function ChatlinkDialog(props) {
@@ -14682,7 +14567,7 @@ chatlinkDialog_ChatlinkDialog.defaultProps = {
 // CONCATENATED MODULE: ./js/chat/ui/conversationaudiovideopanel.jsx
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-function conversationaudiovideopanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationaudiovideopanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationaudiovideopanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationaudiovideopanel_typeof(obj); }
+function conversationaudiovideopanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationaudiovideopanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationaudiovideopanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationaudiovideopanel_typeof(obj); }
 
 function conversationaudiovideopanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -14730,9 +14615,7 @@ function muteOrHoldIconStyle(opts) {
   return "small-icon hidden";
 }
 
-var conversationaudiovideopanel_RemoteVideoPlayer =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_MegaRenderMixin) {
   conversationaudiovideopanel_inherits(RemoteVideoPlayer, _MegaRenderMixin);
 
   function RemoteVideoPlayer(props) {
@@ -14893,9 +14776,7 @@ conversationaudiovideopanel_RemoteVideoPlayer.propTypes = {
   noAudioLevel: prop_types_default.a.bool
 };
 
-var conversationaudiovideopanel_ConversationAVPanel =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_MegaRenderMixin2) {
   conversationaudiovideopanel_inherits(ConversationAVPanel, _MegaRenderMixin2);
 
   function ConversationAVPanel(props) {
@@ -15874,13 +15755,9 @@ function (_MegaRenderMixin2) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
-function conversationpanel_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
+function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
 
 function conversationpanel_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { conversationpanel_get = Reflect.get; } else { conversationpanel_get = function _get(target, property, receiver) { var base = conversationpanel_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return conversationpanel_get(target, property, receiver || target); }
 
@@ -15933,9 +15810,7 @@ function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototype
 var ENABLE_GROUP_CALLING_FLAG = true; // eslint-disable-next-line id-length
 
 var MAX_USERS_CHAT_PRIVATE = 100;
-var conversationpanel_JoinCallNotification =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var conversationpanel_JoinCallNotification = /*#__PURE__*/function (_MegaRenderMixin) {
   conversationpanel_inherits(JoinCallNotification, _MegaRenderMixin);
 
   function JoinCallNotification() {
@@ -15985,9 +15860,7 @@ function (_MegaRenderMixin) {
   return JoinCallNotification;
 }(mixins["MegaRenderMixin"]);
 ;
-var conversationpanel_ConversationRightArea =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var conversationpanel_ConversationRightArea = /*#__PURE__*/function (_MegaRenderMixin2) {
   conversationpanel_inherits(ConversationRightArea, _MegaRenderMixin2);
 
   function ConversationRightArea() {
@@ -16381,9 +16254,7 @@ function (_MegaRenderMixin2) {
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 = /*#__PURE__*/function (_MegaRenderMixin3) {
   conversationpanel_inherits(ConversationPanel, _MegaRenderMixin3);
 
   function ConversationPanel(props) {
@@ -17970,9 +17841,7 @@ function (_MegaRenderMixin3) {
   return ConversationPanel;
 }(mixins["MegaRenderMixin"]), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
-var conversationpanel_ConversationPanels =
-/*#__PURE__*/
-function (_MegaRenderMixin4) {
+var conversationpanel_ConversationPanels = /*#__PURE__*/function (_MegaRenderMixin4) {
   conversationpanel_inherits(ConversationPanels, _MegaRenderMixin4);
 
   function ConversationPanels() {
@@ -18146,7 +18015,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 
 
@@ -19240,7 +19109,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   type = type || "private";
   setAsActive = setAsActive === true;
   var roomId = chatId;
-  var publicChatKey;
 
   if (!publicChatKey && chatHandle && self.publicChatKeys[chatHandle]) {
     if (type !== "public") {
@@ -20845,7 +20713,9 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
     if (newState === ChatRoom.STATE.READY) {
       if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
         // this should never happen, but just in case...
-        self.getChatIdMessages().resend();
+        var cim = self.getChatIdMessages();
+        cim.restore();
+        cim.resend();
       }
 
       self.loadContactNames();
@@ -22577,7 +22447,11 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -22596,7 +22470,7 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -22620,9 +22494,7 @@ var ReactDOM = __webpack_require__(4);
 
 
 
-var ToggleCheckbox =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var ToggleCheckbox = /*#__PURE__*/function (_MegaRenderMixin) {
   _inherits(ToggleCheckbox, _MegaRenderMixin);
 
   function ToggleCheckbox(props) {
@@ -22671,9 +22543,7 @@ function (_MegaRenderMixin) {
 
 ;
 
-var Checkbox =
-/*#__PURE__*/
-function (_MegaRenderMixin2) {
+var Checkbox = /*#__PURE__*/function (_MegaRenderMixin2) {
   _inherits(Checkbox, _MegaRenderMixin2);
 
   function Checkbox(props) {
@@ -22735,9 +22605,7 @@ function (_MegaRenderMixin2) {
 
 ;
 
-var IntermediateCheckbox =
-/*#__PURE__*/
-function (_MegaRenderMixin3) {
+var IntermediateCheckbox = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(IntermediateCheckbox, _MegaRenderMixin3);
 
   function IntermediateCheckbox(props) {
@@ -22814,8 +22682,7 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
-function startGroupChatWizard_typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
+function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -22844,9 +22711,7 @@ var startGroupChatWizard_ReactDOM = __webpack_require__(4);
 
 
 
-var startGroupChatWizard_StartGroupChatWizard =
-/*#__PURE__*/
-function (_MegaRenderMixin) {
+var startGroupChatWizard_StartGroupChatWizard = /*#__PURE__*/function (_MegaRenderMixin) {
   startGroupChatWizard_inherits(StartGroupChatWizard, _MegaRenderMixin);
 
   function StartGroupChatWizard(props) {

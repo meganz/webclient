@@ -252,6 +252,9 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
     var contact = M.u[user_hash];
 
     if (contact) {
+        if (contact.presence === UserPresence.PRESENCE.ONLINE && presence !== UserPresence.PRESENCE.ONLINE) {
+            contact.lastGreen = unixtime();
+        }
         contact.presence = presence;
     }
     else {
@@ -267,6 +270,10 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
         );
         contact = M.u[user_hash];
         contact.presence = presence;
+        if (presence === UserPresence.PRESENCE.ONLINE) {
+            contact.lastGreen = unixtime();
+        }
+
         M.syncUsersFullname(user_hash);
         M.syncContactEmail(user_hash);
     }

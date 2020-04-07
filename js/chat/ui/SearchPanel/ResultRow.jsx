@@ -1,8 +1,12 @@
 import React from 'react';
 import { TYPE, LABEL } from './ResultContainer.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
+import { LastActivity } from '../contacts.jsx';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
+const USER_CARD_CLASS = `user-card`;
+
+const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
 
 const highlight = (text, matches) => {
     if (matches) {
@@ -49,14 +53,14 @@ const Chat = ({ result }) => {
             {/* TODO: add static DOM re: group chats avatar */}
             <div style={{
                 float: 'left',
-                width: 36,
-                height: 36,
+                width: 30,
+                height: 30,
                 borderRadius: 200,
                 border: '3px solid #FFF',
-                background: 'tomato' }}>
+                background: 'cornflowerblue' }}>
             </div>
             <div
-                className="user-info"
+                className={USER_CARD_CLASS}
                 dangerouslySetInnerHTML={{ __html: highlight(result.room.topic, result.matches) }}>
             </div>
             <div className="clear"></div>
@@ -64,19 +68,61 @@ const Chat = ({ result }) => {
     );
 };
 
-const Member = ({ result }) => {
-    const contact = M.u[result.data];
+const Member = ({
+    result: {
+        data, matches, room
+    }
+}) => {
+    const contact = M.u[data];
+    const hasHighlight = matches && !!matches.length;
+    const isGroup = roomIsGroup(room);
+    // [...] TODO: refactor -- conditionals/rendering, abstract the amount of members, cut longer text
+    const userCard = {
+        graphic: (
+            // `Graphic` result of member type -- the last activity status is shown as graphic icon
+            // https://mega.nz/file/0MMymIDZ#_uglL1oUSJnH-bkp4IWfNL_hk6iEsQW77GHYXEvHWOs
+            <div className="graphic">
+                {isGroup ?
+                    room.getRoomTitle() :
+                    <span dangerouslySetInnerHTML={{
+                        __html: highlight(nicknames.getNicknameAndName(data), matches)
+                    }}>
+                    </span>
+                }
+                {isGroup ? '' : <ContactPresence contact={contact} />}
+            </div>
+        ),
+        textual: (
+            // `Textual` result of member type -- last activity as plain text
+            // https://mega.nz/file/RcUWiKpC#onYjToPq3whTYyMseLal5v0OxiAge0j2p9I5eO_qwoI
+            <div className="textual">
+                <span>{isGroup ? room.getRoomTitle() : nicknames.getNicknameAndName(data)}</span>
+                {isGroup ?
+                    (l[20233] || "%s Members").replace("%s", Object.keys(room.members).length) :
+                    <LastActivity contact={contact} showLastGreen={true} />
+                }
+            </div>
+        )
+    };
+
     return (
         <div
             className={SEARCH_ROW_CLASS}
-            onClick={() => loadSubPage(result.room.getRoomUrl())}>
-            <Avatar contact={contact} />
-            <div className="user-info">
-                <span dangerouslySetInnerHTML={{
-                    __html: highlight(nicknames.getNicknameAndName(result.data), result.matches)
-                }}>
-                </span>
-                <ContactPresence contact={contact} />
+            onClick={() => loadSubPage(room.getRoomUrl())}>
+            {isGroup ? (
+                <div style={{
+                    float: 'left',
+                    width: 30,
+                    height: 30,
+                    borderRadius: 200,
+                    border: '3px solid #FFF',
+                    background: 'cornflowerblue' }}>
+                </div>
+            ) : (
+                <Avatar contact={contact} />
+            )}
+            <div className={USER_CARD_CLASS}>
+                {userCard[hasHighlight ? 'graphic' : 'textual']}
             </div>
             <div className="clear"></div>
         </div>

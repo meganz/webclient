@@ -392,6 +392,23 @@ export class ContactPresence extends MegaRenderMixin {
     }
 };
 
+export const LastActivity = ({ contact, showLastGreen }) => {
+    if (!contact) {
+        return null;
+    }
+
+    const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+    const activityStatus = showLastGreen && contact.presence <= 2 && lastActivity ?
+        (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity)) :
+        M.onlineStatusClass(contact.presence)[0];
+
+    return (
+        <span>
+            {activityStatus}
+        </span>
+    );
+};
+
 
 export class ContactFingerprint extends MegaRenderMixin {
     static defaultProps = {
@@ -643,16 +660,7 @@ export class ContactCard extends ContactAwareComponent {
 
         var userCard = null;
         var className = this.props.className || "";
-        if (className.indexOf("short") >=0) {
-            var presenceRow;
-            var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-            if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
-                presenceRow = (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity));
-            }
-            else {
-                presenceRow = M.onlineStatusClass(contact.presence)[0];
-            }
-
+        if (className.indexOf("short") >= 0) {
             userCard = <div className="user-card-data">
                 {usernameBlock}
                 <div className="user-card-status">
@@ -662,9 +670,9 @@ export class ContactCard extends ContactAwareComponent {
                             <i className="small-icon audio-call"></i> :
                             null
                     }
-                    <span>{presenceRow}</span>
+                    <LastActivity contact={contact} showLastGreen={this.props.showLastGreen} />
                 </div>
-            </div>
+            </div>;
         }
         else {
             userCard = <div className="user-card-data">
@@ -676,7 +684,7 @@ export class ContactCard extends ContactAwareComponent {
                         null
                 }
                 <div className="user-card-email">{contact.m}</div>
-            </div>
+            </div>;
         }
 
         var selectionTick = null;

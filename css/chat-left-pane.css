@@ -402,7 +402,7 @@ div.search-field i.reset-icon {
 
 div.search-field input {
     width: 100%;
-    padding: 9px 0 9px 32px;
+    padding: 9px 30px 9px 32px;
     font-size: 13px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 4px;
@@ -474,14 +474,30 @@ div.result-table div.result-table-row div.avatar-wrapper {
     width: 36px;
 }
 
-div.result-table div.result-table-row div.user-info {
+div.result-table div.result-table-row div.user-card {
     float: left;
     width: 190px;
     padding: 5px 0 0 10px;
     font-size: 14px;
 }
 
-div.result-table div.result-table-row div.user-info div.user-card-presence {
+div.result-table div.result-table-row div.user-card span {
+    /* […] */
+}
+
+div.result-table div.result-table-row div.user-card div.graphic {
+    /* […] */
+}
+
+div.result-table div.result-table-row div.user-card div.textual {
+    /* […] */
+}
+
+div.result-table div.result-table-row div.user-card div.textual span {
+    display: block;
+}
+
+div.result-table div.result-table-row div.user-card div.user-card-presence {
     margin: 0 0 0 8px;
 }
 
@@ -510,7 +526,7 @@ div.result-table div.result-table-row.message span.title div.user-card-presence 
     margin-bottom: 1px;
 }
 
-div.result-table div.result-table-row.message span.summary {
+div.result-table div.result-table-row.message div.summary {
     overflow: hidden;
     max-width: 215px;
     font-size: 13px;

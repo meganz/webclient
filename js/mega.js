@@ -2228,12 +2228,7 @@ function loadfm(force) {
                     pup    : '&p',             // public upload page - handle
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
-                    chatqueuedmsgs : '&k', // queued chat messages - k
-                    pta: '&k' // persisted type messages - k
-                }, {
-                    chatqueuedmsgs : 1,
-                    pta: 1
-                });
+                }, {});
 
                 fmdb.init(fetchfm, localStorage.force);
             }

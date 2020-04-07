@@ -896,6 +896,17 @@
             $('.dialog-newfolder-button', $dialog).removeClass('hidden');
         }
 
+        // Reset the value of permission and permissions list
+        if ($('.share-dialog-permissions', $dialog).length > 0) {
+            $('.share-dialog-permissions', $dialog).attr('class', 'share-dialog-permissions read-only')
+                .safeHTML('<span></span>' + l[7534]);
+            $('.permissions-menu-item', $dialog).removeClass('active');
+            $('.permissions-menu-item.read-only', $dialog).addClass('active');
+        }
+
+        // Unbind the click event of hiding the permissions menu from the dialog
+        $dialog.off('click.hidePermissionsMenu');
+
         // If copying from contacts tab (Ie, sharing)
         if (section === 'cloud-drive' && (M.currentrootid === 'contacts' || M.currentrootid === 'chat')) {
             $('.fm-picker-dialog-title', $dialog).text(l[1344]);
@@ -920,6 +931,17 @@
                         });
                     $menu.fadeIn(200);
                 });
+            // Hide the permissions menu once click out the menu
+            $dialog.rebind('click.hidePermissionsMenu', function(e) {
+                var $this = $(e.target);
+                if (!$this.hasClass('permissions-menu')
+                    && $this.parents('.permissions-menu').length === 0
+                    && !$this.hasClass('share-dialog-permissions')
+                    && $this.parents('.share-dialog-permissions').length === 0
+                ) {
+                    $('.permissions-menu', $dialog).fadeOut(200);
+                }
+            });
         }
         else if ($.selectFolderDialog) {
             $('.fm-picker-dialog-title', $dialog).text(l[16533]);
@@ -1469,11 +1491,14 @@
                 jsp.scrollToElement($(this), true);
             }
 
-            if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
-                $('.dialog-newfolder-button', $dialog).removeClass('hidden');
-            }
-            else {
-                $('.dialog-newfolder-button', $dialog).addClass('hidden');
+            // If not copying from contacts tab (Ie, sharing)
+            if (!(section === 'cloud-drive' && (M.currentrootid === 'contacts' || M.currentrootid === 'chat'))) {
+                if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
+                    $('.dialog-newfolder-button', $dialog).removeClass('hidden');
+                }
+                else {
+                    $('.dialog-newfolder-button', $dialog).addClass('hidden');
+                }
             }
         });
 
@@ -1669,7 +1694,7 @@
                             $.saveAsCallBack(handle);
                         }
                     }
-                );                
+                );
                 return false;
             }
 

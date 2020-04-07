@@ -636,6 +636,17 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                         );
                     }
 
+                    if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage
+                    ) {
+                        // clear messagesQueueKvStorage
+                        waitingPromises.push(
+                            megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage.clear()
+                        );
+                    }
+
                     MegaPromise.allDone(waitingPromises).then(function(r) {
                         console.debug('megaUtilsReload', r);
 

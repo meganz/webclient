@@ -16,7 +16,7 @@ var Chatd = function(userId, megaChat, options) {
     self.chatIdMessages = {};
 
     // local cache of the Message object
-    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs");
+    self.messagesQueueKvStorage = new SharedLocalKVStorage("cqmsgs2");
 
     /**
      * Set to true when this chatd instance is (being) destroyed

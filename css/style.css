@@ -11269,9 +11269,33 @@ table {
     float: right;
     text-align: right;
 }
+.account.left-pane.big-txt.suba-pay-bill {
+    width:100%;
+    margin-top: -8px;
+    margin-bottom: 12px;
+}
+.account.left-pane.big-txt.suba-pay-bill.hidden {
+    display: none;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.disabled,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.pending,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    color: darkorange;
+    opacity: 1;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    margin-top: -10px;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left.hidden {
+    display: none;
+}
 .account.left-pane.big-txt span {
     color: #777777;
     padding-left: 5px;
+}
+.account.left-pane.big-txt .pay-bill-btn span {
+    color: unset;
+    padding-left: unset;
 }
 .small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
     text-align: center;

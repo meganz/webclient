@@ -250,20 +250,32 @@ function dashboardUI() {
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
-                if (u_attr.b.s === 1) {
+                if (u_attr.b.s === 1 || u_attr.b.s === 2) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
                     if (u_attr.b.m) { // master
                         timestamp = account.srenew[0];
-                        if ((Date.now() / 1000) - timestamp > 0) {
+                        var currentTime = Date.now();
+                        if (currentTime / 1000 - timestamp > 0) {
                             $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
                                 .text(l[19609]);
+                            var expiryDate = new Date(timestamp * 1000);
+                            expiryDate.setUTCMonth(expiryDate.getUTCMonth() + 1);
+
+                            var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                            var daysLeft = l[16284].replace('%1', remainingDays);
+
+                            $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
+                            $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                         }
                     }
                 }
                 else {
                     $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
+                    if (u_attr.b.m) {
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
+                    }
                 }
 
                 if (u_attr.b.m) { // master
@@ -287,7 +299,8 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
+        $('.default-green-button.upgrade-account, .bandwidth-info a, .pay-bill-btn','.dashboard')
+            .rebind('click.dboard', function() {
             if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
                 loadSubPage('repay');
             }

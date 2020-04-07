@@ -828,7 +828,7 @@ var allowedLandingPages = ['fm', 'recents', 'chat'];
  */
 function getLandingPage() {
     'use strict';
-    return allowedLandingPages[mega.config.get('uhp')] || 'fm';
+    return pfid ? false : allowedLandingPages[mega.config.get('uhp')] || 'fm';
 }
 
 /**

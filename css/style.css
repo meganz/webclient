@@ -11271,8 +11271,8 @@ table {
 }
 .account.left-pane.big-txt.suba-pay-bill {
     width:100%;
-    margin-top: -8px;
-    margin-bottom: 12px;
+    margin-top: -2px;
+    margin-bottom: 15px;
 }
 .account.left-pane.big-txt.suba-pay-bill.hidden {
     display: none;

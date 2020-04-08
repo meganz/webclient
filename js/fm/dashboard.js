@@ -250,29 +250,26 @@ function dashboardUI() {
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
-                if (u_attr.b.s === 1 || u_attr.b.s === 2) {
+                if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
-                    if (u_attr.b.m) { // master
-                        timestamp = account.srenew[0];
-                        var currentTime = Date.now();
-                        if (currentTime / 1000 - timestamp > 0) {
-                            $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
-                                .text(l[19609]);
-                            var expiryDate = new Date(timestamp * 1000);
-                            expiryDate.setUTCMonth(expiryDate.getUTCMonth() + 1);
-
-                            var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
-                            var daysLeft = l[16284].replace('%1', remainingDays);
-
-                            $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
-                            $('.suba-pay-bill', $businessLeft).removeClass('hidden');
-                        }
+                }
+                else if (u_attr.b.s === 2 && u_attr.b.m) {
+                    $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
+                        .text(l[19609]);
+                    if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
+                        var expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
+                        var currentTime = new Date();
+                        var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                        var daysLeft = l[16284].replace('%1', remainingDays);
+                        $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }
                 else {
-                    $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
+                    $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
+
                     if (u_attr.b.m) {
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }

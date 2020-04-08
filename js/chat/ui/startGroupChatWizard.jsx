@@ -233,7 +233,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 step={self.state.step}
-                title={self.state.createChatLink ? l[20638] : l[19483]}
+                title={this.props.flowType === 2 && self.state.createChatLink ? l[20638] : l[19483]}
                 className={classes}
                 selected={self.state.selected}
                 onClose={() => {

@@ -4260,12 +4260,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: opacity 200ms ease-in-out;
     opacity: 0.6;
 }
-.nw-tree-panel-arrows {
+.nw-tree-panel-arrows.icons-sprite {
     right: 7px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: -88px -1992px;
     opacity: 0.8;
+}
+.active-folder-link .fm-tree-panel ul:first-child > li:first-child > .nw-fm-tree-item {
+    padding-right: 33px;
 }
 .nw-tree-panel-arrows:hover, .nw-tree-panel-arrows.active {
     opacity: 1;

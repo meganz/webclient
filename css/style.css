@@ -4956,6 +4956,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: text;
     text-align: left;
     font-size: 14px;
+    padding-right: 25px;
+}
+.contacts .nw-fm-tree-header input:not([readonly]):focus, .contacts .nw-fm-tree-header.filled-input input {
+    padding-right: 55px;
 }
 .nw-fm-tree-header .button {
     position: absolute;
@@ -4968,14 +4972,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     z-index: 7;
-}
-.contacts.filled-input .fm-add-user {
-    display: none;
-}
-.nw-fm-tree-header:not(.conversations).focused-input .button {
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
 }
 .nw-fm-tree-header.shared-with-me input::selection {
     background: #FFA500;
@@ -5055,13 +5051,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0;
     cursor: pointer;
 }
+.contacts .nw-fm-search-icon {
+    right: 39px;
+}
 .filled-input .nw-fm-search-icon {
-    background-position: -10px -6436px;
+    background-position: -10px -6435px;
 }
 .filled-input .nw-fm-search-icon:hover {
-    background-position: -11px -7821px;
+    background-position: -11px -7820px;
 }
-.nw-fm-tree-header:not(.contacts):hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
+.nw-fm-tree-header:hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;

@@ -227,9 +227,6 @@ html.gbot {
     width: 100%;
     z-index: 200;
     -webkit-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
     transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
 }
 .bottom-page .top-head::after {

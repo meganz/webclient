@@ -173,7 +173,8 @@ var affiliateprogram = {
             var $target = $(e.target);
 
             if (!$target.is('.top-login-button') && !$target.is('.dropdown-lnk') &&
-                !$target.is('.notification') && !$target.closest('.dropdown').length) {
+                !$target.is('.notification') && !$target.is('.activity-status') &&
+                !$target.closest('.dropdown').length) {
 
                 $('.dropdown:visible', self.$contentBlock).addClass('hidden');
                 $('.dropdown-lnk.active', self.$contentBlock).removeClass('active');

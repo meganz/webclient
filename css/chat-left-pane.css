@@ -359,7 +359,9 @@
     top: 8px;
 }
 
-/* --- Search Panel ------------------------------------------------------------------------------------------------- */
+/*
+ * Search Panel
+ * ------------------------------------------------------------------------------------------------------------------ */
 
 div.search-panel {
     position: absolute;
@@ -373,7 +375,9 @@ div.search-panel {
     box-sizing: border-box;
 }
 
-/* --- Search Field ------------------------------------------------------------------------------------------------- */
+/*
+ * Search Field
+ * ------------------------------------------------------------------------------------------------------------------ */
 
 div.search-field {
     position: relative;
@@ -448,7 +452,9 @@ div.search-field div.search-field-status i.decrypting { background: salmon; }
 div.search-field div.search-field-status i.paused { background: orange; }
 div.search-field div.search-field-status i.complete { background: chocolate; }
 
-/* --- Result Table & Result Row ------------------------------------------------------------------------------------ */
+/*
+ * Result Table & Result Row
+ * ------------------------------------------------------------------------------------------------------------------ */
 
 div.result-table {
     margin: 5px 0 5px 0;
@@ -467,7 +473,9 @@ div.result-table div.result-table-row {
     cursor: pointer;
 }
 
-/* --- Result Row: Recent & Members --- */
+/*
+ * Result Row: Recent & Members
+ * ------------------------------------------------------------------------------------------------------------------ */
 
 div.result-table div.result-table-row div.avatar-wrapper {
     float: left;

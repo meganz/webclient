@@ -18,10 +18,10 @@ export const LABEL = {
 
 export const ResultContainer = ({ recent, results }) => {
 
-    /**
-     * `Recent`
-     * https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
-     */
+    //
+    // `Recent` table
+    // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+    // ----------------------------------------------------------------------
 
     if (recent && recent.length) {
         return (
@@ -33,12 +33,12 @@ export const ResultContainer = ({ recent, results }) => {
         );
     }
 
-    /**
-     * Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
-     * https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
-     * https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
-     * https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
-     */
+    //
+    // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
+    // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
+    // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
+    // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+    // ----------------------------------------------------------------------
 
     const RESULT_TABLE = {
         CONTACTS_AND_CHATS: [],

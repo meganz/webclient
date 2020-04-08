@@ -6,7 +6,7 @@ import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
 import { Dropdown, DropdownItem, DropdownContactsSelector } from './../../ui/dropdowns.jsx';
-import { ContactCard } from './../ui/contacts.jsx';
+import { ContactCard, MembersAmount } from './../ui/contacts.jsx';
 import { TypingArea } from './../ui/typingArea.jsx';
 import { WhosTyping } from './whosTyping.jsx';
 import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
@@ -1909,7 +1909,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         }</utils.EmojiFormattedContent>
                     </span>
                     <span className="txt small">
-                        {(l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length)}
+                        <MembersAmount room={self.props.chatRoom} />
                     </span>
                 </div>
             </div>;

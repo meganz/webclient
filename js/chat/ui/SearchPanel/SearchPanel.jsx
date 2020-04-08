@@ -27,9 +27,7 @@ export default class SearchPanel extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        $(document).rebind('click.searchPanel', (ev) =>
-            this.clickedOutsideComponent(ev) && !this.props.minimized && this.toggleMinimize()
-        );
+        this.bindEvents();
     }
 
     componentWillReceiveProps(nextProps, nextContext) {
@@ -41,8 +39,33 @@ export default class SearchPanel extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        $(document).unbind('click.searchPanel');
+        $(document).unbind('.searchPanel');
     }
+
+    bindEvents = () =>
+        $(document)
+            // Clicked on search result
+            .rebind('resultOpen.searchPanel', () => this.toggleMinimize())
+            // Clicked outside the search panel component
+            .rebind('click.searchPanel', ev =>
+                this.clickedOutsideComponent(ev) && !this.props.minimized && this.toggleMinimize()
+            )
+            // `ESC` keypress
+            .rebind('keydown.searchPanel', ({ keyCode }) => {
+                if (keyCode && keyCode === 27 /* ESC */ && !this.props.minimized) {
+                    this.toggleMinimize();
+                }
+            });
+
+    clickedOutsideComponent = ev =>
+        ev &&
+        $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
+        !$(ev.target).is('i.reset-icon') && /* current element !== reset search element */
+        !$(ev.target).is('.small-icon.thin-search-icon'); /* current element !== toggle search icon */
+
+    toggleMinimize = () => {
+        this.props.onToggle();
+    };
 
     getRecent = () => {
         megaChat.getFrequentContacts()
@@ -54,16 +77,6 @@ export default class SearchPanel extends MegaRenderMixin {
                     }))
                 });
             });
-    };
-
-    clickedOutsideComponent = ev =>
-        ev &&
-        $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
-        !$(ev.target).is('i.reset-icon') && /* current element !== reset search element */
-        !$(ev.target).is('.small-icon.thin-search-icon'); /* current element !== toggle search icon */
-
-    toggleMinimize = () => {
-        this.props.onToggle();
     };
 
     doSearch = s => {

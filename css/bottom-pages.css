@@ -5001,7 +5001,7 @@ a.opensource-icon-txt.coming-soon {
     overflow: hidden;
     z-index: 10;
 }
-.bottom-page .dropdown-item {
+.bottom-page.dropdown .dropdown-item {
     height: 48px;
     font-size: 20px;
     line-height: 48px;
@@ -5016,16 +5016,16 @@ a.opensource-icon-txt.coming-soon {
     -moz-box-shadow: 0 1px 0 0 #EEEEEE;
     box-shadow: 0 1px 0 0 #EEEEEE;
 }
-.bottom-page .dropdown-item:last-child {
+.bottom-page.dropdown .dropdown-item:last-child {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
 }
-.bottom-page .dropdown-item:hover, .bottom-page .dropdown-item.active {
+.bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropdown .dropdown-item.active {
     color: white;
     background-color: #00C0A6 !important;
 }
-.dropdown-content {
+.bottom-page.dropdown .dropdown-content {
     max-height: 290px;
     min-width: 80px;
     overflow-y: auto;

@@ -62,6 +62,10 @@
     -khtml-opacity: 0;
     opacity: 0;
 }
+.fr .dropdown.body.submenu {
+    min-width: 252px;
+    max-width: 290px;
+}
 .dropdown.body.submenu.left-position {
     left: auto;
     right: 100%;

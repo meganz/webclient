@@ -1955,7 +1955,7 @@ function passwordManager(form) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }
-            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
+            history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);
             $form.find('input').val('');
         }, 1000);
         return false;

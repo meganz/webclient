@@ -2141,3 +2141,14 @@ i.account-icon.menu {
 .semi-huge-icon.big-icons-sprite.user-with-chain {
     background-position: -111px -1664px;
 }
+
+/* diaalog-sprite */
+.small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5290px;
+}
+.small-icon.dialog-sprite.arrows-to-top, .active .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5321px;
+}
+.small-icon.dialog-sprite.dark-cross, .download-complete .bar-table .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5352px;
+}

@@ -293,7 +293,9 @@ var watchdog = Object.freeze({
                 break;
 
             default:
-                mBroadcaster.sendMessage("watchdog:" + msg, strg);
+                if (mBroadcaster.sendMessage("watchdog:" + msg, strg)) {
+                    break;
+                }
 
                 if (msg.startsWith('Q!')) {
                     var value = false;

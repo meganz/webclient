@@ -411,11 +411,12 @@
                     }
                 }
 
+                var pluralText = items.length > 2 ? l[23250].replace('[X]', items.length - 1) : l[23249];
                 $div.safeAppend(
                     '<div class="item-row" data-node="@@">' +
                     '    <div class="transfer-filetype-icon file @@"></div>' +
                     '    <div class="summary-ff-name">@@</div> &nbsp; ' + tail +
-                    '</div>', data, icon, str_mtrunc(name, 42), String(l[10663]).replace('[X]', items.length - 1)
+                    '</div>', data, icon, str_mtrunc(name, 42), pluralText
                 );
 
                 if (single) {

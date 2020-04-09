@@ -705,7 +705,7 @@ function dl_g(res, ctx) {
                 var $this = $(this);
 
                 if (!$this.is('.expanded.floating') || $this.is('.video-theatre-mode')) {
-                    return false;
+                    return;
                 }
                 var delta = ev.wheelDelta || ev.detail || ev.originalEvent.wheelDelta
                     || ev.originalEvent.detail * 40 || ev.originalEvent.deltaY * 40 || null;

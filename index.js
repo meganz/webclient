@@ -194,13 +194,15 @@ function topPopupAlign(button, popup, topPos) {
             pageWidth,
             popupRightPos,
             arrowRightPos,
-            buttonTopPos;
+            buttonTopPos,
+            headerWidth;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('body').outerWidth();
+            headerWidth = $('.top-head').outerWidth();
             $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
-            popupRightPos = pageWidth
+            popupRightPos = headerWidth
                 - $button.offset().left
                 - $button.outerWidth() / 2
                 - $popup.outerWidth() / 2;
@@ -291,19 +293,16 @@ function init_page() {
         $.lastSeenFilelink = getSitePath();
     };
 
-    if (page[0] === '!' && page.length > 1) {
+    var pageBeginLetters = page.substr(0, 2);
 
-        ar = page.substr(1, page.length - 1).split('!');
-        if (ar[0]) {
-            dlid = ar[0].replace(/[^\w-]+/g, "");
-        }
+    if (page.length > 2 && (page[0] === '!' || pageBeginLetters === 'F!')) {
+        // Convering old links to new links format.
+        page = page[0] === 'F' ? page.replace('F!', 'folder/').replace('!', '#')
+            .replace('!', '/folder/').replace('?', '/file/')
+            : page.replace('!', 'file/').replace('!', '#');
 
-        if (ar[1]) {
-            dlkey = ar[1].replace(/[^\w-]+/g, "");
-        }
-        $.playbackOptions = ar[2];
-
-        fileLinkReloading();
+        history.replaceState({ subpage: page }, "", '/' + page);
+        return init_page();
     }
 
     if (page.substr(0, 5) === 'file/') {
@@ -382,7 +381,7 @@ function init_page() {
     }
 
     var oldPFKey = pfkey;
-    var pageBeginLetters = page.substr(0, 2);
+
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
@@ -499,34 +498,7 @@ function init_page() {
         return true;
     };
 
-    if (pageBeginLetters === 'F!' && page.length > 2) {
-        if (page.indexOf('?') > 0) {
-            page = page.split('?');
-            $.autoSelectNode = page[1];
-            page = page[0];
-        }
-        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
-
-        pfid = false;
-        if (ar[0]) {
-            pfid = ar[0].replace(/[^\w-]+/g, "");
-        }
-
-        pfkey = false;
-        if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
-        }
-
-        pfhandle = false;
-        if (ar[2]) {
-            pfhandle = ar[2].replace(/[^\w-]+/g, "");
-        }
-
-        if (!processFolderLink()) {
-            return;
-        }
-    }
-    else if (page.substr(0, 7) === 'folder/') {
+    if (page.substr(0, 7) === 'folder/') {
         var phLen = page.indexOf('#');
         var possibleS = -1; 
 

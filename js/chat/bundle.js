@@ -22944,7 +22944,7 @@ var startGroupChatWizard_StartGroupChatWizard = /*#__PURE__*/function (_MegaRend
 
       return startGroupChatWizard_React.makeElement(modalDialogs["a" /* default */].ModalDialog, {
         step: self.state.step,
-        title: self.state.createChatLink ? l[20638] : l[19483],
+        title: this.props.flowType === 2 && self.state.createChatLink ? l[20638] : l[19483],
         className: classes,
         selected: self.state.selected,
         onClose: function onClose() {

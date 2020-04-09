@@ -3508,6 +3508,7 @@
     "22808": "Istoricul r\u0103scump\u0103r\u0103rilor",
     "22809": "Metod\u0103",
     "22810": "*Calcul bazat pe utilizatorii recomanda\u021bi care achizi\u021bioneaz\u0103 planuri anuale.",
+    "22811": "Personalizeaz\u0103 prima pagin\u0103 afi\u0219at\u0103 la deschiderea managerului de fi\u0219iere",
     "22817": "E\u0219ti deja autentificat \u00eentr-un cont MEGA din acest browser. D\u0103 clic mai \u00eent\u00e2i pe Deconecteaz\u0103-te \u0219i apoi \u00eencearc\u0103 s\u0103 dai clic din nou pe acela\u0219i link Reseteaz\u0103-\u021bi parola.",
     "22818": "E\u0219ti deja autentificat \u00eentr-un cont MEGA din acest browser. D\u0103 clic mai \u00eent\u00e2i pe Deconecteaz\u0103-te \u0219i apoi \u00eencearc\u0103 s\u0103 dai clic din nou pe acela\u0219i link Parcheaz\u0103-mi contul.",
     "22819": "E\u0219uat",
@@ -3647,5 +3648,8 @@
     "23214": "Not\u0103: Po\u021bi s\u0103 ne consul\u021bi [A]regulamentul programului pentru recomand\u0103ri[\/A] pentru mai multe detalii",
     "23219": "Exist\u0103 deja un element cu acela\u0219i nume",
     "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The link creator\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
-    "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A]."
+    "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A].",
+    "23246": "Share the [X] folder",
+    "23249": "\u2026 and 1 other",
+    "23250": "\u2026 and [X] others"
 }

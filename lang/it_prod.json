@@ -3508,6 +3508,7 @@
     "22808": "Cronologia delle redenzioni",
     "22809": "Metodo",
     "22810": "*Il calcolo si basa riferendosi a utenti invitati che acquistano piani annuali.",
+    "22811": "Personalizza la prima pagina che viene mostrata dopo aver aperto il Gestore file",
     "22817": "Hai gi\u00e0 una sessione attiva in un account MEGA da questo browser. Clicca su Logout prima e poi prova a cliccare nuovamente lo stesso link di reset della tua password.",
     "22818": "Hai gi\u00e0 una sessione attiva in un account MEGA da questo browser. Clicca su Logout prima e poi prova a cliccare nuovamente lo stesso link di parcheggio del mio account.",
     "22819": "Fallito",
@@ -3647,5 +3648,8 @@
     "23214": "Nota: Puoi seguire le [A]regole del Programma referral[\/A] per maggiori informazioni",
     "23219": "\u00c8 gi\u00e0 presente un oggetto con lo stesso nome",
     "23242": "Questo oggetto \u00e8 stato segnalato in quanto contiene materiale obiettabile, come sfruttamento di minori, estremismo violento, o bestialit\u00e0. L'account del creatore del link \u00e8 stato chiuso e tutti i suoi dettagli, incluso l'indirizzo IP, sono stati dati alle autorit\u00e0.",
-    "23243": "Il link non \u00e8 disponibile, in quanto l'account del proprietario \u00e8 stato chiuso a causa di ripetute violazioni dei [A]Termini di Servizio[\/A] di MEGA."
+    "23243": "Il link non \u00e8 disponibile, in quanto l'account del proprietario \u00e8 stato chiuso a causa di ripetute violazioni dei [A]Termini di Servizio[\/A] di MEGA.",
+    "23246": "Condividi la cartella [X]",
+    "23249": "... e 1 altro",
+    "23250": "... e [X] altri"
 }

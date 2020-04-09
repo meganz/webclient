@@ -3508,6 +3508,7 @@
     "22808": "Historial de cobros",
     "22809": "M\u00e9todo",
     "22810": "*C\u00e1lculo basado en los usuarios recomendados que compran planes anuales.",
+    "22811": "Personaliza la primera p\u00e1gina que se muestra al abrir el Administrador de archivos",
     "22817": "Ya tienes una sesi\u00f3n abierta con una cuenta de MEGA en este navegador. Haz clic en Desconectar y luego pulsa de nuevo sobre Restablecer contrase\u00f1a.",
     "22818": "Ya tienes una sesi\u00f3n abierta con una cuenta de MEGA en este navegador. Haz clic en Desconectar y luego pulsa de nuevo sobre Aparcar mi cuenta.",
     "22819": "Rechazado",
@@ -3647,5 +3648,8 @@
     "23214": "Aviso: Puedes consultar nuestras [A]Reglas del programa de recomendaciones[\/A] para m\u00e1s informaci\u00f3n",
     "23219": "Ya hay un elemento con el mismo nombre.",
     "23242": "Este archivo\/carpeta ha sido reportado por contenido objetable, como material de explotaci\u00f3n infantil, extremismo violento o bestialismo. La cuenta del usuario se ha cerrado y sus datos completos, incluida la direcci\u00f3n IP, se han proporcionado a las autoridades.",
-    "23243": "Este enlace no est\u00e1 disponible ya que la cuenta del usuario se ha cerrado por una violaci\u00f3n grave de los  [A]T\u00e9rminos de servicio[\/A] de MEGA."
+    "23243": "Este enlace no est\u00e1 disponible ya que la cuenta del usuario se ha cerrado por una violaci\u00f3n grave de los  [A]T\u00e9rminos de servicio[\/A] de MEGA.",
+    "23246": "Share the [X] folder",
+    "23249": "\u2026 and 1 other",
+    "23250": "\u2026 and [X] others"
 }

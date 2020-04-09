@@ -3508,6 +3508,7 @@
     "22808": "Inwissel geschiedenis",
     "22809": "Methode",
     "22810": "* Berekening op basis van doorverwezen gebruikers die jaarabonnementen kopen.",
+    "22811": "Pas de eerste pagina aan die wordt weergegeven bij het openen van Bestandsbeheer",
     "22817": "U bent al ingelogd in een MEGA account vanuit deze browser. Klik eerst op Uitloggen en probeer daarna dezelfde link \"uw wachtwoord Resetten\" opnieuw aan te klikken.",
     "22818": "U bent al ingelogd in een MEGA account vanuit deze browser. Klik eerst op Uitloggen en probeer daarna op dezelfde link \"Parkeer mijn account\" opnieuw te klikken.",
     "22819": "Mislukt",
@@ -3647,5 +3648,8 @@
     "23214": "Opmerking: u kunt onze [A]Regels voor verwijzingsprogramma's[\/A] raadplegen voor meer informatie",
     "23219": "Er is al een item met dezelfde naam",
     "23242": "Deze map\/dit bestand bevatte aanstootgevende inhoud, zoals Kinderuitbuitingsmateriaal, Gewelddadig Extremisme of Bestialiteit. Het account van de gebruiker is gesloten en hun volledige details, inclusief IP-adres, zijn aan de autoriteiten verstrekt.",
-    "23243": "Deze koppeling is niet beschikbaar doordat de account van de gebruiker voor grove schending van de MEGA's [A]Servicevoorwaarden[\/A] is gesloten."
+    "23243": "Deze koppeling is niet beschikbaar doordat de account van de gebruiker voor grove schending van de MEGA's [A]Servicevoorwaarden[\/A] is gesloten.",
+    "23246": "Share the [X] folder",
+    "23249": "\u2026 and 1 other",
+    "23250": "\u2026 and [X] others"
 }

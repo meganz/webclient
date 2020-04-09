@@ -3508,6 +3508,7 @@
     "22808": "Historique des remboursements",
     "22809": "Mode",
     "22810": "*Calcul d\u2019apr\u00e8s l\u2019achat d\u2019abonnements annuels par les utilisateurs\u00a0parrain\u00e9s",
+    "22811": "Personnalisez la premi\u00e8re page qui est affich\u00e9e lors de l\u2019ouverture du gestionnaire de fichiers.",
     "22817": "Ce navigateur est d\u00e9j\u00e0 connect\u00e9 \u00e0 un compte MEGA. Cliquez d\u2019abord sur D\u00e9connexion, puis essayez de recliquer sur le m\u00eame lien R\u00e9initialiser votre mot de passe.",
     "22818": "Ce navigateur est d\u00e9j\u00e0 connect\u00e9 \u00e0 un compte MEGA. Cliquez d\u2019abord sur D\u00e9connexion, puis essayez de recliquer sur le m\u00eame lien Remiser mon compte.",
     "22819": "\u00c9chec",
@@ -3647,5 +3648,8 @@
     "23214": "Note\u00a0: Vous trouverez plus de pr\u00e9cisions dans notre [A]R\u00e8glement du programme de parrainage[\/A]",
     "23219": "Un \u00e9l\u00e9ment porte d\u00e9j\u00e0 le m\u00eame nom",
     "23242": "Ce dossier ou fichier a \u00e9t\u00e9 signal\u00e9 comme source de contenu r\u00e9pr\u00e9hensible tel qu\u2019exploitation d\u2019enfants, extr\u00e9misme violent ou bestialit\u00e9. Le compte du cr\u00e9ateur du lien a \u00e9t\u00e9 ferm\u00e9 et ses renseignements complets, dont l\u2019adresse IP, ont \u00e9t\u00e9 remis aux autorit\u00e9s.",
-    "23243": "Ce lien n\u2019est pas accessible, car le compte de l\u2019utilisateur a \u00e9t\u00e9 ferm\u00e9 en raison d\u2019une violation flagrante des [A]Conditions g\u00e9n\u00e9rales d\u2019utilisation[\/A] de MEGA."
+    "23243": "Ce lien n\u2019est pas accessible, car le compte de l\u2019utilisateur a \u00e9t\u00e9 ferm\u00e9 en raison d\u2019une violation flagrante des [A]Conditions g\u00e9n\u00e9rales d\u2019utilisation[\/A] de MEGA.",
+    "23246": "Partager le dossier [X]",
+    "23249": "\u2026 et 1 autre",
+    "23250": "\u2026 et [X] autres"
 }

@@ -401,9 +401,9 @@ var bottompage = {
             // Download bar collapse/expand
             if (page === 'download') {
 
-                var downlaoding = $topHeader.hasClass('downloading') || $topHeader.hasClass('download-complete');
+                var dlStarted = $topHeader.hasClass('downloading') || $topHeader.hasClass('download-complete');
 
-                if ((topPos > 150 && $topHeader.is('.expanded')) || downlaoding) {
+                if ((topPos > 150 && $topHeader.is('.expanded')) || dlStarted) {
                     $topHeader.removeClass('expanded initial').addClass('auto');
                 }
                 else if (topPos < 50 && $topHeader.is('.auto')) {

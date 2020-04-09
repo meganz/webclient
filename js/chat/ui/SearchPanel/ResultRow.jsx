@@ -1,11 +1,14 @@
 import React from 'react';
 import { TYPE, LABEL } from './ResultContainer.jsx';
+import { STATUS } from './SearchPanel.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
 
 /**
+ * TODO: validate the correctness of this check --  valid way to check for group chats?
+ *
  * roomIsGroup
  * @description Check whether given chat room is group chat.
  * @param {ChatRoom} room
@@ -50,16 +53,15 @@ const highlight = (text, matches) => {
  * @returns {string}
  */
 
-const getTruncatedMemberNames = (room, maxMembers = null, maxLength = 20) => {
+const getTruncatedMemberNames = (room, maxMembers = 0, maxLength = 20) => {
     let truncatedMemberNames = [];
 
     const members =  Object.keys(room.members);
     for (let i = 0; i < members.slice(0, maxMembers || members.length).length; i++) {
         const handle = members[i];
-        const member = M.u[handle];
         const name = M.getNameByHandle(handle);
 
-        if (!handle || !member || !name) {
+        if (!handle || !name) {
             continue;
         }
 
@@ -93,7 +95,7 @@ const getTruncatedRoomTopic = (room, maxLength = 20) => (
  */
 
 const openResult = room => {
-    $(document).trigger('resultOpen');
+    $(document).trigger('chatSearchResultOpen');
     loadSubPage(room.getRoomUrl());
 };
 
@@ -235,7 +237,7 @@ const Nil = () => (
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-export const ResultRow = ({ type, result, children }) => {
+export const ResultRow = ({ type, result, status, children }) => {
     switch (type) {
         case TYPE.MESSAGE:
             return <Message result={result} />;
@@ -244,7 +246,7 @@ export const ResultRow = ({ type, result, children }) => {
         case TYPE.MEMBER:
             return <Member result={result} />;
         case TYPE.NIL:
-            return <Nil />;
+            return status === STATUS.COMPLETED && <Nil />;
         default:
             return (
                 <div className={SEARCH_ROW_CLASS}>

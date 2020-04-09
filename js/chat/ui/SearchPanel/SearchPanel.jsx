@@ -30,6 +30,7 @@ export default class SearchPanel extends MegaRenderMixin {
         this.bindEvents();
     }
 
+    // TODO: validate if really necessary; currently needed because render is not invoked on prop update from the parent
     componentWillReceiveProps(nextProps, nextContext) {
         super.componentWillReceiveProps(nextProps, nextContext);
         if (nextProps.minimized !== this.props.minimized) {
@@ -45,7 +46,7 @@ export default class SearchPanel extends MegaRenderMixin {
     bindEvents = () =>
         $(document)
             // Clicked on search result
-            .rebind('resultOpen.searchPanel', () => this.toggleMinimize())
+            .rebind('chatSearchResultOpen.searchPanel', () => this.toggleMinimize())
             // Clicked outside the search panel component
             .rebind('click.searchPanel', ev =>
                 this.clickedOutsideComponent(ev) && !this.props.minimized && this.toggleMinimize()
@@ -57,11 +58,22 @@ export default class SearchPanel extends MegaRenderMixin {
                 }
             });
 
-    clickedOutsideComponent = ev =>
-        ev &&
-        $(ev.target).parents(`.${SEARCH_PANEL_CLASS}`).length === 0 && /* current container !== root component */
-        !$(ev.target).is('i.reset-icon') && /* current element !== reset search element */
-        !$(ev.target).is('.small-icon.thin-search-icon'); /* current element !== toggle search icon */
+    clickedOutsideComponent = ev => {
+        const $target = ev && $(ev.target);
+        return (
+            $target &&
+            // current parents !== root component
+            $target.parents(`.${SEARCH_PANEL_CLASS}`).length === 0 &&
+            // current element !== left sidebar container; applicable due occasional click misfire/s on scroll
+            $target.parents('div.fm-left-menu.conversations').length === 0 &&
+            // current element !== main chat area; applicable due occasional click misfire/s on scroll
+            !$target.is('div.conversationsApp') &&
+            // current element !== reset search element
+            !$target.is('i.reset-icon') &&
+            // current element !== toggle search icon
+            !$target.is('div.small-icon.thin-search-icon')
+        );
+    }
 
     toggleMinimize = () => {
         this.props.onToggle();
@@ -147,16 +159,16 @@ export default class SearchPanel extends MegaRenderMixin {
                 ${SEARCH_PANEL_CLASS}
                 ${this.props.minimized ? 'hidden' : ''}
             `}>
-                <PerfectScrollbar>
-                    <SearchField
-                        value={value}
-                        searching={searching}
-                        status={status}
-                        onFocus={this.handleFocus}
-                        onChange={this.handleChange}
-                        onSearchToggle={this.handleSearchToggle}
-                        onSearchReset={this.handleSearchReset} />
+                <SearchField
+                    value={value}
+                    searching={searching}
+                    status={status}
+                    onFocus={this.handleFocus}
+                    onChange={this.handleChange}
+                    onSearchToggle={this.handleSearchToggle}
+                    onSearchReset={this.handleSearchReset} />
 
+                <PerfectScrollbar>
                     {!!recent.length && !searching && (
                         <ResultContainer recent={recent} />
                     )}

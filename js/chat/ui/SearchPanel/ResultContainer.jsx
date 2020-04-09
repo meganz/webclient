@@ -16,7 +16,7 @@ export const LABEL = {
     RECENT: 'Recent'
 };
 
-export const ResultContainer = ({ recent, results }) => {
+export const ResultContainer = ({ recent, results, status }) => {
 
     //
     // `Recent` table
@@ -67,7 +67,7 @@ export const ResultContainer = ({ recent, results }) => {
 
             return (
                 <ResultTable key={index} heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
-                    {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} />}
+                    {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} status={status} />}
                 </ResultTable>
             );
         })

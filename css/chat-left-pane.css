@@ -380,7 +380,10 @@ div.search-panel {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 div.search-field {
-    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
 }
 
 div.search-field i {
@@ -390,13 +393,13 @@ div.search-field i {
 }
 
 div.search-field i.thin-search-icon {
-    top: 8px;
-    left: 7px;
+    top: 14px;
+    left: 12px;
 }
 
 div.search-field i.reset-icon {
-    top: 12px;
-    right: 7px;
+    top: 17px;
+    right: 14px;
     width: 14px;
     height: 14px;
     border-radius: 200px;
@@ -458,6 +461,7 @@ div.search-field div.search-field-status i.complete { background: chocolate; }
 
 div.result-table {
     margin: 5px 0 5px 0;
+    min-height: 180px;
 }
 
 div.result-table div.result-table-heading {

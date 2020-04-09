@@ -899,7 +899,7 @@
 
         // Reset the value of permission and permissions list
         if ($('.share-dialog-permissions', $dialog).length > 0) {
-            $('.share-dialog-permissions', $dialog).attr('class', 'share-dialog-permissions read-only')
+            $('.share-dialog-permissions', $dialog).removeClass("read-and-write full-access").addClass("read-only")
                 .safeHTML('<span></span>' + l[7534]);
             $('.permissions-menu-item', $dialog).removeClass('active');
             $('.permissions-menu-item.read-only', $dialog).addClass('active');

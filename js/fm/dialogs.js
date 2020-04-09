@@ -945,6 +945,7 @@
             });
         }
         else if ($.selectFolderDialog) {
+            $('.share-dialog-permissions', $dialog).addClass('hidden');
             $('.fm-picker-dialog-title', $dialog).text(l[16533]);
         }
         else {

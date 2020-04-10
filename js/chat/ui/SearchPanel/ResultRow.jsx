@@ -181,7 +181,7 @@ const Member = ({
             <div className="graphic">
                 {isGroup ?
                     <span dangerouslySetInnerHTML={{
-                        __html: highlight(getTruncatedRoomTopic(room) || getTruncatedMemberNames(room, 5), matches) }}
+                        __html: highlight(room.topic || room.getRoomTitle(), matches) }}
                     /> :
                     <>
                         <span dangerouslySetInnerHTML={{
@@ -198,7 +198,7 @@ const Member = ({
             <div className="textual">
                 {isGroup ?
                     <>
-                        <span>{getTruncatedRoomTopic(room) || getTruncatedMemberNames(room, 5)}</span>
+                        <span>{room.topic || room.getRoomTitle()}</span>
                         <MembersAmount room={room} />
                     </> :
                     <>

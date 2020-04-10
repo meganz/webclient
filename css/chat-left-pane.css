@@ -375,6 +375,15 @@ div.search-panel {
     box-sizing: border-box;
 }
 
+div.search-heading {
+    height: 100%;
+    text-align: center;
+    font-size: 15px;
+    line-height: 24px;
+    color: #333;
+    font-family: LatoWebSemibold, source_sans_prosemibold, sans-serif;
+}
+
 /*
  * Search Field
  * ------------------------------------------------------------------------------------------------------------------ */
@@ -487,10 +496,23 @@ div.result-table div.result-table-row div.avatar-wrapper {
 }
 
 div.result-table div.result-table-row div.user-card {
+    position: relative;
     float: left;
-    width: 190px;
+    width: 75%;
     padding: 5px 0 0 10px;
     font-size: 14px;
+}
+
+div.result-table div.result-table-row div.user-card span {
+    overflow: hidden;
+    float: left;
+    max-width: 100%;
+    max-width: -webkit-calc(100% - 25px);
+    max-width: -moz-calc(100% -25px);
+    max-width: calc(100% - 25px);
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 div.result-table div.result-table-row div.user-card span {
@@ -509,8 +531,12 @@ div.result-table div.result-table-row div.user-card div.textual span {
     display: block;
 }
 
+div.result-table div.result-table-row div.user-card div.textual span:nth-child(2) {
+    clear: both;
+}
+
 div.result-table div.result-table-row div.user-card div.user-card-presence {
-    margin: 0 0 0 8px;
+    margin: 0 0 1px 8px;
 }
 
 /* --- Result Row: Messages --- */
@@ -540,7 +566,7 @@ div.result-table div.result-table-row.message span.title div.user-card-presence 
 
 div.result-table div.result-table-row.message div.summary {
     overflow: hidden;
-    max-width: 215px;
+    max-width: 100%;
     font-size: 13px;
     white-space: nowrap;
     text-overflow: ellipsis;

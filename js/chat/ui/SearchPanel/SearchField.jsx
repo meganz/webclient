@@ -5,13 +5,15 @@ import { STATUS } from './SearchPanel.jsx';
 export default class SearchField extends MegaRenderMixin {
     static inputRef = React.createRef();
 
+    static focus = () => SearchField.inputRef && SearchField.inputRef.current && SearchField.inputRef.current.focus();
+
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
         super.componentDidMount();
-        SearchField.inputRef.current.focus();
+        SearchField.focus();
     }
 
     renderStatus = status => {
@@ -43,7 +45,7 @@ export default class SearchField extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, onFocus, onChange, onSearchToggle, onSearchReset } = this.props;
+        const { value, searching, status, onFocus, onChange, onToggle, onReset } = this.props;
         const isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
 
         return (
@@ -62,13 +64,13 @@ export default class SearchField extends MegaRenderMixin {
                 {searching && status && (
                     <div
                         className={`search-field-status ${isClickable ? 'clickable' : ''}`}
-                        onClick={() => isClickable && onSearchToggle()}>
+                        onClick={() => isClickable && onToggle()}>
                         {this.renderStatus(status)}
                     </div>
                 )}
 
                 {searching && (
-                    <i className="small-icon reset-icon" onClick={() => onSearchReset(SearchField.inputRef)}></i>
+                    <i className="small-icon reset-icon" onClick={onReset}></i>
                 )}
             </div>
         );

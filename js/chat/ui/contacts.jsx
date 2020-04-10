@@ -410,11 +410,11 @@ export const LastActivity = ({ contact, showLastGreen }) => {
 };
 
 export const MembersAmount = ({ room }) => {
-    return (
+    return room ?
         <span>
             {(l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)}
-        </span>
-    );
+        </span> :
+        null;
 };
 
 export class ContactFingerprint extends MegaRenderMixin {

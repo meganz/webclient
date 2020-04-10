@@ -33,8 +33,13 @@ export default class SearchPanel extends MegaRenderMixin {
     // TODO: validate if really necessary; currently needed because render is not invoked on prop update from the parent
     componentWillReceiveProps(nextProps, nextContext) {
         super.componentWillReceiveProps(nextProps, nextContext);
+
         if (nextProps.minimized !== this.props.minimized) {
             this.safeForceUpdate();
+            // Focus on re-opening from minimize
+            if (!nextProps.minimized) {
+                Soon(() => SearchField.focus());
+            }
         }
     }
 
@@ -110,10 +115,6 @@ export default class SearchPanel extends MegaRenderMixin {
         });
     };
 
-    handleFocus = () => {
-        this.getRecent();
-    };
-
     handleChange = ev => {
         const value = ev.target.value;
         const searching = value.length >= 3;
@@ -127,7 +128,7 @@ export default class SearchPanel extends MegaRenderMixin {
         );
     };
 
-    handleSearchToggle = () => {
+    handleToggle = () => {
         const megaPromise = window.megaPromiseTemp;
 
         if (megaPromise && megaPromise.cs) {
@@ -141,13 +142,13 @@ export default class SearchPanel extends MegaRenderMixin {
         }
     };
 
-    handleSearchReset = inputRef => {
+    handleReset = () => {
         this.setState({
             value: '',
             searching: false,
             status: undefined
         }, () =>
-            inputRef && inputRef.current.focus()
+            SearchField.focus()
         );
     };
 
@@ -163,10 +164,10 @@ export default class SearchPanel extends MegaRenderMixin {
                     value={value}
                     searching={searching}
                     status={status}
-                    onFocus={this.handleFocus}
+                    onFocus={this.getRecent}
                     onChange={this.handleChange}
-                    onSearchToggle={this.handleSearchToggle}
-                    onSearchReset={this.handleSearchReset} />
+                    onToggle={this.handleToggle}
+                    onReset={this.handleReset} />
 
                 <PerfectScrollbar>
                     {!!recent.length && !searching && (

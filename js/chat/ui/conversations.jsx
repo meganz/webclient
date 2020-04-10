@@ -1348,13 +1348,15 @@ class ConversationsApp extends MegaRenderMixin {
                         )}
                         <div className="nw-fm-tree-header conversations filled-input">
                             <div
-                                className="small-icon thin-search-icon"
+                                className="search-heading"
                                 onClick={() =>
                                     this.setState(state => ({
                                         searchActive: true,
                                         searchMinimized: !state.searchMinimized
                                     }))
                                 }>
+                                {l[7997] /* `Chat` */}
+                                <div className="small-icon thin-search-icon" />
                             </div>
                             <Button group="conversationsListing" icon="chat-with-plus">
                                 <DropdownContactsSelector

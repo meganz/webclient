@@ -2,6 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './ResultContainer.jsx';
 import { STATUS } from './SearchPanel.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
+import { MegaRenderMixin } from '../../../stores/mixins';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
@@ -118,115 +119,126 @@ const GroupAvatar__temp = () => (
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Message = ({ result }) => {
-    const { data, text, matches, room } = result;
-    const summary = data.hasAttachments() ? data.getAttachmentMeta()[0].name : text;
+class Message extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
+    }
 
-    return (
-        <div
-            className={`${SEARCH_ROW_CLASS} message`}
-            onClick={() => openResult(room)}>
-            <span className="title">
-                {nicknames.getNicknameAndName(data.userId)}
-                <ContactPresence contact={M.u[data.userId]} />
-            </span>
+    render() {
+        const { data, text, matches, room, contact } = this.props;
+        const summary = data.hasAttachments() ? data.getAttachmentMeta()[0].name : text;
+
+        return (
             <div
-                className="summary"
-                dangerouslySetInnerHTML={{ __html: highlight(summary, matches) }}>
+                className={`${SEARCH_ROW_CLASS} message`}
+                onClick={() => openResult(room)}>
+                <span className="title">
+                    {nicknames.getNicknameAndName(contact.u)}
+                    <ContactPresence contact={contact} />
+                </span>
+                <div
+                    className="summary"
+                    dangerouslySetInnerHTML={{ __html: highlight(summary, matches) }}>
+                </div>
+                <span className="date">
+                    {time2date(data.delay)}
+                </span>
             </div>
-            <span className="date">
-                {time2date(data.delay)}
-            </span>
-        </div>
-    );
-};
+        );
+    }
+}
 
 //
 // Chat
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Chat = ({ result }) => {
-    return (
-        <div
-            className={SEARCH_ROW_CLASS}
-            onClick={() => openResult(result.room)}>
-            <GroupAvatar__temp />
+class Chat extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const { room, matches } = this.props;
+
+        return (
             <div
-                className={USER_CARD_CLASS}
-                dangerouslySetInnerHTML={{ __html: highlight(result.room.topic, result.matches) }}>
+                className={SEARCH_ROW_CLASS}
+                onClick={() => openResult(room)}>
+                <GroupAvatar__temp />
+                <div
+                    className={USER_CARD_CLASS}
+                    dangerouslySetInnerHTML={{ __html: highlight(room.topic, matches) }}>
+                </div>
+                <div className="clear" />
             </div>
-            <div className="clear" />
-        </div>
-    );
-};
+        );
+    }
+}
 
 //
 // Member
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-const Member = ({
-    result: {
-        data, matches, room
+class Member extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
     }
-}) => {
-    const contact = M.u[data];
-    const hasHighlight = matches && !!matches.length;
-    const isGroup = roomIsGroup(room);
-    const userCard = {
-        graphic: (
-            // `Graphic` result of member type -- the last activity status is shown as graphic icon
-            // https://mega.nz/file/0MMymIDZ#_uglL1oUSJnH-bkp4IWfNL_hk6iEsQW77GHYXEvHWOs
-            <div className="graphic">
-                {isGroup ?
-                    <span dangerouslySetInnerHTML={{
-                        __html: highlight(room.topic || room.getRoomTitle(), matches) }}
-                    /> :
-                    <>
+
+    render() {
+        const { data, matches, room, contact } = this.props;
+        const hasHighlight = matches && !!matches.length;
+        const isGroup = roomIsGroup(room);
+        const userCard = {
+            graphic: (
+                // `Graphic` result of member type -- the last activity status is shown as graphic icon
+                // https://mega.nz/file/0MMymIDZ#_uglL1oUSJnH-bkp4IWfNL_hk6iEsQW77GHYXEvHWOs
+                <div className="graphic">
+                    {isGroup ?
                         <span dangerouslySetInnerHTML={{
-                            __html: highlight(nicknames.getNicknameAndName(data), matches)
-                        }} />
-                        <ContactPresence contact={contact} />
-                    </>
-                }
-            </div>
-        ),
-        textual: (
-            // `Textual` result of member type -- last activity as plain text
-            // https://mega.nz/file/RcUWiKpC#onYjToPq3whTYyMseLal5v0OxiAge0j2p9I5eO_qwoI
-            <div className="textual">
-                {isGroup ?
-                    <>
-                        <span>{room.topic || room.getRoomTitle()}</span>
-                        <MembersAmount room={room} />
-                    </> :
-                    <>
-                        <span>{nicknames.getNicknameAndName(data)}</span>
-                        <LastActivity contact={contact} showLastGreen={true} />
-                    </>
-                }
-            </div>
-        )
-    };
+                            __html: highlight(room.topic || room.getRoomTitle(), matches)
+                        }} /> :
+                        <>
+                            <span dangerouslySetInnerHTML={{
+                                __html: highlight(nicknames.getNicknameAndName(data), matches)
+                            }}/>
+                            <ContactPresence contact={contact} />
+                        </>
+                    }
+                </div>
+            ),
+            textual: (
+                // `Textual` result of member type -- last activity as plain text
+                // https://mega.nz/file/RcUWiKpC#onYjToPq3whTYyMseLal5v0OxiAge0j2p9I5eO_qwoI
+                <div className="textual">
+                    {isGroup ?
+                        <>
+                            <span>{room.topic || room.getRoomTitle()}</span>
+                            <MembersAmount room={room} />
+                        </> :
+                        <>
+                            <span>{nicknames.getNicknameAndName(data)}</span>
+                            <LastActivity contact={contact} showLastGreen={true} />
+                        </>
+                    }
+                </div>
+            )
+        };
 
-    return (
-        <div
-            className={SEARCH_ROW_CLASS}
-            onClick={() => openResult(room)}>
-            {isGroup ? <GroupAvatar__temp /> : <Avatar contact={contact} />}
-            <div className={USER_CARD_CLASS}>
-                {userCard[hasHighlight ? 'graphic' : 'textual']}
+        return (
+            <div
+                className={SEARCH_ROW_CLASS}
+                onClick={() => openResult(room)}>
+                {isGroup ? <GroupAvatar__temp/> : <Avatar contact={contact}/>}
+                <div className={USER_CARD_CLASS}>
+                    {userCard[hasHighlight ? 'graphic' : 'textual']}
+                </div>
+                <div className="clear"/>
             </div>
-            <div className="clear" />
-        </div>
-    );
-};
-
-//
-// Nil
-// TODO: add documentation
-// ---------------------------------------------------------------------------------------------------------------------
+        );
+    }
+}
 
 const Nil = () => (
     <div className={`${SEARCH_ROW_CLASS} nil`}>
@@ -237,21 +249,42 @@ const Nil = () => (
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-export const ResultRow = ({ type, result, status, children }) => {
-    switch (type) {
-        case TYPE.MESSAGE:
-            return <Message result={result} />;
-        case TYPE.CHAT:
-            return <Chat result={result} />;
-        case TYPE.MEMBER:
-            return <Member result={result} />;
-        case TYPE.NIL:
-            return status === STATUS.COMPLETED && <Nil />;
-        default:
-            return (
-                <div className={SEARCH_ROW_CLASS}>
-                    {children}
-                </div>
-            );
+export default class ResultRow extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
     }
-};
+
+    render() {
+        const { type, result, status, children } = this.props;
+
+        switch (type) {
+            case TYPE.MESSAGE:
+                return (
+                    <Message
+                        data={result.data}
+                        text={result.text}
+                        matches={result.matches}
+                        room={result.room}
+                        contact={M.u[result.data.userId]} />
+                );
+            case TYPE.CHAT:
+                return <Chat room={result.room} matches={result.matches} />;
+            case TYPE.MEMBER:
+                return (
+                    <Member
+                        data={result.data}
+                        matches={result.matches}
+                        room={result.room}
+                        contact={M.u[result.data]} />
+                );
+            case TYPE.NIL:
+                return status === STATUS.COMPLETED && <Nil />;
+            default:
+                return (
+                    <div className={SEARCH_ROW_CLASS}>
+                        {children}
+                    </div>
+                );
+        }
+    }
+}

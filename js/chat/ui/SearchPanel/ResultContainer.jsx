@@ -1,6 +1,7 @@
 import React from 'react';
-import { ResultTable } from './ResultTable.jsx';
-import { ResultRow } from './ResultRow.jsx';
+import ResultTable  from './ResultTable.jsx';
+import ResultRow  from './ResultRow.jsx';
+import { MegaRenderMixin } from '../../../stores/mixins';
 
 export const TYPE = {
     MESSAGE: 1,
@@ -16,60 +17,70 @@ export const LABEL = {
     RECENT: 'Recent'
 };
 
-export const ResultContainer = ({ recent, results, status }) => {
+export default class ResultContainer extends MegaRenderMixin {
+    constructor(props) {
+        super(props);
+    }
 
-    //
-    // `Recent` table
-    // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
-    // ----------------------------------------------------------------------
-
-    if (recent && recent.length) {
+    renderRecents = recents => {
         return (
+            //
+            // `Recent` table
+            // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+            // ----------------------------------------------------------------------
             <ResultTable heading={LABEL.RECENT}>
-                {recent.map(contact =>
-                    <ResultRow key={contact.data} type={TYPE.MEMBER} result={contact} />
+                {recents.map(recent =>
+                    <ResultRow key={recent.data} type={TYPE.MEMBER} result={recent} />
                 )}
             </ResultTable>
         );
-    }
-
-    //
-    // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
-    // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
-    // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
-    // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
-    // ----------------------------------------------------------------------
-
-    const RESULT_TABLE = {
-        CONTACTS_AND_CHATS: [],
-        MESSAGES: [],
     };
 
-    for (let i = results.length; i--;) {
-        const result = results[i];
-        const { MESSAGE, MEMBER, CHAT } = TYPE;
-        const { type: resultType, resultId } = result;
-        const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+    renderResults = (results, status) => {
 
-        RESULT_TABLE[table] = [
-            ...RESULT_TABLE[table],
-            <ResultRow
-                key={resultId}
-                type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
-                result={result} />
-        ];
+        //
+        // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
+        // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
+        // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
+        // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+        // ----------------------------------------------------------------------
+
+        const RESULT_TABLE = {
+            CONTACTS_AND_CHATS: [],
+            MESSAGES: [],
+        };
+
+        for (let i = results.length; i--;) {
+            const result = results[i];
+            const { MESSAGE, MEMBER, CHAT } = TYPE;
+            const { type: resultType, resultId } = result;
+            const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+
+            RESULT_TABLE[table] = [
+                ...RESULT_TABLE[table],
+                <ResultRow
+                    key={resultId}
+                    type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
+                    result={result} />
+            ];
+        }
+
+        return (
+            Object.keys(RESULT_TABLE).map((key, index) => {
+                const table = RESULT_TABLE[key];
+                const hasRows = table.length;
+
+                return (
+                    <ResultTable key={index} heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
+                        {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} status={status} />}
+                    </ResultTable>
+                );
+            })
+        );
+    };
+
+    render() {
+        const { recents, results, status } = this.props;
+        return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status);
     }
-
-    return (
-        Object.keys(RESULT_TABLE).map((key, index) => {
-            const table = RESULT_TABLE[key];
-            const hasRows = table.length;
-
-            return (
-                <ResultTable key={index} heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
-                    {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} status={status} />}
-                </ResultTable>
-            );
-        })
-    );
-};
+}

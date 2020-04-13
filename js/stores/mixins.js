@@ -451,7 +451,7 @@ export class MegaRenderMixin extends React.Component {
         }
 
         if (!self.props.manualDataChangeTracking) {
-            var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+            var mapKeys = map._dataChangeIndex !== undefined && map.keys ? map.keys() : Object.keys(map);
 
             for (var i = 0; i < mapKeys.length; i++) {
                 var k = mapKeys[i];

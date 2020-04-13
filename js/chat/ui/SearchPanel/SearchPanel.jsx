@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
 import SearchField from './SearchField.jsx';
-import { ResultContainer } from './ResultContainer.jsx';
+import ResultContainer  from './ResultContainer.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 
 export const STATUS = {
@@ -17,7 +17,7 @@ export default class SearchPanel extends MegaRenderMixin {
         value: '',
         searching: false,
         status: undefined,
-        recent: [],
+        recents: [],
         results: []
     };
 
@@ -84,13 +84,14 @@ export default class SearchPanel extends MegaRenderMixin {
         this.props.onToggle();
     };
 
-    getRecent = () => {
+    getRecents = () => {
         megaChat.getFrequentContacts()
             .then(frequentContacts => {
                 this.setState({
-                    recent: frequentContacts.map(frequentContact => ({
+                    recents: frequentContacts.map(frequentContact => ({
                         data: frequentContact.userId,
-                        room: frequentContact.chatRoom
+                        room: frequentContact.chatRoom,
+                        contact: M.u[frequentContact.userId]
                     }))
                 });
             });
@@ -153,7 +154,7 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     render() {
-        const { value, searching, status, recent, results } = this.state;
+        const { value, searching, status, recents, results } = this.state;
 
         return (
             <div className={`
@@ -164,14 +165,14 @@ export default class SearchPanel extends MegaRenderMixin {
                     value={value}
                     searching={searching}
                     status={status}
-                    onFocus={this.getRecent}
+                    onFocus={this.getRecents}
                     onChange={this.handleChange}
                     onToggle={this.handleToggle}
                     onReset={this.handleReset} />
 
                 <PerfectScrollbar>
-                    {!!recent.length && !searching && (
-                        <ResultContainer recent={recent} />
+                    {!!recents.length && !searching && (
+                        <ResultContainer recents={recents} />
                     )}
 
                     {searching && (

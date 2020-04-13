@@ -1015,13 +1015,14 @@ RtcModule.prototype.onChatOnline = function(chat) {
     if (!recovery) {
         return;
     }
-    // we have a call to recover on this chatid
+    // we have a call to recover on this chatid. Just in case, normally should not happen as we just went online
     if (this.calls[chatid]) {
         this.logger.log("We reconnected, but there is already another call, aborting recovery...");
         recovery.abort(Term.kErrAlready);
         return;
     }
-    this.logger.warn("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
+    this.logger.warn("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid) +
+        "(" + chat.callInfo.participantCount() + " peers in the call)");
     this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
 };
 
@@ -1414,6 +1415,10 @@ Call.prototype.msgSession = function(packet) {
              "Our peerId is smaller, processing received SESSION");
         }
     }
+    if (!self._inCallPingTimer) {
+        // in blind recovery, we start the INCALL ping as soon as someone replies to our JOIN
+        self._startIncallPingTimer();
+    }
 
     if (self.state === CallState.kJoining) {
         self._setCallInProgress();
@@ -1516,6 +1521,10 @@ Call.prototype.msgJoin = function(packet) {
         } else if (self.state === CallState.kJoining && self.recovery) {
             // Call recovery - peers send joins to each other
             self._setCallInProgress();
+            if (!self._inCallPingTimer) {
+                // during blind recovery, we start INCALL pings only after someone replies to our JOIN
+                self._startIncallPingTimer();
+            }
         }
 
         var newSid = self.manager.crypto.random(8);
@@ -1653,11 +1662,13 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
 
         if (reasonNoPeer === Term.kAnsElsewhere || reasonNoPeer === Term.kErrAlready
          || reasonNoPeer === Term.kAnswerTimeout) {
-            self.logger.log("Not sending CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
+            self.logger.log("Not sending terminate CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
         } else if (self.predestroyState === CallState.kRingIn) {
-            self.logger.log("Not sending CALLDATA because we were passively ringing");
+            self.logger.log("Not sending terminate CALLDATA because we were passively ringing");
         } else if (self.predestroyState === CallState.kCallingOut) {
-            self.logger.log("Not sending CALLDATA because we haven't yet sent the call request");
+            self.logger.log("Not sending terminate CALLDATA because we haven't yet sent the call request");
+        } else if (!self._inCallPingTimer) {
+            self.logger.log("Not sending terminate CALLDATA because INCALL pings were not started");
         } else {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
@@ -2222,9 +2233,14 @@ Call.prototype._join = function() {
         return false;
     }
     if (self.recovery) {
-        self._bcastCallData(CallDataType.kSession);
+        if (!self.recovery.isBlind) {
+            // send a dummy CALLDATA so that peers receiving INCALL for us, know our state as well
+            self._bcastCallData(CallDataType.kSession);
+            self._startIncallPingTimer();
+        }
+    } else {
+        self._startIncallPingTimer();
     }
-    self._startIncallPingTimer();
     // Timeout from JOIN sending till kInProgress state
     // Then we have monitorCallSetupTimeout() - from kInProgress till first session connected
     setTimeout(function() {
@@ -2804,6 +2820,12 @@ Call.prototype._configFromRecovery = function(recovery) {
     this.gLocalStream = recovery.gLocalStream;
     delete recovery.gLocalStream;
     delete this.manager.callRecoveries[this.chatid];
+    if (this.chat.callInfo.participantCount() < 1) {
+        // We are doing a "blind" call reacovery - call does not exist anymore at chatd, but we are sending a JOIN
+        // in hope everybody dropped out unexpectedly (chatd restart or all were on same network). In this case,
+        // we don't want to register a new call before anyone actually replies the blind JOIN
+        recovery.isBlind = true;
+    }
     this._fire('onCallRecovering', this, this.chat.tsCallStart);
 };
 

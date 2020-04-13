@@ -952,6 +952,7 @@ function api_reqfailed(channel, error) {
 
                     // Exit early to prevent logout because further API requests are
                     // needed to verify by SMS and if logged out then it won't work
+                    window.doUnloadLogOut = 0x9001;
                     return false;
                 }
                 else if (reasonCode === 700) {

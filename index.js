@@ -3003,10 +3003,15 @@ window.onhashchange = function () {
 };
 
 window.onbeforeunload = function () {
+    'use strict';
+
     if (dlmanager.isDownloading || ulmanager.isUploading) {
         return $.memIOSaveAttempt ? null : l[377];
     }
 
+    if (window.doUnloadLogOut) {
+        u_logout();
+    }
     mBroadcaster.crossTab.leave();
 };
 

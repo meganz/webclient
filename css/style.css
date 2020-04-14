@@ -2249,9 +2249,9 @@ a.nt-settings-button:hover span {
     position: absolute;
     content: '';
     width: calc(100% + 6px);
-    height: calc(100% + 6px);
+    height: 100%;
     left: -3px;
-    top: -3px;
+    top: 0;
 }
 .jspHorizontalBar .jspDrag {
     height: 8px !important;
@@ -21477,11 +21477,9 @@ table.speed-table {
 .ps-container {
     max-width: 100%;
 }
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0 !important;
-}
 .ps-container > .ps-scrollbar-y-rail {
-    width: 13px;
+    width: 14px !important;
+    right: 0 !important;
 }
 .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     right: 3px !important;
@@ -21492,12 +21490,9 @@ table.speed-table {
     position: absolute;
     content: '';
     width: calc(100% + 6px);
-    height: calc(100% + 6px);
+    height: 100%;
     left: -3px;
-    top: -3px;
-}
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
-    right: 0px !important;
+    top: 0;
 }
 .ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
@@ -21549,9 +21544,6 @@ div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
 
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
-}
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0px !important;
 }
 .ps-container > .ps-scrollbar-y-rail {
     margin: 2px 0;

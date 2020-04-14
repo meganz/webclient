@@ -301,7 +301,7 @@ function init_page() {
             .replace('!', '/folder/').replace('?', '/file/')
             : page.replace('!', 'file/').replace('!', '#');
 
-        history.replaceState({ subpage: page }, "", '/' + page);
+        history.replaceState({ subpage: page }, "", (hashLogic ? '#' : '/') + page);
         return init_page();
     }
 

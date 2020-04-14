@@ -2536,7 +2536,7 @@
     "19604": "Pending email change",
     "19605": "The new email address\u2019s status will remain as pending until it is confirmed by the user. The account will still be usable during this period.",
     "19606": "Email change is pending",
-    "19607": "Role",
+    "19607": "Role:",
     "19608": "Payment overdue",
     "19609": "Payment required",
     "19610": "Administrator",
@@ -3651,5 +3651,6 @@
     "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A].",
     "23246": "Share the [X] folder",
     "23249": "\u2026 and 1 other",
-    "23250": "\u2026 and [X] others"
+    "23250": "\u2026 and [X] others",
+    "23251": "Pay Now"
 }

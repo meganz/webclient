@@ -12,6 +12,11 @@ mobile.chatlink = {
 
         'use strict';
 
+        if (is_ios && window.location.toString().indexOf("?didtap") > -1) {
+            window.top.location = mobile.downloadOverlay.getStoreLink();
+            return;
+        }
+
         var $overlay = $('.mobile.chat-links-preview');
 
         $('.chatlink-mobile-header a, .chatlink-mobile-header', $overlay).rebind('click.home', function(e) {
@@ -78,13 +83,22 @@ mobile.chatlink = {
 
         'use strict';
 
+        var redirectToStore = function() {
+            window.top.location = mobile.downloadOverlay.getStoreLink();
+        };
+
+        if (window.location.toString().indexOf("?didtap") > -1) {
+            redirectToStore();
+            return false;
+        }
+
         var redirectLink = "chat/" + handle + "#" + key;
 
         // If iOS (iPhone, iPad, iPod), use method based off https://github.com/prabeengiri/DeepLinkingToNativeApp/
         if (is_ios || localStorage.testOpenInApp === 'ios') {
 
             var ns = '.ios ';
-            var appLink = 'mega://' + redirectLink;
+            var appLink = 'https://' + window.location.host + '/' + redirectLink + "?didtap";
             var events = ['pagehide', 'blur', 'beforeunload'];
             var timeout = null;
 
@@ -94,9 +108,6 @@ mobile.chatlink = {
                 $(window).off(events.join(ns) + ns);
             };
 
-            var redirectToStore = function() {
-                window.top.location = mobile.downloadOverlay.getStoreLink();
-            };
 
             var redirect = function() {
                 var ms = 500;

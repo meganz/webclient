@@ -1,6 +1,9 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
 import { STATUS } from './SearchPanel.jsx';
+import { LABEL } from './ResultContainer.jsx';
+
+const SEARCH_STATUS_CLASS = `search-field-status`;
 
 export default class SearchField extends MegaRenderMixin {
     static inputRef = React.createRef();
@@ -16,28 +19,32 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.focus();
     }
 
-    renderStatus = status => {
+    // [...] TODO: add enum-like object re: translations
+    renderStatus = (status, isClickable, onToggle) => {
+        const className = `${SEARCH_STATUS_CLASS} ${isClickable ? 'clickable' : ''}`;
+        const handleClick = () => isClickable && onToggle();
+
         switch (status) {
             case STATUS.IN_PROGRESS:
                 return (
-                    <>
-                        <i className="decrypting"></i>
-                        decrypting results...
-                    </>
+                    <div className={`${className} searching`} onClick={handleClick}>
+                        <i />
+                        {LABEL.DECRYPTING_RESULTS}
+                    </div>
                 );
             case STATUS.PAUSED:
                 return (
-                    <>
-                        <i className="paused"></i>
-                        resume search
-                    </>
+                    <div className={`${className} paused`} onClick={handleClick}>
+                        <i />
+                        {LABEL.RESUME_SEARCH}
+                    </div>
                 );
             case STATUS.COMPLETED:
                 return (
-                    <>
-                        <i className="complete"></i>
-                        search complete
-                    </>
+                    <div className={`${className} complete`} onClick={handleClick}>
+                        <i />
+                        {LABEL.SEARCH_COMPLETE}
+                    </div>
                 );
             default:
                 return null;
@@ -62,11 +69,7 @@ export default class SearchField extends MegaRenderMixin {
                     onChange={onChange} />
 
                 {searching && status && (
-                    <div
-                        className={`search-field-status ${isClickable ? 'clickable' : ''}`}
-                        onClick={() => isClickable && onToggle()}>
-                        {this.renderStatus(status)}
-                    </div>
+                    this.renderStatus(status, isClickable, onToggle)
                 )}
 
                 {searching && (

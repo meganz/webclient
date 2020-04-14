@@ -11,10 +11,22 @@ export const TYPE = {
 };
 
 export const LABEL = {
+
+    //
+    // Result table & Result row
+    // ------------------------------------
+
     MESSAGES: 'Messages',
     CONTACTS_AND_CHATS: 'Contacts And Chats',
     NO_RESULTS: 'No Results',
-    RECENT: 'Recent'
+    RECENT: 'Recent',
+
+    //
+    // Search field status
+    // ------------------------------------
+    DECRYPTING_RESULTS: 'decrypting results...',
+    RESUME_SEARCH: 'resume search',
+    SEARCH_COMPLETE: 'search complete'
 };
 
 export default class ResultContainer extends MegaRenderMixin {
@@ -22,19 +34,19 @@ export default class ResultContainer extends MegaRenderMixin {
         super(props);
     }
 
-    renderRecents = recents => {
-        return (
-            //
-            // `Recent` table
-            // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
-            // ----------------------------------------------------------------------
-            <ResultTable heading={LABEL.RECENT}>
-                {recents.map(recent =>
-                    <ResultRow key={recent.data} type={TYPE.MEMBER} result={recent} />
-                )}
-            </ResultTable>
-        );
-    };
+    renderRecents = recents => (
+
+        //
+        // `Recent` table
+        // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+        // ----------------------------------------------------------------------
+
+        <ResultTable heading={LABEL.RECENT}>
+            {recents.map(recent =>
+                <ResultRow key={recent.data} type={TYPE.MEMBER} result={recent} />
+            )}
+        </ResultTable>
+    );
 
     renderResults = (results, status) => {
 

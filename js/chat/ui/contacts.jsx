@@ -392,30 +392,46 @@ export class ContactPresence extends MegaRenderMixin {
     }
 };
 
-export const LastActivity = ({ contact, showLastGreen }) => {
-    if (!contact) {
-        return null;
+export class LastActivity extends ContactAwareComponent {
+    constructor(props) {
+        super(props);
     }
 
-    const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-    const activityStatus = showLastGreen && contact.presence <= 2 && lastActivity ?
-        (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity)) :
-        M.onlineStatusClass(contact.presence)[0];
+    render() {
+        const { contact, showLastGreen } = this.props;
 
-    return (
-        <span>
-            {activityStatus}
-        </span>
-    );
-};
+        if (!contact) {
+            return null;
+        }
 
-export const MembersAmount = ({ room }) => {
-    return room ?
-        <span>
-            {(l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)}
-        </span> :
-        null;
-};
+        const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+        const activityStatus = showLastGreen && contact.presence <= 2 && lastActivity ?
+            (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity)) :
+            M.onlineStatusClass(contact.presence)[0];
+
+        return (
+            <span>
+                {activityStatus}
+            </span>
+        );
+    }
+}
+
+export class MembersAmount extends ContactAwareComponent {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const { room } = this.props;
+
+        return room ?
+            <span>
+                {(l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)}
+            </span> :
+            null;
+    }
+}
 
 export class ContactFingerprint extends MegaRenderMixin {
     static defaultProps = {

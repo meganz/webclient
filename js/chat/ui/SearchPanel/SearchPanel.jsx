@@ -137,9 +137,10 @@ export default class SearchPanel extends MegaRenderMixin {
 
             this.setState({
                 status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
-            }, () =>
-                inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume()
-            );
+            }, () => {
+                Soon(() => SearchField.focus());
+                return inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume();
+            });
         }
     };
 
@@ -149,12 +150,22 @@ export default class SearchPanel extends MegaRenderMixin {
             searching: false,
             status: undefined
         }, () =>
-            SearchField.focus()
+            Soon(() => SearchField.focus())
         );
     };
 
     render() {
         const { value, searching, status, recents, results } = this.state;
+
+        //
+        // `SearchPanel`
+        // https://mega.nz/file/UZUz0A5C#j4ctadWqhVT2_m3qyNfgrle11B8NNZgrKTafg1htd1Y
+        // https://mega.nz/file/UR1VjYKR#FhY3j9WZDJlCYYj2skuCScIHnrIsr7OI4KBfTiQLnHQ
+        // https://mega.nz/file/QFExTYpD#Jp9R0CV3ri9B081k1i36kDa57ZEe2W2JPp5havIn8Ww
+        //
+        // Component hierarchy
+        // https://mega.nz/file/kZEhFQxa#uuR2BQ6DXFJPi002eKZbzBpf25pDtddNeMSMsZ1EzPs
+        // -------------------------------------------------------------------------
 
         return (
             <div className={`
@@ -170,7 +181,7 @@ export default class SearchPanel extends MegaRenderMixin {
                     onToggle={this.handleToggle}
                     onReset={this.handleReset} />
 
-                <PerfectScrollbar>
+                <PerfectScrollbar options={{ 'suppressScrollX': true }}>
                     {!!recents.length && !searching && (
                         <ResultContainer recents={recents} />
                     )}

@@ -100,20 +100,6 @@ const openResult = room => {
     loadSubPage(room.getRoomUrl());
 };
 
-// TODO: temp -- when assets are available, add static DOM re: group chats avatar
-const GroupAvatar__temp = () => (
-    <div
-        style={{
-            float: 'left',
-            width: 30,
-            height: 30,
-            borderRadius: 200,
-            border: '3px solid #FFF',
-            background: 'cornflowerblue'
-        }}
-    />
-);
-
 //
 // Message
 // TODO: add documentation
@@ -165,10 +151,11 @@ class Chat extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room)}>
-                <GroupAvatar__temp />
-                <div
-                    className={USER_CARD_CLASS}
-                    dangerouslySetInnerHTML={{ __html: highlight(room.topic, matches) }}>
+                <div className="group-chat" />
+                <div className={USER_CARD_CLASS}>
+                    <div className="graphic">
+                        <span dangerouslySetInnerHTML={{ __html: highlight(room.topic, matches) }} />
+                    </div>
                 </div>
                 <div className="clear" />
             </div>
@@ -230,7 +217,7 @@ class Member extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room)}>
-                {isGroup ? <GroupAvatar__temp/> : <Avatar contact={contact}/>}
+                {isGroup ? <div className="group-chat" /> : <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
                     {userCard[hasHighlight ? 'graphic' : 'textual']}
                 </div>

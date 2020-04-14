@@ -369,10 +369,11 @@ div.search-panel {
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 5px 5px 0;
+    padding: 3px 3px 0;
     background: #FAFAFA;
     z-index: 10;
     box-sizing: border-box;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial, sans-serif;
 }
 
 div.search-heading {
@@ -381,7 +382,7 @@ div.search-heading {
     font-size: 15px;
     line-height: 24px;
     color: #333;
-    font-family: LatoWebSemibold, source_sans_prosemibold, sans-serif;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
 /*
@@ -402,13 +403,13 @@ div.search-field i {
 }
 
 div.search-field i.thin-search-icon {
-    top: 14px;
+    top: 12px;
     left: 12px;
 }
 
 div.search-field i.reset-icon {
-    top: 17px;
-    right: 14px;
+    top: 14px;
+    right: 12px;
     width: 14px;
     height: 14px;
     border-radius: 200px;
@@ -418,7 +419,8 @@ div.search-field i.reset-icon {
 
 div.search-field input {
     width: 100%;
-    padding: 9px 30px 9px 32px;
+    height: 37px;
+    padding: 10px 30px 8px 35px;
     font-size: 13px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 4px;
@@ -434,11 +436,12 @@ div.search-field input::-ms-input-placeholder { color: #CCC; }
 div.search-field div.search-field-status {
     position: relative;
     margin: -2px 0 0 0;
-    padding: 4px 32px;
+    padding: 4px 35px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 0 0 4px 4px;
-    font-size: 14px;
+    font-size: 12px;
     background: #FAFAFA;
+    color: #666;
 }
 
 div.search-field div.search-field-status:hover {
@@ -449,20 +452,42 @@ div.search-field div.search-field-status.clickable {
     cursor: pointer;
 }
 
+div.search-field div.search-field-status.clickable:hover {
+    /* […] */
+}
+
 div.search-field div.search-field-status i {
     position: absolute;
-    top: 6px;
+    top: 5px;
     left: 10px;
     display: block;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 200px;
     background: tomato;
 }
 
-div.search-field div.search-field-status i.decrypting { background: salmon; }
-div.search-field div.search-field-status i.paused { background: orange; }
-div.search-field div.search-field-status i.complete { background: chocolate; }
+div.search-field div.search-field-status.searching i {
+    background: transparent url('../images/temp/chat_searching.png') 0 0 no-repeat;
+    background-size: 14px auto; /* TODO: do as rotating, use proper asset  */
+}
+
+div.search-field div.search-field-status.searching:hover i {
+    background: transparent url('../images/temp/chat_search_pause.svg') 0 0 no-repeat;
+}
+
+div.search-field div.search-field-status.paused i {
+    background: transparent url('../images/temp/chat_search_resume.svg') 0 0 no-repeat;
+    opacity: 0.7;
+}
+
+div.search-field div.search-field-status.paused:hover i {
+    opacity: 1;
+}
+
+div.search-field div.search-field-status.complete i {
+    background: transparent url('../images/temp/chat_search_complete.svg') 0 0 no-repeat;
+}
 
 /*
  * Result Table & Result Row
@@ -470,20 +495,37 @@ div.search-field div.search-field-status i.complete { background: chocolate; }
 
 div.result-table {
     margin: 5px 0 5px 0;
-    min-height: 180px;
+    min-height: 190px;
+}
+
+div.result-table:last-child {
+    padding: 0 0 60px 0;
 }
 
 div.result-table div.result-table-heading {
     padding: 3px;
     font-size: 14px;
     text-transform: uppercase;
+    border-radius: 4px;
     color: #333;
     background: #EEE;
 }
 
 div.result-table div.result-table-row {
     margin: 10px 0;
+    padding: 0 5px;
     cursor: pointer;
+}
+
+div.result-table div.result-table-row div.group-chat {
+    float: left;
+    width: 30px;
+    height: 30px;
+    border: 3px solid #FFF;
+    border-radius: 200px;
+    background: transparent url('../images/temp/chat_group_img@2x.png') 0 0 no-repeat;
+    background-size: 30px auto;
+
 }
 
 /*
@@ -499,8 +541,9 @@ div.result-table div.result-table-row div.user-card {
     position: relative;
     float: left;
     width: 75%;
-    padding: 5px 0 0 10px;
+    padding: 0 0 0 10px;
     font-size: 14px;
+    line-height: 19px;
 }
 
 div.result-table div.result-table-row div.user-card span {
@@ -520,19 +563,41 @@ div.result-table div.result-table-row div.user-card span {
 }
 
 div.result-table div.result-table-row div.user-card div.graphic {
+    overflow: hidden;
+    padding: 8px 0 0 0;
+}
+
+div.result-table div.result-table-row div.user-card div.graphic span {
     /* […] */
 }
 
+div.result-table div.result-table-row div.user-card div.graphic span:nth-child(1) {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
+    color: #666;
+}
+
+div.result-table div.result-table-row div.user-card div.graphic strong {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
+    color: #000;
+}
+
 div.result-table div.result-table-row div.user-card div.textual {
-    /* […] */
+    overflow: hidden;
 }
 
 div.result-table div.result-table-row div.user-card div.textual span {
     display: block;
 }
 
+div.result-table div.result-table-row div.user-card div.textual span:nth-child(1) {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
+    color: #333;
+}
+
 div.result-table div.result-table-row div.user-card div.textual span:nth-child(2) {
     clear: both;
+    font-size: 13px;
+    color: #666;
 }
 
 div.result-table div.result-table-row div.user-card div.user-card-presence {
@@ -557,7 +622,7 @@ div.result-table div.result-table-row.message span {
 
 div.result-table div.result-table-row.message span.title {
     font-size: 14px;
-    font-weight: 600;
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
 div.result-table div.result-table-row.message span.title div.user-card-presence {
@@ -570,7 +635,12 @@ div.result-table div.result-table-row.message div.summary {
     font-size: 13px;
     white-space: nowrap;
     text-overflow: ellipsis;
-    color: #666;
+    color: #555;
+}
+
+div.result-table div.result-table-row.message div.summary strong {
+    font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
+    color: #000;
 }
 
 div.result-table div.result-table-row.message span.date {
@@ -589,6 +659,7 @@ div.result-table div.result-table-row.nil {
 
 div.result-table div.result-table-row.nil span {
     display: block;
+    padding: 10px 0 0 0;
     font-size: 20px;
     color: #333;
 }

@@ -4,10 +4,11 @@
     background-color: rgba(213,218,220,0.95);
 }
 #mega-text-editor .editor-textarea-container {
-    width: 60%;
+    width: 80%;
     height: 100%;
     margin: 0 auto;
     min-width: 800px;
+    max-width: 99%;
 }
 #mega-text-editor #text-editor-textarea {
     width: 100%;

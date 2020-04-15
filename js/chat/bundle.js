@@ -1066,7 +1066,7 @@ function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || func
 
 
 var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
-  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
+  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'presence', 'm', 'avatar']);
 };
 
 var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
@@ -1802,7 +1802,7 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
           var SECONDS = new Date().getTime() / 1000 - lastActivity;
           var FORTY_FIVE_DAYS = 3888000; // seconds
 
-          var timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity);
+          var timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
           presenceRow = (l[19994] || "Last seen %s").replace("%s", timeToLast);
         } else {
           presenceRow = M.onlineStatusClass(contact.presence)[0];

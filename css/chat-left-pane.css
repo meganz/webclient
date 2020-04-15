@@ -413,7 +413,8 @@ div.search-field i.reset-icon {
     width: 14px;
     height: 14px;
     border-radius: 200px;
-    background: orange;
+    background: transparent url('../images/temp/search-reset.png') 0 0 no-repeat;
+    background-size: 15px auto;
     cursor: pointer;
 }
 

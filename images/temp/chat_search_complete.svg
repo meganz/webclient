@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 64 (93537) - https://sketch.com -->
+    <title>chat_search_complete</title>
+    <desc>Created with Sketch.</desc>
+    <g id="left-sidebar" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="left-sidebar---search-init-results" transform="translate(-531.000000, -300.000000)" fill="#666666">
+            <g id="search-complete" transform="translate(531.000000, 300.000000)">
+                <polygon id="check" points="4 7 7 9 13 4 14 5 6.91 11.9139404 3 8"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

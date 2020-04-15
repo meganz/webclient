@@ -20,6 +20,7 @@ mobile.conflictResolutionDialog = {
     prompt: function(op, file, node, remaining, target) {
         'use strict';
 
+        var self = this;
         var isFolder = file.t;
         var name = M.getSafeName(file.name);
 
@@ -31,15 +32,25 @@ mobile.conflictResolutionDialog = {
         this.$fileManagerBlock = $('.mobile.file-manager-block');
         this.$useSameAction = this.$overlay.find(".repeat-action-control");
         this.$useSameAction.prop("checked", false);
+        this.$useSameAction.parent().addClass('checkboxOff').removeClass('checkboxOn');
 
         this._renderActionText(op);
 
         var promise = new MegaPromise();
         var done = function(file, name, action) {
-            mobile.conflictResolutionDialog.close();
-            loadingDialog.show();
-            var repeatAction = mobile.conflictResolutionDialog.$useSameAction.prop('checked') || false;
-            promise.resolve(file, name, action, repeatAction);
+            var repeatAction = self.$useSameAction.prop('checked') || false;
+            self.close();
+
+            // XXX: Do we really need to show a loading overlay for synchronous operations? anyway, doing as desktop..
+            if (repeatAction) {
+                loadingDialog.show();
+                promise.always(function() {
+                    loadingDialog.hide();
+                });
+            }
+            onIdle(function() {
+                promise.resolve(file, name, action, repeatAction);
+            });
         };
 
         this.$overlay.find('.fm-dialog-close, .cancel').rebind('tap', function() {

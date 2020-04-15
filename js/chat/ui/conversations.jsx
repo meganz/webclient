@@ -394,16 +394,22 @@ class ConversationsListItem extends MegaRenderMixin {
 
             var mutedMicrophone = null;
             var activeCamera = null;
-
-            if (!mediaOptions.audio) {
-                mutedMicrophone = <i className="small-icon grey-crossed-mic"></i>;
+            var onHold = null;
+            if (chatRoom.callManagerCall.rtcCall.isOnHold()) {
+                onHold = <i className="small-icon grey-call-on-hold"></i>;
             }
-            if (mediaOptions.video) {
-                activeCamera = <i className="small-icon grey-videocam"></i>;
+            else {
+                if (!mediaOptions.audio) {
+                    mutedMicrophone = <i className="small-icon grey-crossed-mic"></i>;
+                }
+                if (mediaOptions.video) {
+                    activeCamera = <i className="small-icon grey-videocam"></i>;
+                }
             }
             inCallDiv = <div className="call-duration">
                 {mutedMicrophone}
                 {activeCamera}
+                {onHold}
                 <span className="call-counter" data-room-id={chatRoom.chatId}>{
                     secondsToTimeShort(chatRoom._currentCallCounter)
                 }</span>
@@ -1037,7 +1043,6 @@ class ConversationsApp extends MegaRenderMixin {
                 if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
                     $typeArea.trigger("focus");
                     e.megaChatHandled = true;
-                    moveCursortoToEnd($typeArea[0]);
                 }
 
             }

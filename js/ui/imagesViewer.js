@@ -16,6 +16,7 @@ var slideshowid;
     var _hideCounter = false;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
+    var _pdfSeen = false;
 
     function slideshow_handle(raw) {
         var result;
@@ -637,7 +638,18 @@ var slideshowid;
             slideshow_imgControls(1);
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
-            cleanupPDFViewerDiv();
+
+            if (_pdfSeen) {
+                _pdfSeen = false;
+
+                tryCatch(function() {
+                    var doc = document.getElementById('pdfpreviewdiv1');
+                    if (doc && (doc = doc.contentWindow.document)) {
+                        doc.open();
+                        doc.close();
+                    }
+                })();
+            }
 
             return false;
         }
@@ -1213,6 +1225,7 @@ var slideshowid;
             doc.open();
             doc.write(myPage);
             doc.close();
+            _pdfSeen = true;
         });
     }
 
@@ -1440,12 +1453,6 @@ var slideshowid;
 
         // Ensure we are not eating too much memory...
         delay('slideshow:freemem', slideshow_freemem, 6e3);
-    }
-
-    function cleanupPDFViewerDiv() {
-        var doc = $('#pdfpreviewdiv1', '.viewer-overlay')[0].contentWindow.document;
-        doc.open();
-        doc.close();
     }
 
     function slideshow_freemem() {

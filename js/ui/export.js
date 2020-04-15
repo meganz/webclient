@@ -840,6 +840,13 @@ var exportPassword = {
                 var folderIdentifier = (linkType === exportPassword.LINK_TYPE_FOLDER) ? 'F' : '';
                 var url = folderIdentifier + '!' + handleUrlEncoded + '!' + decryptedKeyUrlEncoded;
 
+
+                if (mega.flags.nlfe) {
+                    url = (folderIdentifier ? '/folder/' : '/file/') + handleUrlEncoded
+                        + '#' + decryptedKeyUrlEncoded;
+                }
+
+
                 // Show completed briefly before redirecting
                 $decryptButtonProgress.addClass('hidden');
                 $decryptButtonText.text(l[9077]);   // Decrypted
@@ -1405,8 +1412,14 @@ var exportExpiry = {
 
         // Embed code handling
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
-        if ($.itemExportEmbed || is_video(n) === 1) {
-            var link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
+        if ($.itemExportEmbed || is_video(n) === 1 && !folderlink) {
+            var link;
+            if (mega.flags.nlfe) {
+                link = getBaseUrl() + '/embed/' + n.ph + '#' + a32_to_base64(n.k);
+            }
+            else {
+                link = getBaseUrl() + '/embed#!' + n.ph + '!' + a32_to_base64(n.k);
+            }
             var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
             var setCode = function() {
                 var time = 0;
@@ -1642,7 +1655,7 @@ var exportExpiry = {
                         $key.text($key.data('key'));
                     }
                 }
-                else if (keyPart[0] === '!') {
+                else if (keyPart[0] === '!' || keyPart[0] === '#') {
                     // Remove initial ! separator and subsequent file/folder handle, if any
                     $key.text(keyPart.substr(1).split(/[?!]/)[0]);
                 }
@@ -1747,9 +1760,16 @@ var exportExpiry = {
         var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
 
         if (folderlink) {
-            fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid;
-            fileUrlKey = '!' + pfkey;
-            fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
+            if (mega.flags.nlfe) {
+                fileUrlWithoutKey = getBaseUrl() + '/folder/' + pfid;
+                fileUrlKey = '#' + pfkey;
+                fileUrlNodeHandle = (item.t ? '/folder/' : '/file/') + item.h;
+            }
+            else {
+                fileUrlWithoutKey = getBaseUrl() + '/#F!' + pfid;
+                fileUrlKey = '!' + pfkey;
+                fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
+            }
             fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
         }
         else if (item.t) {
@@ -1772,8 +1792,22 @@ var exportExpiry = {
             fileSize = htmlentities(bytesToSize(item.s));
         }
 
-        fileUrlWithoutKey = fileUrlWithoutKey || (getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph));
-        fileUrlKey = fileUrlKey || (key ? '!' + a32_to_base64(key) : '');
+        if (!fileUrlWithoutKey) {
+            if (mega.flags.nlfe) {
+                fileUrlWithoutKey = (getBaseUrl() + (type ? '/folder/' : '/file/') + htmlentities(item.ph));
+            }
+            else {
+                fileUrlWithoutKey = (getBaseUrl() + '/#' + type + '!' + htmlentities(item.ph));
+            }
+        }
+        if (!fileUrlKey) {
+            if (mega.flags.nlfe) {
+                fileUrlKey = (key ? '#' + a32_to_base64(key) : '');
+            }
+            else {
+                fileUrlKey = (key ? '!' + a32_to_base64(key) : '');
+            }
+        }
 
         html = '<div class="export-link-item' + folderClass + '" data-node-handle="' + nodeHandle + '">'
              +      '<div class="export-icon ' + fileIcon(item) + '" ></div>'

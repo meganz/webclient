@@ -405,13 +405,16 @@ export class LastActivity extends ContactAwareComponent {
         }
 
         const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-        const activityStatus = showLastGreen && contact.presence <= 2 && lastActivity ?
-            (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity)) :
-            M.onlineStatusClass(contact.presence)[0];
+        const SECONDS = (new Date().getTime() / 1000) - lastActivity;
+        const FORTY_FIVE_DAYS = 3888000; // seconds
+        const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity);
+        const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
 
         return (
             <span>
-                {activityStatus}
+                {hasActivityStatus ?
+                    (l[19994] || "Last seen %s").replace("%s", timeToLast) :
+                    M.onlineStatusClass(contact.presence)[0]}
             </span>
         );
     }

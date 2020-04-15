@@ -400,10 +400,13 @@ var bottompage = {
 
             // Download bar collapse/expand
             if (page === 'download') {
-                if (topPos > 150 && $topHeader.is('.expanded')) {
+
+                var dlStarted = $topHeader.hasClass('downloading') || $topHeader.hasClass('download-complete');
+
+                if ((topPos > 150 && $topHeader.is('.expanded')) || dlStarted) {
                     $topHeader.removeClass('expanded initial').addClass('auto');
                 }
-                else if (topPos < 50 && $topHeader.is('.video-theatre-mode.auto')) {
+                else if (topPos < 50 && $topHeader.is('.auto')) {
                     expandDlBar();
                 }
                 return;

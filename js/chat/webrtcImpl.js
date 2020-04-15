@@ -143,7 +143,6 @@
     };
     RtcGlobalEventHandler.prototype.onClientAvChange = function() {};
     RtcGlobalEventHandler.prototype.onOwnNetworkQualityChange = function(quality) {
-        this.megaChat.networkQuality = quality;
         if (this.megaChat.activeCallManagerCall) {
             this.megaChat.activeCallManagerCall.room.trackDataChange();
         }

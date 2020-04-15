@@ -179,7 +179,7 @@ mobile.signin = {
 
                             // I need this event handler to be triggered only once after successful sub-user login
                             mBroadcaster.once('fm:initialized', M.importWelcomePDF);
-
+                            delete localStorage.businessSubAc;
                         }
                     },
                     businessUser: password   // we need the plain enterd password in later stages
@@ -192,7 +192,6 @@ mobile.signin = {
                     null,
                     signupcode,
                     fname + ' ' + lname);
-                delete localStorage.businessSubAc;
             }
             else {
                 // Start the login flow and set different callbacks for the old and new registration types

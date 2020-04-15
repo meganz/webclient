@@ -1351,21 +1351,18 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                     $promise.resolve(roomId, self.chats[roomId]);
                     return;
                 }
-                var res = self.openChat(
-                    userHandles,
-                    (ap.m === 1) ? "public" : (ap.g === 1 ? "group" : "private"),
-                    ap.id,
-                    ap.cs,
-                    ap.url,
-                    setAsActive,
-                    chatHandle,
-                    publicChatKey,
-                    ck
-                );
-
-                $promise.linkDoneAndFailTo(
-                    res[2]
-                );
+                else {
+                    if (setAsActive === true) {
+                        // duplicated 1on1 chats (diff ids, both marked as private) found, while init loading
+                        // the chat w/ currentUrl=one of those dup chats
+                        loadSubPage('fm/chat');
+                    } else {
+                        if (d) {
+                            console.error("ChatRoom not found. This should never happen.");
+                        }
+                    }
+                }
+                $promise.reject();
             })
             .fail(function() {
                 $promise.reject(arguments[0]);

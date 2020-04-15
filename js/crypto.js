@@ -368,6 +368,7 @@ function api_reset() {
                         '[{[f2{'  : tree_node,       // tree node (versioned)
                         '['       : tree_residue,    // tree residue
                         '#'       : api_esplit });   // numeric error code
+
     // WSC interface (chunked mode)
     api_init(5, 'wsc', {
         '{[a{': sc_packet,     // SC command
@@ -715,7 +716,17 @@ function api_proc(q) {
                         var ctx = ctxs[i];
 
                         if (typeof ctx.callback === 'function') {
-                            ctx.callback(t[i], ctx, this, t);
+                            var res = t[i];
+
+                            if (res.err < 0) {
+                                // eslint-disable-next-line max-depth
+                                if (d) {
+                                    logger.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);
+                                }
+                                ctx.v2APIError = res;
+                                res = res.err;
+                            }
+                            ctx.callback(res, ctx, this, t);
                         }
                     }
 
@@ -812,7 +823,14 @@ function api_send(q) {
 }
 
 function api_reqerror(q, e, status) {
-    if (e == EAGAIN || e == ERATELIMIT) {
+    'use strict';
+    var c = e | 0;
+
+    if (typeof e === 'object' && e.err < 0) {
+        c = e.err | 0;
+    }
+
+    if (c === EAGAIN || c === ERATELIMIT) {
         // request failed - retry with exponential backoff
         if (q.backoff) {
             q.backoff = Math.min(600000, q.backoff << 1);
@@ -823,14 +841,14 @@ function api_reqerror(q, e, status) {
 
         q.timer = setTimeout(api_send, q.backoff, q);
 
-        e = EAGAIN;
+        c = EAGAIN;
     }
     else {
         q.failhandler(q.c, e);
     }
 
     if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-        if (status === true && e == EAGAIN) {
+        if (status === true && c === EAGAIN) {
             mega.loadReport.EAGAINs++;
         }
         else if (status === 500) {
@@ -863,14 +881,23 @@ function api_retry() {
     }
 }
 
-function api_reqfailed(c, e) {
-    // does this failure belong to a folder link, but not on the SC channel?
-    if (apixs[c].sid[0] == 'n' && c != 2) {
-        // yes: handle as a failed folder link access
-        return folderreqerr(c, e);
+function api_reqfailed(channel, error) {
+    'use strict';
+
+    var e = error | 0;
+    var c = channel | 0;
+
+    if (typeof error === 'object' && error.err < 0) {
+        e = error.err | 0;
     }
 
-    if (e == ESID) {
+    // does this failure belong to a folder link, but not on the SC channel?
+    if (apixs[c].sid[0] === 'n' && c !== 2) {
+        // yes: handle as a failed folder link access
+        return folderreqerr(c, error);
+    }
+
+    if (e === ESID) {
         u_logout(true);
         Soon(function() {
             showToast('clipboard', l[19]);
@@ -878,12 +905,12 @@ function api_reqfailed(c, e) {
         loadingInitDialog.hide();
         loadSubPage('login');
     }
-    else if ((c == 2 || c == 5) && e == ETOOMANY) {
+    else if ((c === 2 || c === 5) && e === ETOOMANY) {
         // too many pending SC requests - reload from scratch
         fm_fullreload(this.q, 'ETOOMANY');
     }
     // if suspended account
-    else if (e == EBLOCKED) {
+    else if (e === EBLOCKED) {
         var queue = apixs[c];
         queue.rawreq = false;
         queue.cmdsQueue.clear();

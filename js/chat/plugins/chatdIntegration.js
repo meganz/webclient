@@ -456,6 +456,9 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
         if (chatRoom && chatRoom.publicChatHandle) {
             chatRoom.onPublicChatRoomInitialized();
         }
+
+        // This chatlink is valid to be affilaited
+        M.affiliate.storeAffiliate(publicChatHandle, 3);
     }
     else {
         chatInfo.url = ret;
@@ -958,7 +961,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             }
             self.waitingChatIdPromises[chatRoom.roomId] = asyncApiReq({
                 'a': 'mcc',
-                'g': chatRoom.type === "group" ? 1 : 0,
+                'g': (chatRoom.type === "group" || chatRoom.type === "public") ? 1 : 0,
                 'u': userHashes,
                 'm': chatRoom.type === "public" ? 1 : 0,
                 'v': Chatd.VERSION

@@ -56,16 +56,24 @@ mobile.decryptionKeyOverlay = {
 
             // If they entered something
             if (decryptionKey) {
+                if (mega.flags.nlfe) {
+                    decryptionKey = decryptionKey.replace('#', '');
+                    var dest = ((folderLink) ? '/folder/' : '/file/') +
+                        publicHandle + '#' + decryptionKey;
+                    page = '';
+                    loadSubPage(dest);
+                }
+                else {
+                    // Remove the ! from the key which is exported from the export dialog
+                    decryptionKey = decryptionKey.replace('!', '');
 
-                // Remove the ! from the key which is exported from the export dialog
-                decryptionKey = decryptionKey.replace('!', '');
+                    // Reconstruct the URL
+                    var urlStart = folderLink ? 'F!' : '!';
+                    var newHash = urlStart + publicHandle + '!' + decryptionKey;
 
-                // Reconstruct the URL
-                var urlStart = folderLink ? 'F!' : '!';
-                var newHash = urlStart + publicHandle + '!' + decryptionKey;
-
-                // Redirect to the hash URL (loadSubPage does not work here)
-                document.location.hash = '#' + newHash;
+                    // Redirect to the hash URL (loadSubPage does not work here)
+                    document.location.hash = '#' + newHash;
+                }
             }
 
             // Prevent clicking behind

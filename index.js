@@ -70,7 +70,7 @@ mBroadcaster.once('startMega', function() {
             if (state.searchString) {
                 add = state.searchString;
             }
-            loadSubPage((state.subpage || state.fmpage || location.hash) + add, event);
+            loadSubPage((state.subpage || state.fmpage || getCleanSitePath() || location.hash) + add, event);
         });
     }
 });
@@ -194,13 +194,15 @@ function topPopupAlign(button, popup, topPos) {
             pageWidth,
             popupRightPos,
             arrowRightPos,
-            buttonTopPos;
+            buttonTopPos,
+            headerWidth;
 
         if ($button.length && $popup.length) {
-            pageWidth = $('body').width();
+            pageWidth = $('body').outerWidth();
+            headerWidth = $('.top-head').outerWidth();
             $popup.removeAttr('style');
             $popupArrow.removeAttr('style');
-            popupRightPos = pageWidth
+            popupRightPos = headerWidth
                 - $button.offset().left
                 - $button.outerWidth() / 2
                 - $popup.outerWidth() / 2;
@@ -262,11 +264,6 @@ function init_page() {
         }
     }
 
-    // cleaning local-storage used attr for business signup
-    if (localStorage.businessSubAc && page !== 'register') {
-        delete localStorage.businessSubAc;
-    }
-
     // Users that logged in and are suspended (requiring special SMS unlock) are not allowed to go anywhere else in the
     // site until they validate their account. So if they clicked the browser back button, then they should get logged
     // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
@@ -278,32 +275,50 @@ function init_page() {
     }
 
     dlkey = false;
-    if (page[0] === '!' && page.length > 1) {
 
-        ar = page.substr(1, page.length - 1).split('!');
-        if (ar[0]) {
-            dlid = ar[0].replace(/[^\w-]+/g, "");
-        }
-
-        if (ar[1]) {
-            dlkey = ar[1].replace(/[^\w-]+/g, "");
-        }
-        $.playbackOptions = ar[2];
-
+    var fileLinkReloading = function() {
         if (M.hasPendingTransfers() && $.lastSeenFilelink !== getSitePath()) {
             page = 'download';
 
             M.abortTransfers()
-                .done(function () {
+                .done(function() {
                     location.reload();
                 })
-                .fail(function () {
+                .fail(function() {
                     loadSubPage($.lastSeenFilelink);
                 });
 
             return;
         }
         $.lastSeenFilelink = getSitePath();
+    };
+
+    var pageBeginLetters = page.substr(0, 2);
+
+    if (page.length > 2 && (page[0] === '!' || pageBeginLetters === 'F!')) {
+        // Convering old links to new links format.
+        page = page[0] === 'F' ? page.replace('F!', 'folder/').replace('!', '#')
+            .replace('!', '/folder/').replace('?', '/file/')
+            : page.replace('!', 'file/').replace('!', '#');
+
+        history.replaceState({ subpage: page }, "", (hashLogic ? '#' : '/') + page);
+        return init_page();
+    }
+
+    if (page.substr(0, 5) === 'file/') {
+        var phLen = page.indexOf('#');
+
+        if (phLen < 0) {
+            phLen = page.length;
+        }
+        dlid = page.substr(5, phLen - 5).replace(/[^\w-]+/g, "");
+
+        // check if we have key
+        if (page.length - phLen > 2) {
+            dlkey = page.substr(phLen + 1, page.length - phLen - 1);
+        }
+
+        fileLinkReloading();
     }
 
     // Set class if gbot
@@ -346,7 +361,7 @@ function init_page() {
 
         $html.height(window.innerHeight);
 
-        $(window).rebind('resize.htmlheight', function () {
+        $(window).rebind('resize.htmlheight', function() {
             $html.height(window.innerHeight);
         });
     }
@@ -366,7 +381,7 @@ function init_page() {
     }
 
     var oldPFKey = pfkey;
-    var pageBeginLetters = page.substr(0, 2);
+
     // contact link handling...
     if (pageBeginLetters === 'C!' && page.length > 2) {
         var ctLink = page.substring(2, page.length);
@@ -376,13 +391,13 @@ function init_page() {
             }
             else {
                 page = 'fm/contacts';
-                mBroadcaster.once('fm:initialized', function () {
+                mBroadcaster.once('fm:initialized', function() {
                     openContactInfoLink(ctLink);
                 });
             }
         }
         else {
-            var processContactLink = function () {
+            var processContactLink = function() {
                 if (!mega.ui.contactLinkCardDialog) {
                     // because there's a strange solution applied by someone to clear the top-mobile
                     // and to re-do everything in the header in mobile.html !!
@@ -411,29 +426,9 @@ function init_page() {
         }
     }
 
-    if (pageBeginLetters === 'F!' && page.length > 2) {
-        if (page.indexOf('?') > 0) {
-            page = page.split('?');
-            $.autoSelectNode = page[1];
-            page = page[0];
-        }
-        ar = page.substr(2, page.length - 1).split(/[^!\w-]/, 1)[0].split('!');
+    var newLinkSelector = '';
 
-        pfid = false;
-        if (ar[0]) {
-            pfid = ar[0].replace(/[^\w-]+/g, "");
-        }
-
-        pfkey = false;
-        if (ar[1]) {
-            pfkey = ar[1].replace(/[^\w-]+/g, "").substr(0, 22);
-        }
-
-        pfhandle = false;
-        if (ar[2]) {
-            pfhandle = ar[2].replace(/[^\w-]+/g, "");
-        }
-
+    var processFolderLink = function() {
         // If the visit to the folder link has not been logged yet
         if (folderLinkVisitLogged === false) {
 
@@ -457,7 +452,7 @@ function init_page() {
 
             if (pfid.length !== 8) {
                 folderreqerr(false, EARGS);
-                return;
+                return false;
             }
 
             if (pfkey.length === 22) {
@@ -478,13 +473,13 @@ function init_page() {
                     parsepage(pages['placeholder']);
 
                     // Show the decryption key dialog on top
-                    mKeyDialog(pfid, true, pfkey)
-                        .fail(function () {
+                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                        .fail(function() {
                             loadSubPage('start');
                         });
                     pfkey = false;
                 }
-                return;
+                return false;
             }
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
@@ -500,6 +495,82 @@ function init_page() {
         else {
             page = 'fm';
         }
+        return true;
+    };
+
+    if (page.substr(0, 7) === 'folder/') {
+        var phLen = page.indexOf('#');
+        var possibleS = -1; 
+
+        if (phLen < 0) {
+            phLen = page.length;
+            possibleS = page.indexOf('/f', 7);
+            if (possibleS > -1) {
+                phLen = possibleS;
+            }
+        }
+
+        pfid = page.substr(7, phLen - 7).replace(/[^\w-]+/g, "");
+
+        // check if we have key
+        pfkey = false;
+        pfhandle = false;
+        if (page.length - phLen > 2) {
+            if (possibleS === -1) {
+                phLen++;
+            }
+
+            var linkRemaining = page.substr(phLen, page.length - phLen);
+
+            var fileSelectorPlace = linkRemaining.indexOf('/file/');
+
+            var folderSelectorPlace = linkRemaining.indexOf('/folder/');
+
+            var selectorIsValid = false;
+
+            if (fileSelectorPlace > -1 || folderSelectorPlace > -1) {
+                selectorIsValid = true;
+            }
+
+            if (selectorIsValid && fileSelectorPlace > -1 && folderSelectorPlace > -1) {
+                selectorIsValid = false;
+            }
+
+            var keyCutPlace;
+            if (selectorIsValid) {
+                if (fileSelectorPlace > -1) {
+                    keyCutPlace = fileSelectorPlace;
+
+                    if (linkRemaining.length - 6 - fileSelectorPlace > 2) {
+                        $.autoSelectNode = linkRemaining.substring(fileSelectorPlace + 6, linkRemaining.length);
+                        $.autoSelectNode = $.autoSelectNode.replace(/[^\w-]+/g, "");
+                    }
+                }
+                else {
+                    keyCutPlace = folderSelectorPlace;
+
+                    if (linkRemaining.length - 8 - folderSelectorPlace > 2) {
+                        pfhandle = linkRemaining.substring(folderSelectorPlace + 8, linkRemaining.length);
+                        pfhandle = pfhandle.replace(/[^\w-]+/g, "");
+                        newLinkSelector = '/folder/' + pfhandle;
+                    }
+
+                }
+            }
+            else {
+                keyCutPlace = Math.min(fileSelectorPlace, folderSelectorPlace);
+                if (keyCutPlace === -1) {
+                    keyCutPlace = linkRemaining.length;
+                }
+            }
+            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "") || false;
+
+        }
+
+        if (!processFolderLink()) {
+            return;
+        }
+
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
@@ -546,7 +617,7 @@ function init_page() {
             return;
         }
     }
-    if ((pfkey || dlkey) && location.hash[0] !== '#') {
+    if ((pfkey || dlkey) && !location.hash) {
         return location.replace(getAppBaseUrl());
     }
 
@@ -577,6 +648,8 @@ function init_page() {
         && (page !== 'security')
         && (page !== 'downloadapp')
         && (page !== 'unsub')
+        && (page.indexOf('file/') === -1)
+        && (page.indexOf('folder/') === -1)
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -1585,14 +1658,17 @@ function init_page() {
                 }
             }
         }
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-        }
-        else {
-            parsepage(pages['download']);
-        }
-        dlinfo(dlid, dlkey, false);
-        topmenuUI();
+
+        M.require('download', 'download_js').done(function() {
+            if (is_mobile) {
+                parsepage(pages['mobile']);
+            }
+            else {
+                parsepage(pages['download']);
+            }
+            dlinfo(dlid, dlkey, false);
+            topmenuUI();
+        });
     }
     else if (page.substr(0, 5) === 'reset') {
         localStorage.clear();

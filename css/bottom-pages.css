@@ -227,9 +227,6 @@ html.gbot {
     width: 100%;
     z-index: 200;
     -webkit-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -moz-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -o-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
-    -ms-transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
     transition: background-color 200ms ease-in-out, top 600ms ease-in-out;
 }
 .bottom-page .top-head::after {
@@ -761,7 +758,7 @@ body.mobile:not(.en) .bottom-page.vertical-centered-bl.top-bl {
     margin: 0 10px 0 13px;
 }
 .bottom-page.big-header.light {
-    font-family: 'montserrat-light', 'LatoWebLigth', 'source_sans_prolight', Arial;
+    font-family: 'montserrat_light', 'montserrat', 'LatoWebLight', Arial;
 }
 .bottom-page.big-header.max-width {
     max-width: 895px;
@@ -773,9 +770,6 @@ body.mobile:not(.en) .bottom-page.vertical-centered-bl.top-bl {
 }
 .bottom-page.big-header i {
     margin: 0 10px 0 13px;
-}
-.bottom-page.big-header.light {
-    font-family: 'montserrat_light', 'montserrat', 'LatoWebLigth', Arial;
 }
 .cn .bottom-page.big-header.light, .ct .bottom-page.big-header.light, .jp .bottom-page.big-header.light, .kr .bottom-page.big-header.light {
     font-family: 'montserrat', 'LatoWeb', Arial;
@@ -1351,12 +1345,6 @@ iframe.security-video-container {
     border-color: #00C0A6;
 }
 /* Bottom pages nav bar */
-.pages-nav-wrap  {
-    min-height: 118px;
-}
-.en .pages-nav-wrap  {
-    min-height: 106px;
-}
 .pages-nav.content-block {
     padding-top: 36px;
     -webkit-box-sizing: border-box;
@@ -4630,7 +4618,7 @@ a.opensource-icon-txt.coming-soon {
     line-height: 59px;
     letter-spacing: -0.33px;
     color: white;
-    font-family: 'montserrat-light', 'LatoWebLigth', 'source_sans_prolight', Arial;
+    font-family: 'montserrat_light', 'montserrat', 'LatoWebLight', Arial;
     padding: 36px 0 13px 0;
 }
 .affiliate-page.top-info {
@@ -4662,6 +4650,7 @@ a.opensource-icon-txt.coming-soon {
     transition: box-shadow 200ms ease-in-out;
     cursor: pointer;
     margin-top: 15px;
+    text-transform: capitalize;
 }
 .bottom-page.white-button:hover {
     -webkit-box-shadow: 0 0 0 4px rgba(255,255,255,0.4);
@@ -4794,7 +4783,7 @@ a.opensource-icon-txt.coming-soon {
 .affiliate.refer-header {
     font-size: 26px;
     line-height: 32px;
-    font-family: 'montserrat-light', 'LatoWebLigth', 'source_sans_prolight', Arial;
+    font-family: 'montserrat_light', 'montserrat', 'LatoWebLight', Arial;
     color: black;
     margin: -2px 0 10px 0;
     min-height: 64px;
@@ -5010,7 +4999,7 @@ a.opensource-icon-txt.coming-soon {
     overflow: hidden;
     z-index: 10;
 }
-.bottom-page .dropdown-item {
+.bottom-page.dropdown .dropdown-item {
     height: 48px;
     font-size: 20px;
     line-height: 48px;
@@ -5025,16 +5014,16 @@ a.opensource-icon-txt.coming-soon {
     -moz-box-shadow: 0 1px 0 0 #EEEEEE;
     box-shadow: 0 1px 0 0 #EEEEEE;
 }
-.bottom-page .dropdown-item:last-child {
+.bottom-page.dropdown .dropdown-item:last-child {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
 }
-.bottom-page .dropdown-item:hover, .bottom-page .dropdown-item.active {
+.bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropdown .dropdown-item.active {
     color: white;
     background-color: #00C0A6 !important;
 }
-.dropdown-content {
+.bottom-page.dropdown .dropdown-content {
     max-height: 290px;
     min-width: 80px;
     overflow-y: auto;

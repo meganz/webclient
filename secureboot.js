@@ -37,7 +37,7 @@ if (typeof process !== 'undefined') {
 
 var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
@@ -102,6 +102,7 @@ function isMobile() {
 }
 
 function getSitePath() {
+    'use strict';
     var hash = location.hash.replace('#', '');
 
     if (hashLogic || isPublicLink(hash)) {
@@ -113,6 +114,10 @@ function getSitePath() {
         if (m) {
             return '/' + m[1];
         }
+    }
+
+    if (isPublickLinkV2(document.location.pathname)) {
+        return document.location.pathname + document.location.hash;
     }
 
     return (document.location.pathname.substr(0, 6) === '/chat/') ?
@@ -177,6 +182,14 @@ function isPublicLink(page) {
 
     var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
+}
+
+function isPublickLinkV2(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+
+    var types = {'file': 6, 'folder': 8, 'embed': 7};
+    return page.length > types[page.split('/')[0]];
 }
 
 // Check whether the provided `page` points to a chat link
@@ -643,7 +656,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
-            params += '&lang=' + lang;
+            params += '&v=2&lang=' + window.lang;
             this._urlParams = params;
         }
 
@@ -749,6 +762,7 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
+
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
@@ -761,6 +775,15 @@ else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({subpage: page}, "", '#' + page);
+}
+else if (isPublickLinkV2(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
+
+    if (is_embed) {
+        page = page.split(/[#/]/);
+        page = '!' + page[1] + '!' + page[2];
+    }
 }
 else {
     if (document.location.hash.length > 0) {
@@ -2320,6 +2343,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/business.html', n: 'business',j:0});
     jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
@@ -2340,7 +2364,6 @@ else if (!browserUpdate) {
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
-        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});

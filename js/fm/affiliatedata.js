@@ -409,54 +409,29 @@
     };
 
     /**
+     * Function to place Affiliate data when user visit affiliate pages
+     * @param {String} value affiliation id.
+     * @param {Number} type affiliation type. 1: ref-link, 2: public link, 3: chat link, 4: contact link.
+     * @returns {void}
+     */
+    AffiliateData.prototype.storeAffiliate = function(value, type) {
+        /* eslint-disable local-rules/misc-warnings */
+        localStorage.affid = value;
+        localStorage.affts = Date.now();
+        localStorage.afftype = type;
+        /* eslint-enable local-rules/misc-warnings */
+    };
+
+    /**
      * @name window.AffiliateData
      * @global
      */
     Object.defineProperty(global, 'AffiliateData', {value: AffiliateData});
 
-})(self);
-
-// Place Affiliate ID if user visit affiliate pages
-mBroadcaster.once('startMega', function _affTagger(tpage) {
-
-    'use strict';
-
-    var now = Date.now();
-    var page = typeof tpage === 'string' && tpage || window.page;
-
-    // Public link Affiliation
-    var ph = String(isPublicLink(page)).split('!')[1];
-
-    if (ph) {
-        localStorage.affid = ph;
-        localStorage.affts = now;
-        localStorage.afftype = 2;
-    }
-
-    // Chatlink Affiliation
-    if (isChatLink(page)) {
-        var clh = String(page).replace('chat/', '').split('#')[0];
-
-        localStorage.affid = clh;
-        localStorage.affts = now;
-        localStorage.afftype = 3;
-    }
-
-    // Contact link Affiliation
-    if (page.substr(0, 2) === 'C!' && page.length > 2) {
-
-        localStorage.affid = page.substr(2);
-        localStorage.affts = now;
-        localStorage.afftype = 4;
-    }
-
-    if (mega.hasOwnProperty('affid')) {
-        // Nothing else to do here, i.e. this is a pagechange event
-        return;
-    }
-    mBroadcaster.addListener('pagechange', _affTagger);
-
-    // Load localstorage affiliate data to mega.
+    /**
+     * @name mega.affid
+     * @mega
+     */
     Object.defineProperty(mega, 'affid', {
         get: function() {
             var storage = localStorage;
@@ -464,13 +439,12 @@ mBroadcaster.once('startMega', function _affTagger(tpage) {
 
             if (id) {
                 var ts = storage.affts;
-                var type = storage.afftype;
+                var type = storage.afftype || 2;
 
-                return ts && type ? {id: id, t: type, ts: Math.floor(ts / 1000)} : id;
+                return {id: id, t: type, ts: Math.floor(ts / 1000)};
             }
 
             return false;
         }
     });
-});
-
+})(self);

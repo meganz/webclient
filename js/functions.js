@@ -382,12 +382,20 @@ function bytesToSize(bytes, precision, format) {
  * Very Similar function as bytesToSize due to it is just simple extended version of it by making it as speed.
  * @returns {String} Returns a string that build with value entered and speed unit e.g. 100 KB/s
  */
-function bytesToSpeed() {
-
+var bytesToSpeed = function bytesToSpeed() {
+    'use strict';
+    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
+};
+mBroadcaster.once('startMega', function() {
     'use strict';
 
-    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
-}
+    if (lang === 'en' || lang === 'es') {
+        bytesToSpeed = function(bytes, precision, format) {
+            return bytesToSize(bytes, precision, format) + '/s';
+        };
+    }
+});
+
 
 function makeid(len) {
     var text = "";
@@ -929,7 +937,7 @@ function MurmurHash3(key, seed) {
  * @param {String} keyr If a wrong key was used
  * @return {MegaPromise}
  */
-function mKeyDialog(ph, fl, keyr) {
+function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
@@ -977,17 +985,25 @@ function mKeyDialog(ph, fl, keyr) {
 
             if (key) {
 
-                // Remove the ! from the key which is exported from the export dialog
-                key = key.replace('!', '');
+                // Remove the !,# from the key which is exported from the export dialog
+                key = key.replace('!', '').replace('#', '');
 
                 var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+
+                var currLink = getSitePath();
+
+                if (isPublickLinkV2(currLink)) {
+                    newHash = (fl ? '/folder/' : '/file/') + ph + '#' + key + (selector ? selector : '');
+                }
 
                 if (getSitePath() !== newHash) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
                     $('.fm-dialog.dlkey-dialog').addClass('hidden');
+
                     loadSubPage(newHash);
+
                 }
             }
             else {
@@ -1022,7 +1038,6 @@ function str_mtrunc(str, len) {
         p2 = Math.ceil(0.30 * len);
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
-
 
 function getTransfersPercent() {
     var dl_r = 0;
@@ -1079,7 +1094,8 @@ function getTransfersPercent() {
 }
 
 function percent_megatitle() {
-
+    'use strict';
+    var t;
     var transferStatus = getTransfersPercent();
 
     var x_ul = Math.floor(transferStatus.ul_done / transferStatus.ul_total * 100) || 0;
@@ -1939,7 +1955,7 @@ function passwordManager(form) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }
-            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
+            history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);
             $form.find('input').val('');
         }, 1000);
         return false;
@@ -2426,6 +2442,46 @@ if (typeof sjcl !== 'undefined') {
     };
 })(window);
 
+/**
+ * Transoms the numerical preferences to preferences view object
+ * @param {Number} pref     Integer value representing the preferences
+ * @returns {Object}        View preferences object
+ */
+function getFMColPrefs(pref) {
+    'use strict';
+    if (pref === undefined) {
+        return;
+    }
+    var columnsPreferences = Object.create(null);
+    columnsPreferences.fav = pref & 4;
+    columnsPreferences.label = pref & 1;
+    columnsPreferences.size = pref & 8;
+    columnsPreferences.type = pref & 64;
+    columnsPreferences.timeAd = pref & 32;
+    columnsPreferences.timeMd = pref & 16;
+    columnsPreferences.versions = pref & 2;
+
+    return columnsPreferences;
+}
+
+/**
+ * Get the number needed for bitwise operator
+ * @param {String} colName      Column name
+ * @returns {Number}            Number to be used in bitwise operator
+ */
+function getNumberColPrefs(colName) {
+    'use strict';
+    switch (colName) {
+        case 'fav': return 4;
+        case 'label': return 1;
+        case 'size': return 8;
+        case 'type': return 64;
+        case 'timeAd': return 32;
+        case 'timeMd': return 16;
+        case 'versions': return 2;
+        default: return null;
+    }
+}
 
 // Constructs an extensible hashmap-like class...
 function Hash(a, b, c, d) {

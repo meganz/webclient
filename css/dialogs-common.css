@@ -2,8 +2,8 @@
  * Dialogs CSS for mobile and desktop devices.
  */
 
-.dialog-sprite {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+.dialog-sprite, i.dialog-sprite {
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat:  no-repeat;
 }
 .fm-dialog.big-radius {

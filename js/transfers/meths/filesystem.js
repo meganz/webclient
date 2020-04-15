@@ -581,9 +581,14 @@
                                 }, onError);
 
                                 logger.debug('Truncating file to offset ' + dl_position);
-                                onIdle(function() {
+                                onIdle(tryCatch(function() {
                                     dl_fw.truncate(dl_position);
-                                });
+                                }, function(ex) {
+                                    logger.warn(ex);
+                                    if (!canSwitchDownloadMethod(dl, dl_id, fileEntry)) {
+                                        dlFatalError(dl, ex);
+                                    }
+                                }));
                             }
                         };
                         zfileEntry = fileEntry;

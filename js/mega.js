@@ -2228,12 +2228,7 @@ function loadfm(force) {
                     pup    : '&p',             // public upload page - handle
 
                     // channel 1: non-transactional (maintained by IndexedDBKVStorage)
-                    chatqueuedmsgs : '&k', // queued chat messages - k
-                    pta: '&k' // persisted type messages - k
-                }, {
-                    chatqueuedmsgs : 1,
-                    pta: 1
-                });
+                }, {});
 
                 fmdb.init(fetchfm, localStorage.force);
             }
@@ -3370,24 +3365,38 @@ function processMCF(mcfResponse, ignoreDB) {
     }
 }
 
-function folderreqerr(c, e)
-{
+function folderreqerr(c, e) {
+    'use strict';
+
+    var title = l[1043];
+    var message = null;
+
     loadingDialog.hide();
     loadingInitDialog.hide();
 
     loadfm.loaded = false;
     loadfm.loading = false;
 
+    if (typeof e === 'object' && e.err < 0) {
+        if (e.u === 7) {
+            message = l[23242];
+
+            if (e.l !== 2) {
+                message = l[23243];
+            }
+        }
+        else {
+            e = e.err;
+        }
+    }
+
     // If desktop site show "Folder link unavailable" dialog
     if (!is_mobile) {
-        var title;
-        var message;
         if (parseInt(e) === EARGS) {
             title = l[20198];
             message = l[20199];
         }
-        else {
-            title = l[1043];
+        else if (!message) {
             message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
         }
 
@@ -3404,7 +3413,7 @@ function folderreqerr(c, e)
     else {
         // Show file/folder not found overlay
         mobile.initDOM();
-        mobile.notFoundOverlay.show(e);
+        mobile.notFoundOverlay.show(message || parseInt(e && e.err || e));
     }
 }
 
@@ -3587,6 +3596,12 @@ function loadfm_callback(res) {
                         loadSubPage('start');
                     });
             }
+        }
+
+        if (folderlink) {
+
+            // This folderlink is valid to affiliate
+            M.affiliate.storeAffiliate(folderlink, 2);
         }
 
         // If we have shares, and if a share is for this node, record it on the nodes share list
@@ -3935,6 +3950,7 @@ function fmviewmode(id, e)
 }
 
 var thumbnails = Object.create(null);
+var th_pending = Object.create(null);
 var th_requested = Object.create(null);
 var fa_duplicates = Object.create(null);
 var fa_reqcnt = 0;
@@ -3972,6 +3988,7 @@ function fm_thumbnails(mode, nodeList, callback)
                             k: n.k
                         };
                     th_requested[n.h] = 1;
+                    th_pending[n.h] = [];
 
                     if (u == a)
                         y = n.h;
@@ -3985,6 +4002,15 @@ function fm_thumbnails(mode, nodeList, callback)
                 else if (n.seen && n.seen !== 2)
                 {
                     fm_thumbnail_render(n);
+                }
+
+                if (mode === 'standalone' && typeof callback === 'function') {
+                    if (thumbnails[n.h]) {
+                        onIdle(callback.bind(null, n.h));
+                    }
+                    else if (th_pending[n.h]) {
+                        th_pending[n.h].push(onIdle.bind(null, callback.bind(null, n.h)));
+                    }
                 }
             }
         }
@@ -4002,6 +4028,12 @@ function fm_thumbnails(mode, nodeList, callback)
             {
                 if (mode === 'standalone' && typeof callback === 'function') {
                     onIdle(callback.bind(null, node));
+                }
+                if (th_pending[node]) {
+                    for (var t = th_pending[node].length; t--;) {
+                        th_pending[node][t]();
+                    }
+                    delete th_pending[node];
                 }
                 if (uint8arr === 0xDEAD)
                 {

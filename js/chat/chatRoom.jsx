@@ -131,7 +131,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
             if (self.chatd && self.isOnline() && self.chatIdBin) {
                 // this should never happen, but just in case...
-                self.getChatIdMessages().resend();
+                var cim = self.getChatIdMessages();
+                cim.restore();
+                cim.resend();
             }
         }
     });
@@ -638,7 +640,7 @@ ChatRoom.prototype.persistToFmdb = function() {
             var roomInfo = {
                 'id': self.chatId,
                 'cs': self.chatShard,
-                'g' : (self.type === "group") ? 1 : 0,
+                'g': self.type === "group" || self.type === "public" ? 1 : 0,
                 'u' : users,
                 'ts': self.ctime,
                 'ct': self.ct,

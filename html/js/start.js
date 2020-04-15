@@ -63,9 +63,11 @@ function init_start() {
     });
 
     if (mega.flags.refpr) {
+        var slidingTimer;
 
-        // Top banner controls init
-        $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', function() {
+        var doSlide = function() {
+            // eslint-disable-next-line no-unused-expressions
+            slidingTimer && clearTimeout(slidingTimer);
             var $banners = $('.bottom-page.top-banner', $page);
 
             if ($banners.filter('.active').hasClass('banner1')) {
@@ -76,7 +78,11 @@ function init_start() {
                 $banners.removeClass('active');
                 $banners.filter('.banner1').addClass('active');
             }
-        });
+            slidingTimer = setTimeout(doSlide, 10000);
+        };
+        slidingTimer = setTimeout(doSlide, 10000);
+        // Top banner controls init
+        $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
     }
 
     /**

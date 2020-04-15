@@ -253,17 +253,26 @@ function dashboardUI() {
                 if (u_attr.b.s === 1) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
-                    if (u_attr.b.m) { // master
-                        timestamp = account.srenew[0];
-                        if ((Date.now() / 1000) - timestamp > 0) {
-                            $businessLeft.find('.suba-status').addClass('pending').removeClass('disabled active')
-                                .text(l[19609]);
-                        }
+                }
+                else if (u_attr.b.s === 2 && u_attr.b.m) {
+                    $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
+                        .text(l[19609]);
+                    if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
+                        var expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
+                        var currentTime = new Date();
+                        var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                        var daysLeft = l[16284].replace('%1', remainingDays);
+                        $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }
                 else {
-                    $businessLeft.find('.suba-status').addClass('disabled').removeClass('pending active')
+                    $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
+
+                    if (u_attr.b.m) {
+                        $('.suba-pay-bill', $businessLeft).removeClass('hidden');
+                    }
                 }
 
                 if (u_attr.b.m) { // master
@@ -287,7 +296,8 @@ function dashboardUI() {
         }
 
         /* Registration date, bandwidth notification link */
-        $('.dashboard .default-green-button.upgrade-account, .bandwidth-info a').rebind('click', function() {
+        $('.default-green-button.upgrade-account, .bandwidth-info a, .pay-bill-btn','.dashboard')
+            .rebind('click.dboard', function() {
             if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
                 loadSubPage('repay');
             }

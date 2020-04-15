@@ -16,7 +16,7 @@ var Chatd = function(userId, megaChat, options) {
     self.chatIdMessages = {};
 
     // local cache of the Message object
-    self.messagesQueueKvStorage = new SharedLocalKVStorage("chatqueuedmsgs");
+    self.messagesQueueKvStorage = new SharedLocalKVStorage("cqmsgs2");
 
     /**
      * Set to true when this chatd instance is (being) destroyed
@@ -1979,23 +1979,6 @@ Chatd.Messages.prototype.loginState = function() {
 
 Chatd.Messages.prototype._clearCallInfo = function() {
     this.callInfo = new CallInfo();
-};
-
-function CallInfo() {
-    /* callInfo structure when there is a call:
-        callInfo = {
-            callId: binstring,
-            participants: {
-                <peerid1>: av1,
-                <peerid2>: av2
-            }
-        }
-    */
-    this.participants = {};
-};
-
-CallInfo.prototype.participantCount = function() {
-    return Object.keys(this.participants).length;
 };
 
 // send JOIN

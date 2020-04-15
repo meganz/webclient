@@ -271,6 +271,10 @@
 .small-icon.grey-crossed-mic {
     background-position: -65px -3268px;
 }
+.small-icon.grey-call-on-hold {
+    /* FIXME: create a real onhold icon */
+    background-position: -10px -3610px;
+}
 .small-icon.clock-icon {
     background-position: -2px -3200px;
 }
@@ -935,6 +939,25 @@
 }
 .huge-icon.crossed-phone {
     background-position: -74px -2989px;
+    width: 70px;
+    height: 70px;
+}
+.huge-icon.call-on-hold {
+    /* FIXME: create a real onhold icon */
+    background-position: -153px -2741px;
+    width: 40px;
+    height: 40px;
+    zoom: 3.0
+}
+.big-icon.call-on-hold {
+    /* FIXME: create a real onhold icon */
+    background-position: -150px -2730px;
+    width: 70px;
+    height: 70px;
+}
+.big-icon.crossed-call-on-hold {
+    /* FIXME: create a real onhold icon */
+    background-position: -150px -2800px;
     width: 70px;
     height: 70px;
 }
@@ -2117,4 +2140,15 @@ i.account-icon.menu {
 }
 .semi-huge-icon.big-icons-sprite.user-with-chain {
     background-position: -111px -1664px;
+}
+
+/* diaalog-sprite */
+.small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5290px;
+}
+.small-icon.dialog-sprite.arrows-to-top, .active .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5321px;
+}
+.small-icon.dialog-sprite.dark-cross, .download-complete .bar-table .small-icon.dialog-sprite.arrows-to-bottom {
+    background-position: -137px -5352px;
 }

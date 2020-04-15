@@ -201,6 +201,19 @@
         var filter;
         var callback;
 
+        if (inputcomplete && json && !this.p && json.length > 7 && this.tostring(this.sub(json, 0, 7)) === '{"err":') {
+            callback = this.filters['#'];
+            node = JSON.parse(this.tostring(json));
+
+            if (d) {
+                this.logger.debug('APIv2 Custom Error Detail', node, [this.ctx]);
+            }
+            if (callback) {
+                callback.call(this.ctx, node);
+            }
+            return 1;
+        }
+
         while (this.p < json.length) {
             var c = this.tochar(json[this.p]);
 

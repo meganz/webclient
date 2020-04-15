@@ -102,6 +102,8 @@ MegaApi.prototype.req = function(params, ch) {
 
     api_req(params, {
         callback: tryCatch(function(res) {
+            delete this.callback;
+
             if (typeof res === 'number' && res < 0) {
                 promise.reject.apply(promise, arguments);
             }
@@ -631,6 +633,17 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                         // chatdPersist was disabled, potential crash, try to delete the db manually
                         waitingPromises.push(
                             ChatdPersist.forceDrop()
+                        );
+                    }
+
+                    if (
+                        typeof(megaChat) !== 'undefined' &&
+                        megaChat.plugins.chatdIntegration &&
+                        megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage
+                    ) {
+                        // clear messagesQueueKvStorage
+                        waitingPromises.push(
+                            megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage.clear()
                         );
                     }
 
@@ -1485,7 +1498,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             var _rawXHR = function(url, data, callback) {
                 M.xhr(url, JSON.stringify([data]))
                     .always(function(ev, data) {
-                        var resp;
+                        var resp = data | 0;
                         if (typeof data === 'string' && data[0] === '[') {
                             try {
                                 resp = JSON.parse(data)[0];
@@ -1517,14 +1530,9 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                         }
                     }
                 };
-                if (data) {
-                    api_setsid(u_sid);
-                    u_storage.sid = u_sid;
-                    u_checklogin3a(data, ctx);
-                }
-                else {
-                    u_checklogin(ctx, false);
-                }
+                api_setsid(u_sid);
+                u_storage.sid = u_sid;
+                u_checklogin3a(data, ctx);
             });
             return false;
         }

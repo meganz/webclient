@@ -3448,6 +3448,10 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         updateLeftSubUserPanel(subuser);
     }
 
+    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
+        return;
+    }
+
     // if we are in table view
     if (!$('.user-management-list-table').hasClass('hidden')
         || !$('.user-management-landing-page.user-management-view').hasClass('hidden')) {

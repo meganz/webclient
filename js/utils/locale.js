@@ -275,9 +275,12 @@ function acc_time2date(unixtime, yearIsOptional) {
     return result;
 }
 
-function time2last(timestamp) {
+function time2last(timestamp, skipSeconds) {
     var sec = (new Date().getTime() / 1000) - timestamp;
-    if (sec < 4) {
+    if (skipSeconds && sec < 59) {
+        return l[23252] || "Less then a minute ago";
+    }
+    else if (sec < 4) {
         return l[880];
     }
     else if (sec < 59) {

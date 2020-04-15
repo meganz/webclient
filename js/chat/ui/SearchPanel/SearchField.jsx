@@ -8,7 +8,23 @@ const SEARCH_STATUS_CLASS = `search-field-status`;
 export default class SearchField extends MegaRenderMixin {
     static inputRef = React.createRef();
 
-    static focus = () => SearchField.inputRef && SearchField.inputRef.current && SearchField.inputRef.current.focus();
+    static select = () => {
+        const inputElement = SearchField.inputRef && SearchField.inputRef.current;
+        const value = inputElement.value;
+
+        if (inputElement && value) {
+            inputElement.selectionStart = 0;
+            inputElement.selectionEnd = value.length;
+        }
+    };
+
+    static focus = () => (
+        SearchField.inputRef && SearchField.inputRef.current && SearchField.inputRef.current.focus()
+    );
+
+    static hasValue = () => (
+        SearchField.inputRef && SearchField.inputRef.current && !!SearchField.inputRef.current.value.length
+    );
 
     constructor(props) {
         super(props);

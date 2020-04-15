@@ -112,7 +112,7 @@ class Message extends MegaRenderMixin {
 
     render() {
         const { data, text, matches, room, contact } = this.props;
-        const summary = data.hasAttachments() ? data.getAttachmentMeta()[0].name : text;
+        const summary = data.isManagement() ? data.getManagementMessageSummaryText() : text;
 
         return (
             <div

@@ -36,9 +36,12 @@ export default class SearchPanel extends MegaRenderMixin {
 
         if (nextProps.minimized !== this.props.minimized) {
             this.safeForceUpdate();
-            // Focus on re-opening from minimize
+            // Focus and mark the text as selected on re-opening from minimize
             if (!nextProps.minimized) {
-                Soon(() => SearchField.focus());
+                Soon(() => {
+                    SearchField.focus();
+                    SearchField.select();
+                });
             }
         }
     }
@@ -59,7 +62,8 @@ export default class SearchPanel extends MegaRenderMixin {
             // `ESC` keypress
             .rebind('keydown.searchPanel', ({ keyCode }) => {
                 if (keyCode && keyCode === 27 /* ESC */ && !this.props.minimized) {
-                    this.toggleMinimize();
+                    // Clear the text on the first `ESC` press; minimize on the second
+                    return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
                 }
             });
 

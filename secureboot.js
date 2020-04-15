@@ -1220,6 +1220,7 @@ function mObjectURL(data, type)
                     if (msg !== 'pong') {
                         this.setMaster();
                     } else {
+                        this.notify('ack-pong');
                         delete localStorage[ev.key];
                     }
                     this.listen();
@@ -1252,9 +1253,7 @@ function mObjectURL(data, type)
             // as earlier as possible, e.g. now.
             localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
 
-            setTimeout(function() {
-                setup();
-            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
+            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
         },
 
         listen: function crossTab_listen(aListener) {
@@ -1323,6 +1322,7 @@ function mObjectURL(data, type)
 
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
+            this.notify('pong');
 
             // (function liveLoop(tag) {
             // if (tag === mBroadcaster.crossTab.master) {
@@ -1356,6 +1356,11 @@ function mObjectURL(data, type)
             }
 
             switch (msg) {
+                case 'ack-pong':
+                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
+                        break;
+                    }
+                    /* fallthrough */
                 case 'ping':
                     this.slaves.push(strg.origin);
                     if (this.master) {

@@ -2536,7 +2536,7 @@
     "19604": "Oczekuje na zmian\u0119 adresu e-mail",
     "19605": "Status nowego adresu e-mailowego pozostanie niezmieniony, dop\u00f3ki nie zostanie potwierdzony przez u\u017cytkownika. Konto b\u0119dzie nadal dost\u0119pne w tym okresie.",
     "19606": "Zmiana adresu e-mail jest w toku",
-    "19607": "Rola",
+    "19607": "Rola:",
     "19608": "Op\u0142ata zaleg\u0142a",
     "19609": "P\u0142atno\u015b\u0107 wymagana",
     "19610": "Administrator",
@@ -3652,5 +3652,6 @@
     "23246": "Udost\u0119pnij katalog [X]",
     "23249": "... i 1 pozosta\u0142y",
     "23250": "\u2026 i [X] pozosta\u0142ych",
-    "23251": "Zap\u0142a\u0107 teraz"
+    "23251": "Zap\u0142a\u0107 teraz",
+    "23252": "Mniej ni\u017c minut\u0119 temu"
 }

@@ -2536,7 +2536,7 @@
     "19604": "Afwachting e-mail wijziging",
     "19605": "De nieuwe e-mailadres status blijft in afwachting tot dat het bevestigd is door de gebruiker. De account blijft bruikbaar tijdens deze periode.",
     "19606": "Email wijziging is in afwachting",
-    "19607": "Rol",
+    "19607": "Rol:",
     "19608": "Betaling over tijd",
     "19609": "Betaling verplicht",
     "19610": "Beheerder",
@@ -3652,5 +3652,6 @@
     "23246": "Deel de [X] map",
     "23249": "... en 1 andere",
     "23250": "... en [X] anderen",
-    "23251": "Betaal nu"
+    "23251": "Betaal nu",
+    "23252": "Minder dan een minuut geleden"
 }

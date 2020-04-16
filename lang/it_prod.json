@@ -2536,7 +2536,7 @@
     "19604": "Cambiamento dell'indirizzo email in attesa",
     "19605": "Lo status del nuovo indirizzo email rimarr\u00e0 in attesa fin quando non verr\u00e0 confermato dall'utente. L'account sar\u00e0 comunque utilizzabile durante questo periodo.",
     "19606": "Il cambio dell'email \u00e8 in attesa",
-    "19607": "Ruolo",
+    "19607": "Ruolo:",
     "19608": "Pagamento in ritardo",
     "19609": "Pagamento necessario",
     "19610": "Amministratore",
@@ -3652,5 +3652,6 @@
     "23246": "Condividi la cartella [X]",
     "23249": "... e 1 altro",
     "23250": "... e [X] altri",
-    "23251": "Paga ora"
+    "23251": "Paga ora",
+    "23252": "Meno di un minuto fa"
 }

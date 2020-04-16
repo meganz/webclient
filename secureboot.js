@@ -755,7 +755,8 @@ if (!browserUpdate && is_extension)
     }
 
     Object.defineProperty(window, 'eval', {
-        value : function eval(code) {
+        value : function evil(code) {
+            'use strict';
             throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
         }
     });

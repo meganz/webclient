@@ -840,7 +840,7 @@ var authring = (function () {
 
         // XXX: u_attr.u is read-only, BUT this is a weak protection unless we make the whole object
         // read-only as well..tricky, however we may want to still allow this for testing purposes..
-        if (typeof u_attr !== 'object' || u_attr.u !== window.u_handle || u_attr.keyring) {
+        if (!is_karma && (typeof u_attr !== 'object' || u_attr.u !== window.u_handle || u_attr.keyring)) {
             logger.error('Doh! Tampering attempt...', u_handle, [u_attr]);
 
             if (location.host === 'mega.nz' || is_extension) {

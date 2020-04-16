@@ -605,8 +605,8 @@ MegaData.prototype.contacts = function() {
         return false; // stop propagation!
     });
 
-    // On the Contacts screen, initiate a call by double clicking a contact name in the left panel
-    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item.online', function() {
+    // On the Contacts screen, double clicking a contact name in the left panel changes to the conversation screen
+    $('.fm-tree-panel').rebind('dblclick.treepanel', '.nw-contact-item', function() {
 
         // Get the element ID
         var $this = $(this);

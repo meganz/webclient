@@ -91,7 +91,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf(' edg/') > 0) {
         displayName = 'Edge (Chromium)';
-        icon = 'edge.png';
+        icon = 'edgium.png';
         browser = 'Edgium';
         verTag = 'Edg';
     }
@@ -303,7 +303,7 @@ function browserdetails(useragent) {
     }
 
     if (!icon && browser) {
-        if (browser === 'Internet Explorer' || browser === 'Edge') {
+        if (browser === 'Internet Explorer') {
             icon = 'ie.png';
         }
         else {

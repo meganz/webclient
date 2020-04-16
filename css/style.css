@@ -14912,7 +14912,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow:not(.grid-header-star) {
     cursor: pointer;
-    background-position: -100%;
+    background-position: -100% -100%;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: block;

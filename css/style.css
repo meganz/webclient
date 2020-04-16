@@ -11213,7 +11213,6 @@ table {
     color: #333;
     line-height: 18px;
     margin:8px 0 16px 0;
-    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -11251,7 +11250,6 @@ table {
     line-height: 20px;
     text-align: left;
     white-space: normal;
-    text-transform: capitalize;
     overflow: visible;
     vertical-align: top;
     text-overflow: ellipsis;
@@ -11264,7 +11262,6 @@ table {
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
-    text-transform: capitalize;
     padding: 0;
     vertical-align: top;
     float: right;
@@ -14912,7 +14909,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow:not(.grid-header-star) {
     cursor: pointer;
-    background-position: -100%;
+    background-position: -100% -100%;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: block;

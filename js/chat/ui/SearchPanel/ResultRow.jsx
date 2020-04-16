@@ -45,49 +45,6 @@ const highlight = (text, matches) => {
 };
 
 /**
- * getTruncatedMemberNames
- * @description Returns comma-separated string of truncated member names based on passed room; allows to specify the
- * maximum amount of members to be retrieved, as well the desired maximum length for the truncation.
- * @param {ChatRoom} room
- * @param {number} maxMembers The maximum amount of members to be retrieved
- * @param {number} maxLength The maximum length of characters for the truncation
- * @returns {string}
- */
-
-const getTruncatedMemberNames = (room, maxMembers = 0, maxLength = 20) => {
-    let truncatedMemberNames = [];
-
-    const members =  Object.keys(room.members);
-    for (let i = 0; i < members.slice(0, maxMembers || members.length).length; i++) {
-        const handle = members[i];
-        const name = M.getNameByHandle(handle);
-
-        if (!handle || !name) {
-            continue;
-        }
-
-        truncatedMemberNames = [
-            ...truncatedMemberNames,
-            name.length > maxLength ? `${name.substr(0, maxLength)}...` : name
-        ];
-    }
-
-    return truncatedMemberNames.join(', ');
-};
-
-/**
- * getTruncatedRoomTopic
- * @description Returns truncated room topic based on the passed maximum character length.
- * @param {ChatRoom} room
- * @param {number} maxLength The maximum length of characters for the truncation
- * @returns {string}
- */
-
-const getTruncatedRoomTopic = (room, maxLength = 20) => (
-    room.topic && room.topic.length > maxLength ? `${room.topic.substr(0, maxLength)}...` : room.topic
-);
-
-/**
  * openResult
  * @description Invoked on result click, opens the respective chat room; triggers the `resultOpen` event to notify
  * the root component for the interaction and do minimize.

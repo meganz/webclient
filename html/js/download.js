@@ -882,12 +882,15 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
     $('.download.speed-block', $dowloadWrapper).removeClass('hidden');
     $('.download.eta-block', $dowloadWrapper).removeClass('hidden');
     $('.bar-table .progress-block', $dowloadWrapper).removeClass('hidden');
+    $('.download .pause-transfer', $dowloadWrapper).removeClass('hidden active')
+        .children('span').text(l[9112]);
 
     $('.download.error-text', $dowloadWrapper).addClass('hidden');
     $('.download.main-transfer-error', $dowloadWrapper).addClass('hidden');
     $('.download.overquoata-error', $dowloadWrapper).addClass('hidden');
     $('.download.state-text', $dowloadWrapper).addClass('hidden');
-    $('.see-our-plans, .get-more-bonuses, .create-account-button.inline', $dowloadWrapper).addClass('hidden');
+    $('.see-our-plans, .get-more-bonuses, .create-account-button.inline', $dowloadWrapper)
+        .addClass('hidden');
 
     if (dl_queue[dl_queue_num]) {
         if (!dl_queue[dl_queue_num].st) {

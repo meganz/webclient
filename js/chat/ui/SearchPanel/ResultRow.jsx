@@ -50,11 +50,15 @@ const highlight = (text, matches) => {
  * the root component for the interaction and do minimize.
  * @see SearchPanel.bindEvents()
  * @param {ChatRoom} room
+ * @param {String} [messageId]
  */
 
-const openResult = room => {
+const openResult = (room, messageId) => {
     $(document).trigger('chatSearchResultOpen');
     loadSubPage(room.getRoomUrl());
+    if (messageId) {
+        room.scrollToMessageId(messageId);
+    }
 };
 
 //
@@ -74,7 +78,7 @@ class Message extends MegaRenderMixin {
         return (
             <div
                 className={`${SEARCH_ROW_CLASS} message`}
-                onClick={() => openResult(room)}>
+                onClick={() => openResult(room, data.messageId)}>
                 <span className="title">
                     {nicknames.getNicknameAndName(contact.u)}
                     <ContactPresence contact={contact} />

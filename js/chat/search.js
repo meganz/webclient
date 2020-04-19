@@ -160,7 +160,7 @@ RoomSearch.prototype.onHistoryFetched = function() {
         // we may receive a dummy event, then numFetched will be 0
         self.logger.debug("onHistoryFetched: No new messages fetched");
     }
-    if (self.state === SearchState.kDestroying || !haveMoreHistory) {
+    if (self.state === SearchState.kDestroying || !haveMoreHistory && self.state !== SearchState.kPaused) {
         self._setComplete();
     }
 };
@@ -371,9 +371,6 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
         cs.resume();
     }
 
-    // [...] TODO: temporary, remove;
-    console.error('@lp -- please, check when possible re: window.megaPromiseTemp');
-    window.megaPromiseTemp = megaPromise;
     return megaPromise;
 };
 ChatSearch.prototype.setupLogger = function() {
@@ -437,9 +434,11 @@ ChatSearch.prototype.onRoomSearchComplete = function(roomSearch) {
     var len = searches.length;
     for (var i = 0; i < len; i++) {
         if (searches[i].state < SearchState.kComplete) {
+            console.error(searches[i].state);
             return;
         }
     }
+    console.error('onComplete');
     this.handler.onComplete();
 };
 

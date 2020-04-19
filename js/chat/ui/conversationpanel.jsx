@@ -640,6 +640,7 @@ export class ConversationPanel extends MegaRenderMixin {
             }, rand_range(5, 10) * 1000);
         }
         self.props.chatRoom._uiIsMounted = true;
+        self.props.chatRoom.$rConversationPanel = self;
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -816,6 +817,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     e.preventDefault();
                 }
             });
+            $(self.props.chatRoom).trigger("onComponentDidUpdate");
         }
     }
     handleWindowResize(e, scrollToBottom) {
@@ -903,11 +905,20 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (self.isComponentEventuallyVisible()) {
-            if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
+            if (
+                self.props.chatRoom.scrolledToBottom &&
+                !self.editDomElement &&
+                !self.props.chatRoom.isScrollingToMessageId
+            ) {
                 ps.scrollToBottom(true);
                 return true;
             }
-            if (self.lastScrollPosition !== ps.getScrollPositionY() && !self.editDomElement) {
+            if (
+                self.lastScrollPosition &&
+                self.lastScrollPosition !== ps.getScrollPositionY() &&
+                !self.editDomElement &&
+                !self.props.chatRoom.isScrollingToMessageId
+            ) {
                 ps.scrollToY(self.lastScrollPosition, true);
                 return true;
             }

@@ -2189,6 +2189,10 @@ MessagesBuff.prototype.detachMessages = function() {
         // persisted may contain missing messages in the iDB db.
         return;
     }
+    if (room.isScrollingToMessageId) {
+        // do not detach messages if we are programatically retrieving history and scrolling to specific messageId
+        return;
+    }
 
 
     var removedAnyMessage = false;

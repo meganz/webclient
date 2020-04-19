@@ -106,17 +106,16 @@ export default class SearchPanel extends MegaRenderMixin {
         return new MegaPromise((res, rej) => {
             delay('chat-search', function() {
                 return ChatSearch.doSearch(
-                    s,
+                    RegExpEscape(s),
                     function(room, result, results) {
                         self.setState({
-                            results,
-                            status: STATUS.IN_PROGRESS
+                            results
                         });
                     },
                     function() {
                         self.setState({ status: STATUS.COMPLETED });
                     }).done(res).fail(rej);
-            }, 600);
+            }, 1600);
         });
     };
 
@@ -127,14 +126,15 @@ export default class SearchPanel extends MegaRenderMixin {
         this.setState({
             value,
             searching,
-            status: STATUS.IN_PROGRESS
+            status: STATUS.IN_PROGRESS,
+            results: []
         }, () =>
             searching ? this.doSearch(value) : this.setState({ results: [] })
         );
     };
 
     handleToggle = () => {
-        const megaPromise = window.megaPromiseTemp;
+        const megaPromise = ChatSearch.doSearch.megaPromise;
 
         if (megaPromise && megaPromise.cs) {
             const inProgress = this.state.status === STATUS.IN_PROGRESS;

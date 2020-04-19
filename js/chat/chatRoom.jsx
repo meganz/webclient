@@ -1935,6 +1935,43 @@ ChatRoom.prototype.detachSearch = function() {
         this.trackDataChange();
     }
 };
+
+ChatRoom.prototype.scrollToMessageId = function(msgId) {
+    var self = this;
+    assert(self.isCurrentlyActive, 'chatRoom is not visible');
+    self.isScrollingToMessageId = true;
+
+    var ps = self.$rConversationPanel.messagesListScrollable;
+    assert(ps);
+
+    var msgObj = self.messagesBuff.getMessageById(msgId);
+    if (msgObj) {
+        var elem = $('.' + msgId + '.message.body')[0];
+        self.scrolledToBottom = false;
+
+        ps.scrollToElement(elem, true);
+
+        // cleanup the stored old scroll position, so that the auto scroll won't scroll back to previous position
+        // after all onResizes and componentDidUpdates
+        self.$rConversationPanel.lastScrollPosition = undefined;
+        self.isScrollingToMessageId = false;
+    }
+    else if (self.messagesBuff.haveMoreHistory()) {
+        self.messagesBuff.retrieveChatHistory();
+        ps.doProgramaticScroll(0, true);
+        // wait for messages to be received
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+            // wait for UI to update (so that the element is now available in the dom)
+            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId);
+            });
+        });
+    }
+    else {
+        self.isScrollingToMessageId = false;
+    }
+};
+
 window.ChatRoom = ChatRoom;
 
 export default {

@@ -7047,9 +7047,14 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
-.thumb .transfer-filetype-icon.image img,
+
 .thumb .transfer-filetype-icon.pdf img,
-.thumb .transfer-filetype-icon.video img {
+.thumb .transfer-filetype-icon.raw img,
+.thumb .transfer-filetype-icon.audio img,
+.thumb .transfer-filetype-icon.image img,
+.thumb .transfer-filetype-icon.video img,
+.thumb .transfer-filetype-icon.vector img,
+.thumb .transfer-filetype-icon.photoshop img {
     display: inline-block;
     height: 18px;
     margin: 4px 2px;
@@ -7058,6 +7063,7 @@ table {
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
 }
+
 .fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;

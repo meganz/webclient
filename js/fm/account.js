@@ -2461,9 +2461,9 @@ accountUI.security = {
                 }
             }
 
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
+            // If unknown country code use question mark png
+            if (!country.icon || country.icon === '??.png') {
+                country.icon = 'ud.png';
             }
 
             // Generate row html

@@ -267,7 +267,7 @@ function updateIpcRequests() {
 function countrydetails(isocode) {
     var cdetails = {
         name: M.getCountryName(isocode),
-        icon: isocode.toLowerCase() + '.gif'
+        icon: isocode.toLowerCase() + '.png'
     };
     return cdetails;
 }

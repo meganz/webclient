@@ -961,8 +961,25 @@
 .fm-account-security .fm-browsers-icon img {
     margin: 4px 0 0 0;
 }
+.fm-account-security .fm-flags-icon {
+    margin: 6px 0 0 0;
+    line-height: 0;
+}
 .fm-account-security .fm-flags-icon img {
     margin: 0;
+    width: 17px;
+    border-radius: 2px;
+    display: block;
+}
+.fm-account-security .fm-flags-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
 }
 .fm-account-security .tranfer-filetype-txt, .fm-account-security .fm-browsers-txt, .fm-flags-txt, .fm-member-icon-txt {
     height: auto;

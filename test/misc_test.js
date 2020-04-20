@@ -83,6 +83,7 @@ describe('Test promisify and mutex', function() {
                 '8ec59e2a.bddfffc7.a4afce3d.bddfffc7.b0bf12d8'
             ];
             push(mMethod);
+            console.log('mutex-signature', result.join('.'));
             assert.strictEqual(JSON.stringify(mutex.queue), '{}');
             expect(signatures.join('$').indexOf(result.join('.'))).to.greaterThan(1);
             done();

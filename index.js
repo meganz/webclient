@@ -271,7 +271,13 @@ function init_page() {
     if ((typeof sms !== 'undefined' && sms.isSuspended) ||
         (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
 
-        u_logout(true);
+        if (typeof mobile !== 'undefined' && mobile.sms.isSuspended && u_type) {
+            // Reset flag if log in with another account successfully
+            mobile.sms.isSuspended = false;
+        }
+        else {
+            u_logout(true);
+        }
     }
 
     dlkey = false;
@@ -500,7 +506,7 @@ function init_page() {
 
     if (page.substr(0, 7) === 'folder/') {
         var phLen = page.indexOf('#');
-        var possibleS = -1; 
+        var possibleS = -1;
 
         if (phLen < 0) {
             phLen = page.length;

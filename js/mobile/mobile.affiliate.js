@@ -446,7 +446,8 @@ mobile.affiliate = {
 
         var template =
             '<div class="mobile fm-affiliate list-item">' +
-                '<img src="$countryImg" alt=""> $countryName <span class="num">$count</span>' +
+                '<div class="img-wrap"><img src="$countryImg" alt=""></div>' +
+                '$countryName <span class="num">$count</span>' +
             '</div>';
 
         var signupGeo = {};

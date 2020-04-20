@@ -21629,7 +21629,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .ps-container > .ps-scrollbar-y-rail {
     margin: 2px 0;
-    z-index: 7;
 }
 .bp-main .jspPane {
     min-width: auto;

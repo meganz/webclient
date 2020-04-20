@@ -194,7 +194,10 @@ i.small-icon.icons-sprite,
 .transfer-progress-type.upload .transfer-progress-pct::before,
 .transfer-task-row::before,
 .toast-icon.multi-files-icon,
-#mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-icon {
+#mega-text-editor .txt-editor-download-btn .txt-editor-download-btn-icon,
+.dropdown-dark-arrow,
+.transfer-task-status::before
+{
     background-image: url(../images/mega/icons-sprite_v37@2x.png);
     background-size: 262px auto;
 }

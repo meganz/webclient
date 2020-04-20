@@ -1122,7 +1122,7 @@
                     }
                 }
 
-                if (this.viewmode || aProperties.name.length > 78 || aProperties.playtime !== undefined) {
+                if (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined) {
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
                     }
@@ -1132,7 +1132,9 @@
                     if (aNode.s) {
                         title.push(bytesToSize(aNode.s, 0));
                     }
-                    title.push(aProperties.name);
+                    if (aProperties.name) {
+                        title.push(aProperties.name);
+                    }
                 }
                 title = title.join(' ');
 

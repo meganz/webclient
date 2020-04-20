@@ -11299,6 +11299,10 @@ table {
     text-align: center;
     width: 100%;
 }
+.account.left-pane .account.left-pane.small-txt.hidden,
+.account.left-pane .account.left-pane.big-txt.hidden {
+    display: none;
+}
 .account.widget .fm-account-blocks {
     padding-top: 10px;
     max-width: 50%;

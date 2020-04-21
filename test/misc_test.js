@@ -81,6 +81,7 @@ describe('Test promisify and mutex', function() {
                 '-',
                 '1169c55.5b9ad68c.346c706a.5b9ad68c.c4b5eb55',
                 '8fc7d06b.bddfffc7.ba1df54b.bddfffc7.2eec3e5',
+                '6b2d823f.bddfffc7.fc9d467b.bddfffc7.3af5d36d',
                 '94a7e2f6.5b9ad68c.7f9e8ac7.5b9ad68c.b51f4dc6',
                 '8ec59e2a.bddfffc7.a4afce3d.bddfffc7.b0bf12d8'
             ];

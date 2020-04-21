@@ -182,7 +182,7 @@ export default class SearchPanel extends MegaRenderMixin {
                     value={value}
                     searching={searching}
                     status={status}
-                    onFocus={this.getRecents}
+                    onFocus={() => !searching && this.getRecents()}
                     onChange={this.handleChange}
                     onToggle={this.handleToggle}
                     onReset={this.handleReset} />

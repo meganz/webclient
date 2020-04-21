@@ -129,8 +129,8 @@ RoomSearch.prototype.fetchMoreHistory = function() {
     self._isFetchingHistory = true;
     // console.warn(self.room.chatId +": Requesting more history");
     setTimeout(function() {
-        self.room.messagesBuff.retrieveChatHistory(1024);
-    }, 0);
+        self.room.messagesBuff.retrieveChatHistory(64);
+    }, 128 /* give some CPU time for the main UI thread to do "real-time"-like updates */);
 };
 
 RoomSearch.prototype.onHistoryFetched = function() {

@@ -65,7 +65,6 @@ else {
 
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
-
 var FUNCTIONS = [
     'render',
     'shouldComponentUpdate',
@@ -154,8 +153,8 @@ export class MegaRenderMixin extends React.Component {
             super.componentWillUnmount();
         }
         this.__isMounted = false;
-        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+        chatWinResizeManager.removeEventListener('megaRenderMixing' + this.getUniqueId());
+        chatWinResizeManager.removeEventListener('megaRenderMixing2' + this.getUniqueId());
 
         window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
 
@@ -242,10 +241,12 @@ export class MegaRenderMixin extends React.Component {
         this._wasRendered = true;
 
         if (this.props.requiresUpdateOnResize) {
-            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+            chatWinResizeManager.addEventListener('megaRenderMixing' + this.getUniqueId(),
+                this.onResizeDoUpdate.bind(this));
         }
         if (!this.props.skipQueuedUpdatesOnResize) {
-            $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+            chatWinResizeManager.addEventListener('megaRenderMixing2' + this.getUniqueId(),
+                this.onResizeDoUpdate.bind(this));
         }
 
         window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this));

@@ -54,11 +54,11 @@ class Tooltip extends MegaRenderMixin {
     componentDidUpdate(oldProps, oldState) {
         var self = this;
         if (oldState.active === true && this.state.active === false) {
-            $(window).off('resize.tooltip' + this.getUniqueId());
+            chatWinResizeManager.removeEventListener('tooltip' + this.getUniqueId());
         }
         if(self.state.active === true) {
             self.repositionTooltip();
-            $(window).rebind('resize.tooltip' + this.getUniqueId(), function() {
+            chatWinResizeManager.addEventListener('tooltip' + this.getUniqueId(), function() {
                 self.repositionTooltip();
             });
         }

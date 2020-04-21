@@ -629,7 +629,6 @@ class ConversationsList extends MegaRenderMixin {
     }
     componentDidUpdate() {
         super.componentDidUpdate && super.componentDidUpdate();
-        M.treeSearchUI();
     }
 
     conversationClicked(room, e) {

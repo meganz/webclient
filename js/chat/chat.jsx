@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ConversationsUI from "./ui/conversations.jsx";
 
+require("./chatWinResizeManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 require("./chatRoom.jsx");
 
@@ -2493,6 +2494,10 @@ Chat.prototype.onSnActionPacketReceived = function() {
 
 
 Chat.prototype.getFrequentContacts = function() {
+    if (Chat._frequentsCache) {
+        return Chat._frequentsCache;
+    }
+
     var chats = this.chats;
     var recentContacts = {};
     var promises = [];
@@ -2511,13 +2516,14 @@ Chat.prototype.getFrequentContacts = function() {
     // });
 
     var _calculateLastTsFor = function(r, maxMessages) {
-        var msgIds = r.messagesBuff.messages.keys().reverse();
-        msgIds = msgIds.splice(0, maxMessages);
-        msgIds.forEach(function(msgId) {
-            var msg = r.messagesBuff.getMessageById(msgId);
+        var mb = r.messagesBuff;
+        var len = mb.messages.length;
+        var msgs = mb.messages.slice(Math.max(0, len - maxMessages), len);
+        for (var i = 0; i < msgs.length; i++) {
+            var msg = msgs[i];
             var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
             if (r.type === "private" && contactHandle === u_handle) {
-                contactHandle = contactHandle || r.getParticipantsExceptMe()[0]
+                contactHandle = contactHandle || r.getParticipantsExceptMe()[0];
             }
 
             if (
@@ -2529,7 +2535,7 @@ Chat.prototype.getFrequentContacts = function() {
                     recentContacts[contactHandle] = { 'userId': contactHandle, 'ts': msg.delay, 'chatRoom': r };
                 }
             }
-        });
+        }
     };
 
     chats.forEach(function(r) {
@@ -2598,6 +2604,12 @@ Chat.prototype.getFrequentContacts = function() {
         });
         masterPromise.resolve(result.reverse());
     });
+    Chat._frequentsCache = masterPromise;
+    masterPromise.always(function() {
+        setTimeout(function() {
+            delete Chat._frequentsCache;
+        }, 6e4 * 5);
+    })
     return masterPromise;
 };
 

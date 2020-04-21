@@ -523,7 +523,7 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
         // size mode from full screen...)
-        $(window).rebind('resize.chatUI_' + room.roomId, function() {
+        chatWinResizeManager.addEventListener('chatUI_' + room.roomId, function() {
             if ($container.is(":visible")) {
                 if (!elementInViewport($localMediaDisplay[0])) {
                     $localMediaDisplay
@@ -602,7 +602,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         }
 
         $(document).off("fullscreenchange.megaChat_" + room.roomId);
-        $(window).off('resize.chatUI_' + room.roomId);
+        chatWinResizeManager.removeEventListener('chatUI_' + room.roomId);
         $(room).off('toggleMessages.av');
 
         var $rootContainer = $container.parents('.conversation-panel');

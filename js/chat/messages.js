@@ -1998,36 +1998,28 @@ MessagesBuff.prototype.markAllAsReceived = function() {
  * @returns {boolean}
  */
 MessagesBuff.prototype.getMessageById = function(messageId) {
-    var self = this;
-    var found = false;
-    for (var i = 0; i < self.messages.length; i++) {
-        var v = self.messages.getItem(i);
-        if (v && v.messageId === messageId) {
-            return v;
-        }
-    }
+    "use strict";
 
-    return found;
+    var self = this;
+    return self.messages[messageId] || false;
 };
 
 MessagesBuff.prototype.removeMessageById = function(messageId) {
+    "use strict";
+
     var self = this;
-    self.messages.forEach(function(v, k) {
-        if (v.deleted === 1) {
-            return; // skip
-        }
+    var msg = self.getMessageById(messageId);
+    if (msg.deleted) {
+        return;
+    }
 
-        if (v.messageId === messageId) {
-            v.deleted = 1;
-            if (!v.seen) {
-                v.seen = true;
-            }
+    msg.deleted = 1;
+    if (!msg.seen) {
+        msg.seen = true;
+    }
 
-            // cleanup the messagesIndex
-            self.messages.removeByKey(v.messageId);
-            return false; // break;
-        }
-    });
+    // cleanup the messagesIndex
+    self.messages.removeByKey(msg.messageId);
 };
 MessagesBuff.prototype.removeMessageBy = function(cb) {
     var self = this;
@@ -2196,9 +2188,12 @@ MessagesBuff.prototype.detachMessages = function() {
 
 
     var removedAnyMessage = false;
-    while (msg = self.messages.getItem(self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2)) {
-        self.messages.removeByKey(msg.messageId, true);
+    if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
+        self.messages.splice(0, self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2);
         removedAnyMessage = true;
+    }
+    else {
+        removedAnyMessage = false;
     }
 
     if (removedAnyMessage === true && self.retrievedAllMessages) {

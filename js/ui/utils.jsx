@@ -107,7 +107,7 @@ class JScrollPane extends MegaRenderMixin {
         $elem.rebind('forceResize.jsp'+self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
-        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+        chatWinResizeManager.addEventListener('jsp' + self.getUniqueId(), self.onResize.bind(self));
         self.onResize();
     }
     componentWillUnmount() {
@@ -115,7 +115,7 @@ class JScrollPane extends MegaRenderMixin {
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
-        $(window).off('resize.jsp' + this.getUniqueId());
+        chatWinResizeManager.removeEventListener('jsp' + this.getUniqueId());
     }
     eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;

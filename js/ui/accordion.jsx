@@ -29,32 +29,6 @@ class Accordion extends MegaRenderMixin {
             'expandedPanel': this.props.expandedPanel
         };
     }
-    componentDidMount() {
-        super.componentDidMount();
-        var self = this;
-        $(window).rebind('resize.modalDialog' + self.getUniqueId(), function() {
-            self.onResize();
-        });
-    }
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        $(window).off('resize.modalDialog' + this.getUniqueId());
-
-    }
-    onResize() {
-        // if (!this.domNode) {
-        //     return;
-        // }
-
-        // always center modal dialogs after they are mounted
-        // $(this.domNode)
-        //     .css({
-        //         'margin': 'auto'
-        //     })
-        //     .position({
-        //         of: $(document.body)
-        //     });
-    }
     onToggle(e, key) {
         // allow multiple opened panels at a time
         // var obj = clone(this.state.expandedPanel);

@@ -632,6 +632,50 @@ MegaDataSortedMap.prototype.removeByKey = MegaDataSortedMap.prototype.remove = f
     return false;
 };
 
+/**
+ * Simplified version of `Array.prototype.splice`, only supports 2 args (no adding/replacement of items) for now.
+ *
+ * @param {Number} start
+ * @param {Number} deleteCount
+ * @returns {Array} array of deleted item ids
+ */
+MegaDataSortedMap.prototype.splice = function(start, deleteCount) {
+    "use strict";
+    if (arguments.length > 2) {
+        // right now we only support deleting items and no actual replacement/addition of new ones
+        assert(false, 'Not implemented');
+    }
+
+    var self = this;
+
+    // retrieve removed vals first
+    var deletedItemIds = self._sortedVals.splice(start, deleteCount);
+
+    for (var i = 0; i < deletedItemIds.length; i++) {
+        delete self._data[deletedItemIds[i]];
+    }
+
+    self.trackDataChange();
+
+    return deletedItemIds;
+};
+
+
+/**
+ * Returns a regular array (not a sorted map!) of values sliced as with `Array.prototype.slice`
+ *
+ * @param {Number} begin
+ * @param {Number} end
+ */
+MegaDataSortedMap.prototype.slice = function(begin, end) {
+    "use strict";
+    var results = this._sortedVals.slice(begin, end);
+    for (var i = 0; i < results.length; i++) {
+        results[i] = this._data[results[i]];
+    }
+    return results;
+};
+
 
 MegaDataSortedMap.prototype.exists = function(keyValue) {
     var self = this;

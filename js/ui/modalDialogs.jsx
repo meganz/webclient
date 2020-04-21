@@ -66,7 +66,6 @@ class ModalDialog extends MegaRenderMixin {
         $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
-        $(window).off('resize.modalDialog' + this.getUniqueId());
     }
     onCloseClicked(e) {
         var self = this;

@@ -1046,6 +1046,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (
             this.isRetrievingHistoryViaScrollPull ||
             this.loadingShown ||
+            (this.props.chatRoom.activeSearches > 0 && this.loadingShown) ||
             (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
             (
                 this.props.chatRoom.messagesBuff.isDecrypting &&
@@ -1115,6 +1116,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
             ) ||
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
+            (self.props.chatRoom.activeSearches && !self.loadingShown) ||
             room.messagesBuff.messagesHistoryIsLoading() === true ||
             room.messagesBuff.joined === false ||
             (
@@ -2132,6 +2134,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                    renderedMessagesCount={messagesList.length}
                                    isLoading={
                                        this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                                       this.props.chatRoom.activeSearches > 0 ||
                                        this.loadingShown
                                    }
                                    options={{

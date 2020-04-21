@@ -273,8 +273,8 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
       }
 
       this.__isMounted = false;
-      $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-      $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+      chatWinResizeManager.removeEventListener('megaRenderMixing' + this.getUniqueId());
+      chatWinResizeManager.removeEventListener('megaRenderMixing2' + this.getUniqueId());
       window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
 
       if (typeof this.__intersectionVisibility !== 'undefined' && this.__intersectionObserverInstance && this.__intersectionObserverInstance.unobserve) {
@@ -372,11 +372,11 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
       this._wasRendered = true;
 
       if (this.props.requiresUpdateOnResize) {
-        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+        chatWinResizeManager.addEventListener('megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
       }
 
       if (!this.props.skipQueuedUpdatesOnResize) {
-        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+        chatWinResizeManager.addEventListener('megaRenderMixing2' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
       }
 
       window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this)); // init on data structure change events
@@ -2706,7 +2706,7 @@ var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
       $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
         self.onResize(forced, scrollPositionYPerc, scrollToElement);
       });
-      $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+      chatWinResizeManager.addEventListener('jsp' + self.getUniqueId(), self.onResize.bind(self));
       self.onResize();
     }
   }, {
@@ -2716,7 +2716,7 @@ var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
 
       var $elem = $(ReactDOM.findDOMNode(this));
       $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
-      $(window).off('resize.jsp' + this.getUniqueId());
+      chatWinResizeManager.removeEventListener('jsp' + this.getUniqueId());
     }
   }, {
     key: "eventuallyReinitialise",
@@ -3199,7 +3199,7 @@ var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
     value: function componentDidMount() {
       _get(_getPrototypeOf(Dropdown.prototype), "componentDidMount", this).call(this);
 
-      $(window).rebind('resize.drpdwn' + this.getUniqueId(), this.onResized);
+      chatWinResizeManager.addEventListener('drpdwn' + this.getUniqueId(), this.onResized.bind(this));
       this.onResized();
       var self = this;
       $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
@@ -3228,7 +3228,7 @@ var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
         this.onActiveChange(false);
       }
 
-      $(window).unbind('resize.drpdwn' + this.getUniqueId());
+      chatWinResizeManager.removeEventListener('drpdwn' + this.getUniqueId());
     }
   }, {
     key: "doRerender",
@@ -3660,7 +3660,6 @@ var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
       $(document).off('keyup.modalDialog' + this.getUniqueId());
       $(document.body).removeClass('overlayed');
       $('.fm-dialog-overlay').addClass('hidden');
-      $(window).off('resize.modalDialog' + this.getUniqueId());
     }
   }, {
     key: "onCloseClicked",
@@ -5031,12 +5030,12 @@ var Tooltip = /*#__PURE__*/function (_MegaRenderMixin3) {
       var self = this;
 
       if (oldState.active === true && this.state.active === false) {
-        $(window).off('resize.tooltip' + this.getUniqueId());
+        chatWinResizeManager.removeEventListener('tooltip' + this.getUniqueId());
       }
 
       if (self.state.active === true) {
         self.repositionTooltip();
-        $(window).rebind('resize.tooltip' + this.getUniqueId(), function () {
+        chatWinResizeManager.addEventListener('tooltip' + this.getUniqueId(), function () {
           self.repositionTooltip();
         });
       }
@@ -8276,7 +8275,7 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
 
       var self = this;
       this.$container = $(typingArea_ReactDOM.findDOMNode(this));
-      $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this)); // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+      chatWinResizeManager.addEventListener('typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this)); // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
 
       self._lastTextareaHeight = 20;
 
@@ -8337,7 +8336,7 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
       var chatRoom = self.props.chatRoom;
       self.triggerOnUpdate(); // window.removeEventListener('resize', self.handleWindowResize);
 
-      $(window).unbind('resize.typingArea' + self.getUniqueId());
+      chatWinResizeManager.removeEventListener('typingArea' + self.getUniqueId());
     }
   }, {
     key: "componentDidUpdate",
@@ -8933,10 +8932,6 @@ var WhosTyping = /*#__PURE__*/function (_MegaRenderMixin) {
 var perfectScrollbar = __webpack_require__(10);
 
 // CONCATENATED MODULE: ./js/ui/accordion.jsx
-function accordion_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { accordion_get = Reflect.get; } else { accordion_get = function _get(target, property, receiver) { var base = accordion_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return accordion_get(target, property, receiver || target); }
-
-function accordion_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = accordion_getPrototypeOf(object); if (object === null) break; } return object; }
-
 function accordion_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { accordion_typeof = function _typeof(obj) { return typeof obj; }; } else { accordion_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return accordion_typeof(obj); }
 
 function accordion_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -9021,37 +9016,6 @@ var Accordion = /*#__PURE__*/function (_MegaRenderMixin2) {
   }
 
   accordion_createClass(Accordion, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      accordion_get(accordion_getPrototypeOf(Accordion.prototype), "componentDidMount", this).call(this);
-
-      var self = this;
-      $(window).rebind('resize.modalDialog' + self.getUniqueId(), function () {
-        self.onResize();
-      });
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      accordion_get(accordion_getPrototypeOf(Accordion.prototype), "componentWillUnmount", this).call(this);
-
-      $(window).off('resize.modalDialog' + this.getUniqueId());
-    }
-  }, {
-    key: "onResize",
-    value: function onResize() {// if (!this.domNode) {
-      //     return;
-      // }
-      // always center modal dialogs after they are mounted
-      // $(this.domNode)
-      //     .css({
-      //         'margin': 'auto'
-      //     })
-      //     .position({
-      //         of: $(document.body)
-      //     });
-    }
-  }, {
     key: "onToggle",
     value: function onToggle(e, key) {
       // allow multiple opened panels at a time
@@ -13947,7 +13911,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       }); // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
       // size mode from full screen...)
 
-      $(window).rebind('resize.chatUI_' + room.roomId, function () {
+      chatWinResizeManager.addEventListener('chatUI_' + room.roomId, function () {
         if ($container.is(":visible")) {
           if (!elementInViewport($localMediaDisplay[0])) {
             $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
@@ -14031,7 +13995,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       }
 
       $(document).off("fullscreenchange.megaChat_" + room.roomId);
-      $(window).off('resize.chatUI_' + room.roomId);
+      chatWinResizeManager.removeEventListener('chatUI_' + room.roomId);
       $(room).off('toggleMessages.av');
       var $rootContainer = $container.parents('.conversation-panel');
       $('.call-block', $rootContainer).height('');
@@ -15537,7 +15501,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
   }, {
     key: "specShouldComponentUpdate",
     value: function specShouldComponentUpdate() {
-      if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
+      if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.activeSearches > 0 && this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
         return false;
       } else {
         return undefined;
@@ -15589,7 +15553,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var privateChatDiv = room.type === "group" ? "privateChatDiv" : '';
       var messagesList = [];
 
-      if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
+      if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.activeSearches && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
         self.loadingShown = true;
       } else if (room.messagesBuff.joined === true) {
         if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
@@ -16498,7 +16462,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         editingMessageId: self.state.editing,
         confirmDeleteDialog: self.state.confirmDeleteDialog,
         renderedMessagesCount: messagesList.length,
-        isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown,
+        isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
         options: {
           'suppressScrollX': true
         }
@@ -17820,7 +17784,7 @@ var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
 
 
 
-var StartGroupChatWizard = __webpack_require__(23).StartGroupChatWizard;
+var StartGroupChatWizard = __webpack_require__(24).StartGroupChatWizard;
 
 var renderMessageSummary = function renderMessageSummary(lastMessage) {
   var renderableSummary;
@@ -18408,7 +18372,6 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
       conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this) && conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this).call(this);
-      M.treeSearchUI();
     }
   }, {
     key: "conversationClicked",
@@ -19291,9 +19254,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
 
- // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 
-__webpack_require__(21);
+
+__webpack_require__(21); // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
+
+
+__webpack_require__(22);
 
 var EMOJI_DATASET_VERSION = 3;
 
@@ -21579,6 +21545,10 @@ Chat.prototype.onSnActionPacketReceived = function () {
 };
 
 Chat.prototype.getFrequentContacts = function () {
+  if (Chat._frequentsCache) {
+    return Chat._frequentsCache;
+  }
+
   var chats = this.chats;
   var recentContacts = {};
   var promises = [];
@@ -21594,10 +21564,12 @@ Chat.prototype.getFrequentContacts = function () {
   // });
 
   var _calculateLastTsFor = function _calculateLastTsFor(r, maxMessages) {
-    var msgIds = r.messagesBuff.messages.keys().reverse();
-    msgIds = msgIds.splice(0, maxMessages);
-    msgIds.forEach(function (msgId) {
-      var msg = r.messagesBuff.getMessageById(msgId);
+    var mb = r.messagesBuff;
+    var len = mb.messages.length;
+    var msgs = mb.messages.slice(Math.max(0, len - maxMessages), len);
+
+    for (var i = 0; i < msgs.length; i++) {
+      var msg = msgs[i];
       var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
 
       if (r.type === "private" && contactHandle === u_handle) {
@@ -21613,7 +21585,7 @@ Chat.prototype.getFrequentContacts = function () {
           };
         }
       }
-    });
+    }
   };
 
   chats.forEach(function (r) {
@@ -21666,6 +21638,12 @@ Chat.prototype.getFrequentContacts = function () {
       return a.ts < b.ts ? 1 : b.ts < a.ts ? -1 : 0;
     });
     masterPromise.resolve(result.reverse());
+  });
+  Chat._frequentsCache = masterPromise;
+  masterPromise.always(function () {
+    setTimeout(function () {
+      delete Chat._frequentsCache;
+    }, 6e4 * 5);
   });
   return masterPromise;
 };
@@ -21873,11 +21851,83 @@ module.exports = ReactPropTypesSecret;
 
 /***/ }),
 /* 21 */
+/***/ (function(module, exports) {
+
+(function () {
+  /**
+   * Simplified* and minimalistic `$(window).on('resize', ...)` event listener API that is more optimal then
+   * $.fn.remove/add.
+   *
+   * Automatically initialized globally as `chatWinResizeManager`.
+   *
+   *  note* - would never support extra Event-like features live bubbling, preventing default, etc, since this is
+   *  only meant to be used for 'resize' event, which can't bubble or be "prevented"
+   *
+   * @constructor
+   */
+  var ChatWinResizeManager = function ChatWinResizeManager() {
+    this.initialized = false;
+    this.listeners = {};
+  };
+  /**
+   * Called internally to actually do the resize binding when needed.
+   *
+   * @private
+   */
+
+
+  ChatWinResizeManager.prototype._lateInit = function () {
+    $(window).rebind('resize.chatWinResizeManager', this.triggered.bind(this));
+    this.initialized = true;
+  };
+  /**
+   * Add an `cb` event listener for window.onresize with namespace `namespace`
+   *
+   * @param {String} namespace
+   * @param {Function} cb
+   */
+
+
+  ChatWinResizeManager.prototype.addEventListener = function (namespace, cb) {
+    if (this.initialized === false) {
+      this._lateInit();
+    }
+
+    this.listeners[namespace] = this.listeners[namespace] || cb;
+  };
+  /**
+   * Remove listener with namespace `namespace`
+   * @param {String} namespace
+   */
+
+
+  ChatWinResizeManager.prototype.removeEventListener = function (namespace) {
+    delete this.listeners[namespace];
+  };
+  /**
+   * Called by the onResize
+   */
+
+
+  ChatWinResizeManager.prototype.triggered = function (e) {
+    for (var k in this.listeners) {
+      if (Object.prototype.hasOwnProperty.call(this.listeners, k)) {
+        this.listeners[k](e);
+      }
+    }
+  }; // init globally. will be initialized only when first .addEventListener is called
+
+
+  window.chatWinResizeManager = new ChatWinResizeManager();
+})();
+
+/***/ }),
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var utils = __webpack_require__(22);
+var utils = __webpack_require__(23);
 
 var React = __webpack_require__(0);
 
@@ -23706,7 +23756,7 @@ window.ChatRoom = ChatRoom;
 });
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23738,7 +23788,7 @@ function extendActions(prefix, src, toBeAppended) {
 ;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

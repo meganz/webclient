@@ -201,7 +201,6 @@ RoomSearch.prototype._setComplete = function() {
 };
 
 RoomSearch.prototype.match = function(str, type, data) {
-    str = escapeHTML(str);
     var rx = this.parentSearch.searchRegExp;
     rx.lastIndex = 0;
     var m = rx.exec(str);

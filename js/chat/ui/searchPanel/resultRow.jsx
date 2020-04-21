@@ -33,6 +33,7 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
  */
 
 const highlight = (text, matches) => {
+    text = escapeHTML(text);
     if (matches) {
         let highlighted;
         for (let i = matches.length; i--;) {

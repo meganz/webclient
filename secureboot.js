@@ -627,6 +627,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }

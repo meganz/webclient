@@ -56,9 +56,11 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clicked on search result
             .rebind('chatSearchResultOpen.searchPanel', () => this.toggleMinimize())
             // Clicked outside the search panel component
-            .rebind('click.searchPanel', ev =>
-                this.clickedOutsideComponent(ev) && !this.props.minimized && this.toggleMinimize()
-            )
+            .rebind('click.searchPanel', ev => {
+                if (this.clickedOutsideComponent(ev) && !this.props.minimized) {
+                    this.toggleMinimize();
+                }
+            })
             // `ESC` keypress
             .rebind('keydown.searchPanel', ({ keyCode }) => {
                 if (keyCode && keyCode === 27 /* ESC */ && !this.props.minimized) {

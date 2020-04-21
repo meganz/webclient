@@ -38,3 +38,57 @@ describe("Test array.* methods", function() {
         assert.strictEqual(JSON.stringify(a), JSON.stringify(u));
     });
 });
+
+describe('Test promisify and mutex', function() {
+    'use strict';
+    var assert = chai.assert;
+
+    it('can lock and unlock', function(done) {
+        var result = [];
+        var push = function(resolve) {
+            result.push(MurmurHash3('' + resolve, 3).toString(16));
+            onIdle(resolve);
+        };
+        var fail = function(ex) {
+            onIdle(function() {
+                throw ex;
+            });
+        };
+        var mName = 'mutex-test';
+        var mMethod = mutex(mName, push);
+
+        expect(Object.isFrozen(mMethod)).to.eq(true);
+        expect(Object.isExtensible(mMethod)).to.eq(false);
+
+        assert.strictEqual(mMethod.__name__, mName);
+        assert.strictEqual(push.__method__, mMethod);
+        assert.strictEqual(mMethod.__function__, push);
+        assert.strictEqual(mutex.lock.__function__.__method__, mutex.lock);
+        assert.strictEqual(mutex.unlock.__function__.__method__, mutex.unlock);
+
+        push(mutex.unlock);
+        mutex.lock('foo').then(function(unlock) {
+            mutex.lock(mName).then(push);
+            mMethod().then(unlock);
+            assert.strictEqual(JSON.stringify(mutex.queue), '{"foo":[null],"' + mName + '":[null]}');
+        }).catch(fail);
+        mutex.lock('foo').then(function(unlock) {
+            assert.strictEqual(JSON.stringify(mutex.queue), '{"foo":[]}');
+            push(unlock);
+            return unlock();
+        }).then(function() {
+            var signatures = [
+                '-',
+                '1169c55.5b9ad68c.346c706a.5b9ad68c.c4b5eb55',
+                '8fc7d06b.bddfffc7.ba1df54b.bddfffc7.2eec3e5',
+                '94a7e2f6.5b9ad68c.7f9e8ac7.5b9ad68c.b51f4dc6',
+                '8ec59e2a.bddfffc7.a4afce3d.bddfffc7.b0bf12d8'
+            ];
+            push(mMethod);
+            console.log('mutex-signature', result.join('.'));
+            assert.strictEqual(JSON.stringify(mutex.queue), '{}');
+            expect(signatures.join('$').indexOf(result.join('.'))).to.greaterThan(1);
+            done();
+        }).catch(fail);
+    });
+});

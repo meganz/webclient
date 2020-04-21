@@ -22,8 +22,12 @@ var extensions = {
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
     'raw': [
-        ['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'],
-        'RAW'
+        Object.keys(is_image.raw)
+            .map(function(e) {
+                'use strict';
+                return e.toLowerCase();
+            }),
+        l[20240] || 'RAW Image'
     ],
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
@@ -517,28 +521,31 @@ function filemime(n, def) {
 
 /**
  * Get file type
- * @param {Object} n                Node
- * @param {Boolean} getFullType     Optional to return full detailed array of the type
+ * @param {MegaNode|String} n       ufs-node, or file-name
+ * @param {Boolean} [getFullType]   Return full detailed array of the type
  * @returns {String|Array}          Extension Desc, or full type info
  */
 function filetype(n, getFullType) {
     "use strict";
-    if (typeof n === 'object') {
-        n = n.name;
+    var name = String(n && (n.name || n.n) || n || '');
+    var node = typeof n === 'object' ? n : {name: name};
+    var fext = fileext(name);
+
+    if (!ext[fext]) {
+        var t = is_video(node);
+        if (t > 0) {
+            fext = extensions[t > 1 ? 'audio' : 'video'][0][0];
+        }
     }
-    var fext = fileext(String(n));
+
     if (ext[fext]) {
         if (getFullType) {
             return ext[fext];
         }
         return ext[fext][1];
     }
-    else if (fext && fext.length > 1) {
-        return l[20366].replace('%1', fext.toUpperCase());
-    }
-    else {
-        return l[18055];
-    }
+
+    return fext.length ? l[20366].replace('%1', fext.toUpperCase()) : l[18055];
 }
 
 function fileIcon(node) {
@@ -562,6 +569,9 @@ function fileIcon(node) {
     }
     else if (ext[fileext(node.name)]) {
         icon = ext[fileext(node.name)][0];
+    }
+    else if ((icon = is_video(node)) > 0) {
+        icon = icon > 1 ? 'audio' : 'video';
     }
     else {
         icon = 'generic';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
-import SearchField from './SearchField.jsx';
-import ResultContainer  from './ResultContainer.jsx';
+import SearchField from './searchField.jsx';
+import ResultContainer  from './resultContainer.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 
 export const STATUS = {

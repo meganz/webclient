@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../stores/mixins';
-import { STATUS } from './SearchPanel.jsx';
-import { LABEL } from './ResultContainer.jsx';
+import { STATUS } from './searchPanel.jsx';
+import { LABEL } from './resultContainer.jsx';
 
 const SEARCH_STATUS_CLASS = `search-field-status`;
 

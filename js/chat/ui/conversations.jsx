@@ -10,7 +10,7 @@ import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import ContactsUI  from './../ui/contacts.jsx';
 import {ConversationPanels} from "./../ui/conversationpanel.jsx";
-import SearchPanel from './SearchPanel/SearchPanel.jsx';
+import SearchPanel from './SearchPanel/searchPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 

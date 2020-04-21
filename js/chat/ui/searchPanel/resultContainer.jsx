@@ -1,6 +1,6 @@
 import React from 'react';
-import ResultTable  from './ResultTable.jsx';
-import ResultRow  from './ResultRow.jsx';
+import ResultTable  from './resultTable.jsx';
+import ResultRow  from './resultRow.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
 
 export const TYPE = {

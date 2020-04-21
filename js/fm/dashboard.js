@@ -51,6 +51,10 @@ function dashboardUI() {
         else {
             $('.business-dashboard .go-to-usermanagement-btn').addClass('hidden');
         }
+        if (u_attr.b.s !== 1 || !u_attr.b.m) {
+            $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+            $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
+        }
     }
     else {
         $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
@@ -280,6 +284,10 @@ function dashboardUI() {
                 }
                 else {
                     $businessLeft.find('.suba-role').text(l[5568]);
+                }
+                if (u_attr.b.s !== 1 || !u_attr.b.m) {
+                    $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+                    $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
                 }
 
                 var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');

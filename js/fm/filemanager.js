@@ -3627,6 +3627,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
         $ddUIgrid.selectable({
             filter: $.selectddUIitem,
+            cancel: '.ps-scrollbar-y-rail, .ps-scrollbar-x-rail',
             start: function (e, u) {
                 $.hideContextMenu(e);
                 $.hideTopMenu();

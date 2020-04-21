@@ -62,11 +62,11 @@ const openResult = (room, messageId) => {
 };
 
 //
-// Message
+// MessageRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Message extends MegaRenderMixin {
+class MessageRow extends MegaRenderMixin {
     constructor(props) {
         super(props);
     }
@@ -96,11 +96,11 @@ class Message extends MegaRenderMixin {
 }
 
 //
-// Chat
+// ChatRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Chat extends MegaRenderMixin {
+class ChatRow extends MegaRenderMixin {
     constructor(props) {
         super(props);
     }
@@ -125,11 +125,11 @@ class Chat extends MegaRenderMixin {
 }
 
 //
-// Member
+// MemberRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Member extends MegaRenderMixin {
+class MemberRow extends MegaRenderMixin {
     constructor(props) {
         super(props);
     }
@@ -188,7 +188,7 @@ class Member extends MegaRenderMixin {
     }
 }
 
-const Nil = () => (
+const NilRow = () => (
     <div className={`${SEARCH_ROW_CLASS} nil`}>
         <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
         <span>{LABEL.NO_RESULTS}</span>
@@ -208,7 +208,7 @@ export default class ResultRow extends MegaRenderMixin {
         switch (type) {
             case TYPE.MESSAGE:
                 return (
-                    <Message
+                    <MessageRow
                         data={result.data}
                         text={result.text}
                         matches={result.matches}
@@ -216,17 +216,17 @@ export default class ResultRow extends MegaRenderMixin {
                         contact={M.u[result.data.userId]} />
                 );
             case TYPE.CHAT:
-                return <Chat room={result.room} matches={result.matches} />;
+                return <ChatRow room={result.room} matches={result.matches} />;
             case TYPE.MEMBER:
                 return (
-                    <Member
+                    <MemberRow
                         data={result.data}
                         matches={result.matches}
                         room={result.room}
                         contact={M.u[result.data]} />
                 );
             case TYPE.NIL:
-                return status === STATUS.COMPLETED && <Nil />;
+                return status === STATUS.COMPLETED && <NilRow />;
             default:
                 return (
                     <div className={SEARCH_ROW_CLASS}>

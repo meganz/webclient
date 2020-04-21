@@ -168,7 +168,7 @@ export default class SearchPanel extends MegaRenderMixin {
         // https://mega.nz/file/QFExTYpD#Jp9R0CV3ri9B081k1i36kDa57ZEe2W2JPp5havIn8Ww
         //
         // Component hierarchy
-        // https://mega.nz/file/kZEhFQxa#uuR2BQ6DXFJPi002eKZbzBpf25pDtddNeMSMsZ1EzPs
+        // https://mega.nz/file/lRkwyYwR#XsLtcMV6fe_HiBZ1shOdt0FvJrB-rr6agoIh0N8xQys
         // -------------------------------------------------------------------------
 
         return (

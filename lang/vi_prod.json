@@ -3491,7 +3491,7 @@
     "22780": "How do I see my earnings?",
     "22781": "We provide an intuitive referral dashboard where you can find detailed reports of your earnings.",
     "22783": "Why should I become a referrer for MEGA?",
-    "22784": "With more than 170 million registered users, MEGA is the leading end-to-end encrypted cloud collaboration platform.[BR]Becoming a referral partner allows you to help us grow MEGA and participate in the success!",
+    "22784": "With more than 170 million registered users, MEGA is the leading end-to-end encrypted cloud collaboration platform.[BR]Becoming a referral partner allows you to help us grow MEGA and participate in the success.",
     "22785": "What does it cost to join the program?",
     "22786": "It\u2019s free to participate in the referral program. However, to qualify for a redemption you must make at least one real payment* to MEGA. Click on [A]Plans and Pricing[\/A] to see our PRO plan options.",
     "22787": "How do your referrals qualify for a commission for existing users?",
@@ -3653,5 +3653,8 @@
     "23249": "\u2026 and 1 other",
     "23250": "\u2026 and [X] others",
     "23251": "Pay Now",
-    "23252": "Less than a minute ago"
+    "23252": "Less than a minute ago",
+    "23255": "Status:",
+    "23262": "Change Password",
+    "23278": "Firefox\/Chrome Extension"
 }

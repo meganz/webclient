@@ -1449,7 +1449,7 @@
     "16125": "Gebruikte tegoed gedurende de laatste 6 uur:",
     "16126": "Neem meer overdracht tegoed",
     "16127": "Opslag Tegoed",
-    "16128": "Lid sinds",
+    "16128": "Lid Sinds",
     "16129": "Uw wachtwoord is niet opgeslagen door MEGA en dus kunnen we het niet voor u herstellen, mocht u het verliezen of vergeten. Voor betrouwbare toegang tot uw account raden wij u aan dat u de Herstel Sleutel download en opslaat op een veilige plek.",
     "16130": "Data",
     "16131": "All bestanden",
@@ -3491,7 +3491,7 @@
     "22780": "Hoe zie ik mijn inkomsten?",
     "22781": "We bieden een intu\u00eftief verwijzingsdashboard waar u gedetailleerde rapporten van uw inkomsten kunt vinden.",
     "22783": "Waarom zou ik een verwijzer voor MEGA worden?",
-    "22784": "Met meer dan 150 miljoen geregistreerde gebruikers is MEGA het toonaangevende eind-tot-eind gecodeerde cloud-samenwerkingsplatform. [BR]Door een verwijzingpartner te worden, kunt u ons helpen MEGA te laten groeien en deel te nemen aan het succes!",
+    "22784": "Met meer dan 170 miljoen geregistreerde gebruikers is MEGA het toonaangevende eind-tot-eind gecodeerde cloud-samenwerkingsplatform. [BR] Door een verwijzende partner te worden, kunt u ons helpen MEGA te laten groeien en deel te nemen aan het succes.",
     "22785": "Wat kost het om deel te nemen aan het programma?",
     "22786": "Het is gratis om deel te nemen aan het verwijzingsprogramma. Om in aanmerking te komen voor een terugbetaling, moet u echter ten minste \u00e9\u00e9n echte betaling * aan MEGA doen. Klik op [A] Plannen en prijzen [\/A] om onze PRO-planopties te bekijken.",
     "22787": "Hoe komen uw verwijzingen in aanmerking voor een commissie voor bestaande gebruikers?",
@@ -3653,5 +3653,8 @@
     "23249": "... en 1 andere",
     "23250": "... en [X] anderen",
     "23251": "Betaal nu",
-    "23252": "Minder dan een minuut geleden"
+    "23252": "Minder dan een minuut geleden",
+    "23255": "Status:",
+    "23262": "Wijzig Wachtwoord",
+    "23278": "Firefox\/Chrome Extension"
 }

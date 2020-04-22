@@ -187,15 +187,17 @@ export default class SearchPanel extends MegaRenderMixin {
                     onToggle={this.handleToggle}
                     onReset={this.handleReset} />
 
-                <PerfectScrollbar options={{ 'suppressScrollX': true }}>
-                    {!!recents.length && !searching && (
-                        <ResultContainer recents={recents} />
-                    )}
+                <div className="search-results-wrapper">
+                    <PerfectScrollbar options={{ 'suppressScrollX': true }}>
+                        {!!recents.length && !searching && (
+                            <ResultContainer recents={recents} />
+                        )}
 
-                    {searching && (
-                        <ResultContainer status={status} results={results} />
-                    )}
-                </PerfectScrollbar>
+                        {searching && (
+                            <ResultContainer status={status} results={results} />
+                        )}
+                    </PerfectScrollbar>
+                </div>
             </div>
         );
     }

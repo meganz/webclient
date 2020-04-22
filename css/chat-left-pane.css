@@ -385,6 +385,11 @@ div.search-heading {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
+div.search-results-wrapper {
+    overflow: hidden;
+    height: 95%;
+}
+
 /*
  * Search Field
  * ------------------------------------------------------------------------------------------------------------------ */
@@ -497,10 +502,6 @@ div.search-field div.search-field-status.complete i {
 div.result-table {
     margin: 5px 0 5px 0;
     min-height: 190px;
-}
-
-div.result-table:last-child {
-    padding: 0 0 60px 0;
 }
 
 div.result-table div.result-table-heading {

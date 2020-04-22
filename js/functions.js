@@ -1951,8 +1951,8 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (is_chrome_web_ext || is_firefox_web_ext) {
-                    path = path.replace('/#', '/mega/secure.html#');
+                if (is_extension) {
+                    path = path.replace('/#', '/' + urlrootfile + '#');
                 }
             }
             history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);

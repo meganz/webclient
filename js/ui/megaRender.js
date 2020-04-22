@@ -877,7 +877,7 @@
                 }
                 else {
                     props.classNames.push('file');
-                    props.type = filetype(aNode.name);
+                    props.type = filetype(aNode);
                     props.size = bytesToSize(aNode.s);
 
                     if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {

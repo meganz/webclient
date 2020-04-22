@@ -128,7 +128,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         + '</div>' + flashhtml + '</td>'
         + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
         + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
-        + '<td>' + filetype(node.name) + '</td>'
+        + '<td>' + filetype(node) + '</td>'
         + '<td class="transfer-size">' + bytesToSize(node.s) + '</td>'
         + '<td><span class="downloaded-size">' + bytesToSize(0) + '</span></td>'
         + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'

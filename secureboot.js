@@ -627,6 +627,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }
@@ -746,16 +747,30 @@ if (!browserUpdate && is_extension)
     }
     else {
         // WebExtensions
-        tmp = 'mega';
-        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
-            tmp = localStorage.chromextdevpath || tmp;
+        urlrootfile = 'mega/secure.html';
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object') {
+            if (!sessionStorage.extStageReload) {
+                sessionStorage.extStageReload = 1;
+                location.reload(true);
+            }
+
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime);
         }
-        bootstaticpath = chrome.extension.getURL(tmp + '/');
-        urlrootfile = tmp + '/secure.html';
+        else {
+            tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
+
+            if (tmp.version === '109101.103.97') {
+                urlrootfile = 'webclient/index.html';
+            }
+        }
+
+        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     Object.defineProperty(window, 'eval', {
-        value : function eval(code) {
+        value : function evil(code) {
+            'use strict';
             throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
         }
     });
@@ -1220,6 +1235,7 @@ function mObjectURL(data, type)
                     if (msg !== 'pong') {
                         this.setMaster();
                     } else {
+                        this.notify('ack-pong');
                         delete localStorage[ev.key];
                     }
                     this.listen();
@@ -1252,9 +1268,7 @@ function mObjectURL(data, type)
             // as earlier as possible, e.g. now.
             localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
 
-            setTimeout(function() {
-                setup();
-            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
+            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
         },
 
         listen: function crossTab_listen(aListener) {
@@ -1323,6 +1337,7 @@ function mObjectURL(data, type)
 
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
+            this.notify('pong');
 
             // (function liveLoop(tag) {
             // if (tag === mBroadcaster.crossTab.master) {
@@ -1356,6 +1371,11 @@ function mObjectURL(data, type)
             }
 
             switch (msg) {
+                case 'ack-pong':
+                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
+                        break;
+                    }
+                    /* fallthrough */
                 case 'ping':
                     this.slaves.push(strg.origin);
                     if (this.master) {
@@ -1884,6 +1904,7 @@ else if (!browserUpdate) {
                 return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
+                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')
@@ -3964,6 +3985,59 @@ function promisify(fc) {
     Object.defineProperty(a$yncMethod, '__function__', {value: fc});
     return a$yncMethod;
 }
+
+function mutex(name, handler) {
+    'use strict';
+    var mMutexMethod = function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            mutex.lock(name).then(function(unlock) {
+                var res = function(a0) {
+                    unlock().always(resolve.bind(null, a0));
+                };
+                var rej = function(a0) {
+                    unlock().always(reject.bind(null, a0));
+                };
+                mMutexMethod.__function__.apply(self, [res, rej].concat(args));
+            }).catch(function(ex) {
+                console.error(ex);
+                mutex.unlock(name).always(reject.bind(null, ex));
+            });
+        });
+    };
+    mMutexMethod.prototype = undefined;
+    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
+    Object.defineProperty(mMutexMethod, '__name__', {value: name});
+    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
+    return Object.freeze(mMutexMethod);
+}
+
+mutex.queue = Object.create(null);
+mutex.lock = promisify(function(resolve, reject, name) {
+    'use strict';
+    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
+
+    if (mutex.queue[name]) {
+        mutex.queue[name].push(resolve);
+    }
+    else {
+        mutex.queue[name] = [];
+        resolve();
+    }
+});
+mutex.unlock = promisify(function(resolve, reject, name) {
+    'use strict';
+    var next = (mutex.queue[name] || []).shift();
+    if (next) {
+        onIdle(next);
+    }
+    else {
+        delete mutex.queue[name];
+    }
+    resolve();
+});
+Object.freeze(mutex);
 
 mBroadcaster.once('startMega', function() {
     var data = sessionStorage.sitet;

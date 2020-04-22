@@ -2536,7 +2536,7 @@
     "19604": "Afwachting e-mail wijziging",
     "19605": "De nieuwe e-mailadres status blijft in afwachting tot dat het bevestigd is door de gebruiker. De account blijft bruikbaar tijdens deze periode.",
     "19606": "Email wijziging is in afwachting",
-    "19607": "Rol",
+    "19607": "Rol:",
     "19608": "Betaling over tijd",
     "19609": "Betaling verplicht",
     "19610": "Beheerder",
@@ -3647,9 +3647,11 @@
     "23213": "Traag netwerk",
     "23214": "Opmerking: u kunt onze [A]Regels voor verwijzingsprogramma's[\/A] raadplegen voor meer informatie",
     "23219": "Er is al een item met dezelfde naam",
-    "23242": "Deze map\/dit bestand bevatte aanstootgevende inhoud, zoals Kinderuitbuitingsmateriaal, Gewelddadig Extremisme of Bestialiteit. Het account van de gebruiker is gesloten en hun volledige details, inclusief IP-adres, zijn aan de autoriteiten verstrekt.",
+    "23242": "Er werd gerapporteerd dat deze map\/dit bestand aanstootgevende inhoud bevat, zoals uitbuitingsmateriaal voor kinderen, gewelddadig extremisme of bestialiteit. Het account van de link maker is gesloten en de volledige details, inclusief het IP-adres, zijn aan de autoriteiten verstrekt.",
     "23243": "Deze koppeling is niet beschikbaar doordat de account van de gebruiker voor grove schending van de MEGA's [A]Servicevoorwaarden[\/A] is gesloten.",
-    "23246": "Share the [X] folder",
-    "23249": "\u2026 and 1 other",
-    "23250": "\u2026 and [X] others"
+    "23246": "Deel de \"[X]\"  map",
+    "23249": "... en 1 andere",
+    "23250": "... en [X] anderen",
+    "23251": "Betaal nu",
+    "23252": "Minder dan een minuut geleden"
 }

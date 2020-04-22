@@ -3649,7 +3649,9 @@
     "23219": "Exist\u0103 deja un element cu acela\u0219i nume",
     "23242": "This folder\/file was reported to contain objectionable content, such as Child Exploitation Material, Violent Extremism, or Bestiality. The link creator\u2019s account has been closed and their full details, including IP address, have been provided to the authorities.",
     "23243": "This link is unavailable as the user's account has been closed for gross violation of MEGA\u2019s [A]Terms of Service[\/A].",
-    "23246": "Share the [X] folder",
+    "23246": "Share the \u201c[X]\u201d folder",
     "23249": "\u2026 and 1 other",
-    "23250": "\u2026 and [X] others"
+    "23250": "\u2026 and [X] others",
+    "23251": "Pl\u0103te\u0219te acum",
+    "23252": "Less than a minute ago"
 }

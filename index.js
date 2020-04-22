@@ -301,7 +301,7 @@ function init_page() {
             .replace('!', '/folder/').replace('?', '/file/')
             : page.replace('!', 'file/').replace('!', '#');
 
-        history.replaceState({ subpage: page }, "", '/' + page);
+        history.replaceState({ subpage: page }, "", (hashLogic ? '#' : '/') + page);
         return init_page();
     }
 
@@ -2365,7 +2365,7 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click.hidetopmenu', function(e) {
+    $('#pageholder, #startholder').rebind('mousedown.hidetopmenu', function(e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }
@@ -3003,10 +3003,15 @@ window.onhashchange = function () {
 };
 
 window.onbeforeunload = function () {
+    'use strict';
+
     if (dlmanager.isDownloading || ulmanager.isUploading) {
         return $.memIOSaveAttempt ? null : l[377];
     }
 
+    if (window.doUnloadLogOut) {
+        u_logout();
+    }
     mBroadcaster.crossTab.leave();
 };
 

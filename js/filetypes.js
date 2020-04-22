@@ -22,8 +22,12 @@ var extensions = {
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
     'raw': [
-        ['3fr', 'arw', 'bay', 'cr2', 'dcr', 'dng', 'fff', 'mef', 'mrw', 'nef', 'pef', 'rw2', 'srf', 'orf', 'rwl'],
-        'RAW'
+        Object.keys(is_image.raw)
+            .map(function(e) {
+                'use strict';
+                return e.toLowerCase();
+            }),
+        l[20240] || 'RAW Image'
     ],
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
@@ -494,7 +498,82 @@ var extmime = {
     "xvm": "application/xv+xml",
     "xvml": "application/xv+xml",
     "xwd": "image/x-xwindowdump",
-    "zip": "application/zip"
+    "zip": "application/zip",
+
+    // RAW Images
+    "3fr": "image/x-hasselblad-3fr",
+    "arw": "image/x-sony-arw",
+    "arq": "image/x-sony-arq",
+    "bay": "image/x-casio-bay",
+    "bmq": "image/x-nucore-bmq",
+    "cap": "image/x-phaseone-cap",
+    "cr2": "image/x-canon-cr2",
+    "cr3": "image/x-canon-cr3",
+    "crw": "image/x-canon-crw",
+    "cs1": "image/x-sinar-cs1",
+    "dc2": "image/x-kodak-dc2",
+    "dcr": "image/x-kodak-dcr",
+    "dng": "image/x-dcraw",
+    "dsc": "image/x-kodak-dsc",
+    "drf": "image/x-kodak-drf",
+    "erf": "image/x-epson-erf",
+    "eip": "image/x-phaseone-eip",
+    "fff": "image/x-hasselblad-fff",
+    "iiq": "image/x-phaseone-iiq",
+    "k25": "image/x-kodak-k25",
+    "kc2": "image/x-kodak-kc2",
+    "kdc": "image/x-kodak-kdc",
+    "mdc": "image/x-monolta-mdc",
+    "mef": "image/x-mamiya-mef",
+    "mos": "image/x-leaf-mos",
+    "mrw": "image/x-minolta-mrw",
+    "nef": "image/x-nikon-nef",
+    "nrw": "image/x-nikon-nrw",
+    "obm": "image/x-olympus-obm",
+    "orf": "image/x-olympus-orf",
+    "ori": "image/x-olympus-ori",
+    "pef": "image/x-pentax-pef",
+    "ptx": "image/x-pentax-ptx",
+    "pxn": "image/x-logitech-pxn",
+    "qtk": "image/x-apple-qtx",
+    "raf": "image/x-fuji-raf",
+    "raw": "image/x-panasonic-raw",
+    "rdc": "image/x-difoma-rdc",
+    "rw2": "image/x-panasonic-rw2",
+    "rwz": "image/x-rawzor-rwz",
+    "rwl": "image/x-leica-rwl",
+    "sr2": "image/x-sony-sr2",
+    "srf": "image/x-sony-srf",
+    "srw": "image/x-samsung-srw",
+    "sti": "image/x-sinar-sti",
+    "x3f": "image/x-sigma-x3f",
+    "ciff": "image/x-canon-crw",
+    "cine": "image/x-phantom-cine",
+    "ia": "image/x-sinar-ia",
+
+    // Uncommon Images
+    "aces": "image/aces",
+    "avci": "image/avci",
+    "avcs": "image/avcs",
+    "fits": "image/fits",
+    "g3fax": "image/g3fax",
+    "hej2k": "image/hej2k",
+    "hsj2": "image/hsj2",
+    "jls": "image/jls",
+    "jp2": "image/jp2",
+    "jph": "image/jph",
+    "jphc": "image/jphc",
+    "jpx": "image/jpx",
+    "jxr": "image/jxr",
+    "jxrA": "image/jxrA",
+    "jxrS": "image/jxrS",
+    "jxs": "image/jxs",
+    "jxsc": "image/jxsc",
+    "jxsi": "image/jxsi",
+    "jxss": "image/jxss",
+    "naplps": "image/naplps",
+    "pti": "image/prs.pti",
+    "t38": "image/t38"
 };
 
 for (var i in extensions) {
@@ -517,28 +596,31 @@ function filemime(n, def) {
 
 /**
  * Get file type
- * @param {Object} n                Node
- * @param {Boolean} getFullType     Optional to return full detailed array of the type
+ * @param {MegaNode|String} n       ufs-node, or file-name
+ * @param {Boolean} [getFullType]   Return full detailed array of the type
  * @returns {String|Array}          Extension Desc, or full type info
  */
 function filetype(n, getFullType) {
     "use strict";
-    if (typeof n === 'object') {
-        n = n.name;
+    var name = String(n && (n.name || n.n) || n || '');
+    var node = typeof n === 'object' ? n : {name: name};
+    var fext = fileext(name);
+
+    if (!ext[fext]) {
+        var t = is_video(node);
+        if (t > 0) {
+            fext = extensions[t > 1 ? 'audio' : 'video'][0][0];
+        }
     }
-    var fext = fileext(String(n));
+
     if (ext[fext]) {
         if (getFullType) {
             return ext[fext];
         }
         return ext[fext][1];
     }
-    else if (fext && fext.length > 1) {
-        return l[20366].replace('%1', fext.toUpperCase());
-    }
-    else {
-        return l[18055];
-    }
+
+    return fext.length ? l[20366].replace('%1', fext.toUpperCase()) : l[18055];
 }
 
 function fileIcon(node) {
@@ -562,6 +644,9 @@ function fileIcon(node) {
     }
     else if (ext[fileext(node.name)]) {
         icon = ext[fileext(node.name)][0];
+    }
+    else if ((icon = is_video(node)) > 0) {
+        icon = icon > 1 ? 'audio' : 'video';
     }
     else {
         icon = 'generic';

@@ -473,12 +473,27 @@
     color: #333;
 }
 .distribution .fm-affiliate.list-item img {
-    display: inline-block;
+    display: block;
     width: 24px;
     height: 16px;
-    margin: 1px 5px 0 0;
+    border-radius: 2px;
+}
+.distribution .fm-affiliate.list-item .img-wrap {
+    display: inline-block;
+    margin: 1px 8px 0 0;
     vertical-align: top;
-    background: grey;
+    line-height: 0;
+    position: relative;
+}
+.distribution .fm-affiliate.list-item .img-wrap::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
 }
 .fm-affiliate.no-redemption {
     text-align: center;

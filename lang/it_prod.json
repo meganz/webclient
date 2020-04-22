@@ -1449,7 +1449,7 @@
     "16125": "Quota usata nelle ultime 6 ore:",
     "16126": "Ottieni pi\u00f9 quota di trasferimento",
     "16127": "Quota di archiviazione",
-    "16128": "Membro da",
+    "16128": "Membro dal",
     "16129": "La tua password non \u00e8 archiviata da MEGA quindi non possiamo recuperarla per te. Per riavere accesso al tuo account ti consigliamo di scaricare e salvare la tua Chiave di Recupero in un posto sicuro.",
     "16130": "Dati",
     "16131": "Tutti i file",
@@ -2536,7 +2536,7 @@
     "19604": "Cambiamento dell'indirizzo email in attesa",
     "19605": "Lo status del nuovo indirizzo email rimarr\u00e0 in attesa fin quando non verr\u00e0 confermato dall'utente. L'account sar\u00e0 comunque utilizzabile durante questo periodo.",
     "19606": "Il cambio dell'email \u00e8 in attesa",
-    "19607": "Ruolo",
+    "19607": "Ruolo:",
     "19608": "Pagamento in ritardo",
     "19609": "Pagamento necessario",
     "19610": "Amministratore",
@@ -3491,7 +3491,7 @@
     "22780": "Come vedo i miei guadagni?",
     "22781": "Noi forniamo un pannello di controllo intuitivo dei referral, dove puoi trovare report dettagliati dei tuoi guadagni.",
     "22783": "Perch\u00e9 dovrei diventare un referente per MEGA?",
-    "22784": "Con pi\u00f9 di 150 milioni di utenti registrati, MEGA \u00e8 la principale piattaforma di collaborazione cloud criptata end-to-end.[BR]Diventare un nostro referente ti permetter\u00e0 di aiutare MEGA a crescere e partecipare al successo!",
+    "22784": "Con pi\u00f9 di 170 milioni di utenti registrati, MEGA \u00e8 la principale piattaforma di collaborazione cloud criptata end-to-end.[BR]Diventare un nostro referente ti permetter\u00e0 di aiutare MEGA a crescere e partecipare al successo!",
     "22785": "Quanto costa unirsi al programma?",
     "22786": "\u00c8 gratuito partecipare al programma. In ogni caso, per qualificarti per una redenzione devi aver effettuato almeno un vero pagamento* a MEGA. Clicca su [A]Piani e Prezzi[\/A] per andare alla pagina PRO e vedere i nostri piani.",
     "22787": "Come si qualificano gli inviti per la commissione per chi \u00e8 gi\u00e0 utente?",
@@ -3649,7 +3649,9 @@
     "23219": "\u00c8 gi\u00e0 presente un oggetto con lo stesso nome",
     "23242": "Questo oggetto \u00e8 stato segnalato in quanto contiene materiale obiettabile, come sfruttamento di minori, estremismo violento, o bestialit\u00e0. L'account del creatore del link \u00e8 stato chiuso e tutti i suoi dettagli, incluso l'indirizzo IP, sono stati dati alle autorit\u00e0.",
     "23243": "Il link non \u00e8 disponibile, in quanto l'account del proprietario \u00e8 stato chiuso a causa di ripetute violazioni dei [A]Termini di Servizio[\/A] di MEGA.",
-    "23246": "Condividi la cartella [X]",
+    "23246": "Condividi la cartella \"[X]\"",
     "23249": "... e 1 altro",
-    "23250": "... e [X] altri"
+    "23250": "... e [X] altri",
+    "23251": "Paga ora",
+    "23252": "Meno di un minuto fa"
 }

@@ -833,6 +833,10 @@ ChatRoom.prototype.getParticipantsTruncated = function(maxMembers, maxLength) {
         );
     }
 
+    if (truncatedParticipantNames.length === maxMembers) {
+        truncatedParticipantNames.push('...');
+    }
+
     return truncatedParticipantNames.join(', ');
 };
 

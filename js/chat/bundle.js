@@ -21655,6 +21655,10 @@ ChatRoom.prototype.getParticipantsTruncated = function (maxMembers, maxLength) {
     truncatedParticipantNames.push(name.length > maxLength ? name.substr(0, maxLength) + '...' : name);
   }
 
+  if (truncatedParticipantNames.length === maxMembers) {
+    truncatedParticipantNames.push('...');
+  }
+
   return truncatedParticipantNames.join(', ');
 };
 /**

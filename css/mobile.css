@@ -209,7 +209,7 @@ ul, li {
 .mobile.main-block.error-overlay {
     bottom: 0;
     left: 0;
-    position: fixed;
+    position: absolute;
     top: 0;
     z-index: 1300;
 }
@@ -220,6 +220,9 @@ ul, li {
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+#mobile-ui-error .mobile.content-cell {
+    background-color: #fff;
 }
 .mobile.logo {
     width: 38px;

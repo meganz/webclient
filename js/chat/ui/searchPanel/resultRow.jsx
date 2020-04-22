@@ -204,7 +204,7 @@ export default class ResultRow extends MegaRenderMixin {
     }
 
     render() {
-        const { type, result, status, children } = this.props;
+        const { type, result, children } = this.props;
 
         switch (type) {
             case TYPE.MESSAGE:
@@ -227,7 +227,7 @@ export default class ResultRow extends MegaRenderMixin {
                         contact={M.u[result.data]} />
                 );
             case TYPE.NIL:
-                return status === STATUS.COMPLETED && <NilRow />;
+                return <NilRow />;
             default:
                 return (
                     <div className={SEARCH_ROW_CLASS}>

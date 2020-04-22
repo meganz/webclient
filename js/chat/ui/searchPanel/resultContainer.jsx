@@ -1,6 +1,7 @@
 import React from 'react';
 import ResultTable  from './resultTable.jsx';
 import ResultRow  from './resultRow.jsx';
+import { STATUS } from './searchPanel.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
 
 export const TYPE = {
@@ -79,14 +80,33 @@ export default class ResultContainer extends MegaRenderMixin {
 
         return (
             Object.keys(RESULT_TABLE).map((key, index) => {
-                const table = RESULT_TABLE[key];
-                const hasRows = table.length;
+                const table = {
+                    ref: RESULT_TABLE[key],
+                    hasRows: RESULT_TABLE[key] && RESULT_TABLE[key].length,
+                    isEmpty: RESULT_TABLE[key] && RESULT_TABLE[key].length < 1,
+                    props: {
+                        key: index,
+                        heading: key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS
+                    }
+                };
 
-                return (
-                    <ResultTable key={index} heading={key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS}>
-                        {hasRows ? table.map(row => row) : <ResultRow type={TYPE.NIL} status={status} />}
-                    </ResultTable>
-                );
+                if (table.hasRows) {
+                    return (
+                        <ResultTable {...table.props}>
+                            {table.ref.map(row => row)}
+                        </ResultTable>
+                    );
+                }
+
+                if (status === STATUS.COMPLETED && table.isEmpty) {
+                    return (
+                        <ResultTable {...table.props}>
+                            <ResultRow type={TYPE.NIL} />
+                        </ResultTable>
+                    );
+                }
+
+                return null;
             })
         );
     };

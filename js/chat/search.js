@@ -433,11 +433,11 @@ ChatSearch.prototype.onRoomSearchComplete = function(roomSearch) {
     var len = searches.length;
     for (var i = 0; i < len; i++) {
         if (searches[i].state < SearchState.kComplete) {
-            console.error(searches[i].state);
+            // console.error(searches[i].state);
             return;
         }
     }
-    console.error('onComplete');
+    // console.error('onComplete');
     this.handler.onComplete();
 };
 

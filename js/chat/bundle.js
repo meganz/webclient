@@ -21625,6 +21625,43 @@ ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
   return res;
 };
 /**
+ * getParticipantsTruncated
+ * @description Returns comma-separated string of truncated member names based on passed room; allows to specify the
+ * maximum amount of members to be retrieved, as well the desired maximum length for the truncation.
+ * @param {number} maxMembers The maximum amount of members to be retrieved
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getParticipantsTruncated = function (maxMembers, maxLength) {
+  maxMembers = maxMembers || 5;
+  maxLength = maxLength || 30;
+  var truncatedParticipantNames = [];
+  var members = Object.keys(this.members);
+
+  for (var i = 0; i < members.length; i++) {
+    var handle = members[i];
+    var name = M.getNameByHandle(handle);
+
+    if (!handle || !name || handle === u_handle) {
+      continue;
+    }
+
+    if (i > maxMembers) {
+      break;
+    }
+
+    truncatedParticipantNames.push(name.length > maxLength ? name.substr(0, maxLength) + '...' : name);
+  }
+
+  if (truncatedParticipantNames.length === maxMembers) {
+    truncatedParticipantNames.push('...');
+  }
+
+  return truncatedParticipantNames.join(', ');
+};
+/**
  * Get room title
  *
  * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
@@ -21642,29 +21679,27 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
     return M.getNameByHandle(participants[0]) || "";
   } else {
     if (!ignoreTopic && self.topic && self.topic.substr) {
-      return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
+      return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
     }
 
-    participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
-    var names = [];
-
-    for (var i = 0; i < Math.min(participants.length, 5); i++) {
-      var contactHash = participants[i];
-
-      if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
-        var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
-        names.push(name);
-      }
-    }
+    var names = self.getParticipantsTruncated();
 
     var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 
-    if (names.length === 0) {
-      return def;
-    }
-
-    return names.length > 0 ? names.join(", ") : def;
+    return names.length > 0 ? names : def;
   }
+};
+/**
+ * getTruncatedRoomTopic
+ * @description Returns truncated room topic based on the passed maximum character length.
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength) {
+  maxLength = maxLength || 30;
+  return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 /**
  * Set the room topic

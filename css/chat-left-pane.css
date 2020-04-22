@@ -622,15 +622,28 @@ div.result-table div.result-table-row.message span {
 }
 
 div.result-table div.result-table-row.message span.title {
+    overflow: hidden;
+    float: left;
+    max-width: 100%;
+    max-width: -webkit-calc(90% - 25px);
+    max-width: -moz-calc(90% -25px);
+    max-width: calc(90% - 25px);
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+div.result-table div.result-table-row.message span.title {
     font-size: 14px;
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
-div.result-table div.result-table-row.message span.title div.user-card-presence {
-    margin-bottom: 1px;
+div.result-table div.result-table-row.message div.user-card-presence {
+    margin-bottom: -2px;
 }
 
 div.result-table div.result-table-row.message div.summary {
+    clear: both;
     overflow: hidden;
     max-width: 100%;
     font-size: 13px;

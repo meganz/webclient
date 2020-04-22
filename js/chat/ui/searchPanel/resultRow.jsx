@@ -82,8 +82,8 @@ class MessageRow extends MegaRenderMixin {
                 onClick={() => openResult(room, data.messageId)}>
                 <span className="title">
                     {nicknames.getNicknameAndName(contact.u)}
-                    <ContactPresence contact={contact} />
                 </span>
+                <ContactPresence contact={contact} />
                 <div
                     className="summary"
                     dangerouslySetInnerHTML={{ __html: highlight(summary, matches) }}>

@@ -14971,6 +14971,8 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
       }
 
       conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidMount", this).call(this);
+
+      self.relinkToStream();
     }
   }, {
     key: "componentWillUnmount",
@@ -14985,17 +14987,17 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidUpdate", this).call(this);
+
+      this.relinkToStream();
+    }
+  }, {
+    key: "relinkToStream",
+    value: function relinkToStream() {
       var self = this;
-      var noVideo = self.state.noVideo;
-
-      if (self.state.prevNoVideo === noVideo) {
-        return;
-      }
-
-      self.state.prevNoVideo = noVideo;
       var player = self.refs.player;
 
-      if (noVideo) {
+      if (self.state.noVideo) {
         if (player) {
           RTC.detachMediaStream(player);
         }
@@ -15024,7 +15026,10 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
 ;
 conversationaudiovideopanel_RemoteVideoPlayer.propTypes = {
   sess: prop_types_default.a.object.isRequired,
-  isActive: prop_types_default.a.bool.isRequired,
+  isActive: prop_types_default.a.bool,
+  // used only for carousel to flag the active video thumbnail
+  isCarouselMain: prop_types_default.a.bool,
+  // if it's the big window in carousel mode
   peerAv: prop_types_default.a.number.isRequired,
   onPlayerClick: prop_types_default.a.func,
   noAudioLevel: prop_types_default.a.bool
@@ -15062,33 +15067,38 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
     key: "getActiveSid",
     value: function getActiveSid() {
       var self = this;
-      var chatRoom = self.props.chatRoom;
-      var call = chatRoom.callManagerCall;
+      var call = self.props.chatRoom.callManagerCall;
 
-      if (!call || !call.isActive()) {
-        return;
+      if (!call) {
+        return false;
       }
 
+      var rtcCall = call.rtcCall;
       var selected = self.state.selectedStreamSid;
+
+      if (selected && selected !== "local" && !rtcCall.sessions[base64urldecode(selected)]) {
+        // session doesn't exist anymore, we will select another active peer below
+        selected = null;
+      }
 
       if (selected) {
         return selected;
-      }
+      } // we have no active peer, select the first session
 
-      var sess = Object.values(call.rtcCall.sessions)[0];
-      return sess ? sess.stringSid : undefined;
+
+      var sess = Object.values(rtcCall.sessions)[0];
+      return sess ? sess.stringSid : "local";
     }
   }, {
     key: "haveScreenSharingPeer",
     value: function haveScreenSharingPeer() {
-      var chatRoom = this.props.chatRoom;
-      var callManagerCall = chatRoom.callManagerCall;
+      var call = this.props.chatRoom.callManagerCall;
 
-      if (!callManagerCall) {
+      if (!call) {
         return false;
       }
 
-      var rtcCall = callManagerCall.rtcCall;
+      var rtcCall = call.rtcCall;
 
       if (!rtcCall.sessions) {
         return false;
@@ -15140,15 +15150,21 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "onPlayerClick",
     value: function onPlayerClick(sid) {
-      if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
-        this.setState({
-          'selectedStreamSid': sid
-        });
+      if (this.getViewMode() !== VIEW_MODES.CAROUSEL) {
+        return;
       }
+
+      this.setState({
+        'selectedStreamSid': sid
+      });
     }
   }, {
     key: "_hideBottomPanel",
     value: function _hideBottomPanel() {
+      if (!this.isMounted()) {
+        return;
+      }
+
       var self = this;
       var room = self.props.chatRoom;
 
@@ -15201,14 +15217,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
         $('.participantsContainer', $container).height('auto');
         var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
-        var mediaOpts;
-
-        if (this.state.selectedStreamSid === "local") {
-          mediaOpts = callManagerCall.getMediaOptions();
-        } else {
-          mediaOpts = callManagerCall.getRemoteMediaOptions(self.getActiveSid());
-        }
-
+        var activeSid = this.getActiveSid();
+        var mediaOpts = activeSid === "local" ? callManagerCall.getMediaOptions() : callManagerCall.getRemoteMediaOptions(activeSid);
         $('.activeStream', $container).height(activeStreamHeight);
         $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
         $('.user-video, .user-audio, .user-video video', $container).width('').height('');
@@ -15241,6 +15251,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       } else {
+        // grid mode
         $('.participantsContainer', $container).height($container.outerHeight() - $('.call-header', $container).outerHeight());
         newWidth = totalWidth / totalStreams;
       }
@@ -15266,6 +15277,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(ConversationAVPanel.prototype), "componentDidUpdate", this).call(this);
+
       var self = this;
       var room = self.props.chatRoom;
       var callManagerCall = room.callManagerCall;
@@ -15276,7 +15289,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
       var $container = $(external_ReactDOM_default.a.findDOMNode(self));
       var mouseoutThrottling = null;
-      $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
+      $container.rebind('mouseover.chatUI' + room.roomId, function () {
         var $this = $(this);
         clearTimeout(mouseoutThrottling);
         self.visiblePanel = true;
@@ -15578,13 +15591,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       });
       var localPlayerElement = null;
       var remotePlayerElements = [];
-      var onRemotePlayerClick; // handler that exists only for the peer views in the carosel bottom bar
+      var onRemotePlayerClick; // handler that exists only for the thumbnail views in the carosel bottom bar
 
       var isCarousel = self.getViewMode() === VIEW_MODES.CAROUSEL;
 
       if (isCarousel) {
-        var activeSid = chatRoom.type === "group" || chatRoom.type === "public" ? self.getActiveSid() : false;
-        var activePlayer = null;
+        var activeSid = self.getActiveSid();
+        var activePlayer;
         onRemotePlayerClick = self.onPlayerClick.bind(self);
       }
 
@@ -15627,7 +15640,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             sess: sess,
             key: "carousel_active",
             peerAv: sess.peerAv(),
-            isActive: true,
+            isCarouselMain: true,
             noAudioLevel: true
           });
         }
@@ -15688,9 +15701,11 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         }
       } else {
         // carousel
+        var localPlayer;
+
         if (!localMedia.video) {
           // display avatar for local video
-          var localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : ""),
             key: "local",
             onClick: function onClick(e) {
@@ -15708,14 +15723,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             chatRoom: this.props.chatRoom,
             hideVerifiedBadge: true
           })));
-          remotePlayerElements.push(localPlayer);
 
           if (activeSid === "local") {
             activePlayer = localPlayer;
           }
         } else {
           // we have local video (carousel mode)
-          var _localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-video local-carousel is-video" + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : ""),
             key: "local-video",
             onClick: function onClick(e) {
@@ -15737,8 +15751,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
               RTC.attachMediaStream(_ref4, rtcCall.localStream());
             }
           })));
-
-          remotePlayerElements.push(_localPlayer);
 
           if (activeSid === "local") {
             activePlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -15762,6 +15774,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             }));
           }
         }
+
+        remotePlayerElements.push(localPlayer);
       }
 
       var unreadDiv = null;

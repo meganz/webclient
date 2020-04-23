@@ -107,8 +107,13 @@ function MegaData() {
                 }
                 return maf;
             }
-        })
+        });
     })(this);
+
+    // Initialize affiliate dataset on-demand
+    lazy(this, 'affiliate', function() {
+        return new AffiliateData();
+    });
 
     this.sortRules = {
         'name': this.sortByName.bind(this),
@@ -159,6 +164,14 @@ function MegaData() {
         this['init' + 'UIKeyEvents'] = dummy;
         this['abort' + 'Transfers'] = dummy;
         this['search' + 'Path'] = dummy;
+
+        this['initFile' + 'ManagerUI'] = function() {
+            if (typeof window.InitFileDrag === 'function') {
+                window.InitFileDrag();
+                delete window.InitFileDrag;
+            }
+        };
+        mobile.uploadOverlay.shim(this);
 
         this['addWeb' + 'Download'] = function(nodes) {
             // @see filesystem.js/abortAndStartOver
@@ -220,10 +233,6 @@ function MegaData() {
                 mobile.cloud.renderLayout();
             }
             return true;
-        };
-
-        this['ul' + 'progress'] = function() {
-            return mobile.uploadOverlay.showUploadProgress.apply(mobile.uploadOverlay, arguments);
         };
 
         var tf = [

@@ -33,16 +33,19 @@
     margin-left: 0;
 }
 .about.main-menu.item span {
-    display: inline-block;
     border-bottom: 4px solid transparent;
     padding-bottom: 3px;
     -webkit-transition: color 200ms ease-in-out, border-color 200ms ease-in-out;
     transition: color 200ms ease-in-out, border-color 200ms ease-in-out;
+    display: inline-block;
 }
-.en .about.main-menu.item span.lang.en, .about.main-menu.item span.lang {
+.en .about .lang.en, .about .lang {
+    display: block;
+}
+.en .about span.lang.en, .about span.lang {
     display:  inline-block;
 }
-.en .about.main-menu.item span.lang, .about.main-menu.item span.lang.en {
+.en .about .lang, .about .lang.en, .en .about span.lang, .about span.lang.en {
     display: none;
 }
 body:not(.mobile) .about.main-menu.item:hover span {
@@ -71,29 +74,42 @@ body:not(.mobile) .about.main-menu.item:hover span {
 body:not(.mobile) .about.top-info a:hover {
     text-decoration: none;
 }
-.about-numbers {
+.about.numbers-wrap {
     font-size: 0;
-}
-.about.big-numbers {
-    font-size: 54px;
-    line-height: 66px;
-    color: #00C0A6;
-    font-family: 'montserrat_semibold', 'source_sans_prosemibold', Arial;
-    padding: 66px 0 10px 0;
+    padding-bottom: 56px;
 }
 .about.numbers-info {
-    font-size: 20px;
+    font-size: 24px;
     line-height: 29px;
     color: #373737;
-    padding: 0 10px 56px 10px;
-    max-width: 232px;
+    padding: 62px 10px 0 10px;
     margin: auto;
     webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.about.numbers-info .num {
+    font-size: 33px;
+    line-height: 44px;
+    color: #00C0A6;
+    font-family: 'montserrat', 'source_sans_proregular', Arial;
+    display: block;
+}
+.about.numbers-info .num span, .en .about.numbers-info .num {
+    font-size: 54px;
+    font-family: 'montserrat_bold', 'montserrat_semibold', 'source_sans_prosemibold', Arial;
+    display: block;
+}
+.about.numbers-info .num span {
+    line-height: 56px;
+    padding: 6px 0 5px 0;
+}
+.en .about.numbers-info .num  span {
+    display: inline-block;
+    padding-bottom: 18px;
+}
 .en .about.numbers-info {
-    font-size: 24px;
+    max-width: 232px;
 }
 .en .about.numbers-info.short {
     max-width: 165px;
@@ -162,29 +178,13 @@ body:not(.mobile) .about.top-info a:hover {
     -webkit-transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
     transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
     white-space: normal;
-    padding: 10px 14px;
+    padding: 10px 36px;
     webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-.about.leader-info i {
-    display: block;
-    margin: 20px 0 25px 23px;
-}
-.about.leader-info i.right {
-    margin: 19px 0 0 23px;
-}
-/*.de */.about.leader-info i {
-    float: right;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-/*.de */.about.leader-info i.right {
-    float: none;
-}
 .about.leader-info span {
-    display: block;
-    clear: both;
+    padding: 0 2px;
 }
 .about.leader:hover .about.leader-info {
     visibility: visible;
@@ -378,11 +378,22 @@ body:not(.mobile) .about.white-button:hover {
     margin: 135px 0 8px 3%;
 }
 .bottom-page.about-sprite.use {
-    width: 340px;
-    height: 188px;
+    width: 100%;
+    max-width: 350px;
+    height: 203px;
     display: inline-block;
-    background-position: -11px -1150px;
-    margin-bottom: 102px;
+    background-position: center -1164px;
+}
+.about.use-header {
+    font-family: 'montserrat_bold', 'montserrat_semibold', 'source_sans_probold', Arial;
+    font-size: 16px;
+    line-height: 20px;
+    color: #373737;
+    padding: 28px 0 0 0;
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+    letter-spacing: 1.2px;
 }
 .bottom-page.about-sprite.encryption {
     width: 173px;
@@ -393,17 +404,16 @@ body:not(.mobile) .about.white-button:hover {
 }
 .bottom-page.about-sprite.gdpr {
     width: 202px;
-    height: 264px;
+    height: 206px;
     display: inline-block;
     background-position: -302px -1418px;
-    margin: 0 20% 55px 20%;
+    margin: 0 20% 48px 20%;
 }
 .about-privacy .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1020px;
 }
 .about-privacy .startpage.italic-text {
     max-width: none;
-    padding: 0;
 }
 .about-privacy .startpage.quote-icon {
     left: 0;
@@ -430,19 +440,18 @@ body:not(.mobile) .about.white-button:hover {
 } 
 .about.data-header {
     display: inline-block;
-    margin: 34px 0;
+    margin: 76px 20px 65px 20px;
+    font-size: 0;
 }
 .about.data-header span {
-    display: block;
     font-size: 30px;
     line-height: 36px;
     color: #373737;
-    padding: 6px 35px;
+    padding: 0 8px;
     font-family: 'LatoWebBlack', 'source_sans_probold', Arial;
-    clear: both;
 }
-.about.data-header i {
-    display: block;
+.ar .about.data-header i, .it .about.data-header i, .es .about.data-header i, .fr .about.data-header i, .ru .about.data-header i {
+    margin-top: 5px;
 }
 @-webkit-keyframes animatedBackground {
   from {
@@ -496,12 +505,18 @@ body:not(.mobile) .about.white-button:hover {
     .id .about .bottom-page.big-icon-info {
         font-size: 26px;
     }
+    .bottom-page.big-header {
+        font-size: 30px;
+    }
 }
 @media only screen and (max-width: 783px) {
     .about.joing-txt, .about.hiring-txt, .id .about.joing-txt {
         width: auto;
     }
-    .about.big-numbers {
+    .about.numbers-info .num {
+        font-size: 28px
+    }
+    .en .about.numbers-info .num, .en .about.numbers-info .num span {
         font-size: 44px;
     }
     .about.main-menu.item {
@@ -511,14 +526,14 @@ body:not(.mobile) .about.white-button:hover {
     .en .about.main-menu.item  {
         margin-left: 30px;
     }
-    .en .about.numbers-info {
+    .en .about.main-menu.item:first-child {
+        margin-left: 0;
+    }
+    .about.numbers-info {
         font-size: 20px;
     }
     .about .bottom-page .col-6 {
         width: 25%;
-    }
-    .first-line .about.numbers-info {
-        padding-bottom: 0;
     }
     .about.hiring {
         height: auto;
@@ -562,8 +577,11 @@ body:not(.mobile) .about.white-button:hover {
         margin: 30px 0 10px 0;
     }
     .bottom-page.about-sprite.use {
-        background-position: -11px -1150px;
+        background-position: center -1165px;
         background-size: 525px auto;
+    }
+    .about.use-header {
+        padding-bottom:  20px;
     }
     .bottom-page.about-sprite.gdpr {
         margin: 30px 0 0 0;
@@ -588,13 +606,11 @@ body:not(.mobile) .about.white-button:hover {
         line-height: 38px;
     }
     .about.top-info {
-        padding: 0 0 15px 0;
+        padding: 36px 0 18px 0;
     }
-    .about.big-numbers {
-        padding: 26px 0 3px 0;
-    }
-    .first-line .about.big-numbers {
-        padding: 43px 0 3px 0;
+    .about.numbers-info {
+        font-size: 16px;
+        line-height: 18px;
     }
     .about .bottom-page.ultra-huge-top-pad {
         padding-top: 60px;
@@ -615,7 +631,6 @@ body:not(.mobile) .about.white-button:hover {
     .bottom-page.big-header.left-txt-align, .about.top-info {
         text-align: center;
     }
-
     .about.img4 {
         margin: 47px 0 8px 3%;
     }
@@ -625,9 +640,13 @@ body:not(.mobile) .about.white-button:hover {
     .about.img6 {
         margin: 38px 0 50px 0;
     }
-    .about.numbers-info, .en .about.numbers-info {
-        font-size: 16px;
-        line-height: 18px;
+    .about.numbers-info .num {
+        font-size: 20px;
+        line-height: 28px;
+    }
+    .about.numbers-info .num span {
+        line-height: 50px;
+        padding: 4px 0 0 0;
     }
 }
 @media only screen and (max-width: 490px) {
@@ -664,21 +683,20 @@ body:not(.mobile) .about.white-button:hover {
         line-height: 21px;
         padding: 0 0 15px 0;
     }
-    .about.big-numbers {
-        font-size: 18px;
-        line-height: 22px;
-        padding: 43px 0 3px 0;
+    .about.numbers-info .num span, .en .about.numbers-info .num, .en .about.numbers-info .num span {
+        font-size: 28px;
+        line-height: 32px;
     }
-    .about.numbers-info,  .en .about.numbers-info {
-        font-size: 14px;
-        line-height: 18px;
+    .about.numbers-wrap {
         padding-bottom: 40px;
     }
-    .about.big-numbers {
-        padding: 26px 0 3px 0;
+    .about.numbers-info {
+        font-size: 14px;
+        line-height: 18px;
+        padding-top: 40px;
     }
-    .first-line .about.big-numbers {
-        padding: 43px 0 3px 0;
+    .en .about.numbers-info .num span {
+        padding-bottom: 8px;
     }
     .about .bottom-page.big-header.big-bott-pad {
         padding-bottom: 24px;
@@ -723,9 +741,13 @@ body:not(.mobile) .about.white-button:hover {
     }
     .bottom-page.about-sprite.use {
         width: 273px;
-        height: 150px;
-        background-position: -7px -907px;
+        height: 159px;
+        background-position: center -921px;
         background-size: 415px auto;
+        margin-bottom: 0;
+    }
+    .about.use-header {
+        font-size: 13px;
     }
     .bottom-page.about-sprite.encryption {
         width: 142px;
@@ -746,9 +768,8 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about.data-header span {
         font-size: 16px;
-        line-height: 20px;
     }
-    .ro .about.main-menu.item, .vi .about.main-menu.item, .tl .about.main-menu.item, .es .about.main-menu.item {
+    .ro .about.main-menu.item, .vi .about.main-menu.item, .tl .about.main-menu.item, .es .about.main-menu.item, .de .about.main-menu.item {
         font-size: 12px;
     }
     .nl .about.main-menu.body {
@@ -770,6 +791,9 @@ body:not(.mobile) .about.white-button:hover {
     }
 }
 @media only screen and (max-width: 380px) {
+    .about.main-menu.body {
+        white-space: normal;
+    }
     .about.main-menu.item {
         font-size: 12px;
     }
@@ -781,32 +805,26 @@ body:not(.mobile) .about.white-button:hover {
         padding-left: 10px;
         padding-right: 10px;
     }
-    .br .about.main-menu.item, .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item, .es .about.main-menu.item, .it .about.main-menu.item, .pl .about.main-menu.item {
+    .br .about.main-menu.item, .fr .about.main-menu.item, .ro .about.main-menu.item, .vi .about.main-menu.item, .es .about.main-menu.item, .it .about.main-menu.item, .pl .about.main-menu.item, .de .about.main-menu.item {
         width: 50%;
         margin: 0;
     }
-    .br .about.main-menu.item span, .fr .about.main-menu.item span, .ro .about.main-menu.item span, .vi .about.main-menu.item span, .es .about.main-menu.item span, .it .about.main-menu.item span, .p .about.main-menu.item span {
+    .br .about.main-menu.item span, .fr .about.main-menu.item span, .ro .about.main-menu.item span, .vi .about.main-menu.item span, .es .about.main-menu.item span, .it .about.main-menu.item span, .de .about.main-menu.item span, .pl .about.main-menu.item span {
         padding-bottom: 0;
         margin-bottom: 10px;
     }
     .about .bottom-page .col-4 {
         width: 100%;
     }
-    .about .bottom-page .col-4.first-line:nth-of-type(2) .big-numbers {
-        padding: 26px 0 3px 0;
-    }
-    .first-line .about.numbers-info, .about.numbers-info, .en .about.numbers-info {
+    .about.use-header {
         padding-bottom: 0;
-    }
-    .bottom-page.about-numbers {
-        padding-bottom: 40px;
     }
 }
 @media only screen and (max-width: 340px) {
     .bottom-page.about-sprite.use {
         width: 205px;
-        height: 115px;
-        background-position: -7px -688px;
+        height: 121px;
+        background-position: center -699px;
         background-size: 315px auto;
     }
     .ru .about.main-menu.item {
@@ -834,7 +852,7 @@ body:not(.mobile) .about.white-button:hover {
         padding-left: 10px;
         padding-right: 10px;
     }
-    .about.main-menu.item {
+    .about.main-menu.item, .en .about.main-menu.item {
         width: 50%;
         margin: 0;
     }

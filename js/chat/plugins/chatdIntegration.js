@@ -456,6 +456,9 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
         if (chatRoom && chatRoom.publicChatHandle) {
             chatRoom.onPublicChatRoomInitialized();
         }
+
+        // This chatlink is valid to be affilaited
+        M.affiliate.storeAffiliate(publicChatHandle, 3);
     }
     else {
         chatInfo.url = ret;
@@ -683,7 +686,14 @@ ChatdIntegration.prototype.openChat = function(chatInfo, isMcf, missingMcf) {
                     }, 500, 10000)
                         .done(function() {
                             if (setAsActive.createChatLink) {
-                                chatRoom.trigger('showGetChatLinkDialog');
+                                // in case of CPU throttling, the UI of the dialog may not yet be shown
+                                // so lets delay this a bit
+                                createTimeoutPromise(function() {
+                                    return !!chatRoom.isUIMounted();
+                                }, 300, 2000)
+                                    .always(function() {
+                                        chatRoom.trigger('showGetChatLinkDialog');
+                                    });
                             }
                         })
                         .fail(function() {
@@ -951,7 +961,7 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
             }
             self.waitingChatIdPromises[chatRoom.roomId] = asyncApiReq({
                 'a': 'mcc',
-                'g': chatRoom.type === "group" ? 1 : 0,
+                'g': (chatRoom.type === "group" || chatRoom.type === "public") ? 1 : 0,
                 'u': userHashes,
                 'm': chatRoom.type === "public" ? 1 : 0,
                 'v': Chatd.VERSION
@@ -1524,8 +1534,8 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                                         mb.messages.remove(msgObject.pendingMessageId);
                                     }
                                     msg.source = Message.SOURCE.CHATD;
+                                    self._parseMessage(chatRoom, msg);
                                     mb.messages.push(msg);
-                                    self._parseMessage(chatRoom, chatRoom.messagesBuff.messages[msgObject.messageId]);
                                 }
                             } else {
                                 self.logger.error('Unknown message type!');

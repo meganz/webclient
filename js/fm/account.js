@@ -168,6 +168,8 @@ accountUI.renderAccountPage = function(account) {
     // Reinitialize Scroll bar
     initAccountScroll();
     mBroadcaster.sendMessage('settingPageReady');
+    fmtopUI();
+
     loadingDialog.hide();
 };
 
@@ -1329,6 +1331,8 @@ accountUI.account = {
 
             'use strict';
 
+            var self = this;
+
             // Date/time format setting
             accountUI.inputs.radio.init(
                 '.uidateformat',
@@ -1351,7 +1355,40 @@ accountUI.account = {
                     mega.config.setn('font_size', parseInt(val));
                 }
             );
-        }
+
+            self.initHomePageDropdown();
+
+        },
+
+        /**
+         * Render and bind events for the home page dropdown.
+         * @returns {void}
+         */
+        initHomePageDropdown: function() {
+
+            'use strict';
+
+            var $hPageSelect = $('.fm-account-main .default-select.settings-choose-homepage-dropdown');
+            var $textField = $('span', $hPageSelect);
+
+            // Mark active item.
+            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"', $hPageSelect);
+            $activeItem.addClass('active');
+            $textField.text($activeItem.text());
+
+            // Initialize scrolling. This is to prevent scroll losing bug with action packet.
+            initSelectScrolling('#account-hpage .default-select-scroll');
+
+            // Bind Dropdowns events
+            bindDropdownEvents($hPageSelect, 1, '.fm-account-main');
+
+            $('.default-dropdown-item', $hPageSelect).rebind('click.saveChanges', function() {
+                var $selectedOption = $('.default-dropdown-item.active', $hPageSelect);
+                var newValue = $selectedOption.attr('data-value') || 'fm';
+                showToast('settings', l[16168]);
+                setLandingPage(newValue);
+            });
+        },
     },
 
     cancelAccount: {
@@ -2424,9 +2461,9 @@ accountUI.security = {
                 }
             }
 
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
+            // If unknown country code use question mark png
+            if (!country.icon || country.icon === '??.png') {
+                country.icon = 'ud.png';
             }
 
             // Generate row html

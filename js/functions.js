@@ -267,7 +267,7 @@ function updateIpcRequests() {
 function countrydetails(isocode) {
     var cdetails = {
         name: M.getCountryName(isocode),
-        icon: isocode.toLowerCase() + '.gif'
+        icon: isocode.toLowerCase() + '.png'
     };
     return cdetails;
 }
@@ -277,11 +277,12 @@ function countrydetails(isocode) {
  * similar to `bytesToSize` but this function returns an object
  * (`{ size: "23,33", unit: 'KB' }`) which is easier to consume
  *
- * @param {Number} bytes        Size in bytes to convert
- * @param {Number} precision    Precision to show the decimal number
+ * @param {Number} bytes Size in bytes to convert
+ * @param {Number} [precision] Precision to show the decimal number
+ * @param {Boolean} [isSpd] True if this is a speed, unit will be returned as speed unit like KB/s
  * @returns {Object} Returns an object similar to `{size: "2.1", unit: "MB"}`
  */
-function numOfBytes(bytes, precision) {
+function numOfBytes(bytes, precision, isSpd) {
 
     'use strict';
 
@@ -290,7 +291,8 @@ function numOfBytes(bytes, precision) {
         precision = 2;
     }
 
-    var parts = bytesToSize(bytes, precision).split(' ');
+    var fn = isSpd ? bytesToSpeed : bytesToSize;
+    var parts = fn(bytes, precision).split(' ');
 
     return { size: parts[0], unit: parts[1] || 'B' };
 }
@@ -298,21 +300,12 @@ function numOfBytes(bytes, precision) {
 function bytesToSize(bytes, precision, format) {
     'use strict'; /* jshint -W074 */
 
-    var s_b = 'B';
-    var s_kb = 'KB';
-    var s_mb = 'MB';
-    var s_gb = 'GB';
-    var s_tb = 'TB';
-    var s_pb = 'PB';
-
-    if (lang === 'fr') {
-        s_b = 'O';
-        s_kb = 'Ko';
-        s_mb = 'Mo';
-        s_gb = 'Go';
-        s_tb = 'To';
-        s_pb = 'Po';
-    }
+    var s_b = l[20158];
+    var s_kb = l[7049];
+    var s_mb = l[20159];
+    var s_gb = l[17696];
+    var s_tb = l[20160];
+    var s_pb = l[23061];
 
     var kilobyte = 1024;
     var megabyte = kilobyte * 1024;
@@ -384,6 +377,25 @@ function bytesToSize(bytes, precision, format) {
         return resultSize + ' ' + resultUnit;
     }
 }
+
+/*
+ * Very Similar function as bytesToSize due to it is just simple extended version of it by making it as speed.
+ * @returns {String} Returns a string that build with value entered and speed unit e.g. 100 KB/s
+ */
+var bytesToSpeed = function bytesToSpeed() {
+    'use strict';
+    return l[23062].replace('[%s]', bytesToSize.apply(this, arguments));
+};
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    if (lang === 'en' || lang === 'es') {
+        bytesToSpeed = function(bytes, precision, format) {
+            return bytesToSize(bytes, precision, format) + '/s';
+        };
+    }
+});
+
 
 function makeid(len) {
     var text = "";
@@ -925,7 +937,7 @@ function MurmurHash3(key, seed) {
  * @param {String} keyr If a wrong key was used
  * @return {MegaPromise}
  */
-function mKeyDialog(ph, fl, keyr) {
+function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     var promise = new MegaPromise();
@@ -973,17 +985,25 @@ function mKeyDialog(ph, fl, keyr) {
 
             if (key) {
 
-                // Remove the ! from the key which is exported from the export dialog
-                key = key.replace('!', '');
+                // Remove the !,# from the key which is exported from the export dialog
+                key = key.replace('!', '').replace('#', '');
 
                 var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+
+                var currLink = getSitePath();
+
+                if (isPublickLinkV2(currLink)) {
+                    newHash = (fl ? '/folder/' : '/file/') + ph + '#' + key + (selector ? selector : '');
+                }
 
                 if (getSitePath() !== newHash) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
                     $('.fm-dialog.dlkey-dialog').addClass('hidden');
+
                     loadSubPage(newHash);
+
                 }
             }
             else {
@@ -1018,7 +1038,6 @@ function str_mtrunc(str, len) {
         p2 = Math.ceil(0.30 * len);
     return str.substr(0, p1) + '\u2026' + str.substr(-p2);
 }
-
 
 function getTransfersPercent() {
     var dl_r = 0;
@@ -1075,7 +1094,8 @@ function getTransfersPercent() {
 }
 
 function percent_megatitle() {
-
+    'use strict';
+    var t;
     var transferStatus = getTransfersPercent();
 
     var x_ul = Math.floor(transferStatus.ul_done / transferStatus.ul_total * 100) || 0;
@@ -1935,7 +1955,7 @@ function passwordManager(form) {
                     path = path.replace('/#', '/mega/secure.html#');
                 }
             }
-            history.replaceState({ success: true, subpage: path.replace('#','').replace('/','') }, '', path);
+            history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);
             $form.find('input').val('');
         }, 1000);
         return false;
@@ -2422,6 +2442,46 @@ if (typeof sjcl !== 'undefined') {
     };
 })(window);
 
+/**
+ * Transoms the numerical preferences to preferences view object
+ * @param {Number} pref     Integer value representing the preferences
+ * @returns {Object}        View preferences object
+ */
+function getFMColPrefs(pref) {
+    'use strict';
+    if (pref === undefined) {
+        return;
+    }
+    var columnsPreferences = Object.create(null);
+    columnsPreferences.fav = pref & 4;
+    columnsPreferences.label = pref & 1;
+    columnsPreferences.size = pref & 8;
+    columnsPreferences.type = pref & 64;
+    columnsPreferences.timeAd = pref & 32;
+    columnsPreferences.timeMd = pref & 16;
+    columnsPreferences.versions = pref & 2;
+
+    return columnsPreferences;
+}
+
+/**
+ * Get the number needed for bitwise operator
+ * @param {String} colName      Column name
+ * @returns {Number}            Number to be used in bitwise operator
+ */
+function getNumberColPrefs(colName) {
+    'use strict';
+    switch (colName) {
+        case 'fav': return 4;
+        case 'label': return 1;
+        case 'size': return 8;
+        case 'type': return 64;
+        case 'timeAd': return 32;
+        case 'timeMd': return 16;
+        case 'versions': return 2;
+        default: return null;
+    }
+}
 
 // Constructs an extensible hashmap-like class...
 function Hash(a, b, c, d) {
@@ -2865,19 +2925,3 @@ function registerLinuxDownloadButton($links) {
     });
 }
 
-/**
- * Global function to Check if the node is for a textual file
- * @param {MegaData} node       The node to check
- * @returns {Void}              void
- */
-function isTextual(node) {
-    'use strict';
-    if (node && node.name && fileext(node.name) === '') {
-        return true;
-    }
-    var fType = filetype(node, true)[0];
-    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
-        return true;
-    }
-    return false;
-}

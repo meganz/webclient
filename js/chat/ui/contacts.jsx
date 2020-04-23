@@ -13,6 +13,7 @@ var _attchRerenderCbContacts = function() {
         'firstName',
         'lastName',
         'nickname',
+        'presence',
         'm',
         'avatar'
     ]);
@@ -646,8 +647,12 @@ export class ContactCard extends ContactAwareComponent {
         if (className.indexOf("short") >=0) {
             var presenceRow;
             var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+
             if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
-                presenceRow = (l[19994] || "Last seen %s").replace("%s", time2last(lastActivity));
+                const SECONDS = (new Date().getTime() / 1000) - lastActivity;
+                const FORTY_FIVE_DAYS = 3888000; // seconds
+                const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
+                presenceRow = (l[19994] || "Last seen %s").replace("%s", timeToLast);
             }
             else {
                 presenceRow = M.onlineStatusClass(contact.presence)[0];

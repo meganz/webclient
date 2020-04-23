@@ -4,11 +4,6 @@ import {MegaRenderMixin} from "../../stores/mixins.js";
 import utils from './../../ui/utils.jsx';
 
 class SharedFileItem extends MegaRenderMixin {
-    handlePreview({ h: nodeHash, ch: nodeChatHandle }) {
-        $.autoplay = nodeHash;
-        slideshow(nodeChatHandle, undefined, true);
-    }
-
     render() {
         var self = this;
         var message = this.props.message;
@@ -22,7 +17,7 @@ class SharedFileItem extends MegaRenderMixin {
             <div
                 className={"chat-shared-block " + (self.props.isLoading ? "is-loading" : "")}
                 key={message.messageId + "_" + node.h}
-                onClick={() => this.props.isPreviewable ? this.handlePreview(node) : M.addDownload([node])}
+                onClick={() => this.props.isPreviewable ? M.viewMediaFile(node) : M.addDownload([node])}
                 onDoubleClick={() => M.addDownload([node])}>
                 <div className={"icon-or-thumb " + (thumbnails[node.h] ? "thumb" : "")}>
                     <div className={"medium-file-icon " + icon}></div>
@@ -38,7 +33,7 @@ class SharedFileItem extends MegaRenderMixin {
             </div>
         );
     }
-};
+}
 
 class SharedFilesAccordionPanel extends MegaRenderMixin {
     @utils.SoonFcWrap(350)
@@ -182,13 +177,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                     }
                     var nodes = message.getAttachmentMeta();
                     nodes.forEach(function(node) {
-                        var icon = fileIcon(node);
-                        var mediaType = is_video(node);
-                        var isImage = is_image2(node);
-                        var isVideo = mediaType > 0;
-                        var showThumbnail = String(node.fa).indexOf(':0*') > 0;
-                        var isPreviewable = isImage || isVideo;
                         var imgId = "sharedFiles!" + node.ch;
+                        const {icon, showThumbnail, isPreviewable} = M.getMediaProperties(node);
 
                         files.push(
                             <SharedFileItem message={message} key={node.h + "_" + message.messageId}

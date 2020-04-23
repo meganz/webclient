@@ -70,6 +70,9 @@ function init_embed(ph, key, g) {
 
     if (node) {
         var link = '#!' + ph + '!' + key;
+        if (mega.flags.nlfe) {
+            link = '/file/' + ph + '#' + key;
+        }
 
         // Remove header and logo on embed player when viewing the security video on /security page
         if (under('security')) {
@@ -77,9 +80,14 @@ function init_embed(ph, key, g) {
             $('.viewer-bottom-bl').addClass('no-grad');
             $('.download.video-block').addClass('no-bg-color');
         }
+        else {
+            localStorage.affid = ph;
+            localStorage.affts = Date.now();
+            localStorage.afftype = 2;
+        }
 
         $('.play-video-button, .viewonmega-item, .filename').rebind('click', function() {
-            open(getAppBaseUrl() + link);
+            open(getBaseUrl() + link);
             return false;
         });
 
@@ -96,7 +104,7 @@ function init_embed(ph, key, g) {
             var timeoffset = 0;
             var $block = $('.sharefile-block');
             var $wrapper = $('.video-wrapper');
-            var url = getBaseUrl() + '/embed' + link;
+            var url = getBaseUrl() + '/embed' + link.replace('file/', '');
             var embed = '<iframe src="%" width="640" height="360" frameborder="0" allowfullscreen></iframe>';
 
             $('.close-overlay, .sharefile-buttons .cancel', $block).rebind('click', function() {
@@ -108,7 +116,7 @@ function init_embed(ph, key, g) {
             $('.sharefile-buttons .copy', $block).rebind('click', function() {
                 var content = String($('.tab-content', $block).text());
                 if (playing && document.getElementById('timecheckbox').checked) {
-                    content = content.replace(/![\w-]{8}![^"]+/, '$&!' + timeoffset + 's');
+                    content = content.replace(/[!/][\w-]{8}[!#][^"]+/, '$&!' + timeoffset + 's');
                 }
                 copyToClipboard(content, 1);
             });
@@ -123,7 +131,7 @@ function init_embed(ph, key, g) {
 
                 if ($(this).is('.getlink-item, .share-link')) {
                     $('.tab-link.share-link', $block).addClass('active');
-                    $('.tab-content', $block).text(url.replace('/embed', '/'));
+                    $('.tab-content', $block).text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
                     $('.sharefile-settings', $block).addClass('hidden');
                 }
                 else {
@@ -317,6 +325,16 @@ mBroadcaster.once('startMega', function() {
         return String(new Error().stack);
     };
     M.hasPendingTransfers = dummy;
+    M.req = promisify(function(resolve, reject, params, ch) {
+        api_req(typeof params === 'string' ? {a: params} : params, {
+            callback: function(res) {
+                if (typeof res === 'number' && res < 0) {
+                    return reject(res);
+                }
+                resolve(res);
+            }
+        }, ch | 0);
+    });
 
     dlmanager = Object.create(null);
     dlmanager._quotaTasks = [];
@@ -507,6 +525,10 @@ function pagemetadata() {
     if (ep_node) {
         var url = getBaseUrl() + '/embed#!' + ep_node.link;
         var data = MediaAttribute(ep_node).data;
+
+        if (mega.flags.nlfe) {
+            url = getBaseUrl() + '/embed/' + ep_node.link.replace('!', '#');
+        }
 
         if (data) {
             append('og:duration', data.playtime);

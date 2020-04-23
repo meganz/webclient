@@ -32,6 +32,7 @@ mobile.cloud = {
         }
 
         // jQuery selectors
+        var $otherPages = $('#fmholder > div:not(.hidden)');
         var $fileManager = $('.mobile.file-manager-block');
 
 
@@ -58,6 +59,9 @@ mobile.cloud = {
         // Hide the loading progress
         loadingDialog.hide();
         loadingInitDialog.hide();
+
+        // Hide other pages that may be showing and show the Cloud Drive
+        $otherPages.addClass('hidden');
 
         // Show the file manager after everything is ready
         $fileManager.removeClass('hidden');

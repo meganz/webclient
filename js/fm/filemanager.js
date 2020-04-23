@@ -9,13 +9,13 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { max: 65, min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: /*null*/ 'calc(100% - 510px)', viewed: true };
+    this.columnsWidth.cloud.fname = { max: 500, min: 180, curr: 'calc(100% - 510px)', viewed: true };
     this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
-    this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false }
+    this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
@@ -51,9 +51,7 @@ FileManager.prototype.initFileManager = function() {
         console.time('renderfm');
     }
 
-    if (!is_mobile) {
-        this.initFileManagerUI();
-    }
+    this.initFileManagerUI();
     this.sortByName();
 
     if (is_mobile) {
@@ -74,8 +72,10 @@ FileManager.prototype.initFileManager = function() {
                 $treesub.addClass('opened');
             }
 
-            M.openFolder($.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid, true)
-                .always(function() {
+            M.openFolder(
+                $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage(),
+                true
+            ).always(function() {
                     if (megaChatIsReady) {
                         megaChat.renderMyStatus();
                     }
@@ -794,8 +794,8 @@ FileManager.prototype.initFileManagerUI = function() {
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
         treesearch = false;
-        var mySelf = $(this);
-        var clickedClass = mySelf.attr('class');
+        var $mySelf = $(this);
+        var clickedClass = $mySelf.attr('class');
 
         if (!clickedClass) {
             return;
@@ -813,7 +813,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 'recents':         {root: 'recents',   prev: null},
                 'inbox':           {root: M.InboxID,   prev: null},
                 'rubbish-bin':     {root: M.RubbishID, prev: null},
-                'user-management':      {root: 'user-management', prev: null}
+                'user-management': {root: 'user-management', prev: null},
+                'affiliate':       {root: 'affiliate', prev: null}
             };
         }
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
@@ -835,7 +836,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         isMegaSyncTransfer = false;
                     }
-                    mySelf.click();
+                    $mySelf.click();
 
                 });
                 return false;
@@ -863,7 +864,7 @@ FileManager.prototype.initFileManagerUI = function() {
             return !!fmTabState[c];
         })[0];
 
-        if (mySelf.hasClass('contacts') && !mySelf.find('.contacts-indicator').is('.hidden')) {
+        if ($mySelf.hasClass('contacts') && !$('.contacts-indicator', $mySelf).is('.hidden')) {
              M.openFolder('ipc');
              return false;
         }
@@ -881,7 +882,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if (mySelf.hasClass('account') || mySelf.hasClass('dashboard')) {
+        if ($mySelf.hasClass('account') || $mySelf.hasClass('dashboard') || $mySelf.hasClass('affiliate')) {
             if (u_type === 0) {
                 if ($(this).hasClass('account')) {
                     ephemeralDialog(l[7687]);
@@ -894,6 +895,9 @@ FileManager.prototype.initFileManagerUI = function() {
             else if ($(this).hasClass('dashboard')) {
                 loadSubPage('fm/dashboard');
             }
+            else if ($(this).hasClass('affiliate')) {
+                loadSubPage('fm/refer');
+            }
             else {
                 loadSubPage('fm/account');
                 if ($('.fm-account-main').data('jsp')) {
@@ -902,7 +906,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             return false;
         }
-        // else if (mySelf.hasClass('recents')) {
+        // else if ($mySelf.hasClass('recents')) {
         //     loadSubPage('fm/recents');
         // }
 
@@ -1054,9 +1058,12 @@ FileManager.prototype.updFileManagerUI = function() {
         if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
         }
-        if (newNode.p === this.currentdirid || newNode.h === this.currentdirid ||
-            newNode.p === this.currentCustomView.nodeID || newNode.h === this.currentCustomView.nodeID) {
-            UImain = true;
+        if (newNode.p === this.currentdirid
+            || newNode.h === this.currentdirid
+            || newNode.p === this.currentCustomView.nodeID
+            || newNode.h === this.currentCustomView.nodeID) {
+
+            UImain = M.v.length || !is_mobile || !mobile.uploadOverlay.uploading;
 
             if ($.onRenderNewSelectNode === newNode.h) {
                 delete $.onRenderNewSelectNode;
@@ -1867,7 +1874,7 @@ FileManager.prototype.createFolderUI = function() {
             }, 2000);
         }
         else {
-            if (duplicated(1, name)) {// Check if folder name already exists
+            if (duplicated(name)) {// Check if folder name already exists
                 $inputWrapper.addClass('duplicate');
                 $input.addClass('error');
 
@@ -2070,7 +2077,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
                     return false;
                 }
 
-                if (isTextual(node)) {
+                if (is_text(node)) {
                     return true;
                 }
                 return false;
@@ -2091,7 +2098,9 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            ReactDOM.unmountComponentAtNode(constructor.domNode);
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            constructor.domNode.remove();
+            dialogPlacer.remove();
             selected = [];
             closeDialog();
         },
@@ -2110,6 +2119,39 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
     var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
 
     constructor = ReactDOM.render(dialog, dialogPlacer);
+};
+
+FileManager.prototype.initNewChatlinkDialog = function() {
+    'use strict';
+
+    // If chat is not ready.
+    if (!megaChatIsReady) {
+        if (megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed');
+        }
+        else {
+            // Waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            mBroadcaster.once('chat_initialized', this.initNewChatlinkDialog.bind(this));
+        }
+        return false;
+    }
+
+    loadingDialog.hide();
+
+    var dialogPlacer = document.createElement('div');
+
+    var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
+        name: "start-group-chat",
+        flowType: 2,
+        onClose: function() {
+            ReactDOM.unmountComponentAtNode(dialogPlacer);
+            dialogPlacer.remove();
+            closeDialog();
+        }
+    });
+
+    ReactDOM.render(dialog, dialogPlacer);
 };
 
 FileManager.prototype.initUIKeyEvents = function() {
@@ -2981,6 +3023,18 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.versions.disabled = false;
             M.columnsWidth.cloud.fav.disabled = false;
             M.columnsWidth.cloud.label.disabled = false;
+
+            // if we have FM configuration
+            var storedColumnsPreferences = mega.config.get('fmColPrefs');
+            if (storedColumnsPreferences !== undefined) {
+                var prefs = getFMColPrefs(storedColumnsPreferences);
+                for (var colPref in prefs) {
+                    if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
+                        M.columnsWidth.cloud[colPref].viewed =
+                            prefs[colPref] > 0;
+                    }
+                }
+            }
         }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -3257,20 +3311,41 @@ FileManager.prototype.addGridUI = function(refresh) {
         if ($me.hasClass('notactive')) {
             return false;
         }
+
+        var targetCol = $me.attr('megatype');
+
+        // TODO: fix me (jQuery.show/hide -> jQuery.addClass/removeClass)
+        /* eslint-disable local-rules/jquery-replacements */
         if ($me.attr('isviewed')) {
             $me.removeAttr('isviewed').find('i').removeClass('icons-sprite tiny-grey-tick');
-            M.columnsWidth.cloud[$me.attr('megatype')].viewed = false;
-            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').hide();
-            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').hide();
+            M.columnsWidth.cloud[targetCol].viewed = false;
+            $('.grid-table-header th[megatype="' + targetCol + '"]').hide();
+            $('.grid-table.fm td[megatype="' + targetCol + '"]').hide();
         }
         else {
             $me.attr('isviewed', 'y').find('i').addClass('icons-sprite tiny-grey-tick');
-            M.columnsWidth.cloud[$me.attr('megatype')].viewed = true;
-            $('.grid-table-header th[megatype="' + $me.attr('megatype') + '"]').show();
-            $('.grid-table.fm td[megatype="' + $me.attr('megatype') + '"]').show();
+            M.columnsWidth.cloud[targetCol].viewed = true;
+            $('.grid-table-header th[megatype="' + targetCol + '"]').show();
+            $('.grid-table.fm td[megatype="' + targetCol + '"]').show();
         }
+        /* eslint-enable local-rules/jquery-replacements */
 
         M.columnsWidth.makeNameColumnStatic();
+
+        var columnPreferences = mega.config.get('fmColPrefs');
+        if (columnPreferences === undefined) {
+            columnPreferences = 108; // default
+        }
+        var colConfigNb = getNumberColPrefs(targetCol);
+        if (colConfigNb) {
+            if (M.columnsWidth.cloud[targetCol].viewed) {
+                columnPreferences |= colConfigNb;
+            }
+            else {
+                columnPreferences &= ~colConfigNb;
+            }
+        }
+        mega.config.set('fmColPrefs', columnPreferences);
 
         if (M.megaRender && M.megaRender.megaList) {
             if (!M.megaRender.megaList._scrollIsInitialized) {
@@ -3552,6 +3627,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
         $ddUIgrid.selectable({
             filter: $.selectddUIitem,
+            cancel: '.ps-scrollbar-y-rail, .ps-scrollbar-x-rail',
             start: function (e, u) {
                 $.hideContextMenu(e);
                 $.hideTopMenu();
@@ -3651,7 +3727,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
             slideshow(h);
         }
-        else if (isTextual(n) && n.s < 20971520) {
+        else if (is_text(n)) {
             $.selected = [h];
             // there's no jquery parent for this container.
             // eslint-disable-next-line local-rules/jquery-scopes
@@ -3747,11 +3823,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
     $('.fm-left-menu').removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +
-        'conversations opc ipc inbox account dashboard transfers recents user-management'
+        'conversations opc ipc inbox account dashboard transfers recents user-management affiliate'
     ).addClass(tmpId);
     $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
 
+    $('#fmholder').removeClass('affiliate-program');
     $('.fm-main').removeClass('active-folder-link');
     $('.nw-fm-left-icons-panel .logo').addClass('hidden');
     $('.fm-products-nav').text('');
@@ -3897,6 +3974,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             M.addTransferPanelUI();
         }
         $.transferOpen(true);
+    }
+
+    if (id === 'affiliate') {
+        $('#fmholder').addClass('affiliate-program');
     }
 
     var headertxt = '';

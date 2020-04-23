@@ -1,3 +1,8 @@
+/**
+ * @file Browser polyfills
+ * @desc This is the only file where we're allowed to extend native prototypes, as required for polyfills.
+ *//* eslint-disable no-extend-native */
+
 /** document.hasFocus polyfill */
 mBroadcaster.once('startMega', function() {
     if (typeof document.hasFocus !== 'function') {
@@ -124,7 +129,7 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('boot_done', function() {
     'use strict';
 
     if (typeof window.devicePixelRatio === 'undefined') {
@@ -136,13 +141,45 @@ mBroadcaster.once('startMega', function() {
     }
 });
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    // Pragmatic Device Memory API Polyfill...
+    // https://caniuse.com/#search=deviceMemory
+    if (navigator.deviceMemory === undefined) {
+        lazy(navigator, 'deviceMemory', function() {
+            var value = 0.5;
+            var uad = ua.details || false;
+
+            if (uad.engine === 'Gecko') {
+                value = 1 + uad.is64bit;
+
+                if (parseInt(uad.version) > 67) {
+                    value *= 3;
+                }
+            }
+            else if (uad.is64bit) {
+                value = 2;
+            }
+
+            return value;
+        });
+    }
+});
+
+
+mBroadcaster.once('boot_done', function() {
     'use strict';
     Promise.prototype.always = function(fc) {
         this.then(fc).catch(fc);
         return this;
     };
-    Promise.prototype.dump = MegaPromise.prototype.dumpToConsole;
+    Promise.prototype.dump = function(tag) {
+        // XXX: No more then/catch after invoking this!
+        this.then(console.debug.bind(console, tag || 'OK'))
+            .catch(console.warn.bind(console, tag || 'FAIL'));
+        return this;
+    };
 });
 
 mBroadcaster.once('boot_done', function() {

@@ -164,14 +164,6 @@
     CredentialsWarningDialog.prototype._renderFingerprints = function() {
         var userHandle = CredentialsWarningDialog.contactHandle;
         var keyType = CredentialsWarningDialog.keyType;
-        warnedFingerprint[userHandle][keyType] = 1;
-        // Log occurrence of this dialog.
-        api_req({
-            a: 'log',
-            e: 99606,
-            m: 'Fingerprint dialog shown to user for key ' + keyType + ' for user ' + userHandle
-        });
-
         var previousFingerprint = CredentialsWarningDialog.previousFingerprint;
         var newFingerprint = CredentialsWarningDialog.newFingerprint;
         var previousFingerprintHtml = '';

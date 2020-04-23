@@ -884,7 +884,7 @@ a.account-manage-button:hover {
     background-color: rgba(255,255,255,1);
     -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -6px -10649px;
     background-repeat: no-repeat;
     left: 0;
@@ -1046,7 +1046,7 @@ a.account-manage-button:hover {
     height: 40px;
 }
 .free .fm-right-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .free .fm-right-account-block:not(.active-achievements) .bandwidth .chart.data .perc-txt, .no-percs .chart.data .perc-txt {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -10px -11854px;
     width: 30px;
 }
@@ -1654,7 +1654,7 @@ a.blog-button:hover {
     display: none;
 }
 .notification-loading-icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
     height: 225px;
@@ -1785,7 +1785,7 @@ a.blog-button:hover {
     line-height: 18px;
     padding: 2px 0 2px 28px;
     margin: 0 14px 0 0;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -14px -7100px;
     background-repeat: no-repeat;
 }
@@ -1795,7 +1795,7 @@ a.blog-button:hover {
     height: 20px;
     right: -4px;
     top: -4px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -10px -27px;
     background-position: -14px -6776px;
     background-repeat: no-repeat;
@@ -2202,12 +2202,8 @@ a.nt-settings-button:hover span {
     position: absolute;
     top: 0;
     right: 0;
-    width: 11px;
+    width: 14px;
     height: 100%;
-}
-.fm-tree-panel .jspVerticalBar {
-    right: 11px;
-    width: 0px;
 }
 .jspHorizontalBar {
     position: absolute;
@@ -2238,6 +2234,7 @@ a.nt-settings-button:hover span {
     position: relative;
     top: 0;
     left: 0;
+    margin: 0 3px;
     cursor: pointer;
     -webkit-transition: opacity 250ms ease-in-out;
     -moz-transition: opacity 250ms ease-in-out;
@@ -2247,6 +2244,14 @@ a.nt-settings-button:hover span {
     -moz-opacity: 0.2;
     -khtml-opacity: 0.2;
     opacity: 0.2;
+}
+.jspDrag::before {
+    position: absolute;
+    content: '';
+    width: calc(100% + 6px);
+    height: 100%;
+    left: -3px;
+    top: 0;
 }
 .jspHorizontalBar .jspDrag {
     height: 8px !important;
@@ -2290,97 +2295,6 @@ a.nt-settings-button:hover span {
     /* If you do require horizontal scrollbars, don't use jScrollPane - we're deprecating it anyway */
     display: none !important;
 }
-ul.tagit {
-    overflow: auto;
-    margin-left: inherit;
-    margin-right: inherit;
-    padding: 0;
-    margin: 0;
-}
-ul.tagit li {
-    display: block;
-    float: left;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice {
-    position: relative;
-    line-height: inherit;
-}
-ul.tagit li.tagit-choice-read-only {
-    padding: 0 7px 0 7px;
-}
-ul.tagit li.tagit-choice-editable {
-    padding: 0 18px 0 7px;
-}
-ul.tagit li.tagit-new {
-}
-ul.tagit li.tagit-choice a.tagit-label {
-    cursor: pointer;
-    text-decoration: none;
-}
-ul.tagit li.tagit-choice .tagit-close {
-    cursor: pointer;
-    position: absolute;
-    top: 50%;
-    margin-top: -10px;
-}
-ul.tagit li.tagit-choice .tagit-close .text-icon {
-    display: none;
-}
-ul.tagit li.tagit-choice input {
-    display: block;
-    float: left;
-}
-ul.tagit li.tagit-choice {
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border: 1px solid #e7e7e8;
-    font-size: 13px;
-    background: none;
-    background-color: #f2f2f3;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    font-weight: normal;
-    height: 22px;
-    line-height: 20px;
-    margin: 0 0 2px 2px;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice .tagit-label:not(a) {
-    color: #565a5b;
-    font-size: 13px;
-}
-ul.tagit li.tagit-choice a.tagit-close {
-    text-decoration: none;
-}
-ul.tagit li.tagit-choice .tagit-close {
-    right: .4em;
-}
-ul.tagit li.tagit-choice .ui-icon {
-    display: none;
-}
-ul.tagit li.tagit-choice .tagit-close .text-icon {
-    display: inline-block;
-    height: 8px;
-    width: 8px;
-    background-image: url(../images/mega/send-sprite.png);
-    background-size: 254px 60px;
-    background-repeat: no-repeat;
-    background-position: left top;
-    font-size: 13px;
-    margin: 6px 0 0 0;
-    color: #565a5b;
-}
-ul.tagit li.tagit-choice:hover, ul.tagit li.tagit-choice.remove {
-}
-ul.tagit li.tagit-choice a.tagLabel:hover, ul.tagit li.tagit-choice a.tagit-close .text-icon:hover {
-}
-ul.tagit input[type="text"] {
-    color: #565a5b;
-    background: none;
-}
 .ui-widget {
     font-size: 13px;
 }
@@ -2416,10 +2330,6 @@ ul.tagit input[type="text"] {
     height: 30px;
     line-height: 29px;
     padding-left: 42px;
-    background-image: url(../images/mega/send-sprite.png);
-    background-size: 254px 60px;
-    background-repeat: no-repeat;
-    background-position: 10px -34px;
     cursor: pointer;
     color: #383b3d;
     font-size: 13px;
@@ -3354,7 +3264,7 @@ img.blog-new-logos {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: 2px -496px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -3420,7 +3330,7 @@ img.blog-new-logos {
     bottom: -16px;
     left: 50%;
     margin: 0 0 0 -8px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -3462,7 +3372,7 @@ img.blog-new-logos {
     height: 18px;
     left: 11px;
     top: 6px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -132px -3180px;
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
@@ -3613,7 +3523,6 @@ label.iPhoneCheckLabelOff span {
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
-    width: 0px;
 }
 .fm-tree-panel:hover .jspTrack {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
@@ -3707,7 +3616,7 @@ label.iPhoneCheckLabelOff span {
     height: 24px;
     left: 10px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -1px -3036px;
     background-repeat: no-repeat;
 }
@@ -3939,7 +3848,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: default;
 }
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: center -9911px;
     cursor: pointer;
@@ -3982,7 +3891,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display:block;
     position:absolute;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -337px -717px;
     background-repeat: no-repeat;
     left: 0;
@@ -4121,7 +4029,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .fm-add-user-scrolling .nw-contact-item {
     padding-right: 32px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: right -2907px;
     background-repeat: no-repeat;
 }
@@ -4146,7 +4054,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin: 12px;
     border: 2px solid #d9d9d9;
     padding: 0 10px 0 32px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -10px -2969px;
     background-repeat: no-repeat;
     -moz-border-radius: 5px;
@@ -4163,7 +4071,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     color: #868686;
 }
 .verified .nw-contact-verified-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -19px -2827px;
     background-repeat: no-repeat;
     position: absolute;
@@ -4201,7 +4109,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .files-grid-view.fm .column-settings::before {
     content: "";
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: -148px -1992px;
     display: inline-block;
     position: fixed;
@@ -4265,7 +4173,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     z-index: 10;
     background-position: -11px -2244px;
     -webkit-box-sizing: border-box;
@@ -4344,7 +4252,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     right: 2px;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -4352,12 +4260,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: opacity 200ms ease-in-out;
     opacity: 0.6;
 }
-.nw-tree-panel-arrows {
+.nw-tree-panel-arrows.icons-sprite {
     right: 7px;
     top: 6px;
-    background-image: url(../images/mega/icons-sprite_v36.png);
     background-position: -88px -1992px;
     opacity: 0.8;
+}
+.active-folder-link .fm-tree-panel ul:first-child > li:first-child > .nw-fm-tree-item {
+    padding-right: 33px;
 }
 .nw-tree-panel-arrows:hover, .nw-tree-panel-arrows.active {
     opacity: 1;
@@ -4900,7 +4810,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     z-index: 100;
     cursor: pointer;
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: 6px -1350px;
     background-repeat: no-repeat;
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
@@ -5012,8 +4922,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     float: left;
     height: 100%;
     position: relative;
-    min-height: 480px;
+    min-height: 528px;
     z-index: 21;
+}
+.nw-fm-left-icons-panel .bottom-icons {
+    position: absolute;
+    left: 0;
+    bottom: 0;
 }
 .nw-fm-tree-header {
     position: relative;
@@ -5043,6 +4958,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     cursor: text;
     text-align: left;
     font-size: 14px;
+    padding-right: 25px;
+}
+.contacts .nw-fm-tree-header input:not([readonly]):focus, .contacts .nw-fm-tree-header.filled-input input {
+    padding-right: 55px;
 }
 .nw-fm-tree-header .button {
     position: absolute;
@@ -5055,14 +4974,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
     z-index: 7;
-}
-.contacts.filled-input .fm-add-user {
-    display: none;
-}
-.nw-fm-tree-header:not(.conversations).focused-input .button {
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
 }
 .nw-fm-tree-header.shared-with-me input::selection {
     background: #FFA500;
@@ -5110,7 +5021,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-left-menu.account + div + div + .nw-tree-panel-header {
     display: none;
 }
-.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .out-shares .nw-fm-tree-header.shared-with-me, .public-links .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management {
+.cloud-drive .nw-fm-tree-header.cloud-drive, .shared-with-me .nw-fm-tree-header.shared-with-me, .out-shares .nw-fm-tree-header.shared-with-me, .public-links .nw-fm-tree-header.shared-with-me, .contacts .nw-fm-tree-header.contacts, .conversations .nw-fm-tree-header.conversations, .content-panel.active, .rubbish-bin .nw-fm-tree-header.rubbish-bin, .notifications .nw-fm-tree-header.notifications, .inbox .nw-fm-tree-header.inbox, .account .nw-fm-tree-header.account, .dashboard .nw-fm-tree-header.dashboard, .user-management .nw-fm-tree-header.user-management, .affiliate .nw-fm-tree-header.affiliate {
     display: block;
 }
 .transfers-header-bl {
@@ -5123,7 +5034,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: block;
 }
 .nw-fm-search-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -10px -7881px;
     position: absolute;
@@ -5142,13 +5053,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0;
     cursor: pointer;
 }
+.contacts .nw-fm-search-icon {
+    right: 39px;
+}
 .filled-input .nw-fm-search-icon {
-    background-position: -10px -6436px;
+    background-position: -10px -6435px;
 }
 .filled-input .nw-fm-search-icon:hover {
-    background-position: -11px -7821px;
+    background-position: -11px -7820px;
 }
-.nw-fm-tree-header:not(.contacts):hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
+.nw-fm-tree-header:hover .nw-fm-search-icon, .focused-input .nw-fm-search-icon, .filled-input .nw-fm-search-icon {
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
@@ -5168,7 +5082,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     height: 48px;
     content: '';
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -100px -100px;
     opacity: 0.7;
@@ -5217,6 +5131,53 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-left-icon.account::before {
     background-position: 3px -500px;
 }
+.nw-fm-left-icon.affiliate::before {
+    background-position: 1px -13379px;
+    -webkit-transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+}
+.nw-fm-left-icon.affiliate:hover::before {
+    transform: translateX(-4px);
+}
+.nw-fm-left-icon.affiliate::after {
+    width: 48px;
+    height: 48px;
+    content: '';
+    position: absolute;
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    background-repeat: no-repeat;
+    background-position: 1px -13379px;
+    opacity: 0.7;
+    -webkit-transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+    transition: opacity 100ms ease-in-out, transform 100ms ease-in-out;
+    z-index: 20;
+}
+.nw-fm-left-icon.affiliate:hover::after {
+    transform: translateX(4px);
+    opacity: 1;
+}
+.nw-fm-left-icon.affiliate.animate::after, .nw-fm-left-icon.affiliate.animate::before {
+    animation-name: iconBounce;
+    animation-duration: 5s;
+    opacity: 1;
+    background-position: 1px -13379px;
+}
+@keyframes iconBounce {
+    from, 20% ,40%, 60%, 80%, to {
+        transform: translateY(0px);
+        background-position: 1px -13337px;
+    }
+    10% ,30%, 50%, 70%, 90% {
+        transform: translateY(-6px);
+    }
+}
+.nw-fm-left-icon.affiliate.active::before, .nw-fm-left-icon.affiliate.active::after {
+    background-position: 1px -13337px;
+    opacity: 1;
+}
+.nw-fm-left-icon.user-management::before {
+    background-position: 1px -11961px;
+}
 .nw-fm-left-icon .nw-fm-left-border {
     width: 2px;
     height: 48px;
@@ -5230,13 +5191,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -o-transition: all 200ms ease-in-out;
     -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
-}
-.transfers.nw-fm-left-icon {
-    position: absolute;
-    bottom: 0;
-}
-.transfers.nw-fm-left-icon.active {
-    border-color: #13E03C;
 }
 .transfers .nw-fm-left-border {
     z-index: 100;
@@ -5410,7 +5364,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 /**
  * hide sections of the site if the current visited link is a folder share link
  */
-.active-folder-link .nw-fm-left-icon.cloud-drive, .active-folder-link .nw-fm-tree-header.cloud-drive, .active-folder-link .nw-fm-left-icon.inbox, .active-folder-link .nw-fm-left-icon.shared-with-me, .active-folder-link .nw-fm-left-icon.contacts, .active-folder-link .nw-fm-left-icon.conversations, .active-folder-link .nw-fm-left-icon.rubbish-bin, .active-folder-link .nw-fm-left-icon.account, .active-folder-link .nw-fm-left-icon.dashboard, .active-folder-link .nw-fm-left-icon.recents {
+.active-folder-link .nw-fm-left-icon:not(.transfers) {
     display: none;
 }
 .nw-fm-left-icon .beta-text {
@@ -5419,7 +5373,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: absolute;
     top: 49px;
     width: 36px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: center -848px;
 }
@@ -5452,6 +5406,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     border-color: #D90007;
 }
 .nw-fm-left-icon.rubbish-bin.active .nw-fm-left-border {
+    border-color: #13E03C;
+}
+.nw-fm-left-icon.affiliate.active .nw-fm-left-border {
+    border-color: #FF9500;
+}
+.nw-fm-left-icon.user-management.active .nw-fm-left-border {
+    border-color: #FFA500;
+}
+.transfers.nw-fm-left-icon.active {
     border-color: #13E03C;
 }
 .dark-overlay {
@@ -5494,13 +5457,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     height: 100%;
     z-index: 499;
     background-color: rgba(255,255,255, 0.5);
-}
-.nw-fm-left-icon.rubbish-bin, .nw-fm-left-icon.account {
-    position: absolute;
-    bottom: 96px;
-}
-.nw-fm-left-icon.account {
-    bottom: 48px;
 }
 .not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
     display: none !important;
@@ -5547,7 +5503,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     width: 12px;
     height:12px;
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: -39px -1240px;
     margin: 4px 5px 0 -3px;
     vertical-align: top;
@@ -5755,7 +5711,7 @@ th.grid-first-th {
     height: 24px;
     width: 30px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
@@ -5796,7 +5752,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     height: 24px;
     width: 25px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -13px -4884px;
     background-size: auto;
@@ -5945,7 +5901,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     width: 24px;
     height: 24px;
     background-position: -55px -4827px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -6284,7 +6240,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 }
 .grid-url-arrow::after, .file-settings-icon::after, .clear-transfer-icon::after {
     content: '';
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-repeat: no-repeat;
     background-position: -160px -831px;
     display: block;
@@ -6296,7 +6252,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .clear-transfer-icon::after {
     opacity: 0.67;
     background-position: 1px -4045px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
 .hide-settings-icon {
     -moz-opacity: 0;
@@ -6374,7 +6330,6 @@ table {
     margin: 0 0 0 -1px;
     background-position: -336px -357px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon {
@@ -6382,7 +6337,6 @@ table {
     height: 38px;
     background-position: -216px -3239px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
 }
 .medium-file-icon.word {
@@ -6653,7 +6607,6 @@ table {
     display: block;
     background-position: 0 -3234px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
     position: absolute;
     margin: -42px 0 0 -41px;
@@ -7094,9 +7047,14 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
-.thumb .transfer-filetype-icon.image img,
+
 .thumb .transfer-filetype-icon.pdf img,
-.thumb .transfer-filetype-icon.video img {
+.thumb .transfer-filetype-icon.raw img,
+.thumb .transfer-filetype-icon.audio img,
+.thumb .transfer-filetype-icon.image img,
+.thumb .transfer-filetype-icon.video img,
+.thumb .transfer-filetype-icon.vector img,
+.thumb .transfer-filetype-icon.photoshop img {
     display: inline-block;
     height: 18px;
     margin: 4px 2px;
@@ -7105,6 +7063,7 @@ table {
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
 }
+
 .fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;
@@ -7195,7 +7154,7 @@ table {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
 }
 .transfer-table tr:nth-child(odd) td .transfer-type::before {
@@ -7235,11 +7194,11 @@ table {
     background-position: -7px -4064px;
 }
 .transfer-type.download::before {
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: -118px -1238px;
 }
 .transfer-type.upload::before {
-    background-image: url(../images/mega/icons-sprite_v36.png);
+    background-image: url(../images/mega/icons-sprite_v37.png);
     background-position: -158px -1238px;
 }
 .transfer-paused.transfer-started .transfer-type::before {
@@ -7269,7 +7228,7 @@ table {
     display: block;
     left: 0;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -15px -700px;
     position: absolute;
@@ -7295,7 +7254,7 @@ table {
 .transfer-table .eta {
     min-width: 100px;
     display: inline-block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -15px -724px;
     background-repeat: no-repeat;
     text-indent: 17px;
@@ -7312,7 +7271,7 @@ table {
     text-indent: 18px;
 }
 .transfer-table .eta.unknown::before {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: 0 -4172px;
     background-repeat: no-repeat;
     content: '';
@@ -7464,7 +7423,7 @@ table {
     margin: 0 -6px 0 -1px;
 }
 .fm-breadcrumbs.has-next-button {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: right -1434px;
 }
@@ -7495,7 +7454,7 @@ table {
     opacity: 0;
 }
 .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
 }
 .fm-breadcrumbs.has-next-button .right-arrow-bg {
@@ -7555,7 +7514,7 @@ table {
     font-size: 13px;
     color: #333333;
     padding: 0 20px 0 22px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -2px -3304px;
     float: right;
@@ -7633,7 +7592,7 @@ table {
     display: block;
     float: right;
     margin: 9px 11px 0 29px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -8199,11 +8158,20 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     -webkit-background-clip: padding;
     background-clip: padding-box;
 }
-.fm-dialog.fm-modal-dialog {
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%)  !important;
+.fm-modal-dialog {
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    display: flex;
+}
+.fm-modal-dialog  .fm-dialog {
+    position: relative;
     margin: auto !important;
+    left: 0;
+    top: 0;
+    z-index: 1200;
 }
 .fm-dialog.share-dialog {
     z-index: 1100;
@@ -8236,7 +8204,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .dlkey-dialog .decryption-key .icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -8261,7 +8229,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .password-dialog .decryption-password .icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -8935,7 +8903,7 @@ body:not(.en) .warning-dialog-a.wide {
     height: 30px;
     width: 30px;
     background-position: -53px -4825px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -9159,7 +9127,7 @@ body:not(.en) .warning-dialog-a.wide {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: right -8359px;
     -webkit-box-sizing: border-box;
@@ -9369,7 +9337,7 @@ body:not(.en) .warning-dialog-a.wide {
     float: left;
     width: 92px;
     height: 75px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
 }
 .notification-dialog .fm-notification-icon {
@@ -9473,7 +9441,7 @@ body:not(.en) .warning-dialog-a.wide {
     display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -5px -3080px;
     background-color: rgba(0,0,0,0.2);
@@ -9515,7 +9483,7 @@ body:not(.en) .warning-dialog-a.wide {
     content: '';
     display: block;
     position: absolute;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: 0px -1848px;
     background-repeat: no-repeat;
     width: 18px;
@@ -9541,7 +9509,7 @@ body:not(.en) .warning-dialog-a.wide {
     width: 100%;
     position: absolute;
     left: 0;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: left -2771px;
     background-repeat: repeat-x;
     z-index: 100;
@@ -9572,7 +9540,6 @@ body:not(.en) .warning-dialog-a.wide {
     margin: 22px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: 0 0;
 }
 .export-link-text-pad {
@@ -9624,7 +9591,7 @@ body:not(.en) .warning-dialog-a.wide {
     position: relative;
 }
 .export-link-expiry-icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -138px -5513px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -9836,7 +9803,7 @@ span.orange {
     width: 30px;
     float: right;
     background-position: -54px -4874px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -9888,7 +9855,6 @@ span.orange {
     left: 0;
     display: none;
     background-image: url(../images/mega/properties-sprite_v2.png);
-    background-size: 589px 6320px;
     background-position: 29px 40px;
     background-repeat: no-repeat;
     margin: 8px;
@@ -9974,20 +9940,20 @@ span.orange {
 }
 .shared-with-me.read-only .properties-elements-counter span {
     background-color: #61D2FF;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -81px -238px;
     background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
     background-color: #FFD300;
     background-position: -83px -205px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
     background-color: #00E22C;
     background-position: -81px -174px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -10427,7 +10393,7 @@ span.orange {
     margin: 0 0 0 -6px;
     position: absolute;
     top: 6px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: center -8343px;
     background-position: right -1288px;
     background-repeat: no-repeat;
@@ -10519,11 +10485,11 @@ span.orange {
     background-color: rgba(255,255,255,0.1);
 }
 .sorting-menu-item.active, .sorting-menu-item.selected {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     color: rgba(255,255,255,1);
 }
 .sorting-menu-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: left -7998px;
     display: block;
@@ -10554,7 +10520,7 @@ table {
 }
 .transfer-table-header th:first-child span {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -6px -4019px;
     height: 24px;
@@ -10712,7 +10678,7 @@ table {
     background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -11031,7 +10997,7 @@ table {
     width: 25px;
     height: 13px;
     position: absolute;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: center -6063px;
     background-repeat: no-repeat;
     margin: -20px 0 0 -12px;
@@ -11142,7 +11108,7 @@ table {
 }
 .default-select {
     font-size: 14px;
-    color: #666666;
+    color: #333;
     margin: 0;
 }
 .account-history-dropdown-button {
@@ -11253,7 +11219,6 @@ table {
     color: #333;
     line-height: 18px;
     margin:8px 0 16px 0;
-    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -11291,7 +11256,6 @@ table {
     line-height: 20px;
     text-align: left;
     white-space: normal;
-    text-transform: capitalize;
     overflow: visible;
     vertical-align: top;
     text-overflow: ellipsis;
@@ -11304,19 +11268,46 @@ table {
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
-    text-transform: capitalize;
     padding: 0;
     vertical-align: top;
     float: right;
     text-align: right;
 }
+.account.left-pane.big-txt.suba-pay-bill {
+    width:100%;
+    margin-top: -2px;
+    margin-bottom: 15px;
+}
+.account.left-pane.big-txt.suba-pay-bill.hidden {
+    display: none;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.disabled,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.pending,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    color: darkorange;
+    opacity: 1;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    margin-top: -10px;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left.hidden {
+    display: none;
+}
 .account.left-pane.big-txt span {
     color: #777777;
     padding-left: 5px;
 }
+.account.left-pane.big-txt .pay-bill-btn span {
+    color: unset;
+    padding-left: unset;
+}
 .small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
     text-align: center;
     width: 100%;
+}
+.account.left-pane .account.left-pane.small-txt.hidden,
+.account.left-pane .account.left-pane.big-txt.hidden {
+    display: none;
 }
 .account.widget .fm-account-blocks {
     padding-top: 10px;
@@ -12387,7 +12378,7 @@ h5.main-italic-header {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: center -5880px;
 }
@@ -12657,7 +12648,6 @@ h5.main-italic-header {
     float: left;
     margin: 0 0 0 0;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: 0 0;
     background-repeat: no-repeat;
 }
@@ -13244,7 +13234,6 @@ strong, b {
     height: 64px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     margin-top: 3px;
 }
 .share-folder-info {
@@ -13287,7 +13276,7 @@ strong, b {
 .widget-circle, .widget-arrows {
     width: 40px;
     height: 40px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: left top;
     background-repeat: no-repeat;
 }
@@ -13321,7 +13310,7 @@ strong, b {
     line-height: 18px;
     padding-left: 27px;
     min-height: 18px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: -11px -1132px;
     background-repeat: no-repeat;
     color: #666666;
@@ -13351,7 +13340,7 @@ strong, b {
     position: absolute;
     bottom: 50px;
     left: 14px;
-    background-image: url(../images/mega/widjet-progress.png);
+    background-image: url(../images/mega/widget-progress.png);
     background-position: center -1261px;
     width: 12px;
     height: 8px;
@@ -14439,7 +14428,7 @@ code, c {
 }
 .notification-empty-icon {
     height: 225px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
 }
@@ -14930,8 +14919,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow:not(.grid-header-star) {
     cursor: pointer;
-    background-position: right bottom;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-position: -100% -100%;
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: block;
     float: left;
@@ -14943,6 +14932,9 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .arrow.asc {
     background-position: right -1225px;
 }
+.arrow.label:not(.asc):not(.desc) {
+    background-image: none;
+}
 .search-bottom-wrapper {
     background-color: #EEEEEE;
     height: 36px;
@@ -14950,6 +14942,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     bottom: 0;
     display: none;
     width: 100%;
+    z-index: 12;
 }
 .search-bottom-menu {
     min-width: 100%;
@@ -15028,7 +15021,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .search-path-icon-span {
     background-position: 0 0px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -15036,30 +15028,33 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: block;
     cursor: pointer;
 }
-.search-path-icon.cloud-drive {
+.search-path-icon.cloud-drive,
+.search-path-icon-span.cloud-drive {
     background-position: -5px -999px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
 .search-path-icon.folder, .search-path-icon.shared-folder {
     background-position: -337px -717px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
 }
 .search-path-icon.shared-folder {
     background-position: -12px -4369px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.recycle-item {
+.search-path-icon.recycle-item,
+.search-path-icon-span.recycle-item {
     background-position: -1px -8035px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.contacts-item {
+.search-path-icon.contacts-item,
+.search-path-icon-span.contacts-item {
     background-position: -12px -4410px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
-.search-path-icon.inbox-item {
+.search-path-icon.inbox-item,
+.search-path-icon-span.inbox-item {
     background-position: -3px -6717px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
 .search-path-icon img {
     width: 24px;
@@ -15081,9 +15076,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     display: inline-block;
     position: relative;
 }
+.breadcrumbs-bottom .search-path-txt.ultra-short-foldername,
 .search-bottom-menu .search-path-txt.short-foldername {
     max-width: 110px;
 }
+.breadcrumbs-bottom .search-path-txt.ultra-short-foldername,
 .search-bottom-menu .search-path-txt.ultra-short-foldername {
     max-width: 40px;
 }
@@ -15130,7 +15127,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 10px;
     height: 30px;
     background-repeat: no-repeat;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: right -1430px;
     margin: 0 4px 0 0;
 }
@@ -15516,7 +15513,7 @@ span.incoming-call-name {
     display: inline-block;
 }
 .star .incoming-contact-info span.incoming-call-name {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: right -6265px;
     background-repeat: no-repeat;
     padding-right: 25px;
@@ -15615,7 +15612,7 @@ span.incoming-call-name {
     top: 4px;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -2px -3669px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -15656,7 +15653,7 @@ span.incoming-call-name {
     display: block;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -122px -3719px;
     background-repeat: no-repeat;
 }
@@ -15765,7 +15762,6 @@ span.incoming-call-name {
 }
 .shared-folder-icon {
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -217px -4799px;
     background-repeat: no-repeat;
     width: 40px;
@@ -15815,7 +15811,7 @@ span.incoming-call-name {
     padding-left: 31px;
     color: #666;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -13px -4292px;
     background-repeat: no-repeat;
 }
@@ -15901,7 +15897,6 @@ body:not(.de) .contacts-interation {
     background-position: -4px -4791px;
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     margin: 15px 0 0 28px;
 }
 .shared-details-info-block {
@@ -16117,7 +16112,6 @@ body:not(.de) .contacts-interation {
     width:24px;
     height:24px;
     background-image: url(../images/mega/files-icons_v3.png);
-    background-size: 399px 5575px;
     background-position: -297px -877px;
     background-repeat: no-repeat;
     position: absolute;
@@ -16441,7 +16435,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close, li.token-input-token-invite .input-close {
     height: 20px;
     width: 10px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -94px -460px;
     background-repeat: no-repeat;
     display: block;
@@ -16676,7 +16670,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     left: 50%;
     margin-left: -9px;
     width: 18px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: left -3831px;
 }
@@ -16713,7 +16707,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position:absolute;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: center -535px;
 }
@@ -16770,13 +16764,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .share-search-result.selected {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: right -748px;
 }
 .share-dialog-img {
     height: 90px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: center 4px;
     margin: 24px 0;
@@ -16786,7 +16780,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 30px;
     height: 28px;
     z-index: 10;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -76px -82px;
     background-repeat: no-repeat;
 }
@@ -16829,7 +16823,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 25px;
     height: 25px;
     left: 0;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -89px -134px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17043,12 +17037,12 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     text-align: center;
 }
 #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v9.png) no-repeat scroll -138px -5392px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v11.png) no-repeat scroll -138px -5392px;
     height: 24px;
     width: 24px;
 }
 #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v9.png) no-repeat scroll -138px -5431px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v11.png) no-repeat scroll -138px -5431px;
     height: 24px;
     width: 24px;
 }
@@ -17118,7 +17112,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border: medium none;
 }
 #ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v9.png) no-repeat scroll -135px -5350px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v11.png) no-repeat scroll -135px -5350px;
     height: 24px;
     position: absolute;
     right: 12px;
@@ -17198,7 +17192,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     vertical-align: top;
 }
 .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -5px -5352px;
     background-repeat: no-repeat;
     height: 22px;
@@ -17310,7 +17304,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: center -5194px;
     background-repeat: no-repeat;
     position: absolute;
@@ -17351,7 +17345,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     display: block;
     left: 50%;
     margin-left: -12px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: center -5028px;
     background-repeat: no-repeat;
 }
@@ -17366,7 +17360,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     top: 3px;
     left: 12px;
     display: block;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -87px -277px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17403,7 +17397,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     height: 20px;
     float: right;
     margin: 13px 0 0 7px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: -91px -826px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17424,7 +17418,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     opacity: 0.7;
 }
 .share-dialog-contacts .jspVerticalBar, .multiple-input .jspVerticalBar, .fm-dialog-body .jspVerticalBar, .fm-call-dialog .jspVerticalBar {
-    width: 9px;
+    width: 12px;
 }
 .share-dialog-contacts .jspDrag, .multiple-input .jspDrag, .fm-dialog-body .jspDrag, .fm-call-dialog .jspDrag {
     width: 6px;
@@ -17471,7 +17465,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .import-contacts-service.imported {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: right -2163px;
     background-repeat: no-repeat;
 }
@@ -17483,7 +17477,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     float: left;
     margin: 12px 0 0 10px;
     font-family: 'source_sans_prosemibold', Arial;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -11px -2074px;
     background-repeat: no-repeat;
 }
@@ -17497,7 +17491,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: rgba(0,0,0,0.2);
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: 1px -2137px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -17533,7 +17527,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     bottom: -6px;
     right: 12px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -17543,7 +17537,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     top: 5px;
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -2px -3178px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17601,7 +17595,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 .fm-picker-dialog-button::before {
     content: " ";
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width: 56px;
     height: 56px;
@@ -17904,7 +17898,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin: 12px 12px 12px 12px
 }
 .fm-mega-dialog-size-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: center -5509px;
     background-repeat: no-repeat;
     width: 20px;
@@ -18094,7 +18088,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     float: left;
     width: 60px;
     height: 60px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: 0 -3927px;
     margin-left: 20px;
@@ -18122,7 +18116,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     padding: 0;
 }
 .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: 0 -4112px;
     background-size: auto;
     cursor: pointer;
@@ -18174,7 +18168,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     font-size: 14px;
     line-height: 18px;
     font-family: 'source_sans_proregular', Arial;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-repeat: no-repeat;
     background-position: 2px -4011px;
     margin: 0 0 0 12px;
@@ -19624,7 +19618,7 @@ body.pro:after {
 }
 .transfer-bar-overlay div {
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -13px -564px;
     background-color: rgba(255,255,255,0.7);
@@ -19832,7 +19826,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
     width: 15px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -50px -1551px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -19882,7 +19876,7 @@ body.pro:after {
     padding-top: 9px;
 }
 .bandwidth-back-button {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -95px -1551px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -20153,7 +20147,7 @@ div.camera-bottom-txt {
     width: 100px;
     height: 100px;
     margin: 8px auto 31px auto;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -29px -4228px;
     background-repeat: no-repeat;
 }
@@ -20844,7 +20838,7 @@ body.kr .account.chart.data {
 }
 .contact-us .contact-new-title::before {
     content: '';
-    background-image: url(../images/mega/contact-us-sprite@2x.png);;
+    background-image: url(../images/mega/contact-us-sprite@2x.png);
     background-size: 80px auto;
     width: 28px;
     height: 28px;
@@ -21021,7 +21015,68 @@ body.kr .account.chart.data {
     font-size: 18px;
 }
 /* User select */
-.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .message.text-block a, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span, .fingerprint-txt span, .membership-big-txt.email, .properties-txt-pad *, .grid-scrolling-table td *, .bottom-page.scroll-block *, .message.content-area *, .message.date-divider {
+.selectable, .selectable *,
+input,
+textarea,
+.fm-dialog p,
+.properties-file-link,
+.contact-fingerprint-txt *,
+.fingerprint-txt,
+.contact-details-user-name,
+.contact-details-email,
+.nw-contact-name,
+.fm-breadcrumbs.contact
+.right-arrow-bg span,
+div.new-download-file-title,
+.dev-nw *,
+.fmholder .dev-nw div,
+.fmholder div.new-affiliate-bg1 *,
+.fmholder div.main-mid-pad.new-bottom-pages *,
+.collected-data li,
+.export-item-title,
+.grid-table.vouchers *,
+.export-item-title,
+.properties-file-txt,
+.wire-transfer-details *,
+.blog-new-full *,
+div div.new-download-file-title,
+div div.nt-info-txt,
+div div.nt-main-date,
+.new-right-content-block *,
+.ff-right-block *,
+.pro-gray-block *,
+.sync-white-bl *,
+.sync-top-txt,
+.sync-top-txt-block *,
+.blog-new-full *,
+.fingerprint > span,
+.fm-account-main table *,
+.fm-account-main label,
+.fm-account-main div:not(.default-big-button):not(.default-button),
+.fm-account-main div:not(.default-big-button):not(.default-button) + span,
+.new-bottom-pages *,
+.file-link-info,
+.nw-conversations-name,
+.active-folder-link .tranfer-filetype-txt,
+.active-folder-link .nw-fm-tree-folder,
+.active-folder-link .file-block-title,
+.fm-breadcrumbs span span,
+.export-item-title,
+.export-link-gray-txt,
+.message.text-block,
+.message.text-block a,
+.user-card-name:not(.message),
+.user-card-name:not(.message) span,
+.user-card-email,
+.message.data-title,
+.download.info-txt,
+.fm-account-main a,
+.fm-account-main span,
+.fingerprint-txt span, .membership-big-txt.email,
+.properties-txt-pad *,
+.bottom-page.scroll-block *,
+.message.content-area *,
+.message.date-divider {
     -webkit-touch-callout: text !important;
     -webkit-user-select: text !important;
     -khtml-user-select: text !important;
@@ -21514,18 +21569,22 @@ table.speed-table {
 .ps-container {
     max-width: 100%;
 }
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0 !important;
-}
 .ps-container > .ps-scrollbar-y-rail {
-    width: 11px;
+    width: 14px !important;
+    right: 0 !important;
 }
 .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     right: 3px !important;
     width: 8px !important;
+    position: relative;
 }
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
-    right: 0px !important;
+.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y::before {
+    position: absolute;
+    content: '';
+    width: calc(100% + 6px);
+    height: 100%;
+    left: -3px;
+    top: 0;
 }
 .ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
     background-color: transparent !important;
@@ -21578,12 +21637,8 @@ div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
 }
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0px !important;
-}
 .ps-container > .ps-scrollbar-y-rail {
     margin: 2px 0;
-    z-index: 7;
 }
 .bp-main .jspPane {
     min-width: auto;
@@ -21705,7 +21760,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 36px;
     height: 44px;
     margin-right: 12px;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -8px -5749px;
 }
 .widget-dialog .fm-body-text span {
@@ -21930,11 +21985,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 2px;
 }
 .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
         background-position: -128px -5818px;
 }
 .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -88px -5818px;
 }
 .widget-dialog .close-button{
@@ -22002,7 +22057,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     right: 0;
     top:0;
     position:absolute;
-    background-image: url(../images/mega/dialog-sprite_v9.png);
+    background-image: url(../images/mega/dialog-sprite_v11.png);
     background-position: -8px -5816px;
     opacity: 0.73;
     cursor: pointer;
@@ -22797,16 +22852,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .withoutkey .new-registration-checkbox.reset-pass .radio-txt {
     padding-right: 0;
 }
-
-
-
-
-
-
-
-
 /* codes for user-management */
-
 .top-head .top-buttons {
     display: block;
 }
@@ -22849,7 +22895,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: 0px -2381px;
     background-image: url(../images/mega/top-login-sprite_v9.png);
     background-repeat: no-repeat;
-    background-size: 48px 2406px;
     position: absolute;
     width: 12px;
     height: 12px;
@@ -22896,7 +22941,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 .content-panel.user-management .user-management-status::before, .user-management-view .user-management-status::before {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     left: 0px;
     top: 0px;
@@ -22919,7 +22964,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     opacity: 0.8;
 }
 .content-panel.dashboard .small-icon.info-icon, .export-links-dialog .small-icon.info-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -26px -12378px;
     background-size: 48px auto;
@@ -22933,7 +22978,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     vertical-align: middle;
     margin-top: -3px;
 }
-
 .content-panel.dashboard .small-icon.info-icon:hover {
     opacity: 0.8;
 }
@@ -23008,7 +23052,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     left: 16px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
 
 .user-management-tree-panel-header .img.enabled-accounts{
@@ -23037,7 +23081,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     right: 2px;
     top: 12px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -12px -9768px;
     cursor: pointer;
@@ -23116,7 +23160,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     line-height: 26px;
 }
 .user-management-main-page-buttons .default-white-button-user-management .icon, .user-management-main-page-buttons .default-green-button-user-management .icon{
-    margin:1px 8px 1px 0px;
+    margin:1px 8px 1px -3px;
 }
 .fm-files-view-icon-user-management {
     width: 18px;
@@ -23124,7 +23168,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     display: block;
     float: right;
     margin-top: 5px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -23376,7 +23420,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-view .id-card-icon.icon, .fm-right-header-user-management .id-card-icon.icon, .user-management-dialog .id-card-icon.icon{
     background-position: -157px -736px;
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-size: 192px auto;
     width:24px;
     height: 24px;
@@ -23454,7 +23498,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height:24px;
     padding:0;
     margin:20px 8px 20px 0;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -23527,19 +23571,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
        background-color: rgba(255,81,21,1);
 }
 
-.nw-fm-left-icon.user-management::before {
-    background-position: 0px -11961px;
-}
-
-.nw-fm-left-icon.user-management.active .nw-fm-left-border {
-    border-color: #FFA500;
-}
-
-.nw-fm-left-icon.user-management{
-    position: absolute;
-    bottom: 144px;
-}
-
 .user-management-sorting-menu{
     right: -198px;
     top: 39px;
@@ -23599,7 +23630,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px 4px 8px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: inline-block;
 }
@@ -23624,7 +23655,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height:24px;
     margin: 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: inline-block;
     background-position: 0px -12216px;
@@ -23728,7 +23759,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-breadcrumb .user-management-icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: 0 -12281px;
     width:24px;
     height: 24px;
@@ -23737,7 +23768,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     cursor: pointer;
 }
 .user-management-breadcrumb .user-management-next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -23951,7 +23982,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height: 10px;
     border-radius: 100%;
     margin:9px 15px 9px 3px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     display: inline-block;
     position: relative;
 }
@@ -24118,7 +24149,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 
 .user-management-storage .img,
 .user-management-transfer .img{
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-size: 192px auto;
     background-repeat: no-repeat;
     width: 86px;
@@ -24198,7 +24229,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 16px;
     margin:4px 0;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     float: left;
 }
@@ -24298,7 +24329,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:24px;
     height: 24px;
     position: relative;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     opacity: 0.6;
 }
@@ -24709,7 +24740,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     margin:8px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 0;
@@ -24887,7 +24918,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 94px;
     bottom:-11px;
     display: block;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -24px -12312px;
     opacity: 0.8;
@@ -24973,7 +25004,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-grid-table .subaccount-img-big .subaccount-selection-button::before {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -16px -4912px;
     width: 15px;
@@ -25160,9 +25191,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -webkit-filter: blur(0.25em);
 }
 
-.user-management-dialog * {
-    font-family: 'LatoWeb';
-}
 .user-management-dialog .edit-email-warning.active {
     z-index: 999;
     width: -webkit-calc(100% - 16px);
@@ -25314,13 +25342,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .voucher-info-redeem .icon, .user-management-view .icon, .fm-right-header-user-management .icon, .user-management-dialog .icon, .user-management-overview-bar .icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
 }
 .user-management-view .icon48, .user-management-dialog .icon48 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     display: inline-block;
     width:48px;
@@ -25329,7 +25357,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon56, .user-management-dialog .icon56 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width:56px;
     height: 56px;
@@ -25337,7 +25365,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 
 .user-management-view .icon64, .user-management-dialog .icon64, .bottom-page.unsub .icon64 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width:64px;
     height: 64px;
@@ -25359,14 +25387,16 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .mega-logo {
     background-position: -129px -98px;
 }
-
+.dialog-heading-img {
+    display: block;
+}
 .user-management-dialog .dialog-heading-img, .card-container .dialog-heading-img {
-    background-image: url(../images/mega/big-icons_v4.png);
-    margin:40px auto 24px auto;
+    background-image: url(../images/mega/big-icons_v5.png);
+    margin: 40px auto 24px auto;
 }
 
 .user-management-dialog .sent-email-logo {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width:86px;
     height: 44px;
@@ -25686,7 +25716,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: relative;
 }
 .user-management-landing-page .mega-56px-icon{
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width: 56px;
     height: 56px;
@@ -26043,7 +26073,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     background-position: center -2215px;
 }
 .user-management-account-settings .setting-icon24, .user-management-dialog .setting-icon24 {
-    background-image: url(../images/mega/big-icons_v4.png);
+    background-image: url(../images/mega/big-icons_v5.png);
     background-repeat: no-repeat;
     width: 24px;
     height: 24px;
@@ -27207,7 +27237,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width:16px;
     height: 18px;
     background-position: -28px -12060px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     position: absolute;
 }
@@ -27715,7 +27745,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-account-settings .mega-input-title-ontop.short-input .list-arrow {
     width: 16px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-position: -4px -12309px;
     right: 8px;
@@ -28136,7 +28166,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .recovery-key-container {
     box-sizing: border-box;
     height: 66px;
-    width: 386px;
+    width: 460px;
     border: 1px solid rgba(0,0,0,0.05);
     border-radius: 4px;
     background-color: #FFFFFF;
@@ -28149,7 +28179,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .recovery-key-info-block .recovery-key-name {
     height: 18px;
-    width: 140px;
+    width: 210px;
     color: #333333;
     font-size: 14px;
     line-height: 18px;
@@ -28190,7 +28220,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     overflow: hidden;
 }
 .fm-picker-dialog .icon {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-size: 48px auto;
     background-repeat: no-repeat;
     width:24px;
@@ -28303,7 +28333,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin: 4px 0 0 9px;
 }
 .fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     background-size: 48px auto;
     background-position: -12px -4517px;
@@ -28401,7 +28431,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin:4px 4px 0 8px;
 }
 .fm-picker-dialog .next-arrow {
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -41px -1433px;
     width: 7px;
     height: 24px;
@@ -28733,7 +28763,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -webkit-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     -moz-box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
     box-shadow: 0 0 0 1px rgba(255,255,255,0.8);
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-position: -11px -2244px;
 }
 .fm-picker-dialog .my-chat-list {
@@ -28925,7 +28955,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     margin:4px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -29513,7 +29543,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 .transfer-progress-type.download .transfer-progress-pct::before, .transfer-progress-type.upload .transfer-progress-pct::before {
     content: "";
-    background-image: url("../images/mega/icons-sprite_v36.png");
+    background-image: url("../images/mega/icons-sprite_v37.png");
     width: 24px;
     height: 24px;
     left: 0px;
@@ -29584,7 +29614,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     vertical-align: top;
 }
 .transfer-progress-icon {
-    background-image: url("../images/mega/icons-sprite_v36.png");
+    background-image: url("../images/mega/icons-sprite_v37.png");
     width: 24px;
     height: 24px;
     background-repeat: no-repeat;
@@ -29643,7 +29673,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 16px;
     height: 16px;
     display: block;
-    background-image: url("../images/mega/icons-sprite_v36.png");
+    background-image: url("../images/mega/icons-sprite_v37.png");
 }
 .transfer-task-row::after {
     content: "";
@@ -29714,7 +29744,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 24px;
     height: 24px;
     display: none;
-    background-image: url("../images/mega/icons-sprite_v36.png");
+    background-image: url("../images/mega/icons-sprite_v37.png");
 }
 .transfer-task-actions {
     display: none;
@@ -29753,11 +29783,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     border-radius: 4px;
     white-space: nowrap;
     right: 20px;
-    -webkit-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
-    -moz-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
-    -o-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
-    -ms-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
-    transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
     -moz-opacity: 0;
     -khtml-opacity: 0;
@@ -29766,6 +29792,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     visibility: hidden;
 }
 .transfer-complete-actions i:hover .tooltips, .transfer-task-actions .transfer-progress-icon:hover .tooltips {
+    -webkit-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -moz-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -o-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    -ms-transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
+    transition: right 300ms ease-in-out 1s, opacity 1s ease-in-out 1s, visibility 1s ease-in;
     filter:progid:DXImageTransform.Microsoft.Alpha(opacity=100);
     -moz-opacity: 1;
     -khtml-opacity: 1;
@@ -29773,6 +29804,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     right: 28px;
     visibility: visible;
 }
+.transfer-complete-actions i .tooltips:hover, .transfer-task-actions .transfer-progress-icon .tooltips:hover {
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+    -moz-opacity: 0;
+    -khtml-opacity: 0;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    -ms-transition: none;
+    transition: none;
+}
+
 .transfer-progress-bar, .transfer-progress-bar-pct {
     position: absolute;
     display: block;
@@ -29987,7 +30031,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     overflow: hidden;
 }
 .float-widget.transfer-prorgess .banner .delete-img.icon {
-    background-image: url(../images//mega/fm-main-sprite_v13.png);
+    background-image: url(../images//mega/fm-main-sprite_v15.png);
     background-position: 0px -12400px;
     position: absolute;
     width: 24px;

@@ -259,3 +259,14 @@ body.rtl .user-management-account-settings .mega-input-title-ontop.short-input .
     left: 8px;
     right: auto;
 }
+
+/* Megadrop related for Arabic */
+body.ar .wu-stat .wu-total-curr {
+    width: 50%;
+}
+body.ar .wu-stat .wu-total-speed {
+    width: 35%;
+}
+body.ar .wu-stat .wu-total-perc {
+    width: 15%;
+}

@@ -59,7 +59,8 @@ MegaData.prototype.openSharingDialog = function() {
             .addClass('read-only');
 
         // Update dialog title text
-        $('.fm-dialog-title', $dialog).text(l[5631] + ' "' + M.d[$.selected].name + '"');
+        var shareDialogTitle = l[23246].replace('[X]', M.d[$.selected].name);
+        $('.fm-dialog-title', $dialog).text(shareDialogTitle);
         $('.multiple-input .token-input-token-mega', $dialog).remove();
         initTokenInputsScroll($('.multiple-input', $dialog));
         Soon(function() {

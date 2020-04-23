@@ -18,11 +18,11 @@
     color: #373737;
     padding: 76px 40px 35px 40px;
 }
-.download .startpage.top-header {
-    margin-top: 118px;
-}
-body:not(.en) .download .startpage.top-header {
+.download .startpage.top-header, .download .bottom-page.top-title {
     margin-top: 128px;
+}
+body.en .download .startpage.top-header, body.en .download .bottom-page.top-title {
+    margin-top: 118px;
 }
 .startpage.top-info {
     font-size: 16px;
@@ -122,6 +122,37 @@ body:not(.en) .download .startpage.top-header {
 }
 .startpage.img-wrap::after {
     right: 0;
+}
+.bottom-page.banners {
+    position: relative;
+}
+.bottom-page.top-banner {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+    transition: opacity 500ms ease-in-out, visibility 500ms ease-in-out;
+}
+.bottom-page.top-banner.active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+}
+.bottom-page.top-banner.banner2 {
+    padding-bottom: 71px;
+}
+.bottom-page.banner-control {
+    position: absolute;
+    top: 470px;
+    left: 90px;
+    z-index: 3;
+    cursor: pointer;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 90px;
 }
 .startpage.plan-wrapper {
     max-width: 848px;
@@ -859,6 +890,9 @@ body:not(.en) .download .startpage.top-header {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
+.startpage.italic-text span {
+    padding: 0 8px;
+}
 .startpage.quote-icon {
     position: absolute;
     width: 36px;
@@ -909,6 +943,13 @@ body:not(.en) .download .startpage.top-header {
 @media only screen and (max-width: 1140px) {
 .startpage.img-wrap::before {
     display: none;
+}
+.bottom-page.banner-control {
+    left: 10px;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 10px;
 }
 }
 
@@ -1010,6 +1051,9 @@ body:not(.en) .download .startpage.top-header {
     width: auto;
     max-width: 100%;
     max-height: 100%;
+}
+.bottom-page.top-banner.banner2 {
+    padding-bottom: 0;
 }
 }
 
@@ -1175,6 +1219,9 @@ body:not(.en) .download .startpage.top-header {
 .startpage.italic-text {
     font-size: 14px;
 }
+.affiliate-page.top-banner .bottom-page.top-bl {
+    margin-bottom: 60px;
+}
 }
 @media only screen and (max-width: 705px) {
 .startpage.square-block.top-margin, .chaotic .startpage.square-block:nth-child(odd) {
@@ -1275,6 +1322,13 @@ body:not(.en) .download .startpage.top-header {
     opacity: 0;
     left: 0;
 }
+.bottom-page.banner-control {
+    left: 5px;
+}
+.bottom-page.banner-control.next {
+    left: auto;
+    right: 5px;
+}
 }
 
 @media only screen and (max-width: 420px) {
@@ -1348,5 +1402,8 @@ body:not(.en) .download .startpage.top-header {
 }
 .ar .startpage.plan-block .startpage.button-48-height {
     font-size: 13px;
+}
+.bottom-page.banner-control {
+    top: 430px;
 }
 }

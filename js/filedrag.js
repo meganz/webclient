@@ -460,6 +460,9 @@
             if (page == 'start') {
                 start_upload();
             }
+            if (!window.InitFileDrag) {
+                return;
+            }
             $('.fm-file-upload input').remove();
             $('.fm-file-upload').append('<input type="file" id="fileselect1" title="' + l[99] + '" multiple="">');
             $('.fm-folder-upload input').remove();
@@ -553,6 +556,11 @@
         document.getElementsByTagName("body")[0].addEventListener("dragleave", fnLeave, false);
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
         document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
+
+        if (is_mobile && (ua.details.engine === 'Gecko' || is_ios && is_ios < 13)) {
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=1456557
+            $('input[multiple]').removeAttr('multiple');
+        }
 
 
         if (is_chrome_firefox) {

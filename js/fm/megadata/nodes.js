@@ -1981,19 +1981,25 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var $treeElements = $('#treea_' + handle).add('#treea_os_' + handle).add('#treea_pl_' + handle);
 
         // Remove all colour label classes
-        $('#' + handle).removeClass(removeClasses);
-        $('#' + handle + ' a').removeClass(removeClasses);
+        var $item = $('#' + handle);
+        $item.removeClass(removeClasses);
+        $('a', $item).removeClass(removeClasses);
+        $('.label', $item).text('');
         $treeElements.removeClass('labeled');
         $('.colour-label-ind', $treeElements).remove();
 
         if (labelId) {
             // Add colour label classes.
-            var colourClass = 'colour-label ' + M.getLabelClassFromId(labelId);
+            var lblColor = M.getLabelClassFromId(labelId);
+            var colourClass = 'colour-label ' + lblColor;
 
-            $('#' + handle).addClass(colourClass);
-            $('#' + handle + ' a').addClass(colourClass);
+            $item.addClass(colourClass);
+            $('a', $item).addClass(colourClass);
             $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
+            if (M.megaRender) {
+                $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
+            }
         }
 
         var currentTreeLabel = M.filterTreePanel[M.currentTreeType + '-label'];
@@ -3735,6 +3741,77 @@ MegaData.prototype.getNodeParent = function(node) {
     }
 
     return node && node.p || false;
+};
+
+/**
+ * Retrieve media properties for a file node.
+ * @param {MegaNode|String} node An ufs node or handle
+ * @return {Object} Media properties.
+ */
+MegaData.prototype.getMediaProperties = function(node) {
+    'use strict';
+    node = typeof node === 'string' ? this.getNodeByHandle(node) : node;
+
+    var isText = false;
+    var isImage = is_image2(node);
+    var mediaType = is_video(node);
+    var isVideo = mediaType > 0;
+    var isAudio = mediaType > 1;
+    var isPreviewable = isImage || isVideo;
+
+    if (!isPreviewable && is_text(node)) {
+        isText = isPreviewable = true;
+    }
+
+    return {
+        isText: isText,
+        isImage: isImage,
+        isVideo: isVideo,
+        isAudio: isAudio,
+        icon: fileIcon(node),
+        isPreviewable: isPreviewable,
+        showThumbnail: String(node.fa).indexOf(':1*') > 0
+    };
+};
+
+/**
+ * Preview a node in-browser.
+ * @param {MegaNode|String} node An ufs node or handle
+ * @return {Boolean} whether it was shown.
+ */
+MegaData.prototype.viewMediaFile = function(node) {
+    'use strict';
+    node = typeof node === 'string' ? this.getNodeByHandle(node) : node;
+    var prop = M.getMediaProperties(node);
+    var handle = node.ch || node.h;
+    var result = true;
+
+    console.assert(prop.isPreviewable, 'This is not viewable..');
+
+    if (prop.isText) {
+        loadingDialog.show();
+        mega.fileTextEditor.getFile(handle)
+            .then(function(data) {
+                loadingDialog.hide();
+                mega.textEditorUI.setupEditor(node.name, data, handle, true);
+            })
+            .catch(function(ex) {
+                console.warn(ex);
+                loadingDialog.hide();
+            });
+    }
+    else if (typeof slideshow === 'function') {
+        if (prop.isVideo) {
+            $.autoplay = node.h;
+        }
+        slideshow(handle, 0, true);
+    }
+    else {
+        console.assert(is_mobile, 'Where are we?...');
+        result = false;
+    }
+
+    return result;
 };
 
 /**

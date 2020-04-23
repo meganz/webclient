@@ -559,14 +559,19 @@ function setContactLink($container) {
         var leftPos = $this.offset().left + $this.width() / 2 - $tooltip.outerWidth() / 2;
         var topPos = $this.offset().top - $tooltip.outerHeight() - 10;
 
-        $tooltip.addClass('visible').css({
-            'left': leftPos,
-            'top': topPos
-        });
+        $tooltip
+            .addClass('visible')
+            .removeClass('hidden')
+            .css({
+                'left': leftPos,
+                'top': topPos
+            });
     });
 
     $publicLink.rebind('mouseout.publiclnk', function() {
-        $('.dropdown.tooltip.small').removeClass('visible');
+        $('.dropdown.tooltip.small')
+            .removeClass('visible')
+            .addClass('hidden');
     });
 
     $publicLink.rebind('click.publiclnk', function() {
@@ -856,6 +861,13 @@ function fmtopUI() {
 
         $icon.removeClass('filled glow');
     }
+
+    if (mega.flags.refpr) {
+        $('.nw-fm-left-icon.affiliate').removeClass('hidden');
+    }
+    else {
+        $('.nw-fm-left-icon.affiliate').addClass('hidden');
+    }
 }
 
 function doClearbin(all) {
@@ -1125,15 +1137,14 @@ function fm_showoverlay() {
 
 /**
  * Looking for a already existing name of URL (M.v)
- * @param {Integer} nodeType file:0 folder:1
  * @param {String} value New file/folder name
  * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
  */
-function duplicated(nodeType, value, target) {
+function duplicated(value, target) {
     "use strict";
     if (!target) {
         var items = M.v.filter(function (item) {
-            return item.name === value && item.t === nodeType;
+            return item.name === value;
         });
 
         return items.length !== 0;
@@ -1142,7 +1153,7 @@ function duplicated(nodeType, value, target) {
         if (M.c[target]) {
             // Check if a folder/file with the same name already exists.
             for (var handle in M.c[target]) {
-                if (M.d[handle] && M.d[handle].t === nodeType && M.d[handle].name === value) {
+                if (M.d[handle] && M.d[handle].name === value) {
                     return true;
                 }
             }
@@ -1181,11 +1192,11 @@ function renameDialog() {
                     }
                     else if (M.isSafeName(value)) {
                         var targetFolder = n.p;
-                        if (!duplicated(nodeType, value, targetFolder)) {
-                            M.rename(n.h, value);
+                        if (duplicated(value, targetFolder)) {
+                            errMsg = l[23219];
                         }
                         else {
-                            errMsg = nodeType ? l[17579] : l[17578];
+                            M.rename(n.h, value);
                         }
                     }
                     else {
@@ -1597,6 +1608,9 @@ function openContactInfoLink(contactLink) {
 
                     return false;
                 });
+
+                // This contact link is valid to be affilaited
+                M.affiliate.storeAffiliate(contactLink, 4);
             }
         }
         else {
@@ -1610,7 +1624,13 @@ function openContactInfoLink(contactLink) {
                     openContactInfoLink(contactLink);
                 });
 
-                return loadSubPage(page);
+                // This contact link is not checked but stored for register case
+                // and also user click `add contact` anyway so it's user's call
+                M.affiliate.storeAffiliate(contactLink, 4);
+
+                login_next = page;
+                login_txt = l[1298];
+                return loadSubPage('login');
             });
         }
         $dialog.removeClass('hidden');
@@ -2747,16 +2767,18 @@ function createFolderDialog(close) {
             if ($.cftarget) {
                 specifyTarget = $.cftarget;
             }
-            if (duplicated(1, v, specifyTarget)) {
+            if (duplicated(v, specifyTarget)) {
                 $dialog.addClass('duplicate');
                 $input.addClass('error');
 
-                setTimeout(function () {
-                    $dialog.removeClass('duplicate');
-                    $input.removeClass('error');
-
-                    $input.trigger("focus");
-                }, 2000);
+                setTimeout(
+                    function() {
+                        $input.removeClass('error');
+                        $dialog.removeClass('duplicate');
+                        $input.trigger("focus");
+                    },
+                    2000
+                );
 
                 return;
             }
@@ -2941,7 +2963,7 @@ function createFileDialog(close, action, params) {
             $input.addClass('error');
             return;
         }
-        else if (duplicated(0, v, target)) {
+        else if (duplicated(v, target)) {
             $dialog.addClass('duplicate');
             $input.addClass('error');
 
@@ -3403,6 +3425,9 @@ function fm_resize_handler(force) {
             $mainBlock.addClass('ultra low-width');
         }
         initDashboardScroll();
+    }
+    else if (M.currentdirid === 'refer') {
+        initAffiliateScroll();
     }
     else if (!M.chat) {
         if (M.viewmode) {

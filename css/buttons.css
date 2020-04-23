@@ -363,6 +363,16 @@ body:not(.rtl) .default-white-button::first-letter {
     line-height: 35px;
     height: 36px;
 }
+.default-green-button.height-40 {
+    line-height: 40px;
+    height: 40px;
+    font-size: 16px;
+    border-radius: 4px;
+    padding: 0 20px;
+}
+.default-green-button.height-40  i {
+    margin: 11px 0 0 5px;
+}
 .default-white-button.big, .default-red-button.big, .default-green-button.big {
     line-height: 43px;
     height: 43px;
@@ -1129,7 +1139,7 @@ body:not(.rtl) .default-white-button::first-letter {
     width: 24px;
     height: 24px;
     margin:3px 8px 4px 0px;
-    background-image: url(../images/mega/fm-main-sprite_v13.png);
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;

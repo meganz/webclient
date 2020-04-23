@@ -6,8 +6,35 @@
 <div class="account-mid-block dev-block ltr">
   <div class="main_bg_image">
     <div class="register-mid-pad">
-      <div class="account-left-block"> <a href="/dev" class="account-link selected" id="a_dev"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-home">Home</span> </a> <a href="/sdk" class="account-link"  id="a_dev_sdk"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-core">C++ SDK</span> </a> <a href="/doc" class="account-link" id="a_dev_doc"> <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-doc">Documentation</span> </a>
-        <div class="dev-new-submenu hidden"> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_1"> Preface </span> </span> </a> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_5"> Programming model </span> </span> </a> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"  id="docmenu_6"> Implementation </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_7"> Development process </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_8"> Planned future enhancements </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_9"> Method/callback overview </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_10"> Error codes </span> </span> </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt" id="docmenu_11"> Under the hood </span> </span> </a> </div>
+      <div class="account-left-block">
+        <a class="account-link selected clickurl" href="/dev" id="a_dev">
+          <span class="account-link-arrow"></span>
+          <span class="dev-new-icon dev-new-home">Home</span>
+        </a>
+        <a class="account-link clickurl" href="/sdk" id="a_dev_sdk">
+          <span class="account-link-arrow"></span>
+          <span class="dev-new-icon dev-new-core">C++ SDK</span>
+        </a>
+        <a class="account-link clickurl" href="/doc" id="a_dev_doc">
+          <span class="account-link-arrow"></span> <span class="dev-new-icon dev-new-doc">Documentation</span>
+        </a>
+        <div class="dev-new-submenu hidden"><a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span
+                class="dev-new-submenu-txt" id="docmenu_1"> Preface </span> </span> </a> <a
+                class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                       id="docmenu_5"> Programming model </span> </span>
+        </a> <a class="dev-new-submenu-item"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                       id="docmenu_6"> Implementation </span> </span>
+        </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                            id="docmenu_7"> Development process </span> </span>
+        </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                            id="docmenu_8"> Planned future enhancements </span> </span>
+        </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                            id="docmenu_9"> Method/callback overview </span> </span>
+        </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                            id="docmenu_10"> Error codes </span> </span>
+        </a> <a class="dev-new-submenu-item last"> <span class="dev-new-submenu-pad"> <span class="dev-new-submenu-txt"
+                                                                                            id="docmenu_11"> Under the hood </span> </span>
+        </a></div>
         <div class="clear"></div>
       </div>
       <div class="account-right-block">
@@ -19,14 +46,14 @@
               <div class="dev-new-img-bl"> <img alt="" src="{staticpath}images/mega/dev-img1.png" /> </div>
               <div class="dev-new-header"> C++ Client Access Engine </div>
               <div class="dev-new-description"> The software layer that shields your application from the complexities of MEGA's cryptography, API and I/O. </div>
-              <a href="/sdk" class="dev-new-red-button"> Get the Code</a>
+              <a class="dev-new-red-button clickurl" href="/sdk"> Get the Code</a>
               <div class="clear"></div>
             </div>
             <div class="dev-new-right-bl">
               <div class="dev-new-img-bl"> <img alt="" src="{staticpath}images/mega/dev-img2.png" /> </div>
               <div class="dev-new-header"> Documentation </div>
               <div class="dev-new-description"> Getting started: Integration guide, data structures, methods and callbacks, error codes, and more! </div>
-              <a href="/doc" class="dev-new-red-button"> View documentation</a>
+              <a class="dev-new-red-button clickurl" href="/doc"> View documentation</a>
               <div class="clear"></div>
             </div>
             <div class="clear"></div>
@@ -116,58 +143,133 @@
           </div>
           <div class="dev-block-pad new-dev" id="dev_doc" style="display:none;">
             <div id="dev_preface_div">
-              <p>Welcome to the MEGA SDK! We hope that it will prove useful to developers who are interested in integrating MEGA support into their applications.</p>
+              <p>Welcome to the MEGA SDK! We hope that it will prove useful to developers who are interested in
+                integrating MEGA support into their applications.</p>
               <h2 id="doc_1">1 What is the MEGA SDK good for?</h2>
-              <p>The MEGA SDK consists of code and documentation that enables you to make use of MEGA's API functionality at a comfortably high level of abstraction. Its core component &mdash; a code module called <I>client access engine</I> &mdash; maintains a current copy of the user's account in memory (which includes all relevant files, folders, contacts and shares), accepts commands from the application and notifies the application of command results and other updates through callbacks.</p>
+              <p>The MEGA SDK consists of code and documentation that enables you to make use of MEGA's API
+                functionality at a comfortably high level of abstraction. Its core component &mdash; a code module
+                called <i>client access engine</i> &mdash; maintains a current copy of the user's account in memory
+                (which includes all relevant files, folders, contacts and shares), accepts commands from the
+                application and notifies the application of command results and other updates through callbacks.</p>
               <h2>2 How do I use the MEGA client access engine?</h2>
-              <p>The MEGA client access engine comes as a set of C++ classes and interfaces. If you are using C++, you can simply add them to your project. You then instantiate the MegaClient class (which holds the session state) and pass it an instance of your implementation of the HttpIO interface (which handles network requests and blocking) and MegaApp (through which you receive the engine's callbacks).</p>
-              <p>The core code is reasonably platform independent (if you encounter any issues with your specific C++ compiler environment, please let us know). To illustrate practical usage, a sample application (a basic ftp-style interactive console client) is included.</p>
-              <h2>3 Why do you provide a code module rather than documenting the API interface in sufficient detail for me to implement it myself?</h2>
+              <p>The MEGA client access engine comes as a set of C++ classes and interfaces. If you are using C++, you
+                can simply add them to your project. You then instantiate the MegaClient class (which holds the session
+                state) and pass it an instance of your implementation of the HttpIO interface (which handles network
+                requests and blocking) and MegaApp (through which you receive the engine's callbacks).</p>
+              <p>The core code is reasonably platform independent (if you encounter any issues with your specific C++
+                compiler environment, please let us know). To illustrate practical usage, a sample application (a basic
+                ftp-style interactive console client) is included.</p>
+              <h2>3 Why do you provide a code module rather than documenting the API interface in sufficient detail for
+                me to implement it myself?</h2>
               <p>Two reasons:</p>
               <ul>
-                <li>Complexity/efficiency &mdash; Since all of MEGA's crypto logic runs on the client side, you'd be looking at a project exceeding 5,000 lines of code. And, as natural language is rather inefficient when it comes to specifying algorithms, the documentation would be similarly voluminous.</li>
-                <li>Consistency/interoperability &mdash; Ambiguities in the specification or its imprecise interpretation would inevitably lead to undesired behavioural differences between implementations.</li>
+                <li>Complexity/efficiency &mdash; Since all of MEGA's crypto logic runs on the client side, you'd be
+                  looking at a project exceeding 5,000 lines of code. And, as natural language is rather inefficient
+                  when it comes to specifying algorithms, the documentation would be similarly voluminous.
+                </li>
+                <li>Consistency/interoperability &mdash; Ambiguities in the specification or its imprecise
+                  interpretation would inevitably lead to undesired behavioural differences between implementations.
+                </li>
               </ul>
-              <h2>4 Thanks, but why C++? I am using C, Objective C, C#, Java, Scala, Python, Ruby, Perl, PHP, VB...</h2>
-              <p>The requirement to integrate with projects that compile to native code rules out all languages that rely on specific interpreters or runtime environments. C, being the "lingua franca" of nearly all modern systems, would have been the obvious choice, but the code compactness and readability benefits provided by C++'s syntactic sugar and template library are well worth the minor additional integration overhead. We will work with interested developers to add MEGA support to their preferred environments by way of native code modules/extensions (rather than by porting the functionality to the target language itself). Please contact us at <a href="mailto:developers@mega.nz">developers@mega.nz</a> if you are willing and able to contribute to a particular integration effort.</p>
+              <h2>4 Thanks, but why C++? I am using C, Objective C, C#, Java, Scala, Python, Ruby, Perl, PHP,
+                VB...</h2>
+              <p>The requirement to integrate with projects that compile to native code rules out all languages that
+                rely on specific interpreters or runtime environments. C, being the "lingua franca" of nearly all
+                modern systems, would have been the obvious choice, but the code compactness and readability benefits
+                provided by C++'s syntactic sugar and template library are well worth the minor additional integration
+                overhead. We will work with interested developers to add MEGA support to their preferred environments
+                by way of native code modules/extensions (rather than by porting the functionality to the target
+                language itself). Please contact us at <a href="mailto:developers@mega.nz">developers@mega.nz</a> if
+                you are willing and able to contribute to a particular integration effort.</p>
               <h2 id="doc_5">5. Programming model</h2>
               <h2>5.1 Interaction</h2>
-              <p>The application submits requests to the client access engine through nonblocking calls to methods of the MegaClient object and signals events to the application by invoking methods of an object of its implementation of the MegaApp interface.</p>
+              <p>The application submits requests to the client access engine through nonblocking calls to methods of
+                the MegaClient object and signals events to the application by invoking methods of an object of its
+                implementation of the MegaApp interface.</p>
               <h2>5.2 Files and folders</h2>
-              <p>Files and folders are represented by Node objects and referenced by node handles. Nodes point to parent nodes, forming trees. Trees have exactly one root node (circular linkage is not allowed). Node updates (caused by the session's own actions, other sessions of the same account or other accounts, e.g. through activity in a shared folder) are notified in real time through a callback specifying the affected nodes. Deleted nodes are first notified with their removed flag set before being purged to give the application an opportunity to remove them from the UI view.</p>
-              <p>There are at least three node trees per account: Root, incoming and rubbish. Additional trees can originate from other users as shared folders.</p>
+              <p>Files and folders are represented by Node objects and referenced by node handles. Nodes point to
+                parent nodes, forming trees. Trees have exactly one root node (circular linkage is not allowed). Node
+                updates (caused by the session's own actions, other sessions of the same account or other accounts,
+                e.g. through activity in a shared folder) are notified in real time through a callback specifying the
+                affected nodes. Deleted nodes are first notified with their removed flag set before being purged to
+                give the application an opportunity to remove them from the UI view.</p>
+              <p>There are at least three node trees per account: Root, incoming and rubbish. Additional trees can
+                originate from other users as shared folders.</p>
               <h2>5.3 Users and contacts</h2>
-              <p>Users are referenced by their user handle and/or their primary e-mail address. The engine maintains a User object for every user account that has appeared in the context of the current session: As a contact or merely as the owner of a filesystem node. A visibility flag turns a user into a contact if set.</p>
-              <p>User attributes can be used to store credentials such as avatar pictures, address, date of birth etc. It is recommended to store application-private user credentials AES-CBC encrypted.</p>
+              <p>Users are referenced by their user handle and/or their primary e-mail address. The engine maintains a
+                User object for every user account that has appeared in the context of the current session: As a
+                contact or merely as the owner of a filesystem node. A visibility flag turns a user into a contact if
+                set.</p>
+              <p>User attributes can be used to store credentials such as avatar pictures, address, date of birth etc.
+                It is recommended to store application-private user credentials AES-CBC encrypted.</p>
               <h2>5.4 Asynchronous completion</h2>
-              <p>All engine methods are nonblocking &mdash; waiting for network communication to complete is not an option. Instead, they merely initiate the desired action, the outcome of which is eventually signalled through a callback. The application should be robust against such callbacks arriving after a long time (i.e., many seconds). Failed requests (e.g. due to network issues) are retried automatically with exponential backoff. The application receives notification of this through a callback and should inform the user accordingly, along with a UI element to manually initiate a retry.</p>
-              <p>Three types of operation are subject to acceleration by a mechanism called "speculative instant completion": Node attribute updates, moves and deletions. As these merely receive a highly predictable "OK" or "failure" response from the API, there is some benefit in immediately updating the local nodes and reloading the session state in the rare event of an inconsistency. The engine loosely protects them with an access check that is following the same semantics as the authoritative check on the API server side.</p>
+              <p>All engine methods are nonblocking &mdash; waiting for network communication to complete is not an
+                option. Instead, they merely initiate the desired action, the outcome of which is eventually signalled
+                through a callback. The application should be robust against such callbacks arriving after a long time
+                (i.e., many seconds). Failed requests (e.g. due to network issues) are retried automatically with
+                exponential backoff. The application receives notification of this through a callback and should inform
+                the user accordingly, along with a UI element to manually initiate a retry.</p>
+              <p>Three types of operation are subject to acceleration by a mechanism called "speculative instant
+                completion": Node attribute updates, moves and deletions. As these merely receive a highly predictable
+                "OK" or "failure" response from the API, there is some benefit in immediately updating the local nodes
+                and reloading the session state in the rare event of an inconsistency. The engine loosely protects them
+                with an access check that is following the same semantics as the authoritative check on the API server
+                side.</p>
               <h2>5.5 Concurrency considerations</h2>
-              <p>Shared access to a resource (writable nodes accessible to the user's account) based on a potentially outdated (due to network latency) view is naturally prone to race conditions, leading to inconsistencies when two parties make conflicting updates within the latency window. The engine contains heuristics to detect these conflicts and will ask the application to discard and reload its view if needed (the user should be informed accordingly).</p>
+              <p>Shared access to a resource (writable nodes accessible to the user's account) based on a potentially
+                outdated (due to network latency) view is naturally prone to race conditions, leading to
+                inconsistencies when two parties make conflicting updates within the latency window. The engine
+                contains heuristics to detect these conflicts and will ask the application to discard and reload its
+                view if needed (the user should be informed accordingly).</p>
               <h2>5.6 Event processing and threading</h2>
-              <p>Due to its nonblocking nature, the MEGA client access engine integrates extremely well with single-threaded applications (although on platforms without a nonblocking DNS lookup facility, you may not get around using a worker thread for name resolution). If you, however, prefer to use multiple threads, you are welcome to do so - as long as you ensure that no two threads get to enter the engine or access its data structures at the same time.</p>
+              <p>Due to its nonblocking nature, the MEGA client access engine integrates extremely well with
+                single-threaded applications (although on platforms without a nonblocking DNS lookup facility, you may
+                not get around using a worker thread for name resolution). If you, however, prefer to use multiple
+                threads, you are welcome to do so - as long as you ensure that no two threads get to enter the engine
+                or access its data structures at the same time.</p>
               <h2>5.7 Running the engine</h2>
-              <p>There are three approaches to integrating the engine with the application. The goal is to have the engine get the CPU (through MegaClient's exec() method) swiftly whenever one of its wakeup triggers fires: </p>
+              <p>There are three approaches to integrating the engine with the application. The goal is to have the
+                engine get the CPU (through MegaClient's exec() method) swiftly whenever one of its wakeup triggers
+                fires: </p>
               <ul>
-                <li>block inside the engine's own blocking callback (which waits for socket I/O and timeouts) and include the application's own wakeup triggers</li>
-                <li>record the engine's wakeup triggers and include them in the application's existing blocking facility</li>
-                <li>dedicate a worker thread to the MEGA engine and interact with the application through e.g. a bidirectional message queue (inefficient, but the only option if, for some reason, you cannot modify the application's event processing)</li>
+                <li>block inside the engine's own blocking callback (which waits for socket I/O and timeouts) and
+                  include the application's own wakeup triggers
+                </li>
+                <li>record the engine's wakeup triggers and include them in the application's existing blocking
+                  facility
+                </li>
+                <li>dedicate a worker thread to the MEGA engine and interact with the application through e.g. a
+                  bidirectional message queue (inefficient, but the only option if, for some reason, you cannot modify
+                  the application's event processing)
+                </li>
               </ul>
               <h2>5.8 File name conflicts</h2>
-              <p>Applications must be prepared to deal with file and folder name clashes. In many scenarios, this is trivial - the user sees all copies and makes the decision which file he is interested in, mostly based on its timestamp. Some applications, however, map a MEGA node tree to a resource that uses file paths as unique keys, e.g. filesystems. In this case, we recommend that only the most recent node is used.</p>
-              <p>Filename characters that are not allowed on the host must be urlencoded using %xx. When writing files back to the server, valid urlencoded sequences must be replaced with the encoded character. This has the potential unwanted side effect of mangling filenames that originally contained valid %xx sequences, but this should be rare, and they'll be unmangled when read back to the local machine.</p>
+              <p>Applications must be prepared to deal with file and folder name clashes. In many scenarios, this is
+                trivial - the user sees all copies and makes the decision which file he is interested in, mostly based
+                on its timestamp. Some applications, however, map a MEGA node tree to a resource that uses file paths
+                as unique keys, e.g. filesystems. In this case, we recommend that only the most recent node is
+                used.</p>
+              <p>Filename characters that are not allowed on the host must be urlencoded using %xx. When writing files
+                back to the server, valid urlencoded sequences must be replaced with the encoded character. This has
+                the potential unwanted side effect of mangling filenames that originally contained valid %xx sequences,
+                but this should be rare, and they'll be unmangled when read back to the local machine.</p>
               <h2>5.9 Namespace management: Node, file and user attributes</h2>
-              <p>We kindly ask all application developers wishing to introduce new node, file or user attributes to coordinate the numbering/naming and formatting conventions with us to maximize cross-application interoperability. Should you elect not to do so, please avoid cluttering the namespaces and prefix the new attribute names with your abbreviated company or application name.</p>
+              <p>We kindly ask all application developers wishing to introduce new node, file or user attributes to
+                coordinate the numbering/naming and formatting conventions with us to maximize cross-application
+                interoperability. Should you elect not to do so, please avoid cluttering the namespaces and prefix the
+                new attribute names with your abbreviated company or application name.</p>
               <h2 id="doc_6">6. Implementation</h2>
               <h2>6.1 Interfaces</h2>
               <p>The following interfaces need to be implemented by the application: </p>
               <ul>
                 <li>
                   <c>FileAccess</c>
-                  - File opening/closing/reading/writing</li>
+                  - File opening/closing/reading/writing
+                </li>
                 <li>
                   <c>HttpIO</c>
-                  - HTTP requests with SSL support</li>
+                  - HTTP requests with SSL support
+                </li>
                 <li>
                   <c>PrnGen</c>
                   - Cryptographically strong pseudo-random number generator</li>
@@ -306,7 +408,9 @@
                 <c>quota_exceeded()</c>
                 callback, and the download will retry automatically until bandwidth quota becomes available.</p>
               <h2>6.5 API access authorization</h2>
-              <p>To access the MEGA API, applications need to present a valid API key, which can be obtained free of charge from <a href="/sdk">https://mega.nz/sdk</a>. Please see the <a href="/sdkterms">SDK terms of service</a> for details.</p>
+              <p>To access the MEGA API, applications need to present a valid API key, which can be obtained free of
+                charge from <a class="clickurl" href="/sdk">https://mega.nz/sdk</a>.
+                Please see the <a class="clickurl" href="/sdkterms">SDK terms of service</a> for details.</p>
               <h2 id="doc_7">7 Development process</h2>
               <p>The release of the C++ SDK is merely a starting point, and it will evolve over time. We'd like to hear from developers actually using it in their applications - if you find bugs, design flaws or other shortcomings, please get in touch at <a href="mailto:developers@mega.nz">developers@mega.nz</a>. MEGA is hiring, so be prepared to receive an offer if your feedback indicates that you are a bright mind.</p>
               <p>A developer forum and source code repository will be made available soon.</p>
@@ -540,7 +644,9 @@
               </p>
               <p>Callback:
                 <c>
-                login_result(error e)</p>
+                  login_result(error e)
+                </c>
+              </p>
               <p>Error codes:
                 <c>API_ENOENT</c>
                 : Invalid e-mail address or password,
@@ -570,14 +676,18 @@
               </p>
               <p>Callback:
                 <c>
-                changepw_result(error e)</p>
+                  changepw_result(error e)
+                </c>
+              </p>
               <p>Return code:
                 <c>API_EACCESS</c>
                 if no user session exists.</p>
               <h2>9.6 Updating a node's attributes (with instant completion)</h2>
               <p>Method:
                 <c>
-                error setattr(Node* node, const char** newattr)</p>
+                  error setattr(Node* node, const char** newattr)
+                </c>
+              </p>
               <p>Return value: API_EACCESS if node not writable.</p>
               <p>Callback: setattr_result(handle nodehandle, error e)</p>
               <p>The node's current attributes are pushed to the server. The optional
@@ -693,7 +803,7 @@
               <p>
                 <c>macs</c>
                 contains the MAC hash for each file chunk
-              <p/>
+              </p>
               <p>
                 <c>fn</c>
                 is the filename (UTF-8)</p>
@@ -762,7 +872,7 @@
               <p>Callback: node_updated(client,nodes,count) - nodes were added, updated or removed</p>
               <p>Callback: notify_retry(client,time) - specifies time in decisecons until the next retry</p>
               <p>Callback: reload(client,reason) - possible inconsistency, reload account state</p>
-              <h2 id="doc_10">10    Error codes</h2>
+              <h2 id="doc_10e">10 Error codes</h2>
               <ul>
                 <li>API_OK (0): Success</li>
                 <li>API_EINTERNAL (-1): An internal error has occurred. Please submit a bug report, detailing the exact circumstances in which this error occurred.</li>
@@ -811,7 +921,8 @@
               <p>While a request is executed, all users that may be affected by it are locked. This includes the requesting user and all users that are in a shared folder relationship and/or in the contact list. A request may return the error code EAGAIN in the event of a failed locking attempt or a temporary server-side malfunction. The request is likely to complete when retried. Client applications must implement exponential backoff (with user-triggerable immediate retry) and should inform the user of a possible server or network issue if the EAGAIN condition persists or no response is received for more than a few seconds.</p>
               <p>A successfully executed request returns an array of result objects, with each result appearing in the same array index location as the corresponding command.</p>
               <h2>11.6.1 Request URL format</h2>
-              <p> Target URL: <a href="/doc">https://g.api.mega.co.nz/cs?id=sequence_number&ak=appkey&&#91;&sid=sessionid|&n=node&#93;</a></p>
+              <p> Target URL: <a class="clickurl" href="/doc">https://g.api.mega.co.nz/cs?id=sequence_number&ak=appkey&&#91;&sid=sessionid|&n=node&#93;</a>
+              </p>
               <ul>
                 <li>sequence_number is a session-unique number that is incremented per dispatched request (but not changed when requests are repeated in response to network issues or EAGAIN)</li>
                 <li>appkey is the application's key</li>
@@ -830,7 +941,8 @@
               <h2>11.7 Server-client requests</h2>
               <p>As a server cannot reliably establish a connection to a client, server-client requests have to be polled by the latter through a blocking read loop.</p>
               <h2>11.7.1 Request URL format</h2>
-              <p>Target URL: <a href="/doc">https://g.api.mega.co.nz/sc?id=sequence_reference&#91;&sid=sessionid|&n=node&#93;&#91;ssl=1&#93;</a></p>
+              <p>Target URL: <a class="clickurl" href="/doc">https://g.api.mega.co.nz/sc?id=sequence_reference&#91;&sid=sessionid|&n=node&#93;&#91;ssl=1&#93;</a>
+              </p>
               <ul>
                 <li>sequence_reference tells the server which server-client request(s) to deliver next. It is initialized from the response to a filesystem tree fetch (f command).</li>
                 <li>sessionid is the session ID of the user session authentication mode</li>

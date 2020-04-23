@@ -7,15 +7,17 @@
  * @param is_dir {Boolean}
  * @param [is_chatlink] {Boolean}
  * @param [is_contactlink] {Boolean}
+ * @param [url] {String}
  * @constructor
  */
-var LinkInfoHelper = function(node_handle, node_key, is_dir, is_chatlink, is_contactlink) {
+var LinkInfoHelper = function(node_handle, node_key, is_dir, is_chatlink, is_contactlink, url) {
     "use strict";
     this.node_handle = node_handle;
     this.node_key = node_key;
     this.is_dir = is_dir;
     this.is_chatlink = is_chatlink;
     this.is_contactlink = is_contactlink;
+    this._url = url;
     this.info = {};
 };
 
@@ -23,6 +25,7 @@ LinkInfoHelper.MEGA_LINKS_REGEXP = [
     "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/#(!|F!)([a-zA-Z\!0-9\-_]+)",
     "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(chat\\/)([a-zA-Z\#0-9\-_]+)",
     "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(C!)([a-zA-Z\#0-9\-_]+)",
+    "(http(s?):\\/\\/)?([a-zA-Z0-9\-.]*)?mega.(co\\.nz|nz)\\/(file|folder)/([a-zA-Z\#0-9\-_]+)",
 ];
 LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED = false;
 LinkInfoHelper._CACHE = {};
@@ -95,7 +98,22 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                     var cacheKey = handle + ":" + key;
 
                     if (!LinkInfoHelper._CACHE[cacheKey]) {
-                        LinkInfoHelper._CACHE[cacheKey] = new LinkInfoHelper(handle, key, is_dir);
+                        LinkInfoHelper._CACHE[cacheKey] = new LinkInfoHelper(handle, key, is_dir, false, false, m[0]);
+                    }
+
+                    found.push(
+                        LinkInfoHelper._CACHE[cacheKey]
+                    );
+                }
+                else if (m[5] === "file" || m[5] === "folder") {
+                    var handleAndKey = m[6].split("#");
+                    var handle = handleAndKey[0];
+                    var key = handleAndKey[1] && handleAndKey[1].split("/")[0] || "";
+                    var is_dir = m[5] === "folder";
+                    var cacheKey = (m[3] || "") + "_" + handle + ":" + key;
+
+                    if (!LinkInfoHelper._CACHE[cacheKey]) {
+                        LinkInfoHelper._CACHE[cacheKey] = new LinkInfoHelper(handle, key, is_dir, false, false, m[0]);
                     }
 
                     found.push(

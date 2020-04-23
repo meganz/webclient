@@ -1,0 +1,89 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/business.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/affiliate-program.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../js/vendor/Chart.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            
+            $('.fm-dialog.generate-url .url').bind('click', function() {
+                var sel, range;
+                var el = $(this)[0];
+                if (window.getSelection && document.createRange) {
+                  sel = window.getSelection();
+                  if(sel.toString() == ''){
+                     window.setTimeout(function(){
+                        range = document.createRange();
+                        range.selectNodeContents(el);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    },1);
+                  }
+                }
+            });
+        });
+
+    </script>
+</head>
+<body id="bodyel" class="logged fontsize2 en lite">
+    <div class="fm-dialog-overlay"></div>
+    
+    <div class="fm-dialog generate-url lato" style="display: block;">
+        <div class="fm-dialog-close"></div>
+        <div class="fm-dialog-title">Generate your unique MEGA referral URL</div>
+        <div class="generate-url header">
+            Use your unique link to share MEGA with your audience and get paid:
+        </div>
+        <div class="generate-url url-block">
+            <div class="generate-url copy-button">
+                Copy
+            </div>
+            <i class="small-icon fm-s small-chain"></i>
+            <div class="url">https://mega.nz/<span>startpage</span>/&amp;aff=SkgDOEONb_w</div>
+        </div>
+        <div class="generate-url info">
+            Choose any MEGA page to generate your unique URL:
+        </div>
+         <div class="generate-url page-names">
+            <span class="active">Startpage</span>
+            <span>Business</span>
+            <span>Mobile Apps</span>
+            <span>Desktop Apps</span>
+            <span>UWP</span>
+            <span>Security</span>
+            <span>Privacy Company</span>
+            <span>MEGAbird</span>
+            <span>Plans &amp; Pricing</span>
+            <span>Help Center</span>
+            <span>Affiliate</span>
+            <span>About MEGA</span>
+            <span>Extensions</span>
+            <a href="">More...</a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -25,11 +25,12 @@ function WebrtcApi() {
     } else if (!navigator.mediaDevices.getUserMedia) {
         throw new Error('Browser is not WebRTC-capable - no getUserMedia support');
     }
+/*
     else if (window.webkitAudioContext) { // Safari
         this.browser = 'safari';
         this.isSafari = true;
     }
-/*  else if (navigator.userAgent.indexOf("Edge") > -1) {
+    else if (navigator.userAgent.indexOf("Edge") > -1) {
         this.browser = 'edge';
         this.isEdge = true;
     }
@@ -42,7 +43,8 @@ function WebrtcApi() {
     // Some browsers (i.e. older Safari) may support removing a track via replaceTrack(null), but can't re-add a track
     // later - the peer doesn't see it
     this.supportsReplaceTrack = !!(window.RTCRtpSender && RTCRtpSender.prototype.replaceTrack);
-    this.supportsUnifiedPlan = window.RTCRtpTransceiver && RTCRtpTransceiver.prototype.hasOwnProperty("currentDirection");
+    this.supportsUnifiedPlan = !this.isFirefox && window.RTCRtpTransceiver &&
+        RTCRtpTransceiver.prototype.hasOwnProperty("currentDirection");
     this.supportsRxTxGetStats = !!(window.RTCRtpSender && RTCRtpSender.prototype.getStats);
     this.supportsScreenCapture = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
 
@@ -89,12 +91,26 @@ function WebrtcApi() {
             }
             if (pms) {
                 pms.then(function() {
-                    elem.play();
+                    return elem.play();
+                })
+                .catch(function(err) {
+                    console.error("attachMediaStream: failed to play:", err);
                 });
+                pms.catch(function(err) {
+                    console.error("attachMediaStream: failed to set source:", err);
+                });
+
             } else {
                 elem.play();
             }
         }
+    };
+    this.isAttachedToStream = function(playerElement) {
+        return (playerElement.srcObject || playerElement.src);
+    };
+    this.detachMediaStream = function(elem) {
+        elem.src = "";
+        elem.srcObject = null;
     };
     var mediaDevices = navigator.mediaDevices;
     if (mediaDevices && mediaDevices.getUserMedia) {
@@ -181,6 +197,17 @@ WebrtcApi.prototype.fixupIceServers = function (iceServers) {
     }
     return iceServers;
 };
+
+WebrtcApi.prototype.peerConnCreate = function(options) {
+    var conn = new RTCPeerConnection(options);
+    conn.outputStream = new MediaStream();
+    return conn;
+};
+
+WebrtcApi.prototype.peerConnDestroy = function(conn) {
+    this.streamStopAndRemoveTracks(conn.outputStream, conn.outputStream.getTracks());
+};
+
 /**
  * @returns whether a peer connection has the necessary preconditions necessary to replace
  * its video track
@@ -189,54 +216,67 @@ WebrtcApi.prototype.peerConnCanReplaceVideoTrack = function(peerConn) {
     return this.supportsReplaceTrack && peerConn.videoSender;
 };
 
-WebrtcApi.prototype.peerConnAddVideoTrack = function(peerConn, track, stream) {
-    peerConn.videoSender = peerConn.addTrack(track, stream);
+WebrtcApi.prototype.peerConnAddVideoTrack = function(peerConn, track) {
+    this.streamStopAndRemoveVideoTracks(peerConn.outputStream); // just in case
+    peerConn.outputStream.addTrack(track);
+    peerConn.videoSender = peerConn.addTrack(track, peerConn.outputStream);
 };
 
 WebrtcApi.prototype.peerConnReplaceVideoTrack = function(peerConn, track) {
     assert(this.supportsReplaceTrack);
     assert(peerConn.videoSender);
+    var outStream = peerConn.outputStream;
+    this.streamStopAndRemoveVideoTracks(outStream);
+    peerConn.outputStream.addTrack(track);
     return peerConn.videoSender.replaceTrack(track);
 };
 
 WebrtcApi.prototype.peerConnRemoveVideoTrack = function(peerConn) {
-    assert(this.supportsReplaceTrack);
+    var self = this;
+    assert(self.supportsReplaceTrack);
     if (!peerConn.videoSender) {
         return null;
     }
     try {
-        return peerConn.videoSender.replaceTrack(null);
+        return peerConn.videoSender.replaceTrack(null)
+        .then(function() {
+            var stream = peerConn.outputStream;
+            assert(stream);
+            self.streamStopAndRemoveVideoTracks(stream);
+        });
     } catch (e) {
         return Promise.reject("replaceTrack(null) exception: " + e);
     }
 };
 
-WebrtcApi.prototype.peerConnAddTracksFromStream = function(peerConn, stream) {
-    if (this.isEdge) {
-        // Edge can't add one track to multiple peer connections, so we need to clone the stream
-        stream = stream.clone();
-    }
+WebrtcApi.prototype.peerConnAddClonedTracksFromStream = function(peerConn, stream) {
+    // NOTE: Edge can't add one track to multiple peer connections, so we need to clone the stream
     var tracks = stream.getTracks();
     var len = tracks.length;
     for (var i = 0; i < len; i++) {
-        var track = tracks[i];
+        var track = tracks[i].clone();
+        var pcStream = peerConn.outputStream;
+        pcStream.addTrack(track);
         if (track.kind === 'video') {
             assert(!peerConn.videoSender);
-            peerConn.videoSender = peerConn.addTrack(track, stream);
+            peerConn.videoSender = peerConn.addTrack(track, pcStream);
         } else {
-            peerConn.addTrack(track, stream);
+            peerConn.addTrack(track, pcStream);
         }
     }
 };
 
-WebrtcApi.prototype.streamStopAndRemoveVideoTracks = function(stream) {
-    var vts = stream.getVideoTracks();
-    var len = vts.length;
+WebrtcApi.prototype.streamStopAndRemoveTracks = function(stream, tracks) {
+    var len = tracks.length;
     for (var i = 0; i < len; i++) {
-        var track = vts[i];
+        var track = tracks[i];
         track.stop();
         stream.removeTrack(track);
     }
+};
+
+WebrtcApi.prototype.streamStopAndRemoveVideoTracks = function(stream) {
+    this.streamStopAndRemoveTracks(stream, stream.getVideoTracks());
 };
 
 var RTC = null;

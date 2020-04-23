@@ -456,7 +456,7 @@
     border-radius: 3px;
     font-size: 14px;
     letter-spacing: -0.7px;
-    font-family: 'source_code_proregular';
+    font-family: 'source_code_proregular', 'Courier New', Courier, monospace;
     -webkit-box-shadow: inset 0px 0px 0px 1px #ccc;
     -moz-box-shadow: inset 0px 0px 0px 1px #ccc;
     box-shadow: inset 0px 0px 0px 1px #ccc;
@@ -948,7 +948,7 @@
 }
 
 .geolocation-icon {
-    background: url('../images/mega/icons-sprite_v36.png') no-repeat -121px -1960px;
+    background: url('../images/mega/icons-sprite_v37.png') no-repeat -121px -1960px;
     width: 10px;
     height: 15px;
     display: inline-block;

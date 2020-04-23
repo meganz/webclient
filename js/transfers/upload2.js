@@ -38,6 +38,7 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 var uldl_hold = false;
+var ul_queue = false;
 
 /* jshint -W003 */
 var ulmanager = {
@@ -184,6 +185,27 @@ var ulmanager = {
         }
 
         return false;
+    },
+
+    getUploadByID: function(id) {
+        'use strict';
+
+        var queue = ul_queue.filter(isQueueActive);
+        for (var i = queue.length; i--;) {
+            var q = queue[i];
+
+            if (q.id === id || this.getGID(q) === id) {
+                return q;
+            }
+        }
+
+        return false;
+    },
+
+    isUploadActive: function(id) {
+        'use strict';
+        var gid = typeof id === 'object' ? this.getGID(id) : id;
+        return document.getElementById(gid) || this.getUploadByID(gid).starttime > 0;
     },
 
     /**
@@ -394,7 +416,7 @@ var ulmanager = {
                     errorstr = reason.substr(0, 50) + '...';
                 }
                 if (!file.isCreateFile) {
-                    $('.transfer-table #ul_' + file.id + ' .transfer-status').text(errorstr);
+                    $('#ul_' + file.id + ' .transfer-status').text(errorstr);
                 }
                 msgDialog('warninga', l[1309], l[1498] + ': ' + fileName, reason);
                 ulmanager.abort(file);
@@ -890,15 +912,6 @@ var ulmanager = {
                 newnodes = [];
                 process_f(res.f);
                 M.updFileManagerUI();
-
-                if (M.viewmode) {
-                    fm_thumbnails();
-                }
-            }
-
-            // If on mobile, show that the upload has completed and allow them to upload another
-            if (is_mobile) {
-                mobile.uploadOverlay.showUploadComplete(n);
             }
 
             onSuccess(n.h);
@@ -1129,7 +1142,8 @@ var ulmanager = {
             if (ul.target === deletedNodeId) {
                 var gid = ulmanager.getGID(ul);
                 toAbort.push(gid);
-                $('.transfer-table #' + gid).addClass('transfer-error').find('.transfer-status').text(l[20634]);
+                $('.transfer-status', $('#' + gid).addClass('transfer-error')).text(l[20634]);
+                mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, l[20634]);
             }
         });
 
@@ -1197,15 +1211,11 @@ ChunkUpload.prototype.updateprogress = function() {
         this.file.speedometer = Speedometer(tp);
     }
     this.file.progressevents = (this.file.progressevents || 0) + 1;
+    p = GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0;
 
-    M.ulprogress(
-        this.file,
-        Math.floor(tp / this.file.size * 100),
-        tp,
-        this.file.size,
-        GlobalProgress[this.gid].speed = this.file.speedometer ? this.file.speedometer.progress(tp) : 0, // speed
-        this.file.isCreateFile
-    );
+    if (!this.file.isCreateFile) {
+        M.ulprogress(this.file, Math.floor(tp / this.file.size * 100), tp, this.file.size, p);
+    }
 
     if (tp === this.file.size) {
         this.file.complete = true;

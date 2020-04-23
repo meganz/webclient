@@ -7,7 +7,7 @@ import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-class ExtraFooterElement extends MegaRenderMixin {
+export class ExtraFooterElement extends MegaRenderMixin {
     render() {
         return this.props.children;
     }
@@ -38,6 +38,12 @@ class ModalDialog extends MegaRenderMixin {
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         document.querySelector('.conversationsApp').addEventListener('click', this.onBlur);
 
+        $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), function(e) {
+            if ($(e.target).is('.fm-modal-dialog')) {
+                self.onBlur();
+            }
+        });
+
         $(document).rebind('keyup.modalDialog' + self.getUniqueId(), function(e) {
             if (e.keyCode == 27) { // escape key maps to keycode `27`
                 self.onBlur();
@@ -47,7 +53,7 @@ class ModalDialog extends MegaRenderMixin {
     onBlur(e) {
         var $element = $(ReactDOM.findDOMNode(this));
 
-        if(
+        if (
             (!e || !$(e.target).closest(".fm-dialog").is($element))
         ) {
             document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
@@ -61,7 +67,6 @@ class ModalDialog extends MegaRenderMixin {
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
         $(window).off('resize.modalDialog' + this.getUniqueId());
-
     }
     onCloseClicked(e) {
         var self = this;
@@ -81,7 +86,7 @@ class ModalDialog extends MegaRenderMixin {
     render() {
         var self = this;
 
-        var classes = "fm-dialog fm-modal-dialog " + self.props.className;
+        var classes = "fm-dialog " + self.props.className;
 
         var footer = null;
 
@@ -135,14 +140,16 @@ class ModalDialog extends MegaRenderMixin {
 
             footer = <div className="fm-dialog-footer white">
                 {extraFooterElements}
-                {buttons}
+                <div className="footer-buttons">
+                    {buttons}
+                </div>
                 <div className="clear"></div>
             </div>;
         }
 
         return (
-            <utils.RenderTo element={document.body} className={classes} popupDidMount={this.onPopupDidMount}>
-                <div>
+            <utils.RenderTo element={document.body} className="fm-modal-dialog" popupDidMount={this.onPopupDidMount}>
+                <div className={classes}>
                     <div className="fm-dialog-close" onClick={self.onCloseClicked}></div>
                     {
                         self.props.title ? <div className="fm-dialog-title">{self.props.title}</div> : null
@@ -376,6 +383,5 @@ class ConfirmDialog extends MegaRenderMixin {
 export default {
     ModalDialog,
     SelectContactDialog,
-    ConfirmDialog,
-    ExtraFooterElement
+    ConfirmDialog
 };

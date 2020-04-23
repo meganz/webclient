@@ -37,7 +37,7 @@ if (typeof process !== 'undefined') {
 
 var tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = location.pathname === '/embed' || tmp.substr(0, 2) === 'E!';
+var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
 var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
@@ -102,6 +102,7 @@ function isMobile() {
 }
 
 function getSitePath() {
+    'use strict';
     var hash = location.hash.replace('#', '');
 
     if (hashLogic || isPublicLink(hash)) {
@@ -115,6 +116,10 @@ function getSitePath() {
         }
     }
 
+    if (isPublickLinkV2(document.location.pathname)) {
+        return document.location.pathname + document.location.hash;
+    }
+
     return (document.location.pathname.substr(0, 6) === '/chat/') ?
             document.location.pathname + '#' + hash :
             document.location.pathname;
@@ -122,21 +127,78 @@ function getSitePath() {
 
 // remove dangling characters from the pathname/hash
 function getCleanSitePath(path) {
+    'use strict';
+
     if (path === undefined) {
         path = getSitePath();
     }
 
-    path = mURIDecode(path).replace(/^[/#]+|\/+$/g, '');
+    // cleanup and handle affiliate tags.
+    path = mURIDecode(path).replace(/^[#/]+|\/+$/g, '').split(/(\/\w+=)/);
 
-    return path;
+    if (path.length > 1) {
+        for (var s = 1; s < path.length; s += 2) {
+            path[String(path[s]).replace(/\W/g, '')] = mURIDecode(path[s + 1]);
+        }
+
+        if (path.uao) {
+            var target = window.mega || window;
+            target.uaoref = path.uao;
+        }
+        if (path.aff) {
+            if (path.aff_time) {
+                // eslint-disable-next-line sonarjs/no-inverted-boolean-check
+                if (!(localStorage.affts > (path.aff_time *= 1000))) {
+                    localStorage.affid = path.aff;
+                    localStorage.affts = path.aff_time;
+
+                    // Future proof, currently only public link affiliate data is coming from other agent.
+                    // Later, url from other agents will contains type for it to support other type.
+                    localStorage.afftype = path.aff_type || 2;
+                }
+            }
+            else {
+                // if only aff parameter is passed, treat it as aff referral url.
+                localStorage.affid = path.aff;
+                localStorage.affts = Date.now();
+                localStorage.afftype = 1;
+            }
+        }
+    }
+    else if (path[0].indexOf('aff=') === 0) {
+        localStorage.affid = String(path[0]).replace('aff=', '');
+        localStorage.affts = Date.now();
+        localStorage.afftype = 1;
+        path = [''];
+    }
+
+    return path[0];
 }
 
 // Check whether the provided `page` points to a public link
 function isPublicLink(page) {
-    page = mURIDecode(page).replace(/^[/#]+/, '');
+    'use strict';
+    page = getCleanSitePath(page);
 
     var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
+}
+
+function isPublickLinkV2(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+
+    var types = {'file': 6, 'folder': 8, 'embed': 7};
+    return page.length > types[page.split('/')[0]];
+}
+
+// Check whether the provided `page` points to a chat link
+function isChatLink(page) {
+
+    'use strict';
+
+    page = mURIDecode(page).replace(/^[#/]+/, '');
+    return page.indexOf('chat/') === 0 ? page : false;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -492,6 +554,7 @@ var mega = {
     ui: {},
     state: 0,
     utils: {},
+    uaoref: window.uaoref,
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
         typeof window.chrome === 'object'
@@ -564,6 +627,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }
@@ -593,7 +657,7 @@ var mega = {
             var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
             params += apiut;
 
-            params += '&lang=' + lang;
+            params += '&v=2&lang=' + window.lang;
             this._urlParams = params;
         }
 
@@ -683,23 +747,42 @@ if (!browserUpdate && is_extension)
     }
     else {
         // WebExtensions
-        tmp = 'mega';
-        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
-            tmp = localStorage.chromextdevpath || tmp;
+        urlrootfile = 'mega/secure.html';
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object' || typeof chrome.extension !== 'object') {
+            if (!sessionStorage.extStageReload) {
+                sessionStorage.extStageReload = 1;
+                location.reload(true);
+            }
+            else if (sessionStorage.extStageReload < 3) {
+                sessionStorage.extStageReload++;
+                location.reload(true);
+            }
+
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime,
+                window.chrome && chrome.extension);
         }
-        bootstaticpath = chrome.extension.getURL(tmp + '/');
-        urlrootfile = tmp + '/secure.html';
+        else {
+            tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
+
+            if (tmp.version === '109101.103.97') {
+                urlrootfile = 'webclient/index.html';
+            }
+        }
+
+        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     Object.defineProperty(window, 'eval', {
-        value : function eval(code) {
+        value : function evil(code) {
+            'use strict';
             throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
         }
     });
 }
 
-
 var page;
+
 if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
@@ -713,6 +796,15 @@ else if ((page = isPublicLink(document.location.hash))) {
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({subpage: page}, "", '#' + page);
 }
+else if (isPublickLinkV2(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
+
+    if (is_embed) {
+        page = page.split(/[#/]/);
+        page = '!' + page[1] + '!' + page[2];
+    }
+}
 else {
     if (document.location.hash.length > 0) {
         // history.replaceState for legacy hash requests to new URL paradigm
@@ -722,6 +814,7 @@ else {
         // new URL paradigm, look for desired page in the location.pathname:
         page = document.location.pathname;
     }
+
     page = getCleanSitePath(page);
 	// put try block around it to allow the page to be rendered in Google cache
 	try
@@ -1147,6 +1240,7 @@ function mObjectURL(data, type)
                     if (msg !== 'pong') {
                         this.setMaster();
                     } else {
+                        this.notify('ack-pong');
                         delete localStorage[ev.key];
                     }
                     this.listen();
@@ -1179,9 +1273,7 @@ function mObjectURL(data, type)
             // as earlier as possible, e.g. now.
             localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
 
-            setTimeout(function() {
-                setup();
-            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
+            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
         },
 
         listen: function crossTab_listen(aListener) {
@@ -1250,6 +1342,7 @@ function mObjectURL(data, type)
 
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
+            this.notify('pong');
 
             // (function liveLoop(tag) {
             // if (tag === mBroadcaster.crossTab.master) {
@@ -1283,6 +1376,11 @@ function mObjectURL(data, type)
             }
 
             switch (msg) {
+                case 'ack-pong':
+                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
+                        break;
+                    }
+                    /* fallthrough */
                 case 'ping':
                     this.slaves.push(strg.origin);
                     if (this.master) {
@@ -1811,6 +1909,7 @@ else if (!browserUpdate) {
                 return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
+                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')
@@ -2270,6 +2369,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/business.html', n: 'business',j:0});
     jsl.push({f:'html/js/business.js', n: 'business_pp_js', j:1});
     jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
+    jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
     jsl.push({f:'js/vendor/smartcrop.js', n: 'smartcrop_js', j:1, w:7});
@@ -2290,7 +2390,6 @@ else if (!browserUpdate) {
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
-        jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
         jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
@@ -2409,6 +2508,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+        jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -2432,6 +2532,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/affiliate-program.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2460,6 +2561,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
+    jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -2493,6 +2595,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
@@ -2546,8 +2649,8 @@ else if (!browserUpdate) {
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
+    jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from
@@ -2619,6 +2722,8 @@ else if (!browserUpdate) {
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
+        'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
+        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
         'blog': {f:'html/blog.html', n: 'blog', j:0},
         'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
         'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
@@ -2689,6 +2794,7 @@ else if (!browserUpdate) {
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
+        'charthelper_js': {f:'js/ui/chart.helper.js', n: 'charthelper_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
         'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
         'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
@@ -2782,6 +2888,7 @@ else if (!browserUpdate) {
         'cmd': ['cmd', 'megacmd_js'],
         'mobile': ['mobileapp'],
         'ios': ['mobileapp'],
+        'refer': ['affiliate', 'affiliate_js'],
         'android': ['mobileapp'],
         'support': ['support_js', 'support'],
         'contact': ['contact'],
@@ -3222,18 +3329,6 @@ else if (!browserUpdate) {
             var now = Date.now();
 
             pageLoadTime = now - pageLoadTime;
-
-            var ph = String(isPublicLink(page)).split('!')[1];
-            if (ph) {
-                localStorage.affid = ph;
-                localStorage.affts = now;
-            }
-
-            Object.defineProperty(mega, 'affid', {
-                get: function() {
-                    return parseInt(localStorage.affts) + 864e5 > Date.now() && localStorage.affid || 0;
-                }
-            });
 
             mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
         });
@@ -3895,6 +3990,59 @@ function promisify(fc) {
     Object.defineProperty(a$yncMethod, '__function__', {value: fc});
     return a$yncMethod;
 }
+
+function mutex(name, handler) {
+    'use strict';
+    var mMutexMethod = function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            mutex.lock(name).then(function(unlock) {
+                var res = function(a0) {
+                    unlock().always(resolve.bind(null, a0));
+                };
+                var rej = function(a0) {
+                    unlock().always(reject.bind(null, a0));
+                };
+                mMutexMethod.__function__.apply(self, [res, rej].concat(args));
+            }).catch(function(ex) {
+                console.error(ex);
+                mutex.unlock(name).always(reject.bind(null, ex));
+            });
+        });
+    };
+    mMutexMethod.prototype = undefined;
+    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
+    Object.defineProperty(mMutexMethod, '__name__', {value: name});
+    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
+    return Object.freeze(mMutexMethod);
+}
+
+mutex.queue = Object.create(null);
+mutex.lock = promisify(function(resolve, reject, name) {
+    'use strict';
+    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
+
+    if (mutex.queue[name]) {
+        mutex.queue[name].push(resolve);
+    }
+    else {
+        mutex.queue[name] = [];
+        resolve();
+    }
+});
+mutex.unlock = promisify(function(resolve, reject, name) {
+    'use strict';
+    var next = (mutex.queue[name] || []).shift();
+    if (next) {
+        onIdle(next);
+    }
+    else {
+        delete mutex.queue[name];
+    }
+    resolve();
+});
+Object.freeze(mutex);
 
 mBroadcaster.once('startMega', function() {
     var data = sessionStorage.sitet;

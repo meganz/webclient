@@ -301,6 +301,11 @@
 .affiliate.refer-cell.animated {
     opacity: 0;
     position: relative;
+    -webkit-transition: all 200ms ease-in-out ;
+    transition: all 200ms ease-in-out ;
+}
+.affiliate.refer-cell.animated.start-animation:hover {
+    transform: scale(1.06) !important;
 }
 .affiliate.refer-cell.animated.start-animation {
     -webkit-transition: opacity 500ms ease-in-out, transform 300ms ease-in-out;

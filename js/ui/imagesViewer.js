@@ -16,6 +16,7 @@ var slideshowid;
     var _hideCounter = false;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
+    var _pdfSeen = false;
 
     function slideshow_handle(raw) {
         var result;
@@ -638,6 +639,18 @@ var slideshowid;
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
 
+            if (_pdfSeen) {
+                _pdfSeen = false;
+
+                tryCatch(function() {
+                    var doc = document.getElementById('pdfpreviewdiv1');
+                    if (doc && (doc = doc.contentWindow.document)) {
+                        doc.open();
+                        doc.close();
+                    }
+                })();
+            }
+
             return false;
         }
 
@@ -1071,7 +1084,7 @@ var slideshowid;
                     mBroadcaster.removeListener(preqs[n.h].ev3);
                     mBroadcaster.removeListener(preqs[n.h].ev4);
 
-                    preqs[n.h].destroy();
+                    preqs[n.h].kill();
                     preqs[n.h] = false;
                 }
             };
@@ -1212,6 +1225,7 @@ var slideshowid;
             doc.open();
             doc.write(myPage);
             doc.close();
+            _pdfSeen = true;
         });
     }
 
@@ -1496,6 +1510,9 @@ var slideshowid;
         }
     }
 
+    /**
+     * @global
+     */
     global.slideshow = slideshow;
     global.slideshow_next = slideshow_next;
     global.slideshow_prev = slideshow_prev;

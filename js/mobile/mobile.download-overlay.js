@@ -605,9 +605,9 @@ mobile.downloadOverlay = {
 
         // Calculate the download speed
         var percentCompleteRounded = Math.round(percentComplete);
-        var speed = numOfBytes(bytesPerSecond);
+        var speed = numOfBytes(bytesPerSecond, 2, true);
         var speedSizeRounded = Math.round(speed.size);
-        var speedText = speedSizeRounded + ' ' + speed.unit + '/s';
+        var speedText = speedSizeRounded + ' ' + speed.unit;
 
         // Display the download progress and speed
         $downloadPercent.text(percentCompleteRounded + '%');

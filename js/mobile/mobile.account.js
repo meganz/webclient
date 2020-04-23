@@ -30,7 +30,9 @@ mobile.account = {
         mobile.account.fetchAndDisplayTwoFactorAuthStatus($page);
         mobile.account.initChangePasswordButton($page);
         mobile.account.initNotificationButton($page);
-        mobile.account.initTitleMenu();
+
+        // Init the titleMenu for this page.
+        mobile.titleMenu.init();
 
         // Initialise the top menu
         topmenuUI();
@@ -40,23 +42,6 @@ mobile.account = {
 
         // Add a server log
         api_req({ a: 'log', e: 99672, m: 'Mobile web My Account page accessed' });
-    },
-
-    /**
-     * Init the titleMenu for this page.
-     */
-    initTitleMenu: function() {
-        'use strict';
-
-        mobile.titleMenu.init();
-
-        var $titleHeaderTextContainer = $(".fm-header-txt");
-
-        // Attach event handlers local to this page controller.
-        $titleHeaderTextContainer.off('tap').on('tap', function() {
-            mobile.titleMenu.open();
-            return false;
-        });
     },
 
     /**

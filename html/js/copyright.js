@@ -19,11 +19,7 @@ copyright.updateUI = function() {
  */
 copyright.validateEmail = function(email) {
     'use strict';
-    var re1 = /[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*/;
-    var re2 = /@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-    var re = new RegExp(re1.source + re2.source);
-    var match = re.exec(email);
-    return match !== null;
+    return isValidEmail(email);
 };
 
 /**
@@ -34,11 +30,28 @@ copyright.validateEmail = function(email) {
 copyright.validateUrl = function(url) {
     'use strict';
     if (!/^\s*https?:\/\/mega\./i.test(url)) {
-        return 0;
+        return false;
     }
     url = copyright.decodeURIm(url);
-    var handles = copyright.getHandles(url);
-    return Object.keys(handles).length;
+
+    var passwordLinkPattern = /(#P!)([\w-]+)\b/i;
+
+    if (passwordLinkPattern.test(url)) {
+        return true;
+    }
+
+    var folder_filePattern = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/i;
+
+    if (folder_filePattern.test(url)) {
+        return true;
+    }
+
+    if (url.toLowerCase().indexOf('/file/') > -1 || url.toLowerCase().indexOf('/folder/') > -1) {
+        return true;
+    }
+    
+    return false;
+
 };
 
 /**
@@ -52,28 +65,63 @@ copyright.getHandles = function(data) {
     var handles = {};
     var passwordLinkPattern = /(#P!)([\w-]+)\b/gi;
 
-    // Find the handles for any password protected link
-    data = data.replace(passwordLinkPattern, function(fullUrlHash, passwordLinkId, urlEncodedData) {
+    var file_pos = data.toLowerCase().indexOf('/file/');
+    var folder_pos = data.toLowerCase().indexOf('/folder/');
 
-        // Decode the Base64 URL encoded data and get the 6 bytes for the handle, then re-encode the handle to Base64
-        var bytes = exportPassword.base64UrlDecode(urlEncodedData);
-        var handle = bytes.subarray(2, 8);
-        var handleBase64 = exportPassword.base64UrlEncode(handle);
-
-        // Add the handle
-        handles[handleBase64] = 1;
-
-        // Remove the link so the bottom code doesn't detect it as well
-        return '';
-    });
-
-    var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
-
-    (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id) {
-        if (!handles[id]) {
-            handles[id] = 1;
+    if (file_pos > -1 || folder_pos > -1) {
+        var linkHandle;
+        if (file_pos > -1 && folder_pos < 0) {
+            linkHandle = data.substr(file_pos + 6, 8);
+            handles[linkHandle] = 2; // dont check for sub-handles
         }
-    });
+        else if (folder_pos > -1 && file_pos < 0) {
+
+            linkHandle = data.substr(folder_pos + 8, 8);
+
+            var folder_pos2 = data.lastIndexOf('/folder/');
+
+            if (folder_pos === folder_pos2) {
+                handles[linkHandle] = 2; // dont check for sub-handles
+            }
+            else {
+                handles[linkHandle] = data.substr(folder_pos2 + 8, 8);
+            }
+        }
+        else {
+            if (file_pos < folder_pos) {
+                return null; // i want it to break
+            }
+            else {
+                linkHandle = data.substr(folder_pos + 8, 8);
+                handles[linkHandle] = data.substr(file_pos + 6, 8);
+            }
+        }
+    }
+    else {
+        // Find the handles for any password protected link
+        data = data.replace(passwordLinkPattern, function(fullUrlHash, passwordLinkId, urlEncodedData) {
+
+            // Decode the Base64 URL encoded data and get the
+            // 6 bytes for the handle, then re - encode the handle to Base64
+            var bytes = exportPassword.base64UrlDecode(urlEncodedData);
+            var handle = bytes.subarray(2, 8);
+            var handleBase64 = exportPassword.base64UrlEncode(handle);
+
+            // Add the handle
+            handles[handleBase64] = 1;
+
+            // Remove the link so the bottom code doesn't detect it as well
+            return '';
+        });
+
+        var p = /.(?:F?!|\w+\=)([\w-]{8})(?:!([\w-]+))?\b/gi;
+
+        (data.replace(/<\/?\w[^>]+>/g, '').replace(/\s+/g, '') + data).replace(p, function(a, id) {
+            if (!handles[id]) {
+                handles[id] = 1;
+            }
+        });
+    }
 
     return handles;
 };
@@ -559,10 +607,19 @@ copyright.init_cndispute = function() {
                 otherremarks: $('input.otherremarks').val()
             };
 
-            // If URL has a subnode handle, then also send the ufsh parameter.
-            var subNodeHandle = /\#.*\!.*\?([A-z0-9_-]{8})/.exec(url);
-            if (subNodeHandle && subNodeHandle[1]) {
-                requestParameters.ufsh = subNodeHandle[1];
+
+            if (handles[0] !== 2) {
+
+                if (handles[0] === 1) {
+                    // If URL has a subnode handle, then also send the ufsh parameter.
+                    var subNodeHandle = /\#.*\!.*\?([A-z0-9_-]{8})/.exec(url);
+                    if (subNodeHandle && subNodeHandle[1]) {
+                        requestParameters.ufsh = subNodeHandle[1];
+                    }
+                }
+                else {
+                    requestParameters.ufsh = handles[0];
+                }
             }
             
             api_req(requestParameters, {
@@ -669,3 +726,4 @@ copyright.markInputWrong = function(elm) {
         })
         .parent().css('box-shadow', '0px 0px 8px #f00');
 };
+

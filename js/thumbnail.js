@@ -498,6 +498,20 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
     }
 }
 
+mBroadcaster.once('startMega', function() {
+    'use strict';
+    exifImageRotation.fromImage = getComputedStyle(document.documentElement).imageOrientation === 'from-image';
+
+    if (d && exifImageRotation.fromImage) {
+        console.info('This browser automatically rotates images based on the EXIF metadata.', [ua]);
+    }
+
+    if (window.safari) {
+        // TODO / FIXME
+        exifImageRotation.fromImage = false;
+    }
+});
+
 /**
  * Rotate images as per the extracted EXIF orientation
  * @param {Image|Object} target Image element where to render the result
@@ -514,12 +528,24 @@ function exifImageRotation(target, buffer, orientation) {
         target.src = blobURI;
     }
     else {
+        var img = new Image();
+        var canvas = document.createElement('canvas');
         var signalError = function() {
             // let the target reach its onerror...
             target.src = 'data:text/xml,error';
+
+            if (exifImageRotation.fromImage) {
+                document.body.removeChild(img);
+                document.body.removeChild(canvas);
+            }
         };
 
-        var img = new Image();
+        if (exifImageRotation.fromImage) {
+            img.style.imageOrientation = 'none';
+            canvas.style.imageOrientation = 'none';
+            document.body.appendChild(img);
+            document.body.appendChild(canvas);
+        }
         img.onload = tryCatch(function() {
             var width = this.naturalWidth;
             var height = this.naturalHeight;
@@ -532,7 +558,9 @@ function exifImageRotation(target, buffer, orientation) {
                 return signalError();
             }
 
-            var canvas = document.createElement('canvas');
+            if (d) {
+                console.debug('exifImageRotation: %d x %d', width, height);
+            }
             var ctx = canvas.getContext('2d');
 
             ctx.save();
@@ -594,13 +622,20 @@ function exifImageRotation(target, buffer, orientation) {
             ctx.restore();
             target.src = canvas.toDataURL();
 
+            if (exifImageRotation.fromImage) {
+                document.body.removeChild(img);
+                document.body.removeChild(canvas);
+            }
+
         }, img.onerror = function(ev) {
             if (d) {
                 console.error('exifImageRotation failed...', ev);
             }
             signalError();
         });
-        img.src = blobURI;
+        onIdle(function() {
+            img.src = blobURI;
+        });
     }
 
     setTimeout(function() {

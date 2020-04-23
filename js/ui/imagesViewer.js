@@ -1033,7 +1033,9 @@ var slideshowid;
 
             M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-                previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                if (!exifImageRotation.fromImage) {
+                    previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                }
             }, function(ev) {
                 if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
                     eventlog(99703, true);

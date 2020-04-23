@@ -39,6 +39,7 @@ export default class SearchPanel extends MegaRenderMixin {
             // Focus and mark the text as selected on re-opening from minimize
             if (!nextProps.minimized) {
                 Soon(() => {
+                    this.doToggle('resume');
                     SearchField.focus();
                     SearchField.select();
                 });
@@ -87,6 +88,7 @@ export default class SearchPanel extends MegaRenderMixin {
     }
 
     toggleMinimize = () => {
+        this.doToggle('pause');
         this.props.onToggle();
     };
 
@@ -121,6 +123,13 @@ export default class SearchPanel extends MegaRenderMixin {
         });
     };
 
+    doToggle = action /* pause || resume || destroy */ => {
+        const megaPromise = ChatSearch.doSearch.megaPromise;
+        if (action && megaPromise && megaPromise.cs) {
+            megaPromise.cs[action]();
+        }
+    };
+
     handleChange = ev => {
         const value = ev.target.value;
         const searching = value.length >= 3;
@@ -136,28 +145,26 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     handleToggle = () => {
-        const megaPromise = ChatSearch.doSearch.megaPromise;
+        const inProgress = this.state.status === STATUS.IN_PROGRESS;
 
-        if (megaPromise && megaPromise.cs) {
-            const inProgress = this.state.status === STATUS.IN_PROGRESS;
-
-            this.setState({
-                status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
-            }, () => {
-                Soon(() => SearchField.focus());
-                return inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume();
-            });
-        }
+        this.setState({
+            status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
+        }, () => {
+            Soon(() => SearchField.focus());
+            return this.doToggle(inProgress ? 'pause' : 'resume');
+        });
     };
 
     handleReset = () => {
         this.setState({
             value: '',
             searching: false,
-            status: undefined
-        }, () =>
-            Soon(() => SearchField.focus())
-        );
+            status: undefined,
+            results: []
+        }, () => {
+            this.doToggle('destroy');
+            Soon(() => SearchField.focus());
+        });
     };
 
     render() {

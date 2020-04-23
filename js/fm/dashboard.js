@@ -452,19 +452,17 @@ function dashboardUI() {
             var $dataStats = $('.business-dashboard .subaccount-view-used-data');
 
             var ffNumText = function(value, type) {
-                var fileTypes = [23259, 23257, 23261];
-                var folderTypes = [23258, 23256, 23260];
                 var counter = value || 0;
                 var numTextOutput = "";
 
                 if (counter === 0) {
-                    numTextOutput = l[type === 'file' ? fileTypes[0] : folderTypes[0]];
+                    numTextOutput = type === 'file' ? l[23259] : l[23258];
                 }
                 else if (counter === 1) {
-                    numTextOutput = l[type === 'file' ? fileTypes[1] : folderTypes[1]];
+                    numTextOutput = type === 'file' ? l[23257] : l[23256];
                 }
                 else {
-                    numTextOutput = l[type === 'file' ? fileTypes[2] : folderTypes[2]].replace('[X]', counter);
+                    numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
                 }
 
                 return numTextOutput;
@@ -616,10 +614,10 @@ dashboardUI.updateChatWidget = function() {
     });
 };
 dashboardUI.updateCloudDataWidget = function() {
-    var file0 = 23253;
+    var file0 = l[23253];
     var file1 = 835;
     var files = 833;
-    var folder0 = 23254;
+    var folder0 = l[23254];
     var folder1 = 834;
     var folders = 832;
     var data = M.getDashboardData();
@@ -662,7 +660,7 @@ dashboardUI.updateCloudDataWidget = function() {
             else if (intl) {
                 cnt = intl.format(props.cnt || 0);
                 if (cnt === "0") {
-                    str = l[(locale[idx] === files) ? file0 : folder0];
+                    str = locale[idx] === files ? file0 : folder0;
                 }
             }
 

@@ -13477,6 +13477,8 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
       }
 
       conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidMount", this).call(this);
+
+      self.relinkToStream();
     }
   }, {
     key: "componentWillUnmount",
@@ -13491,17 +13493,17 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidUpdate", this).call(this);
+
+      this.relinkToStream();
+    }
+  }, {
+    key: "relinkToStream",
+    value: function relinkToStream() {
       var self = this;
-      var noVideo = self.state.noVideo;
-
-      if (self.state.prevNoVideo === noVideo) {
-        return;
-      }
-
-      self.state.prevNoVideo = noVideo;
       var player = self.refs.player;
 
-      if (noVideo) {
+      if (self.state.noVideo) {
         if (player) {
           RTC.detachMediaStream(player);
         }
@@ -13530,7 +13532,10 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
 ;
 conversationaudiovideopanel_RemoteVideoPlayer.propTypes = {
   sess: prop_types_default.a.object.isRequired,
-  isActive: prop_types_default.a.bool.isRequired,
+  isActive: prop_types_default.a.bool,
+  // used only for carousel to flag the active video thumbnail
+  isCarouselMain: prop_types_default.a.bool,
+  // if it's the big window in carousel mode
   peerAv: prop_types_default.a.number.isRequired,
   onPlayerClick: prop_types_default.a.func,
   noAudioLevel: prop_types_default.a.bool
@@ -13568,33 +13573,38 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
     key: "getActiveSid",
     value: function getActiveSid() {
       var self = this;
-      var chatRoom = self.props.chatRoom;
-      var call = chatRoom.callManagerCall;
+      var call = self.props.chatRoom.callManagerCall;
 
-      if (!call || !call.isActive()) {
-        return;
+      if (!call) {
+        return false;
       }
 
+      var rtcCall = call.rtcCall;
       var selected = self.state.selectedStreamSid;
+
+      if (selected && selected !== "local" && !rtcCall.sessions[base64urldecode(selected)]) {
+        // session doesn't exist anymore, we will select another active peer below
+        selected = null;
+      }
 
       if (selected) {
         return selected;
-      }
+      } // we have no active peer, select the first session
 
-      var sess = Object.values(call.rtcCall.sessions)[0];
-      return sess ? sess.stringSid : undefined;
+
+      var sess = Object.values(rtcCall.sessions)[0];
+      return sess ? sess.stringSid : "local";
     }
   }, {
     key: "haveScreenSharingPeer",
     value: function haveScreenSharingPeer() {
-      var chatRoom = this.props.chatRoom;
-      var callManagerCall = chatRoom.callManagerCall;
+      var call = this.props.chatRoom.callManagerCall;
 
-      if (!callManagerCall) {
+      if (!call) {
         return false;
       }
 
-      var rtcCall = callManagerCall.rtcCall;
+      var rtcCall = call.rtcCall;
 
       if (!rtcCall.sessions) {
         return false;
@@ -13646,15 +13656,21 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "onPlayerClick",
     value: function onPlayerClick(sid) {
-      if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
-        this.setState({
-          'selectedStreamSid': sid
-        });
+      if (this.getViewMode() !== VIEW_MODES.CAROUSEL) {
+        return;
       }
+
+      this.setState({
+        'selectedStreamSid': sid
+      });
     }
   }, {
     key: "_hideBottomPanel",
     value: function _hideBottomPanel() {
+      if (!this.isMounted()) {
+        return;
+      }
+
       var self = this;
       var room = self.props.chatRoom;
 
@@ -13707,14 +13723,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
         $('.participantsContainer', $container).height('auto');
         var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
-        var mediaOpts;
-
-        if (this.state.selectedStreamSid === "local") {
-          mediaOpts = callManagerCall.getMediaOptions();
-        } else {
-          mediaOpts = callManagerCall.getRemoteMediaOptions(self.getActiveSid());
-        }
-
+        var activeSid = this.getActiveSid();
+        var mediaOpts = activeSid === "local" ? callManagerCall.getMediaOptions() : callManagerCall.getRemoteMediaOptions(activeSid);
         $('.activeStream', $container).height(activeStreamHeight);
         $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
         $('.user-video, .user-audio, .user-video video', $container).width('').height('');
@@ -13747,6 +13757,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       } else {
+        // grid mode
         $('.participantsContainer', $container).height($container.outerHeight() - $('.call-header', $container).outerHeight());
         newWidth = totalWidth / totalStreams;
       }
@@ -13772,6 +13783,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(ConversationAVPanel.prototype), "componentDidUpdate", this).call(this);
+
       var self = this;
       var room = self.props.chatRoom;
       var callManagerCall = room.callManagerCall;
@@ -13782,7 +13795,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
       var $container = $(external_ReactDOM_default.a.findDOMNode(self));
       var mouseoutThrottling = null;
-      $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
+      $container.rebind('mouseover.chatUI' + room.roomId, function () {
         var $this = $(this);
         clearTimeout(mouseoutThrottling);
         self.visiblePanel = true;
@@ -14084,13 +14097,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       });
       var localPlayerElement = null;
       var remotePlayerElements = [];
-      var onRemotePlayerClick; // handler that exists only for the peer views in the carosel bottom bar
+      var onRemotePlayerClick; // handler that exists only for the thumbnail views in the carosel bottom bar
 
       var isCarousel = self.getViewMode() === VIEW_MODES.CAROUSEL;
 
       if (isCarousel) {
-        var activeSid = chatRoom.type === "group" || chatRoom.type === "public" ? self.getActiveSid() : false;
-        var activePlayer = null;
+        var activeSid = self.getActiveSid();
+        var activePlayer;
         onRemotePlayerClick = self.onPlayerClick.bind(self);
       }
 
@@ -14133,7 +14146,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             sess: sess,
             key: "carousel_active",
             peerAv: sess.peerAv(),
-            isActive: true,
+            isCarouselMain: true,
             noAudioLevel: true
           });
         }
@@ -14194,9 +14207,11 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         }
       } else {
         // carousel
+        var localPlayer;
+
         if (!localMedia.video) {
           // display avatar for local video
-          var localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : ""),
             key: "local",
             onClick: function onClick(e) {
@@ -14214,14 +14229,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             chatRoom: this.props.chatRoom,
             hideVerifiedBadge: true
           })));
-          remotePlayerElements.push(localPlayer);
 
           if (activeSid === "local") {
             activePlayer = localPlayer;
           }
         } else {
           // we have local video (carousel mode)
-          var _localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-video local-carousel is-video" + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : ""),
             key: "local-video",
             onClick: function onClick(e) {
@@ -14243,8 +14257,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
               RTC.attachMediaStream(_ref4, rtcCall.localStream());
             }
           })));
-
-          remotePlayerElements.push(_localPlayer);
 
           if (activeSid === "local") {
             activePlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -14268,6 +14280,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             }));
           }
         }
+
+        remotePlayerElements.push(localPlayer);
       }
 
       var unreadDiv = null;
@@ -16914,6 +16928,8 @@ var roomIsGroup = function roomIsGroup(room) {
 
 
 var highlight = function highlight(text, matches) {
+  text = escapeHTML(text);
+
   if (matches) {
     var highlighted;
 
@@ -16947,23 +16963,23 @@ var openResult = function openResult(room, messageId) {
     room.scrollToMessageId(messageId);
   }
 }; //
-// Message
+// MessageRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-var resultRow_Message = /*#__PURE__*/function (_MegaRenderMixin) {
-  resultRow_inherits(Message, _MegaRenderMixin);
+var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
+  resultRow_inherits(MessageRow, _MegaRenderMixin);
 
-  var _super = resultRow_createSuper(Message);
+  var _super = resultRow_createSuper(MessageRow);
 
-  function Message(props) {
-    resultRow_classCallCheck(this, Message);
+  function MessageRow(props) {
+    resultRow_classCallCheck(this, MessageRow);
 
     return _super.call(this, props);
   }
 
-  resultRow_createClass(Message, [{
+  resultRow_createClass(MessageRow, [{
     key: "render",
     value: function render() {
       var _this$props = this.props,
@@ -16980,9 +16996,9 @@ var resultRow_Message = /*#__PURE__*/function (_MegaRenderMixin) {
         }
       }, /*#__PURE__*/external_React_default.a.createElement("span", {
         className: "title"
-      }, nicknames.getNicknameAndName(contact.u), /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
+      }, nicknames.getNicknameAndName(contact.u)), /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
         contact: contact
-      })), /*#__PURE__*/external_React_default.a.createElement("div", {
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "summary",
         dangerouslySetInnerHTML: {
           __html: highlight(summary, matches)
@@ -16993,25 +17009,25 @@ var resultRow_Message = /*#__PURE__*/function (_MegaRenderMixin) {
     }
   }]);
 
-  return Message;
+  return MessageRow;
 }(mixins["MegaRenderMixin"]); //
-// Chat
+// ChatRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-var resultRow_Chat = /*#__PURE__*/function (_MegaRenderMixin2) {
-  resultRow_inherits(Chat, _MegaRenderMixin2);
+var resultRow_ChatRow = /*#__PURE__*/function (_MegaRenderMixin2) {
+  resultRow_inherits(ChatRow, _MegaRenderMixin2);
 
-  var _super2 = resultRow_createSuper(Chat);
+  var _super2 = resultRow_createSuper(ChatRow);
 
-  function Chat(props) {
-    resultRow_classCallCheck(this, Chat);
+  function ChatRow(props) {
+    resultRow_classCallCheck(this, ChatRow);
 
     return _super2.call(this, props);
   }
 
-  resultRow_createClass(Chat, [{
+  resultRow_createClass(ChatRow, [{
     key: "render",
     value: function render() {
       var _this$props2 = this.props,
@@ -17038,25 +17054,25 @@ var resultRow_Chat = /*#__PURE__*/function (_MegaRenderMixin2) {
     }
   }]);
 
-  return Chat;
+  return ChatRow;
 }(mixins["MegaRenderMixin"]); //
-// Member
+// MemberRow
 // TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
-var resultRow_Member = /*#__PURE__*/function (_MegaRenderMixin3) {
-  resultRow_inherits(Member, _MegaRenderMixin3);
+var resultRow_MemberRow = /*#__PURE__*/function (_MegaRenderMixin3) {
+  resultRow_inherits(MemberRow, _MegaRenderMixin3);
 
-  var _super3 = resultRow_createSuper(Member);
+  var _super3 = resultRow_createSuper(MemberRow);
 
-  function Member(props) {
-    resultRow_classCallCheck(this, Member);
+  function MemberRow(props) {
+    resultRow_classCallCheck(this, MemberRow);
 
     return _super3.call(this, props);
   }
 
-  resultRow_createClass(Member, [{
+  resultRow_createClass(MemberRow, [{
     key: "render",
     value: function render() {
       var _this$props3 = this.props,
@@ -17114,10 +17130,10 @@ var resultRow_Member = /*#__PURE__*/function (_MegaRenderMixin3) {
     }
   }]);
 
-  return Member;
+  return MemberRow;
 }(mixins["MegaRenderMixin"]);
 
-var resultRow_Nil = function Nil() {
+var resultRow_NilRow = function NilRow() {
   return /*#__PURE__*/external_React_default.a.createElement("div", {
     className: "".concat(SEARCH_ROW_CLASS, " nil")
   }, /*#__PURE__*/external_React_default.a.createElement("img", {
@@ -17144,12 +17160,11 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
       var _this$props4 = this.props,
           type = _this$props4.type,
           result = _this$props4.result,
-          status = _this$props4.status,
           children = _this$props4.children;
 
       switch (type) {
         case TYPE.MESSAGE:
-          return /*#__PURE__*/external_React_default.a.createElement(resultRow_Message, {
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_MessageRow, {
             data: result.data,
             text: result.text,
             matches: result.matches,
@@ -17158,13 +17173,13 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
           });
 
         case TYPE.CHAT:
-          return /*#__PURE__*/external_React_default.a.createElement(resultRow_Chat, {
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_ChatRow, {
             room: result.room,
             matches: result.matches
           });
 
         case TYPE.MEMBER:
-          return /*#__PURE__*/external_React_default.a.createElement(resultRow_Member, {
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_MemberRow, {
             data: result.data,
             matches: result.matches,
             room: result.room,
@@ -17172,7 +17187,7 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
           });
 
         case TYPE.NIL:
-          return status === STATUS.COMPLETED && /*#__PURE__*/external_React_default.a.createElement(resultRow_Nil, null);
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_NilRow, null);
 
         default:
           return /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -17220,6 +17235,7 @@ function resultContainer_assertThisInitialized(self) { if (self === void 0) { th
 function resultContainer_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function resultContainer_getPrototypeOf(o) { resultContainer_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return resultContainer_getPrototypeOf(o); }
+
 
 
 
@@ -17306,17 +17322,29 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
       }
 
       return Object.keys(RESULT_TABLE).map(function (key, index) {
-        var table = RESULT_TABLE[key];
-        var hasRows = table.length;
-        return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, {
-          key: index,
-          heading: key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS
-        }, hasRows ? table.map(function (row) {
-          return row;
-        }) : /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
-          type: TYPE.NIL,
-          status: status
-        }));
+        var table = {
+          ref: RESULT_TABLE[key],
+          hasRows: RESULT_TABLE[key] && RESULT_TABLE[key].length,
+          isEmpty: RESULT_TABLE[key] && RESULT_TABLE[key].length < 1,
+          props: {
+            key: index,
+            heading: key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS
+          }
+        };
+
+        if (table.hasRows) {
+          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, table.ref.map(function (row) {
+            return row;
+          }));
+        }
+
+        if (status === STATUS.COMPLETED && table.isEmpty) {
+          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            type: TYPE.NIL
+          }));
+        }
+
+        return null;
       });
     };
 
@@ -17486,6 +17514,18 @@ var perfectScrollbar = __webpack_require__(10);
 // CONCATENATED MODULE: ./js/chat/ui/SearchPanel/searchPanel.jsx
 function searchPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { searchPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { searchPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return searchPanel_typeof(obj); }
 
+function searchPanel_toConsumableArray(arr) { return searchPanel_arrayWithoutHoles(arr) || searchPanel_iterableToArray(arr) || searchPanel_unsupportedIterableToArray(arr) || searchPanel_nonIterableSpread(); }
+
+function searchPanel_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function searchPanel_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return searchPanel_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return searchPanel_arrayLikeToArray(o, minLen); }
+
+function searchPanel_iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function searchPanel_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return searchPanel_arrayLikeToArray(arr); }
+
+function searchPanel_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function searchPanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function searchPanel_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -17547,7 +17587,9 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         return _this.toggleMinimize();
       }) // Clicked outside the search panel component
       .rebind('click.searchPanel', function (ev) {
-        return _this.clickedOutsideComponent(ev) && !_this.props.minimized && _this.toggleMinimize();
+        if (_this.clickedOutsideComponent(ev) && !_this.props.minimized) {
+          _this.toggleMinimize();
+        }
       }) // `ESC` keypress
       .rebind('keydown.searchPanel', function (_ref) {
         var keyCode = _ref.keyCode;
@@ -17577,14 +17619,20 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
 
     _this.getRecents = function () {
       megaChat.getFrequentContacts().then(function (frequentContacts) {
+        frequentContacts = frequentContacts.slice(0, 30);
+        var recents = [];
+
+        for (var i = frequentContacts.length; i--;) {
+          var recent = frequentContacts[i];
+          recents = [].concat(searchPanel_toConsumableArray(recents), [{
+            data: recent.userId,
+            room: recent.chatRoom,
+            contact: M.u[recent.userId]
+          }]);
+        }
+
         _this.setState({
-          recents: frequentContacts.map(function (frequentContact) {
-            return {
-              data: frequentContact.userId,
-              room: frequentContact.chatRoom,
-              contact: M.u[frequentContact.userId]
-            };
-          })
+          recents: recents
         });
       });
     };
@@ -17689,6 +17737,8 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var _this$state = this.state,
           value = _this$state.value,
           searching = _this$state.searching,
@@ -17701,7 +17751,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       // https://mega.nz/file/QFExTYpD#Jp9R0CV3ri9B081k1i36kDa57ZEe2W2JPp5havIn8Ww
       //
       // Component hierarchy
-      // https://mega.nz/file/kZEhFQxa#uuR2BQ6DXFJPi002eKZbzBpf25pDtddNeMSMsZ1EzPs
+      // https://mega.nz/file/lRkwyYwR#XsLtcMV6fe_HiBZ1shOdt0FvJrB-rr6agoIh0N8xQys
       // -------------------------------------------------------------------------
 
       return /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -17710,11 +17760,15 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         value: value,
         searching: searching,
         status: status,
-        onFocus: this.getRecents,
+        onFocus: function onFocus() {
+          return !searching && _this2.getRecents();
+        },
         onChange: this.handleChange,
         onToggle: this.handleToggle,
         onReset: this.handleReset
-      }), /*#__PURE__*/external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "search-results-wrapper"
+      }, /*#__PURE__*/external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
         options: {
           'suppressScrollX': true
         }
@@ -17723,7 +17777,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       }), searching && /*#__PURE__*/external_React_default.a.createElement(resultContainer_ResultContainer, {
         status: status,
         results: results
-      })));
+      }))));
     }
   }]);
 
@@ -22679,6 +22733,43 @@ ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
   return res;
 };
 /**
+ * getParticipantsTruncated
+ * @description Returns comma-separated string of truncated member names based on passed room; allows to specify the
+ * maximum amount of members to be retrieved, as well the desired maximum length for the truncation.
+ * @param {number} maxMembers The maximum amount of members to be retrieved
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getParticipantsTruncated = function (maxMembers, maxLength) {
+  maxMembers = maxMembers || 5;
+  maxLength = maxLength || 30;
+  var truncatedParticipantNames = [];
+  var members = Object.keys(this.members);
+
+  for (var i = 0; i < members.length; i++) {
+    var handle = members[i];
+    var name = M.getNameByHandle(handle);
+
+    if (!handle || !name || handle === u_handle) {
+      continue;
+    }
+
+    if (i > maxMembers) {
+      break;
+    }
+
+    truncatedParticipantNames.push(name.length > maxLength ? name.substr(0, maxLength) + '...' : name);
+  }
+
+  if (truncatedParticipantNames.length === maxMembers) {
+    truncatedParticipantNames.push('...');
+  }
+
+  return truncatedParticipantNames.join(', ');
+};
+/**
  * Get room title
  *
  * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
@@ -22696,29 +22787,27 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
     return M.getNameByHandle(participants[0]) || "";
   } else {
     if (!ignoreTopic && self.topic && self.topic.substr) {
-      return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
+      return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
     }
 
-    participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
-    var names = [];
-
-    for (var i = 0; i < Math.min(participants.length, 5); i++) {
-      var contactHash = participants[i];
-
-      if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
-        var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
-        names.push(name);
-      }
-    }
+    var names = self.getParticipantsTruncated();
 
     var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 
-    if (names.length === 0) {
-      return def;
-    }
-
-    return names.length > 0 ? names.join(", ") : def;
+    return names.length > 0 ? names : def;
   }
+};
+/**
+ * getTruncatedRoomTopic
+ * @description Returns truncated room topic based on the passed maximum character length.
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength) {
+  maxLength = maxLength || 30;
+  return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 /**
  * Set the room topic

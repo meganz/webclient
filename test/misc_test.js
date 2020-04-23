@@ -45,8 +45,9 @@ describe('Test promisify and mutex', function() {
 
     it('can lock and unlock', function(done) {
         var result = [];
+        var tag = 'begin';
         var push = function(resolve) {
-            result.push(MurmurHash3('' + resolve, 3).toString(16));
+            result.push(tag);
             onIdle(resolve);
         };
         var fail = function(ex) {
@@ -68,26 +69,32 @@ describe('Test promisify and mutex', function() {
 
         push(mutex.unlock);
         mutex.lock('foo').then(function(unlock) {
-            mutex.lock(mName).then(push);
-            mMethod().then(unlock);
+            tag = 'x1';
+            mutex.lock(mName)
+                .then(function(a0) {
+                    tag = 'meth';
+                    return push(a0);
+                });
+            tag = 'x2';
+            mMethod().then(function(a0) {
+                tag = 'm2';
+                return unlock(a0);
+            });
             assert.strictEqual(JSON.stringify(mutex.queue), '{"foo":[null],"' + mName + '":[null]}');
         }).catch(fail);
+
+        tag = 'x3';
         mutex.lock('foo').then(function(unlock) {
             assert.strictEqual(JSON.stringify(mutex.queue), '{"foo":[]}');
+            tag = 'stack';
             push(unlock);
+            tag = 'x4';
             return unlock();
         }).then(function() {
-            var signatures = [
-                '-',
-                '1169c55.5b9ad68c.346c706a.5b9ad68c.c4b5eb55',
-                '8fc7d06b.bddfffc7.ba1df54b.bddfffc7.2eec3e5',
-                '94a7e2f6.5b9ad68c.7f9e8ac7.5b9ad68c.b51f4dc6',
-                '8ec59e2a.bddfffc7.a4afce3d.bddfffc7.b0bf12d8'
-            ];
+            tag = 'end';
             push(mMethod);
-            console.log('mutex-signature', result.join('.'));
             assert.strictEqual(JSON.stringify(mutex.queue), '{}');
-            expect(signatures.join('$').indexOf(result.join('.'))).to.greaterThan(1);
+            assert.strictEqual(result.join('.'), 'begin.meth.meth.stack.end');
             done();
         }).catch(fail);
     });

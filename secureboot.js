@@ -627,6 +627,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }
@@ -746,12 +747,30 @@ if (!browserUpdate && is_extension)
     }
     else {
         // WebExtensions
-        tmp = 'mega';
-        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
-            tmp = localStorage.chromextdevpath || tmp;
+        urlrootfile = 'mega/secure.html';
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object' || typeof chrome.extension !== 'object') {
+            if (!sessionStorage.extStageReload) {
+                sessionStorage.extStageReload = 1;
+                location.reload(true);
+            }
+            else if (sessionStorage.extStageReload < 3) {
+                sessionStorage.extStageReload++;
+                location.reload(true);
+            }
+
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime,
+                window.chrome && chrome.extension);
         }
-        bootstaticpath = chrome.extension.getURL(tmp + '/');
-        urlrootfile = tmp + '/secure.html';
+        else {
+            tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
+
+            if (tmp.version === '109101.103.97') {
+                urlrootfile = 'webclient/index.html';
+            }
+        }
+
+        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     Object.defineProperty(window, 'eval', {
@@ -1890,6 +1909,7 @@ else if (!browserUpdate) {
                 return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
+                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')

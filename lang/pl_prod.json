@@ -3491,7 +3491,7 @@
     "22780": "Jak mog\u0119 zobaczy\u0107 moje zarobki?",
     "22781": "Udost\u0119pniamy intuicyjny pulpit polecaj\u0105cy, w kt\u00f3rym mo\u017cna znale\u017a\u0107 szczeg\u00f3\u0142owe raporty swoich zarobk\u00f3w.",
     "22783": "Dlaczego powinienem zosta\u0107 polecaj\u0105cym MEGA?",
-    "22784": "Z ponad 150 milionami zarejestrowanych u\u017cytkownik\u00f3w, MEGA jest wiod\u0105c\u0105 kompleksow\u0105 platform\u0105 do wsp\u00f3\u0142pracy w chmurze szyfrowanej.[BR]Zosta\u0144 partnerem polecaj\u0105cym, pomo\u017cesz nam rozwija\u0107 MEGA i uczestniczy\u0107 w sukcesie!",
+    "22784": "Z ponad 170 milionami zarejestrowanych u\u017cytkownik\u00f3w, MEGA jest wiod\u0105c\u0105 kompleksow\u0105 platform\u0105 do wsp\u00f3\u0142pracy w chmurze szyfrowanej. [BR] Zosta\u0144 partnerem polecaj\u0105cym, pomo\u017ce nam rozwin\u0105\u0107 MEGA i uczestniczy\u0107 w sukcesie.",
     "22785": "Ile kosztuje przyst\u0105pienie do programu?",
     "22786": "Udzia\u0142 w programie rekomendacji jest bezp\u0142atny. Aby jednak skorzysta\u0107 z umorzenia, musisz dokona\u0107 przynajmniej jednej prawdziwej p\u0142atno\u015bci * na rzecz MEGA. Kliknij [A]Plany i ceny[\/A], aby zobaczy\u0107 nasze opcje planu PRO.",
     "22787": "W jaki spos\u00f3b Twoje polecenia kwalifikuj\u0105 si\u0119 do prowizji dla istniej\u0105cych u\u017cytkownik\u00f3w?",
@@ -3653,5 +3653,16 @@
     "23249": "... i 1 pozosta\u0142y",
     "23250": "\u2026 i [X] pozosta\u0142ych",
     "23251": "Zap\u0142a\u0107 teraz",
-    "23252": "Mniej ni\u017c minut\u0119 temu"
+    "23252": "Mniej ni\u017c minut\u0119 temu",
+    "23253": "0 plik\u00f3w",
+    "23254": "0 katalog\u00f3w",
+    "23255": "Status:",
+    "23256": "1 katalog",
+    "23257": "1 plik",
+    "23258": "0 katalog\u00f3w",
+    "23259": "0 plik\u00f3w",
+    "23260": "[X] katalog\u00f3w",
+    "23261": "[X] plik\u00f3w",
+    "23262": "Zmie\u0144 has\u0142o",
+    "23278": "Firefox\/Chrome Extension"
 }

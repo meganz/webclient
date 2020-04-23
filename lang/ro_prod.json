@@ -3491,7 +3491,7 @@
     "22780": "Cum \u00eemi v\u0103d c\u00e2\u0219tigurile?",
     "22781": "Oferim un tablou de bord intuitiv pentru recomand\u0103ri, \u00een care po\u021bi g\u0103si rapoarte detaliate despre c\u00e2\u0219tigurile tale.",
     "22783": "De ce ar trebui s\u0103 devin agent de recomand\u0103ri pentru MEGA?",
-    "22784": "Cu mai mult de 150 de milioane de utilizatori \u00eenregistra\u021bi, MEGA este cea mai important\u0103 platform\u0103 \u00een cloud colaborativ\u0103, criptat\u0103 cap\u0103t-la-cap\u0103t.[BR]Devenind un partener de recomand\u0103ri, \u00ee\u021bi permite s\u0103 ne aju\u021bi s\u0103 cre\u0219tem MEGA \u0219i s\u0103 participi la reu\u0219it\u0103!",
+    "22784": "With more than 170 million registered users, MEGA is the leading end-to-end encrypted cloud collaboration platform.[BR]Becoming a referral partner allows you to help us grow MEGA and participate in the success.",
     "22785": "C\u00e2t cost\u0103 s\u0103 te al\u0103turi programului?",
     "22786": "Este gratuit s\u0103 participi \u00een programul pentru recomand\u0103ri. Cu toate acestea, pentru a fi eligibil \u00een cazul unei r\u0103scump\u0103r\u0103ri, trebuie s\u0103 realizezi cel pu\u021bin o plat\u0103 real\u0103* la MEGA. D\u0103 clic pe [A]Planuri \u0219i pre\u021buri[\/A] pentru a vedea op\u021biunile planului nostru PRO.",
     "22787": "Cum recomand\u0103rile te fac eligibil pentru un comision \u00een cazul utilizatorilor existen\u021bi?",
@@ -3653,5 +3653,16 @@
     "23249": "\u2026 and 1 other",
     "23250": "\u2026 and [X] others",
     "23251": "Pl\u0103te\u0219te acum",
-    "23252": "Less than a minute ago"
+    "23252": "Less than a minute ago",
+    "23253": "0 files",
+    "23254": "0 folders",
+    "23255": "Status:",
+    "23256": "1 Folder",
+    "23257": "1 File",
+    "23258": "0 Folders",
+    "23259": "0 Files",
+    "23260": "[X] Folders",
+    "23261": "[X] Files",
+    "23262": "Change Password",
+    "23278": "Firefox\/Chrome Extension"
 }

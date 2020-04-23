@@ -1813,6 +1813,10 @@ function CallRecovery(call) {
     }, RtcModule.kCallRecoveryTimeout);
 }
 
+CallRecovery.prototype.localStream = function() {
+    return this.gLocalStream;
+};
+
 CallRecovery.prototype.abort = function(reason) {
     var self = this;
     if (self.timeoutTimer) {

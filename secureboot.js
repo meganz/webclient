@@ -749,13 +749,18 @@ if (!browserUpdate && is_extension)
         // WebExtensions
         urlrootfile = 'mega/secure.html';
 
-        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object') {
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object' || typeof chrome.extension !== 'object') {
             if (!sessionStorage.extStageReload) {
                 sessionStorage.extStageReload = 1;
                 location.reload(true);
             }
+            else if (sessionStorage.extStageReload < 3) {
+                sessionStorage.extStageReload++;
+                location.reload(true);
+            }
 
-            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime);
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime,
+                window.chrome && chrome.extension);
         }
         else {
             tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;

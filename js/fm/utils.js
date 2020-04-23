@@ -1750,8 +1750,21 @@ MegaUtils.prototype.toArrayBuffer = function(data) {
 
     var promise = new MegaPromise();
 
+    if (typeof data === 'string' && data.substr(0, 5) === 'data:') {
+        data = dataURLToAB(data);
+    }
+
     if (data instanceof Blob) {
         promise = this.readBlob(data);
+    }
+    else if (typeof data === 'string' && data.substr(0, 5) === 'blob:') {
+        M.xhr({url: data, type: 'arraybuffer'})
+            .then(function(ev, data) {
+                promise.resolve(data);
+            })
+            .catch(function(ex, detail) {
+                promise.reject(detail);
+            });
     }
     else if (this.isTypedArray(data)) {
         if (data.byteLength !== data.buffer.byteLength) {

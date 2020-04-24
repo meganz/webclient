@@ -926,6 +926,16 @@ function api_reqfailed(channel, error) {
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
+                var setLogOutOnNavigation = function() {
+                    onIdle(function() {
+                        mBroadcaster.once('pagechange', function() {
+                            u_logout();
+                            location.reload(true);
+                        });
+                    });
+                    window.doUnloadLogOut = 0x9001;
+                    return false;
+                };
 
                 // On clicking OK, log the user out and redirect to contact page
                 loadingDialog.hide();
@@ -958,8 +968,7 @@ function api_reqfailed(channel, error) {
 
                     // Exit early to prevent logout because further API requests are
                     // needed to verify by SMS and if logged out then it won't work
-                    window.doUnloadLogOut = 0x9001;
-                    return false;
+                    return setLogOutOnNavigation();
                 }
                 else if (reasonCode === 700) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';

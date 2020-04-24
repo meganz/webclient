@@ -7915,9 +7915,9 @@ var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRen
     value: function resizeBreadcrumbs() {
       var _this5 = this;
 
-      var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-      var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
       Soon(function () {
+        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', _this5.findDOMNode());
+        var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
         var wrapperWidth = $breadcrumbsWrapper.outerWidth();
         var $el = $(_this5.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
         var i = 0;

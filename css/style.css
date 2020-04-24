@@ -6749,6 +6749,9 @@ table {
 .export-icon.keynote, .share-folder-icon div.keynote {
     background-position: -113px -599px;
 }
+.export-icon.vector, .share-folder-icon div.vector {
+    background-position: -113px -719px;
+}
 .export-icon.numbers, .share-folder-icon div.numbers {
     background-position: -113px -719px;
 }
@@ -6789,7 +6792,7 @@ table {
     background-position: -113px -2159px;
 }
 .export-icon.photoshop, .share-folder-icon div.photoshop {
-    bbackground-position: -113px -2279px;
+    background-position: -113px -2279px;
 }
 .export-icon.pdf, .share-folder-icon div.pdf {
     background-position: -113px -2399px;

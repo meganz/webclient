@@ -12120,6 +12120,11 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
       return false;
     }
   }, {
+    key: "_isUserRegistered",
+    value: function _isUserRegistered() {
+      return typeof u_type !== 'undefined' && u_type > 2;
+    }
+  }, {
     key: "_isNodeHavingALink",
     value: function _isNodeHavingALink(h) {
       return M.getNodeShare(h) !== false;
@@ -12509,7 +12514,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "rounded-grey-down-arrow",
                   label: __(l[1187]),
                   onClick: self._startDownload.bind(self, v)
-                }), /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
+                }), self._isUserRegistered() && /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "grey-cloud",
                   label: __(l[1988]),
                   onClick: self._addToCloudDrive.bind(self, v, false)
@@ -12517,7 +12522,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "conversations",
                   label: __(l[17764]),
                   onClick: self._addToCloudDrive.bind(self, v, true)
-                })));
+                }))));
               }
 
               var attachmentClasses = "message shared-data";

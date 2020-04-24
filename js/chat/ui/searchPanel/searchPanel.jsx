@@ -39,7 +39,6 @@ export default class SearchPanel extends MegaRenderMixin {
             // Focus and mark the text as selected on re-opening from minimize
             if (!nextProps.minimized) {
                 Soon(() => {
-                    this.doToggle('resume');
                     SearchField.focus();
                     SearchField.select();
                 });
@@ -125,8 +124,24 @@ export default class SearchPanel extends MegaRenderMixin {
 
     doToggle = action /* pause || resume || destroy */ => {
         const megaPromise = ChatSearch.doSearch.megaPromise;
+
         if (action && megaPromise && megaPromise.cs) {
-            megaPromise.cs[action]();
+            const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
+
+            this.setState({
+                status: (() => {
+                    switch (action) {
+                        case 'pause':
+                            return PAUSED;
+                        case 'resume':
+                            return IN_PROGRESS;
+                        default:
+                            return COMPLETED;
+                    }
+                })()
+            }, () =>
+                megaPromise.cs[action]()
+            );
         }
     };
 

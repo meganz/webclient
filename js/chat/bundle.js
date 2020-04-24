@@ -6456,9 +6456,9 @@ var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRen
     value: function resizeBreadcrumbs() {
       var _this5 = this;
 
-      var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-      var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
       Soon(function () {
+        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', _this5.findDOMNode());
+        var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
         var wrapperWidth = $breadcrumbsWrapper.outerWidth();
         var $el = $(_this5.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
         var i = 0;
@@ -10626,6 +10626,11 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
       return false;
     }
   }, {
+    key: "_isUserRegistered",
+    value: function _isUserRegistered() {
+      return typeof u_type !== 'undefined' && u_type > 2;
+    }
+  }, {
     key: "_isNodeHavingALink",
     value: function _isNodeHavingALink(h) {
       return M.getNodeShare(h) !== false;
@@ -11015,7 +11020,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "rounded-grey-down-arrow",
                   label: __(l[1187]),
                   onClick: self._startDownload.bind(self, v)
-                }), /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
+                }), self._isUserRegistered() && /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "grey-cloud",
                   label: __(l[1988]),
                   onClick: self._addToCloudDrive.bind(self, v, false)
@@ -11023,7 +11028,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "conversations",
                   label: __(l[17764]),
                   onClick: self._addToCloudDrive.bind(self, v, true)
-                })));
+                }))));
               }
 
               var attachmentClasses = "message shared-data";
@@ -17614,6 +17619,8 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.toggleMinimize = function () {
+      _this.doToggle('pause');
+
       _this.props.onToggle();
     };
 
@@ -17655,6 +17662,35 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       });
     };
 
+    _this.doToggle = function (action
+    /* pause || resume || destroy */
+    ) {
+      var megaPromise = ChatSearch.doSearch.megaPromise;
+
+      if (action && megaPromise && megaPromise.cs) {
+        var IN_PROGRESS = STATUS.IN_PROGRESS,
+            PAUSED = STATUS.PAUSED,
+            COMPLETED = STATUS.COMPLETED;
+
+        _this.setState({
+          status: function () {
+            switch (action) {
+              case 'pause':
+                return PAUSED;
+
+              case 'resume':
+                return IN_PROGRESS;
+
+              default:
+                return COMPLETED;
+            }
+          }()
+        }, function () {
+          return megaPromise.cs[action]();
+        });
+      }
+    };
+
     _this.handleChange = function (ev) {
       var value = ev.target.value;
       var searching = value.length >= 3;
@@ -17672,29 +17708,28 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.handleToggle = function () {
-      var megaPromise = ChatSearch.doSearch.megaPromise;
+      var inProgress = _this.state.status === STATUS.IN_PROGRESS;
 
-      if (megaPromise && megaPromise.cs) {
-        var inProgress = _this.state.status === STATUS.IN_PROGRESS;
-
-        _this.setState({
-          status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
-        }, function () {
-          Soon(function () {
-            return searchField_SearchField.focus();
-          });
-          return inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume();
+      _this.setState({
+        status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
+      }, function () {
+        Soon(function () {
+          return searchField_SearchField.focus();
         });
-      }
+        return _this.doToggle(inProgress ? 'pause' : 'resume');
+      });
     };
 
     _this.handleReset = function () {
       _this.setState({
         value: '',
         searching: false,
-        status: undefined
+        status: undefined,
+        results: []
       }, function () {
-        return Soon(function () {
+        _this.doToggle('destroy');
+
+        Soon(function () {
           return searchField_SearchField.focus();
         });
       });

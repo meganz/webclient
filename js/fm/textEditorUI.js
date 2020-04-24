@@ -193,6 +193,11 @@ mega.textEditorUI = new function TextEditorUI() {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
                         }
+                        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
+                            mega.fileTextEditor.removeOldVersion(fileHandle);
+                            fileHandle = fh;
+                            fh = '';
+                        }
                         versionHandle = fh;
                         savedFileData = editor.getValue();
 

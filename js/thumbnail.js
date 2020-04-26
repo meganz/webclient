@@ -672,10 +672,11 @@ function ppmtojpeg(ppm) {
             i = 0;
             j = 0;
             while (i < ppmLen && j < iLen) {
+                var a = ppm[i] | ppm[i + 1] | ppm[i + 2];
                 imageData.data[j] = ppm[i];         // R
                 imageData.data[j + 1] = ppm[i + 1]; // G
                 imageData.data[j + 2] = ppm[i + 2]; // B
-                imageData.data[j + 3] = 0xCE;       // A
+                imageData.data[j + 3] = a ? 208 : 0;// A
                 j += 4;
                 i += 3;
             }

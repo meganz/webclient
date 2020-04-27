@@ -641,6 +641,8 @@ export class ConversationPanel extends MegaRenderMixin {
         }
         self.props.chatRoom._uiIsMounted = true;
         self.props.chatRoom.$rConversationPanel = self;
+
+        $(self.props.chatRoom).trigger("onComponentDidMount");
     }
     eventuallyInit(doResize) {
         var self = this;

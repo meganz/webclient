@@ -68,6 +68,206 @@ export class ContactButton extends ContactAwareComponent {
         }
         return -1;
     }
+    dropdownItemGenerator() {
+        var self = this;
+        var contact = self.props.contact;
+        var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
+
+        var moreDropdowns = [];
+
+        var username = M.getNameByHandle(contact.u);
+
+        var onContactClicked = function() {
+            if (contact.c === 2) {
+                loadSubPage('fm/account');
+            }
+            if (contact.c === 1) {
+                loadSubPage('fm/' + contact.u);
+            }
+        };
+
+        moreDropdowns.push(
+            <div className="dropdown-avatar rounded" key="mainContactInfo">
+                <Avatar className="avatar-wrapper context-avatar"
+                        chatRoom={this.props.chatRoom}
+                        contact={contact} hideVerifiedBadge="true" onClick={onContactClicked} />
+                <div className="dropdown-user-name" onClick={onContactClicked}>
+                    <div className="name">
+                        {username}
+                        <ContactPresence className="small" contact={contact} />
+                    </div>
+                    <span className="email">
+                            {contact.m}
+                        </span>
+                </div>
+            </div>
+        );
+
+        moreDropdowns.push(
+            <ContactFingerprint key="fingerprint" contact={contact} />
+        );
+
+        if (dropdowns.length && contact.c !== 2) {
+            moreDropdowns.push(dropdowns);
+
+            moreDropdowns.push(
+                <hr key="top-separator" />
+            );
+        }
+
+        if (contact.c === 2) {
+            moreDropdowns.push(
+                <DropdownItem
+                    key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
+                    loadSubPage('fm/account');
+                }} />
+            );
+        }
+        if (contact.c === 1) {
+
+            var startAudioCall = function() {
+                megaChat.createAndShowPrivateRoomFor(contact.u)
+                    .then(function(room) {
+                        room.setActive();
+                        room.startAudioCall();
+                    });
+            };
+
+            if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
+                moreDropdowns.push(
+                    <DropdownItem
+                        key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
+                        onClick={startAudioCall} />
+                );
+
+
+
+                moreDropdowns.push(
+                    <div className="dropdown body submenu" key="dropdownGroup">
+                        <div>
+                            <DropdownItem
+                                key="startAudio" icon="context handset" label={__(l[1565])}
+                                onClick={startAudioCall} />
+                        </div>
+                        <div>
+                            <DropdownItem
+                                key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
+                                megaChat.createAndShowPrivateRoomFor(contact.u)
+                                    .then(function(room) {
+                                        room.setActive();
+                                        room.startVideoCall();
+                                    });
+                            }} />
+                        </div>
+                    </div>
+                );
+            }
+            else {
+                moreDropdowns.push(
+                    <DropdownItem
+                        key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
+                        loadSubPage('fm/chat/p/' + contact.u);
+                    }} />
+                );
+            }
+
+            moreDropdowns.push(
+                <hr key="files-separator" />
+            );
+
+            moreDropdowns.push(
+                <DropdownItem
+                    key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
+                    megaChat.openChatAndSendFilesDialog(contact.u);
+                }} />
+            );
+            moreDropdowns.push(
+                <DropdownItem
+                    key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
+                    openCopyShareDialog(contact.u);
+                }} />
+            );
+        }
+        else if (!contact.c) {
+            moreDropdowns.push(
+                <DropdownItem
+                    key="view2"
+                    icon="small-icon icons-sprite grey-plus"
+                    label={__(l[101])}
+                    onClick={() => {
+                        loadingDialog.show();
+                        const isAnonymousUser = (!u_handle || u_type !== 3);
+                        const ADD_CONTACT = 'addContact';
+                        if (anonymouschat && isAnonymousUser) {
+                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                            if (localStorage.getItem(ADD_CONTACT) === null) {
+                                localStorage.setItem(
+                                    ADD_CONTACT,
+                                    JSON.stringify({u: contact.u, unixTime: unixtime()})
+                                );
+                            }
+                        }
+                        else {
+                            M.syncContactEmail(contact.u)
+                                .done(function(email) {
+                                    var exists = false;
+                                    var opcKeys = Object.keys(M.opc);
+                                    for (var i = 0; i < opcKeys.length; i++) {
+                                        if (!exists && M.opc[opcKeys[i]].m === email) {
+                                            exists = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (exists) {
+                                        closeDialog();
+                                        msgDialog('warningb', '', l[17545]);
+                                    }
+                                    else {
+                                        M.inviteContact(M.u[u_handle].m, email);
+                                        var title = l[150];
+                                        var msg = l[5898].replace('[X]', email);
+
+                                        closeDialog();
+                                        msgDialog('info', title, msg);
+                                    }
+                                })
+                                .always(function() {
+                                    loadingDialog.hide();
+                                });
+                        }
+                    }
+                    } />
+            );
+        }
+
+        // Don't show Set Nickname button if not logged in or clicking your own name
+        if (u_attr && contact.u !== u_handle) {
+
+            // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
+            moreDropdowns.push(
+                <hr key="nicknames-separator" />
+            );
+            moreDropdowns.push(
+                <DropdownItem
+                    key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
+                    nicknames.setNicknameDialog.init(contact.u);
+                }} />
+            );
+        }
+
+        if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
+            moreDropdowns.push(
+                <hr key="remove-separator" />
+            );
+            moreDropdowns.push(
+                self.props.dropdownRemoveButton
+            );
+        }
+
+        console.error(this, moreDropdowns.length);
+        return moreDropdowns;
+    }
     render() {
         var self = this;
 
@@ -95,219 +295,26 @@ export class ContactButton extends ContactAwareComponent {
             label = <em className="contact-name-loading"></em>;
         }
 
-        var username = M.getNameByHandle(contact.u);
 
         var buttonComponent = null;
         if (!self.props.noContextMenu) {
-            var moreDropdowns = [];
 
 
-            var onContactClicked = function() {
-                if (contact.c === 2) {
-                    loadSubPage('fm/account');
-                }
-                if (contact.c === 1) {
-                    loadSubPage('fm/' + contact.u);
-                }
-            };
-
-            moreDropdowns.push(
-                <div className="dropdown-avatar rounded" key="mainContactInfo">
-                    <Avatar className="avatar-wrapper context-avatar"
-                        chatRoom={this.props.chatRoom}
-                        contact={contact} hideVerifiedBadge="true" onClick={onContactClicked} />
-                    <div className="dropdown-user-name" onClick={onContactClicked}>
-                        <div className="name">
-                            {username}
-                            <ContactPresence className="small" contact={contact} />
-                        </div>
-                        <span className="email">
-                            {contact.m}
-                        </span>
-                    </div>
-                </div>
-            );
-
-            moreDropdowns.push(
-                <ContactFingerprint key="fingerprint" contact={contact} />
-            );
-
-            if (dropdowns.length && contact.c !== 2) {
-                moreDropdowns.push(dropdowns);
-
-                moreDropdowns.push(
-                    <hr key="top-separator" />
-                );
-            }
-
-            if (contact.c === 2) {
-                moreDropdowns.push(
-                    <DropdownItem
-                        key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
-                            loadSubPage('fm/account');
-                        }} />
-                );
-            }
-            if (contact.c === 1) {
-
-                var startAudioCall = function() {
-                    megaChat.createAndShowPrivateRoomFor(contact.u)
-                        .then(function(room) {
-                            room.setActive();
-                            room.startAudioCall();
-                        });
-                };
-
-                if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-                    moreDropdowns.push(
-                        <DropdownItem
-                            key="startCall" className="contains-submenu" icon="context handset" label={__(l[19125])}
-                            onClick={startAudioCall} />
-                    );
-
-
-
-                    moreDropdowns.push(
-                        <div className="dropdown body submenu" key="dropdownGroup">
-                            <div>
-                                <DropdownItem
-                                    key="startAudio" icon="context handset" label={__(l[1565])}
-                                    onClick={startAudioCall} />
-                            </div>
-                            <div>
-                                <DropdownItem
-                                    key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
-                                        megaChat.createAndShowPrivateRoomFor(contact.u)
-                                            .then(function(room) {
-                                                room.setActive();
-                                                room.startVideoCall();
-                                            });
-                                    }} />
-                            </div>
-                        </div>
-                    );
-                }
-                else {
-                    moreDropdowns.push(
-                        <DropdownItem
-                            key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
-                                loadSubPage('fm/chat/p/' + contact.u);
-                            }} />
-                    );
-                }
-
-                moreDropdowns.push(
-                    <hr key="files-separator" />
-                );
-
-                moreDropdowns.push(
-                    <DropdownItem
-                        key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
-                        megaChat.openChatAndSendFilesDialog(contact.u);
-                    }} />
-                );
-                moreDropdowns.push(
-                    <DropdownItem
-                        key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
-                            openCopyShareDialog(contact.u);
-                    }} />
-                );
-            }
-            else if (!contact.c) {
-                moreDropdowns.push(
-                    <DropdownItem
-                        key="view2"
-                        icon="small-icon icons-sprite grey-plus"
-                        label={__(l[101])}
-                        onClick={() => {
-                            loadingDialog.show();
-                            const isAnonymousUser = (!u_handle || u_type !== 3);
-                            const ADD_CONTACT = 'addContact';
-                            if (anonymouschat && isAnonymousUser) {
-                                megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-                                if (localStorage.getItem(ADD_CONTACT) === null) {
-                                    localStorage.setItem(
-                                        ADD_CONTACT,
-                                        JSON.stringify({u: contact.u, unixTime: unixtime()})
-                                    );
-                                }
-                            }
-                            else {
-                                M.syncContactEmail(contact.u)
-                                    .done(function(email) {
-                                        var exists = false;
-                                        var opcKeys = Object.keys(M.opc);
-                                        for (var i = 0; i < opcKeys.length; i++) {
-                                            if (!exists && M.opc[opcKeys[i]].m === email) {
-                                                exists = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if (exists) {
-                                            closeDialog();
-                                            msgDialog('warningb', '', l[17545]);
-                                        }
-                                        else {
-                                            M.inviteContact(M.u[u_handle].m, email);
-                                            var title = l[150];
-                                            var msg = l[5898].replace('[X]', email);
-
-                                            closeDialog();
-                                            msgDialog('info', title, msg);
-                                        }
-                                    })
-                                    .always(function() {
-                                        loadingDialog.hide();
-                                    });
-                            }
-                        }
-                        } />
-                );
-            }
-
-            // Don't show Set Nickname button if not logged in or clicking your own name
-            if (u_attr && contact.u !== u_handle) {
-
-                // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
-                moreDropdowns.push(
-                    <hr key="nicknames-separator" />
-                );
-                moreDropdowns.push(
-                    <DropdownItem
-                        key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
-                            nicknames.setNicknameDialog.init(contact.u);
-                        }} />
-                );
-            }
-
-            if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
-                moreDropdowns.push(
-                    <hr key="remove-separator" />
-                );
-                moreDropdowns.push(
-                    self.props.dropdownRemoveButton
-                );
-            }
-
-            if (moreDropdowns.length > 0) {
-                buttonComponent = <Button
-                    className={classes}
-                    icon={icon}
-                    disabled={moreDropdowns.length === 0 || self.props.dropdownDisabled}
-                    label={label}
-                    >
-                    <Dropdown className="contact-card-dropdown"
-                                          positionMy={dropdownPosition}
-                                          positionAt={dropdownPosition}
-                                          vertOffset={vertOffset}
-                                          horizOffset={horizOffset}
-                                          noArrow={true}
-                    >
-                        {moreDropdowns}
-                    </Dropdown>
-                </Button>;
-            }
+            buttonComponent = <Button
+                className={classes}
+                icon={icon}
+                disabled={self.props.dropdownDisabled}
+                label={label}
+            >
+                <Dropdown className="contact-card-dropdown"
+                          positionMy={dropdownPosition}
+                          positionAt={dropdownPosition}
+                          vertOffset={vertOffset}
+                          horizOffset={horizOffset}
+                          dropdownItemGenerator={self.dropdownItemGenerator.bind(this)}
+                          noArrow={true}
+                />
+            </Button>;
         }
 
         return buttonComponent;

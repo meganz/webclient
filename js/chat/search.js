@@ -65,8 +65,11 @@ function RoomSearch(parentSearch, room) {
     var self = this;
     self.parentSearch = parentSearch;
     self.room = room;
-    self.logger = MegaLogger.getLogger("ChatSearch[" + room.chatId + "]",
-        parentSearch.logger._myOpts, parentSearch.logger);
+    self.logger = MegaLogger.getLogger(
+        "ChatSearch[" + room.chatId + "]",
+        parentSearch.logger._myOpts,
+        parentSearch.logger
+    );
     room.attachSearch();
     self._setState(SearchState.kNew);
     self.room.rebind("onHistoryDecrypted.search", function() {
@@ -89,10 +92,12 @@ RoomSearch.prototype.resume = function() {
     var room = self.room;
     if (self.state === SearchState.kNew) {
         // match chat topic
-        self.match(room.topic, SearchResultType.kChatTopic);
+        room.topic && self.match(room.topic, SearchResultType.kChatTopic);
         // match room member names
         var members = room.members;
-        if (members) {
+        // only search for  "other member name matches" if this is a 1on1, otherwise duplicated results are shown in
+        // the ui
+        if (members && room.type === "private") {
             for (var userid in members) {
                 if (userid === u_handle) {
                     continue;
@@ -111,7 +116,7 @@ RoomSearch.prototype.resume = function() {
         for (var i = messages.length - 1; i >= 0; i--) {
             var msg = messages.getItem(i);
             if (msg && msg.textContents && msg.textContents.length > 0) {
-                self.match(msg.textContents, SearchResultType.kMessage, msg);
+                self.match(msg.textContents, SearchResultType.kMessage, msg, messages.length - i);
             }
         }
     }
@@ -150,7 +155,7 @@ RoomSearch.prototype.onHistoryFetched = function() {
         for (var i = 0; i < numFetched; i++) {
             var msg = messages.getItem(i);
             if (msg.textContents) {
-                self.match(msg.textContents, SearchResultType.kMessage, msg);
+                self.match(msg.textContents, SearchResultType.kMessage, msg, newCount - i);
             }
         }
         if (haveMoreHistory && self.state === SearchState.kInProgress) {
@@ -167,6 +172,8 @@ RoomSearch.prototype.onHistoryFetched = function() {
 
 RoomSearch.prototype._destroy = function() {
     this._setState(this.state !== SearchState.kComplete ? SearchState.kDestroying : this.state);
+    this.room.detachSearch();
+    this.room.unbind("onHistoryDecrypted.search");
 };
 
 RoomSearch.prototype.pause = function() {
@@ -193,14 +200,13 @@ RoomSearch.prototype._setComplete = function() {
     }
     delete this._isFetchingHistory;
     this._setState(SearchState.kComplete);
-    this.room.detachSearch();
     this.room.unbind("onHistoryDecrypted.search");
-    this.logger.log("Fetch and search complete", "(total",
-        this.room.messagesBuff.messages.length, "messages)");
+    this.logger.log("Fetch and search complete", "(total", this.room.messagesBuff.messages.length, "messages)");
+    this.room.detachSearch();
     this.parentSearch.onRoomSearchComplete(this);
 };
 
-RoomSearch.prototype.match = function(str, type, data) {
+RoomSearch.prototype.match = function(str, type, data, index) {
     var rx = this.parentSearch.searchRegExp;
     rx.lastIndex = 0;
     var m = rx.exec(str);
@@ -212,10 +218,11 @@ RoomSearch.prototype.match = function(str, type, data) {
         matches.push({idx: m.index, str: m[0]});
     } while ((m = rx.exec(str)));
 
-    var result = { type: type, text: str, matches: matches };
+    var result = { type: type, text: str, matches: matches, index: index };
     if (data) {
         result.data = data;
     }
+
     var stop = this.parentSearch.handler.onResult(this.room, result);
     if (stop) {
         this._setComplete();
@@ -304,15 +311,12 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
     var megaPromise = new MegaPromise();
 
     var results = new MegaDataSortedMap("resultId", function(a, b) {
-        // TODO: impl
+        console.error("sort?", a.type, b.type, a, b);
         if (a.type === SearchResultType.kMessage && b.type === SearchResultType.kMessage) {
-            return a.data.delay < b.data.delay ? -1 : (a.data.delay > b.data.delay ? 1 : 0);
+            return a.data.delay < b.data.delay ? 1 : (a.data.delay > b.data.delay ? -1 : 0);
         }
-        else if (
-            (a.type === SearchResultType.kMessage || b.type === SearchResultType.kMessage) &&
-            a.type !== b.type
-        ) {
-            return a.type !== SearchResultType.kMessage ? -1 : 1;
+        else if (a.type !== b.type) {
+            return a.type < b.type ? 1 : (a.type > b.type ? -1 : 0);
         }
         else {
             var aChat = megaChat.getChatById(a.chatId);
@@ -322,11 +326,14 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
     });
     ChatSearch.doSearch.currentResults = results;
 
+    var resultId = 0;
+    var cs;
+
     if (ChatSearch.doSearch.megaPromise) {
-        ChatSearch.doSearch.megaPromise.cs.destroy();
         ChatSearch.doSearch.megaPromise.always(function() {
             megaPromise.linkDoneAndFailTo(ChatSearch.doSearch(s, onResult, onComplete));
         });
+        ChatSearch.doSearch.megaPromise.cs.destroy();
         return megaPromise;
     }
     else {
@@ -343,13 +350,14 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
                 megaPromise.resolve(cs, results);
                 onComplete && onComplete();
             },
+            'onDestroy': function() {
+                megaPromise.reject();
+                onComplete && onComplete();
+            }
         };
 
-        var cs = new ChatSearch(megaChat, false, s, handler);
+        cs = new ChatSearch(megaChat, false, s, handler);
         // console.error('search > doSearch() -> cs:', cs);
-
-
-        var resultId = 0;
 
         ChatSearch.doSearch.megaPromise = megaPromise;
         megaPromise.always(function() {
@@ -463,5 +471,9 @@ ChatSearch.prototype.destroy = function() {
 
     if (ChatSearch._instance === this) {
         delete ChatSearch._instance;
+    }
+
+    if (this.handler.onComplete) {
+        this.handler.onComplete();
     }
 };

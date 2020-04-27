@@ -2165,6 +2165,8 @@ MessagesBuff.prototype.dumpBufferToConsole = function() {
 /**
  * Remove messages from the buff. Typically used when the user has scrolled to the bottom of the chat, so it does
  * not make sense to render too old messages and waste cpu/mem/dom tree usage.
+ *
+ * @returns {Boolean} if removed any messages
  */
 MessagesBuff.prototype.detachMessages = function() {
     var self = this;
@@ -2174,22 +2176,23 @@ MessagesBuff.prototype.detachMessages = function() {
     // and detaching of messages from the UI, we would need to simply disable the detaching of messages for
     // indexedDB incompatible browsers
     if (!room.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
-        return;
+        return false;
     }
     if (room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey) {
         // do not detach messages in pub mode..otherwise, IF the user joins - the chat history that would get
         // persisted may contain missing messages in the iDB db.
-        return;
+        return false;
     }
     if (room.isScrollingToMessageId) {
         // do not detach messages if we are programatically retrieving history and scrolling to specific messageId
-        return;
+        return false;
     }
 
 
     var removedAnyMessage = false;
-    if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
-        self.messages.splice(0, self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2);
+    var detachCount = self.chatRoom.isCurrentlyActive ? Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2 : 3;
+    if (self.messages.length > detachCount) {
+        self.messages.splice(0,  self.messages.length - detachCount);
         removedAnyMessage = true;
     }
     else {
@@ -2199,6 +2202,7 @@ MessagesBuff.prototype.detachMessages = function() {
     if (removedAnyMessage === true && self.retrievedAllMessages) {
         self.retrievedAllMessages = false;
     }
+    return removedAnyMessage;
 };
 
 /**
@@ -2274,4 +2278,103 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
         (returnNumsInsteadOfIds ? foundFirst.orderValue : foundFirst.messageId),
         (returnNumsInsteadOfIds ? foundLast.orderValue : foundLast.messageId)
     ] : false;
+};
+
+
+
+MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
+    "use strict";
+
+    var renderableSummary;
+    if (lastMessage.renderableSummary) {
+        renderableSummary = lastMessage.renderableSummary;
+    }
+    else {
+        if (lastMessage.isManagement && lastMessage.isManagement()) {
+            renderableSummary = lastMessage.getManagementMessageSummaryText();
+        }
+        else if (!lastMessage.textContents && lastMessage.dialogType) {
+            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+        }
+        else {
+            renderableSummary = lastMessage.textContents;
+        }
+        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
+
+        var escapeUnescapeArgs = [
+            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
+            {'message': {'textContents': renderableSummary}},
+            ['textContents', 'messageHtml'],
+            'messageHtml'
+        ];
+
+        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+            escapeUnescapeArgs[0],
+            escapeUnescapeArgs[1],
+            escapeUnescapeArgs[2],
+            escapeUnescapeArgs[3]
+        );
+        renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
+            escapeUnescapeArgs[0],
+            escapeUnescapeArgs[1],
+            escapeUnescapeArgs[2],
+            escapeUnescapeArgs[3]
+        );
+
+        renderableSummary = renderableSummary || "";
+        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+    }
+
+    var author;
+
+    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
+        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
+    }
+    else if (lastMessage.dialogType === "alterParticipants") {
+        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] ||
+            Message.getContactForMessage(lastMessage);
+    }
+    else {
+        author = Message.getContactForMessage(lastMessage);
+    }
+    if (author) {
+        if (!lastMessage._contactChangeListener && author.addChangeListener) {
+            lastMessage._contactChangeListener = author.addChangeListener(function() {
+                delete lastMessage.renderableSummary;
+                lastMessage.trackDataChange();
+            });
+        }
+
+        if (lastMessage.chatRoom.type === "private") {
+            if (author && author.u === u_handle) {
+                renderableSummary = l[19285] + " " + renderableSummary;
+            }
+        }
+        else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
+            if (author) {
+                if (author.u === u_handle) {
+                    renderableSummary = l[19285] + " " + renderableSummary;
+                }
+                else {
+                    var name = M.getNameByHandle(author.u);
+                    name = ellipsis(name, undefined, 11);
+                    if (name) {
+                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+                    }
+                }
+            }
+        }
+    }
+
+    return renderableSummary;
 };

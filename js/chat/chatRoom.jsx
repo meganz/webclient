@@ -1967,16 +1967,25 @@ ChatRoom.prototype.attachSearch = function() {
 
 ChatRoom.prototype.detachSearch = function() {
     if (--this.activeSearches === 0) {
+        console.error('detachMessages', this.getRoomTitle());
         this.messagesBuff.detachMessages();
-        this.trackDataChange();
     }
+    this.activeSearches = Math.max(this.activeSearches, 0);
+    this.trackDataChange();
 };
 
-ChatRoom.prototype.scrollToMessageId = function(msgId) {
+ChatRoom.prototype.scrollToMessageId = function(msgId, index) {
+    console.error("scrollToMessageId", msgId, index);
     var self = this;
     assert(self.isCurrentlyActive, 'chatRoom is not visible');
     self.isScrollingToMessageId = true;
 
+    if (!self.$rConversationPanel) {
+        $(self).one('onComponentDidMount.scrollToMsgId' + msgId, function() {
+            self.scrollToMessageId(msgId, index);
+        });
+        return;
+    }
     var ps = self.$rConversationPanel.messagesListScrollable;
     assert(ps);
 
@@ -1992,8 +2001,17 @@ ChatRoom.prototype.scrollToMessageId = function(msgId) {
         self.$rConversationPanel.lastScrollPosition = undefined;
         self.isScrollingToMessageId = false;
     }
+    else if (self.messagesBuff.isRetrievingHistory) {
+        // wait for messages to be received
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+            // wait for UI to update (so that the element is now available in the dom)
+            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId, index);
+            });
+        });
+    }
     else if (self.messagesBuff.haveMoreHistory()) {
-        self.messagesBuff.retrieveChatHistory();
+        self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
         ps.doProgramaticScroll(0, true);
         // wait for messages to be received
         $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {

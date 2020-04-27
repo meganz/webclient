@@ -97,7 +97,7 @@ export default class SearchPanel extends MegaRenderMixin {
                 let recents = [];
                 for (let i = frequentContacts.length; i--;) {
                     const recent = frequentContacts[i];
-                    recents = [...recents, { data: recent.userId, room: recent.chatRoom, contact: M.u[recent.userId] }];
+                    recents = [...recents, { data: recent.userId, contact: M.u[recent.userId] }];
                 }
                 this.setState({ recents });
             });
@@ -151,13 +151,19 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     handleReset = () => {
+        if (
+            this.state.status === STATUS.IN_PROGRESS &&
+            ChatSearch.doSearch.megaPromise &&
+            ChatSearch.doSearch.megaPromise.state() === "pending"
+        ) {
+            ChatSearch.doSearch.megaPromise.cs.destroy();
+        }
+
         this.setState({
             value: '',
             searching: false,
             status: undefined
-        }, () =>
-            Soon(() => SearchField.focus())
-        );
+        }, () => Soon(() => SearchField.focus()));
     };
 
     render() {

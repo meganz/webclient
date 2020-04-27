@@ -14,100 +14,6 @@ import SearchPanel from './SearchPanel/searchPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 
-var renderMessageSummary = function(lastMessage) {
-    var renderableSummary;
-    if (lastMessage.renderableSummary) {
-        renderableSummary = lastMessage.renderableSummary;
-    }
-    else {
-        if (lastMessage.isManagement && lastMessage.isManagement()) {
-            renderableSummary = lastMessage.getManagementMessageSummaryText();
-        }
-        else if (!lastMessage.textContents && lastMessage.dialogType) {
-            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
-        }
-        else {
-            renderableSummary = lastMessage.textContents;
-        }
-        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
-
-        var escapeUnescapeArgs = [
-            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
-            {'message': {'textContents': renderableSummary}},
-            ['textContents', 'messageHtml'],
-            'messageHtml'
-        ];
-
-        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-        renderableSummary = escapeUnescapeArgs[1].message.textContents;
-
-        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
-
-        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
-
-        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
-
-        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-
-        renderableSummary = renderableSummary || "";
-        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
-        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
-    }
-
-    var author;
-
-    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
-        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
-    }
-    else if (lastMessage.dialogType === "alterParticipants") {
-        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] ||
-            Message.getContactForMessage(lastMessage);
-    }
-    else {
-        author = Message.getContactForMessage(lastMessage);
-    }
-    if (author) {
-        if (!lastMessage._contactChangeListener && author.addChangeListener) {
-            lastMessage._contactChangeListener = author.addChangeListener(function() {
-                delete lastMessage.renderableSummary;
-                lastMessage.trackDataChange();
-            });
-        }
-
-        if (lastMessage.chatRoom.type === "private") {
-            if (author && author.u === u_handle) {
-                renderableSummary = l[19285] + " " + renderableSummary;
-            }
-        }
-        else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
-            if (author) {
-                if (author.u === u_handle) {
-                    renderableSummary = l[19285] + " " + renderableSummary;
-                }
-                else {
-                    var name = M.getNameByHandle(author.u);
-                    name = ellipsis(name, undefined, 11);
-                    if (name) {
-                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
-                    }
-                }
-            }
-        }
-    }
-
-    return renderableSummary;
-};
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
@@ -286,7 +192,9 @@ class ConversationsListItem extends MegaRenderMixin {
         else if (lastMessage) {
             lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
             // safe some CPU cycles...
-            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
+            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
+                lastMessage
+            );
             lastMessage.renderableSummary = renderableSummary;
 
             if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {

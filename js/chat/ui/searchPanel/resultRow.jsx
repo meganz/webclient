@@ -50,15 +50,21 @@ const highlight = (text, matches) => {
  * @description Invoked on result click, opens the respective chat room; triggers the `resultOpen` event to notify
  * the root component for the interaction and do minimize.
  * @see SearchPanel.bindEvents()
- * @param {ChatRoom} room
+ * @param {ChatRoom|String} room room or userId
  * @param {String} [messageId]
+ * @param {Number} [index]
  */
 
-const openResult = (room, messageId) => {
+const openResult = (room, messageId, index) => {
     $(document).trigger('chatSearchResultOpen');
-    loadSubPage(room.getRoomUrl());
-    if (messageId) {
-        room.scrollToMessageId(messageId);
+    if (isString(room)) {
+        loadSubPage('fm/chat/p/' + room);
+    }
+    else {
+        loadSubPage(room.getRoomUrl());
+        if (messageId) {
+            room.scrollToMessageId(messageId, index);
+        }
     }
 };
 
@@ -73,13 +79,13 @@ class MessageRow extends MegaRenderMixin {
     }
 
     render() {
-        const { data, text, matches, room, contact } = this.props;
-        const summary = data.isManagement() ? data.getManagementMessageSummaryText() : text;
+        const { data, matches, room, contact, index } = this.props;
+        const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
 
         return (
             <div
                 className={`${SEARCH_ROW_CLASS} message`}
-                onClick={() => openResult(room, data.messageId)}>
+                onClick={() => openResult(room, data.messageId, index)}>
                 <span className="title">
                     {nicknames.getNicknameAndName(contact.u)}
                 </span>
@@ -138,7 +144,7 @@ class MemberRow extends MegaRenderMixin {
     render() {
         const { data, matches, room, contact } = this.props;
         const hasHighlight = matches && !!matches.length;
-        const isGroup = roomIsGroup(room);
+        const isGroup = room && roomIsGroup(room);
         const userCard = {
             graphic: (
                 // `Graphic` result of member type -- the last activity status is shown as graphic icon
@@ -178,7 +184,7 @@ class MemberRow extends MegaRenderMixin {
         return (
             <div
                 className={SEARCH_ROW_CLASS}
-                onClick={() => openResult(room)}>
+                onClick={() => openResult(room ? room : contact.h)}>
                 {isGroup ? <div className="group-chat" /> : <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
                     {userCard[hasHighlight ? 'graphic' : 'textual']}
@@ -211,7 +217,7 @@ export default class ResultRow extends MegaRenderMixin {
                 return (
                     <MessageRow
                         data={result.data}
-                        text={result.text}
+                        index={result.index}
                         matches={result.matches}
                         room={result.room}
                         contact={M.u[result.data.userId]} />

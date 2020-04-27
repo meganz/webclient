@@ -99,11 +99,11 @@ var _createObjectDataMethods = function(kls) {
     };
 
     obj.keys = function() {
-        return Object.keys(this._data)
+        return Object.keys(this._data);
     };
 
     obj.size = function() {
-        return this.keys().length
+        return this.keys().length;
     };
 
     obj.hasOwnProperty = function(prop) {
@@ -413,7 +413,9 @@ var MegaDataMap = function(parent) {
     manualTrackChangesOnStructure(self, true);
 
     Object.defineProperty(self, 'length', {
-        get: function() { return Object.keys(self._data).length; },
+        get: function() {
+            return this._sortedVals ? this._sortedVals.length : Object.keys(self._data).length;
+        },
         enumerable: false,
         configurable: true
     });
@@ -682,9 +684,14 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
     return (self._data[keyValue] ? true : false);
 };
 
+/**
+ * For performance reason, the returned data is not cloned.
+ *
+ * @returns {*[] | {} | any}
+ */
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;
-    return clone(self._sortedVals);
+    return self._sortedVals;
 };
 
 MegaDataSortedMap.prototype.values = function() {

@@ -132,7 +132,7 @@ export class Dropdown extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        chatWinResizeManager.addEventListener('drpdwn' + this.getUniqueId(), this.onResized.bind(this));
+        chatGlobalEventManager.addEventListener('resize', 'drpdwn' + this.getUniqueId(), this.onResized.bind(this));
         this.onResized();
         var self = this;
         $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
@@ -156,7 +156,7 @@ export class Dropdown extends MegaRenderMixin {
             // in which this element is not active any more (since it would be removed from the DOM...)
             this.onActiveChange(false);
         }
-        chatWinResizeManager.removeEventListener('drpdwn' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'drpdwn' + this.getUniqueId());
     }
 
     doRerender() {

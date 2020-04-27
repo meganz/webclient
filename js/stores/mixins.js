@@ -153,10 +153,10 @@ export class MegaRenderMixin extends React.Component {
             super.componentWillUnmount();
         }
         this.__isMounted = false;
-        chatWinResizeManager.removeEventListener('megaRenderMixing' + this.getUniqueId());
-        chatWinResizeManager.removeEventListener('megaRenderMixing2' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing2' + this.getUniqueId());
 
-        window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.removeEventListener('hashchange', 'hc' + this.getUniqueId());
 
         if (
             typeof this.__intersectionVisibility !== 'undefined' &&
@@ -241,15 +241,16 @@ export class MegaRenderMixin extends React.Component {
         this._wasRendered = true;
 
         if (this.props.requiresUpdateOnResize) {
-            chatWinResizeManager.addEventListener('megaRenderMixing' + this.getUniqueId(),
+            chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing' + this.getUniqueId(),
                 this.onResizeDoUpdate.bind(this));
         }
         if (!this.props.skipQueuedUpdatesOnResize) {
-            chatWinResizeManager.addEventListener('megaRenderMixing2' + this.getUniqueId(),
+            chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing2' + this.getUniqueId(),
                 this.onResizeDoUpdate.bind(this));
         }
 
-        window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.addEventListener('hashchange', 'hc' + this.getUniqueId(),
+            this.queuedUpdateOnResize.bind(this));
 
         // init on data structure change events
         if (this.props) {

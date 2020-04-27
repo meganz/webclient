@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ConversationsUI from "./ui/conversations.jsx";
 
-require("./chatWinResizeManager.jsx");
+require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 require("./chatRoom.jsx");
 
@@ -2532,7 +2532,7 @@ Chat.prototype.getFrequentContacts = function() {
                 contactHandle !== u_handle
             ) {
                 if (!recentContacts[contactHandle] || recentContacts[contactHandle].ts < msg.delay) {
-                    recentContacts[contactHandle] = { 'userId': contactHandle, 'ts': msg.delay, 'chatRoom': r };
+                    recentContacts[contactHandle] = { 'userId': contactHandle, 'ts': msg.delay };
                 }
             }
         }
@@ -2559,6 +2559,7 @@ Chat.prototype.getFrequentContacts = function() {
                     _calculateLastTsFor(r, 32);
                     delete loadingMoreChats[r.chatId];
                     finishedLoadingChats[r.chatId] = true;
+                    r.messagesBuff.detachMessages();
                 }
 
 

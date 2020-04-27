@@ -417,7 +417,7 @@ export class TypingArea extends MegaRenderMixin {
         var self = this;
         this.$container = $(ReactDOM.findDOMNode(this));
 
-        chatWinResizeManager.addEventListener(
+        chatGlobalEventManager.addEventListener('resize',
             'typingArea' + self.getUniqueId(),
             self.handleWindowResize.bind(this)
         );
@@ -484,7 +484,7 @@ export class TypingArea extends MegaRenderMixin {
         var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
         // window.removeEventListener('resize', self.handleWindowResize);
-        chatWinResizeManager.removeEventListener('typingArea' + self.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
     componentDidUpdate() {
         var self = this;

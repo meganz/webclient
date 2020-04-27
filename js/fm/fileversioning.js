@@ -318,7 +318,7 @@ var versiondialogid;
 
                     var v = versionList[i];
                     var curTimeMarker;
-                    var msgDate = new Date(v.ts * 1000);
+                    var msgDate = new Date(v.ts * 1000 || 0);
                     var iso = (msgDate.toISOString());
                     if (todayOrYesterday(iso)) {
                         // if in last 2 days, use the time2lastSeparator

@@ -1571,7 +1571,14 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 v.getState() === Message.STATE.NOT_SEEN &&
                 !v.deleted &&
                 v.textContents !== "" &&
-                v.textContents /* not false-based value */
+                (
+                    (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
+                    (
+                        v.dialogType === "remoteCallEnded" && v.meta && v.meta.userId !== u_handle &&
+                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED
+                    ) ||
+                    v.textContents /* not false-based value */
+                )
             ) {
                 var shouldRender = true;
                 if (

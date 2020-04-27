@@ -1575,7 +1575,10 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
                     (
                         v.dialogType === "remoteCallEnded" && v.meta && v.meta.userId !== u_handle &&
-                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED
+                        (
+                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED ||
+                            v.meta.reason === CallManager.CALL_END_REMOTE_REASON.NO_ANSWER
+                        )
                     ) ||
                     v.textContents /* not false-based value */
                 )

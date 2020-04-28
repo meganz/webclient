@@ -94,11 +94,15 @@ export default class SearchPanel extends MegaRenderMixin {
     getRecents = () => {
         megaChat.getFrequentContacts()
             .then(frequentContacts => {
-                frequentContacts = frequentContacts.slice(0, 30);
                 let recents = [];
-                for (let i = frequentContacts.length; i--;) {
+                let len = frequentContacts.length;
+                for (let i = len; i--;) {
                     const recent = frequentContacts[i];
                     recents = [...recents, { data: recent.userId, contact: M.u[recent.userId] }];
+                    if (i < len - 30) {
+                        // break if had > 30 results
+                        break;
+                    }
                 }
                 this.setState({ recents });
             });

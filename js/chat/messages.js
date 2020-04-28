@@ -2192,7 +2192,28 @@ MessagesBuff.prototype.detachMessages = function() {
     var removedAnyMessage = false;
     var detachCount = self.chatRoom.isCurrentlyActive ? Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2 : 3;
     if (self.messages.length > detachCount) {
-        self.messages.splice(0,  self.messages.length - detachCount);
+        var deletedItems = self.messages.splice(0,  self.messages.length - detachCount);
+
+        // detach attachments?
+        if (M.chc[self.chatRoom.roomId]) {
+            var attachmentsIndex = {};
+            var atts = M.chc[self.chatRoom.roomId];
+            for (var k in atts) {
+                attachmentsIndex[atts[k].m] = k;
+            }
+
+            for (var i = 0; i < deletedItems.length; i++) {
+                // cleanup the `messageId` index
+                delete M.chc[deletedItems[i]];
+
+                // search and optionally cleanup the [roomId] index in M.chc (atts)
+                var foundKey = attachmentsIndex[deletedItems[i]];
+
+                if (typeof foundKey !== "undefined") {
+                    delete atts[foundKey];
+                }
+            }
+        }
         removedAnyMessage = true;
     }
     else {

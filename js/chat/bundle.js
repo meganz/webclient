@@ -1363,7 +1363,6 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
         moreDropdowns.push(self.props.dropdownRemoveButton);
       }
 
-      console.error(this, moreDropdowns.length);
       return moreDropdowns;
     }
   }, {
@@ -2104,7 +2103,7 @@ var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
       self._frequents = megaChat.getFrequentContacts();
 
       self._frequents.always(function (r) {
-        self._foundFrequents = r.reverse().splice(0, 30);
+        self._foundFrequents = clone(r).reverse().splice(0, 30);
         self.safeForceUpdate();
       });
     }
@@ -17326,19 +17325,23 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
         MESSAGES: []
       };
 
-      for (var i = results.length; i--;) {
-        var result = results[i];
-        var MESSAGE = TYPE.MESSAGE,
-            MEMBER = TYPE.MEMBER,
-            CHAT = TYPE.CHAT;
-        var resultType = result.type,
-            resultId = result.resultId;
-        var table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
-        RESULT_TABLE[table] = [].concat(_toConsumableArray(RESULT_TABLE[table]), [/*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
-          key: resultId,
-          type: resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT,
-          result: result
-        })]);
+      for (var resultTypeGroup in results) {
+        var len = results[resultTypeGroup].length;
+
+        for (var i = 0; i < len; i++) {
+          var result = results[resultTypeGroup].getItem(i);
+          var MESSAGE = TYPE.MESSAGE,
+              MEMBER = TYPE.MEMBER,
+              CHAT = TYPE.CHAT;
+          var resultType = result.type,
+              resultId = result.resultId;
+          var table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+          RESULT_TABLE[table] = [].concat(_toConsumableArray(RESULT_TABLE[table]), [/*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            key: resultId,
+            type: resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT,
+            result: result
+          })]);
+        }
       }
 
       return Object.keys(RESULT_TABLE).map(function (key, index) {
@@ -17641,15 +17644,20 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
 
     _this.getRecents = function () {
       megaChat.getFrequentContacts().then(function (frequentContacts) {
-        frequentContacts = frequentContacts.slice(0, 30);
         var recents = [];
+        var len = frequentContacts.length;
 
-        for (var i = frequentContacts.length; i--;) {
+        for (var i = len; i--;) {
           var recent = frequentContacts[i];
           recents = [].concat(searchPanel_toConsumableArray(recents), [{
             data: recent.userId,
             contact: M.u[recent.userId]
           }]);
+
+          if (i < len - 30) {
+            // break if had > 30 results
+            break;
+          }
         }
 
         _this.setState({
@@ -21944,8 +21952,6 @@ module.exports = ReactPropTypesSecret;
 
 
   ChatGlobalEventManager.prototype.triggered = SoonFc(function (eventName, e) {
-    console.error("triggered", eventName);
-
     for (var k in this.listeners[eventName]) {
       this.listeners[eventName][k](e);
     }
@@ -23846,7 +23852,6 @@ ChatRoom.prototype.attachSearch = function () {
 
 ChatRoom.prototype.detachSearch = function () {
   if (--this.activeSearches === 0) {
-    console.error('detachMessages', this.getRoomTitle());
     this.messagesBuff.detachMessages();
   }
 
@@ -23855,7 +23860,6 @@ ChatRoom.prototype.detachSearch = function () {
 };
 
 ChatRoom.prototype.scrollToMessageId = function (msgId, index) {
-  console.error("scrollToMessageId", msgId, index);
   var self = this;
   assert(self.isCurrentlyActive, 'chatRoom is not visible');
   self.isScrollingToMessageId = true;

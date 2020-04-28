@@ -2004,7 +2004,6 @@ ChatRoom.prototype.attachSearch = function() {
 
 ChatRoom.prototype.detachSearch = function() {
     if (--this.activeSearches === 0) {
-        console.error('detachMessages', this.getRoomTitle());
         this.messagesBuff.detachMessages();
     }
     this.activeSearches = Math.max(this.activeSearches, 0);
@@ -2012,7 +2011,6 @@ ChatRoom.prototype.detachSearch = function() {
 };
 
 ChatRoom.prototype.scrollToMessageId = function(msgId, index) {
-    console.error("scrollToMessageId", msgId, index);
     var self = this;
     assert(self.isCurrentlyActive, 'chatRoom is not visible');
     self.isScrollingToMessageId = true;

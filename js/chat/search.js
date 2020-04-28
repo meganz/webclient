@@ -310,20 +310,19 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
 ChatSearch.doSearch = function(s, onResult, onComplete) {
     var megaPromise = new MegaPromise();
 
-    var results = new MegaDataSortedMap("resultId", function(a, b) {
-        console.error("sort?", a.type, b.type, a, b);
-        if (a.type === SearchResultType.kMessage && b.type === SearchResultType.kMessage) {
+    var results = {
+        CONTACTS_AND_CHATS: new MegaDataSortedMap("resultId", function(a, b) {
+            var aChat = a && a.room;
+            var bChat = b && b.room;
+            var aLastActivity = (aChat && aChat.lastActivity || 0);
+            var bLastActivity = (bChat && bChat.lastActivity || 0);
+            return aLastActivity > bLastActivity ? -1 : (aLastActivity < bLastActivity ? 1 : 0);
+        }),
+        MESSAGES: new MegaDataSortedMap("resultId", function(a, b) {
             return a.data.delay < b.data.delay ? 1 : (a.data.delay > b.data.delay ? -1 : 0);
-        }
-        else if (a.type !== b.type) {
-            return a.type < b.type ? 1 : (a.type > b.type ? -1 : 0);
-        }
-        else {
-            var aChat = megaChat.getChatById(a.chatId);
-            var bChat = megaChat.getChatById(b.chatId);
-            return (bChat && bChat.lastActivity || 0) - (aChat && aChat.lastActivity || 0);
-        }
-    });
+        })
+    };
+
     ChatSearch.doSearch.currentResults = results;
 
     var resultId = 0;
@@ -342,7 +341,13 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
                 resultMeta['chatId'] = room.chatId;
                 resultMeta['room'] = room;
                 resultMeta['resultId'] = resultId++;
-                results.push(resultMeta);
+                if (resultMeta.type === SearchResultType.kChatTopic || resultMeta.type === SearchResultType.kMember) {
+                    results.CONTACTS_AND_CHATS.push(resultMeta);
+                }
+                else {
+                    results.MESSAGES.push(resultMeta);
+                }
+
                 // console.error(room, resultMeta);
                 onResult && onResult(room.chatId, resultMeta, results);
             },

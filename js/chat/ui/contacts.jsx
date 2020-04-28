@@ -265,7 +265,6 @@ export class ContactButton extends ContactAwareComponent {
             );
         }
 
-        console.error(this, moreDropdowns.length);
         return moreDropdowns;
     }
     render() {
@@ -881,7 +880,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
         self._frequents = megaChat.getFrequentContacts();
         self._frequents.always(function(r) {
-            self._foundFrequents = r.reverse().splice(0, 30);
+            self._foundFrequents = clone(r).reverse().splice(0, 30);
             self.safeForceUpdate();
         });
     }

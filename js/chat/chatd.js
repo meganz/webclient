@@ -1279,13 +1279,6 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                 chatdPersist: true
                             });
 
-
-                            console.error("@lp This generates a duplicate onHistoryDecrypted, which is" +
-                            "already generated via messages.js as a consequence of the above fired " +
-                            "onMessageHistoryDone\n" +
-                            "TODO: Verify that it's fired in all necessary cases - e.g. it's not" +
-                            "fired if '(MessagesBuff.isRetrievingSharedFiles)'");
-
                             if (chatRoom) {
                                 $(chatRoom).trigger('onHistoryDecrypted');
                             }

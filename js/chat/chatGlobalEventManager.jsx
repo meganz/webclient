@@ -59,7 +59,6 @@
      * Called by the onResize/hashchange
      */
     ChatGlobalEventManager.prototype.triggered = SoonFc(function(eventName, e) {
-        console.error("triggered", eventName);
         for (var k in this.listeners[eventName]) {
             this.listeners[eventName][k](e);
         }

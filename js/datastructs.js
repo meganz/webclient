@@ -603,7 +603,7 @@ MegaDataSortedMap.prototype.push = function(v) {
     }
 
     if (!result) {
-        if (!currentElement) {
+        if (typeof currentElement === 'undefined') {
             // first
             self._sortedVals.push(keyVal);
         }
@@ -708,7 +708,7 @@ MegaDataSortedMap.prototype.getItem = function(num) {
     var self = this;
 
     var foundKeyVal = self._sortedVals[num];
-    return (foundKeyVal ? self._data[foundKeyVal] : undefined);
+    return self._data[foundKeyVal];
 };
 
 MegaDataSortedMap.prototype.indexOfKey = function(value) {

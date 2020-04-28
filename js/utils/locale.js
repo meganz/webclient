@@ -174,7 +174,7 @@ function time2date(unixTime, format) {
     // print time as ISO date format
     var printISO = function _printISO() {
         var timeOffset = date.getTimezoneOffset() * 60;
-        var isodate = new Date((unixTime - timeOffset) * 1000);
+        var isodate = new Date((unixTime - timeOffset) * 1000 || 0);
         var length = format === 0 ? 16 : 10;
         return isodate.toISOString().replace('T', ' ').substr(0, length);
     };
@@ -231,9 +231,9 @@ function setAccDateTimeFormat(locales) {
  */
 function acc_time2date(unixtime, yearIsOptional) {
 
-    var MyDate = new Date(unixtime * 1000);
+    var MyDate = new Date(unixtime * 1000 || 0);
     var locales = getCountryAndLocales().locales;
-    var currYear = (new Date()).getFullYear();
+    var currYear = l.year;
     var result;
 
     // If dateTimeFormat is already set with the current locale using it.
@@ -276,7 +276,7 @@ function acc_time2date(unixtime, yearIsOptional) {
 }
 
 function time2last(timestamp, skipSeconds) {
-    var sec = (new Date().getTime() / 1000) - timestamp;
+    var sec = Date.now() / 1000 - timestamp;
     if (skipSeconds && sec < 59) {
         return l[23252] || "Less then a minute ago";
     }

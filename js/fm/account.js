@@ -1372,7 +1372,7 @@ accountUI.account = {
             var $textField = $('span', $hPageSelect);
 
             // Mark active item.
-            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"', $hPageSelect);
+            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"]', $hPageSelect);
             $activeItem.addClass('active');
             $textField.text($activeItem.text());
 

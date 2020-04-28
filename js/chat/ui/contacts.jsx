@@ -119,8 +119,8 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
-                    loadSubPage('fm/account');
-                }} />
+                        loadSubPage('fm/account');
+                    }}/>
             );
         }
         if (contact.c === 1) {
@@ -152,12 +152,12 @@ export class ContactButton extends ContactAwareComponent {
                         <div>
                             <DropdownItem
                                 key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
-                                megaChat.createAndShowPrivateRoomFor(contact.u)
-                                    .then(function(room) {
-                                        room.setActive();
-                                        room.startVideoCall();
-                                    });
-                            }} />
+                                    megaChat.createAndShowPrivateRoomFor(contact.u)
+                                        .then(function(room) {
+                                            room.setActive();
+                                            room.startVideoCall();
+                                        });
+                                }} />
                         </div>
                     </div>
                 );
@@ -166,8 +166,8 @@ export class ContactButton extends ContactAwareComponent {
                 moreDropdowns.push(
                     <DropdownItem
                         key="startChat" icon="context conversation" label={__(l[5885])} onClick={() => {
-                        loadSubPage('fm/chat/p/' + contact.u);
-                    }} />
+                            loadSubPage('fm/chat/p/' + contact.u);
+                        }} />
                 );
             }
 
@@ -178,14 +178,14 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="send-files-item" icon="context arrow-in-circle" label={__(l[6834])} onClick={() => {
-                    megaChat.openChatAndSendFilesDialog(contact.u);
-                }} />
+                        megaChat.openChatAndSendFilesDialog(contact.u);
+                    }} />
             );
             moreDropdowns.push(
                 <DropdownItem
                     key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
-                    openCopyShareDialog(contact.u);
-                }} />
+                        openCopyShareDialog(contact.u);
+                    }} />
             );
         }
         else if (!contact.c) {
@@ -251,8 +251,8 @@ export class ContactButton extends ContactAwareComponent {
             moreDropdowns.push(
                 <DropdownItem
                     key="set-nickname" icon="small-icon context writing-pen" label={__(l[20828])} onClick={() => {
-                    nicknames.setNicknameDialog.init(contact.u);
-                }} />
+                        nicknames.setNicknameDialog.init(contact.u);
+                    }} />
             );
         }
 
@@ -273,7 +273,6 @@ export class ContactButton extends ContactAwareComponent {
         var label = self.props.label ? self.props.label : "";
         var classes = self.props.className ? self.props.className : "";
         var contact = self.props.contact;
-        var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
         var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
         var dropdownPosition = "left top";
         var vertOffset = 0;
@@ -306,12 +305,12 @@ export class ContactButton extends ContactAwareComponent {
                 label={label}
             >
                 <Dropdown className="contact-card-dropdown"
-                          positionMy={dropdownPosition}
-                          positionAt={dropdownPosition}
-                          vertOffset={vertOffset}
-                          horizOffset={horizOffset}
-                          dropdownItemGenerator={self.dropdownItemGenerator.bind(this)}
-                          noArrow={true}
+                    positionMy={dropdownPosition}
+                    positionAt={dropdownPosition}
+                    vertOffset={vertOffset}
+                    horizOffset={horizOffset}
+                    dropdownItemGenerator={self.dropdownItemGenerator.bind(this)}
+                    noArrow={true}
                 />
             </Button>;
         }

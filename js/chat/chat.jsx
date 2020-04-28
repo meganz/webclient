@@ -2545,25 +2545,23 @@ Chat.prototype.getFrequentContacts = function() {
             // r = r;
 
         var _histDecryptedCb = function(r) {
-                // console.error("loading?", r.chatId, r.messagesBuff.messages.length);
-                if (!loadingMoreChats[r.chatId] &&
-                    r.messagesBuff.messages.length < 32 &&
-                    r.messagesBuff.haveMoreHistory()
-                ) {
-                    // console.error("loading:", r.chatId);
-                    loadingMoreChats[r.chatId] = true;
-                    r.messagesBuff.retrieveChatHistory(false);
-                }
-                else {
-                    $(r).unbind('onHistoryDecrypted.recent');
-                    _calculateLastTsFor(r, 32);
-                    delete loadingMoreChats[r.chatId];
-                    finishedLoadingChats[r.chatId] = true;
-                    r.messagesBuff.detachMessages();
-                }
-
-
-            };
+            // console.error("loading?", r.chatId, r.messagesBuff.messages.length);
+            if (!loadingMoreChats[r.chatId] &&
+                r.messagesBuff.messages.length < 32 &&
+                r.messagesBuff.haveMoreHistory()
+            ) {
+                // console.error("loading:", r.chatId);
+                loadingMoreChats[r.chatId] = true;
+                r.messagesBuff.retrieveChatHistory(false);
+            }
+            else {
+                $(r).unbind('onHistoryDecrypted.recent');
+                _calculateLastTsFor(r, 32);
+                delete loadingMoreChats[r.chatId];
+                finishedLoadingChats[r.chatId] = true;
+                r.messagesBuff.detachMessages();
+            }
+        };
 
 
         if (r.isLoading()) {

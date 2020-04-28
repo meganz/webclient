@@ -1372,7 +1372,6 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
       var label = self.props.label ? self.props.label : "";
       var classes = self.props.className ? self.props.className : "";
       var contact = self.props.contact;
-      var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
       var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
       var dropdownPosition = "left top";
       var vertOffset = 0;
@@ -16910,7 +16909,6 @@ function resultRow_setPrototypeOf(o, p) { resultRow_setPrototypeOf = Object.setP
 
 
 
-
 var SEARCH_ROW_CLASS = "result-table-row";
 var USER_CARD_CLASS = "user-card";
 /**
@@ -17015,7 +17013,7 @@ var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
         }
       }, /*#__PURE__*/external_React_default.a.createElement("span", {
         className: "title"
-      }, nicknames.getNicknameAndName(contact.u)), /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
+      }, room.getRoomTitle()), !roomIsGroup(room) && /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
         contact: contact
       }), /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "summary",

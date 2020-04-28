@@ -761,10 +761,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             chatRoom.trigger('onMessagesBuffAppend', msg);
         }
 
-        if (self.chatRoom.scrolledToBottom === true && self.chatRoom.activeSearches === 0) {
-            if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
-                self.detachMessages();
-            }
+        if (
+            self.chatRoom.scrolledToBottom === true &&
+            self.chatRoom.activeSearches === 0 &&
+            self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2
+        ) {
+            self.detachMessages();
         }
 
         return res;

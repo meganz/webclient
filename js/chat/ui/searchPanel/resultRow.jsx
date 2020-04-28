@@ -1,6 +1,5 @@
 import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
-import { STATUS } from './searchPanel.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
 

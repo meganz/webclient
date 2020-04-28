@@ -768,42 +768,6 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
 };
 
 /**
- * Neuter an ArrayBuffer
- * @param {Mixed} ab ArrayBuffer/TypedArray
- */
-MegaUtils.prototype.neuterArrayBuffer = function neuter(ab) {
-    'use strict';
-
-    if (!(ab instanceof ArrayBuffer)) {
-        ab = ab && ab.buffer;
-    }
-
-    try {
-        if (typeof ArrayBuffer.transfer === 'function') {
-            ArrayBuffer.transfer(ab, 0); // ES7
-        }
-        else {
-            if (!neuter.dataWorker) {
-                var blobURI = mObjectURL(['var d'], 'text/javascript');
-                setTimeout(function() {
-                    URL.revokeObjectURL(blobURI);
-                }, 2e3);
-                neuter.dataWorker = new Worker(blobURI);
-            }
-            neuter.dataWorker.postMessage(ab, [ab]);
-        }
-        if (ab.byteLength !== 0) {
-            throw new Error('Silently failed! -- ' + ua);
-        }
-    }
-    catch (ex) {
-        if (d > 1) {
-            console.warn('Cannot neuter ArrayBuffer', ab, ex);
-        }
-    }
-};
-
-/**
  * Resources loader through our secureboot mechanism
  * @param {...*} var_args  Resources to load, either plain filenames or jsl2 members
  * @return {MegaPromise}

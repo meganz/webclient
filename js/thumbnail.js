@@ -389,7 +389,6 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 var defMime = 'image/jpeg';
                 var curMime = MediaInfoLib.isFileSupported(node) ? defMime : filemime(M.d[node], defMime);
                 file = new Blob([new Uint8Array(imagedata)], {type: curMime});
-                M.neuterArrayBuffer(imagedata);
             }
             if (mega.chrome && file.size > 6e8) {
                 console.warn('Aborting thumbnail creation due https://crbug.com/536816 ...');
@@ -640,7 +639,6 @@ function exifImageRotation(target, buffer, orientation) {
 
     setTimeout(function() {
         URL.revokeObjectURL(blobURI);
-        M.neuterArrayBuffer(buffer);
     }, 1e4);
 }
 

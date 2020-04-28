@@ -256,9 +256,6 @@ MegaQueue.prototype.run_in_context = function(task) {
                 }
             }
         }
-        if (!is_embed && task[0][3] && M.isTypedArray(task[0][3])) {
-            M.neuterArrayBuffer(task[0][3]);
-        }
         task[0] = task[1] = task[2] = undefined;
     }.bind(this));
 };

@@ -67,8 +67,8 @@ export default class ResultContainer extends MegaRenderMixin {
             let len = results[resultTypeGroup].length;
             for (let i = 0; i < len; i++) {
                 const result = results[resultTypeGroup].getItem(i);
-                const {MESSAGE, MEMBER, CHAT} = TYPE;
-                const {type: resultType, resultId} = result;
+                const { MESSAGE, MEMBER, CHAT } = TYPE;
+                const { type: resultType, resultId } = result;
                 const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
 
                 RESULT_TABLE[table] = [

@@ -92,7 +92,8 @@
 	top: 2px;
 	content: " ";
 }
-.bus-reg-body .bus-reg-radio-option {
+.bus-reg-body .bus-reg-radio-option,
+.bus-repay-block .bus-reg-radio-option {
     display: inline-block;
     cursor: pointer;
 }

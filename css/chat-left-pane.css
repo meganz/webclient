@@ -371,7 +371,7 @@ div.search-panel {
     height: 100%;
     padding: 3px 3px 0;
     background: #FAFAFA;
-    z-index: 10;
+    z-index: 130;
     box-sizing: border-box;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial, sans-serif;
 }
@@ -503,7 +503,6 @@ div.search-field div.search-field-status.complete i {
 
 div.result-table {
     margin: 5px 0 5px 0;
-    min-height: 190px;
 }
 
 div.result-table div.result-table-heading {

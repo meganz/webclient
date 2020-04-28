@@ -268,10 +268,8 @@ function init_page() {
     // site until they validate their account. So if they clicked the browser back button, then they should get logged
     // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
     // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
-    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
-        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
-
-        u_logout(true);
+    if (window.doUnloadLogOut) {
+        return false;
     }
 
     dlkey = false;
@@ -500,7 +498,7 @@ function init_page() {
 
     if (page.substr(0, 7) === 'folder/') {
         var phLen = page.indexOf('#');
-        var possibleS = -1; 
+        var possibleS = -1;
 
         if (phLen < 0) {
             phLen = page.length;

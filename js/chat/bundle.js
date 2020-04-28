@@ -6464,9 +6464,9 @@ var cloudBrowserModalDialog_CloudBrowserDialog = /*#__PURE__*/function (_MegaRen
     value: function resizeBreadcrumbs() {
       var _this5 = this;
 
-      var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-      var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
       Soon(function () {
+        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', _this5.findDOMNode());
+        var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
         var wrapperWidth = $breadcrumbsWrapper.outerWidth();
         var $el = $(_this5.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
         var i = 0;
@@ -10634,6 +10634,11 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
       return false;
     }
   }, {
+    key: "_isUserRegistered",
+    value: function _isUserRegistered() {
+      return typeof u_type !== 'undefined' && u_type > 2;
+    }
+  }, {
     key: "_isNodeHavingALink",
     value: function _isNodeHavingALink(h) {
       return M.getNodeShare(h) !== false;
@@ -11023,7 +11028,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "rounded-grey-down-arrow",
                   label: __(l[1187]),
                   onClick: self._startDownload.bind(self, v)
-                }), /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
+                }), self._isUserRegistered() && /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement(generic_DropdownsUI.DropdownItem, {
                   icon: "grey-cloud",
                   label: __(l[1988]),
                   onClick: self._addToCloudDrive.bind(self, v, false)
@@ -11031,7 +11036,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   icon: "conversations",
                   label: __(l[17764]),
                   onClick: self._addToCloudDrive.bind(self, v, true)
-                })));
+                }))));
               }
 
               var attachmentClasses = "message shared-data";
@@ -13485,6 +13490,8 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
       }
 
       conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidMount", this).call(this);
+
+      self.relinkToStream();
     }
   }, {
     key: "componentWillUnmount",
@@ -13499,17 +13506,17 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(RemoteVideoPlayer.prototype), "componentDidUpdate", this).call(this);
+
+      this.relinkToStream();
+    }
+  }, {
+    key: "relinkToStream",
+    value: function relinkToStream() {
       var self = this;
-      var noVideo = self.state.noVideo;
-
-      if (self.state.prevNoVideo === noVideo) {
-        return;
-      }
-
-      self.state.prevNoVideo = noVideo;
       var player = self.refs.player;
 
-      if (noVideo) {
+      if (self.state.noVideo) {
         if (player) {
           RTC.detachMediaStream(player);
         }
@@ -13538,7 +13545,10 @@ var conversationaudiovideopanel_RemoteVideoPlayer = /*#__PURE__*/function (_Mega
 ;
 conversationaudiovideopanel_RemoteVideoPlayer.propTypes = {
   sess: prop_types_default.a.object.isRequired,
-  isActive: prop_types_default.a.bool.isRequired,
+  isActive: prop_types_default.a.bool,
+  // used only for carousel to flag the active video thumbnail
+  isCarouselMain: prop_types_default.a.bool,
+  // if it's the big window in carousel mode
   peerAv: prop_types_default.a.number.isRequired,
   onPlayerClick: prop_types_default.a.func,
   noAudioLevel: prop_types_default.a.bool
@@ -13576,33 +13586,38 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
     key: "getActiveSid",
     value: function getActiveSid() {
       var self = this;
-      var chatRoom = self.props.chatRoom;
-      var call = chatRoom.callManagerCall;
+      var call = self.props.chatRoom.callManagerCall;
 
-      if (!call || !call.isActive()) {
-        return;
+      if (!call) {
+        return false;
       }
 
+      var rtcCall = call.rtcCall;
       var selected = self.state.selectedStreamSid;
+
+      if (selected && selected !== "local" && !rtcCall.sessions[base64urldecode(selected)]) {
+        // session doesn't exist anymore, we will select another active peer below
+        selected = null;
+      }
 
       if (selected) {
         return selected;
-      }
+      } // we have no active peer, select the first session
 
-      var sess = Object.values(call.rtcCall.sessions)[0];
-      return sess ? sess.stringSid : undefined;
+
+      var sess = Object.values(rtcCall.sessions)[0];
+      return sess ? sess.stringSid : "local";
     }
   }, {
     key: "haveScreenSharingPeer",
     value: function haveScreenSharingPeer() {
-      var chatRoom = this.props.chatRoom;
-      var callManagerCall = chatRoom.callManagerCall;
+      var call = this.props.chatRoom.callManagerCall;
 
-      if (!callManagerCall) {
+      if (!call) {
         return false;
       }
 
-      var rtcCall = callManagerCall.rtcCall;
+      var rtcCall = call.rtcCall;
 
       if (!rtcCall.sessions) {
         return false;
@@ -13654,15 +13669,21 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "onPlayerClick",
     value: function onPlayerClick(sid) {
-      if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
-        this.setState({
-          'selectedStreamSid': sid
-        });
+      if (this.getViewMode() !== VIEW_MODES.CAROUSEL) {
+        return;
       }
+
+      this.setState({
+        'selectedStreamSid': sid
+      });
     }
   }, {
     key: "_hideBottomPanel",
     value: function _hideBottomPanel() {
+      if (!this.isMounted()) {
+        return;
+      }
+
       var self = this;
       var room = self.props.chatRoom;
 
@@ -13715,14 +13736,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
         $('.participantsContainer', $container).height('auto');
         var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
-        var mediaOpts;
-
-        if (this.state.selectedStreamSid === "local") {
-          mediaOpts = callManagerCall.getMediaOptions();
-        } else {
-          mediaOpts = callManagerCall.getRemoteMediaOptions(self.getActiveSid());
-        }
-
+        var activeSid = this.getActiveSid();
+        var mediaOpts = activeSid === "local" ? callManagerCall.getMediaOptions() : callManagerCall.getRemoteMediaOptions(activeSid);
         $('.activeStream', $container).height(activeStreamHeight);
         $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
         $('.user-video, .user-audio, .user-video video', $container).width('').height('');
@@ -13755,6 +13770,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
           }
         }
       } else {
+        // grid mode
         $('.participantsContainer', $container).height($container.outerHeight() - $('.call-header', $container).outerHeight());
         newWidth = totalWidth / totalStreams;
       }
@@ -13780,6 +13796,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "componentDidUpdate",
     value: function componentDidUpdate() {
+      conversationaudiovideopanel_get(conversationaudiovideopanel_getPrototypeOf(ConversationAVPanel.prototype), "componentDidUpdate", this).call(this);
+
       var self = this;
       var room = self.props.chatRoom;
       var callManagerCall = room.callManagerCall;
@@ -13790,7 +13808,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
       var $container = $(external_ReactDOM_default.a.findDOMNode(self));
       var mouseoutThrottling = null;
-      $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function () {
+      $container.rebind('mouseover.chatUI' + room.roomId, function () {
         var $this = $(this);
         clearTimeout(mouseoutThrottling);
         self.visiblePanel = true;
@@ -14092,13 +14110,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       });
       var localPlayerElement = null;
       var remotePlayerElements = [];
-      var onRemotePlayerClick; // handler that exists only for the peer views in the carosel bottom bar
+      var onRemotePlayerClick; // handler that exists only for the thumbnail views in the carosel bottom bar
 
       var isCarousel = self.getViewMode() === VIEW_MODES.CAROUSEL;
 
       if (isCarousel) {
-        var activeSid = chatRoom.type === "group" || chatRoom.type === "public" ? self.getActiveSid() : false;
-        var activePlayer = null;
+        var activeSid = self.getActiveSid();
+        var activePlayer;
         onRemotePlayerClick = self.onPlayerClick.bind(self);
       }
 
@@ -14141,7 +14159,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             sess: sess,
             key: "carousel_active",
             peerAv: sess.peerAv(),
-            isActive: true,
+            isCarouselMain: true,
             noAudioLevel: true
           });
         }
@@ -14202,9 +14220,11 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
         }
       } else {
         // carousel
+        var localPlayer;
+
         if (!localMedia.video) {
           // display avatar for local video
-          var localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : ""),
             key: "local",
             onClick: function onClick(e) {
@@ -14222,14 +14242,13 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             chatRoom: this.props.chatRoom,
             hideVerifiedBadge: true
           })));
-          remotePlayerElements.push(localPlayer);
 
           if (activeSid === "local") {
             activePlayer = localPlayer;
           }
         } else {
           // we have local video (carousel mode)
-          var _localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
+          localPlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "call user-video local-carousel is-video" + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : ""),
             key: "local-video",
             onClick: function onClick(e) {
@@ -14251,8 +14270,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
               RTC.attachMediaStream(_ref4, rtcCall.localStream());
             }
           })));
-
-          remotePlayerElements.push(_localPlayer);
 
           if (activeSid === "local") {
             activePlayer = /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -14276,6 +14293,8 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
             }));
           }
         }
+
+        remotePlayerElements.push(localPlayer);
       }
 
       var unreadDiv = null;
@@ -17615,6 +17634,8 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.toggleMinimize = function () {
+      _this.doToggle('pause');
+
       _this.props.onToggle();
     };
 
@@ -17655,6 +17676,35 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       });
     };
 
+    _this.doToggle = function (action
+    /* pause || resume || destroy */
+    ) {
+      var megaPromise = ChatSearch.doSearch.megaPromise;
+
+      if (action && megaPromise && megaPromise.cs) {
+        var IN_PROGRESS = STATUS.IN_PROGRESS,
+            PAUSED = STATUS.PAUSED,
+            COMPLETED = STATUS.COMPLETED;
+
+        _this.setState({
+          status: function () {
+            switch (action) {
+              case 'pause':
+                return PAUSED;
+
+              case 'resume':
+                return IN_PROGRESS;
+
+              default:
+                return COMPLETED;
+            }
+          }()
+        }, function () {
+          return megaPromise.cs[action]();
+        });
+      }
+    };
+
     _this.handleChange = function (ev) {
       var value = ev.target.value;
       var searching = value.length >= 3;
@@ -17672,33 +17722,28 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.handleToggle = function () {
-      var megaPromise = ChatSearch.doSearch.megaPromise;
+      var inProgress = _this.state.status === STATUS.IN_PROGRESS;
 
-      if (megaPromise && megaPromise.cs) {
-        var inProgress = _this.state.status === STATUS.IN_PROGRESS;
-
-        _this.setState({
-          status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
-        }, function () {
-          Soon(function () {
-            return searchField_SearchField.focus();
-          });
-          return inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume();
+      _this.setState({
+        status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
+      }, function () {
+        Soon(function () {
+          return searchField_SearchField.focus();
         });
-      }
+        return _this.doToggle(inProgress ? 'pause' : 'resume');
+      });
     };
 
     _this.handleReset = function () {
-      if (_this.state.status === STATUS.IN_PROGRESS && ChatSearch.doSearch.megaPromise && ChatSearch.doSearch.megaPromise.state() === "pending") {
-        ChatSearch.doSearch.megaPromise.cs.destroy();
-      }
-
       _this.setState({
         value: '',
         searching: false,
-        status: undefined
+        status: undefined,
+        results: []
       }, function () {
-        return Soon(function () {
+        _this.doToggle('destroy');
+
+        Soon(function () {
           return searchField_SearchField.focus();
         });
       });
@@ -22667,6 +22712,43 @@ ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
   return res;
 };
 /**
+ * getParticipantsTruncated
+ * @description Returns comma-separated string of truncated member names based on passed room; allows to specify the
+ * maximum amount of members to be retrieved, as well the desired maximum length for the truncation.
+ * @param {number} maxMembers The maximum amount of members to be retrieved
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getParticipantsTruncated = function (maxMembers, maxLength) {
+  maxMembers = maxMembers || 5;
+  maxLength = maxLength || 30;
+  var truncatedParticipantNames = [];
+  var members = Object.keys(this.members);
+
+  for (var i = 0; i < members.length; i++) {
+    var handle = members[i];
+    var name = M.getNameByHandle(handle);
+
+    if (!handle || !name || handle === u_handle) {
+      continue;
+    }
+
+    if (i > maxMembers) {
+      break;
+    }
+
+    truncatedParticipantNames.push(name.length > maxLength ? name.substr(0, maxLength) + '...' : name);
+  }
+
+  if (truncatedParticipantNames.length === maxMembers) {
+    truncatedParticipantNames.push('...');
+  }
+
+  return truncatedParticipantNames.join(', ');
+};
+/**
  * Get room title
  *
  * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
@@ -22684,29 +22766,27 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
     return M.getNameByHandle(participants[0]) || "";
   } else {
     if (!ignoreTopic && self.topic && self.topic.substr) {
-      return (encapsTopicInQuotes ? '"' : "") + self.topic.substr(0, 30) + (encapsTopicInQuotes ? '"' : "");
+      return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
     }
 
-    participants = self.members && Object.keys(self.members).length > 0 ? Object.keys(self.members) : [];
-    var names = [];
-
-    for (var i = 0; i < Math.min(participants.length, 5); i++) {
-      var contactHash = participants[i];
-
-      if (contactHash && M.u[contactHash] && contactHash !== u_handle) {
-        var name = M.u[contactHash] ? M.getNameByHandle(contactHash) : false;
-        names.push(name);
-      }
-    }
+    var names = self.getParticipantsTruncated();
 
     var def = __(l[19077]).replace('%s1', new Date(self.ctime * 1000).toLocaleString());
 
-    if (names.length === 0) {
-      return def;
-    }
-
-    return names.length > 0 ? names.join(", ") : def;
+    return names.length > 0 ? names : def;
   }
+};
+/**
+ * getTruncatedRoomTopic
+ * @description Returns truncated room topic based on the passed maximum character length.
+ * @param {number} maxLength The maximum length of characters for the truncation
+ * @returns {string}
+ */
+
+
+ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength) {
+  maxLength = maxLength || 30;
+  return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 /**
  * Set the room topic

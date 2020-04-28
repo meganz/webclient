@@ -112,6 +112,7 @@ class RemoteVideoPlayer extends MegaRenderMixin {
             self.props.sess.audioIndicator = this;
         }
         super.componentDidMount();
+        self.relinkToStream();
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -121,15 +122,13 @@ class RemoteVideoPlayer extends MegaRenderMixin {
         }
     }
     componentDidUpdate() {
+        super.componentDidUpdate();
+        this.relinkToStream();
+    }
+    relinkToStream() {
         var self = this;
-        var noVideo = self.state.noVideo;
-        if (self.state.prevNoVideo === noVideo) {
-            return;
-        }
-        self.state.prevNoVideo = noVideo;
-
         let player = self.refs.player;
-        if (noVideo) {
+        if (self.state.noVideo) {
             if (player) {
                 RTC.detachMediaStream(player);
             }
@@ -151,7 +150,8 @@ class RemoteVideoPlayer extends MegaRenderMixin {
 
 RemoteVideoPlayer.propTypes = {
     sess: PropTypes.object.isRequired,
-    isActive: PropTypes.bool.isRequired,
+    isActive: PropTypes.bool, // used only for carousel to flag the active video thumbnail
+    isCarouselMain: PropTypes.bool, // if it's the big window in carousel mode
     peerAv: PropTypes.number.isRequired,
     onPlayerClick: PropTypes.func,
     noAudioLevel: PropTypes.bool
@@ -175,25 +175,29 @@ class ConversationAVPanel extends MegaRenderMixin {
     }
     getActiveSid() {
         var self = this;
-        var chatRoom = self.props.chatRoom;
-        var call = chatRoom.callManagerCall;
-        if (!call || !call.isActive()) {
-            return;
+        var call = self.props.chatRoom.callManagerCall;
+        if (!call) {
+            return false;
         }
+        var rtcCall = call.rtcCall;
         var selected = self.state.selectedStreamSid;
+        if (selected && selected !== "local" && !rtcCall.sessions[base64urldecode(selected)]) {
+            // session doesn't exist anymore, we will select another active peer below
+            selected = null;
+        }
         if (selected) {
             return selected;
         }
-        var sess = Object.values(call.rtcCall.sessions)[0];
-        return sess ? sess.stringSid : undefined;
+        // we have no active peer, select the first session
+        let sess = Object.values(rtcCall.sessions)[0];
+        return sess ? sess.stringSid : "local";
     }
     haveScreenSharingPeer() {
-        var chatRoom = this.props.chatRoom;
-        var callManagerCall = chatRoom.callManagerCall;
-        if (!callManagerCall) {
+        var call = this.props.chatRoom.callManagerCall;
+        if (!call) {
             return false;
         }
-        var rtcCall = callManagerCall.rtcCall;
+        var rtcCall = call.rtcCall;
         if (!rtcCall.sessions) {
             return false;
         }
@@ -230,11 +234,15 @@ class ConversationAVPanel extends MegaRenderMixin {
         return this.state.viewMode;
     }
     onPlayerClick(sid) {
-        if (this.getViewMode() === VIEW_MODES.CAROUSEL) {
-            this.setState({'selectedStreamSid': sid});
+        if (this.getViewMode() !== VIEW_MODES.CAROUSEL) {
+            return;
         }
+        this.setState({'selectedStreamSid': sid});
     }
     _hideBottomPanel() {
+        if(!this.isMounted()) {
+            return;
+        }
         var self = this;
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
@@ -286,13 +294,10 @@ class ConversationAVPanel extends MegaRenderMixin {
                 $('.participantsContainer', $container).outerHeight()
             ;
 
-            var mediaOpts;
-            if (this.state.selectedStreamSid === "local") {
-                mediaOpts = callManagerCall.getMediaOptions();
-            }
-            else {
-                mediaOpts = callManagerCall.getRemoteMediaOptions(self.getActiveSid());
-            }
+            var activeSid = this.getActiveSid();
+            var mediaOpts = (activeSid === "local")
+                ? callManagerCall.getMediaOptions()
+                : callManagerCall.getRemoteMediaOptions(activeSid);
 
             $('.activeStream', $container).height(
                 activeStreamHeight
@@ -343,7 +348,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             }
 
         }
-        else {
+        else { // grid mode
             $('.participantsContainer', $container).height(
                 $container.outerHeight() - $('.call-header', $container).outerHeight()
             );
@@ -377,6 +382,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         this.initialRender = false;
     }
     componentDidUpdate() {
+        super.componentDidUpdate();
         var self = this;
         var room = self.props.chatRoom;
         var callManagerCall = room.callManagerCall;
@@ -387,7 +393,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         var $container = $(ReactDOM.findDOMNode(self));
 
         var mouseoutThrottling = null;
-        $container.rebind('mouseover.chatUI' + self.props.chatRoom.roomId, function() {
+        $container.rebind('mouseover.chatUI' + room.roomId, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
             self.visiblePanel = true;
@@ -695,13 +701,11 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         var localPlayerElement = null;
         var remotePlayerElements = [];
-        var onRemotePlayerClick; // handler that exists only for the peer views in the carosel bottom bar
+        var onRemotePlayerClick; // handler that exists only for the thumbnail views in the carosel bottom bar
         var isCarousel = (self.getViewMode() === VIEW_MODES.CAROUSEL);
         if (isCarousel) {
-            var activeSid = (chatRoom.type === "group" || chatRoom.type === "public")
-                ? self.getActiveSid()
-                : false;
-            var activePlayer = null;
+            var activeSid = self.getActiveSid();
+            var activePlayer;
             onRemotePlayerClick = self.onPlayerClick.bind(self);
         }
 
@@ -742,7 +746,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                     sess = {sess}
                     key = {"carousel_active"}
                     peerAv = {sess.peerAv()}
-                    isActive = {true}
+                    isCarouselMain = {true}
                     noAudioLevel = {true}
                 />;
             }
@@ -814,11 +818,11 @@ class ConversationAVPanel extends MegaRenderMixin {
                 </div>;
             }
         }
-        else {
-            // carousel
+        else { // carousel
+            let localPlayer;
             if (!localMedia.video) {
                 // display avatar for local video
-                let localPlayer =
+                localPlayer =
                 <div
                     className={
                         "call user-audio local-carousel is-avatar" + (activeSid === "local" ? " active " : "")
@@ -841,14 +845,12 @@ class ConversationAVPanel extends MegaRenderMixin {
                     </div>
                 </div>;
 
-                remotePlayerElements.push(localPlayer);
-
                 if (activeSid === "local") {
                     activePlayer = localPlayer;
                 }
             }
             else { // we have local video (carousel mode)
-                let localPlayer = <div
+                localPlayer = <div
                     className={
                         "call user-video local-carousel is-video" + (
                             activeSid === "local" ? " active " : ""
@@ -880,8 +882,6 @@ class ConversationAVPanel extends MegaRenderMixin {
                     />
                 </div>;
 
-                remotePlayerElements.push(localPlayer);
-
                 if (activeSid === "local") {
                     activePlayer = <div
                         className={
@@ -901,7 +901,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                             muted={true}
                             volume={0}
                             id={"localvideo_big_" + base64urlencode(rtcCall.id)}
-                            ref={function(ref){
+                            ref={function(ref) {
                                 if (ref && !RTC.isAttachedToStream(ref)) {
                                     RTC.attachMediaStream(ref, rtcCall.localStream());
                                 }
@@ -910,6 +910,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                     </div>;
                 }
             }
+            remotePlayerElements.push(localPlayer);
         }
 
         var unreadDiv = null;

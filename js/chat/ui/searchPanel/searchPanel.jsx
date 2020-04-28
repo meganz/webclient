@@ -87,6 +87,7 @@ export default class SearchPanel extends MegaRenderMixin {
     }
 
     toggleMinimize = () => {
+        this.doToggle('pause');
         this.props.onToggle();
     };
 
@@ -121,6 +122,29 @@ export default class SearchPanel extends MegaRenderMixin {
         });
     };
 
+    doToggle = action /* pause || resume || destroy */ => {
+        const megaPromise = ChatSearch.doSearch.megaPromise;
+
+        if (action && megaPromise && megaPromise.cs) {
+            const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
+
+            this.setState({
+                status: (() => {
+                    switch (action) {
+                        case 'pause':
+                            return PAUSED;
+                        case 'resume':
+                            return IN_PROGRESS;
+                        default:
+                            return COMPLETED;
+                    }
+                })()
+            }, () =>
+                megaPromise.cs[action]()
+            );
+        }
+    };
+
     handleChange = ev => {
         const value = ev.target.value;
         const searching = value.length >= 3;
@@ -136,34 +160,26 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     handleToggle = () => {
-        const megaPromise = ChatSearch.doSearch.megaPromise;
+        const inProgress = this.state.status === STATUS.IN_PROGRESS;
 
-        if (megaPromise && megaPromise.cs) {
-            const inProgress = this.state.status === STATUS.IN_PROGRESS;
-
-            this.setState({
-                status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
-            }, () => {
-                Soon(() => SearchField.focus());
-                return inProgress ? megaPromise.cs.pause() : megaPromise.cs.resume();
-            });
-        }
+        this.setState({
+            status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
+        }, () => {
+            Soon(() => SearchField.focus());
+            return this.doToggle(inProgress ? 'pause' : 'resume');
+        });
     };
 
     handleReset = () => {
-        if (
-            this.state.status === STATUS.IN_PROGRESS &&
-            ChatSearch.doSearch.megaPromise &&
-            ChatSearch.doSearch.megaPromise.state() === "pending"
-        ) {
-            ChatSearch.doSearch.megaPromise.cs.destroy();
-        }
-
         this.setState({
             value: '',
             searching: false,
-            status: undefined
-        }, () => Soon(() => SearchField.focus()));
+            status: undefined,
+            results: []
+        }, () => {
+            this.doToggle('destroy');
+            Soon(() => SearchField.focus());
+        });
     };
 
     render() {

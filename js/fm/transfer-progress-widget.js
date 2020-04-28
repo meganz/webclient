@@ -552,7 +552,7 @@ mega.tpw = new function TransferProgressWidget() {
 
                         if ($widgetHeadAndBody.is(':visible')) {
                             $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
-                            isHiddenByUser = false;
+                            isHiddenByUser = true;
                         }
                     }
                 }
@@ -594,7 +594,7 @@ mega.tpw = new function TransferProgressWidget() {
 
                         if ($widgetHeadAndBody.is(':visible')) {
                             $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
-                            isHiddenByUser = false;
+                            isHiddenByUser = true;
                         }
                     }
                 }

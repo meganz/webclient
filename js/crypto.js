@@ -534,21 +534,32 @@ if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
 // this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
 function chunkedfetch(xhr, uri, postdata, httpMethod) {
     "use strict";
+
+    var fail = function(ex) {
+        if (d) {
+            console.error("Fetch error", ex);
+        }
+        // at this point fake a partial data to trigger a retry..
+        xhr.status = 206;
+        xhr.onloadend();
+    };
     var requestBody = {
         method: 'POST',
         body: postdata
     };
-    if (httpMethod && httpMethod === 'GET') {
+
+    if (httpMethod === 'GET') {
         requestBody.method = 'GET';
         delete requestBody.body;
     }
-    fetch(uri, requestBody).then(function (response) {
+
+    fetch(uri, requestBody).then(function(response) {
         var reader = response.body.getReader();
-        var evt = { loaded: 0 };
+        var evt = {loaded: 0};
         xhr.status = response.status;
         xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
 
-        function chunkedread() {
+        (function chunkedread() {
             return reader.read().then(function(r) {
                 if (r.done) {
                     // signal completion through .onloadend()
@@ -562,14 +573,9 @@ function chunkedfetch(xhr, uri, postdata, httpMethod) {
                     xhr.onprogress(evt);
                     chunkedread();
                 }
-            });
-        }
-
-        chunkedread();
-    }).catch(function(err) {
-        console.error("Fetch error: ", err);
-        xhr.onloadend();
-    });
+            }).catch(fail);
+        })();
+    }).catch(fail);
 }
 
 // send pending API request on channel q
@@ -920,6 +926,16 @@ function api_reqfailed(channel, error) {
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
+                var setLogOutOnNavigation = function() {
+                    onIdle(function() {
+                        mBroadcaster.once('pagechange', function() {
+                            u_logout();
+                            location.reload(true);
+                        });
+                    });
+                    window.doUnloadLogOut = 0x9001;
+                    return false;
+                };
 
                 // On clicking OK, log the user out and redirect to contact page
                 loadingDialog.hide();
@@ -952,8 +968,7 @@ function api_reqfailed(channel, error) {
 
                     // Exit early to prevent logout because further API requests are
                     // needed to verify by SMS and if logged out then it won't work
-                    window.doUnloadLogOut = 0x9001;
-                    return false;
+                    return setLogOutOnNavigation();
                 }
                 else if (reasonCode === 700) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';

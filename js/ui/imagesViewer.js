@@ -1318,7 +1318,6 @@ var slideshowid;
 
                 // Restore last good preview
                 if (previews[id].prev) {
-                    M.neuterArrayBuffer(previews[id].buffer);
                     URL.revokeObjectURL(previews[id].src);
                     previews[id] = previews[id].prev;
                     delete previews[id].prev;
@@ -1486,7 +1485,6 @@ var slideshowid;
                 k = p.h;
 
                 size += p.buffer.byteLength;
-                M.neuterArrayBuffer(p.buffer);
                 p.buffer = p.full = preqs[k] = false;
 
                 if (p.prev) {

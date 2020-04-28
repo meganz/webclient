@@ -130,7 +130,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-files-block').removeClass('hidden');
     $('.fm-empty-user-management').addClass('hidden');
 
-    this.URLchanger('');
+    if (!quickWay) {
+        this.URLchanger('');
+    }
 
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
@@ -732,7 +734,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 if (is_mobile) {
-                    mobile.register.showConfirmAccountScreen(res, true);
+                    mobile.register.show(res);
                 }
                 else {
                     loadSubPage('register');
@@ -3359,8 +3361,9 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
     try {
 
         if (hashLogic) {
-            var newHash = '#fm/user-management' + subLocation;
+            var newHash = '#fm/user-management' + (subLocation ? '/' + subLocation : '');
             if (document.location.hash !== newHash) {
+                window.skipHashChange = true;
                 document.location.hash = newHash;
                 page = newHash;
                 M.currentdirid = page;

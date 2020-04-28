@@ -45,9 +45,10 @@ RepayPage.prototype.initPage = function() {
         });
 
     // event handler for radio buttons
-    $('.bus-reg-radio', $paymentBlock)
+    $('.bus-reg-radio-option', $paymentBlock)
         .off('click.suba').on('click.suba', function businessRepayCheckboxClick() {
             var $me = $(this);
+            $me = $('.bus-reg-radio', $me);
             if ($me.hasClass('checkOn')) {
                 return;
             }

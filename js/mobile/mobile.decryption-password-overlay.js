@@ -109,7 +109,7 @@ mobile.decryptionPasswordOverlay = {
                             if (u_type === false) {
                                 res.signupcode = decryptedTokenBase64;
                                 localStorage.businessSubAc = JSON.stringify(res);
-                                mobile.register.showConfirmAccountScreen(res, true);
+                                mobile.register.show(res);
                             }
                             else {
                                 var msgTxt = l[18795];

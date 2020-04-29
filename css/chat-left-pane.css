@@ -453,7 +453,7 @@
 }
 
 .search-field .search-field-status.searching {
-    /* […] */
+    /* [...] */
 }
 
 .search-field .search-field-status.clickable {
@@ -461,7 +461,7 @@
 }
 
 .search-field .search-field-status.clickable:hover {
-    /* […] */
+    /* [...] */
 }
 
 .search-field .search-field-status i {
@@ -546,7 +546,7 @@
 }
 
 .result-table .result-table-row .user-card span {
-    /* […] */
+    /* [...] */
 }
 
 .result-table .result-table-row .user-card .graphic {
@@ -555,7 +555,7 @@
 }
 
 .result-table .result-table-row .user-card .graphic span {
-    /* […] */
+    /* [...] */
 }
 
 .result-table .result-table-row .user-card .graphic span:nth-child(1) {

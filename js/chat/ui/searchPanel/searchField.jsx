@@ -39,7 +39,6 @@ export default class SearchField extends MegaRenderMixin {
     renderStatus = (status, isClickable, onToggle) => {
         const className = `${SEARCH_STATUS_CLASS} ${isClickable ? 'clickable' : ''}`;
         const handleClick = () => isClickable && onToggle();
-        var statusClass
 
         switch (status) {
             case STATUS.IN_PROGRESS:
@@ -83,8 +82,7 @@ export default class SearchField extends MegaRenderMixin {
                     ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
-                    onChange={onChange}
-                    className={searching ? 'searching' : ''} />
+                    onChange={onChange} />
 
                 {searching && status && (
                     this.renderStatus(status, isClickable, onToggle)

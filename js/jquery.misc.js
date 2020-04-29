@@ -82,6 +82,35 @@ $.fn.visible = function (e, i)
     return !!(i === true ? f.offsetWidth * f.offsetHeight : true) && b <= c && a >= g
 };
 
+// Returns in percentages how much can be seen vertically of an element in the current viewport.
+$.fn.pvisible = function() {
+    // Based on https://stackoverflow.com/a/33860876
+    'use strict';
+    var $this = $(this[0]);
+    if (!$this.length) {
+        return 0;
+    }
+    var dh = $this.height();
+    var dp = $this.offset().top;
+    var wh = $(window).height();
+    var ds = $(document).scrollTop();
+    var hb = ds - dp;
+    var ha = dp + dh - (ds + wh);
+
+    if (ds > dp + dh || dp > ds + wh) {
+        return 0;
+    }
+
+    var res = 100;
+    if (hb > 0) {
+        res -= hb * 100 / dh;
+    }
+    if (ha > 0) {
+        res -= ha * 100 / dh;
+    }
+    return res;
+};
+
 // Based on http://stackoverflow.com/a/10835425
 $.fn.removeClassWith = function(pfx) {
     'use strict';

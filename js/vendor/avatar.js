@@ -1,5 +1,5 @@
 (function(window) {
-    
+
 /**
  * Functions from Underscore.js 1.4.4
  * http://underscorejs.org
@@ -839,6 +839,7 @@ window.ImageUploadAndCrop = (function(){
 
         if (ClientFileReader.isSupported()) {
             this.clientFileReader = new ClientFileReader({
+                readMethod: 'ArrayBuffer',
                 onRead: this._onFileProcessed,
                 onError: this._onFilesError,
                 fileTypeFilter: ClientFileReader.typeFilters.imageWeb,
@@ -902,7 +903,33 @@ window.ImageUploadAndCrop = (function(){
         this._resetFileUploadField();
     };
 
-    ImageUploadAndCrop.prototype._onFileProcessed = function(imageSrc){
+    ImageUploadAndCrop.prototype._onFileProcessed = function(imageData) {
+        if (!imageData || !imageData.byteLength) {
+            return this._onFileProcessed2(imageData);
+        }
+
+        var self = this;
+        var img = new Image();
+        img.onload = img.onerror = function() {
+            self._onFileProcessed2(this.src);
+
+            if (exifImageRotation.fromImage) {
+                document.body.removeChild(img);
+            }
+        };
+        if (exifImageRotation.fromImage) {
+            img.style.imageOrientation = 'none';
+            document.body.appendChild(img);
+        }
+
+        var orientation = 1;
+        onIdle(function() {
+            exifImageRotation(img, imageData, orientation);
+        });
+        orientation = EXIF.readFromArrayBuffer(imageData).Orientation;
+    };
+
+    ImageUploadAndCrop.prototype._onFileProcessed2 = function(imageSrc){
         if (imageSrc){
             if (!isNaN(this.options.maxImageDimension)) {
                 var validatePromise = this.validateImageResolution(imageSrc);

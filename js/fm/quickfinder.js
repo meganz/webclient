@@ -35,14 +35,14 @@ var QuickFinder = function(searchable_elements, containers) {
     });
 
     $(window).rebind('keypress.quickFinder', function(e) {
+        if (!window.M || M.chat) {
+            return;
+        }
 
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
         if ($(e.target).is("input, textarea, select") || $.dialog) {
-            return;
-        }
-        if (M.chat) {
             return;
         }
 

@@ -7,12 +7,19 @@ function clickURLs() {
     'use strict';
     var nodeList = document.querySelectorAll('a.clickurl');
 
-    if (nodeList) {
+    if (nodeList.length) {
         $(nodeList).rebind('click', function() {
             var $this = $(this);
             var url = $this.attr('href') || $this.data('fxhref');
 
             if (url) {
+                var target = $this.attr('target');
+
+                if (target === '_blank') {
+                    open(getBaseUrl() + url);
+                    return false;
+                }
+
                 if (window.loadingDialog && $this.hasClass('pages-nav')) {
                     loadingDialog.quiet = true;
                     onIdle(function() {
@@ -1951,8 +1958,8 @@ function passwordManager(form) {
             if (hashLogic || isPublicLink(path)) {
                 path = path.replace('/', '/#');
 
-                if (is_chrome_web_ext || is_firefox_web_ext) {
-                    path = path.replace('/#', '/mega/secure.html#');
+                if (is_extension) {
+                    path = path.replace('/#', '/' + urlrootfile + '#');
                 }
             }
             history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);

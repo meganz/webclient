@@ -39,26 +39,27 @@ export default class SearchField extends MegaRenderMixin {
     renderStatus = (status, isClickable, onToggle) => {
         const className = `${SEARCH_STATUS_CLASS} ${isClickable ? 'clickable' : ''}`;
         const handleClick = () => isClickable && onToggle();
+        var statusClass
 
         switch (status) {
             case STATUS.IN_PROGRESS:
                 return (
                     <div className={`${className} searching`} onClick={handleClick}>
-                        <i />
+                        <i className="small-icon tiny-searching" />
                         {LABEL.DECRYPTING_RESULTS}
                     </div>
                 );
             case STATUS.PAUSED:
                 return (
                     <div className={`${className} paused`} onClick={handleClick}>
-                        <i />
+                        <i className="small-icon tiny-play" />
                         {LABEL.RESUME_SEARCH}
                     </div>
                 );
             case STATUS.COMPLETED:
                 return (
                     <div className={`${className} complete`} onClick={handleClick}>
-                        <i />
+                        <i className="small-icon tiny-complete" />
                         {LABEL.SEARCH_COMPLETE}
                     </div>
                 );
@@ -82,14 +83,15 @@ export default class SearchField extends MegaRenderMixin {
                     ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
-                    onChange={onChange} />
+                    onChange={onChange}
+                    className={searching ? 'searching' : ''} />
 
                 {searching && status && (
                     this.renderStatus(status, isClickable, onToggle)
                 )}
 
                 {searching && (
-                    <i className="small-icon reset-icon" onClick={onReset}></i>
+                    <i className="small-icon tiny-reset" onClick={onReset}></i>
                 )}
             </div>
         );

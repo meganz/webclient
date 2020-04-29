@@ -140,6 +140,24 @@
     width: 16px;
     background-position: -212px -1237px;
 }
+
+/* Chat search icons */
+.small-icon.tiny-reset {
+    background-position: -170px -896px;
+}
+.small-icon.tiny-searching {
+    background-position: -50px -896px;
+}
+.small-icon.tiny-pause {
+    background-position: -110px -896px;
+}
+.small-icon.tiny-play {
+    background-position: -140px -896px;
+}
+.small-icon.tiny-complete {
+    background-position: -80px -896px;
+}
+
 .small-icon.audio-call {
     background-position: -4px -38px;
 }

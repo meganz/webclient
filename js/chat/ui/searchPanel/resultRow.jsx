@@ -118,7 +118,7 @@ class ChatRow extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room)}>
-                <div className="group-chat" />
+                <div className="chat-topic-icon" />
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
                         <span dangerouslySetInnerHTML={{ __html: highlight(room.topic, matches) }} />

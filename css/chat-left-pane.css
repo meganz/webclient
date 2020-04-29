@@ -363,20 +363,20 @@
  * Search Panel
  * ------------------------------------------------------------------------------------------------------------------ */
 
-div.search-panel {
+.search-panel {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    padding: 3px 3px 0;
+    padding: 2px 3px 0 2px;
     background: #FAFAFA;
     z-index: 130;
     box-sizing: border-box;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial, sans-serif;
 }
 
-div.search-heading {
+.search-heading {
     height: 100%;
     text-align: center;
     font-size: 15px;
@@ -385,66 +385,67 @@ div.search-heading {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
-div.search-results-wrapper {
+.search-results-wrapper {
     overflow: hidden;
-    height: -webkit-calc(100% - 65px);
-    height: -moz-calc(100% - 65px);
-    height: calc(100% - 65px);
+    height: -webkit-calc(100% - 57px);
+    height: -moz-calc(100% - 57px);
+    height: calc(100% - 57px);
 }
 
 /*
  * Search Field
  * ------------------------------------------------------------------------------------------------------------------ */
 
-div.search-field {
+.search-field {
     top: 0;
     left: 0;
     width: 100%;
     z-index: 10;
 }
 
-div.search-field i {
+.search-field i {
     position: absolute;
     display: block;
     z-index: 10;
 }
 
-div.search-field i.thin-search-icon {
-    top: 12px;
-    left: 12px;
+.search-field i.thin-search-icon {
+    top: 8px;
+    left: 8px;
 }
 
-div.search-field i.reset-icon {
-    top: 14px;
-    right: 12px;
-    width: 14px;
-    height: 14px;
-    border-radius: 200px;
-    background: transparent url('../images/temp/search-reset.png') 0 0 no-repeat;
-    background-size: 15px auto;
+.search-field i.tiny-reset {
+    top: 8px;
+    right: 8px;
     cursor: pointer;
 }
 
-div.search-field input {
+.search-field input {
     width: 100%;
-    height: 37px;
-    padding: 10px 30px 8px 35px;
+    height: 32px;
+    padding: 3px 30px 3px 30px;
     font-size: 13px;
+    line-height: 24px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     color: #333333;
     background: #FFF;
     box-sizing: border-box;
+    font-family: 'LatoWeb', Arial;
 }
+.search-field input
+.search-field input::-webkit-input-placeholder { color: #CCC; }
+.search-field input::-moz-placeholder { color: #CCC; }
+.search-field input::-ms-input-placeholder { color: #CCC; }
 
-div.search-field input::-webkit-input-placeholder { color: #CCC; }
-div.search-field input::-moz-placeholder { color: #CCC; }
-div.search-field input::-ms-input-placeholder { color: #CCC; }
-
-div.search-field div.search-field-status {
+.search-field input.searching {
+    height: 34px;
+    padding-bottom: 5px;
+}
+.search-field .search-field-status {
     position: relative;
     margin: -2px 0 0 0;
-    padding: 4px 35px;
+    padding: 4px 30px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 0 0 4px 4px;
     font-size: 12px;
@@ -452,95 +453,79 @@ div.search-field div.search-field-status {
     color: #666;
 }
 
-div.search-field div.search-field-status:hover {
+.search-field .search-field-status.searching {
     /* […] */
 }
 
-div.search-field div.search-field-status.clickable {
+.search-field .search-field-status.clickable {
     cursor: pointer;
 }
 
-div.search-field div.search-field-status.clickable:hover {
+.search-field .search-field-status.clickable:hover {
     /* […] */
 }
 
-div.search-field div.search-field-status i {
+.search-field .search-field-status i {
     position: absolute;
-    top: 5px;
-    left: 10px;
+    top: 2px;
+    left: 4px;
     display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 200px;
-    background: tomato;
 }
-
-div.search-field div.search-field-status.searching i {
-    background: transparent url('../images/temp/chat_searching.png') 0 0 no-repeat;
-    background-size: 14px auto; /* TODO: do as rotating, use proper asset  */
+.search-field .search-field-status.searching i  {
+    -webkit-animation: rotate 0.8s infinite linear;
+    animation: rotate 0.8s infinite linear;
 }
-
-div.search-field div.search-field-status.searching:hover i {
-    background: transparent url('../images/temp/chat_search_pause.svg') 0 0 no-repeat;
-}
-
-div.search-field div.search-field-status.paused i {
-    background: transparent url('../images/temp/chat_search_resume.svg') 0 0 no-repeat;
-    opacity: 0.7;
-}
-
-div.search-field div.search-field-status.paused:hover i {
-    opacity: 1;
-}
-
-div.search-field div.search-field-status.complete i {
-    background: transparent url('../images/temp/chat_search_complete.svg') 0 0 no-repeat;
+.search-field .search-field-status.searching:hover i {
+    background-position: -110px -896px;
+    -webkit-animation: none;
+    animation: none;
 }
 
 /*
  * Result Table & Result Row
  * ------------------------------------------------------------------------------------------------------------------ */
 
-div.result-table {
-    margin: 5px 0 5px 0;
+.result-table {
+    margin: 2px 0 5px 0;
 }
 
-div.result-table div.result-table-heading {
-    padding: 3px;
-    font-size: 14px;
-    text-transform: uppercase;
+.result-table .result-table-heading {
+    height: 20px;
+    background-color: #EEEEEE;
     border-radius: 4px;
-    color: #333;
-    background: #EEE;
+    text-transform: uppercase;
+    color: #333333;
+    padding: 0 8px;
+    font-size: 13px;
+    line-height: 20px;
+    margin-bottom: 2px;
 }
 
-div.result-table div.result-table-row {
+.result-table .result-table-row {
     margin: 10px 0;
-    padding: 0 5px;
+    padding: 0 10px;
     cursor: pointer;
 }
 
-div.result-table div.result-table-row div.group-chat {
-    float: left;
-    width: 30px;
-    height: 30px;
-    border: 3px solid #FFF;
-    border-radius: 200px;
-    background: transparent url('../images/temp/chat_group_img@2x.png') 0 0 no-repeat;
-    background-size: 30px auto;
-
+.result-table .result-table-row .chat-topic-icon {
+    width: 36px;
+    height: 36px;
+    border: 2px solid #FFF;
+    border-radius: 100%;
+    box-sizing: border-box;
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
 }
 
 /*
  * Result Row: Recent & Members
  * ------------------------------------------------------------------------------------------------------------------ */
 
-div.result-table div.result-table-row div.avatar-wrapper {
+.result-table .result-table-row .avatar-wrapper {
     float: left;
     width: 36px;
 }
 
-div.result-table div.result-table-row div.user-card {
+.result-table .result-table-row .user-card {
     position: relative;
     float: left;
     width: 75%;
@@ -549,7 +534,7 @@ div.result-table div.result-table-row div.user-card {
     line-height: 19px;
 }
 
-div.result-table div.result-table-row div.user-card span {
+.result-table .result-table-row .user-card span {
     overflow: hidden;
     float: left;
     max-width: 100%;
@@ -561,69 +546,69 @@ div.result-table div.result-table-row div.user-card span {
     white-space: nowrap;
 }
 
-div.result-table div.result-table-row div.user-card span {
+.result-table .result-table-row .user-card span {
     /* […] */
 }
 
-div.result-table div.result-table-row div.user-card div.graphic {
+.result-table .result-table-row .user-card .graphic {
     overflow: hidden;
     padding: 8px 0 0 0;
 }
 
-div.result-table div.result-table-row div.user-card div.graphic span {
+.result-table .result-table-row .user-card .graphic span {
     /* […] */
 }
 
-div.result-table div.result-table-row div.user-card div.graphic span:nth-child(1) {
+.result-table .result-table-row .user-card .graphic span:nth-child(1) {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
     color: #666;
 }
 
-div.result-table div.result-table-row div.user-card div.graphic strong {
+.result-table .result-table-row .user-card .graphic strong {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
     color: #000;
 }
 
-div.result-table div.result-table-row div.user-card div.textual {
+.result-table .result-table-row .user-card .textual {
     overflow: hidden;
 }
 
-div.result-table div.result-table-row div.user-card div.textual span {
+.result-table .result-table-row .user-card .textual span {
     display: block;
 }
 
-div.result-table div.result-table-row div.user-card div.textual span:nth-child(1) {
+.result-table .result-table-row .user-card .textual span:nth-child(1) {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
     color: #333;
 }
 
-div.result-table div.result-table-row div.user-card div.textual span:nth-child(2) {
+.result-table .result-table-row .user-card .textual span:nth-child(2) {
     clear: both;
     font-size: 13px;
     color: #666;
 }
 
-div.result-table div.result-table-row div.user-card div.user-card-presence {
+.result-table .result-table-row .user-card .user-card-presence {
     margin: 0 0 1px 8px;
 }
 
 /* --- Result Row: Messages --- */
 
-div.result-table div.result-table-row.message {
+.result-table .result-table-row.message {
     margin: 5px 0;
     padding: 5px 3px;
 }
 
-div.result-table div.result-table-row.message:nth-child(odd) {
+.result-table .result-table-row.message:nth-child(odd) {
     background: #FFF;
 }
 
-div.result-table div.result-table-row.message span {
+.result-table .result-table-row.message span {
     display: block;
     padding: 3px 0;
 }
 
-div.result-table div.result-table-row.message span.title {
+.result-table .result-table-row.message span.title {
     overflow: hidden;
     float: left;
     max-width: 100%;
@@ -635,16 +620,16 @@ div.result-table div.result-table-row.message span.title {
     white-space: nowrap;
 }
 
-div.result-table div.result-table-row.message span.title {
+.result-table .result-table-row.message span.title {
     font-size: 14px;
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
 }
 
-div.result-table div.result-table-row.message div.user-card-presence {
+.result-table .result-table-row.message .user-card-presence {
     margin-bottom: -2px;
 }
 
-div.result-table div.result-table-row.message div.summary {
+.result-table .result-table-row.message .summary {
     clear: both;
     overflow: hidden;
     max-width: 100%;
@@ -654,12 +639,12 @@ div.result-table div.result-table-row.message div.summary {
     color: #555;
 }
 
-div.result-table div.result-table-row.message div.summary strong {
+.result-table .result-table-row.message .summary strong {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial, sans-serif;
     color: #000;
 }
 
-div.result-table div.result-table-row.message span.date {
+.result-table .result-table-row.message span.date {
     font-size: 12px;
     color: #999;
 }
@@ -667,13 +652,13 @@ div.result-table div.result-table-row.message span.date {
 
 /* --- Result Row: No Results --- */
 
-div.result-table div.result-table-row.nil {
+.result-table .result-table-row.nil {
     padding: 20px;
     cursor: default;
     text-align: center;
 }
 
-div.result-table div.result-table-row.nil span {
+.result-table .result-table-row.nil span {
     display: block;
     padding: 10px 0 0 0;
     font-size: 20px;

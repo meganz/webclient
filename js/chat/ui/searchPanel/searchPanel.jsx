@@ -80,7 +80,7 @@ export default class SearchPanel extends MegaRenderMixin {
             // current element !== main chat area; applicable due occasional click misfire/s on scroll
             !$target.is('div.conversationsApp') &&
             // current element !== reset search element
-            !$target.is('i.reset-icon') &&
+            !$target.is('i.tiny-reset') &&
             // current element !== toggle search icon
             !$target.is('div.small-icon.thin-search-icon')
         );

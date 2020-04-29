@@ -417,7 +417,8 @@ export class TypingArea extends MegaRenderMixin {
         var self = this;
         this.$container = $(ReactDOM.findDOMNode(this));
 
-        chatGlobalEventManager.addEventListener('resize',
+        chatGlobalEventManager.addEventListener(
+            'resize',
             'typingArea' + self.getUniqueId(),
             self.handleWindowResize.bind(this)
         );

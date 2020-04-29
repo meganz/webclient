@@ -637,8 +637,8 @@ MegaDataSortedMap.prototype.removeByKey = MegaDataSortedMap.prototype.remove = f
 /**
  * Simplified version of `Array.prototype.splice`, only supports 2 args (no adding/replacement of items) for now.
  *
- * @param {Number} start
- * @param {Number} deleteCount
+ * @param {Number} start first index to start from
+ * @param {Number} deleteCount number of items to delete
  * @returns {Array} array of deleted item ids
  */
 MegaDataSortedMap.prototype.splice = function(start, deleteCount) {

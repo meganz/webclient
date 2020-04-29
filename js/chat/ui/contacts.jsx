@@ -196,7 +196,7 @@ export class ContactButton extends ContactAwareComponent {
                     label={__(l[101])}
                     onClick={() => {
                         loadingDialog.show();
-                        const isAnonymousUser = (!u_handle || u_type !== 3);
+                        const isAnonymousUser = !u_handle || u_type !== 3;
                         const ADD_CONTACT = 'addContact';
                         if (anonymouschat && isAnonymousUser) {
                             megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
@@ -410,7 +410,7 @@ export class LastActivity extends ContactAwareComponent {
         }
 
         const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-        const SECONDS = (new Date().getTime() / 1000) - lastActivity;
+        const SECONDS = new Date().getTime() / 1000 - lastActivity;
         const FORTY_FIVE_DAYS = 3888000; // seconds
         const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
         const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;

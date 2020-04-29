@@ -68,7 +68,7 @@ function RoomSearch(parentSearch, room) {
     );
     room.attachSearch();
     self._setState(SearchState.kNew);
-    self.room.rebind(CHAT_SEARCH_HISTDECRYPTED_EVENTNAME, function() {
+    self.room.rebind(CS_HISTDECRYPTED_EVENTNAME, function() {
         setTimeout(function() {
             self.onHistoryFetched();
         }, 0);
@@ -172,7 +172,7 @@ RoomSearch.prototype._destroy = function() {
     "use strict";
     this._setState(this.state === SearchState.kComplete ? this.state : SearchState.kDestroying);
     this.room.detachSearch();
-    this.room.unbind(CHAT_SEARCH_HISTDECRYPTED_EVENTNAME);
+    this.room.unbind(CS_HISTDECRYPTED_EVENTNAME);
 };
 
 RoomSearch.prototype.pause = function() {
@@ -202,7 +202,7 @@ RoomSearch.prototype._setComplete = function() {
     }
     delete this._isFetchingHistory;
     this._setState(SearchState.kComplete);
-    this.room.unbind(CHAT_SEARCH_HISTDECRYPTED_EVENTNAME);
+    this.room.unbind(CS_HISTDECRYPTED_EVENTNAME);
     this.logger.log("Fetch and search complete", "(total", this.room.messagesBuff.messages.length, "messages)");
     this.room.detachSearch();
     this.parentSearch.onRoomSearchComplete(this);

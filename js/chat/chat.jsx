@@ -2608,7 +2608,7 @@ Chat.prototype.getFrequentContacts = function() {
         setTimeout(function() {
             delete Chat._frequentsCache;
         }, 6e4 * 5);
-    })
+    });
     return masterPromise;
 };
 

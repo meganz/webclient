@@ -433,7 +433,6 @@
     box-sizing: border-box;
     font-family: 'LatoWeb', Arial;
 }
-.search-field input
 .search-field input::-webkit-input-placeholder { color: #CCC; }
 .search-field input::-moz-placeholder { color: #CCC; }
 .search-field input::-ms-input-placeholder { color: #CCC; }

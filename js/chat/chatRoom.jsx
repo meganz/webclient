@@ -121,8 +121,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     // Events
     if (d) {
         this.rebind('onStateChange.chatRoomDebug', function(e, oldState, newState) {
-            self.logger.debug("Will change state from: ",
-                ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
+            self.logger.debug(
+                "Will change state from: ",
+                ChatRoom.stateToText(oldState),
+                " to ",
+                ChatRoom.stateToText(newState)
             );
         });
     }
@@ -2038,7 +2041,7 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index) {
     }
     else if (self.messagesBuff.isRetrievingHistory) {
         // wait for messages to be received
-        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
             // wait for UI to update (so that the element is now available in the dom)
             $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
                 self.scrollToMessageId(msgId, index);
@@ -2049,7 +2052,7 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index) {
         self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
         ps.doProgramaticScroll(0, true);
         // wait for messages to be received
-        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
             // wait for UI to update (so that the element is now available in the dom)
             $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
                 self.scrollToMessageId(msgId);

@@ -88,6 +88,7 @@ RtcModule.kIncallPingInterval = 4000;
 RtcModule.kMediaGetTimeout = 20000000;
 RtcModule.kSessSetupTimeout = 25000;
 RtcModule.kCallSetupTimeout = 35000;
+RtcModule.kJoinTimeout = 25000;
 RtcModule.kCallRecoveryTimeout = 30000;
 RtcModule.kStreamRenegTimeout = 10000;
 // If sess setup times out and the time elapsed since the SDP handshake completed
@@ -915,11 +916,16 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
     assert(chat);
     var roomCallState = chat.callInfo;
     if (isJoin) {
-        if (!roomCallState.callId) {
-            self.logger.error("Attempted to join a call, but there is no call in the rooom, aborting join");
-            return null;
+        if (recovery) {
+            callid = recovery.id;
+        } else {
+            if (roomCallState.callId) {
+                callid = roomCallState.callId;
+            } else {
+                self.logger.error("Attempted to join a call, but there is no call in the rooom, aborting join");
+                return null;
+            }
         }
-        callid = roomCallState.callId;
     } else { // starting new call
         assert(!recovery);
         if (roomCallState.callId) {
@@ -1009,19 +1015,14 @@ RtcModule.prototype.onChatOnline = function(chat) {
     if (!recovery) {
         return;
     }
-    // we have a call to recover on this chatid
+    // we have a call to recover on this chatid. Just in case, normally should not happen as we just went online
     if (this.calls[chatid]) {
         this.logger.log("We reconnected, but there is already another call, aborting recovery...");
         recovery.abort(Term.kErrAlready);
         return;
     }
-    var callInfo = chat.callInfo;
-    if (!callInfo.participantCount() || recovery.id !== callInfo.callId) {
-        this.logger.log("We reconnected, but call is gone, aborting recovery...");
-        recovery.abort(Term.kErrCallRecoveryFailed);
-        return;
-    }
-    this.logger.log("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid));
+    this.logger.warn("Recovering call " + base64urlencode(recovery.callid) + " on chat " + base64urlencode(chatid) +
+        "(" + chat.callInfo.participantCount() + " peers in the call)");
     this._startOrJoinCall(chatid, recovery.av, recovery.callHandler, true, recovery);
 };
 
@@ -1414,6 +1415,10 @@ Call.prototype.msgSession = function(packet) {
              "Our peerId is smaller, processing received SESSION");
         }
     }
+    if (!self._inCallPingTimer) {
+        // in blind recovery, we start the INCALL ping as soon as someone replies to our JOIN
+        self._startIncallPingTimer();
+    }
 
     if (self.state === CallState.kJoining) {
         self._setCallInProgress();
@@ -1463,6 +1468,7 @@ Call.prototype._notifyNewSession = function(sess) {
     }
 };
 
+// Timeout from kInProgress till first session reaches connected state
 Call.prototype._monitorCallSetupTimeout = function() {
     var self = this;
     self._setupTimer = setTimeout(function() {
@@ -1515,6 +1521,10 @@ Call.prototype.msgJoin = function(packet) {
         } else if (self.state === CallState.kJoining && self.recovery) {
             // Call recovery - peers send joins to each other
             self._setCallInProgress();
+            if (!self._inCallPingTimer) {
+                // during blind recovery, we start INCALL pings only after someone replies to our JOIN
+                self._startIncallPingTimer();
+            }
         }
 
         var newSid = self.manager.crypto.random(8);
@@ -1628,9 +1638,6 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
         if (self.state >= CallState.kDestroyed) {
             return;
         }
-        if (code !== Term.kAppTerminating && code !== Term.kErrNetSignalling) {
-            assert(self.hasNoSessions());
-        }
         var logMsg =  "Terminating call in state " + constStateToText(CallState, self.predestroyState) +
             " with reason " + constStateToText(Term, reasonNoPeer);
         if (code !== reasonNoPeer) {
@@ -1655,32 +1662,46 @@ Call.prototype._destroy = function(code, weTerminate, msg) {
 
         if (reasonNoPeer === Term.kAnsElsewhere || reasonNoPeer === Term.kErrAlready
          || reasonNoPeer === Term.kAnswerTimeout) {
-            self.logger.log("Not sending CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
+            self.logger.log("Not sending terminate CALLDATA because destroy reason is", constStateToText(Term, reasonNoPeer));
         } else if (self.predestroyState === CallState.kRingIn) {
-            self.logger.log("Not sending CALLDATA because we were passively ringing");
+            self.logger.log("Not sending terminate CALLDATA because we were passively ringing");
         } else if (self.predestroyState === CallState.kCallingOut) {
-            self.logger.log("Not sending CALLDATA because we haven't yet sent the call request");
+            self.logger.log("Not sending terminate CALLDATA because we haven't yet sent the call request");
+        } else if (!self._inCallPingTimer) {
+            self.logger.log("Not sending terminate CALLDATA because INCALL pings were not started");
         } else {
             self._bcastCallData(CallDataType.kTerminated, self.termCodeToHistCallEndedCode(code));
         }
-        self._stopIncallPingTimer();
+        // if we have recovery, then the chatd connection is either broken or we have received ENDCALL
+        // in both cases we don't need to send ENDCALL, especially in the latter - that would cause that
+        // ENDCALL to echo back to us during the immediate re-join attempt
+        self._stopIncallPingTimer(recovery != null);
         self._clearCallRecoveryTimer();
         self._setState(CallState.kDestroyed);
         self._fire('onDestroy', reasonNoPeer, (code & Term.kPeer) !== 0, msg, recovery);
         self.manager._removeCall(self);
     };
+    var wasJoiningOrInProgress = (self.predestroyState === CallState.kCallInProgress) ||
+        (self.predestroyState === CallState.kJoining);
     if (code === Term.kAppTerminating) {
         self.logger.warn("Destroying call immediately due to kAppTerminating");
         destroyCall();
         self._destroyPromise = Promise.resolve();
-    } else if (code === Term.kErrNetSignalling && ((self.predestroyState === CallState.kCallInProgress)
-            || (self.predestroyState === CallState.kJoining))) {
+    } else if (code === Term.kErrNetSignalling && wasJoiningOrInProgress) {
         self.logger.warn("Destroying call immediately due to kErrNetSignalling and setting up a recovery attempt");
         // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
         destroyCall(self.manager._setupCallRecovery(self));
         self._destroyPromise = Promise.resolve();
+    } else if (code === Term.kErrNetSiglTimeout && wasJoiningOrInProgress) {
+        self.logger.warn("Destroying call gracefully due to INCALL ping timeout and setting up a recovery attempt");
+        // must ._setupCallRecovery() before destroyCall() because it gets the localAv() from the existing call
+        self._destroyPromise = pmsGracefulTerm.then(function() {
+            assert(self.hasNoSessions());
+            destroyCall(self.manager._setupCallRecovery(self));
+        });
     } else { // normal destroy, first wait for all sessions to terminate
         self._destroyPromise = pmsGracefulTerm.then(function() {
+            assert(self.hasNoSessions());
             destroyCall();
         });
     }
@@ -2216,16 +2237,22 @@ Call.prototype._join = function() {
         return false;
     }
     if (self.recovery) {
-        self._bcastCallData(CallDataType.kSession);
+        if (!self.recovery.isBlind) {
+            // send a dummy CALLDATA so that peers receiving INCALL for us, know our state as well
+            self._bcastCallData(CallDataType.kSession);
+            self._startIncallPingTimer();
+        }
+    } else {
+        self._startIncallPingTimer();
     }
-    self._startIncallPingTimer();
-    // we have session setup timeout timer, but in case we don't even reach a session creation,
-    // we need another timer as well
+    // Timeout from JOIN sending till kInProgress state
+    // Then we have monitorCallSetupTimeout() - from kInProgress till first session connected
     setTimeout(function() {
         if (self.state <= CallState.kJoining) {
-            self._destroy(Term.kErrSessSetupTimeout, true);
+            self.logger.warn("Call setup timed out, destroying");
+            self._destroy(Term.kErrCallSetupTimeout, true);
         }
-    }, RtcModule.kSessSetupTimeout);
+    }, RtcModule.kJoinTimeout);
     return true;
 };
 
@@ -2369,7 +2396,16 @@ Call.prototype._onClientLeftCall = function(userid, clientid) {
             // We may receive a parasitic ENDCALL after we reconnect to chatd, which is about the previous connection
             self.logger.warn("Ignoring ENDCALL received for a reconnect call while in kJoining state");
         } else {
-            self._destroy(Term.kErrNetSignalling, false, "ENDCALL received for ourselves");
+            // We received ENDCALL for us because of INCALL ping timeout - our connection is slow
+            self._destroy(Term.kErrNetSiglTimeout, false, "ENDCALL received for our client")
+            .then(function() {
+                var recovery = self.manager.callRecoveries[self.chatid];
+                if (recovery) {
+                    self.manager._startOrJoinCall(self.chatid, recovery.av, recovery.callHandler, true, recovery);
+                } else {
+                    self.logger.warn("No recovery scheduled after call destroyed with kErrNetSiglTimeout");
+                }
+            });
         }
     }
     else if (this.state === CallState.kRingIn) {
@@ -2788,7 +2824,13 @@ Call.prototype._configFromRecovery = function(recovery) {
     this.gLocalStream = recovery.gLocalStream;
     delete recovery.gLocalStream;
     delete this.manager.callRecoveries[this.chatid];
-    this._fire('onCallRecovered', this, this.chat.tsCallStart);
+    if (this.chat.callInfo.participantCount() < 1) {
+        // We are doing a "blind" call reacovery - call does not exist anymore at chatd, but we are sending a JOIN
+        // in hope everybody dropped out unexpectedly (chatd restart or all were on same network). In this case,
+        // we don't want to register a new call before anyone actually replies the blind JOIN
+        recovery.isBlind = true;
+    }
+    this._fire('onCallRecovering', this, this.chat.tsCallStart);
 };
 
 Call.prototype.localAv = function() {
@@ -4674,8 +4716,9 @@ var Term = Object.freeze({
     kErrCallRecoveryFailed: 43, // < Timed out waiting for call to recover after own or peers' network drop
     kErrCrypto: 44,         // < An error was returned from the crypto subsystem used for MiTM attack protection
                             // < Typically this means that the Cu25519 pubkey of the peer wasn't found
-    kErrorLast: 44,         // < Last enum indicating call termination due to error
-    kLast: 43,              // < Last call terminate enum value
+    kErrNetSiglTimeout: 45, // < chatd shard was disconnected
+    kErrorLast: 45,         // < Last enum indicating call termination due to error
+    kLast: 45,              // < Last call terminate enum value
     kPeer: 128              // < If this flag is set, the condition specified by the code happened at the peer,
                             // < not at our side
 });

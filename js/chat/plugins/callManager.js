@@ -1042,7 +1042,7 @@ CallManagerCall.prototype.onCallRejected = function (e, reason) {
     }
 };
 
-CallManagerCall.prototype.onCallRecovered = function(newCall, tsCallStart) {
+CallManagerCall.prototype.onCallRecovering = function(newCall, tsCallStart) {
     var self = this;
     self.rtcCall = newCall;
     self._renderInCallUI();

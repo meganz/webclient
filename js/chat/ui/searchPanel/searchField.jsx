@@ -82,7 +82,8 @@ export default class SearchField extends MegaRenderMixin {
                     ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
-                    onChange={onChange} />
+                    onChange={onChange}
+                    className={searching ? 'searching' : ''} />
 
                 {searching && status && (
                     this.renderStatus(status, isClickable, onToggle)

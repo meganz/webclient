@@ -18,6 +18,8 @@ var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fa
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
+var contenterror = 0;
+var nocontentcheck = false;
 var l, d = false;
 
 // Cache location.search parameters early as the URL may get rewritten later
@@ -483,9 +485,6 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    var contenterror = 0;
-    var nocontentcheck = false;
-
     if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
@@ -493,7 +492,7 @@ if (!browserUpdate) try
             defaultStaticPath = staticpath;
         }
         else {
-            nocontentcheck = true;
+            nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
 
             // Set the static path and default static path for debug mode to be the same
@@ -2932,6 +2931,7 @@ else if (!browserUpdate) {
         }
     }
     var lightweight=false;
+    var xhr_slots = d && jj ? 5 : localStorage.testSingleThreadLoad ? 1 : 2;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;
     if (!fx_startup_cache && !nocontentcheck)
@@ -2944,7 +2944,8 @@ else if (!browserUpdate) {
         var hash_url = mObjectURL(hashdata, "text/javascript");
         var hash_workers = [];
         var i =0;
-        while (i < 2)
+        // eslint-disable-next-line block-scoped-var
+        while (i < xhr_slots)
         {
             try
             {
@@ -2960,7 +2961,7 @@ else if (!browserUpdate) {
                     }
                     var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
 
-                    if (!nocontentcheck && !compareHashes(e.data.hash, file)) {
+                    if (nocontentcheck === false && !compareHashes(e.data.hash, file)) {
                         siteLoadError(load_error_types.file_corrupt, bootstaticpath + file);
                         contenterror = 1;
                     }
@@ -3023,16 +3024,12 @@ else if (!browserUpdate) {
 
     function jsl_start()
     {
+        if (xhr_stack) {
+            console.error('jsl_start: invalid procedure, pending requests are running...');
+            return false;
+        }
         jslcomplete = 0;
-        if (d && jj) {
-            xhr_progress = [0, 0, 0, 0, 0];
-        }
-        else if (localStorage.testSingleThreadLoad) {
-            xhr_progress = [0];
-        }
-        else {
-            xhr_progress = [0, 0];
-        }
+        xhr_progress = Array(xhr_slots);
         xhr_stack = Array(xhr_progress.length);
         jsl_fm_current = 0;
         jsl_current = 0;
@@ -3251,7 +3248,7 @@ else if (!browserUpdate) {
             }
             else
             {
-                if (!nocontentcheck) {
+                if (nocontentcheck === false) {
 
                     // Hash the file content and convert to hex
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
@@ -3387,7 +3384,8 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
-        //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+
+        xhr_stack = false;
         for (var i in jsl)
         {
             if (!jj || !jsl[i].j || jsl[i].j > 2) {

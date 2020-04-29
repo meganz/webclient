@@ -2937,14 +2937,41 @@ function loadSubPage(tpage, event) {
     }
 
     if (page) {
+        var tmp = [];
+
         for (var p in subpages) {
             if (page.substr(0, p.length) === p) {
                 for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
-                        jsl.push(jsl2[subpages[p][i]]);
+                        tmp.push(jsl2[subpages[p][i]]);
                     }
                 }
             }
+        }
+
+        if (tmp.length) {
+            if (d) {
+                console.info('loadSubPage: About to load required resources...', tmp);
+            }
+
+            if (jsl.length) {
+                if (d) {
+                    console.warn('loadSubPage: There are pending requests running, holding it..');
+                }
+
+                var oldSL = silent_loading;
+                silent_loading = function() {
+                    if (oldSL) {
+                        tryCatch(oldSL)();
+                    }
+                    page = false;
+                    loadSubPage(tpage, event);
+                };
+
+                return;
+            }
+
+            jsl = tmp;
         }
     }
 

@@ -748,20 +748,19 @@ if (!browserUpdate && is_extension)
         // WebExtensions
         urlrootfile = 'mega/secure.html';
 
-        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object' || typeof chrome.extension !== 'object') {
-            if (!sessionStorage.extStageReload) {
-                sessionStorage.extStageReload = 1;
-                location.reload(true);
-            }
-            else if (sessionStorage.extStageReload < 3) {
-                sessionStorage.extStageReload++;
+        tmp = 'extStageReload' + (is_iframed | 0) + (is_embed | 0) + (is_drop | 0);
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object') {
+            var stage = sessionStorage[tmp] | 0;
+            if (stage < 4) {
+                sessionStorage[tmp] = ++stage;
                 location.reload(true);
             }
 
-            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime,
-                window.chrome && chrome.extension);
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime);
         }
         else {
+            delete sessionStorage[tmp];
             tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
 
             if (tmp.version === '109101.103.97') {

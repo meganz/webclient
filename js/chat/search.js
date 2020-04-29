@@ -303,8 +303,8 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
     }
     if (chatId) { // search a specific chatroom
         for (var roomId in megaChat.chats) {
+            var room = megaChat.chats[roomId];
             if (megaChat.chats.hasOwnProperty(roomId) && room.chatId === chatId) {
-                var room = megaChat.chats[roomId];
                 searches.push(new RoomSearch(self, room));
             }
         }

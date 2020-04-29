@@ -666,8 +666,9 @@ MegaDataSortedMap.prototype.splice = function(start, deleteCount) {
 /**
  * Returns a regular array (not a sorted map!) of values sliced as with `Array.prototype.slice`
  *
- * @param {Number} begin
- * @param {Number} end
+ * @param {Number} begin first index to start from
+ * @param {Number} end last index where to end the "slice"
+ * @returns {Array} array of removed IDs
  */
 MegaDataSortedMap.prototype.slice = function(begin, end) {
     "use strict";
@@ -687,7 +688,7 @@ MegaDataSortedMap.prototype.exists = function(keyValue) {
 /**
  * For performance reason, the returned data is not cloned.
  *
- * @returns {*[] | {} | any}
+ * @returns {Array} returns a *non-cloned* array containing all keys
  */
 MegaDataSortedMap.prototype.keys = function() {
     var self = this;

@@ -11,6 +11,8 @@ const EMOJI_DATASET_VERSION = 3;
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
 
+var CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
+
 (function() {
     chatui = function(id) {
         var roomOrUserHash = id.replace("chat/", "");
@@ -2555,7 +2557,7 @@ Chat.prototype.getFrequentContacts = function() {
                 r.messagesBuff.retrieveChatHistory(false);
             }
             else {
-                $(r).unbind('onHistoryDecrypted.recent');
+                $(r).unbind(CHAT_ONHISTDECR_RECNT);
                 _calculateLastTsFor(r, 32);
                 delete loadingMoreChats[r.chatId];
                 finishedLoadingChats[r.chatId] = true;
@@ -2577,13 +2579,13 @@ Chat.prototype.getFrequentContacts = function() {
 
             finishedLoadingChats[r.chatId] = false;
             promises.push(promise);
-            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+            $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
         }
         else if (r.messagesBuff.messages.length < 32 && r.messagesBuff.haveMoreHistory()) {
             // console.error("loading:", r.chatId);
             loadingMoreChats[r.chatId] = true;
             finishedLoadingChats[r.chatId] = false;
-            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+            $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
             var promise = createTimeoutPromise(function() {
                 return finishedLoadingChats[r.chatId] === true;
             }, 500, 15000);

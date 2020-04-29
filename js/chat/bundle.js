@@ -17439,8 +17439,6 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
         return isClickable && onToggle();
       };
 
-      var statusClass;
-
       switch (status) {
         case STATUS.IN_PROGRESS:
           return /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -17505,8 +17503,7 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
         ref: SearchField.inputRef,
         value: value,
         onFocus: onFocus,
-        onChange: onChange,
-        className: searching ? 'searching' : ''
+        onChange: onChange
       }), searching && status && this.renderStatus(status, isClickable, onToggle), searching && /*#__PURE__*/external_React_default.a.createElement("i", {
         className: "small-icon tiny-reset",
         onClick: onReset
@@ -19308,6 +19305,7 @@ var EMOJI_DATASET_VERSION = 3;
 var _chatui;
 
 var webSocketsSupport = typeof WebSocket !== 'undefined';
+var CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 (function () {
   _chatui = function chatui(id) {
@@ -21641,7 +21639,7 @@ Chat.prototype.getFrequentContacts = function () {
         loadingMoreChats[r.chatId] = true;
         r.messagesBuff.retrieveChatHistory(false);
       } else {
-        $(r).unbind('onHistoryDecrypted.recent');
+        $(r).unbind(CHAT_ONHISTDECR_RECNT);
 
         _calculateLastTsFor(r, 32);
 
@@ -21657,12 +21655,12 @@ Chat.prototype.getFrequentContacts = function () {
       }, 500, 10000, undefined, undefined, r.roomId + "FrequentsLoading");
       finishedLoadingChats[r.chatId] = false;
       promises.push(promise);
-      $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+      $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
     } else if (r.messagesBuff.messages.length < 32 && r.messagesBuff.haveMoreHistory()) {
       // console.error("loading:", r.chatId);
       loadingMoreChats[r.chatId] = true;
       finishedLoadingChats[r.chatId] = false;
-      $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+      $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
       var promise = createTimeoutPromise(function () {
         return finishedLoadingChats[r.chatId] === true;
       }, 500, 15000);
@@ -21906,6 +21904,7 @@ module.exports = ReactPropTypesSecret;
    *  only meant to be used for 'resize' event, which can't bubble or be "prevented"
    *
    * @constructor
+   * @returns {ChatGlobalEventManager} ChatGlobalEventManager instance
    */
   var ChatGlobalEventManager = function ChatGlobalEventManager() {
     this.initialized = false;
@@ -21918,6 +21917,7 @@ module.exports = ReactPropTypesSecret;
    * Called internally to actually do the resize binding when needed.
    *
    * @private
+   * @returns {undefined}
    */
 
 
@@ -21929,9 +21929,11 @@ module.exports = ReactPropTypesSecret;
   /**
    * Add an `cb` event listener for `eventName` with namespace `namespace`
    *
-   * @param {String} eventName
-   * @param {String} namespace
-   * @param {Function} cb
+   * @param {String} eventName eventType/Name
+   * @param {String} namespace the namespace to use for this listener
+   * @param {Function} cb callback to be called for this listener
+   *
+   * @returns {undefined}
    */
 
 
@@ -21945,8 +21947,9 @@ module.exports = ReactPropTypesSecret;
   /**
    * Remove listener with namespace `namespace`
    *
-   * @param {String} eventName
-   * @param {String} namespace
+   * @param {String} eventName eventType/Name
+   * @param {String} namespace the namespace to use for this listener
+   * @returns {undefined}
    */
 
 
@@ -21955,6 +21958,11 @@ module.exports = ReactPropTypesSecret;
   };
   /**
    * Called by the onResize/hashchange
+   *
+   * @param {String} eventName the eventType/name
+   * @param {Event} e the actual Event object
+   *
+   * @returns {undefined}
    */
 
 

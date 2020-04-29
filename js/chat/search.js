@@ -233,14 +233,14 @@ RoomSearch.prototype.match = function(str, type, data, index) {
 };
 /**
  * Creates a text chat search object. Call .resume() on it to start the search
- * @param megaChat The global MegaChat object
- * @param chatId The id of the chat where to perform the search. If it's null, then the search
+ * @param {Chat} megaChat The global MegaChat object
+ * @param {String} chatId The id of the chat where to perform the search. If it's null, then the search
  * is performed on all chats
- * @param searchExpr Either a string to be searched for, or a RegExp object.
+ * @param {String|RegExp} searchExpr Either a string to be searched for, or a RegExp object.
  *  If this parameter is a string, a RegExpr object is created with it, with the 'i' and 'g' flags.
  *  In this case, any regex special characters in the string will be treated as such. If they are
  *  to be treated literally, they should be escaped, as in an actual regular expression.
- * @param handler The user handler that received the search results and the search completion event.
+ * @param {Object} handler The user handler that received the search results and the search completion event.
  *  The handler needs to contain two methods:
  *      `onResult(room, result)`
  *          Receives results in realtime, as soon as they are found.
@@ -253,6 +253,8 @@ RoomSearch.prototype.match = function(str, type, data, index) {
  *          Notifies that the search has completed in all specified chatrooms.
  * If `null` is specified for the `handler` parameter, a builtin debug handler is used, which logs
  * the results and the `onComplete()` event to the console.
+ *
+ * @returns {ChatSearch} ChatSearch instance
  */
 function ChatSearch(megaChat, chatId, searchExpr, handler) {
     "use strict";
@@ -300,19 +302,24 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
         };
     }
     if (chatId) { // search a specific chatroom
-        megaChat.chats.forEach(function(room) {
-            if (room.chatId === chatId) {
+        for (var roomId in megaChat.chats) {
+            if (megaChat.chats.hasOwnProperty(roomId) && room.chatId === chatId) {
+                var room = megaChat.chats[roomId];
                 searches.push(new RoomSearch(self, room));
             }
-        });
+        }
+
         if (searches.length < 1) {
             throw new Error("Could not find a room for chatid " + chatId);
         }
     }
     else { // search all chatrooms
-        self.allChats.forEach(function(room) {
-            searches.push(new RoomSearch(self, room));
-        });
+        for (var roomId2 in self.allChats) {
+            if (self.allChats.hasOwnProperty(roomId2)) {
+                var room2 = self.allChats[roomId2];
+                searches.push(new RoomSearch(self, room2));
+            }
+        }
     }
 }
 
@@ -381,9 +388,12 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
         });
 
         results.dump = function() {
-            this.forEach(function(r) {
-                console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
-            });
+            for (var r in results) {
+                if (results.hasOwnProperty(r)) {
+                    console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
+
+                }
+            }
         };
 
         // debug;
@@ -435,6 +445,11 @@ ChatSearch.prototype.setupLogger = function() {
     self.logger._myOpts = opts;
 };
 
+/**
+ * Resumes current searches
+ *
+ * @returns {undefined}
+ */
 ChatSearch.prototype.resume = function() {
     "use strict";
 
@@ -448,6 +463,8 @@ ChatSearch.prototype.resume = function() {
  * will not be aborted, and their results (if any) will still be passed on onResult(), so the
  * user should be prepared to receive them. To completely abort the search, call ChatSearch.destroy()
  * instead. It guarantees that no callback will be called afterwards.
+ *
+ * @returns {undefined}
  */
 ChatSearch.prototype.pause = function() {
     "use strict";
@@ -458,6 +475,11 @@ ChatSearch.prototype.pause = function() {
     }
 };
 
+/**
+ * Called when room search completes
+ *
+ * @returns {undefined}
+ */
 ChatSearch.prototype.onRoomSearchComplete = function() {
     "use strict";
 
@@ -476,17 +498,23 @@ ChatSearch.prototype.onRoomSearchComplete = function() {
 
 /**
  * Debug only.
+ *
+ * @returns {undefined}
  */
 ChatSearch.prototype.dumpRoomSearchesStates = function() {
     "use strict";
 
-    this.roomSearches.forEach(function(rs) {
-        console.error(constStateToText(SearchState, rs.state), rs);
-    });
+    for (var rs in this.roomSearches) {
+        if (this.roomSearches.hasOwnProperty(rs)) {
+            console.error(constStateToText(SearchState, rs.state), rs);
+        }
+    }
 };
 
 /**
  * Completely aborts the search. No callbacks will be called after call to this method.
+ *
+ * @returns {undefined}
  */
 ChatSearch.prototype.destroy = function() {
     "use strict";

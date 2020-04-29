@@ -9,6 +9,7 @@
      *  only meant to be used for 'resize' event, which can't bubble or be "prevented"
      *
      * @constructor
+     * @returns {ChatGlobalEventManager} ChatGlobalEventManager instance
      */
     var ChatGlobalEventManager = function() {
         this.initialized = false;
@@ -23,6 +24,7 @@
      * Called internally to actually do the resize binding when needed.
      *
      * @private
+     * @returns {undefined}
      */
     ChatGlobalEventManager.prototype._lateInit = function() {
         $(window).rebind('resize.chatGlobalEventManager', this.triggered.bind(this, "resize"));
@@ -34,9 +36,11 @@
     /**
      * Add an `cb` event listener for `eventName` with namespace `namespace`
      *
-     * @param {String} eventName
-     * @param {String} namespace
-     * @param {Function} cb
+     * @param {String} eventName eventType/Name
+     * @param {String} namespace the namespace to use for this listener
+     * @param {Function} cb callback to be called for this listener
+     *
+     * @returns {undefined}
      */
     ChatGlobalEventManager.prototype.addEventListener = function(eventName, namespace, cb) {
         if (this.initialized === false) {
@@ -48,8 +52,9 @@
     /**
      * Remove listener with namespace `namespace`
      *
-     * @param {String} eventName
-     * @param {String} namespace
+     * @param {String} eventName eventType/Name
+     * @param {String} namespace the namespace to use for this listener
+     * @returns {undefined}
      */
     ChatGlobalEventManager.prototype.removeEventListener = function(eventName, namespace) {
         delete this.listeners[eventName][namespace];
@@ -57,6 +62,11 @@
 
     /**
      * Called by the onResize/hashchange
+     *
+     * @param {String} eventName the eventType/name
+     * @param {Event} e the actual Event object
+     *
+     * @returns {undefined}
      */
     ChatGlobalEventManager.prototype.triggered = SoonFc(function(eventName, e) {
         for (var k in this.listeners[eventName]) {

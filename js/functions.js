@@ -7,12 +7,19 @@ function clickURLs() {
     'use strict';
     var nodeList = document.querySelectorAll('a.clickurl');
 
-    if (nodeList) {
+    if (nodeList.length) {
         $(nodeList).rebind('click', function() {
             var $this = $(this);
             var url = $this.attr('href') || $this.data('fxhref');
 
             if (url) {
+                var target = $this.attr('target');
+
+                if (target === '_blank') {
+                    open(getBaseUrl() + url);
+                    return false;
+                }
+
                 if (window.loadingDialog && $this.hasClass('pages-nav')) {
                     loadingDialog.quiet = true;
                     onIdle(function() {

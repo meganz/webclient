@@ -613,7 +613,7 @@ scparser.$helper.c = function(a) {
                 crypt.getPubCu25519(v.u);
                 crypt.getPubEd25519(v.u);
             }
-            megaChat[v.c == 0 ? "processRemovedUser" : "processNewUser"](v.u);
+            megaChat[v.c === 2 ? "processRemovedUser" : "processNewUser"](v.u);
         });
     }
 };

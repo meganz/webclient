@@ -5920,6 +5920,11 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
 
         if (!chatRoom || !chatRoom.roomId) {
           return;
+        } // Account has been deleted/deactivated
+
+
+        if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
+          return;
         }
 
         if (!chatRoom.isDisplayable()) {
@@ -6877,7 +6882,14 @@ var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
+__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -16023,10 +16035,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
@@ -17041,7 +17049,11 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         contactHandle = contacts[0];
         contact = M.u[contactHandle];
         avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-        contactName = avatarMeta.fullName;
+        contactName = avatarMeta.fullName; // Account was cancelled/deactivated
+
+        if (contact.c === 2 && room.isCurrentlyActive) {
+          room.processRemovedUserRoom();
+        }
       } else if (contacts && contacts.length > 1) {
         contactName = room.getRoomTitle(true);
       }
@@ -22649,6 +22661,33 @@ ChatRoom.prototype.truncate = function () {
 ChatRoom.prototype.haveActiveCall = function () {
   return this.callManagerCall && this.callManagerCall.isActive() === true;
 };
+/**
+ * processRemovedUserRoom
+ * @description
+ * Processes given room in case of user cancellation/deactivation.
+ * Shows the next displayable chat room based on `lastActivity` ordering. If no displayable rooms are available, the
+ * current room is hidden.
+ */
+
+
+ChatRoom.prototype.processRemovedUserRoom = function () {
+  var conversations = obj_values(megaChat.chats.toJS());
+  var sortedConversations = conversations.sort(M.sortObjFn('lastActivity', -1));
+
+  for (var i = 0; i < sortedConversations.length; i++) {
+    var currentConversation = sortedConversations[i];
+
+    if (currentConversation.chatId && currentConversation.chatId === this.chatId) {
+      var nextConversation = sortedConversations[i + 1];
+
+      if (nextConversation && nextConversation.isDisplayable()) {
+        nextConversation.show();
+      } else {
+        this.hide();
+      }
+    }
+  }
+};
 
 ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
@@ -22831,7 +22870,11 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -23072,7 +23115,6 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
 function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }

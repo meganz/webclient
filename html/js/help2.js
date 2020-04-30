@@ -13,7 +13,7 @@ var Help = (function() {
     var $currentQuestion = null;
 
     function tagUri(tag) {
-        return tag.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        return tag.toLowerCase().replace(/[^\da-z]/g, '_');
     }
 
     function tagsPerDocument(documents, isClient) {
@@ -102,14 +102,7 @@ var Help = (function() {
             var newpage = getCleanSitePath(state);
             if (newpage !== page && page.substr(0, 4) === 'help') {
                 page = newpage;
-
-                if (hashLogic) {
-                    skipHashChange = true;
-                    location.hash = '#' + newpage;
-                }
-                else {
-                    history.replaceState({subpage: newpage}, '', '/' + newpage);
-                }
+                history.replaceState({subpage: page}, '', (hashLogic ? '#' : '/') + page);
             }
         }, 100);
     }
@@ -392,16 +385,14 @@ var Help = (function() {
 
         var $container = $('#help2-main');
         var $sideBar = $('.sidebar-menu-container', $container);
-        var $mainTitleSection = $('.main-title-section', $container);
         var $searchHeader = $('.support-section-header', $container);
         var $cloneHeader = $('.support-section-header-clone', $container);
         var $elements = $('.updateSelected:visible', $container);
-        var timer;
 
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
 
-        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', SoonFc(function() {
             var topPos = $(this).scrollTop();
             var $current = $($('.updateSelected.current')[0]);
 
@@ -409,9 +400,16 @@ var Help = (function() {
                 selectMenuItem($elements.eq(0), $current);
             }
             else {
-                var $new = getVisibleElement(topPos, [$current.prev(), $current, $current.next()]);
-                if ($new && $new !== $current) {
-                    selectMenuItem($new, $current);
+                var pcn = $current.pvisible();
+
+                if (pcn < 10) {
+                    var $prev = $current.prev();
+                    var $next = $current.next();
+                    var nevis = $next.pvisible();
+                    var $mvto = $prev.pvisible() > nevis ? $prev : nevis ? $next : null;
+                    if ($mvto && $mvto.pvisible() > pcn) {
+                        selectMenuItem($mvto, $current);
+                    }
                 }
             }
 
@@ -426,32 +424,22 @@ var Help = (function() {
             else {
                 $sideBar.removeAttr('style').removeClass('fixed');
             }
-
-        });
+        }));
     }
 
 
     var urls = {
         'search': function(args) {
-            var searchTerm = String(args[1]).replace(/\+/g, ' ');
-
-            if (searchTerm.indexOf('%25') >= 0) {
-                do {
-                    searchTerm = searchTerm.replace(/%25/g, '%');
-                } while (searchTerm.indexOf('%25') >= 0);
-            }
-            try {
-                searchTerm = decodeURIComponent(searchTerm);
-            }
-            catch (e) {}
-
+            var searchTerm = mURIDecode(String(args[1]).replace(/\+/g, ' '));
             var sText = searchTerm.replace(/[+-]/g, ' ');
-            var search = sText.replace(/%([0-9a-f]+)/g, function(all, number) {
+            var search = sText.replace(/%([\da-f]+)/g, function(all, number) {
                 return String.fromCharCode(parseInt(number, 16));
             });
-            var words = search.split(((lang == 'ct') || (lang == 'jp')) ? '' : /\s+/)
-                        .filter(function(word) { return word.length; })// filter out empty strings.
-                        .map(function(pattern) { return new RegExp(pattern, 'i'); });
+            var words = search.split(lang === 'ct' || lang === 'jp' ? '' : /\s+/)
+                .filter(String)
+                .map(function(pattern) {
+                    return new RegExp(pattern, 'i');
+                });
 
             var articles = idx.all.filter(function(doc) {
                 return words.filter(function(target) {
@@ -659,29 +647,6 @@ var Help = (function() {
         // init page here instead with page set as 'help' ?!
         // document.location.href = '#help';
         //loadSubPage('help');
-    }
-
-    // getVisibleElement
-    function getVisibleElement(positionY, args) {
-
-        args = args.map(function($element) {
-            if ($element.length === 0) {
-                return null;
-            }
-            var top = $element.offset().top;
-            var height = $element.height() - 250;
-            return top >= -1 * height && top < positionY
-               ? [$element, top - 1 * height, top, positionY]
-               : null;
-        }).filter(function(m) {
-            return m;
-        });
-
-        if (args.length === 0) {
-            return false;
-        }
-
-        return args[0][0];
     }
 
     /**

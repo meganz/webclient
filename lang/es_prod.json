@@ -636,7 +636,6 @@
     "2028": "opcional",
     "2033": "Para descargar archivos ZIP mayores a 2GB podr\u00edas exigir una herramienta de descompresi\u00f3n adicional (como 7zip). Desafortunadamente, ZIP64 no es compatible de manera nativa en todos los sistemas operativos.",
     "2034": "Archivos",
-    "2035": "Carpetas",
     "2041": "No tienes permisos de escritura en esta carpeta local.",
     "2042": "No tienes permisos de escritura en esta carpeta.",
     "2480": "Fallo al confirmar la cuenta",
@@ -3664,5 +3663,7 @@
     "23260": "[X] carpetas",
     "23261": "[X] archivos",
     "23262": "Cambiar contrase\u00f1a",
-    "23278": "Firefox\/Chrome Extension"
+    "23278": "Firefox\/Chrome Extension",
+    "23280": "Estad\u00edsticas semanales",
+    "23281": "Estad\u00edsticas semanales del programa de recomendaciones"
 }

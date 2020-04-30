@@ -23,7 +23,8 @@ var securityPractice = {
                 'class': 'security-video-container'
             });
 
-            $('.security-page-video-block').append(iframe);
+            // eslint-disable-next-line local-rules/jquery-replacements
+            $('.security-page-video-block').removeAttr('style').append(iframe);
         });
 
         // If user is logged into MEGA, show their recovery key on the security page

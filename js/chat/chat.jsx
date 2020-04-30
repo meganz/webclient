@@ -2607,7 +2607,10 @@ Chat.prototype.getFrequentContacts = function() {
     });
     Chat._frequentsCache = masterPromise;
     masterPromise.always(function() {
-        setTimeout(function() {
+        if (Chat._frequentsCacheTimer) {
+            clearTimeout(Chat._frequentsCacheTimer);
+        }
+        Chat._frequentsCacheTimer = setTimeout(function() {
             delete Chat._frequentsCache;
         }, 6e4 * 5);
     });

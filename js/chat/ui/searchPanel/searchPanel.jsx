@@ -110,26 +110,20 @@ export default class SearchPanel extends MegaRenderMixin {
 
     doSearch = s => {
         const self = this;
-        return new MegaPromise((res, rej) => {
-            delay('chat-search', function() {
-                return ChatSearch.doSearch(
-                    RegExpEscape(s),
-                    function(room, result, results) {
-                        self.setState({
-                            results
-                        });
-                    },
-                    function() {
-                        self.setState({ status: STATUS.COMPLETED });
-                    }).done(res).fail(rej);
-            }, 1600);
-        });
+        return ChatSearch.doSearch(
+            RegExpEscape(s),
+            function(room, result, results) {
+                self.setState({results});
+            })
+            .always(function() {
+                self.setState({status: STATUS.COMPLETED});
+            });
     };
 
     doToggle = action /* pause || resume || destroy */ => {
-        const megaPromise = ChatSearch.doSearch.megaPromise;
+        const cs = ChatSearch.doSearch.cs;
 
-        if (action && megaPromise && megaPromise.cs) {
+        if (action && cs) {
             const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
 
             this.setState({
@@ -143,9 +137,9 @@ export default class SearchPanel extends MegaRenderMixin {
                             return COMPLETED;
                     }
                 })()
-            }, () =>
-                megaPromise.cs[action]()
-            );
+            }, () => {
+                cs[action]();
+            });
         }
     };
 
@@ -158,9 +152,14 @@ export default class SearchPanel extends MegaRenderMixin {
             searching,
             status: STATUS.IN_PROGRESS,
             results: []
-        }, () =>
-            searching ? this.doSearch(value) : this.setState({ results: [] })
-        );
+        }, () => {
+            if (searching) {
+                delay('chat-search', this.doSearch.bind(this, value), 1600);
+            }
+            else {
+                this.setState({results: []});
+            }
+        });
     };
 
     handleToggle = () => {

@@ -2313,8 +2313,7 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
     ] : false;
 };
 
-
-
+// eslint-disable-next-line complexity
 MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
     "use strict";
 
@@ -2380,6 +2379,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
     else {
         author = Message.getContactForMessage(lastMessage);
     }
+
     if (author) {
         if (!lastMessage._contactChangeListener && author.addChangeListener) {
             lastMessage._contactChangeListener = author.addChangeListener(function() {
@@ -2389,21 +2389,19 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
         }
 
         if (lastMessage.chatRoom.type === "private") {
-            if (author && author.u === u_handle) {
+            if (author.u === u_handle) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
         }
         else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
-            if (author) {
-                if (author.u === u_handle) {
-                    renderableSummary = l[19285] + " " + renderableSummary;
-                }
-                else {
-                    var name = M.getNameByHandle(author.u);
-                    name = ellipsis(name, undefined, 11);
-                    if (name) {
-                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
-                    }
+            if (author.u === u_handle) {
+                renderableSummary = l[19285] + " " + renderableSummary;
+            }
+            else {
+                var name = M.getNameByHandle(author.u);
+                name = ellipsis(name, undefined, 11);
+                if (name) {
+                    renderableSummary = escapeHTML(name) + ": " + renderableSummary;
                 }
             }
         }

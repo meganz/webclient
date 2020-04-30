@@ -75,6 +75,22 @@ function RoomSearch(parentSearch, room) {
     });
 }
 
+RoomSearch.prototype._matchMembers = function(members) {
+    'use strict';
+    var self = this;
+
+    for (var userid in members) {
+        if (userid === u_handle) {
+            continue;
+        }
+        if (!M.u[userid]) {
+            self.logger.error("Unknown user handle", userid);
+            continue;
+        }
+        self.match(M.getNameByHandle(userid), SearchResultType.kMember, userid);
+    }
+};
+
 RoomSearch.prototype.resume = function() {
     "use strict";
     var self = this;
@@ -85,22 +101,15 @@ RoomSearch.prototype.resume = function() {
     var room = self.room;
     if (self.state === SearchState.kNew) {
         // match chat topic
-        room.topic && self.match(room.topic, SearchResultType.kChatTopic);
+        if (room.topic) {
+            self.match(room.topic, SearchResultType.kChatTopic);
+        }
         // match room member names
         var members = room.members;
         // only search for  "other member name matches" if this is a 1on1, otherwise duplicated results are shown in
         // the ui
         if (members && room.type === "private") {
-            for (var userid in members) {
-                if (userid === u_handle) {
-                    continue;
-                }
-                if (!M.u[userid]) {
-                    self.logger.error("Unknown user handle", userid);
-                    continue;
-                }
-                self.match(M.getNameByHandle(userid), SearchResultType.kMember, userid);
-            }
+            self._matchMembers(members);
         }
         // match messages that are already loaded
         var messages = room.messagesBuff.messages;
@@ -114,12 +123,12 @@ RoomSearch.prototype.resume = function() {
         }
     }
 
-    if (!room.messagesBuff.haveMoreHistory()) {
-        self._setComplete();
-    }
-    else {
+    if (room.messagesBuff.haveMoreHistory()) {
         self._setState(SearchState.kInProgress); // in case it was paused or new
         self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
+    }
+    else {
+        self._setComplete();
     }
 };
 
@@ -323,17 +332,31 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
     }
 }
 
-ChatSearch.doSearch = function(s, onResult, onComplete) {
+/**
+ * Invoke chat search.
+ * @param {String|RegExp} [searchExpr] Either a string to be searched for, or a RegExp object.
+ *  If this parameter is a string, a RegExpr object is created with it, with the 'i' and 'g' flags.
+ *  In this case, any regex special characters in the string will be treated as such. If they are
+ *  to be treated literally, they should be escaped, as in an actual regular expression.
+ * @param {Function} [onResult] Callback to invoke per each result found.
+ * @returns {Promise}
+ */
+ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
     "use strict";
 
-    var megaPromise = new MegaPromise();
+    if (ChatSearch.doSearch.cs) {
+        if (d) {
+            console.info('Aborting running chat-search instance...', ChatSearch.doSearch.cs);
+        }
+        ChatSearch.doSearch.cs.destroy(SearchState.kDestroying);
+    }
 
     var results = {
         CONTACTS_AND_CHATS: new MegaDataSortedMap("resultId", function(a, b) {
             var aChat = a && a.room;
             var bChat = b && b.room;
-            var aLastActivity = (aChat && aChat.lastActivity || 0);
-            var bLastActivity = (bChat && bChat.lastActivity || 0);
+            var aLastActivity = aChat && aChat.lastActivity || 0;
+            var bLastActivity = bChat && bChat.lastActivity || 0;
             return aLastActivity > bLastActivity ? -1 : (aLastActivity < bLastActivity ? 1 : 0);
         }),
         MESSAGES: new MegaDataSortedMap("resultId", function(a, b) {
@@ -344,68 +367,55 @@ ChatSearch.doSearch = function(s, onResult, onComplete) {
     ChatSearch.doSearch.currentResults = results;
 
     var resultId = 0;
-    var cs;
 
-    if (ChatSearch.doSearch.megaPromise) {
-        ChatSearch.doSearch.megaPromise.always(function() {
-            megaPromise.linkDoneAndFailTo(ChatSearch.doSearch(s, onResult, onComplete));
-        });
-        ChatSearch.doSearch.megaPromise.cs.destroy();
-        return megaPromise;
-    }
-    else {
-        var handler = {
-            'onResult': function(room, resultMeta) {
-                resultMeta.chatId = room.chatId;
-                resultMeta.room = room;
-                resultMeta.resultId = resultId++;
-                if (resultMeta.type === SearchResultType.kChatTopic || resultMeta.type === SearchResultType.kMember) {
-                    results.CONTACTS_AND_CHATS.push(resultMeta);
-                }
-                else {
-                    results.MESSAGES.push(resultMeta);
-                }
+    var handler = {
+        'onResult': tryCatch(function(room, resultMeta) {
+            resultMeta.room = room;
+            resultMeta.chatId = room.chatId;
+            resultMeta.resultId = resultId++;
 
-                // console.error(room, resultMeta);
-                onResult && onResult(room.chatId, resultMeta, results);
-            },
-            'onComplete': function() {
-                megaPromise.resolve(cs, results);
-                onComplete && onComplete();
-            },
-            'onDestroy': function() {
-                megaPromise.reject();
-                onComplete && onComplete();
+            if (resultMeta.type === SearchResultType.kMessage) {
+                results.MESSAGES.push(resultMeta);
             }
-        };
-
-        cs = new ChatSearch(megaChat, false, s, handler);
-        // console.error('search > doSearch() -> cs:', cs);
-
-        ChatSearch.doSearch.megaPromise = megaPromise;
-        megaPromise.always(function() {
-            delete ChatSearch.doSearch.megaPromise;
-        });
-
-        results.dump = function() {
-            for (var r in results) {
-                if (results.hasOwnProperty(r)) {
-                    console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
-
-                }
+            else {
+                results.CONTACTS_AND_CHATS.push(resultMeta);
             }
-        };
 
-        // debug;
-        megaPromise.cs = cs;
-        megaPromise.results = cs;
-        // debug end;
+            // console.error(room, resultMeta);
+            if (typeof onResult === 'function') {
+                onResult(room.chatId, resultMeta, results);
+            }
+        }),
+        'onComplete': function(reason) {
+            delete ChatSearch.doSearch.cs;
 
-        cs.resume();
-    }
+            if (reason === SearchState.kDestroying) {
+                reject(SearchState.kDestroying);
+            }
+            else {
+                resolve(results);
+            }
+        },
+        'onDestroy': function(ex) {
+            delete ChatSearch.doSearch.cs;
+            reject(ex);
+        }
+    };
 
-    return megaPromise;
-};
+    ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler);
+    // console.error('search > doSearch() -> cs:', ChatSearch.doSearch.cs);
+
+    results.dump = function() {
+        for (var r in results) {
+            if (results.hasOwnProperty(r)) {
+                console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
+            }
+        }
+    };
+
+    ChatSearch.doSearch.cs.resume();
+});
+
 ChatSearch.prototype.setupLogger = function() {
     "use strict";
 
@@ -516,7 +526,7 @@ ChatSearch.prototype.dumpRoomSearchesStates = function() {
  *
  * @returns {undefined}
  */
-ChatSearch.prototype.destroy = function() {
+ChatSearch.prototype.destroy = function(reason) {
     "use strict";
 
     var searches = this.roomSearches;
@@ -530,6 +540,6 @@ ChatSearch.prototype.destroy = function() {
     }
 
     if (this.handler.onComplete) {
-        this.handler.onComplete();
+        this.handler.onComplete(reason);
     }
 };

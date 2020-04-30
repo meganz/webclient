@@ -240,10 +240,10 @@ class ConversationAVPanel extends MegaRenderMixin {
         this.setState({'selectedStreamSid': sid});
     }
     _hideBottomPanel() {
-        if (!this.isMounted()) {
+        var self = this;
+        if (!self.isMounted()) {
             return;
         }
-        var self = this;
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
             return;

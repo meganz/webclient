@@ -131,13 +131,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     }
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
-        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()) {
-            if (self.chatd && self.isOnline() && self.chatIdBin) {
-                // this should never happen, but just in case...
-                var cim = self.getChatIdMessages();
-                cim.restore();
-                cim.resend();
-            }
+        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()
+            && self.chatd && self.isOnline() && self.chatIdBin) {
+
+            // this should never happen, but just in case...
+            var cim = self.getChatIdMessages();
+            cim.restore();
+            cim.resend();
         }
     });
 

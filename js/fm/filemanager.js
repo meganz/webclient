@@ -1562,6 +1562,9 @@ FileManager.prototype.initContextUI = function() {
             showExpiredBusiness();
             return;
         }
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
         var user_handle = $.selected && $.selected[0];
 
         user_handle =user_handle .replace('contact_', '');

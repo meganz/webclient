@@ -570,11 +570,17 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             if (!window.megaChatIsDisabled) {
                 flt += ',.startchat-item, .startaudiovideo-item, .send-files-item';
             }
-            $(menuCMI).filter(flt).show();
+            var $menuCmi = $(menuCMI);
+            $menuCmi.filter(flt).show();
 
             // Enable All buttons
-            $(menuCMI).filter('.startaudiovideo-item, .send-files-item')
+            $menuCmi.filter('.startaudiovideo-item, .send-files-item')
                 .removeClass('disabled disabled-submenu');
+
+            // disable remove for business accounts + business users
+            if (u_attr && u_attr.b && M.u[id] && M.u[id].b) {
+                $menuCmi.filter('.remove-contact').addClass('disabled');
+            }
 
             // Show Detail block
             $contactDetails.removeClass('hidden');

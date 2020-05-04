@@ -765,7 +765,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                     var contacts = [];
 
-                    attachmentMeta.forEach(function(v) {
+                    (v => {
                         var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
                         var contactEmail = contact.email ? contact.email : contact.m;
                         if (!contactEmail) {
@@ -782,9 +782,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 icon="red-cross"
                                 label={l[83]}
                                 className="red"
-                                onClick={(e) => {
-                                    self.doDelete(e, message);
-                                }}
+                                onClick={(e) => self.doDelete(e, message)}
                             />;
 
                         }
@@ -832,7 +830,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                                 <ContactPresence className="small" contact={contact} />
                                             </div>
                                             <div className="email">
-                                                 {M.u[contact.u].m}
+                                                {M.u[contact.u].m}
                                             </div>
                                         </div>
                                     </div>
@@ -871,8 +869,11 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 >
 
                                     <div className="dropdown-avatar rounded">
-                                        <Avatar className="avatar-wrapper context-avatar" contact={M.u[contact.u]}
-                                            chatRoom={self.props.chatRoom} />
+                                        <Avatar
+                                            className="avatar-wrapper context-avatar"
+                                            contact={M.u[contact.u]}
+                                            chatRoom={self.props.chatRoom}
+                                        />
                                         <div className="dropdown-user-name">
                                             <div className="name">
                                                 {M.getNameByHandle(contact.u)}
@@ -944,15 +945,17 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                                 null
                                         }
                                         {dropdown}
-                                        <Avatar className="avatar-wrapper medium-avatar" contact={M.u[contact.u]}
-                                            chatRoom={self.props.chatRoom} />
+                                        <Avatar
+                                            className="avatar-wrapper medium-avatar"
+                                            contact={M.u[contact.u]}
+                                            chatRoom={self.props.chatRoom}
+                                        />
                                     </div>
                                     <div className="clear"></div>
                                 </div>
                             </div>
                         );
-                    });
-
+                    })(attachmentMeta);
 
                     if (this.props.grouped) {
                         additionalClasses += " grouped";

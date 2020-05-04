@@ -6877,7 +6877,14 @@ var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return /* binding */ conversationpanel_JoinCallNotification; });
+__webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return /* binding */ conversationpanel_ConversationRightArea; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return /* binding */ conversationpanel_ConversationPanel; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return /* binding */ conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(0);
@@ -12618,7 +12625,8 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
             }
 
             var contacts = [];
-            attachmentMeta.forEach(function (v) {
+
+            (function (v) {
               var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
               var contactEmail = contact.email ? contact.email : contact.m;
 
@@ -12634,7 +12642,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   label: l[83],
                   className: "red",
                   onClick: function onClick(e) {
-                    self.doDelete(e, message);
+                    return self.doDelete(e, message);
                   }
                 });
               }
@@ -12777,7 +12785,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
               })), /*#__PURE__*/external_React_default.a.createElement("div", {
                 className: "clear"
               }))));
-            });
+            })(attachmentMeta);
 
             if (this.props.grouped) {
               additionalClasses += " grouped";
@@ -16023,10 +16031,6 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
@@ -22421,23 +22425,25 @@ ChatRoom.prototype.uploadFromComputer = function () {
 };
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
 
 
 ChatRoom.prototype.attachContacts = function (ids) {
-  var self = this;
-  var nodesMeta = [];
-  $.each(ids, function (k, nodeId) {
-    var node = M.u[nodeId];
-    nodesMeta.push({
-      'u': node.u,
-      'email': node.m,
-      'name': node.name || node.m
-    });
-  }); // 1b, 1b, JSON
+  if (ids && Array.isArray(ids) && ids.length > 0) {
+    for (var i = 0; i < ids.length; i++) {
+      var nodeId = ids[i];
+      var node = M.u[nodeId];
+      var contactMeta = {
+        u: node.u,
+        email: node.m,
+        name: node.name || node.m
+      }; // 1b, 1b, JSON
 
-  self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(nodesMeta));
+      this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(contactMeta));
+    }
+  }
 };
 /**
  * Get message by Id
@@ -22831,7 +22837,11 @@ function extendActions(prefix, src, toBeAppended) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(3);
@@ -23072,7 +23082,6 @@ var ui_contacts = __webpack_require__(2);
 var modalDialogs = __webpack_require__(7);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return startGroupChatWizard_StartGroupChatWizard; });
 function startGroupChatWizard_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { startGroupChatWizard_typeof = function _typeof(obj) { return typeof obj; }; } else { startGroupChatWizard_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return startGroupChatWizard_typeof(obj); }
 
 function startGroupChatWizard_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }

@@ -765,7 +765,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                     var contacts = [];
 
-                    (v => {
+                    attachmentMeta.forEach(function(v) {
                         var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
                         var contactEmail = contact.email ? contact.email : contact.m;
                         if (!contactEmail) {
@@ -955,7 +955,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 </div>
                             </div>
                         );
-                    })(attachmentMeta);
+                    });
 
                     if (this.props.grouped) {
                         additionalClasses += " grouped";

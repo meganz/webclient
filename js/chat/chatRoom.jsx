@@ -1626,19 +1626,20 @@ ChatRoom.prototype.uploadFromComputer = function() {
  */
 
 ChatRoom.prototype.attachContacts = function(ids) {
-    if (ids && Array.isArray(ids) && ids.length > 0) {
-        for (let i = 0; i < ids.length; i++) {
-            const nodeId = ids[i];
-            const node = M.u[nodeId];
-            const contactMeta = { u: node.u, email: node.m, name: node.name || node.m };
+    for (let i = 0; i < ids.length; i++) {
+        const nodeId = ids[i];
+        const node = M.u[nodeId];
 
-            // 1b, 1b, JSON
-            this.sendMessage(
-                Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-                Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
-                JSON.stringify(contactMeta)
-            );
-        }
+        // 1b, 1b, JSON
+        this.sendMessage(
+            Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+            Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
+            JSON.stringify([{
+                u: node.u,
+                email: node.m,
+                name: node.name || node.m
+            }])
+        );
     }
 };
 

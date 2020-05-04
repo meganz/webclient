@@ -12625,8 +12625,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
             }
 
             var contacts = [];
-
-            (function (v) {
+            attachmentMeta.forEach(function (v) {
               var contact = M.u && M.u[v.u] ? M.u[v.u] : v;
               var contactEmail = contact.email ? contact.email : contact.m;
 
@@ -12785,7 +12784,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
               })), /*#__PURE__*/external_React_default.a.createElement("div", {
                 className: "clear"
               }))));
-            })(attachmentMeta);
+            });
 
             if (this.props.grouped) {
               additionalClasses += " grouped";
@@ -22431,18 +22430,15 @@ ChatRoom.prototype.uploadFromComputer = function () {
 
 
 ChatRoom.prototype.attachContacts = function (ids) {
-  if (ids && Array.isArray(ids) && ids.length > 0) {
-    for (var i = 0; i < ids.length; i++) {
-      var nodeId = ids[i];
-      var node = M.u[nodeId];
-      var contactMeta = {
-        u: node.u,
-        email: node.m,
-        name: node.name || node.m
-      }; // 1b, 1b, JSON
+  for (var i = 0; i < ids.length; i++) {
+    var nodeId = ids[i];
+    var node = M.u[nodeId]; // 1b, 1b, JSON
 
-      this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(contactMeta));
-    }
+    this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify([{
+      u: node.u,
+      email: node.m,
+      name: node.name || node.m
+    }]));
   }
 };
 /**

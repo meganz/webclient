@@ -610,13 +610,21 @@ ChatRoom.prototype.isArchived = function() {
 };
 
 /**
+ * Check whether given chat is 1-1 w/ cancelled account.
+ * @returns {Boolean}
+ */
+ChatRoom.prototype.isCancelled = function() {
+    return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
+};
+
+/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return ((self.showArchived === true) ||
+    return !self.isCancelled() && ((self.showArchived === true) ||
             !self.isArchived() ||
             (self.callManagerCall && self.callManagerCall.isActive()));
 };
@@ -1868,34 +1876,6 @@ ChatRoom.prototype.truncate = function() {
 
 ChatRoom.prototype.haveActiveCall = function() {
     return this.callManagerCall && this.callManagerCall.isActive() === true;
-};
-
-/**
- * processRemovedUserRoom
- * @description
- * Processes given room in case of user cancellation/deactivation.
- * Shows the next displayable chat room based on `lastActivity` ordering. If no displayable rooms are available, the
- * current room is hidden.
- */
-
-ChatRoom.prototype.processRemovedUserRoom = function() {
-    const conversations = obj_values(megaChat.chats.toJS());
-    const sortedConversations = conversations.sort(M.sortObjFn('lastActivity', -1));
-
-    for (let i = 0; i < sortedConversations.length; i++) {
-        const currentConversation = sortedConversations[i];
-
-        if (currentConversation.chatId && currentConversation.chatId === this.chatId) {
-            const nextConversation = sortedConversations[i + 1];
-
-            if (nextConversation && nextConversation.isDisplayable()) {
-                nextConversation.show();
-            }
-            else {
-                this.hide();
-            }
-        }
-    }
 };
 
 ChatRoom.prototype.havePendingGroupCall = function() {

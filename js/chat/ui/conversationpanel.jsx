@@ -1077,11 +1077,6 @@ export class ConversationPanel extends MegaRenderMixin {
             contact = M.u[contactHandle];
             avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
             contactName = avatarMeta.fullName;
-
-            // Account was cancelled/deactivated
-            if (contact.c === 2 && room.isCurrentlyActive) {
-                room.processRemovedUserRoom();
-            }
         }
         else if (contacts && contacts.length > 1) {
             contactName = room.getRoomTitle(true);

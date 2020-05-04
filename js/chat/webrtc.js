@@ -1498,16 +1498,22 @@ Call.prototype.msgJoin = function(packet) {
             var s = self.sessions[sid];
             if (s.peer === packet.fromUser && s.peerClient === packet.fromClient) {
                 // we have a session to that peer
+                self.logger.warn("Received JOIN from", base64urlencode(packet.fromUser),
+                    "(0x" + Chatd.dumpToHex(packet.fromClient, 0, 4, true) +
+                    ") to whom we already have a session in state " + constStateToText(SessState, s.state) +
+                    " Destroying existing session and accepting the JOIN");
                 if (s.state >= SessState.kTerminating) {
-                    // but session is terminating, force its removal and handle the join
+                    // session is terminating, force its removal and handle the join
                     s._destroy(s._terminateReason);
-                    assert(!self.sessions[sid]);
                 } else {
-                    self.logger.warn("Ignoring JOIN from", base64urlencode(packet.fromUser),
-                        "(0x" + Chatd.dumpToHex(packet.fromClient, 0, 4, true) +
-                        ") to whom we already have a session");
-                    return;
+                    // probably peer lost connectivity and is re-joining call, but we haven't detected that yet
+                    // By destroying the existing session we are not messing up with the simultaneous JOIN protection
+                    // because: if the existing session is a result of our JOIN, then peer must have replied with
+                    // SESSION first, and only after that sent the JOIN, which doesn't make sense in the context of
+                    // simultaneous JOIN.
+                    s._destroy(Term.kErrPeerOffline);
                 }
+                assert(!self.sessions[sid]);
             }
         }
         if (self.state === CallState.kReqSent) {
@@ -4782,21 +4788,15 @@ CallStateAllowedStateTransitions[CallState.kTerminating] = [
 CallStateAllowedStateTransitions[CallState.kDestroyed] = [];
 
 var SessState = Object.freeze({
-    kWaitSdpOffer: 1, // < Session just created, waiting for SDP offer from initiator
-    kWaitSdpAnswer: 2, // < SDP offer has been sent by initiator, waniting for SDP answer
-    kWaitLocalSdpAnswer: 3, // < Remote SDP offer has been set, and we are generating SDP answer
-    kConnecting: 4, // < The SDP handshake has completed at this endpoint, and media connection is to be established
-    kSessInProgress: 5, // < Media connection established
-    kTerminating: 6, // < Session is in terminate handshake
-    kDestroyed: 7 // < Session object is not valid anymore
+    kWaitSdpAnswer: 1, // < SDP offer has been sent by initiator, waniting for SDP answer
+    kWaitLocalSdpAnswer: 2, // < Remote SDP offer has been set, and we are generating SDP answer
+    kConnecting: 3, // < The SDP handshake has completed at this endpoint, and media connection is to be established
+    kSessInProgress: 4, // < Media connection established
+    kTerminating: 5, // < Session is in terminate handshake
+    kDestroyed: 6 // < Session object is not valid anymore
 });
 
-
 var SessStateAllowedStateTransitions = {};
-SessStateAllowedStateTransitions[SessState.kWaitSdpOffer] = [
-    SessState.kWaitLocalSdpAnswer,
-    SessState.kTerminating
-];
 SessStateAllowedStateTransitions[SessState.kWaitLocalSdpAnswer] = [
     SessState.kConnecting,
     SessState.kTerminating

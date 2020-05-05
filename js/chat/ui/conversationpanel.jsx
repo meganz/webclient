@@ -2206,7 +2206,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
-                                    room.messagesBuff.messages.keys().reverse().some(function(k) {
+                                    clone(room.messagesBuff.messages.keys()).reverse().some(function(k) {
                                         if(!foundMessage) {
                                             var message = room.messagesBuff.messages[k];
 

@@ -12603,7 +12603,7 @@ var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
             className: "chat-dropdown empty-txt"
           }, l[19985]);
         } else {
-          var keys = mb.sharedFiles.keys().reverse();
+          var keys = clone(mb.sharedFiles.keys()).reverse();
 
           for (var i = startPos; i < endPos; i++) {
             var message = mb.sharedFiles[keys[i]];
@@ -16534,7 +16534,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         persist: true,
         onUpEditPressed: function onUpEditPressed() {
           var foundMessage = false;
-          room.messagesBuff.messages.keys().reverse().some(function (k) {
+          clone(room.messagesBuff.messages.keys()).reverse().some(function (k) {
             if (!foundMessage) {
               var message = room.messagesBuff.messages[k];
               var contact;

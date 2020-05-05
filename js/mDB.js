@@ -104,7 +104,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm28_';
+    var dbpfx = 'fm27_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1121,10 +1121,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         index = t.schema.primKey.keyPath;
     }
 
-    var originalAnyof = [];
-    var originalWhere = [];
     if (anyof) {
-        originalAnyof = clone(anyof[1]);
         // encrypt all values in the list
         for (i = anyof[1].length; i--;) {
             /*if (!this.filters[anyof[1][i]]) {
@@ -1146,8 +1143,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         t = options.query(t);
     }
     else {
-        for (var k = where.length; k--;) {
-            originalWhere.unshift(where[k][1]);
+        for (var k = where.length; k--; ) {
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
             if (!this.filters[where[k][1]]) {
                 this.filters[where[k][1]] = ab_to_base64(this.strcrypt(where[k][1]));
@@ -1215,8 +1211,8 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                 if (typeof matches[update[index]] == 'undefined') {
                                     // check if this update matches our criteria, if any
                                     if (where) {
-                                        for (var k = where.length; k--;) {
-                                            if (update[where[k][0]] !== where[k][1] && update[where[k][0]] !== originalWhere[k]) break;
+                                        for (var k = where.length; k--; ) {
+                                            if (update[where[k][0]] !== where[k][1]) break;
                                         }
 
                                         // mismatch detected - record it as a deletion
@@ -1237,8 +1233,8 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                     else {
                                         // does this update modify a record matched by the
                                         // anyof inclusion list?
-                                        for (var k = anyof[1].length; k--;) {
-                                            if (update[anyof[0]] === anyof[1][k] || update[anyof[0]] === originalAnyof[k]) break;
+                                        for (var k = anyof[1].length; k--; ) {
+                                            if (update[anyof[0]] === anyof[1][k]) break;
                                         }
 
                                         // no match detected - record it as a deletion
@@ -1283,7 +1279,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         if (where) {
             for (i = r.length; i--;) {
                 for (var k = where.length; k--;) {
-                    if (r[i][where[k][0]] !== where[k][1] && r[i][where[k][0]] !== originalWhere[k]) {
+                    if (r[i][where[k][0]] !== where[k][1]) {
                         r.splice(i, 1);
                         break;
                     }

@@ -17049,11 +17049,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         contactHandle = contacts[0];
         contact = M.u[contactHandle];
         avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
-        contactName = avatarMeta.fullName; // Account was cancelled/deactivated
-
-        if (contact.c === 2 && room.isCurrentlyActive) {
-          room.processRemovedUserRoom();
-        }
+        contactName = avatarMeta.fullName;
       } else if (contacts && contacts.length > 1) {
         contactName = room.getRoomTitle(true);
       }
@@ -19781,7 +19777,12 @@ Chat.prototype.processRemovedUser = function (u) {
     if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
       chatRoom.trackDataChange();
     }
-  });
+  }); // Account was cancelled/deactivated
+
+  if (megaChat.currentlyOpenedChat && M.u[megaChat.currentlyOpenedChat] && M.u[megaChat.currentlyOpenedChat].c === 2) {
+    loadSubPage('fm/chat');
+  }
+
   self.renderMyStatus();
 };
 /**
@@ -21464,6 +21465,15 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 /**
+ * Check whether given chat is 1-1 w/ cancelled account.
+ * @returns {Boolean}
+ */
+
+
+ChatRoom.prototype.isCancelled = function () {
+  return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
+};
+/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
@@ -21472,7 +21482,7 @@ ChatRoom.prototype.isArchived = function () {
 
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
-  return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
+  return !self.isCancelled() && (self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive());
 };
 /**
  * Save chat into info fmdb.
@@ -22660,33 +22670,6 @@ ChatRoom.prototype.truncate = function () {
 
 ChatRoom.prototype.haveActiveCall = function () {
   return this.callManagerCall && this.callManagerCall.isActive() === true;
-};
-/**
- * processRemovedUserRoom
- * @description
- * Processes given room in case of user cancellation/deactivation.
- * Shows the next displayable chat room based on `lastActivity` ordering. If no displayable rooms are available, the
- * current room is hidden.
- */
-
-
-ChatRoom.prototype.processRemovedUserRoom = function () {
-  var conversations = obj_values(megaChat.chats.toJS());
-  var sortedConversations = conversations.sort(M.sortObjFn('lastActivity', -1));
-
-  for (var i = 0; i < sortedConversations.length; i++) {
-    var currentConversation = sortedConversations[i];
-
-    if (currentConversation.chatId && currentConversation.chatId === this.chatId) {
-      var nextConversation = sortedConversations[i + 1];
-
-      if (nextConversation && nextConversation.isDisplayable()) {
-        nextConversation.show();
-      } else {
-        this.hide();
-      }
-    }
-  }
 };
 
 ChatRoom.prototype.havePendingGroupCall = function () {

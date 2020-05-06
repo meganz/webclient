@@ -1142,7 +1142,9 @@ MegaUtils.prototype.getSiteVersion = function() {
 
         // If an extension use the version of that (because sometimes there are independent deployments of extensions)
         if (is_extension) {
-            version = (mega.chrome) ? buildVersion.chrome + ' ' + l[957] : buildVersion.firefox + ' ' + l[959];
+            version = (mega.chrome) ? buildVersion.chrome + ' ' +
+                (ua.details.browser === 'Edgium' ? l[23326] : l[957]) :
+                buildVersion.firefox + ' ' + l[959];
         }
     }
 

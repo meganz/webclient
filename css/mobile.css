@@ -7675,6 +7675,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-family:'LatoWebSemibold', 'source_sans_prosemibold';
     font-weight: initial;
 }
+.mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
+    white-space: normal;
+}
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;
 }
@@ -8417,6 +8420,8 @@ body.key .reg-st3-membership-bl.free.hidden {
     max-width: 460px;
     padding: 24px 20px;
     margin: 0 auto;
+    max-height: 95vh;
+    overflow: scroll;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;
@@ -8435,6 +8440,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile.fm-dialog.park-account-dialog .inline-buttons {
     overflow: auto;
+    margin-bottom: 24px;
 }
 .mobile.fm-dialog-container {
     display: table;

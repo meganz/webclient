@@ -18499,6 +18499,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 480px;
     z-index: 1100;
 }
+.ct .fm-dialog.voucher-dialog {
+    width: 540px;
+}
 .voucher-dialog-body {
     padding: 30px;
 }
@@ -18586,6 +18589,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 428px;
     table-layout: fixed;
     margin: 7px 0 0 0;
+}
+.ct .voucher-dialog .voucher-dialog-buttons {
+    padding: 0 25px;
 }
 .voucher-dialog .voucher-buy-now, .voucher-dialog .voucher-redeem, .voucher-dialog .voucher-redeem-now {
     margin: 24px 0 0 0;

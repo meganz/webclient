@@ -383,7 +383,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         // pages to hide always
-        if (page.indexOf('transfers') !== -1) {
+        if (page.indexOf('transfers') !== -1 || page.indexOf('register') !== -1) {
             mega.tpw.hideWidget();
             return;
         }
@@ -552,7 +552,7 @@ mega.tpw = new function TransferProgressWidget() {
 
                         if ($widgetHeadAndBody.is(':visible')) {
                             $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
-                            isHiddenByUser = false;
+                            isHiddenByUser = true;
                         }
                     }
                 }
@@ -594,7 +594,7 @@ mega.tpw = new function TransferProgressWidget() {
 
                         if ($widgetHeadAndBody.is(':visible')) {
                             $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
-                            isHiddenByUser = false;
+                            isHiddenByUser = true;
                         }
                     }
                 }

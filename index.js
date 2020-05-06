@@ -268,10 +268,8 @@ function init_page() {
     // site until they validate their account. So if they clicked the browser back button, then they should get logged
     // out or they will end up with with a partially logged in account stuck in an infinite loop. This logout is not
     // triggered on the mobile web sms/ pages because a session is still required to talk with the API to get unlocked.
-    if ((typeof sms !== 'undefined' && sms.isSuspended) ||
-        (typeof mobile !== 'undefined' && mobile.sms.isSuspended && page.substr(0, 3) !== 'sms')) {
-
-        u_logout(true);
+    if (window.doUnloadLogOut) {
+        return false;
     }
 
     dlkey = false;
@@ -301,7 +299,7 @@ function init_page() {
             .replace('!', '/folder/').replace('?', '/file/')
             : page.replace('!', 'file/').replace('!', '#');
 
-        history.replaceState({ subpage: page }, "", '/' + page);
+        history.replaceState({ subpage: page }, "", (hashLogic ? '#' : '/') + page);
         return init_page();
     }
 
@@ -500,7 +498,7 @@ function init_page() {
 
     if (page.substr(0, 7) === 'folder/') {
         var phLen = page.indexOf('#');
-        var possibleS = -1; 
+        var possibleS = -1;
 
         if (phLen < 0) {
             phLen = page.length;
@@ -2365,7 +2363,7 @@ function topmenuUI() {
         }
     };
 
-    $('#pageholder, #startholder').rebind('click.hidetopmenu', function(e) {
+    $('#pageholder, #startholder').rebind('mousedown.hidetopmenu', function(e) {
         if (typeof $.hideTopMenu === 'function') {
             $.hideTopMenu(e);
         }
@@ -2939,14 +2937,41 @@ function loadSubPage(tpage, event) {
     }
 
     if (page) {
+        var tmp = [];
+
         for (var p in subpages) {
             if (page.substr(0, p.length) === p) {
                 for (var i in subpages[p]) {
                     if (!jsl_loaded[jsl2[subpages[p][i]].n]) {
-                        jsl.push(jsl2[subpages[p][i]]);
+                        tmp.push(jsl2[subpages[p][i]]);
                     }
                 }
             }
+        }
+
+        if (tmp.length) {
+            if (d) {
+                console.info('loadSubPage: About to load required resources...', tmp);
+            }
+
+            if (jsl.length) {
+                if (d) {
+                    console.warn('loadSubPage: There are pending requests running, holding it..');
+                }
+
+                var oldSL = silent_loading;
+                silent_loading = function() {
+                    if (oldSL) {
+                        tryCatch(oldSL)();
+                    }
+                    page = false;
+                    loadSubPage(tpage, event);
+                };
+
+                return;
+            }
+
+            jsl = tmp;
         }
     }
 
@@ -3003,10 +3028,15 @@ window.onhashchange = function () {
 };
 
 window.onbeforeunload = function () {
+    'use strict';
+
     if (dlmanager.isDownloading || ulmanager.isUploading) {
         return $.memIOSaveAttempt ? null : l[377];
     }
 
+    if (window.doUnloadLogOut) {
+        u_logout();
+    }
     mBroadcaster.crossTab.leave();
 };
 

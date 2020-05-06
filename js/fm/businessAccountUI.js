@@ -130,7 +130,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $('.fm-right-files-block').removeClass('hidden');
     $('.fm-empty-user-management').addClass('hidden');
 
-    this.URLchanger('');
+    if (!quickWay) {
+        this.URLchanger('');
+    }
 
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
@@ -624,7 +626,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
             if (e.keyCode === 13 || e.code === 'Enter' || e.key === 'Enter') {
                 return $('.decrypt-sub-user-link', $dialog).trigger('click');
             }
-            
+
         });
 
         $('.decrypt-sub-user-link', $dialog).on('click', function decryptOkBtnHandler() {
@@ -640,7 +642,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                 var business = new BusinessAccount();
 
                 var failureAction = function (st, res, desc) {
-                    
+
                     loadingDialog.phide();
                     var msg = l[17920]; // not valid password
                     if (res) {
@@ -655,7 +657,7 @@ BusinessAccountUI.prototype.showLinkPasswordDialog = function (invitationLink) {
                 var decryptedTokenBase64 = business.decryptSubAccountInvitationLink(invitationLink, enteredPassword);
                 if (decryptedTokenBase64) {
                     var getInfoPromise = business.getSignupCodeInfo(decryptedTokenBase64);
-                    
+
                     getInfoPromise.fail(failureAction);
 
                     getInfoPromise.done(function signupCodeGettingSuccessHandler(status, res) {
@@ -732,7 +734,7 @@ BusinessAccountUI.prototype.openInvitationLink = function (signupCode) {
                 res.signupcode = signupCode;
                 localStorage.businessSubAc = JSON.stringify(res);
                 if (is_mobile) {
-                    mobile.register.showConfirmAccountScreen(res, true);
+                    mobile.register.show(res);
                 }
                 else {
                     loadSubPage('register');
@@ -897,7 +899,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $subAccountContainer.find('.profile-button-container .migrate-data').text(l[19095]).removeClass('hidden');
     }
     $subAccountContainer.find('.user-management-view-status.text').text(this.subUserStatus(subUser.s));
-    
+
     var subUserDefaultAvatar = useravatar.contact(subUserHandle);
     $('.subaccount-img-big', $subAccountContainer).safeHTML(subUserDefaultAvatar);
     $('.user-management-subuser-avatars', $subHeader).safeHTML(subUserDefaultAvatar);
@@ -1035,10 +1037,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         if (!subUserStats) {
             return;
         }
-        
+
         var totalStorage = 0;
         var totalBandwidth = 0;
-        
+
         var emptyArray = [0, 0, 0, 0, 0];
 
         var rootInfo = subUserStats["2"] || emptyArray;
@@ -1050,7 +1052,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
-            
+
         var totalStorageFormatted = numOfBytes(totalStorage, 2);
         var totalBandwidthFormatted = numOfBytes(totalBandwidth, 2);
         var rootTotalFormatted = numOfBytes(rootInfo[0], 2);
@@ -1084,37 +1086,67 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-version', $subAccountContainer);
 
-        $cloudDriveSection.find('.ff-occupy').text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
-        $cloudDriveSection.find('.folder-number').text(rootInfo[2] + ' ' + l[2035]);
-        $cloudDriveSection.find('.file-number').text(rootInfo[1] + ' ' + l[2034]);
+        var ffNumText = function(value, type) {
+            var counter = value || 0;
+            var numTextOutput = "";
 
-        $inShareSection.find('.ff-occupy').text(inshareInternalTotalFormatted.size + ' ' +
+            if (counter === 0) {
+                numTextOutput = type === 'file' ? l[23259] : l[23258];
+            }
+            else if (counter === 1) {
+                numTextOutput = type === 'file' ? l[23257] : l[23256];
+            }
+            else {
+                numTextOutput = (type === 'file' ? l[23261] : l[23260]).replace('[X]', counter);
+            }
+
+            return numTextOutput;
+        };
+
+        var cloudDriveFolderNumText = ffNumText(rootInfo[2], 'folder');
+        var cloudDriveFileNumText = ffNumText(rootInfo[1], 'file');
+        $('.ff-occupy', $cloudDriveSection).text(rootTotalFormatted.size + ' ' + rootTotalFormatted.unit);
+        $('.folder-number', $cloudDriveSection).text(cloudDriveFolderNumText);
+        $('.file-number', $cloudDriveSection).text(cloudDriveFileNumText);
+
+        var inShareInFolderNumText = ffNumText(inshareInternalInfo[2], 'folder');
+        var inShareInFileNumText = ffNumText(inshareInternalInfo[1], 'file');
+        $('.ff-occupy', $inShareSection).text(inshareInternalTotalFormatted.size + ' ' +
             inshareInternalTotalFormatted.unit);
-        $inShareSection.find('.folder-number').text(inshareInternalInfo[2] + ' ' + l[2035]);
-        $inShareSection.find('.file-number').text(inshareInternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $inShareSection).text(inShareInFolderNumText);
+        $('.file-number', $inShareSection).text(inShareInFileNumText);
 
-        $inShareExSection.find('.ff-occupy').text(inshareExternalTotalFormatted.size + ' ' +
+        var inShareExFolderNumText = ffNumText(inshareExternalInfo[2], 'folder');
+        var inShareExFileNumText = ffNumText(inshareExternalInfo[1], 'file');
+        $('.ff-occupy', $inShareExSection).text(inshareExternalTotalFormatted.size + ' ' +
             inshareExternalTotalFormatted.unit);
-        $inShareExSection.find('.folder-number').text(inshareExternalInfo[2] + ' ' + l[2035]);
-        $inShareExSection.find('.file-number').text(inshareExternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $inShareExSection).text(inShareExFolderNumText);
+        $('.file-number', $inShareExSection).text(inShareExFileNumText);
 
-        $outShareExternalSection.find('.ff-occupy').text(outshareTotalFormatted.size + ' ' +
+        var outShareExFolderNumText = ffNumText(outshareInfo[2], 'folder');
+        var outShareExFileNumText = ffNumText(outshareInfo[1], 'file');
+        $('.ff-occupy', $outShareExternalSection).text(outshareTotalFormatted.size + ' ' +
             outshareTotalFormatted.unit);
-        $outShareExternalSection.find('.folder-number').text(outshareInfo[2] + ' ' + l[2035]);
-        $outShareExternalSection.find('.file-number').text(outshareInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $outShareExternalSection).text(outShareExFolderNumText);
+        $('.file-number', $outShareExternalSection).text(outShareExFileNumText);
 
-        $outShareSection.find('.ff-occupy').text(outshareTotalInternalFormatted.size + ' ' +
+        var outShareInFolderNumText = ffNumText(outshareInternalInfo[2], 'folder');
+        var outShareInFileNumText = ffNumText(outshareInternalInfo[1], 'file');
+        $('.ff-occupy', $outShareSection).text(outshareTotalInternalFormatted.size + ' ' +
             outshareTotalInternalFormatted.unit);
-        $outShareSection.find('.folder-number').text(outshareInternalInfo[2] + ' ' + l[2035]);
-        $outShareSection.find('.file-number').text(outshareInternalInfo[1] + ' ' + l[2034]);
+        $('.folder-number', $outShareSection).text(outShareInFolderNumText);
+        $('.file-number', $outShareSection).text(outShareInFileNumText);
 
-        $rubbishSection.find('.ff-occupy').text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
-        $rubbishSection.find('.folder-number').text(rubbishInfo[2] + ' ' + l[2035]);
-        $rubbishSection.find('.file-number').text(rubbishInfo[1] + ' ' + l[2034]);
+        var rubbishFolderNumText = ffNumText(rubbishInfo[2], 'folder');
+        var rubbishFileNumText = ffNumText(rubbishInfo[1], 'file');
+        $('.ff-occupy', $rubbishSection).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
+        $('.folder-number', $rubbishSection).text(rubbishFolderNumText);
+        $('.file-number', $rubbishSection).text(rubbishFileNumText);
 
-        $versionsSection.find('.ff-occupy').text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
-        $versionsSection.find('.file-number').text((rootInfo[4] + rubbishInfo[4]
-            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4]) + ' ' + l[2034]);
+        var versionsFileNumText = ffNumText(rootInfo[4] + rubbishInfo[4]
+            + inshareInternalInfo[4] + inshareExternalInfo[4] + outshareInfo[4], 'file');
+        $('.ff-occupy', $versionsSection).text(versionsTotalFormatted.size + ' ' + versionsTotalFormatted.unit);
+        $('.file-number', $versionsSection).text(versionsFileNumText);
     };
 
     // viewing the right buttons
@@ -1123,7 +1155,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(fillQuotaInfo);
-    
+
 
     $businessAccountContainer.removeClass('hidden'); // BA container
     $subAccountContainer.removeClass('hidden').attr('id', 'sub-' + subUserHandle); // sub-info container
@@ -1566,7 +1598,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
     };
 
     populateMonthDropDownList();
-    
+
 };
 
 BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContainer) {
@@ -1702,7 +1734,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 '%country', '%zip']);
             return;
         }
-        
+
     };
 
     // event handler for header clicking
@@ -1759,7 +1791,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var cZip = '';
 
     loadCountries();
-    
+
     if (u_attr['%name']) {
         cName = u_attr['%name'];
     }
@@ -2009,7 +2041,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
         });
 
     unhideSection();
-    
+
 };
 
 
@@ -2197,7 +2229,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     };
 
     var fillInvoiceDetailPage = function (st, invoiceDetail) {
-        
+
 
         if (st !== 1 || !validateInvoice(invoiceDetail)) {
             msgDialog('warningb', '', l[19302]);
@@ -2291,7 +2323,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             function invoiceDetailExportClickHandler() {
                 M.require('business_invoice').done(
                     function exportOverviewPageToPDF() {
-                        
+
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
@@ -2350,7 +2382,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 );
             }
         );
-        
+
         $invoiceDetailContainer.jScrollPane({
             enableKeyboardNavigation: false, showArrows: true,
             arrowSize: 8, animateScroll: true
@@ -2589,7 +2621,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 $me.find('.dialog-feature-switch').animate({ marginRight: '22px' }, 150, 'swing', function () {
                     $me.removeClass('toggle-on').addClass('toggle-off');
                 });
-                
+
             }
             else {
                 $me.find('.dialog-feature-switch').animate({ marginRight: '2px' }, 150, 'swing', function () {
@@ -3359,8 +3391,9 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
     try {
 
         if (hashLogic) {
-            var newHash = '#fm/user-management' + subLocation;
+            var newHash = '#fm/user-management' + (subLocation ? '/' + subLocation : '');
             if (document.location.hash !== newHash) {
+                window.skipHashChange = true;
                 document.location.hash = newHash;
                 page = newHash;
                 M.currentdirid = page;

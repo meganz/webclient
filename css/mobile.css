@@ -209,7 +209,7 @@ ul, li {
 .mobile.main-block.error-overlay {
     bottom: 0;
     left: 0;
-    position: fixed;
+    position: absolute;
     top: 0;
     z-index: 1300;
 }
@@ -220,6 +220,9 @@ ul, li {
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+#mobile-ui-error .mobile.content-cell {
+    background-color: #fff;
 }
 .mobile.logo {
     width: 38px;
@@ -1646,7 +1649,25 @@ ul, li {
 }
 .mobile.session-history-page .sh-item-icon {
     display: inline-block;
+    line-height: 0;
     margin-right: 4px;
+    margin-top: 3px;
+    vertical-align: top;
+    position: relative;
+}
+.mobile.session-history-page .sh-item-icon::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+}
+.mobile.session-history-page .sh-item-icon img {
+    width: 18px;
+    border-radius: 2px;
 }
 .mobile.session-history-page .sh-item-ip {
     display: block;
@@ -13215,12 +13236,10 @@ p a.blog-new-read-more {
     padding: 7px 28px;
 }
 .mobile.fm-affiliate.list-item img {
-    display: inline-block;
+    display: block;
     width: 24px;
     height: 16px;
-    margin: 1px 5px 0 0;
-    vertical-align: top;
-    background: grey;
+    border-radius: 2px;
 }
 .mobile.fm-affiliate.list-item {
     box-shadow: 0 1px 0 0 rgba(0,0,0,0.08);
@@ -13230,6 +13249,23 @@ p a.blog-new-read-more {
     font-size: 13px;
     line-height: 18px;
     color: #333;
+}
+.mobile.fm-affiliate.list-item .img-wrap {
+    display: inline-block;
+    margin: 1px 8px 0 0;
+    vertical-align: top;
+    line-height: 0;
+    position: relative;
+}
+.mobile.fm-affiliate.list-item .img-wrap::after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    border-radius: 3px;
+    box-shadow: inset rgba(0, 0, 0, 0.1) 0 0 0 1px;
 }
 .mobile.fm-affiliate.list-item .num {
     font-size: 14px;

@@ -973,10 +973,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.clearSelectionAndHighlight();
     }
     resizeBreadcrumbs() {
-        var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-        var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
-
         Soon(() => {
+            var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
+            var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
+
             var wrapperWidth = $breadcrumbsWrapper.outerWidth();
             var $el = $(this.isSearch() ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
             var i = 0;

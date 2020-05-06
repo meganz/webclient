@@ -2227,8 +2227,6 @@ a.nt-settings-button:hover span {
 }
 .jspDrag {
     background-color: rgb(0, 0, 0);
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
     border-radius: 8px;
     width: 8px;
     position: relative;
@@ -2237,29 +2235,25 @@ a.nt-settings-button:hover span {
     margin: 0 3px;
     cursor: pointer;
     -webkit-transition: opacity 250ms ease-in-out;
-    -moz-transition: opacity 250ms ease-in-out;
-    -o-transition: opacity 250ms ease-in-out;
-    -ms-transition: opacity 250ms ease-in-out;
     transition: opacity 250ms ease-in-out;
-    -moz-opacity: 0.2;
-    -khtml-opacity: 0.2;
-    opacity: 0.2;
+    opacity: 0;
 }
 .jspDrag::before {
     position: absolute;
     content: '';
     width: calc(100% + 6px);
-    height: calc(100% + 6px);
+    height: 100%;
     left: -3px;
-    top: -3px;
+    top: 0;
+}
+.jspScrollable:hover .jspDrag {
+    opacity: 0.2;
+}
+.jspScrollable:hover .jspDrag.jspHover, .jspScrollable:hover .jspDrag.jspActive, .jspScrollable .jspDrag.jspActive {
+    opacity: 0.3;
 }
 .jspHorizontalBar .jspDrag {
     height: 8px !important;
-}
-.jspDrag.jspHover {
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
-    opacity: 0.3;
 }
 .jspHorizontalBar .jspTrack, .jspHorizontalBar .jspDrag {
     float: left;
@@ -3512,23 +3506,6 @@ label.iPhoneCheckLabelOff span {
 }
 .fm-left-menu.dashboard + div + div + .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: 100%;
-}
-.fm-tree-panel .jspTrack {
-    -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
-    transition: all 200ms ease-in-out;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-}
-.fm-tree-panel:hover .jspTrack {
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
 }
 .nw-tree-panel-header + .nw-tree-panel-filter-tag + .fm-tree-panel {
     height: -webkit-calc(100% - 97px);
@@ -6772,6 +6749,9 @@ table {
 .export-icon.keynote, .share-folder-icon div.keynote {
     background-position: -113px -599px;
 }
+.export-icon.vector, .share-folder-icon div.vector {
+    background-position: -113px -719px;
+}
 .export-icon.numbers, .share-folder-icon div.numbers {
     background-position: -113px -719px;
 }
@@ -6812,7 +6792,7 @@ table {
     background-position: -113px -2159px;
 }
 .export-icon.photoshop, .share-folder-icon div.photoshop {
-    bbackground-position: -113px -2279px;
+    background-position: -113px -2279px;
 }
 .export-icon.pdf, .share-folder-icon div.pdf {
     background-position: -113px -2399px;
@@ -7047,9 +7027,14 @@ table {
     line-height: 0;
     margin-left: -4px;
 }
-.thumb .transfer-filetype-icon.image img,
+
 .thumb .transfer-filetype-icon.pdf img,
-.thumb .transfer-filetype-icon.video img {
+.thumb .transfer-filetype-icon.raw img,
+.thumb .transfer-filetype-icon.audio img,
+.thumb .transfer-filetype-icon.image img,
+.thumb .transfer-filetype-icon.video img,
+.thumb .transfer-filetype-icon.vector img,
+.thumb .transfer-filetype-icon.photoshop img {
     display: inline-block;
     height: 18px;
     margin: 4px 2px;
@@ -7058,6 +7043,7 @@ table {
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
 }
+
 .fm-flags-icon img {
     margin: 7px 0 0 2px;
     width: auto;
@@ -11213,7 +11199,6 @@ table {
     color: #333;
     line-height: 18px;
     margin:8px 0 16px 0;
-    text-transform: capitalize;
     white-space: nowrap;
     overflow: hidden;
     -o-text-overflow: ellipsis;
@@ -11251,7 +11236,6 @@ table {
     line-height: 20px;
     text-align: left;
     white-space: normal;
-    text-transform: capitalize;
     overflow: visible;
     vertical-align: top;
     text-overflow: ellipsis;
@@ -11264,19 +11248,46 @@ table {
     margin-bottom: 4px;
     line-height: 20px;
     white-space: normal;
-    text-transform: capitalize;
     padding: 0;
     vertical-align: top;
     float: right;
     text-align: right;
 }
+.account.left-pane.big-txt.suba-pay-bill {
+    width:100%;
+    margin-top: -2px;
+    margin-bottom: 15px;
+}
+.account.left-pane.big-txt.suba-pay-bill.hidden {
+    display: none;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.disabled,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-status.pending,
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    color: darkorange;
+    opacity: 1;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left {
+    margin-top: -10px;
+}
+.left-pane.info-block.business-users .account.left-pane.big-txt.suba-days-left.hidden {
+    display: none;
+}
 .account.left-pane.big-txt span {
     color: #777777;
     padding-left: 5px;
 }
+.account.left-pane.big-txt .pay-bill-btn span {
+    color: unset;
+    padding-left: unset;
+}
 .small-left-panel .account.left-pane.small-txt, .small-left-panel .account.left-pane.big-txt {
     text-align: center;
     width: 100%;
+}
+.account.left-pane .account.left-pane.small-txt.hidden,
+.account.left-pane .account.left-pane.big-txt.hidden {
+    display: none;
 }
 .account.widget .fm-account-blocks {
     padding-top: 10px;
@@ -14888,7 +14899,7 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .arrow:not(.grid-header-star) {
     cursor: pointer;
-    background-position: -100%;
+    background-position: -100% -100%;
     background-image: url(../images/mega/fm-main-sprite_v15.png);
     background-repeat: no-repeat;
     display: block;
@@ -18010,9 +18021,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 .feedback-dialog-textarea .jspDrag {
     background-color: rgba(255, 255, 255, 1);
     right: 6px;
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);
-    -moz-opacity: 0.3;
-    -khtml-opacity: 0.3;
     opacity: 0.3;
 }
 .feedback-dialog-textarea .jspVerticalBar {
@@ -20984,7 +20992,68 @@ body.kr .account.chart.data {
     font-size: 18px;
 }
 /* User select */
-.selectable, .selectable *, input, textarea, .fm-dialog p, .properties-file-link, .contact-fingerprint-txt *, .fingerprint-txt, .contact-details-user-name, .contact-details-email, .nw-contact-name, .fm-breadcrumbs.contact .right-arrow-bg span, div.new-download-file-title, .dev-nw *, .fmholder .dev-nw div, .fmholder div.new-affiliate-bg1 *, .fmholder div.main-mid-pad.new-bottom-pages *, .collected-data li, .export-item-title, .grid-table.vouchers *, .export-item-title, .properties-file-txt, .wire-transfer-details *, .blog-new-full *, div div.new-download-file-title, div div.nt-info-txt, div div.nt-main-date, .new-right-content-block *, .ff-right-block *, .pro-gray-block *, .sync-white-bl *, .sync-top-txt, .sync-top-txt-block *, .blog-new-full *, .fingerprint > span, .fm-account-main table *, .fm-account-main label, .fm-account-main div:not(.default-big-button):not(.default-button), .fm-account-main div:not(.default-big-button):not(.default-button) + span, .new-bottom-pages *, .file-link-info, .nw-conversations-name, .active-folder-link .tranfer-filetype-txt, .active-folder-link .nw-fm-tree-folder, .active-folder-link .file-block-title, .fm-breadcrumbs span span, .export-item-title, .export-link-gray-txt, .message.text-block, .message.text-block a, .user-card-name:not(.message), .user-card-name:not(.message) span, .user-card-email, .message.data-title, .download.info-txt, .fm-account-main a, .fm-account-main span, .fingerprint-txt span, .membership-big-txt.email, .properties-txt-pad *, .grid-scrolling-table td *, .bottom-page.scroll-block *, .message.content-area *, .message.date-divider {
+.selectable, .selectable *,
+input,
+textarea,
+.fm-dialog p,
+.properties-file-link,
+.contact-fingerprint-txt *,
+.fingerprint-txt,
+.contact-details-user-name,
+.contact-details-email,
+.nw-contact-name,
+.fm-breadcrumbs.contact
+.right-arrow-bg span,
+div.new-download-file-title,
+.dev-nw *,
+.fmholder .dev-nw div,
+.fmholder div.new-affiliate-bg1 *,
+.fmholder div.main-mid-pad.new-bottom-pages *,
+.collected-data li,
+.export-item-title,
+.grid-table.vouchers *,
+.export-item-title,
+.properties-file-txt,
+.wire-transfer-details *,
+.blog-new-full *,
+div div.new-download-file-title,
+div div.nt-info-txt,
+div div.nt-main-date,
+.new-right-content-block *,
+.ff-right-block *,
+.pro-gray-block *,
+.sync-white-bl *,
+.sync-top-txt,
+.sync-top-txt-block *,
+.blog-new-full *,
+.fingerprint > span,
+.fm-account-main table *,
+.fm-account-main label,
+.fm-account-main div:not(.default-big-button):not(.default-button),
+.fm-account-main div:not(.default-big-button):not(.default-button) + span,
+.new-bottom-pages *,
+.file-link-info,
+.nw-conversations-name,
+.active-folder-link .tranfer-filetype-txt,
+.active-folder-link .nw-fm-tree-folder,
+.active-folder-link .file-block-title,
+.fm-breadcrumbs span span,
+.export-item-title,
+.export-link-gray-txt,
+.message.text-block,
+.message.text-block a,
+.user-card-name:not(.message),
+.user-card-name:not(.message) span,
+.user-card-email,
+.message.data-title,
+.download.info-txt,
+.fm-account-main a,
+.fm-account-main span,
+.fingerprint-txt span, .membership-big-txt.email,
+.properties-txt-pad *,
+.bottom-page.scroll-block *,
+.message.content-area *,
+.message.date-divider {
     -webkit-touch-callout: text !important;
     -webkit-user-select: text !important;
     -khtml-user-select: text !important;
@@ -21471,91 +21540,9 @@ table.speed-table {
     margin-top: 12px;
     float: left;
 }
-.perfectScrollbarContainer {
-    position: relative;
-}
-.ps-container {
-    max-width: 100%;
-}
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0 !important;
-}
-.ps-container > .ps-scrollbar-y-rail {
-    width: 13px;
-}
-.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
-    right: 3px !important;
-    width: 8px !important;
-    position: relative;
-}
-.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y::before {
-    position: absolute;
-    content: '';
-    width: calc(100% + 6px);
-    height: calc(100% + 6px);
-    left: -3px;
-    top: -3px;
-}
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
-    right: 0px !important;
-}
-.ps-container > .ps-scrollbar-y-rail, .ps-container:hover > .ps-scrollbar-y-rail {
-    background-color: transparent !important;
-    opacity: 1;
-    margin-right: 0;
-}
-.ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
-    background-color: rgb(0, 0, 0) !important;
-    width: 8px;
-    opacity: 0.2;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    cursor: pointer;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    right: 2px;
-}
-div.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    height: 8px;
-    bottom: 2px;
-}
-.ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
-    opacity: 0.3 !important;
-    background-color: rgb(0, 0, 0) !important;
-}
-.ps-container > .ps-scrollbar-x-rail {
-    opacity:  1 !important;
-    cursor: pointer;
-}
-.ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
-    opacity: 0.2 !important;
-    background-color: rgb(0, 0, 0) !important;
-    -webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-}
-.ps-container > .ps-scrollbar-x-rail:hover > .ps-scrollbar-x {
-    opacity: 0.3 !important;
-}
 
 body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-start-conversation, body.megaChatDisabled .nw-contact-name .button.start-chat-button {
     display: none;
-}
-:not(.files-grid-view.fm) .ps-container > .ps-scrollbar-y-rail {
-    right: 0px !important;
-}
-.ps-container > .ps-scrollbar-y-rail {
-    margin: 2px 0;
-    z-index: 7;
 }
 .bp-main .jspPane {
     min-width: auto;
@@ -25108,9 +25095,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     -webkit-filter: blur(0.25em);
 }
 
-.user-management-dialog * {
-    font-family: 'LatoWeb';
-}
 .user-management-dialog .edit-email-warning.active {
     z-index: 999;
     width: -webkit-calc(100% - 16px);
@@ -25307,10 +25291,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 .user-management-dialog .mega-logo {
     background-position: -129px -98px;
 }
-
+.dialog-heading-img {
+    display: block;
+}
 .user-management-dialog .dialog-heading-img, .card-container .dialog-heading-img {
     background-image: url(../images/mega/big-icons_v5.png);
-    margin:40px auto 24px auto;
+    margin: 40px auto 24px auto;
 }
 
 .user-management-dialog .sent-email-logo {

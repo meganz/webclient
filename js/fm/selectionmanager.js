@@ -102,7 +102,10 @@ var SelectionManager = function($selectable, resume) {
             // jQuery UI won't do trigger unselecting, in case of the ui-selected item is NOT in the DOM, so
             // we need to reset it on our own (on drag on the background OR click)
             $(target).rebind('mousedown.sm' + idx, function(e) {
-                if ($(e.target.parentNode).is(".file-block-scrolling:not(.hidden)")) {
+                var $target = $(e.target);
+
+                if ($target.parent().is('.file-block-scrolling:not(.hidden)') &&
+                    !$target.is('.ps-scrollbar-x-rail') && !$target.is('.ps-scrollbar-y-rail')) {
                     selectionManager.clear_selection();
                 }
             });

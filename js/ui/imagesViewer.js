@@ -1033,7 +1033,9 @@ var slideshowid;
 
             M.gfsfetch(n.link || n.h, 0, -1, progress).tryCatch(function(data) {
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
-                previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                if (!exifImageRotation.fromImage) {
+                    previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
+                }
             }, function(ev) {
                 if (ev === EOVERQUOTA || Object(ev.target).status === 509) {
                     eventlog(99703, true);
@@ -1316,7 +1318,6 @@ var slideshowid;
 
                 // Restore last good preview
                 if (previews[id].prev) {
-                    M.neuterArrayBuffer(previews[id].buffer);
                     URL.revokeObjectURL(previews[id].src);
                     previews[id] = previews[id].prev;
                     delete previews[id].prev;
@@ -1484,7 +1485,6 @@ var slideshowid;
                 k = p.h;
 
                 size += p.buffer.byteLength;
-                M.neuterArrayBuffer(p.buffer);
                 p.buffer = p.full = preqs[k] = false;
 
                 if (p.prev) {

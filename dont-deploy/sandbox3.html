@@ -123,6 +123,11 @@
             localStorage.jjnocache = '1';
         }
 
+        if (window.location.search.indexOf('contentcheck=') > -1) {
+            sessionStorage.dbgContentCheck = '1';
+            delete localStorage.jj;
+        }
+
         // localStorage.contextmenu = '1';
         // localStorage.stopOnAssertFail = '1';
         // localStorage.allowBreakpointsOnReload = '1';

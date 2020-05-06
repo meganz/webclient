@@ -119,6 +119,18 @@ mega.textEditorUI = new function TextEditorUI() {
         $editorContianer = $('#mega-text-editor', $containerDialog);
         $saveButton = $('.buttons-holder .save-btn', $editorContianer);
 
+        $('.editor-textarea-container', $editorContianer).resizable({
+            handles: 'e',
+            resize: function() {
+                var cm = $('.editor-textarea-container .CodeMirror', $editorContianer)[0];
+                if (cm) {
+                    cm = cm.CodeMirror;
+                    if (cm) {
+                        cm.setSize();
+                    }
+                }
+            }
+        });
 
         /* eslint-disable sonarjs/no-duplicate-string */
         $('.txt-editor-menu', $editorContianer).rebind(
@@ -180,6 +192,11 @@ mega.textEditorUI = new function TextEditorUI() {
                     mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue()).done(function(fh) {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
+                        }
+                        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
+                            mega.fileTextEditor.removeOldVersion(fileHandle);
+                            fileHandle = fh;
+                            fh = '';
                         }
                         versionHandle = fh;
                         savedFileData = editor.getValue();

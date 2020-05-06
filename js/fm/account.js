@@ -1372,7 +1372,7 @@ accountUI.account = {
             var $textField = $('span', $hPageSelect);
 
             // Mark active item.
-            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"', $hPageSelect);
+            var $activeItem = $('.default-dropdown-item[data-value="' + getLandingPage() + '"]', $hPageSelect);
             $activeItem.addClass('active');
             $textField.text($activeItem.text());
 
@@ -2461,9 +2461,9 @@ accountUI.security = {
                 }
             }
 
-            // If unknown country code use question mark gif
-            if (!country.icon || country.icon === '??.gif') {
-                country.icon = 'ud.gif';
+            // If unknown country code use question mark png
+            if (!country.icon || country.icon === '??.png') {
+                country.icon = 'ud.png';
             }
 
             // Generate row html

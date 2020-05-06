@@ -18,6 +18,8 @@ var defaultStaticPath = 'https://eu.static.mega.co.nz/3/'; // EU should never fa
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
+var contenterror = 0;
+var nocontentcheck = false;
 var l, d = false;
 
 // Cache location.search parameters early as the URL may get rewritten later
@@ -483,9 +485,6 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    var contenterror = 0;
-    var nocontentcheck = false;
-
     if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
@@ -493,7 +492,7 @@ if (!browserUpdate) try
             defaultStaticPath = staticpath;
         }
         else {
-            nocontentcheck = true;
+            nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
             var devhost = window.location.host;
 
             // Set the static path and default static path for debug mode to be the same
@@ -627,6 +626,7 @@ var mega = {
                         }
                     });
 
+                    r.scSent = now;
                     delete sessionStorage.lightTreeReload;
                 }
             }
@@ -746,16 +746,34 @@ if (!browserUpdate && is_extension)
     }
     else {
         // WebExtensions
-        tmp = 'mega';
-        if (typeof chrome.runtime.getManifest === 'function' && !Object(chrome.runtime.getManifest()).update_url) {
-            tmp = localStorage.chromextdevpath || tmp;
+        urlrootfile = 'mega/secure.html';
+
+        tmp = 'extStageReload' + (is_iframed | 0) + (is_embed | 0) + (is_drop | 0);
+
+        if (typeof chrome !== 'object' || typeof chrome.runtime !== 'object') {
+            var stage = sessionStorage[tmp] | 0;
+            if (stage < 4) {
+                sessionStorage[tmp] = ++stage;
+                location.reload(true);
+            }
+
+            console.error('Something went wrong...', window.chrome, window.chrome && chrome.runtime);
         }
-        bootstaticpath = chrome.extension.getURL(tmp + '/');
-        urlrootfile = tmp + '/secure.html';
+        else {
+            delete sessionStorage[tmp];
+            tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
+
+            if (tmp.version === '109101.103.97') {
+                urlrootfile = 'webclient/index.html';
+            }
+        }
+
+        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     Object.defineProperty(window, 'eval', {
-        value : function eval(code) {
+        value : function evil(code) {
+            'use strict';
             throw new Error('Unsafe eval is not allowed, code: ' + String(code).replace(/\s+/g,' ').substr(0,60) + '...');
         }
     });
@@ -1220,6 +1238,7 @@ function mObjectURL(data, type)
                     if (msg !== 'pong') {
                         this.setMaster();
                     } else {
+                        this.notify('ack-pong');
                         delete localStorage[ev.key];
                     }
                     this.listen();
@@ -1252,9 +1271,7 @@ function mObjectURL(data, type)
             // as earlier as possible, e.g. now.
             localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
 
-            setTimeout(function() {
-                setup();
-            }, parseInt(localStorage.ctInstances) === 1 ? 0 : 2000);
+            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
         },
 
         listen: function crossTab_listen(aListener) {
@@ -1323,6 +1340,7 @@ function mObjectURL(data, type)
 
             localStorage.ctInstances = (this.slaves.length + 1);
             mBroadcaster.sendMessage('crossTab:master', this.master);
+            this.notify('pong');
 
             // (function liveLoop(tag) {
             // if (tag === mBroadcaster.crossTab.master) {
@@ -1356,6 +1374,11 @@ function mObjectURL(data, type)
             }
 
             switch (msg) {
+                case 'ack-pong':
+                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
+                        break;
+                    }
+                    /* fallthrough */
                 case 'ping':
                     this.slaves.push(strg.origin);
                     if (this.master) {
@@ -1884,6 +1907,7 @@ else if (!browserUpdate) {
                 return String(s)
                     .replace(/resource:.+->\s/,'')
                     .replace(/blob:[^:\s]+/, '..')
+                    .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
                     .replace('chrome://mega/content','..')
                     .replace(/file:.+extensions/,'..fx')
@@ -2906,6 +2930,7 @@ else if (!browserUpdate) {
         }
     }
     var lightweight=false;
+    var xhr_slots = d && jj ? 5 : localStorage.testSingleThreadLoad ? 1 : 2;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
     var fx_startup_cache = is_chrome_firefox && nocontentcheck;
     if (!fx_startup_cache && !nocontentcheck)
@@ -2918,7 +2943,8 @@ else if (!browserUpdate) {
         var hash_url = mObjectURL(hashdata, "text/javascript");
         var hash_workers = [];
         var i =0;
-        while (i < 2)
+        // eslint-disable-next-line block-scoped-var
+        while (i < xhr_slots)
         {
             try
             {
@@ -2934,7 +2960,7 @@ else if (!browserUpdate) {
                     }
                     var file = Object(jsl[e.data.jsi]).f || 'unknown.js';
 
-                    if (!nocontentcheck && !compareHashes(e.data.hash, file)) {
+                    if (nocontentcheck === false && !compareHashes(e.data.hash, file)) {
                         siteLoadError(load_error_types.file_corrupt, bootstaticpath + file);
                         contenterror = 1;
                     }
@@ -2997,16 +3023,12 @@ else if (!browserUpdate) {
 
     function jsl_start()
     {
+        if (xhr_stack) {
+            console.error('jsl_start: invalid procedure, pending requests are running...');
+            return false;
+        }
         jslcomplete = 0;
-        if (d && jj) {
-            xhr_progress = [0, 0, 0, 0, 0];
-        }
-        else if (localStorage.testSingleThreadLoad) {
-            xhr_progress = [0];
-        }
-        else {
-            xhr_progress = [0, 0];
-        }
+        xhr_progress = Array(xhr_slots);
         xhr_stack = Array(xhr_progress.length);
         jsl_fm_current = 0;
         jsl_current = 0;
@@ -3225,7 +3247,7 @@ else if (!browserUpdate) {
             }
             else
             {
-                if (!nocontentcheck) {
+                if (nocontentcheck === false) {
 
                     // Hash the file content and convert to hex
                     var hashHex = asmCryptoSha256.SHA256.hex(jsl[this.jsi].text);
@@ -3361,7 +3383,8 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
-        //for(var i in localStorage) if (i.substr(0,6) == 'cache!') delete localStorage[i];
+
+        xhr_stack = false;
         for (var i in jsl)
         {
             if (!jj || !jsl[i].j || jsl[i].j > 2) {
@@ -3964,6 +3987,59 @@ function promisify(fc) {
     Object.defineProperty(a$yncMethod, '__function__', {value: fc});
     return a$yncMethod;
 }
+
+function mutex(name, handler) {
+    'use strict';
+    var mMutexMethod = function() {
+        var self = this;
+        var args = toArray.apply(null, arguments);
+        return new Promise(function(resolve, reject) {
+            mutex.lock(name).then(function(unlock) {
+                var res = function(a0) {
+                    unlock().always(resolve.bind(null, a0));
+                };
+                var rej = function(a0) {
+                    unlock().always(reject.bind(null, a0));
+                };
+                mMutexMethod.__function__.apply(self, [res, rej].concat(args));
+            }).catch(function(ex) {
+                console.error(ex);
+                mutex.unlock(name).always(reject.bind(null, ex));
+            });
+        });
+    };
+    mMutexMethod.prototype = undefined;
+    Object.defineProperty(handler, '__method__', {value: mMutexMethod});
+    Object.defineProperty(mMutexMethod, '__name__', {value: name});
+    Object.defineProperty(mMutexMethod, '__function__', {value: handler});
+    return Object.freeze(mMutexMethod);
+}
+
+mutex.queue = Object.create(null);
+mutex.lock = promisify(function(resolve, reject, name) {
+    'use strict';
+    resolve = resolve.bind(this, mutex.unlock.bind(mutex, name));
+
+    if (mutex.queue[name]) {
+        mutex.queue[name].push(resolve);
+    }
+    else {
+        mutex.queue[name] = [];
+        resolve();
+    }
+});
+mutex.unlock = promisify(function(resolve, reject, name) {
+    'use strict';
+    var next = (mutex.queue[name] || []).shift();
+    if (next) {
+        onIdle(next);
+    }
+    else {
+        delete mutex.queue[name];
+    }
+    resolve();
+});
+Object.freeze(mutex);
 
 mBroadcaster.once('startMega', function() {
     var data = sessionStorage.sitet;

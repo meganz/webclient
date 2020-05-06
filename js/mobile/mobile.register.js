@@ -11,14 +11,17 @@ mobile.register = {
 
     /**
      * Render the signin screen
+     * @param {Object} registerInfo     Information passed to register page, used in Business accounts
      */
-    show: function() {
-
+    show: function(registerInfo) {
         'use strict';
 
         // Cache the selector
         this.$screen = $('.mobile.signin-register-block');
         this.$registerScreen = this.$screen.find('.tab-block.register');
+
+        // Cache registerInfo
+        this.registerInfo = registerInfo;
 
         // Show the login/register screen
         this.$screen.removeClass('hidden');
@@ -39,6 +42,20 @@ mobile.register = {
         this.initKeyupEvents();
         this.initRegisterButton();
         this.initBlurEvents();
+
+        // If we have valid passed registerInfo for Business, modify the UI
+        if (registerInfo && registerInfo.firstname && registerInfo.lastname && registerInfo.e) {
+            var $temp = $('.mobile.signin-input.first-name', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(from8(base64urldecode(registerInfo.firstname)));
+
+            $temp = $('.mobile.signin-input.last-name', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(from8(base64urldecode(registerInfo.lastname)));
+
+            $temp = $('.mobile.signin-input.email-address', this.$registerScreen).addClass('hidden');
+            $('input', $temp).val(registerInfo.e);
+
+            $('.top-link.sign-in', this.$screen).addClass('hidden');
+        }
     },
 
     /**
@@ -137,6 +154,7 @@ mobile.register = {
         var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
         var $registerButton = this.$registerScreen.find('.register-button');
         var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
+        var registerInfo = this.registerInfo;
 
         // Add click/tap handler to login button
         $registerButton.off('tap').on('tap', function() {
@@ -197,21 +215,61 @@ mobile.register = {
             // Set a flag indicating the registration came from the webclient.
             localStorage.signUpStartedInWebclient = '1';
 
-            // If they came from the Pro page, set the flag
-            var fromProPage = (localStorage.getItem('proPageContinuePlanNum') !== null) ? true : false;
+            // Business accounts have different flow
+            if (registerInfo || localStorage.businessSubAc) {
+                var signupcode = '';
+                window.businessSubAc = registerInfo || JSON.parse(localStorage.businessSubAc);
+                signupcode = window.businessSubAc.signupcode;
+                var ctx = {
+                    checkloginresult: function(u_ctx, r) {
+                        if (typeof r[0] === 'number' && r[0] < 0) {
+                            msgDialog('warningb', l[135], l[200]);
+                        }
+                        else {
+                            loadingDialog.hide();
+                            u_type = r;
 
-            // If the flag has been set to use the new registration method
-            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+                            security.login.checkLoginMethod(
+                                email,
+                                password,
+                                null,
+                                false,
+                                mobile.signin.old.startLogin,
+                                mobile.signin.new.startLogin);
 
-            // Start the registration process
-            mobile.register[method].startRegistration(
-                firstName,
-                lastName,
-                email,
-                password,
-                fromProPage,
-                mobile.register[method].completeRegistration     // Complete callback
-            );
+                            // I need this event handler to be triggered only once after successful sub-user login
+                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                            delete localStorage.businessSubAc;
+                        }
+                    },
+                    businessUser: password   // we need the plain entered password in later stages
+                    // because u_checklogin take the byte array of the password.
+                };
+                u_checklogin(
+                    ctx,
+                    true,
+                    null,
+                    signupcode,
+                    firstName + ' ' + lastName);
+
+            }
+            else {
+                // If they came from the Pro page, set the flag
+                var fromProPage = localStorage.getItem('proPageContinuePlanNum') || false;
+
+                // If the flag has been set to use the new registration method
+                var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+
+                // Start the registration process
+                mobile.register[method].startRegistration(
+                    firstName,
+                    lastName,
+                    email,
+                    password,
+                    fromProPage,
+                    mobile.register[method].completeRegistration     // Complete callback
+                );
+            }
 
             // Prevent double taps
             return false;

@@ -64,7 +64,7 @@ var megasync = (function() {
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
 
-        if (!ua || !ua.details || !ua.details.browser || !ua.details.version) {
+        if (!ua || !ua.details || !ua.details.browser || !ua.details.version || is_extension) {
             return ShttpMegasyncUrl;
         }
 

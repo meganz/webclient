@@ -63,7 +63,7 @@
         "id-length": [2, {"min": 1, "max": 26}],
         "keyword-spacing": [2, {}],
         "linebreak-style": 2,
-        "max-classes-per-file": [2, 2],
+        "max-classes-per-file": [1, 4],
         "max-depth": [2, 5],
         "max-len": [2, 120],
         "max-params": [2, 7],

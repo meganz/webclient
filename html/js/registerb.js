@@ -47,6 +47,10 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     });
     nbUsersMegaInput.showMessage('*' + l[19501]);
 
+    $nbUsersInput.rebind('wheel.registerb', function(e) {
+        e.preventDefault();
+    });
+
     var cnameMegaInput = new mega.ui.MegaInputs($cnameInput);
     var telMegaInput = new mega.ui.MegaInputs($telInput);
     var fnameMegaInput = new mega.ui.MegaInputs($fnameInput);

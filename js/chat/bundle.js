@@ -19318,7 +19318,7 @@ Chat.prototype.renderMyStatus = SoonFc(function () {
   } // reset
 
 
-  var $status = $('.activity-status-block .activity-status');
+  var $status = $('.activity-status-block .activity-status, .top-menu-popup .avatar-block', 'body');
   $('.top-user-status-popup .tick-item').removeClass("active");
   $status.removeClass('online').removeClass('away').removeClass('busy').removeClass('offline').removeClass('black');
   var actualPresence = self.plugins.presencedIntegration.getMyPresenceSetting();

@@ -2353,7 +2353,6 @@ else if (!browserUpdate) {
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2531,6 +2530,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
 
         jsl.push({f:'html/key.html', n: 'key', j:0});
         jsl.push({f:'html/login.html', n: 'login', j:0});
@@ -2581,6 +2581,7 @@ else if (!browserUpdate) {
     if (is_mobile) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
@@ -2763,6 +2764,7 @@ else if (!browserUpdate) {
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
         'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
         'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
+        'nas': {f:'html/nas.html', n: 'nas', j:0},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
@@ -2885,6 +2887,7 @@ else if (!browserUpdate) {
         'sync': ['sync', 'sync_js'],
         'cmd': ['cmd', 'megacmd_js'],
         'mobile': ['mobileapp'],
+        'nas': ['nas'],
         'ios': ['mobileapp'],
         'refer': ['affiliate', 'affiliate_js'],
         'android': ['mobileapp'],

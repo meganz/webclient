@@ -310,9 +310,12 @@ var mobile = {
         'use strict';
 
         var $megaIcon = $('.mobile.fm-icon.mega');
+        var $overlay = $('.nav-overlay', 'body');
 
         // On Mega icon click
         $megaIcon.off('tap').on('tap', function() {
+            $overlay.addClass('hidden');
+
             if ($(this).hasClass('non-responsive')) {
                 return;
             }

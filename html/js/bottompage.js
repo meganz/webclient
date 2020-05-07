@@ -8,9 +8,9 @@ var bottompage = {
      */
     init: function() {
         "use strict";
+
         var $content = $('.bottom-page.scroll-block', '.fmholder');
 
-        bottompage.initNavButtons();
         if (page.substr(0, 4) === 'help' || page === 'cpage' || page.substr(0, 9) === 'corporate') {
             $('body').addClass('old');
             scrollMenu();
@@ -52,21 +52,18 @@ var bottompage = {
         }
 
         if (!is_mobile) {
-            bottompage.initFloatingTop();
             $('body').removeClass('mobile');
-            bottompage.initBackToScroll();
-            bottompage.initScrollToContent();
+            bottompage.initNavButtons($content);
+            bottompage.initFloatingTop();
         }
         else {
             $('body').addClass('mobile');
-            if (is_android) {
-                bottompage.topBlockHeight();
-
-                $(window).off('orientationchange').on('orientationchange', function() {
-                    bottompage.topBlockHeight();
-                });
-            }
+            bottompage.initMobileNavButtons($content);
         }
+
+        // Init scroll button
+        bottompage.initBackToScroll();
+        bottompage.initScrollToContent();
     },
 
     /**
@@ -195,93 +192,144 @@ var bottompage = {
         "use strict";
 
         // Init Scroll to Content event
-        $('.bottom-page.scroll-button').rebind('click', function () {
+        $('.bottom-page.scroll-button', '.top-bl').rebind('click.scrolltocontent', function() {
 
             $('.fmholder, html, body').animate({
-                scrollTop: $('.bottom-page.top-bl').outerHeight()
+                scrollTop: $('.full-block', 'body').position().top
             }, 1600);
         });
     },
 
-    initNavButtons: function() {
-        $('.pages-nav.nav-button').removeClass('active');
+    initNavButtons: function($content) {
+        "use strict";
 
-        try {
-            $('.pages-nav.nav-button.' + page).addClass('active');
+        var $topMenu = $('.pages-menu.body', $content);
+
+        // No  pages  menu in DOM
+        if ($topMenu.length === 0) {
+            return false;
         }
-        catch (exception) { };
 
-        hiddenNavDropdown();
+        // Close  submenu function
+        function closePagesSubMenu() {
+            $('.submenu.active, .submenu-item.active', $topMenu).removeClass('active');
+            $(window).unbind('resize.pagesmenu');
+        }
 
-        $('.nav-button.compound-lnk').rebind('click', function() {
+        // Close previously opened sub menu
+        closePagesSubMenu();
+
+        // Open submenu
+        $('.submenu-item', $topMenu).rebind('click.openpmenu', function() {
             var $this = $(this);
-            var $dropdown = $this.prev('.compound-items');
+            var $submenu = $this.next('.submenu');
 
-            $this.addClass('opened');
-            $('.nav-overlay').removeClass('hidden');
-            $('.pages-nav.nav-button.active').addClass('greyed-out');
-            $dropdown.addClass('active');
+            if ($this.is('.active')) {
+                closePagesSubMenu();
 
-            function navDropdownPos() {
-                var $this = $('.nav-button.compound-lnk.opened');
-                var $dropdown = $('.pages-nav.compound-items.active');
-                var leftPos;
-                var topPos;
-                var thisLeftPos = $this.offset().left + $this.outerWidth()/2;
-                var thisTopPos = $this.offset().top -
-                    (window.scrollY || window.pageYOffset || document.body.scrollTop);
-                var browserWidth = $('body').outerWidth();
+                return false;
+            }
 
-                if (browserWidth >= 655) {
-                    hiddenNavDropdown();
-                    return false;
-                }
-                topPos = thisTopPos - $dropdown.outerHeight() + 4;
-                if (thisTopPos - $dropdown.outerHeight() + 4 < 10) {
-                    topPos = thisTopPos + $this.outerHeight() - 4;
-                }
+            function subMenuPos() {
+                var $this = $('.submenu-item.active', $topMenu);
+                var $submenu = $this.next('.submenu');
 
-                if ($this.hasClass('mobile')) {
-                    leftPos = thisLeftPos - $dropdown.outerWidth()/2;
-                    if (leftPos < 10) {
-                        leftPos = 10;
-                    }
-                }
-                else {
-                    leftPos = thisLeftPos - $dropdown.outerWidth()/2;
-                    if (browserWidth < leftPos + $dropdown.outerWidth() + 10) {
-                        leftPos = browserWidth - $dropdown.outerWidth() - 10;
-                    }
-                }
-
-                $dropdown.css({
-                    'left': leftPos > 0 ? leftPos : 0,
-                    'top': topPos
+                $submenu.position({
+                    of: $this,
+                    my: "center top",
+                    at: "center bottom",
+                    collision: "fit"
                 });
             }
 
-            navDropdownPos();
+            closePagesSubMenu();
+            $this.addClass('active');
+            $submenu.addClass('active');
+            subMenuPos();
 
-            $('body, html').rebind('touchmove.bodyscroll', function () {
-                hiddenNavDropdown();
-            });
-
-            $(window).rebind('resize.navdropdown', function (e) {
-                navDropdownPos();
+            $(window).rebind('resize.pagesmenu', function() {
+                subMenuPos();
             });
         });
 
-        function hiddenNavDropdown() {
-            $('.nav-overlay').addClass('hidden');
-            $('.nav-button.compound-lnk.opened').removeClass('opened');
-            $('.pages-nav.nav-button.active.greyed-out').removeClass('greyed-out');
-            $('.pages-nav.compound-items.active').removeClass('active').removeAttr('style');
-            $('body, html').off('touchmove.bodyscroll');
-            $(window).off('resize.navdropdown');
+        // Close pages submenu by click outside of submenu
+        $content.rebind('click.closepmenu', function(e) {
+            var $target = $(e.target);
+
+            if (!$target.is('.submenu') && !$target.closest('.submenu-item.active').length) {
+                closePagesSubMenu();
+            }
+        });
+    },
+
+    initMobileNavButtons: function($content) {
+        "use strict";
+
+        var $overlay = $('.nav-overlay', 'body');
+        var $header = $('.fm-header', $content);
+        var $topMenu = $('.pages-menu.body', $content);
+        var $menuDropdown;
+
+        $overlay.addClass('hidden');
+
+        // No  pages menu in DOM
+        if ($topMenu.length === 0) {
+            $header.unbind('click.closepmenu');
+
+            return false;
         }
 
-        $('.nav-overlay').rebind('click', function() {
-            hiddenNavDropdown();
+        $menuDropdown = $('.mobile.pages-menu-dropdown', $content);
+
+        // Close pages menu function
+        function closePagesMenu() {
+            $overlay.addClass('hidden');
+            $('html').removeClass('overlayed');
+            $topMenu.removeClass('active');
+            $menuDropdown.removeClass('active');
+            $overlay.unbind('click.closepmenu');
+            $header.unbind('click.closepmenu');
+        }
+
+        // Close previously opened menu
+        closePagesMenu();
+
+        // Open menu
+        $menuDropdown.rebind('click.openpmenu', function() {
+            var $this = $(this);
+
+            if ($this.is('.active')) {
+                closePagesMenu();
+
+                return false;
+            }
+
+            $overlay.removeClass('hidden');
+            $('html').addClass('overlayed');
+            $this.addClass('active');
+            $topMenu.addClass('active');
+
+            // Close previously opened menu by click on overlay or menu icon
+            $overlay.add($header).rebind('click.closepmenu', function(e) {
+                if ($(e.target).closest('.pages-menu-dropdown').length === 0) {
+                    closePagesMenu();
+                }
+            });
+        });
+
+        // Expand submenu
+        $('.submenu-item', $topMenu).rebind('click.opensubmenu', function() {
+            var $this = $(this);
+            var $submenu = $this.next('.submenu');
+
+            if ($this.is('.active')) {
+                $this.removeClass('active');
+                $submenu.removeClass('active');
+            }
+            else {
+                $this.addClass('active');
+                $submenu.addClass('active');
+            }
         });
     },
 
@@ -347,7 +395,7 @@ var bottompage = {
 
     initFloatingTop: function() {
         var topHeader;
-        var navBar = '.pages-nav.content-block';
+        var navBar = '.pages-menu.body';
 
         if (page === 'download') {
             topHeader = '.download.top-bar';
@@ -361,16 +409,16 @@ var bottompage = {
 
         function topResize() {
             var $topHeader = $(topHeader + ',' + navBar);
-            var $navBar = $('.pages-nav.content-block');
+            var $navBar = $('.pages-menu.body', 'body');
             if ($topHeader.hasClass('floating')) {
                 $topHeader.width($topHeader.parent().outerWidth());
                 if (page !== 'download') {
-                    $navBar.parent().width($navBar.outerWidth());
+                    $navBar.width($navBar.outerWidth());
                 }
             }
             else {
                 $topHeader.css('width',  '');
-                $navBar.parent().removeAttr('style');
+                $navBar.removeAttr('style');
             }
         }
 
@@ -405,6 +453,7 @@ var bottompage = {
 
                 if ((topPos > 150 && $topHeader.is('.expanded')) || dlStarted) {
                     $topHeader.removeClass('expanded initial').addClass('auto');
+                    $('.pages-menu .submenu, .pages-menu .submenu-item', $topHeader).removeClass('active');
                 }
                 else if (topPos < 50 && $topHeader.is('.auto')) {
                     expandDlBar();
@@ -416,35 +465,22 @@ var bottompage = {
                 return;
             }
 
-            navTopPos = $('.pages-nav-wrap').position().top;
-
-            if (topPos > navTopPos + 300) {
+            if (topPos > 300) {
                 $navBar.addClass('floating');
+                $(window).unbind('resize.pagesmenu');
+                $('.submenu.active, .submenu-item.active', $navBar).removeClass('active');
                 topResize();
-                if (topPos > navTopPos + 600) {
+                if (topPos > 600) {
                     $navBar.addClass('activated');
                 }
             }
-            else if (topPos <= navTopPos + 300 && topPos >= navTopPos + 50) {
+            else if (topPos <= 300 && topPos >= 50) {
                 $navBar.removeClass('activated');
             }
             else {
                 $navBar.removeClass('floating activated').removeAttr('style');
             }
         });
-    },
-
-    topBlockHeight: function() {
-        "use strict";
-
-        var $topBlock = $('.bottom-page.top-bl');
-        var $productNav = $topBlock.parent().first('.pages-nav.content-block');
-        var topBlockHeight = $topBlock.parent().length > -1 ? $topBlock.parent().outerHeight() : 0;
-        var productNavHeight = $productNav.length > -1 ? $productNav.outerHeight() : 0;
-
-        if (topBlockHeight - productNavHeight > 0) {
-            $topBlock.height(topBlockHeight - productNavHeight);
-        }
     },
 
     videoResizing: function() {

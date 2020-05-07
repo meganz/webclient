@@ -53,8 +53,8 @@ if (typeof loadingDialog === 'undefined') {
         subject = subject || 'common';
 
         if (!this.quiet) {
-            $overlay = $('.dark-overlay');
-            $spinner = $('.loading-spinner:not(.manual-management)');
+            $overlay = $('.dark-overlay:not(.mobile)', 'body');
+            $spinner = $('.loading-spinner:not(.manual-management)', 'body');
 
             if (label) {
                 $overlay.addClass('white');
@@ -79,8 +79,8 @@ if (typeof loadingDialog === 'undefined') {
         delete $.loadingSubject[subject];
 
         if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
-            $overlay = $('.dark-overlay');
-            $spinner = $('.loading-spinner:not(.manual-management)');
+            $overlay = $('.dark-overlay:not(.mobile)', 'body');
+            $spinner = $('.loading-spinner:not(.manual-management)', 'body');
 
             $overlay.removeClass('white').addClass('hidden');
             $spinner.removeClass('active').addClass('hidden');

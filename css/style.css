@@ -4832,14 +4832,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     border: 0;
     width: 0;
     -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
 .active .top-search-input, .contains-value .top-search-input {
     width: 160px;
     padding-right: 38px;
+}
+.contains-value .top-search-input {
+    -webkit-transition: none;
+    transition: none;
 }
 .fm-main {
     height: 100%;
@@ -7037,11 +7038,9 @@ table {
 .thumb .transfer-filetype-icon.photoshop img {
     display: inline-block;
     height: 18px;
-    margin: 4px 2px;
+    margin: 3px 2px;
     width: 18px;
     border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
 }
 
 .fm-flags-icon img {
@@ -19957,7 +19956,7 @@ body.pro:after {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;

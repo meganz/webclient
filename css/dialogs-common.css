@@ -49,6 +49,7 @@
 .mobile .fm-dialog-title {
     padding-left: 25px;
     padding-right: 25px;
+    white-space: normal;
 }
 .mobile .fm-dialog-title.medium {
     font-size: 16px;

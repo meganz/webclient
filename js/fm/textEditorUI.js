@@ -37,6 +37,9 @@ mega.textEditorUI = new function TextEditorUI() {
                     if (e) {
                         callback();
                     }
+                    else {
+                        editor.focus();
+                    }
                 }
             );
         }
@@ -299,6 +302,53 @@ mega.textEditorUI = new function TextEditorUI() {
                         M.saveAs(savedFileData, fileName);
                     }
                 );
+            }
+        );
+
+        var hotkey = 'ctrlKey';
+        if (ua.details.os === 'Apple') {
+            $('.open-f .menu-item-shortcut', $editorContianer).text(' ');
+            $('.close-f .menu-item-shortcut', $editorContianer).text(' ');
+            $('.save-f .menu-item-shortcut', $editorContianer).text('\u2318 S');
+            $('.save-as-f .menu-item-shortcut', $editorContianer).text('\u21E7\u2318 S');
+            $('.print-f .menu-item-shortcut', $editorContianer).text('\u2318 P');
+            hotkey = 'metaKey';
+        }
+
+        $editorContianer.rebind(
+            'keydown.txt-editor',
+            function keydownHandler(event) {
+                if (event[hotkey]) {
+                    switch (event.code) {
+                        case 'KeyS':
+                            if (event.shiftKey) {
+                                $('.editor-btn-container .save-as-f', $editorContianer).trigger('click');
+                            }
+                            else {
+                                $saveButton.trigger('click');
+                            }
+                            return false;
+                        case 'KeyO':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .open-f', $editorContianer).trigger('click');
+                            return false;
+                        case 'KeyQ':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .close-f', $editorContianer).trigger('click');
+                            return false;
+                        case 'KeyP':
+                            if (event.shiftKey) {
+                                return true;
+                            }
+                            $('.editor-btn-container .print-f', $editorContianer).trigger('click');
+                            return false;
+                    }
+                }
+                return true;
             }
         );
 

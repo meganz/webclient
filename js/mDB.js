@@ -104,7 +104,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm29_';
+    var dbpfx = 'fm30_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -1042,10 +1042,11 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
             if (r[i].d && !r[i].d.byteLength) {
                 // not encrypted.
-                continue;
+                t = r[i].d || {};
             }
-
-            t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+            else {
+                t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+            }
 
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes

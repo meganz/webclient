@@ -440,6 +440,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             function(){
                 if (d) {
                     fmdb.logger.log("Transaction started");
+                    console.time('fmdb-transaction');
                 }
                 fmdb.commit = false;
                 fmdb.cantransact = 1;
@@ -464,10 +465,14 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.state = -1;
                 if (d) {
                     fmdb.logger.log("Transaction committed");
+                    console.timeEnd('fmdb-transaction');
                 }
                 fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
+                if (d) {
+                    console.timeEnd('fmdb-transaction');
+                }
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;

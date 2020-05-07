@@ -164,7 +164,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
 
                 reject(ETEMPUNAVAIL);
             }
-        }, 9000);
+        }, 15000);
 
         var dbSchema = {};
         if (!Array.isArray(fmdb.schema)) {
@@ -440,6 +440,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             function(){
                 if (d) {
                     fmdb.logger.log("Transaction started");
+                    console.time('fmdb-transaction');
                 }
                 fmdb.commit = false;
                 fmdb.cantransact = 1;
@@ -464,10 +465,14 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.state = -1;
                 if (d) {
                     fmdb.logger.log("Transaction committed");
+                    console.timeEnd('fmdb-transaction');
                 }
                 fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
+                if (d) {
+                    console.timeEnd('fmdb-transaction');
+                }
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
@@ -596,13 +601,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (t.t == t.h) t.h++;
 
                 if (fmdb.crashed && !(t.t & 1)) {
-                    if (d) {
+                    if (window.d) {
                         fmdb.logger.warn('The DB is crashed, halting put...');
                     }
                     return;
                 }
 
-                if (d) {
+                if (window.d) {
                     fmdb.logger.log("DB %s with %s element(s) on table %s, channel %s, state %s",
                         (t.t & 1) ? 'del' : 'put', t[t.t].length, table, ch, fmdb.state);
                 }
@@ -624,6 +629,44 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 var op = t.t & 1 ? 'bulkDelete' : 'bulkPut';
                 var data = t[t.t++];
                 var limit = 16384; // increase the limit of the batch
+
+                if (op === 'bulkPut') {
+                    if (window.d) {
+                        console.time('fmdb-serialize');
+                    }
+
+                    for (var rw = 0; rw < data.length; rw++) {
+                        var row = data[rw];
+                        if (row.d) {
+                            if (fmdb.stripnode[table]) {
+                                // this node type is stripnode-optimised: temporarily remove redundant elements
+                                // to create a leaner JSON and save IndexedDB space
+                                var d = row.d;  // this references the live object!
+                                var t1 = fmdb.stripnode[table](d);   // remove overhead
+                                row.d = JSON.stringify(d);          // store lean result
+                                for (var i1 in t1) d[i1] = t1[i1];       // restore overhead
+                            }
+                            else {
+                                // otherwise, just stringify it all
+                                row.d = JSON.stringify(row.d);
+                            }
+                        }
+
+                        // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
+                        for (var i2 in row) {
+                            if (i2 == 'd') {
+                                row.d = fmdb.strcrypt(row.d);
+                            }
+                            else if (table !== 'f' || i2 !== 't') {
+                                row[i2] = ab_to_base64(fmdb.strcrypt(row[i2]));
+                            }
+                        }
+                    }
+
+                    if (window.d) {
+                        console.timeEnd('fmdb-serialize');
+                    }
+                }
 
                 if (data.length < limit) {
                     fmdb.db[table][op](data).then(writeend).catch(writeerror);
@@ -955,31 +998,6 @@ FMDB.prototype.add = function fmdb_add(table, row) {
 
     if (this.crashed) return;
 
-    if (row.d) {
-        if (this.stripnode[table]) {
-            // this node type is stripnode-optimised: temporarily remove redundant elements
-            // to create a leaner JSON and save IndexedDB space
-            var d = row.d;  // this references the live object!
-            var t = this.stripnode[table](d);   // remove overhead
-            row.d = JSON.stringify(d);          // store lean result
-            for (var i in t) d[i] = t[i];       // restore overhead
-        }
-        else {
-            // otherwise, just stringify it all
-            row.d = JSON.stringify(row.d);
-        }
-    }
-
-    // obfuscate index elements as base64-encoded strings, payload as ArrayBuffer
-    for (var i in row) {
-        if (i == 'd') {
-            row.d = this.strcrypt(row.d);
-        }
-        else if (table !== 'f' || i !== 't') {
-            row[i] = ab_to_base64(this.strcrypt(row[i]));
-        }
-    }
-
     this.enqueue(table, row, 0);
 };
 
@@ -1033,7 +1051,14 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     for (var i = r.length; i--; ) {
         try {
-            t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+
+            if (r[i].d && !r[i].d.byteLength) {
+                // not encrypted.
+                t = r[i].d || {};
+            }
+            else {
+                t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+            }
 
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
@@ -1109,7 +1134,10 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         index = t.schema.primKey.keyPath;
     }
 
+    var originalAnyof = [];
+    var originalWhere = [];
     if (anyof) {
+        originalAnyof = clone(anyof[1]);
         // encrypt all values in the list
         for (i = anyof[1].length; i--;) {
             /*if (!this.filters[anyof[1][i]]) {
@@ -1132,6 +1160,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
     }
     else {
         for (var k = where.length; k--; ) {
+            originalWhere.unshift(where[k][1]);
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
             if (!this.filters[where[k][1]]) {
                 this.filters[where[k][1]] = ab_to_base64(this.strcrypt(where[k][1]));
@@ -1200,7 +1229,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                     // check if this update matches our criteria, if any
                                     if (where) {
                                         for (var k = where.length; k--; ) {
-                                            if (update[where[k][0]] !== where[k][1]) break;
+                                            if (update[where[k][0]] !== where[k][1] && update[where[k][0]] !== originalWhere[k]) break;
                                         }
 
                                         // mismatch detected - record it as a deletion
@@ -1222,7 +1251,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                         // does this update modify a record matched by the
                                         // anyof inclusion list?
                                         for (var k = anyof[1].length; k--; ) {
-                                            if (update[anyof[0]] === anyof[1][k]) break;
+                                            if (update[anyof[0]] === anyof[1][k] || update[anyof[0]] === originalAnyof[k]) break;
                                         }
 
                                         // no match detected - record it as a deletion
@@ -1267,7 +1296,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         if (where) {
             for (i = r.length; i--;) {
                 for (var k = where.length; k--;) {
-                    if (r[i][where[k][0]] !== where[k][1]) {
+                    if (r[i][where[k][0]] !== where[k][1] && r[i][where[k][0]] !== originalWhere[k]) {
                         r.splice(i, 1);
                         break;
                     }

@@ -55,6 +55,7 @@
 Object.defineProperty(this, 'MEGA_USER_STRUCT', {
     value: Object.freeze({
         "u": undefined,
+        "b": undefined,
         "c": undefined,
         "m": undefined,
         "m2": undefined,

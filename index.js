@@ -1122,7 +1122,7 @@ function init_page() {
 
         return false;
     }
-    else if (is_mobile && page.substr(0, 3) === 'sms') {
+    else if (is_mobile && !isEphemeral() && page.substr(0, 3) === 'sms') {
 
         parsepage(pages['mobile']);
 

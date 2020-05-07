@@ -736,6 +736,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
             u_attr.name = self.u[userId].name;
 
             $('.user-name').text(u_attr.fullname);
+            $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.fullname);
             $('.membership-big-txt.name').text(u_attr.fullname);
             if (M.currentdirid === 'account') {
                 accountUI.account.profiles.renderFirstName();

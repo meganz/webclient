@@ -400,6 +400,7 @@ accountUI.general = {
         // update avatar
         $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        $('.avatar-block', '.top-menu-popup').safeHTML(useravatar.contact(u_handle));
 
         // Show first name or last name
         $('.membership-big-txt.name').text(u_attr.fullname);
@@ -1126,6 +1127,7 @@ accountUI.account = {
                         callback: function (res) {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
+                                $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop

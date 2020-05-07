@@ -1014,8 +1014,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20553] = l[20553].replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[20588] = l[20588].replace('[A]', '<a class="clickurl" href="/security">')
         .replace('[/A]', '</a>');
-    l[20592] = l[20592].replace('[A1]', '<a class="clickurl" href="/sourcecode">')
-        .replace('[/A1]', '</a>');
+    l[20592] = l[20592].replace('[A1]', '').replace('[/A1]', '');
     l[20592] = l[20592].replace('[A2]', '<a target="_blank" rel="noopener noreferrer"'
         + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
     l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
@@ -1154,6 +1153,18 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23203] = l[23203].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
         .replace('%1', '<span></span>');
     l[23243] = escapeHTML(l[23243]).replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
+    l[23332] = escapeHTML(l[23332]).replace('[A1]', '<a href="/cmd" target="_blank" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="https://www.qnap.com/en/app_center/' +
+            '?qts=4.3&kw=megacmd&type_choose=&cat_choose=" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A2]', '</a>')
+        .replace('[A3]', '<a href="https://www.synology.com/en-nz/dsm/packages/MEGAcmd' +
+            '" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A3]', '</a>');
+    l[23354] = escapeHTML(l[23354]).replace('[A]', '<a href="/pro" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l[23376] = escapeHTML(l[23376]).replace('[A]', '<a href="/security" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
@@ -1161,7 +1172,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
-        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098
+        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23351
     ];
     for (i = common.length; i--;) {
         var num = common[i];

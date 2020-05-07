@@ -185,53 +185,8 @@
     animation-fill-mode: forwards;
     perspective-origin: 50% 50%;
 }
-.startpage.plan-features .plan-feature, .startpage.plan-wrapper {
-    opacity: 0;
-}
-.startpage.plan-features.start-animation .plan-feature, .startpage.plan-wrapper.start-animation {
-    -webkit-animation-name: show-features;
-    -webkit-animation-duration: 1s;
-    -webkit-animation-delay: 0.5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-name: show-features;
-    animation-duration: 1s;
-    animation-delay: 0.5s;
-    animation-fill-mode: forwards;
-}
-.startpage.plan-features.start-animation .plan-feature.f2 {
-    -webkit-animation-delay: 1s;
-    animation-delay: 1s;
-}
-.startpage.plan-features.start-animation .plan-feature.f3 {
-    -webkit-animation-delay: 1.5s;
-    animation-delay: 1.5s;
-}
-.startpage.plan-features.start-animation .plan-feature.f4 {
-    -webkit-animation-delay: 2s;
-    animation-delay: 2s;
-}
-.startpage.plan-features.start-animation .plan-feature.f5 {
-    -webkit-animation-delay: 2.5s;
-    animation-delay: 2.5s;
-}
-.startpage.plan-features.start-animation .plan-feature.f6 {
-    -webkit-animation-delay: 3s;
-    animation-delay: 3s;
-}
-.startpage.dark-slider.animated, .bottom-page.big-header.animated, .startpage.square-block, .bottom-page.big-icon.mega, .startpage.carousel {
-    opacity: 0;
-}
-.startpage.dark-slider.animated.start-animation {
-    -webkit-animation-name: show-features;
-    -webkit-animation-duration: 1.5s;
-    -webkit-animation-delay: 0.5s;
-    -webkit-animation-fill-mode: forwards;
-    animation-name: show-features;
-    animation-duration: 1.5s;
-    animation-delay: 0.5s;
-    animation-fill-mode: forwards;
-}
-.bottom-page.big-header.animated.start-animation, .startpage.square-block.start-animation, .bottom-page.big-icon.mega.start-animation, .startpage.carousel.start-animation {
+.
+.bottom-page.big-header.animated.start-animation .startpage.carousel.start-animation {
     -webkit-animation-name: show-features;
     -webkit-animation-duration: 0.6s;
     -webkit-animation-delay: 0.3s;
@@ -240,40 +195,6 @@
     animation-duration: 0.6s;
     animation-delay: 0.3s;
     animation-fill-mode: forwards;
-}
-.chaotic .startpage.square-block {
-    opacity: 0;
-    position: relative;
-}
-.chaotic .startpage.square-block.c1 {
-    transform: scale(0.5) translate(100%, 50%);
-}
-.chaotic .startpage.square-block.c2 {
-    transform: scale(0.5) translate(0, 80%);
-    z-index: 1;
-}
-.chaotic .startpage.square-block.c3 {
-    transform: scale(0.5) translate(-100%, 50%);
-}
-.chaotic .startpage.square-block.c4 {
-    transform: scale(0.5) translate(100%, -50%);
-}
-.chaotic .startpage.square-block.c5 {
-    transform: scale(0.5) translate(0, -80%);
-    z-index: 1;
-}
-.chaotic .startpage.square-block.c6 {
-    transform: scale(0.5) translate(-100%, -50%);
-}
-.chaotic .startpage.square-block.start-animation {
-    -webkit-transition: all 500ms ease-in-out;
-    transition: all 500ms ease-in-out;
-    -webkit-transition-delay: 500ms;
-    transition-delay: 500ms;
-    -webkit-transition-timing-function: ease-in-out;
-    transition-timing-function: ease-in-out;
-    opacity: 1;
-    transform: scale(1) translate(0, 0);
 }
 
 .scale.animated {

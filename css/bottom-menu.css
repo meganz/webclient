@@ -1,5 +1,5 @@
 .bottom-menu.body {
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
     position: relative;
     background-color: white;
 }
@@ -66,7 +66,7 @@
     background-color: #d90007;
     overflow: hidden;
     margin: 27px 0 0 0;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-position: -11px -1371px;
 }
 .bottom-menu.company-info {
@@ -93,49 +93,50 @@
     position: absolute;
     margin: -29px 0 0 0;
 }
-
 @media only screen and (max-width: 768px) {
-.bottom-menu.col2-of-6 {
-    width: 32%;
+    .bottom-menu.col2-of-6 {
+        width: 32%;
+    }
 }
-}
-
 @media only screen and (max-width: 722px) {
-.bottom-menu.column:first-child {
-    padding-left: 15px;
-    padding-bottom: 52px;
-    width: 100%;
-    text-align: center;
+    .bottom-menu.column:first-child {
+        padding-left: 15px;
+        padding-bottom: 52px;
+        width: 100%;
+        text-align: center;
+    }
+    .bottom-menu.pad {
+        padding: 43px 15px 43px 0;
+    }
+    .bottom-menu.col1-of-6 {
+        width: 25%;
+    }
+    .bottom-menu.copyrights {
+        margin: 52px 15px 20px 15px;
+        position: static;
+        text-align: center;
+    }
+    .bottom-menu.logo {
+        margin: 27px auto 0 auto;
+    }
 }
-.bottom-menu.pad {
-    padding: 43px 15px 43px 0;
-}
-.bottom-menu.col1-of-6 {
-    width: 25%;
-}
-.bottom-menu.copyrights {
-    margin: 52px 15px 20px 15px;
-    position: static;
-    text-align: center;
-}
-.bottom-menu.logo {
-    margin: 27px auto 0 auto;
-}
-}
-
 @media only screen and (max-width: 565px) {
-.bottom-menu.column:first-child, .bottom-menu.copyrights {
-    text-align: left;
-}
-.bottom-menu.pad {
-    padding: 71px 28px 43px 28px;
-}
-.bottom-menu.col1-of-6 {
-    width: 50%;
-}
-.bottom-menu.logo {
-    margin: 27px 0 0 0;
-}
+    .bottom-menu.column:first-child, .bottom-menu.copyrights {
+        text-align: left;
+    }
+    .bottom-menu.pad {
+        padding: 71px 28px 43px 28px;
+    }
+    .bottom-menu.col1-of-6 {
+        width: 50%;
+    }
+    .bottom-menu.logo {
+        margin: 27px 0 0 0;
+    }
+    .bottom-menu.column:first-child, .bottom-menu.column, .bottom-menu.copyrights {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 /* Remove rule when most pages are mobile optimised */
 .mobile .bottom-menu.col1-of-6 {
@@ -153,27 +154,26 @@
 .mobile .bottom-menu.company-info strong {
     display: inline-block;
 }
-
 @media only screen and (max-width: 565px) {
-.mobile .bottom-menu.pad {
-    min-height: 10px;
-    padding: 10px 43px 36px 43px;
-    text-align: center;
-}
-.mobile .bottom-menu.column:first-child {
-    padding-bottom: 0;
-    padding-left: 0;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    text-align: center;
-}
-.mobile .bottom-menu.copyrights {
-    text-align:center;
-}
-.mobile .bottom-menu.company-info strong {
-    display: block;
-}
+    .mobile .bottom-menu.pad {
+        min-height: 10px;
+        padding: 10px 43px 36px 43px;
+        text-align: center;
+    }
+    .mobile .bottom-menu.column:first-child {
+        padding-bottom: 0;
+        padding-left: 0;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0;
+        text-align: center;
+    }
+    .mobile .bottom-menu.copyrights {
+        text-align: center;
+    }
+    .mobile .bottom-menu.company-info strong {
+        display: block;
+    }
 }
 @media only screen and (max-width: 565px) {
     .bottom-menu.col1-of-6 {

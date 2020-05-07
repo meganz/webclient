@@ -505,9 +505,6 @@ body:not(.mobile) .about.white-button:hover {
     .id .about .bottom-page.big-icon-info {
         font-size: 26px;
     }
-    .bottom-page.big-header {
-        font-size: 30px;
-    }
 }
 @media only screen and (max-width: 783px) {
     .about.joing-txt, .about.hiring-txt, .id .about.joing-txt {
@@ -600,10 +597,6 @@ body:not(.mobile) .about.white-button:hover {
     }
     .about.hiring {
         margin: 30px auto 0 auto;
-    }
-    .bottom-page.big-header {
-        font-size: 26px;
-        line-height: 38px;
     }
     .about.top-info {
         padding: 36px 0 18px 0;

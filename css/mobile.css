@@ -3287,7 +3287,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4737,7 +4737,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -4829,13 +4829,6 @@ div.checkboxOn, div.checkboxOff {
 }
 .top-submenu.language-items .top-menu-item.beta .beta-text {
     display: inline-block;
-}
-.mobile.top-menu-popup .top-menu-item {
-    font-size: 15px;
-    line-height: 26px;
-}
-.mobile.top-menu-popup .top-menu-item.submenu-item::before {
-    top: 10px;
 }
 .bottom-menu.copyrights {
     position: static;

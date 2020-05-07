@@ -25,7 +25,7 @@ function expandDlBar() {
                 $topBar.css({
                     'height': contentHeight +
                         $('.download.bar-table', $topBar).outerHeight() +
-                        $('.pages-nav.content-block', $topBar).height()
+                        $('.pages-menu.body', $topBar).height()
                 });
             }
         }
@@ -675,12 +675,13 @@ function dl_g(res, ctx) {
             expandDlBar();
 
             // Expand top bar if its clicked
-            $topBar.rebind('click', function(e) {
+            $topBar.rebind('click.expandbar', function(e) {
                 var $target = $(e.target);
 
                 if ($(this).find('.download-content').height() < 15
                     && $target.not('.button') && !$target.closest('.button').length
                     && !$target.closest('.top-menu-popup').length
+                    && !$target.closest('.pages-menu').length
                     && !$topBar.hasClass('download-complete')) {
 
                     expandDlBar();

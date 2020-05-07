@@ -1629,28 +1629,26 @@ ChatRoom.prototype.uploadFromComputer = function() {
 
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
+
 ChatRoom.prototype.attachContacts = function(ids) {
-    var self = this;
+    for (let i = 0; i < ids.length; i++) {
+        const nodeId = ids[i];
+        const node = M.u[nodeId];
 
-    var nodesMeta = [];
-    $.each(ids, function(k, nodeId) {
-        var node = M.u[nodeId];
-
-        nodesMeta.push({
-            'u': node.u,
-            'email': node.m,
-            'name': node.name || node.m
-        });
-    });
-
-    // 1b, 1b, JSON
-    self.sendMessage(
-        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-        Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
-        JSON.stringify(nodesMeta)
-    );
+        // 1b, 1b, JSON
+        this.sendMessage(
+            Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+            Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
+            JSON.stringify([{
+                u: node.u,
+                email: node.m,
+                name: node.name || node.m
+            }])
+        );
+    }
 };
 
 

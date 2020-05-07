@@ -12646,7 +12646,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   label: l[83],
                   className: "red",
                   onClick: function onClick(e) {
-                    self.doDelete(e, message);
+                    return self.doDelete(e, message);
                   }
                 });
               }
@@ -22443,23 +22443,22 @@ ChatRoom.prototype.uploadFromComputer = function () {
 };
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
 
 
 ChatRoom.prototype.attachContacts = function (ids) {
-  var self = this;
-  var nodesMeta = [];
-  $.each(ids, function (k, nodeId) {
-    var node = M.u[nodeId];
-    nodesMeta.push({
-      'u': node.u,
-      'email': node.m,
-      'name': node.name || node.m
-    });
-  }); // 1b, 1b, JSON
+  for (var i = 0; i < ids.length; i++) {
+    var nodeId = ids[i];
+    var node = M.u[nodeId]; // 1b, 1b, JSON
 
-  self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(nodesMeta));
+    this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify([{
+      u: node.u,
+      email: node.m,
+      name: node.name || node.m
+    }]));
+  }
 };
 /**
  * Get message by Id

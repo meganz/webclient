@@ -77,12 +77,22 @@
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+#mega-text-editor .top-menu-content {
+    padding-bottom: 7px;
+}
 #mega-text-editor .top-menu-item {
-    padding-right: 10px;
-    cursor: default;
+    padding-right: 17px;
+    padding-left: 17px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: LatoWeb;
 }
 #mega-text-editor .top-menu-item span {
-    cursor: pointer;
+    display: inline-block;
+}
+#mega-text-editor .top-menu-item .menu-item-shortcut {
+    float:right;
+    color: #999999;
 }
 #mega-text-editor .editor-file-name-title {
     height: 24px;
@@ -228,6 +238,7 @@
     width: 190px;
     position: fixed;
     z-index: 1120;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 #mega-text-editor .top-menu-popup-editor::before {
     content: '';

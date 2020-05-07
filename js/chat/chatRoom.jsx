@@ -610,13 +610,21 @@ ChatRoom.prototype.isArchived = function() {
 };
 
 /**
+ * Check whether given chat is 1-1 w/ cancelled account.
+ * @returns {Boolean}
+ */
+ChatRoom.prototype.isCancelled = function() {
+    return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
+};
+
+/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return ((self.showArchived === true) ||
+    return !self.isCancelled() && ((self.showArchived === true) ||
             !self.isArchived() ||
             (self.callManagerCall && self.callManagerCall.isActive()));
 };
@@ -1621,28 +1629,26 @@ ChatRoom.prototype.uploadFromComputer = function() {
 
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
+
 ChatRoom.prototype.attachContacts = function(ids) {
-    var self = this;
+    for (let i = 0; i < ids.length; i++) {
+        const nodeId = ids[i];
+        const node = M.u[nodeId];
 
-    var nodesMeta = [];
-    $.each(ids, function(k, nodeId) {
-        var node = M.u[nodeId];
-
-        nodesMeta.push({
-            'u': node.u,
-            'email': node.m,
-            'name': node.name || node.m
-        });
-    });
-
-    // 1b, 1b, JSON
-    self.sendMessage(
-        Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
-        Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
-        JSON.stringify(nodesMeta)
-    );
+        // 1b, 1b, JSON
+        this.sendMessage(
+            Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
+            Message.MANAGEMENT_MESSAGE_TYPES.CONTACT +
+            JSON.stringify([{
+                u: node.u,
+                email: node.m,
+                name: node.name || node.m
+            }])
+        );
+    }
 };
 
 

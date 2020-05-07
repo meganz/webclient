@@ -27,7 +27,7 @@ mega.textEditorUI = new function TextEditorUI() {
      * @returns {Void}              void
      */
     var validateAction = function(msg, submsg, callback) {
-        if (savedFileData && !$saveButton.hasClass('disabled')) {
+        if (!$saveButton.hasClass('disabled')) {
             msgDialog(
                 'confirmation',
                 '',

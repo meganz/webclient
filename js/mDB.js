@@ -596,13 +596,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (t.t == t.h) t.h++;
 
                 if (fmdb.crashed && !(t.t & 1)) {
-                    if (d) {
+                    if (window.d) {
                         fmdb.logger.warn('The DB is crashed, halting put...');
                     }
                     return;
                 }
 
-                if (d) {
+                if (window.d) {
                     fmdb.logger.log("DB %s with %s element(s) on table %s, channel %s, state %s",
                         (t.t & 1) ? 'del' : 'put', t[t.t].length, table, ch, fmdb.state);
                 }
@@ -626,6 +626,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 var limit = 16384; // increase the limit of the batch
 
                 if (op === 'bulkPut') {
+                    if (window.d) {
+                        console.time('fmdb-serialize');
+                    }
 
                     for (var rw = 0; rw < data.length; rw++) {
                         var row = data[rw];
@@ -653,6 +656,10 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 row[i2] = ab_to_base64(fmdb.strcrypt(row[i2]));
                             }
                         }
+                    }
+
+                    if (window.d) {
+                        console.timeEnd('fmdb-serialize');
                     }
                 }
 

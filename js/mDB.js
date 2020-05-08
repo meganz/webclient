@@ -1209,6 +1209,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
             if (t && (t[t.h] && t[t.h].length || t[t.h-1] && t[t.h-1].length)) {
                 // examine update actions in reverse chronological order
                 // FIXME: can stop the loop at t.t for non-transactional writes
+                // FIXME: use separate namespaces for encrypted/decrypted values, for Where, anyoff and deletions
                 for (var a = t.h; a >= 0; a--) {
                     if (t[a]) {
                         if (a & 1) {
@@ -1219,6 +1220,8 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                 if (typeof matches[deletions[j]] == 'undefined') {
                                     // boolean false means "record deleted"
                                     matches[deletions[j]] = false;
+                                    // we need to mark a match decrypted
+                                    matches[fmdb.strdecrypt(base64_to_ab(deletions[j]))] = false;
                                 }
                             }
                         }

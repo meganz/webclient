@@ -1051,19 +1051,25 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     for (var i = r.length; i--; ) {
         try {
-
-            if (r[i].d && !r[i].d.byteLength) {
-                // not encrypted.
-                t = r[i].d || {};
+            var isEncrypted = true;
+            if (r[i].d) {
+                if (!r[i].d.byteLength) {
+                    // not encrypted.
+                    t = r[i].d;
+                    isEncrypted = false;
+                }
+                else {
+                    t = JSON.parse(this.strdecrypt(r[i].d));
+                }
             }
             else {
-                t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+                t = {};
             }
 
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
-                    if (p !== 'd' && (table !== 'f' || p !== 't')) {
+                    if (isEncrypted && p !== 'd' && (table !== 'f' || p !== 't')) {
                         r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }

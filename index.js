@@ -288,7 +288,7 @@ function topPopupAlign(button, popup, topPos) {
     };
 
     // If top menu is opened - set timeout to count correct positions
-    if ($('.top-menu-popup', 'body').not('hidden')) {
+    if (!$('.top-menu-popup', 'body').hasClass('hidden')) {
         setTimeout(function () {
             $.popupAlign();
         }, 250);

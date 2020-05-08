@@ -256,6 +256,9 @@ html.gbot {
     padding-top: 106px;
     box-sizing: border-box;
 }
+.onboarding-suggestions.megasync .bottom-page.top-bl {
+    padding-top: 0;
+}
 .mobile .bottom-page.top-bl {
     padding-top: 0;
 }
@@ -4341,6 +4344,11 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions a.red:hover {
     text-decoration: underline;
 }
+.onboarding-suggestions.megasync .bottom-page.top-bl {
+    max-height: 700px;
+    min-height: 455px;
+    table-layout: fixed;
+}
 .mobile .default-huge-button.inline, .mobile .megaapp-button-info {
     display: none;
 }
@@ -4872,7 +4880,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         padding: 26px 58px;
     }
     .megasync .top-bl  {
-        min-height: 1200px;
+        min-width: 1200px;
     }
 }
 

@@ -41,10 +41,10 @@
   "private": true,
   "readmeFilename": "README.md",
   "dependencies": {
-    "@babel/core": "7.9.0",
+    "@babel/core": "7.9.6",
     "@babel/plugin-proposal-class-properties": "7.8.3",
     "@babel/plugin-proposal-decorators": "7.8.3",
-    "@babel/preset-env": "7.9.5",
+    "@babel/preset-env": "7.9.6",
     "@babel/preset-react": "7.9.4",
     "babel-loader": "8.1.0",
     "grunt": "1.1.0",
@@ -52,7 +52,7 @@
     "grunt-contrib-htmlmin": "3.1.0",
     "grunt-htmljson": "0.1.1",
     "prop-types": "15.7.2",
-    "react-hot-loader": "4.12.20",
+    "react-hot-loader": "4.12.21",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.11"
   },
@@ -64,7 +64,7 @@
     "eslint-plugin-dollar-sign": "1.0.2",
     "eslint-plugin-jquery": "1.5.1",
     "eslint-plugin-local-rules": "0.1.1",
-    "eslint-plugin-no-unsanitized": "3.1.0",
+    "eslint-plugin-no-unsanitized": "3.1.1",
     "eslint-plugin-optimize-regex": "1.2.0",
     "eslint-plugin-react": "7.19.0",
     "eslint-plugin-sonarjs": "0.5.0",
@@ -72,7 +72,7 @@
     "htmlhint": "0.11.0",
     "istanbul": "0.4.5",
     "jscpd": "3.2.1",
-    "karma": "5.0.2",
+    "karma": "5.0.5",
     "karma-chai": "0.1.0",
     "karma-chai-plugins": "0.9.0",
     "karma-chrome-launcher": "3.1.0",
@@ -82,13 +82,13 @@
     "karma-ie-launcher": "1.0.0",
     "karma-jasmine": "3.1.1",
     "karma-junit-reporter": "2.0",
-    "karma-mocha": "2.0.0",
+    "karma-mocha": "2.0.1",
     "karma-phantomjs-launcher": "1.0.4",
     "karma-script-launcher": "1.0.0",
     "karma-sinon": "1.0.5",
     "mocha": "7.1.2",
     "phantomjs-prebuilt": "2.1.16",
     "sinon": "9.0.2",
-    "webpack-dev-server": "3.10.3"
+    "webpack-dev-server": "3.11.0"
   }
 }

@@ -4223,7 +4223,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-left-menu.dashboard + div + div + .nw-tree-panel-header {
     display: none;
 }
-.nw-tree-panel-arrows, .fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
+.fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
     height: 24px;
     width: 24px;
     position: absolute;
@@ -4238,10 +4238,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0.6;
 }
 .nw-tree-panel-arrows.icons-sprite {
+    height: 24px;
+    width: 24px;
+    position: absolute;
     right: 7px;
     top: 6px;
     background-position: -88px -1992px;
     opacity: 0.8;
+    cursor: pointer;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
 }
 .active-folder-link .fm-tree-panel ul:first-child > li:first-child > .nw-fm-tree-item {
     padding-right: 33px;

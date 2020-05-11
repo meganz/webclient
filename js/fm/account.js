@@ -914,13 +914,67 @@ accountUI.account = {
                 var $text = $phoneSettings.find('.add-phone-text');
                 var $phoneNumber = $phoneSettings.find('.phone-number');
                 var $addNumberButton = $phoneSettings.find('.add-number-button');
+                var $removeNumberButton = $('.rem-gsm', $phoneSettings);
+                var $modifyNumberButton = $('.modify-gsm', $phoneSettings);
 
                 // If the phone is already added, show that
                 if (typeof u_attr.smsv !== 'undefined') {
                     $phoneSettings.addClass('verified');
                     $phoneNumber.text(u_attr.smsv);
+
+                    /**
+                     * Send remove command to API, and update UI if needed
+                     * @param {String} msg                  Message dialog's text to show for confirmation
+                     * @param {String} desc                 Message dialog's description to show for confirmation
+                     * @param {Boolean} showSuccessMsg      Show message dialog on success
+                     */
+                    var removeNumber = function(msg, desc, showSuccessMsg) {
+
+                        msgDialog('confirmation', '', msg, desc, function(answer) {
+                            if (answer) {
+                                // lock UI
+                                loadingDialog.show();
+
+                                api_req(
+                                    { a: 'smsr' },
+                                    {
+                                        callback: tryCatch(function(res) {
+                                            // Unlock UI regardless of the result
+                                            loadingDialog.hide();
+                                            if (res === 0) {
+                                                // success
+                                                // no APs, we need to rely on this response.
+                                                delete u_attr.smsv;
+
+                                                // update only relevant sections in UI
+                                                accountUI.account.profiles.renderPhoneBanner();
+                                                accountUI.account.profiles.renderPhoneDetails();
+
+                                                if (showSuccessMsg) {
+                                                    msgDialog('info', '', l[23427]);
+                                                }
+                                                else {
+                                                    sms.phoneInput.init();
+                                                }
+                                            }
+                                            else {
+                                                msgDialog('warningb', '', l[23428]);
+                                            }
+                                        }, function() {
+                                            loadingDialog.hide();
+                                            msgDialog('warningb', '', l[23428]);
+                                        })
+                                    }
+                                );
+                            }
+                        });
+                    };
+
+                    $removeNumberButton.rebind('click.gsmremove', removeNumber.bind(null, l[23425], l[23426], true));
+                    $modifyNumberButton.rebind('click.gsmmodify', removeNumber.bind(null, l[23429], l[23430], false));
                 }
                 else {
+                    $phoneSettings.removeClass('verified');
                     // Otherwise set the text for x GB storage and quota
                     sms.renderAddPhoneText($text);
 

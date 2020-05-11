@@ -989,7 +989,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     // Mobile only
     if (is_mobile) {
         l[20197] = l[20197].replace('[S1]', '<span class="used">').replace('[/S1]', '</span>\n').replace('[S2]', '')
-            .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n') + '<br>';
+            .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n')
+            .replace('$1', '0').replace('$2', '0') + '<br>';
         l[20220] = l[20220].replace('%1', '<span class="mobile user-number js-user-phone-number"></span>');
     }
     else {

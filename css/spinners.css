@@ -24,7 +24,7 @@
     margin: -1px 0 0 -50px;
 }
 .loading-spinner {
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 50%;
     z-index: 1110;

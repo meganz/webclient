@@ -64,6 +64,17 @@ if (typeof loadingDialog === 'undefined') {
             $overlay.removeClass('hidden');
             $spinner.removeClass('hidden').addClass('active');
             this.active = true;
+
+            // Prevent scrolling for mobile web
+            if (is_mobile && $overlay.length && $spinner.length) {
+                document.getElementById('loading-overlay').addEventListener('touchmove', function(e){
+                    e.preventDefault();
+                }, {passive: false});
+
+                document.getElementById('loading-spinner').addEventListener('touchmove', function(e){
+                    e.preventDefault();
+                }, {passive: false});
+            }
         }
 
         $.loadingSubject[subject] = 1;

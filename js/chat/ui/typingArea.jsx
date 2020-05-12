@@ -428,11 +428,20 @@ export class TypingArea extends MegaRenderMixin {
         $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
             self.updateScroll(false);
         });
+
+        if (!this.scrollingInitialised) {
+            this.initScrolling();
+        }
+
         self.triggerOnUpdate(true);
         if (self.$container.is(":visible")) {
             self.updateScroll(false);
         }
-
+        else {
+            Soon(function() {
+                self.updateScroll(false);
+            });
+        }
     }
     componentWillMount() {
         var self = this;
@@ -515,7 +524,6 @@ export class TypingArea extends MegaRenderMixin {
         self.scrollingInitialised = true;
         var $node = $(self.findDOMNode());
         var $textarea = $('textarea:first', $node);
-        var $textareaClone = $('message-preview', $node);
         self.textareaLineHeight = parseInt($textarea.css('line-height'));
         var $textareaScrollBlock = $('.textarea-scroll', $node);
         $textareaScrollBlock.jScrollPane({
@@ -542,8 +550,17 @@ export class TypingArea extends MegaRenderMixin {
         }
         return textareaMaxHeight;
     }
-    @utils.SoonFcWrap(10)
     updateScroll(keyEvents) {
+        var self = this;
+        if (self._updateScollTimer) {
+            clearTimeout(self._updateScollTimer);
+        }
+        self._updateScollTimer = setTimeout(function() {
+            self._updateScroll(keyEvents);
+            self._updateScollTimer = null;
+        }, 10);
+    }
+    _updateScroll(keyEvents) {
         var self = this;
 
         // DONT update if not visible...

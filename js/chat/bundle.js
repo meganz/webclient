@@ -11153,7 +11153,7 @@ var generic_GenericConversationMessage = /*#__PURE__*/function (_ConversationMes
                   label: l[83],
                   className: "red",
                   onClick: function onClick(e) {
-                    self.doDelete(e, message);
+                    return self.doDelete(e, message);
                   }
                 });
               }
@@ -18483,6 +18483,11 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
 
         if (!chatRoom || !chatRoom.roomId) {
           return;
+        } // Account has been deleted/deactivated
+
+
+        if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
+          return;
         }
 
         if (!chatRoom.isDisplayable()) {
@@ -20306,7 +20311,7 @@ Chat.prototype.renderMyStatus = SoonFc(function () {
   } // reset
 
 
-  var $status = $('.activity-status-block .activity-status');
+  var $status = $('.activity-status-block .activity-status, .top-menu-popup .avatar-block', 'body');
   $('.top-user-status-popup .tick-item').removeClass("active");
   $status.removeClass('online').removeClass('away').removeClass('busy').removeClass('offline').removeClass('black');
   var actualPresence = self.plugins.presencedIntegration.getMyPresenceSetting();
@@ -20765,7 +20770,12 @@ Chat.prototype.processRemovedUser = function (u) {
     if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
       chatRoom.trackDataChange();
     }
-  });
+  }); // Account was cancelled/deactivated
+
+  if (megaChat.currentlyOpenedChat && M.u[megaChat.currentlyOpenedChat] && M.u[megaChat.currentlyOpenedChat].c === 2) {
+    loadSubPage('fm/chat');
+  }
+
   self.renderMyStatus();
 };
 /**
@@ -22548,6 +22558,15 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 /**
+ * Check whether given chat is 1-1 w/ cancelled account.
+ * @returns {Boolean}
+ */
+
+
+ChatRoom.prototype.isCancelled = function () {
+  return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
+};
+/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
@@ -22556,7 +22575,7 @@ ChatRoom.prototype.isArchived = function () {
 
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
-  return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
+  return !self.isCancelled() && (self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive());
 };
 /**
  * Save chat into info fmdb.
@@ -23517,23 +23536,22 @@ ChatRoom.prototype.uploadFromComputer = function () {
 };
 /**
  * Attach/share (send as message) contact details
- * @param ids
+ * @param ids {Array} list of contact identifiers
+ * @returns {void}
  */
 
 
 ChatRoom.prototype.attachContacts = function (ids) {
-  var self = this;
-  var nodesMeta = [];
-  $.each(ids, function (k, nodeId) {
-    var node = M.u[nodeId];
-    nodesMeta.push({
-      'u': node.u,
-      'email': node.m,
-      'name': node.name || node.m
-    });
-  }); // 1b, 1b, JSON
+  for (var i = 0; i < ids.length; i++) {
+    var nodeId = ids[i];
+    var node = M.u[nodeId]; // 1b, 1b, JSON
 
-  self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify(nodesMeta));
+    this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify([{
+      u: node.u,
+      email: node.m,
+      name: node.name || node.m
+    }]));
+  }
 };
 /**
  * Get message by Id

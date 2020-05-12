@@ -441,6 +441,7 @@
     height: 34px;
     padding-bottom: 5px;
 }
+
 .search-field .search-field-status {
     position: relative;
     margin: -2px 0 0 0;
@@ -474,6 +475,7 @@
     -webkit-animation: rotate 0.8s infinite linear;
     animation: rotate 0.8s infinite linear;
 }
+
 .search-field .search-field-status.searching:hover i {
     background-position: -110px -896px;
     -webkit-animation: none;

@@ -26,6 +26,10 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.inputRef && SearchField.inputRef.current && !!SearchField.inputRef.current.value.length
     );
 
+    state = {
+        hovered: false
+    };
+
     constructor(props) {
         super(props);
     }
@@ -35,17 +39,21 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.focus();
     }
 
-    // [...] TODO: add enum-like object re: translations
     renderStatus = (status, isClickable, onToggle) => {
         const className = `${SEARCH_STATUS_CLASS} ${isClickable ? 'clickable' : ''}`;
         const handleClick = () => isClickable && onToggle();
+        const handleHover = () => this.setState(state => ({ hovered: !state.hovered }));
 
         switch (status) {
             case STATUS.IN_PROGRESS:
                 return (
-                    <div className={`${className} searching`} onClick={handleClick}>
+                    <div
+                        className={`${className} searching`}
+                        onClick={handleClick}
+                        onMouseOver={handleHover}
+                        onMouseOut={handleHover}>
                         <i className="small-icon tiny-searching" />
-                        {LABEL.DECRYPTING_RESULTS}
+                        {this.state.hovered ? LABEL.PAUSE_SEARCH : LABEL.DECRYPTING_RESULTS}
                     </div>
                 );
             case STATUS.PAUSED:
@@ -82,7 +90,13 @@ export default class SearchField extends MegaRenderMixin {
                     ref={SearchField.inputRef}
                     value={value}
                     onFocus={onFocus}
-                    onChange={onChange}
+                    onChange={ev => {
+                        // Reset the `pause search` state
+                        if (this.state.hovered) {
+                            this.setState({ hovered: false });
+                        }
+                        onChange(ev);
+                    }}
                     className={searching ? 'searching' : ''} />
 
                 {searching && status && (

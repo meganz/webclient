@@ -17277,6 +17277,7 @@ var LABEL = {
   // Search field status
   // ------------------------------------
   DECRYPTING_RESULTS: 'decrypting results...',
+  PAUSE_SEARCH: 'pause search',
   RESUME_SEARCH: 'resume search',
   SEARCH_COMPLETE: 'search complete'
 };
@@ -17432,6 +17433,9 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
     searchField_classCallCheck(this, SearchField);
 
     _this = _super.call(this, props);
+    _this.state = {
+      hovered: false
+    };
 
     _this.renderStatus = function (status, isClickable, onToggle) {
       var className = "".concat(SEARCH_STATUS_CLASS, " ").concat(isClickable ? 'clickable' : '');
@@ -17440,14 +17444,24 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
         return isClickable && onToggle();
       };
 
+      var handleHover = function handleHover() {
+        return _this.setState(function (state) {
+          return {
+            hovered: !state.hovered
+          };
+        });
+      };
+
       switch (status) {
         case STATUS.IN_PROGRESS:
           return /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "".concat(className, " searching"),
-            onClick: handleClick
+            onClick: handleClick,
+            onMouseOver: handleHover,
+            onMouseOut: handleHover
           }, /*#__PURE__*/external_React_default.a.createElement("i", {
             className: "small-icon tiny-searching"
-          }), LABEL.DECRYPTING_RESULTS);
+          }), _this.state.hovered ? LABEL.PAUSE_SEARCH : LABEL.DECRYPTING_RESULTS);
 
         case STATUS.PAUSED:
           return /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -17479,17 +17493,18 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
       _get(searchField_getPrototypeOf(SearchField.prototype), "componentDidMount", this).call(this);
 
       SearchField.focus();
-    } // [...] TODO: add enum-like object re: translations
-
+    }
   }, {
     key: "render",
     value: function render() {
+      var _this2 = this;
+
       var _this$props = this.props,
           value = _this$props.value,
           searching = _this$props.searching,
           status = _this$props.status,
           onFocus = _this$props.onFocus,
-          onChange = _this$props.onChange,
+          _onChange = _this$props.onChange,
           onToggle = _this$props.onToggle,
           onReset = _this$props.onReset;
       var isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
@@ -17504,7 +17519,16 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
         ref: SearchField.inputRef,
         value: value,
         onFocus: onFocus,
-        onChange: onChange,
+        onChange: function onChange(ev) {
+          // Reset the `pause search` state
+          if (_this2.state.hovered) {
+            _this2.setState({
+              hovered: false
+            });
+          }
+
+          _onChange(ev);
+        },
         className: searching ? 'searching' : ''
       }), searching && status && this.renderStatus(status, isClickable, onToggle), searching && /*#__PURE__*/external_React_default.a.createElement("i", {
         className: "small-icon tiny-reset",

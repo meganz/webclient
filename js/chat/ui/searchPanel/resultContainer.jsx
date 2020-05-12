@@ -25,7 +25,9 @@ export const LABEL = {
     //
     // Search field status
     // ------------------------------------
+
     DECRYPTING_RESULTS: 'decrypting results...',
+    PAUSE_SEARCH: 'pause search',
     RESUME_SEARCH: 'resume search',
     SEARCH_COMPLETE: 'search complete'
 };

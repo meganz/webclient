@@ -64,8 +64,7 @@ export default class SearchPanel extends MegaRenderMixin {
             // `ESC` keypress
             .rebind('keydown.searchPanel', ({ keyCode }) => {
                 if (keyCode && keyCode === 27 /* ESC */ && !this.props.minimized) {
-                    // Clear the text on the first `ESC` press; minimize on the second
-                    return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+                    this.toggleMinimize();
                 }
             });
 
@@ -210,7 +209,7 @@ export default class SearchPanel extends MegaRenderMixin {
                     onFocus={() => !searching && this.getRecents()}
                     onChange={this.handleChange}
                     onToggle={this.handleToggle}
-                    onReset={this.handleReset} />
+                    onReset={this.toggleMinimize} />
 
                 <div className="search-results-wrapper">
                     <PerfectScrollbar options={{ 'suppressScrollX': true }}>

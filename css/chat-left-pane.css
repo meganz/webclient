@@ -536,6 +536,7 @@
 .result-table .result-table-row .user-card span {
     overflow: hidden;
     float: left;
+    min-width: 60px;
     max-width: 100%;
     max-width: -webkit-calc(100% - 25px);
     max-width: -moz-calc(100% - 25px);

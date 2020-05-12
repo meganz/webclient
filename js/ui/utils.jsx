@@ -254,7 +254,7 @@ class RenderTo extends React.Component {
 };
 
 
-class EmojiFormattedContent extends React.Component {
+export class EmojiFormattedContent extends React.Component {
     _eventuallyUpdateInternalState(props) {
         if (!props) {
             props = this.props;

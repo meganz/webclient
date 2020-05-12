@@ -2,7 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
-
+import { EmojiFormattedContent } from './../../../ui/utils.jsx';
 const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
 
@@ -31,8 +31,8 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
  * => 'Example <strong>MEGA</strong> string as <strong>input</strong>.'
  */
 
-const highlight = (text, matches) => {
-    text = escapeHTML(text);
+const highlight = (text, matches, dontEscape) => {
+    text = dontEscape ? text : escapeHTML(text);
     if (matches) {
         let highlighted;
         for (let i = matches.length; i--;) {
@@ -86,12 +86,16 @@ class MessageRow extends MegaRenderMixin {
                 className={`${SEARCH_ROW_CLASS} message`}
                 onClick={() => openResult(room, data.messageId, index)}>
                 <span className="title">
-                    {room.getRoomTitle()}
+                    <EmojiFormattedContent>{room.getRoomTitle()}</EmojiFormattedContent>
                 </span>
                 {!roomIsGroup(room) && <ContactPresence contact={contact} />}
                 <div
                     className="summary"
-                    dangerouslySetInnerHTML={{ __html: highlight(summary, matches) }}>
+                    dangerouslySetInnerHTML={{ __html: highlight(
+                        summary,
+                        matches,
+                        true /* already escaped by `getRenderableSummary` */
+                    ) }}>
                 </div>
                 <span className="date">
                     {time2date(data.delay)}
@@ -121,7 +125,11 @@ class ChatRow extends MegaRenderMixin {
                 <div className="chat-topic-icon" />
                 <div className={USER_CARD_CLASS}>
                     <div className="graphic">
-                        <span dangerouslySetInnerHTML={{ __html: highlight(room.topic, matches) }} />
+                        <span dangerouslySetInnerHTML={{ __html: highlight(
+                            megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)),
+                            matches,
+                            true
+                        ) }} />
                     </div>
                 </div>
                 <div className="clear" />
@@ -151,11 +159,23 @@ class MemberRow extends MegaRenderMixin {
                 <div className="graphic">
                     {isGroup ?
                         <span dangerouslySetInnerHTML={{
-                            __html: highlight(room.topic || room.getRoomTitle(), matches)
+                            __html: highlight(
+                                megaChat.plugins.emoticonsFilter.processHtmlMessage(
+                                    htmlentities(room.topic || room.getRoomTitle())
+                                ),
+                                matches,
+                                true
+                            )
                         }} /> :
                         <>
                             <span dangerouslySetInnerHTML={{
-                                __html: highlight(nicknames.getNicknameAndName(data), matches)
+                                __html: highlight(
+                                    megaChat.plugins.emoticonsFilter.processHtmlMessage(
+                                        htmlentities(nicknames.getNicknameAndName(data))
+                                    ),
+                                    matches,
+                                    true
+                                )
                             }}/>
                             <ContactPresence contact={contact} />
                         </>
@@ -168,11 +188,15 @@ class MemberRow extends MegaRenderMixin {
                 <div className="textual">
                     {isGroup ?
                         <>
-                            <span>{room.topic || room.getRoomTitle()}</span>
+                            <span>
+                                <EmojiFormattedContent>{room.topic || room.getRoomTitle()}</EmojiFormattedContent>
+                            </span>
                             <MembersAmount room={room} />
                         </> :
                         <>
-                            <span>{nicknames.getNicknameAndName(data)}</span>
+                            <span>
+                                <EmojiFormattedContent>{nicknames.getNicknameAndName(data)}</EmojiFormattedContent>
+                            </span>
                             <LastActivity contact={contact} showLastGreen={true} />
                         </>
                     }

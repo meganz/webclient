@@ -1576,6 +1576,8 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                 (
                     (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
                     (
+                        v.delay > 1592222400 && /* enable this only after 15th of June 12:00, as agreed that other
+                        apps would have this feature already in production by that date */
                         v.dialogType === "remoteCallEnded" && v.meta && v.meta.userId !== u_handle &&
                         (
                             v.meta.reason === CallManager.CALL_END_REMOTE_REASON.CANCELED ||

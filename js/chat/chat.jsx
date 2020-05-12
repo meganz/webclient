@@ -1104,7 +1104,7 @@ Chat.prototype.renderMyStatus = SoonFc(function() {
     }
 
     // reset
-    var $status = $('.activity-status-block .activity-status');
+    var $status = $('.activity-status-block .activity-status, .top-menu-popup .avatar-block', 'body');
 
     $('.top-user-status-popup .tick-item').removeClass("active");
 
@@ -1645,6 +1645,16 @@ Chat.prototype.processRemovedUser = function(u) {
             chatRoom.trackDataChange();
         }
     });
+
+
+    // Account was cancelled/deactivated
+    if (
+        megaChat.currentlyOpenedChat &&
+        M.u[megaChat.currentlyOpenedChat] &&
+        M.u[megaChat.currentlyOpenedChat].c === 2
+    ) {
+        loadSubPage('fm/chat');
+    }
 
     self.renderMyStatus();
 };

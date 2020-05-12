@@ -4223,7 +4223,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .fm-left-menu.dashboard + div + div + .nw-tree-panel-header {
     display: none;
 }
-.nw-tree-panel-arrows, .fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
+.fm-picker-dialog-panel-arrows, .fm-picker-dialog-panel-arrows, .share-dialog-panel-arrows {
     height: 24px;
     width: 24px;
     position: absolute;
@@ -4238,10 +4238,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0.6;
 }
 .nw-tree-panel-arrows.icons-sprite {
+    height: 24px;
+    width: 24px;
+    position: absolute;
     right: 7px;
     top: 6px;
     background-position: -88px -1992px;
     opacity: 0.8;
+    cursor: pointer;
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
 }
 .active-folder-link .fm-tree-panel ul:first-child > li:first-child > .nw-fm-tree-item {
     padding-right: 33px;
@@ -4832,14 +4838,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     border: 0;
     width: 0;
     -webkit-transition: all 200ms ease-in-out;
-    -moz-transition: all 200ms ease-in-out;
-    -o-transition: all 200ms ease-in-out;
-    -ms-transition: all 200ms ease-in-out;
     transition: all 200ms ease-in-out;
 }
 .active .top-search-input, .contains-value .top-search-input {
     width: 160px;
     padding-right: 38px;
+}
+.contains-value .top-search-input {
+    -webkit-transition: none;
+    transition: none;
 }
 .fm-main {
     height: 100%;
@@ -7037,11 +7044,9 @@ table {
 .thumb .transfer-filetype-icon.photoshop img {
     display: inline-block;
     height: 18px;
-    margin: 4px 2px;
+    margin: 3px 2px;
     width: 18px;
     border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
 }
 
 .fm-flags-icon img {
@@ -18499,6 +18504,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 480px;
     z-index: 1100;
 }
+.ct .fm-dialog.voucher-dialog {
+    width: 540px;
+}
 .voucher-dialog-body {
     padding: 30px;
 }
@@ -18586,6 +18594,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 428px;
     table-layout: fixed;
     margin: 7px 0 0 0;
+}
+.ct .voucher-dialog .voucher-dialog-buttons {
+    padding: 0 25px;
 }
 .voucher-dialog .voucher-buy-now, .voucher-dialog .voucher-redeem, .voucher-dialog .voucher-redeem-now {
     margin: 24px 0 0 0;
@@ -19957,7 +19968,7 @@ body.pro:after {
     margin: -146px 0 0 0;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-position: center -2173px;
     background-repeat: no-repeat;
     height: 210px;

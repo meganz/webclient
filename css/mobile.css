@@ -3287,7 +3287,7 @@ div.checkboxOn, div.checkboxOff {
 .mobile.membership-icon {
     width: 32px;
     height: 32px;
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -4737,7 +4737,7 @@ div.checkboxOn, div.checkboxOff {
     position: relative;
 }
 .mobile.icon {
-    background-image: url(../images/mega/startpage-sprite_v10.png);
+    background-image: url(../images/mega/startpage-sprite_v11.png);
     background-position: 0 -2109px;
     background-repeat: no-repeat;
     width: 20px;
@@ -4829,13 +4829,6 @@ div.checkboxOn, div.checkboxOff {
 }
 .top-submenu.language-items .top-menu-item.beta .beta-text {
     display: inline-block;
-}
-.mobile.top-menu-popup .top-menu-item {
-    font-size: 15px;
-    line-height: 26px;
-}
-.mobile.top-menu-popup .top-menu-item.submenu-item::before {
-    top: 10px;
 }
 .bottom-menu.copyrights {
     position: static;
@@ -7675,6 +7668,9 @@ body.key .reg-st3-membership-bl.free.hidden {
     font-family:'LatoWebSemibold', 'source_sans_prosemibold';
     font-weight: initial;
 }
+.mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
+    white-space: normal;
+}
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps h3.main-italic-header {
     font-size: 13px;
 }
@@ -8417,6 +8413,8 @@ body.key .reg-st3-membership-bl.free.hidden {
     max-width: 460px;
     padding: 24px 20px;
     margin: 0 auto;
+    max-height: 95vh;
+    overflow: scroll;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;
@@ -8435,6 +8433,7 @@ body.key .reg-st3-membership-bl.free.hidden {
 }
 .mobile.fm-dialog.park-account-dialog .inline-buttons {
     overflow: auto;
+    margin-bottom: 24px;
 }
 .mobile.fm-dialog-container {
     display: table;

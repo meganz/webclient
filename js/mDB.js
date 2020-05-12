@@ -104,7 +104,7 @@ FMDB.prototype.init = function fmdb_init(result, wipe) {
     "use strict";
 
     var fmdb = this;
-    var dbpfx = 'fm28_';
+    var dbpfx = 'fm29_';
     var slave = !mBroadcaster.crossTab.master;
 
     fmdb.crashed = false;
@@ -440,6 +440,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
             function(){
                 if (d) {
                     fmdb.logger.log("Transaction started");
+                    console.time('fmdb-transaction');
                 }
                 fmdb.commit = false;
                 fmdb.cantransact = 1;
@@ -464,10 +465,14 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 fmdb.state = -1;
                 if (d) {
                     fmdb.logger.log("Transaction committed");
+                    console.timeEnd('fmdb-transaction');
                 }
                 fmdb.writing = 0;
                 fmdb.writepending(ch);
             }).catch(function(e){
+                if (d) {
+                    console.timeEnd('fmdb-transaction');
+                }
                 if (fmdb.cantransact < 0) {
                     fmdb.logger.error("Your browser's IndexedDB implementation is bogus, disabling transactions.");
                     fmdb.cantransact = 0;
@@ -596,13 +601,13 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 if (t.t == t.h) t.h++;
 
                 if (fmdb.crashed && !(t.t & 1)) {
-                    if (d) {
+                    if (window.d) {
                         fmdb.logger.warn('The DB is crashed, halting put...');
                     }
                     return;
                 }
 
-                if (d) {
+                if (window.d) {
                     fmdb.logger.log("DB %s with %s element(s) on table %s, channel %s, state %s",
                         (t.t & 1) ? 'del' : 'put', t[t.t].length, table, ch, fmdb.state);
                 }
@@ -626,6 +631,9 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                 var limit = 16384; // increase the limit of the batch
 
                 if (op === 'bulkPut') {
+                    if (window.d) {
+                        console.time('fmdb-serialize');
+                    }
 
                     for (var rw = 0; rw < data.length; rw++) {
                         var row = data[rw];
@@ -653,6 +661,10 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                                 row[i2] = ab_to_base64(fmdb.strcrypt(row[i2]));
                             }
                         }
+                    }
+
+                    if (window.d) {
+                        console.timeEnd('fmdb-serialize');
                     }
                 }
 
@@ -1039,18 +1051,25 @@ FMDB.prototype.normaliseresult = function fmdb_normaliseresult(table, r) {
 
     for (var i = r.length; i--; ) {
         try {
-
-            if (r[i].d && !r[i].d.byteLength) {
-                // not encrypted.
-                continue;
+            var isEncrypted = true;
+            if (r[i].d) {
+                if (!r[i].d.byteLength) {
+                    // not encrypted.
+                    t = r[i].d;
+                    isEncrypted = false;
+                }
+                else {
+                    t = JSON.parse(this.strdecrypt(r[i].d));
+                }
             }
-
-            t = r[i].d ? JSON.parse(this.strdecrypt(r[i].d)) : {};
+            else {
+                t = {};
+            }
 
             if (this.restorenode[table]) {
                 // restore attributes based on the table's indexes
                 for (var p in r[i]) {
-                    if (p !== 'd' && (table !== 'f' || p !== 't')) {
+                    if (isEncrypted && p !== 'd' && (table !== 'f' || p !== 't')) {
                         r[i][p] = this.strdecrypt(base64_to_ab(r[i][p]));
                     }
                 }
@@ -1146,7 +1165,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
         t = options.query(t);
     }
     else {
-        for (var k = where.length; k--;) {
+        for (var k = where.length; k--; ) {
             originalWhere.unshift(where[k][1]);
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
             if (!this.filters[where[k][1]]) {
@@ -1190,6 +1209,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
             if (t && (t[t.h] && t[t.h].length || t[t.h-1] && t[t.h-1].length)) {
                 // examine update actions in reverse chronological order
                 // FIXME: can stop the loop at t.t for non-transactional writes
+                // FIXME: use separate namespaces for encrypted/decrypted values, for Where, anyoff and deletions
                 for (var a = t.h; a >= 0; a--) {
                     if (t[a]) {
                         if (a & 1) {
@@ -1200,6 +1220,8 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                 if (typeof matches[deletions[j]] == 'undefined') {
                                     // boolean false means "record deleted"
                                     matches[deletions[j]] = false;
+                                    // we need to mark a match decrypted
+                                    matches[fmdb.strdecrypt(base64_to_ab(deletions[j]))] = false;
                                 }
                             }
                         }
@@ -1215,7 +1237,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                 if (typeof matches[update[index]] == 'undefined') {
                                     // check if this update matches our criteria, if any
                                     if (where) {
-                                        for (var k = where.length; k--;) {
+                                        for (var k = where.length; k--; ) {
                                             if (update[where[k][0]] !== where[k][1] && update[where[k][0]] !== originalWhere[k]) break;
                                         }
 
@@ -1237,7 +1259,7 @@ FMDB.prototype.getbykey1 = function fmdb_getbykey1(table, index, anyof, where, l
                                     else {
                                         // does this update modify a record matched by the
                                         // anyof inclusion list?
-                                        for (var k = anyof[1].length; k--;) {
+                                        for (var k = anyof[1].length; k--; ) {
                                             if (update[anyof[0]] === anyof[1][k] || update[anyof[0]] === originalAnyof[k]) break;
                                         }
 

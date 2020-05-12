@@ -69,13 +69,6 @@ function initMegacmd() {
         }
     });
 
-    $content.find('.bottom-page.scroll-button').rebind('click', function() {
-        $('html, body, .fmholder').animate({
-            scrollTop: $('.bottom-page.full-block').offset().top
-        }, 1000);
-    });
-
-
     registerLinuxDownloadButton($content.find('.megacmd-linux-download'));
 
     $('.bottom-page.scroll-block').rebind('click.closeMegaCmdLinux', function(e) {

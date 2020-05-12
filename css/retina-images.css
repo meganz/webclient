@@ -1,4 +1,3 @@
-
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
 body.pro:after {
     content: url(../images/mega/payment-animation@2x.gif);
@@ -230,7 +229,7 @@ i.small-icon.icons-sprite,
     background-size: 853px auto;
 }
 .upload-overlay-icon {
-    background-image: url(../images/mega/startpage-sprite_v10@2x.png);
+    background-image: url(../images/mega/startpage-sprite_v11@2x.png);
     background-size: 267px auto;
 }
 .properties-file-icon div {

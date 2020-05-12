@@ -518,9 +518,11 @@
             var $chk = $('.bottom-checkbox', $dialog).addClass('hidden');
 
             if (remaining) {
-                $chk.removeClass('hidden')
-                    .find('.radio-txt')
-                    .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
+                var remainingConflictText = remaining > 1 ?
+                    escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>') :
+                    l[23294];
+                $chk.removeClass('hidden');
+                $('.radio-txt', $chk).safeHTML(remainingConflictText);
             }
 
             uiCheckboxes($dialog);

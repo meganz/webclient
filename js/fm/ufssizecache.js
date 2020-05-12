@@ -70,6 +70,7 @@ UFSSizeCache.prototype.save = function(rootNode) {
 
     if (d) {
         console.debug('ufsc.save(%s)', rootNode ? rootNode.h : 'undef', rootNode, this);
+        console.time('ufsc.save');
     }
 
     for (var h in this.cache) {
@@ -105,8 +106,11 @@ UFSSizeCache.prototype.save = function(rootNode) {
         }
     }
 
-    if (d > 1) {
-        this._cache = this.cache;
+    if (d) {
+        console.timeEnd('ufsc.save');
+        if (d > 1) {
+            this._cache = this.cache;
+        }
     }
     delete this.cache;
 };

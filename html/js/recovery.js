@@ -1,6 +1,6 @@
 /**
  * a class to view and control account recovery (password forgetting) prcess
- * 
+ *
  */
 
 function AccountRecoveryControl() {
@@ -123,7 +123,7 @@ function AccountRecoveryControl() {
             else {
                 self.checkAccount(enteredEmail);
             }
-            
+
         }
     };
 
@@ -681,6 +681,8 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
         $('.mobile #startholder.fmholder').removeClass('no-scroll');
     }
 
+    // Pre-fill the email address the user entered at the step one
+    $emailInput.val($('.improved-recovery-steps #recover-input1').val());
     var emailMegaInput = new mega.ui.MegaInputs($emailInput);
 
     var closeDialogLocal = function _closeDialog() {
@@ -730,7 +732,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
     });
 
     $('.closebtn, .fm-dialog-close', $dialog).rebind('click', closeDialogLocal);
-    
+
     if (!is_mobile) {
         $(document).rebind('keydown.parkwarn', function (e) {
             if (e.keyCode === 27) {

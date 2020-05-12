@@ -400,6 +400,7 @@ accountUI.general = {
         // update avatar
         $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
         $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
+        $('.avatar-block', '.top-menu-popup').safeHTML(useravatar.contact(u_handle));
 
         // Show first name or last name
         $('.membership-big-txt.name').text(u_attr.fullname);
@@ -1126,6 +1127,7 @@ accountUI.account = {
                         callback: function (res) {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
+                                $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
                                 // update megadrop username for existing megadrop
@@ -1151,22 +1153,12 @@ accountUI.account = {
 
             this.$QRSettings =  $('.qr-settings');
 
-            var myHost = '';
-            if (!is_extension) {
-                var cutPlace = location.href.indexOf('/fm/');
-                myHost = location.href.substr(0, cutPlace);
-            }
-            else {
-                myHost = 'https://mega.nz';
-            }
-
-            myHost += '/' + account.contactLink;
             var QRoptions = {
                 width: 106,
                 height: 106,
                 correctLevel: QRErrorCorrectLevel.H,    // high
                 foreground: '#dc0000',
-                text: myHost
+                text: getBaseUrl() + '/' + account.contactLink
             };
 
             var defaultValue = (account.contactLink && account.contactLink.length);

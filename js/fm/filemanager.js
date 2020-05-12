@@ -1562,6 +1562,9 @@ FileManager.prototype.initContextUI = function() {
             showExpiredBusiness();
             return;
         }
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
         var user_handle = $.selected && $.selected[0];
 
         user_handle =user_handle .replace('contact_', '');
@@ -2051,6 +2054,16 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
     var dialogPlacer = document.createElement('div');
     var selected = [];
     var constructor;
+    var doClose = function(noClearSelected) {
+        ReactDOM.unmountComponentAtNode(dialogPlacer);
+        constructor.domNode.remove();
+        dialogPlacer.remove();
+        if (!noClearSelected) {
+            selected = [];
+        }
+        closeDialog();
+    };
+
     var options = {
         'create-new-link': {
             title: l[20667],
@@ -2083,7 +2096,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
                 return false;
             },
             onAttach: function() {
-                closeDialog();
+                doClose(true);
                 $.selected = selected;
                 if (OnSelectCallback) {
                     OnSelectCallback(selected);
@@ -2098,11 +2111,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         selectLabel: options[type].selectLabel,
         className: options[type].classes,
         onClose: function() {
-            ReactDOM.unmountComponentAtNode(dialogPlacer);
-            constructor.domNode.remove();
-            dialogPlacer.remove();
-            selected = [];
-            closeDialog();
+            doClose();
         },
         onSelected: function(node) {
             selected = node;

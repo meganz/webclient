@@ -77,12 +77,40 @@
     box-shadow: 0 1px 10px 0 rgba(0,0,0,0.1);
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+#mega-text-editor .top-menu-content {
+    padding: 12px 0 24px 0;
+}
 #mega-text-editor .top-menu-item {
     padding-right: 10px;
-    cursor: default;
+    padding-left: 17px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'source_sans_prosemibold';
+    line-height: 21px;
+    min-height: 32px;
+    color: #333;
+    padding: 5px 10px 5px 17px;
+    -webkit-transition: all 200ms ease-in-out;
+    -moz-transition: all 200ms ease-in-out;
+    -o-transition: all 200ms ease-in-out;
+    -ms-transition: all 200ms ease-in-out;
+    transition: all 200ms ease-in-out;
+    border-left: 2px solid transparent;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0;
+}
+#mega-text-editor .top-menu-item .right-el {
+    float: right;
 }
 #mega-text-editor .top-menu-item span {
-    cursor: pointer;
+    display: inline-block;
+}
+#mega-text-editor .top-menu-item .menu-item-shortcut {
+    float:right;
+    color: #999999;
 }
 #mega-text-editor .editor-file-name-title {
     height: 24px;
@@ -228,6 +256,7 @@
     width: 190px;
     position: fixed;
     z-index: 1120;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 #mega-text-editor .top-menu-popup-editor::before {
     content: '';
@@ -245,4 +274,12 @@
     background-color: #000000;
     position: relative;
     top: 12px;
+}
+#mega-text-editor .top-menu-divider {
+    height: 24px;
+    margin: 0;
+    background: none;
+}
+#mega-text-editor .top-menu-item span {
+    font-size: 14px;
 }

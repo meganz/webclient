@@ -114,22 +114,14 @@ function dashboardUI() {
 
         // QR Code
         var drawQRCanvas = function _drawQRCanvas() {
-            var myHost = '';
-            if (!is_extension) {
-                var cutPlace = location.href.indexOf('/fm/');
-                myHost = location.href.substr(0, cutPlace);
-            }
-            else {
-                myHost = 'https://mega.nz';
-            }
-            myHost += '/' + M.account.contactLink;
+
             if (account.contactLink && account.contactLink.length) {
                 var QRoptions = {
                     width: 106,
                     height: 106,
                     correctLevel: QRErrorCorrectLevel.H,    // high
                     foreground: '#D90007',
-                    text: myHost
+                    text: getBaseUrl() + '/' + account.contactLink
                 };
                 // Render the QR code
                 $('.account.qr-icon').text('').qrcode(QRoptions);

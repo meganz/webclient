@@ -76,7 +76,7 @@
 }
 .link-button.light, .dropdown-item.link-button.light {
     font-size: 13px;
-    line-height: 31px;
+    line-height: 32px;
     white-space: normal;
     height: 32px;
     color: #333;
@@ -184,7 +184,7 @@
 }
 .default-white-button.light, .default-white-button.low-shadow {
     font-size: 16px;
-    line-height: 33px;
+    line-height: 34px;
     height: 34px;
     color: #666666;
     background-color: #FAFAFA;
@@ -205,11 +205,6 @@
 .default-white-button.light.white-border {
     background-color: transparent;
     color: #FAFAFA;
-}
-.default-white-button.light.white-border:hover {
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
-    box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
 }
 .default-white-button.light.white-border::after {
     -webkit-box-shadow: 0px 0px 0px 1px rgba(255,255,255,1);
@@ -274,7 +269,6 @@ body:not(.rtl) .default-white-button::first-letter {
     color: #333333;
     font-size: 12px;
     background: #ffffff;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, #ffffff 0%, #fafafa 100%);
     background: -webkit-linear-gradient(top, #ffffff 0%,#fafafa 100%);
     background: linear-gradient(to bottom, #ffffff 0%,#fafafa 100%);
@@ -318,7 +312,6 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-grey-button {
     color: white;
     background: rgb(170,170,170);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2FhYWFhYSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5OTk5OTkiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: -webkit-linear-gradient(top, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
     background: linear-gradient(to bottom, rgba(170,170,170,1) 0%, rgba(153,153,153,1) 100%);
@@ -330,7 +323,6 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-red-button {
     color: white;
     background: rgb(255,102,107);
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmNjY2YiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNlYzUyNTciIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
     background: -webkit-linear-gradient(top, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
     background: linear-gradient(to bottom, rgba(255,102,107,1) 0%, rgba(236,82,87,1) 100%);
@@ -360,7 +352,7 @@ body:not(.rtl) .default-white-button::first-letter {
     opacity: 0.3;
 }
 .default-white-button.semi-big, .default-grey-button.semi-big, .default-green-button.semi-big {
-    line-height: 35px;
+    line-height: 36px;
     height: 36px;
 }
 .default-green-button.height-40 {
@@ -382,7 +374,7 @@ body:not(.rtl) .default-white-button::first-letter {
     border-radius: 3px;
 }
 .default-white-button.huge, .default-red-button.huge, .default-green-button.huge {
-    line-height: 55px;
+    line-height: 56px;
     height: 56px;
     font-size: 18px;
     padding: 0 16px;
@@ -392,7 +384,7 @@ body:not(.rtl) .default-white-button::first-letter {
     min-width: 218px;
 }
 .default-white-button.semi-small, .default-grey-button.semi-small {
-    line-height: 27px;
+    line-height: 28px;
     height: 28px;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -478,6 +470,11 @@ body:not(.rtl) .default-white-button::first-letter {
     -webkit-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
     -moz-box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
     box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+.default-white-button.light.white-border:not(.disabled):not(.no-hover):hover {
+    -webkit-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    -moz-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
+    box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
 }
 
 .default-green-button:not(.tiny-button):not(.disabled):not(.no-hover):hover {
@@ -719,7 +716,7 @@ body:not(.rtl) .default-white-button::first-letter {
 .default-big-button span {
     display: block;
     font-size: 14px;
-    line-height: 47px;
+    line-height: 48px;
     font-family: 'LatoWeb', 'source_sans_proregular';
     height: 48px;
     background-color: white;
@@ -837,7 +834,7 @@ body:not(.rtl) .default-white-button::first-letter {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    line-height: 63px;
+    line-height: 64px;
     color: white;
     padding: 0 15px;
     min-width: 228px;
@@ -884,7 +881,6 @@ body:not(.rtl) .default-white-button::first-letter {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background: #ffffff;
-    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNmYWZhZmEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
     background: -moz-linear-gradient(top, #ffffff 0%, #fafafa 100%);
     background: -webkit-linear-gradient(top, #ffffff 0%,#fafafa 100%);
     background: linear-gradient(to bottom, #ffffff 0%,#fafafa 100%);
@@ -898,7 +894,7 @@ body:not(.rtl) .default-white-button::first-letter {
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border-radius: 4px;
-    line-height: 55px;
+    line-height: 56px;
     color: white;
     padding: 0 15px;
     min-width: 203px;
@@ -973,7 +969,7 @@ body:not(.rtl) .default-white-button::first-letter {
 .big-red-button, .big-green-button {
     display: inline-block;
     height: 56px;
-    line-height: 55px;
+    line-height: 56px;
     letter-spacing: 0.5px;
     font-size: 18px;
     margin: 0 0 0 20px;
@@ -1017,12 +1013,12 @@ body:not(.rtl) .default-white-button::first-letter {
 }
 .big-red-button.height-48 {
     height: 48px;
-    line-height: 47px;
+    line-height: 48px;
 }
 .big-red-button.height-32 {
     font-size: 16px;
     height: 32px;
-    line-height: 30px;
+    line-height: 32px;
 }
 .big-red-button i {
     margin: 2px -4px 0 0;
@@ -1154,7 +1150,7 @@ body:not(.rtl) .default-white-button::first-letter {
 }
 .big-green-button {
     height: 48px;
-    line-height: 47px;
+    line-height: 48px;
     letter-spacing: 0;
     font-size: 18px;
     margin: 0;

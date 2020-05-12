@@ -493,6 +493,27 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
 }
 
 
+mBroadcaster.once('startMega', function() {
+    'use strict';
+
+    var img = new Image();
+    img.onload = function() {
+        if (this.naturalWidth === 1) {
+            if (d) {
+                console.info('This browser does support AVIF.');
+            }
+            is_image.def.AVIF = 1;
+        }
+    };
+
+    img.src = 'data:image/avif;base64,AAAAHGZ0eXBtaWYxAAAAAG1pZjFhdmlmbWlhZgAAAPJtZXRhAAAAAAAAAC' +
+        'toZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAZ28tYXZpZiB2MAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAA' +
+        'ARAAAEAAQAAAAABFgABAAAAGAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFJbWFnZQAAAABnaXBy' +
+        'cAAAAEhpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGFzcAAAAAEAAAABAAAADGF2MUOBAAwAAAAAEHBpeGk' +
+        'AAAAAAwgICAAAABdpcG1hAAAAAAAAAAEAAQQBAoOEAAAAIG1kYXQSAAoFGAAOwCAyDR/wAABgBgAAAACsyvA=';
+});
+
+
 // ---------------------------------------------------------------------------------------------------------------
 
 var _getImageCache = Object.create(null);

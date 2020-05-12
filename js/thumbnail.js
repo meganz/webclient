@@ -449,6 +449,10 @@ function __render_thumb(img, u8, orientation, noMagicNumCheck) {
                 if (dv.byteLength > 24 && dv.getUint32(20) === 0x68656963) { // HEIC
                     break;
                 }
+                if (dv.byteLength > 24 && dv.getUint32(20) === 0x61766966) { // AVIF
+                    u8.type = 'image/avif';
+                    break;
+                }
                 if (dv.byteLength > 12 && dv.getUint32(8) === 0x57454250) { // WEBP
                     img.doesSupportAlpha = true;
                     break;
@@ -519,7 +523,7 @@ mBroadcaster.once('startMega', function() {
  */
 function exifImageRotation(target, buffer, orientation) {
     'use strict';
-    var blobURI = mObjectURL([buffer], 'image/jpeg');
+    var blobURI = mObjectURL([buffer], buffer.type || 'image/jpeg');
 
     orientation |= 0;
     if (orientation < 2) {

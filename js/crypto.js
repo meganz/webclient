@@ -966,14 +966,15 @@ function api_reqfailed(channel, error) {
                         sms.phoneInput.init(true);
                     }
 
-                    // Exit early to prevent logout because further API requests are
-                    // needed to verify by SMS and if logged out then it won't work
+                    // Allow user to escape from SMS verification dialog in order to login a different account.
                     return setLogOutOnNavigation();
                 }
                 else if (reasonCode === 700) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';
                     security.showVerifyEmailDialog(to);
-                    return false;
+
+                    // Allow user to escape from Email verification dialog in order to login a different account.
+                    return setLogOutOnNavigation();
                 }
                 else {
                     // Unknown reasonCode

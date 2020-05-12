@@ -23919,8 +23919,17 @@ ChatRoom.prototype.detachSearch = function () {
   this.trackDataChange();
 };
 
-ChatRoom.prototype.scrollToMessageId = function (msgId, index) {
+ChatRoom.prototype.scrollToMessageId = function (msgId, index, retryActive) {
   var self = this;
+
+  if (!self.isCurrentlyActive && !retryActive) {
+    // room not shown yet, retry only once again after 1.5s
+    setTimeout(function () {
+      self.scrollToMessageId(msgId, index, true);
+    }, 1500);
+    return;
+  }
+
   assert(self.isCurrentlyActive, 'chatRoom is not visible');
   self.isScrollingToMessageId = true;
 

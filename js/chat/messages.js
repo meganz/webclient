@@ -1929,7 +1929,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     var timeoutPromise = createTimeoutPromise(function() {
         return self.$msgsHistoryLoading.state() !== 'pending';
-    }, 500, 10000)
+    }, 500, 6e4 * 5)
         .always(function() {
             self.chatdIsProcessingHistory = false;
         })

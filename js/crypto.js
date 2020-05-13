@@ -986,6 +986,9 @@ function api_reqfailed(channel, error) {
 
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                }
                 msgDialog('warninga', dialogTitle,
                     reasonText,
                     false,
@@ -1195,6 +1198,10 @@ function waitsc() {
                     else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
                         // WSC is stopped at the beginning.
                         waittimeout = setTimeout(waitsc, waitbackoff);
+                    }
+                    else if (delieveredResponse == EBLOCKED) {
+                        // == because API response will be in a string
+                        api_reqfailed(5, EBLOCKED);
                     }
                 }
                 else if (!apixs[5].split) {

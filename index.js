@@ -3153,11 +3153,16 @@ window.onbeforeunload = function () {
 
     if (window.doUnloadLogOut) {
         u_logout();
+        delete window.doUnloadLogOut;
     }
     mBroadcaster.crossTab.leave();
 };
 
 window.onunload = function () {
+    'use strict';
+    if (window.doUnloadLogOut) {
+        u_logout();
+    }
     mBroadcaster.crossTab.leave();
 
     if (typeof dlpage_ph === 'string') {

@@ -83,7 +83,7 @@ function setDateTimeFormat(locales, format) {
     "use strict";
 
     // Set date format
-    var options = {hour12: false};
+    var options = {hourCycle: 'h23'};
 
     if (format < 10) {
         options.year = 'numeric';

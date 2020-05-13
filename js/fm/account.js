@@ -3039,17 +3039,18 @@ accountUI.contactAndChat = {
 
         'use strict';
 
-        var presenceInt = megaChat.plugins.presencedIntegration;
-        var delaying = this.delayRender(presenceInt, autoaway);
+        if (!megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.plugins.presencedIntegration) {
+            var presenceInt = megaChat.plugins.presencedIntegration;
+            var delaying = this.delayRender(presenceInt, autoaway);
 
-        if (delaying) {
-            return;
+            if (delaying) {
+                return;
+            }
+
+            this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
+            this.status.bindEvents(presenceInt, autoawaytimeout);
+            this.richURL.render();
         }
-
-        this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-        this.status.bindEvents(presenceInt, autoawaytimeout);
-
-        this.richURL.render();
     },
 
     status: {
@@ -3162,6 +3163,10 @@ accountUI.contactAndChat = {
         render: function() {
 
             'use strict';
+
+            if (typeof RichpreviewsFilter === 'undefined') {
+                return;
+            }
 
             // Auto-away switch
             accountUI.inputs.switch.init(

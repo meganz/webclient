@@ -7800,8 +7800,6 @@ EmojiAutocomplete.defaultProps = {
 };
 ;
 // CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
-var _dec, _class, _class2, _temp;
-
 function typingArea_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { typingArea_typeof = function _typeof(obj) { return typeof obj; }; } else { typingArea_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return typingArea_typeof(obj); }
 
 function typingArea_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -7828,8 +7826,6 @@ function typingArea_isNativeReflectConstruct() { if (typeof Reflect === "undefin
 
 function typingArea_getPrototypeOf(o) { typingArea_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return typingArea_getPrototypeOf(o); }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
-
 // libs
 var typingArea_React = __webpack_require__(0);
 
@@ -7840,7 +7836,7 @@ var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
-var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (_temp = _class2 = /*#__PURE__*/function (_MegaRenderMixin) {
+var typingArea_TypingArea = /*#__PURE__*/function (_MegaRenderMixin) {
   typingArea_inherits(TypingArea, _MegaRenderMixin);
 
   var _super = typingArea_createSuper(TypingArea);
@@ -8291,10 +8287,19 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
       $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function () {
         self.updateScroll(false);
       });
+
+      if (!this.scrollingInitialised) {
+        this.initScrolling();
+      }
+
       self.triggerOnUpdate(true);
 
       if (self.$container.is(":visible")) {
         self.updateScroll(false);
+      } else {
+        Soon(function () {
+          self.updateScroll(false);
+        });
       }
     }
   }, {
@@ -8377,7 +8382,6 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
       self.scrollingInitialised = true;
       var $node = $(self.findDOMNode());
       var $textarea = $('textarea:first', $node);
-      var $textareaClone = $('message-preview', $node);
       self.textareaLineHeight = parseInt($textarea.css('line-height'));
       var $textareaScrollBlock = $('.textarea-scroll', $node);
       $textareaScrollBlock.jScrollPane({
@@ -8410,6 +8414,21 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
   }, {
     key: "updateScroll",
     value: function updateScroll(keyEvents) {
+      var self = this;
+
+      if (self._updateScollTimer) {
+        clearTimeout(self._updateScollTimer);
+      }
+
+      self._updateScollTimer = setTimeout(function () {
+        self._updateScroll(keyEvents);
+
+        self._updateScollTimer = null;
+      }, 10);
+    }
+  }, {
+    key: "_updateScroll",
+    value: function _updateScroll(keyEvents) {
       var self = this; // DONT update if not visible...
 
       if (!this.props.chatRoom.isCurrentlyActive) {
@@ -8743,9 +8762,11 @@ var typingArea_TypingArea = (_dec = utils["default"].SoonFcWrap(10), (_class = (
   }]);
 
   return TypingArea;
-}(mixins["MegaRenderMixin"]), _class2.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi"), _class2.defaultProps = {
+}(mixins["MegaRenderMixin"]);
+typingArea_TypingArea.validEmojiCharacters = new RegExp("[\w\:\-\_0-9]", "gi");
+typingArea_TypingArea.defaultProps = {
   'textareaMaxHeight': "40%"
-}, _temp), (_applyDecoratedDescriptor(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype)), _class));
+};
 ;
 // CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 function whosTyping_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { whosTyping_typeof = function _typeof(obj) { return typeof obj; }; } else { whosTyping_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return whosTyping_typeof(obj); }
@@ -12343,13 +12364,13 @@ var TopicChange = /*#__PURE__*/function (_ConversationMessageM) {
 
 
 // CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
-var sharedFilesAccordionPanel_dec, sharedFilesAccordionPanel_class;
+var _dec, _class;
 
 function sharedFilesAccordionPanel_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { sharedFilesAccordionPanel_get = Reflect.get; } else { sharedFilesAccordionPanel_get = function _get(target, property, receiver) { var base = sharedFilesAccordionPanel_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return sharedFilesAccordionPanel_get(target, property, receiver || target); }
 
 function sharedFilesAccordionPanel_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = sharedFilesAccordionPanel_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function sharedFilesAccordionPanel_applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
+function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) { var desc = {}; Object.keys(descriptor).forEach(function (key) { desc[key] = descriptor[key]; }); desc.enumerable = !!desc.enumerable; desc.configurable = !!desc.configurable; if ('value' in desc || desc.initializer) { desc.writable = true; } desc = decorators.slice().reverse().reduce(function (desc, decorator) { return decorator(target, property, desc) || desc; }, desc); if (context && desc.initializer !== void 0) { desc.value = desc.initializer ? desc.initializer.call(context) : void 0; desc.initializer = undefined; } if (desc.initializer === void 0) { Object.defineProperty(target, property, desc); desc = null; } return desc; }
 
 function sharedFilesAccordionPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { sharedFilesAccordionPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return sharedFilesAccordionPanel_typeof(obj); }
 
@@ -12437,7 +12458,7 @@ var SharedFileItem = /*#__PURE__*/function (_MegaRenderMixin) {
   return SharedFileItem;
 }(mixins["MegaRenderMixin"]);
 
-var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = /*#__PURE__*/function (_MegaRenderMixin2) {
+var SharedFilesAccordionPanel = (_dec = utils["default"].SoonFcWrap(350), (_class = /*#__PURE__*/function (_MegaRenderMixin2) {
   sharedFilesAccordionPanel_inherits(SharedFilesAccordionPanel, _MegaRenderMixin2);
 
   var _super2 = sharedFilesAccordionPanel_createSuper(SharedFilesAccordionPanel);
@@ -12676,7 +12697,7 @@ var SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"
   }]);
 
   return SharedFilesAccordionPanel;
-}(mixins["MegaRenderMixin"]), (sharedFilesAccordionPanel_applyDecoratedDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails", [sharedFilesAccordionPanel_dec], Object.getOwnPropertyDescriptor(sharedFilesAccordionPanel_class.prototype, "eventuallyRenderThumbnails"), sharedFilesAccordionPanel_class.prototype)), sharedFilesAccordionPanel_class));
+}(mixins["MegaRenderMixin"]), (_applyDecoratedDescriptor(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype)), _class));
 ;
 
 // CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
@@ -14542,7 +14563,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
 
 
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
-var conversationpanel_dec, _dec2, conversationpanel_class, conversationpanel_class2, conversationpanel_temp;
+var conversationpanel_dec, _dec2, conversationpanel_class, _class2, _temp;
 
 function conversationpanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversationpanel_typeof = function _typeof(obj) { return typeof obj; }; } else { conversationpanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversationpanel_typeof(obj); }
 
@@ -15049,7 +15070,7 @@ var conversationpanel_ConversationRightArea = /*#__PURE__*/function (_MegaRender
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (conversationpanel_temp = conversationpanel_class2 = /*#__PURE__*/function (_MegaRenderMixin3) {
+var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(150), _dec2 = utils["default"].SoonFcWrap(150), (conversationpanel_class = (_temp = _class2 = /*#__PURE__*/function (_MegaRenderMixin3) {
   conversationpanel_inherits(ConversationPanel, _MegaRenderMixin3);
 
   var _super3 = conversationpanel_createSuper(ConversationPanel);
@@ -16641,7 +16662,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
   }]);
 
   return ConversationPanel;
-}(mixins["MegaRenderMixin"]), conversationpanel_class2.lastScrollPositionPerc = 1, conversationpanel_temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
+}(mixins["MegaRenderMixin"]), _class2.lastScrollPositionPerc = 1, _temp), (conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), conversationpanel_applyDecoratedDescriptor(conversationpanel_class.prototype, "handleKeyDown", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "handleKeyDown"), conversationpanel_class.prototype)), conversationpanel_class));
 ;
 var conversationpanel_ConversationPanels = /*#__PURE__*/function (_MegaRenderMixin4) {
   conversationpanel_inherits(ConversationPanels, _MegaRenderMixin4);

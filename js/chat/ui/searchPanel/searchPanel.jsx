@@ -70,18 +70,22 @@ export default class SearchPanel extends MegaRenderMixin {
 
     clickedOutsideComponent = ev => {
         const $target = ev && $(ev.target);
+        const outsideElements = [
+            'div.conversationsApp',
+            'div.fm-main',
+            'div.fm-left-panel',
+            'i.tiny-reset',
+            'div.small-icon.thin-search-icon'
+        ];
+
         return (
             $target &&
             // current parents !== root component
             $target.parents(`.${SEARCH_PANEL_CLASS}`).length === 0 &&
-            // current element !== left sidebar container; applicable due occasional click misfire/s on scroll
+            // current element !== left sidebar container
             $target.parents('div.fm-left-menu.conversations').length === 0 &&
-            // current element !== main chat area; applicable due occasional click misfire/s on scroll
-            !$target.is('div.conversationsApp') &&
-            // current element !== reset search element
-            !$target.is('i.tiny-reset') &&
-            // current element !== toggle search icon
-            !$target.is('div.small-icon.thin-search-icon')
+            // current element !== generic outside element
+            outsideElements.every(outsideElement => !$target.is(outsideElement))
         );
     }
 

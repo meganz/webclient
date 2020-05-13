@@ -865,8 +865,9 @@ function RegExpEscape(text) {
 
 function unixtimeToTimeString(timestamp) {
     var date = new Date(timestamp * 1000);
+    var hourSeparator = locale === 'fr' ? ' h ' : ':';
     return addZeroIfLenLessThen(date.getHours(), 2)
-        + ":" + addZeroIfLenLessThen(date.getMinutes(), 2);
+        + hourSeparator + addZeroIfLenLessThen(date.getMinutes(), 2);
 }
 
 

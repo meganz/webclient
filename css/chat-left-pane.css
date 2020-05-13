@@ -529,7 +529,9 @@
 .result-table .result-table-row .user-card {
     position: relative;
     float: left;
-    width: 70%;
+    width: -webkit-calc(100% - 46px);
+    width: -moz-calc(100% - 46px);
+    width: calc(100% - 46px);
     padding: 0 0 0 10px;
     font-size: 14px;
     line-height: 19px;

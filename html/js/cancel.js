@@ -135,7 +135,7 @@
             text = 'I have experienced too many problems';
         }
         else if (btnId === 'res4_div') {
-            text = "My favourite browser is not technologically compatible and I don't want to change";
+            text = "I am moving to another cloud storage provider";
         }
         else if (btnId === 'res5_div') {
             text = "I find the interface too confusing to use";
@@ -163,7 +163,7 @@
         // Reset feedback dialog to default state
         $(self.opt.fbDlgClass + ' .radioOn').attr('class', 'radioOff');
         $(self.opt.fbDlgClass + ' .radio-txt').removeClass('active');
-        $(self.opt.fbDlgClass + ' #res1_div')
+        $(self.opt.fbDlgClass + ' #res5_div')
             .attr('class', 'radioOn')
             .next().addClass('active');
         $('.fm-dialog' + self.opt.fbDlgClass).removeClass('hidden');

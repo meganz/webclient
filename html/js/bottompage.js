@@ -214,6 +214,7 @@ var bottompage = {
         function closePagesSubMenu() {
             $('.submenu.active, .submenu-item.active', $topMenu).removeClass('active');
             $(window).unbind('resize.pagesmenu');
+            $content.unbind('mousedown.closepmenu');
         }
 
         // Close previously opened sub menu
@@ -250,15 +251,16 @@ var bottompage = {
             $(window).rebind('resize.pagesmenu', function() {
                 subMenuPos();
             });
-        });
 
-        // Close pages submenu by click outside of submenu
-        $content.rebind('click.closepmenu', function(e) {
-            var $target = $(e.target);
+            // Close pages submenu by click outside of submenu
+            $content.rebind('mousedown.closepmenu', function(e) {
+                var $target = $(e.target);
 
-            if (!$target.is('.submenu') && !$target.closest('.submenu-item.active').length) {
-                closePagesSubMenu();
-            }
+                if (!$target.is('.submenu.active') && !$target.closest('.submenu-item.active').length
+                    && !$target.closest('.submenu.active').length) {
+                    closePagesSubMenu();
+                }
+            });
         });
     },
 
@@ -408,8 +410,8 @@ var bottompage = {
         }
 
         function topResize() {
-            var $topHeader = $(topHeader + ',' + navBar);
-            var $navBar = $('.pages-menu.body', 'body');
+            var $topHeader = $(topHeader, 'body');
+            var $navBar = $(navBar, 'body');
             if ($topHeader.hasClass('floating')) {
                 $topHeader.width($topHeader.parent().outerWidth());
                 if (page !== 'download') {

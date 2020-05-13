@@ -3779,6 +3779,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     "use strict";
 
     var tmpId;
+    var $fmholder = $('#fmholder', 'body');
+
     if (d) {
         console.log('sectionUIopen', id, folderlink);
     }
@@ -3786,23 +3788,23 @@ FileManager.prototype.onSectionUIOpen = function(id) {
        $.hideContextMenu();
     }
 
-    $('.nw-fm-left-icon').removeClass('active');
+    $('.nw-fm-left-icon', $fmholder).removeClass('active');
     if (this.hasInboxItems() === true) {
-        $('.nw-fm-left-icon.inbox').removeClass('hidden');
+        $('.nw-fm-left-icon.inbox', $fmholder).removeClass('hidden');
     }
     else {
-        $('.nw-fm-left-icon.inbox').addClass('hidden');
+        $('.nw-fm-left-icon.inbox', $fmholder).addClass('hidden');
     }
 
     // view or hide left icon for business account, confirmed and payed
     if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === 1 || u_attr.b.s === 2) && u_privk) {
-        $('.nw-fm-left-icon.user-management').removeClass('hidden');
+        $('.nw-fm-left-icon.user-management', $fmholder).removeClass('hidden');
     }
     else {
-        $('.nw-fm-left-icon.user-management').addClass('hidden');
+        $('.nw-fm-left-icon.user-management', $fmholder).addClass('hidden');
     }
 
-    $('.content-panel').removeClass('active');
+    $('.content-panel', $fmholder).removeClass('active');
 
     if (id === 'opc' || id === 'ipc') {
         tmpId = 'contacts';
@@ -3812,10 +3814,10 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
         // ToDo: Missing layout for empty Public Upload Page
         if (!Object.keys(mega.megadrop.pufs).length || !Object.keys(mega.megadrop.pups).length) {// Hide PUF tab
-            $('.fm-account-button.megadrop').addClass('hidden');
+            $('.fm-account-button.megadrop', $fmholder).addClass('hidden');
         }
         else {
-            $('.fm-account-button.megadrop').removeClass('hidden');
+            $('.fm-account-button.megadrop', $fmholder).removeClass('hidden');
         }
     }
     else {
@@ -3823,29 +3825,29 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     if (id === 'out-shares' || id === 'public-links') {
-        $('.nw-fm-left-icon.' + String('shared-with-me').replace(/[^\w-]/g, '')).addClass('active');
+        $('.nw-fm-left-icon.' + String('shared-with-me', $fmholder).replace(/[^\w-]/g, '')).addClass('active');
     }
     else {
-        $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
+        $('.nw-fm-left-icon.' + String(tmpId).replace(/[^\w-]/g, ''), $fmholder).addClass('active');
     }
 
-    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, '')).addClass('active');
-    $('.fm-left-menu').removeClass(
+    $('.content-panel.' + String(tmpId).replace(/[^\w-]/g, ''), $fmholder).addClass('active');
+    $('.fm-left-menu', $fmholder).removeClass(
         'cloud-drive folder-link shared-with-me rubbish-bin contacts out-shares public-links ' +
         'conversations opc ipc inbox account dashboard transfers recents user-management affiliate'
     ).addClass(tmpId);
-    $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip').addClass('hidden');
-    $('.fm-import-to-cloudrive, .fm-download-as-zip').off('click');
+    $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).addClass('hidden');
+    $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
-    $('#fmholder').removeClass('affiliate-program');
-    $('.fm-main').removeClass('active-folder-link');
-    $('.nw-fm-left-icons-panel .logo').addClass('hidden');
-    $('.fm-products-nav').text('');
-    $('.nw-fm-tree-header.folder-link').hide();
-    $('.nw-fm-left-icon.folder-link').removeClass('active');
+    $fmholder.removeClass('affiliate-program');
+    $('.fm-main', $fmholder).removeClass('active-folder-link');
+    $('.nw-fm-left-icons-panel .logo', $fmholder).addClass('hidden');
+    $('.fm-products-nav', $fmholder).text('');
+    $('.nw-fm-tree-header.folder-link', $fmholder).addClass('hidden');
+    $('.nw-fm-left-icon.folder-link', $fmholder).removeClass('active');
 
     // Prevent autofill prevent fake form to be submitted
-    $('#search-fake-form-2').rebind('submit', function () {
+    $('#search-fake-form-2', $fmholder).rebind('submit', function() {
         return false;
     });
 
@@ -3855,21 +3857,24 @@ FileManager.prototype.onSectionUIOpen = function(id) {
          $('.fm-breadcrumbs.folder-link .right-arrow-bg').text('Invalid folder');
          } else*/
         if (id === 'cloud-drive' || id === 'transfers') {
-            $('.nw-fm-left-icons-panel .logo').removeClass('hidden');
-            $('.fm-main').addClass('active-folder-link');
-            $('.fm-right-header').addClass('folder-link');
-            $('.fm-left-menu').addClass('folder-link');
-            $('.nw-fm-tree-header.folder-link').show();
+            $('.nw-fm-left-icons-panel .logo', $fmholder).removeClass('hidden');
+            $('.fm-main', $fmholder).addClass('active-folder-link');
+            $('.fm-right-header', $fmholder).addClass('folder-link');
+            $('.fm-left-menu', $fmholder).addClass('folder-link');
+            $('.nw-fm-tree-header.folder-link', $fmholder).removeClass('hidden');
 
             var $prodNav = $('.fm-products-nav').text('');
             if (!u_type) {
                 $prodNav.safeHTML(translate(pages['pagesmenu']));
-                onIdle(clickURLs);
+                onIdle(function() {
+                    clickURLs();
+                    bottompage.initNavButtons($fmholder);
+                });
             }
 
             // remove this two buttons from search result.
             if (M.currentdirid.substr(0, 6) !== 'search') {
-                $('.fm-import-to-cloudrive, .fm-download-as-zip')
+                $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder)
                     .removeClass('hidden')
                     .rebind('click', function() {
                         var c = $(this).attr('class');

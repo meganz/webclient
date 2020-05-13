@@ -226,6 +226,12 @@
     border-color: #D0021B;
     color: #373737;
 }
+.fm-products-nav .pages-menu.body {
+    margin-top: 0;
+    background-color: white;
+    border-top: 1px solid rgba(0,0,0,0.15);
+    min-width: 100%;
+}
 @media (hover: hover) {
     .top-submenu .top-menu-item:hover {
         background-color: rgba(102,102,102,0.1);

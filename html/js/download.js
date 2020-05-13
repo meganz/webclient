@@ -955,6 +955,19 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         $('.download.eta-block .dark-numbers', $dowloadWrapper).safeHTML(secondsToTime(retime, 1));
         $('.download.eta-block .light-txt', $dowloadWrapper).text('');
 
+        if (mega.tpw) {
+            mega.tpw.updateDownloadUpload(
+                mega.tpw.DOWNLOAD,
+                fileid,
+                perc,
+                bytesloaded,
+                bytestotal,
+                kbps,
+                dl_queue_num,
+                dl_queue[dl_queue_num].st
+            );
+        }
+
         if (is_mobile) {
             $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit);
         }
@@ -1089,6 +1102,9 @@ function dlcomplete(dl) {
     else $('.widget-circle').attr('class','widget-circle percents-0');
     Soon(M.resetUploadDownload);
     $('.download.top-bar').removeClass('downloading').addClass('download-complete');
+    if (mega.tpw) {
+        mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
+    }
     fdl_queue_var = false;
 }
 

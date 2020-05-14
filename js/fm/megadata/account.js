@@ -152,6 +152,9 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                             topmenuUI();
                         }
                     }
+                    if (res.b) {
+                        u_attr.b = res.b;
+                    }
                 }
 
                 if (!ctx.account.downbw_used) {

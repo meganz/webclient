@@ -2064,10 +2064,6 @@ function topmenuUI() {
         $menuUsername.text(u_attr.fullname).removeClass('hidden');
     }
 
-    if (u_type && u_attr.email) {
-        $('.email', $menuUserinfo).text(u_attr.email);
-    }
-
     if (mega.flags.refpr) {
         $menuAffiliateItem.removeClass('hidden');
     }
@@ -2089,7 +2085,7 @@ function topmenuUI() {
         }, 1000);
     });
 
-    if (u_type) {
+    if (u_type > 0) {
         $('body').removeClass('not-logged').addClass('logged');
 
         $menuHomeItem.addClass('hidden');
@@ -2120,6 +2116,10 @@ function topmenuUI() {
             .fail(function () {
                 $headerAchievements.addClass('hidden');
             });
+
+        if (u_attr.email) {
+            $('.email', $menuUserinfo).text(u_attr.email);
+        }
 
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {

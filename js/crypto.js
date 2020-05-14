@@ -912,7 +912,9 @@ function api_reqfailed(channel, error) {
         });
         loadingInitDialog.hide();
         loadingDialog.hide('force'); // subjected loading dialog is not hide by loadsubpage, so force hide it.
-        loadSubPage('login');
+        if (page !== 'download') {
+            loadSubPage('login');
+        }
     }
     else if ((c === 2 || c === 5) && e === ETOOMANY) {
         // too many pending SC requests - reload from scratch

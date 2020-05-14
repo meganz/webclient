@@ -725,8 +725,8 @@ function generateAvatarMeta(user_hash) {
 }
 
 function isNonActivatedAccount() {
-    return (!u_privk && typeof (u_attr.p) !== 'undefined'
-            && (u_attr.p >= 1 || u_attr.p <= 4));
+    'use strict';
+    return !window.u_privk && window.u_attr && (u_attr.p >= 1 || u_attr.p <= 4);
 }
 
 function isEphemeral() {

@@ -17589,18 +17589,6 @@ var perfectScrollbar = __webpack_require__(10);
 // CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 function searchPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { searchPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { searchPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return searchPanel_typeof(obj); }
 
-function searchPanel_toConsumableArray(arr) { return searchPanel_arrayWithoutHoles(arr) || searchPanel_iterableToArray(arr) || searchPanel_unsupportedIterableToArray(arr) || searchPanel_nonIterableSpread(); }
-
-function searchPanel_nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function searchPanel_unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return searchPanel_arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return searchPanel_arrayLikeToArray(o, minLen); }
-
-function searchPanel_iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
-
-function searchPanel_arrayWithoutHoles(arr) { if (Array.isArray(arr)) return searchPanel_arrayLikeToArray(arr); }
-
-function searchPanel_arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
 function searchPanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function searchPanel_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -17693,30 +17681,6 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       _this.doToggle('pause');
 
       _this.props.onToggle();
-    };
-
-    _this.getRecents = function () {
-      megaChat.getFrequentContacts().then(function (frequentContacts) {
-        var recents = [];
-        var len = frequentContacts.length;
-
-        for (var i = len; i--;) {
-          var recent = frequentContacts[i];
-          recents = [].concat(searchPanel_toConsumableArray(recents), [{
-            data: recent.userId,
-            contact: M.u[recent.userId]
-          }]);
-
-          if (i < len - 30) {
-            // break if had > 30 results
-            break;
-          }
-        }
-
-        _this.setState({
-          recents: recents
-        });
-      });
     };
 
     _this.doSearch = function (s) {
@@ -17848,8 +17812,6 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
-
       var _this$state = this.state,
           value = _this$state.value,
           searching = _this$state.searching,
@@ -17866,14 +17828,11 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       // -------------------------------------------------------------------------
 
       return /*#__PURE__*/external_React_default.a.createElement("div", {
-        className: "\n                ".concat(SEARCH_PANEL_CLASS, "\n                ").concat(this.props.minimized ? 'hidden' : '', "\n            ")
+        className: "\n                ".concat(SEARCH_PANEL_CLASS, "\n                ").concat(searching ? 'expanded' : '', "\n                ").concat(this.props.minimized ? 'hidden' : '', "\n            ")
       }, /*#__PURE__*/external_React_default.a.createElement(searchField_SearchField, {
         value: value,
         searching: searching,
         status: status,
-        onFocus: function onFocus() {
-          return !searching && _this2.getRecents();
-        },
         onChange: this.handleChange,
         onToggle: this.handleToggle,
         onReset: this.handleReset

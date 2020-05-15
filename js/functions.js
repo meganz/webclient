@@ -1567,6 +1567,17 @@ function assertStateChange(currentState, newState, allowedStatesMap, enumMap) {
 function mLogout(aCallback, force) {
     "use strict";
 
+    // If user are trying logged out from paid ephemral session, warn user that they cannot get back the paid session.
+    if (isNonActivatedAccount()) {
+        msgDialog('warninga:!^' + l[78] + '!' + l[79], 'warning', l[23443], l[23444], function(response) {
+            if (!response) {
+                M.logout();
+            }
+        });
+
+        return;
+    }
+
     if (!force && mega.ui.passwordReminderDialog) {
         var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
 

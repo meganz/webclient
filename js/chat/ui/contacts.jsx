@@ -115,15 +115,15 @@ export class ContactButton extends ContactAwareComponent {
             );
         }
 
-        if (contact.c === 2) {
-            moreDropdowns.push(
-                <DropdownItem
-                    key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
-                        loadSubPage('fm/account');
-                    }}/>
-            );
-        }
-        if (contact.c === 1) {
+            if (contact.c === 2 && contact.u === u_handle) {
+                moreDropdowns.push(
+                    <DropdownItem
+                        key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
+                            loadSubPage('fm/account');
+                        }} />
+                );
+            }
+            if (contact.c === 1) {
 
             var startAudioCall = function() {
                 megaChat.createAndShowPrivateRoomFor(contact.u)
@@ -186,38 +186,38 @@ export class ContactButton extends ContactAwareComponent {
                     key="share-item" icon="context share-folder" label={__(l[6775])} onClick={() => {
                         openCopyShareDialog(contact.u);
                     }} />
-            );
-        }
-        else if (!contact.c) {
-            moreDropdowns.push(
-                <DropdownItem
-                    key="view2"
-                    icon="small-icon icons-sprite grey-plus"
-                    label={__(l[101])}
-                    onClick={() => {
-                        loadingDialog.show();
-                        const isAnonymousUser = !u_handle || u_type !== 3;
-                        const ADD_CONTACT = 'addContact';
-                        if (anonymouschat && isAnonymousUser) {
-                            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-                            if (localStorage.getItem(ADD_CONTACT) === null) {
-                                localStorage.setItem(
-                                    ADD_CONTACT,
-                                    JSON.stringify({u: contact.u, unixTime: unixtime()})
-                                );
+                );
+            }
+            else if (!contact.c || (contact.c === 2 && contact.u !== u_handle)) {
+                moreDropdowns.push(
+                    <DropdownItem
+                        key="view2"
+                        icon="small-icon icons-sprite grey-plus"
+                        label={__(l[101])}
+                        onClick={() => {
+                            loadingDialog.show();
+                            const isAnonymousUser = (!u_handle || u_type !== 3);
+                            const ADD_CONTACT = 'addContact';
+                            if (anonymouschat && isAnonymousUser) {
+                                megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+                                if (localStorage.getItem(ADD_CONTACT) === null) {
+                                    localStorage.setItem(
+                                        ADD_CONTACT,
+                                        JSON.stringify({u: contact.u, unixTime: unixtime()})
+                                    );
+                                }
                             }
-                        }
-                        else {
-                            M.syncContactEmail(contact.u)
-                                .done(function(email) {
-                                    var exists = false;
-                                    var opcKeys = Object.keys(M.opc);
-                                    for (var i = 0; i < opcKeys.length; i++) {
-                                        if (!exists && M.opc[opcKeys[i]].m === email) {
-                                            exists = true;
-                                            break;
+                            else {
+                                M.syncContactEmail(contact.u)
+                                    .done(function(email) {
+                                        var exists = false;
+                                        var opcKeys = Object.keys(M.opc);
+                                        for (var i = 0; i < opcKeys.length; i++) {
+                                            if (!exists && M.opc[opcKeys[i]].m === email) {
+                                                exists = true;
+                                                break;
+                                            }
                                         }
-                                    }
 
                                     if (exists) {
                                         closeDialog();

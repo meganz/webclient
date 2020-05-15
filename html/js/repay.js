@@ -18,6 +18,11 @@ RepayPage.prototype.initPage = function() {
         loadSubPage('start');
         return;
     }
+
+    if (!u_attr.email || isEphemeral()) {
+        return loadSubPage('registerb');
+    }
+
     var mySelf = this;
     loadingDialog.show();
 

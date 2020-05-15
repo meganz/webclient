@@ -966,14 +966,15 @@ function api_reqfailed(channel, error) {
                         sms.phoneInput.init(true);
                     }
 
-                    // Exit early to prevent logout because further API requests are
-                    // needed to verify by SMS and if logged out then it won't work
+                    // Allow user to escape from SMS verification dialog in order to login a different account.
                     return setLogOutOnNavigation();
                 }
                 else if (reasonCode === 700) {
                     var to = String(page).startsWith('emailverify') && 'login-to-account';
                     security.showVerifyEmailDialog(to);
-                    return false;
+
+                    // Allow user to escape from Email verification dialog in order to login a different account.
+                    return setLogOutOnNavigation();
                 }
                 else {
                     // Unknown reasonCode
@@ -985,6 +986,9 @@ function api_reqfailed(channel, error) {
 
                 // if fm-overlay click handler was initialized, we remove the handler to prevent dialog skip
                 $('.fm-dialog-overlay').off('click.fm');
+                if (is_mobile) {
+                    parsepage(pages['mobile']);
+                }
                 msgDialog('warninga', dialogTitle,
                     reasonText,
                     false,
@@ -1194,6 +1198,10 @@ function waitsc() {
                     else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
                         // WSC is stopped at the beginning.
                         waittimeout = setTimeout(waitsc, waitbackoff);
+                    }
+                    else if (delieveredResponse == EBLOCKED) {
+                        // == because API response will be in a string
+                        api_reqfailed(5, EBLOCKED);
                     }
                 }
                 else if (!apixs[5].split) {

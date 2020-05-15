@@ -5312,12 +5312,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .not-logged .fm-main.active-folder-link {
     height: 100%;
-    height: -webkit-calc(100% - 80px);
-    height: -moz-calc(100% - 80px);
-    height: calc(100% - 80px);
-}
-.en.not-logged .fm-main.active-folder-link {
-    height: 100%;
     height: -webkit-calc(100% - 70px);
     height: -moz-calc(100% - 70px);
     height: calc(100% - 70px);
@@ -5326,13 +5320,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     height: -webkit-calc(100% - 12px);
     height: -moz-calc(100% - 12px);
     height: calc(100% - 12px);
-}
-.main-blur-block .pages-nav.content-block {
-    padding-top: 0;
-    -webkit-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
-    -moz-box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
-    box-shadow: inset 0 1px 0 0px rgba(0,0,0,0.15);
-    z-index: 20;
 }
 .l-pane-collapsed .fm-left-panel {
     width: 6px !important;

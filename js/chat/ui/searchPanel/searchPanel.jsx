@@ -30,7 +30,6 @@ export default class SearchPanel extends MegaRenderMixin {
         this.bindEvents();
     }
 
-    // TODO: validate if really necessary; currently needed because render is not invoked on prop update from the parent
     componentWillReceiveProps(nextProps, nextContext) {
         super.componentWillReceiveProps(nextProps, nextContext);
 

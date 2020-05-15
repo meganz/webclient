@@ -60,6 +60,14 @@ export default class ResultContainer extends MegaRenderMixin {
         // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
         // ----------------------------------------------------------------------
 
+        if (status === STATUS.COMPLETED && results.length < 1) {
+            return (
+                <ResultTable>
+                    <ResultRow type={TYPE.NIL} />
+                </ResultTable>
+            );
+        }
+
         const RESULT_TABLE = {
             CONTACTS_AND_CHATS: [],
             MESSAGES: [],
@@ -99,14 +107,6 @@ export default class ResultContainer extends MegaRenderMixin {
                     return (
                         <ResultTable {...table.props}>
                             {table.ref.map(row => row)}
-                        </ResultTable>
-                    );
-                }
-
-                if (status === STATUS.COMPLETED && table.isEmpty) {
-                    return (
-                        <ResultTable {...table.props}>
-                            <ResultRow type={TYPE.NIL} />
                         </ResultTable>
                     );
                 }

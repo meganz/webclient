@@ -8,8 +8,6 @@ const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
 
 /**
- * TODO: validate the correctness of this check --  valid way to check for group chats?
- *
  * roomIsGroup
  * @description Check whether given chat room is group chat.
  * @param {ChatRoom} room
@@ -218,7 +216,7 @@ class MemberRow extends MegaRenderMixin {
 }
 
 const NilRow = () => (
-    <div className={`${SEARCH_ROW_CLASS} nil`}>
+    <div className={SEARCH_ROW_CLASS}>
         <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
         <span>{LABEL.NO_RESULTS}</span>
     </div>

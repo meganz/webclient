@@ -16891,11 +16891,12 @@ var resultTable_ResultTable = /*#__PURE__*/function (_MegaRenderMixin) {
   _createClass(ResultTable, [{
     key: "render",
     value: function render() {
+      var heading = this.props.heading;
       return /*#__PURE__*/external_React_default.a.createElement("div", {
-        className: "result-table"
-      }, /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "result-table ".concat(heading ? '' : 'nil')
+      }, heading ? /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "result-table-heading"
-      }, this.props.heading), this.props.children);
+      }, heading) : null, this.props.children);
     }
   }]);
 
@@ -16934,8 +16935,6 @@ function resultRow_getPrototypeOf(o) { resultRow_getPrototypeOf = Object.setProt
 var SEARCH_ROW_CLASS = "result-table-row";
 var USER_CARD_CLASS = "user-card";
 /**
- * TODO: validate the correctness of this check --  valid way to check for group chats?
- *
  * roomIsGroup
  * @description Check whether given chat room is group chat.
  * @param {ChatRoom} room
@@ -17176,7 +17175,7 @@ var resultRow_MemberRow = /*#__PURE__*/function (_MegaRenderMixin3) {
 
 var resultRow_NilRow = function NilRow() {
   return /*#__PURE__*/external_React_default.a.createElement("div", {
-    className: "".concat(SEARCH_ROW_CLASS, " nil")
+    className: SEARCH_ROW_CLASS
   }, /*#__PURE__*/external_React_default.a.createElement("img", {
     src: "".concat(staticpath, "images/temp/search-icon.png"),
     alt: LABEL.NO_RESULTS
@@ -17343,6 +17342,12 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
       // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
       // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
       // ----------------------------------------------------------------------
+      if (status === STATUS.COMPLETED && results.length < 1) {
+        return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, null, /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+          type: TYPE.NIL
+        }));
+      }
+
       var RESULT_TABLE = {
         CONTACTS_AND_CHATS: [],
         MESSAGES: []
@@ -17381,12 +17386,6 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
         if (table.hasRows) {
           return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, table.ref.map(function (row) {
             return row;
-          }));
-        }
-
-        if (status === STATUS.COMPLETED && table.isEmpty) {
-          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
-            type: TYPE.NIL
           }));
         }
 
@@ -17822,8 +17821,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       searchPanel_get(searchPanel_getPrototypeOf(SearchPanel.prototype), "componentDidMount", this).call(this);
 
       this.bindEvents();
-    } // TODO: validate if really necessary; currently needed because render is not invoked on prop update from the parent
-
+    }
   }, {
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(nextProps, nextContext) {

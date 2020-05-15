@@ -656,13 +656,21 @@
 
 /* --- Result Row: No Results --- */
 
-.result-table .result-table-row.nil {
-    padding: 20px;
-    cursor: default;
-    text-align: center;
+.result-table.nil {
+    display: table;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
 
-.result-table .result-table-row.nil span {
+.result-table.nil .result-table-row {
+    display: table-cell;
+    cursor: default;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.result-table.nil .result-table-row span {
     display: block;
     padding: 10px 0 0 0;
     font-size: 20px;

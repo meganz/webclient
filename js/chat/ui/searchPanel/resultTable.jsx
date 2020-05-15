@@ -7,11 +7,11 @@ export default class ResultTable extends MegaRenderMixin {
     }
 
     render() {
+        const { heading } = this.props;
+
         return (
-            <div className="result-table">
-                <div className="result-table-heading">
-                    {this.props.heading}
-                </div>
+            <div className={`result-table ${heading ? '' : 'nil'}`}>
+                {heading ? <div className="result-table-heading">{heading}</div> : null}
                 {this.props.children}
             </div>
         );

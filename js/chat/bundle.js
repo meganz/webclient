@@ -115,7 +115,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -124,10 +128,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
 
@@ -1054,7 +1054,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -1063,10 +1067,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
 
@@ -1241,7 +1241,7 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
           }));
         }
 
-        if (contact.c === 2) {
+        if (contact.c === 2 && contact.u === u_handle) {
           moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "view0",
             icon: "human-profile",
@@ -1317,7 +1317,7 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
               openCopyShareDialog(contact.u);
             }
           }));
-        } else if (!contact.c) {
+        } else if (!contact.c || contact.c === 2 && contact.u !== u_handle) {
           moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
             key: "view2",
             icon: "small-icon icons-sprite grey-plus",
@@ -2551,7 +2551,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -2560,10 +2564,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -2990,7 +2990,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -2999,10 +3003,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -3506,7 +3506,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3515,10 +3519,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -3988,7 +3988,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3997,10 +4001,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -4250,7 +4250,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4259,10 +4263,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -4434,7 +4434,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4443,10 +4447,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -4871,7 +4871,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4880,10 +4884,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -5227,7 +5227,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -5236,10 +5240,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 // libs
 
@@ -5919,11 +5919,6 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
         var contact;
 
         if (!chatRoom || !chatRoom.roomId) {
-          return;
-        } // Account has been deleted/deactivated
-
-
-        if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
           return;
         }
 
@@ -6724,7 +6719,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6733,10 +6732,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -6832,7 +6827,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6841,10 +6840,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -6927,7 +6922,11 @@ function _get(target, property, receiver) { if (typeof Reflect !== "undefined" &
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6936,10 +6935,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 
 
@@ -8404,7 +8399,11 @@ function emojiDropdown_defineProperties(target, props) { for (var i = 0; i < pro
 
 function emojiDropdown_createClass(Constructor, protoProps, staticProps) { if (protoProps) emojiDropdown_defineProperties(Constructor.prototype, protoProps); if (staticProps) emojiDropdown_defineProperties(Constructor, staticProps); return Constructor; }
 
-function emojiDropdown_createSuper(Derived) { return function () { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (emojiDropdown_isNativeReflectConstruct()) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
+function emojiDropdown_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) emojiDropdown_setPrototypeOf(subClass, superClass); }
+
+function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiDropdown_setPrototypeOf(o, p); }
+
+function emojiDropdown_createSuper(Derived) { var hasNativeReflectConstruct = emojiDropdown_isNativeReflectConstruct(); return function () { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
 
 function emojiDropdown_possibleConstructorReturn(self, call) { if (call && (emojiDropdown_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiDropdown_assertThisInitialized(self); }
 
@@ -8413,10 +8412,6 @@ function emojiDropdown_assertThisInitialized(self) { if (self === void 0) { thro
 function emojiDropdown_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function emojiDropdown_getPrototypeOf(o) { emojiDropdown_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return emojiDropdown_getPrototypeOf(o); }
-
-function emojiDropdown_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) emojiDropdown_setPrototypeOf(subClass, superClass); }
-
-function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiDropdown_setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -8957,7 +8952,11 @@ function emojiAutocomplete_get(target, property, receiver) { if (typeof Reflect 
 
 function emojiAutocomplete_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = emojiAutocomplete_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function emojiAutocomplete_createSuper(Derived) { return function () { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (emojiAutocomplete_isNativeReflectConstruct()) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
+function emojiAutocomplete_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) emojiAutocomplete_setPrototypeOf(subClass, superClass); }
+
+function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiAutocomplete_setPrototypeOf(o, p); }
+
+function emojiAutocomplete_createSuper(Derived) { var hasNativeReflectConstruct = emojiAutocomplete_isNativeReflectConstruct(); return function () { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
 
 function emojiAutocomplete_possibleConstructorReturn(self, call) { if (call && (emojiAutocomplete_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiAutocomplete_assertThisInitialized(self); }
 
@@ -8966,10 +8965,6 @@ function emojiAutocomplete_assertThisInitialized(self) { if (self === void 0) { 
 function emojiAutocomplete_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function emojiAutocomplete_getPrototypeOf(o) { emojiAutocomplete_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return emojiAutocomplete_getPrototypeOf(o); }
-
-function emojiAutocomplete_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) emojiAutocomplete_setPrototypeOf(subClass, superClass); }
-
-function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiAutocomplete_setPrototypeOf(o, p); }
 
 var emojiAutocomplete_React = __webpack_require__(0);
 
@@ -9271,7 +9266,11 @@ function typingArea_get(target, property, receiver) { if (typeof Reflect !== "un
 
 function typingArea_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = typingArea_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function typingArea_createSuper(Derived) { return function () { var Super = typingArea_getPrototypeOf(Derived), result; if (typingArea_isNativeReflectConstruct()) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
+function typingArea_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) typingArea_setPrototypeOf(subClass, superClass); }
+
+function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return typingArea_setPrototypeOf(o, p); }
+
+function typingArea_createSuper(Derived) { var hasNativeReflectConstruct = typingArea_isNativeReflectConstruct(); return function () { var Super = typingArea_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
 
 function typingArea_possibleConstructorReturn(self, call) { if (call && (typingArea_typeof(call) === "object" || typeof call === "function")) { return call; } return typingArea_assertThisInitialized(self); }
 
@@ -9280,10 +9279,6 @@ function typingArea_assertThisInitialized(self) { if (self === void 0) { throw n
 function typingArea_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function typingArea_getPrototypeOf(o) { typingArea_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return typingArea_getPrototypeOf(o); }
-
-function typingArea_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) typingArea_setPrototypeOf(subClass, superClass); }
-
-function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return typingArea_setPrototypeOf(o, p); }
 
 // libs
 var typingArea_React = __webpack_require__(0);
@@ -10240,7 +10235,11 @@ function whosTyping_get(target, property, receiver) { if (typeof Reflect !== "un
 
 function whosTyping_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = whosTyping_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function whosTyping_createSuper(Derived) { return function () { var Super = whosTyping_getPrototypeOf(Derived), result; if (whosTyping_isNativeReflectConstruct()) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
+function whosTyping_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) whosTyping_setPrototypeOf(subClass, superClass); }
+
+function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return whosTyping_setPrototypeOf(o, p); }
+
+function whosTyping_createSuper(Derived) { var hasNativeReflectConstruct = whosTyping_isNativeReflectConstruct(); return function () { var Super = whosTyping_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
 
 function whosTyping_possibleConstructorReturn(self, call) { if (call && (whosTyping_typeof(call) === "object" || typeof call === "function")) { return call; } return whosTyping_assertThisInitialized(self); }
 
@@ -10249,10 +10248,6 @@ function whosTyping_assertThisInitialized(self) { if (self === void 0) { throw n
 function whosTyping_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function whosTyping_getPrototypeOf(o) { whosTyping_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return whosTyping_getPrototypeOf(o); }
-
-function whosTyping_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) whosTyping_setPrototypeOf(subClass, superClass); }
-
-function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return whosTyping_setPrototypeOf(o, p); }
 
 var whosTyping_React = __webpack_require__(0);
 
@@ -10429,7 +10424,11 @@ function accordion_defineProperties(target, props) { for (var i = 0; i < props.l
 
 function accordion_createClass(Constructor, protoProps, staticProps) { if (protoProps) accordion_defineProperties(Constructor.prototype, protoProps); if (staticProps) accordion_defineProperties(Constructor, staticProps); return Constructor; }
 
-function accordion_createSuper(Derived) { return function () { var Super = accordion_getPrototypeOf(Derived), result; if (accordion_isNativeReflectConstruct()) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
+function accordion_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) accordion_setPrototypeOf(subClass, superClass); }
+
+function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return accordion_setPrototypeOf(o, p); }
+
+function accordion_createSuper(Derived) { var hasNativeReflectConstruct = accordion_isNativeReflectConstruct(); return function () { var Super = accordion_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
 
 function accordion_possibleConstructorReturn(self, call) { if (call && (accordion_typeof(call) === "object" || typeof call === "function")) { return call; } return accordion_assertThisInitialized(self); }
 
@@ -10438,10 +10437,6 @@ function accordion_assertThisInitialized(self) { if (self === void 0) { throw ne
 function accordion_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function accordion_getPrototypeOf(o) { accordion_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return accordion_getPrototypeOf(o); }
-
-function accordion_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) accordion_setPrototypeOf(subClass, superClass); }
-
-function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return accordion_setPrototypeOf(o, p); }
 
 var accordion_React = __webpack_require__(0);
 
@@ -10604,7 +10599,11 @@ function participantsList_defineProperties(target, props) { for (var i = 0; i < 
 
 function participantsList_createClass(Constructor, protoProps, staticProps) { if (protoProps) participantsList_defineProperties(Constructor.prototype, protoProps); if (staticProps) participantsList_defineProperties(Constructor, staticProps); return Constructor; }
 
-function participantsList_createSuper(Derived) { return function () { var Super = participantsList_getPrototypeOf(Derived), result; if (participantsList_isNativeReflectConstruct()) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
+function participantsList_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) participantsList_setPrototypeOf(subClass, superClass); }
+
+function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return participantsList_setPrototypeOf(o, p); }
+
+function participantsList_createSuper(Derived) { var hasNativeReflectConstruct = participantsList_isNativeReflectConstruct(); return function () { var Super = participantsList_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
 
 function participantsList_possibleConstructorReturn(self, call) { if (call && (participantsList_typeof(call) === "object" || typeof call === "function")) { return call; } return participantsList_assertThisInitialized(self); }
 
@@ -10613,10 +10612,6 @@ function participantsList_assertThisInitialized(self) { if (self === void 0) { t
 function participantsList_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function participantsList_getPrototypeOf(o) { participantsList_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return participantsList_getPrototypeOf(o); }
-
-function participantsList_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) participantsList_setPrototypeOf(subClass, superClass); }
-
-function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return participantsList_setPrototypeOf(o, p); }
 
 
 
@@ -10975,7 +10970,11 @@ function metaRichpreview_defineProperties(target, props) { for (var i = 0; i < p
 
 function metaRichpreview_createClass(Constructor, protoProps, staticProps) { if (protoProps) metaRichpreview_defineProperties(Constructor.prototype, protoProps); if (staticProps) metaRichpreview_defineProperties(Constructor, staticProps); return Constructor; }
 
-function metaRichpreview_createSuper(Derived) { return function () { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (metaRichpreview_isNativeReflectConstruct()) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
+function metaRichpreview_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreview_setPrototypeOf(subClass, superClass); }
+
+function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreview_setPrototypeOf(o, p); }
+
+function metaRichpreview_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreview_isNativeReflectConstruct(); return function () { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreview_possibleConstructorReturn(self, call) { if (call && (metaRichpreview_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreview_assertThisInitialized(self); }
 
@@ -10984,10 +10983,6 @@ function metaRichpreview_assertThisInitialized(self) { if (self === void 0) { th
 function metaRichpreview_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function metaRichpreview_getPrototypeOf(o) { metaRichpreview_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return metaRichpreview_getPrototypeOf(o); }
-
-function metaRichpreview_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreview_setPrototypeOf(subClass, superClass); }
-
-function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreview_setPrototypeOf(o, p); }
 
 var metaRichpreview_React = __webpack_require__(0);
 
@@ -11122,7 +11117,11 @@ function metaRichpreviewConfirmation_defineProperties(target, props) { for (var 
 
 function metaRichpreviewConfirmation_createClass(Constructor, protoProps, staticProps) { if (protoProps) metaRichpreviewConfirmation_defineProperties(Constructor.prototype, protoProps); if (staticProps) metaRichpreviewConfirmation_defineProperties(Constructor, staticProps); return Constructor; }
 
-function metaRichpreviewConfirmation_createSuper(Derived) { return function () { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (metaRichpreviewConfirmation_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewConfirmation_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreviewConfirmation_setPrototypeOf(subClass, superClass); }
+
+function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfirmation_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewConfirmation_setPrototypeOf(o, p); }
+
+function metaRichpreviewConfirmation_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewConfirmation_isNativeReflectConstruct(); return function () { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewConfirmation_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewConfirmation_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewConfirmation_assertThisInitialized(self); }
 
@@ -11131,10 +11130,6 @@ function metaRichpreviewConfirmation_assertThisInitialized(self) { if (self === 
 function metaRichpreviewConfirmation_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function metaRichpreviewConfirmation_getPrototypeOf(o) { metaRichpreviewConfirmation_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return metaRichpreviewConfirmation_getPrototypeOf(o); }
-
-function metaRichpreviewConfirmation_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreviewConfirmation_setPrototypeOf(subClass, superClass); }
-
-function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfirmation_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewConfirmation_setPrototypeOf(o, p); }
 
 var metaRichpreviewConfirmation_React = __webpack_require__(0);
 
@@ -11251,7 +11246,11 @@ function metaRichpreviewMegaLinks_defineProperties(target, props) { for (var i =
 
 function metaRichpreviewMegaLinks_createClass(Constructor, protoProps, staticProps) { if (protoProps) metaRichpreviewMegaLinks_defineProperties(Constructor.prototype, protoProps); if (staticProps) metaRichpreviewMegaLinks_defineProperties(Constructor, staticProps); return Constructor; }
 
-function metaRichpreviewMegaLinks_createSuper(Derived) { return function () { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (metaRichpreviewMegaLinks_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewMegaLinks_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreviewMegaLinks_setPrototypeOf(subClass, superClass); }
+
+function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLinks_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewMegaLinks_setPrototypeOf(o, p); }
+
+function metaRichpreviewMegaLinks_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewMegaLinks_isNativeReflectConstruct(); return function () { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewMegaLinks_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewMegaLinks_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewMegaLinks_assertThisInitialized(self); }
 
@@ -11260,10 +11259,6 @@ function metaRichpreviewMegaLinks_assertThisInitialized(self) { if (self === voi
 function metaRichpreviewMegaLinks_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function metaRichpreviewMegaLinks_getPrototypeOf(o) { metaRichpreviewMegaLinks_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return metaRichpreviewMegaLinks_getPrototypeOf(o); }
-
-function metaRichpreviewMegaLinks_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) metaRichpreviewMegaLinks_setPrototypeOf(subClass, superClass); }
-
-function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLinks_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewMegaLinks_setPrototypeOf(o, p); }
 
 
 
@@ -11448,7 +11443,11 @@ function AudioPlayer_defineProperties(target, props) { for (var i = 0; i < props
 
 function AudioPlayer_createClass(Constructor, protoProps, staticProps) { if (protoProps) AudioPlayer_defineProperties(Constructor.prototype, protoProps); if (staticProps) AudioPlayer_defineProperties(Constructor, staticProps); return Constructor; }
 
-function AudioPlayer_createSuper(Derived) { return function () { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (AudioPlayer_isNativeReflectConstruct()) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
+function AudioPlayer_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) AudioPlayer_setPrototypeOf(subClass, superClass); }
+
+function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioPlayer_setPrototypeOf(o, p); }
+
+function AudioPlayer_createSuper(Derived) { var hasNativeReflectConstruct = AudioPlayer_isNativeReflectConstruct(); return function () { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
 
 function AudioPlayer_possibleConstructorReturn(self, call) { if (call && (AudioPlayer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioPlayer_assertThisInitialized(self); }
 
@@ -11457,10 +11456,6 @@ function AudioPlayer_assertThisInitialized(self) { if (self === void 0) { throw 
 function AudioPlayer_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function AudioPlayer_getPrototypeOf(o) { AudioPlayer_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return AudioPlayer_getPrototypeOf(o); }
-
-function AudioPlayer_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) AudioPlayer_setPrototypeOf(subClass, superClass); }
-
-function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioPlayer_setPrototypeOf(o, p); }
 
 
 
@@ -11721,7 +11716,11 @@ function AudioContainer_defineProperties(target, props) { for (var i = 0; i < pr
 
 function AudioContainer_createClass(Constructor, protoProps, staticProps) { if (protoProps) AudioContainer_defineProperties(Constructor.prototype, protoProps); if (staticProps) AudioContainer_defineProperties(Constructor, staticProps); return Constructor; }
 
-function AudioContainer_createSuper(Derived) { return function () { var Super = AudioContainer_getPrototypeOf(Derived), result; if (AudioContainer_isNativeReflectConstruct()) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
+function AudioContainer_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) AudioContainer_setPrototypeOf(subClass, superClass); }
+
+function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioContainer_setPrototypeOf(o, p); }
+
+function AudioContainer_createSuper(Derived) { var hasNativeReflectConstruct = AudioContainer_isNativeReflectConstruct(); return function () { var Super = AudioContainer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
 
 function AudioContainer_possibleConstructorReturn(self, call) { if (call && (AudioContainer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioContainer_assertThisInitialized(self); }
 
@@ -11730,10 +11729,6 @@ function AudioContainer_assertThisInitialized(self) { if (self === void 0) { thr
 function AudioContainer_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function AudioContainer_getPrototypeOf(o) { AudioContainer_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return AudioContainer_getPrototypeOf(o); }
-
-function AudioContainer_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) AudioContainer_setPrototypeOf(subClass, superClass); }
-
-function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioContainer_setPrototypeOf(o, p); }
 
 
 
@@ -11897,7 +11892,11 @@ function generic_get(target, property, receiver) { if (typeof Reflect !== "undef
 
 function generic_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = generic_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function generic_createSuper(Derived) { return function () { var Super = generic_getPrototypeOf(Derived), result; if (generic_isNativeReflectConstruct()) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
+function generic_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) generic_setPrototypeOf(subClass, superClass); }
+
+function generic_setPrototypeOf(o, p) { generic_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return generic_setPrototypeOf(o, p); }
+
+function generic_createSuper(Derived) { var hasNativeReflectConstruct = generic_isNativeReflectConstruct(); return function () { var Super = generic_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
 
 function generic_possibleConstructorReturn(self, call) { if (call && (generic_typeof(call) === "object" || typeof call === "function")) { return call; } return generic_assertThisInitialized(self); }
 
@@ -11906,10 +11905,6 @@ function generic_assertThisInitialized(self) { if (self === void 0) { throw new 
 function generic_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function generic_getPrototypeOf(o) { generic_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return generic_getPrototypeOf(o); }
-
-function generic_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) generic_setPrototypeOf(subClass, superClass); }
-
-function generic_setPrototypeOf(o, p) { generic_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return generic_setPrototypeOf(o, p); }
 
 
 
@@ -13351,7 +13346,11 @@ function alterParticipants_defineProperties(target, props) { for (var i = 0; i <
 
 function alterParticipants_createClass(Constructor, protoProps, staticProps) { if (protoProps) alterParticipants_defineProperties(Constructor.prototype, protoProps); if (staticProps) alterParticipants_defineProperties(Constructor, staticProps); return Constructor; }
 
-function alterParticipants_createSuper(Derived) { return function () { var Super = alterParticipants_getPrototypeOf(Derived), result; if (alterParticipants_isNativeReflectConstruct()) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
+function alterParticipants_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) alterParticipants_setPrototypeOf(subClass, superClass); }
+
+function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return alterParticipants_setPrototypeOf(o, p); }
+
+function alterParticipants_createSuper(Derived) { var hasNativeReflectConstruct = alterParticipants_isNativeReflectConstruct(); return function () { var Super = alterParticipants_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
 
 function alterParticipants_possibleConstructorReturn(self, call) { if (call && (alterParticipants_typeof(call) === "object" || typeof call === "function")) { return call; } return alterParticipants_assertThisInitialized(self); }
 
@@ -13360,10 +13359,6 @@ function alterParticipants_assertThisInitialized(self) { if (self === void 0) { 
 function alterParticipants_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function alterParticipants_getPrototypeOf(o) { alterParticipants_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return alterParticipants_getPrototypeOf(o); }
-
-function alterParticipants_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) alterParticipants_setPrototypeOf(subClass, superClass); }
-
-function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return alterParticipants_setPrototypeOf(o, p); }
 
 var alterParticipants_React = __webpack_require__(0);
 
@@ -13537,7 +13532,11 @@ function truncated_defineProperties(target, props) { for (var i = 0; i < props.l
 
 function truncated_createClass(Constructor, protoProps, staticProps) { if (protoProps) truncated_defineProperties(Constructor.prototype, protoProps); if (staticProps) truncated_defineProperties(Constructor, staticProps); return Constructor; }
 
-function truncated_createSuper(Derived) { return function () { var Super = truncated_getPrototypeOf(Derived), result; if (truncated_isNativeReflectConstruct()) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
+function truncated_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) truncated_setPrototypeOf(subClass, superClass); }
+
+function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return truncated_setPrototypeOf(o, p); }
+
+function truncated_createSuper(Derived) { var hasNativeReflectConstruct = truncated_isNativeReflectConstruct(); return function () { var Super = truncated_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
 
 function truncated_possibleConstructorReturn(self, call) { if (call && (truncated_typeof(call) === "object" || typeof call === "function")) { return call; } return truncated_assertThisInitialized(self); }
 
@@ -13546,10 +13545,6 @@ function truncated_assertThisInitialized(self) { if (self === void 0) { throw ne
 function truncated_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function truncated_getPrototypeOf(o) { truncated_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return truncated_getPrototypeOf(o); }
-
-function truncated_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) truncated_setPrototypeOf(subClass, superClass); }
-
-function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return truncated_setPrototypeOf(o, p); }
 
 var truncated_React = __webpack_require__(0);
 
@@ -13636,7 +13631,11 @@ function privilegeChange_defineProperties(target, props) { for (var i = 0; i < p
 
 function privilegeChange_createClass(Constructor, protoProps, staticProps) { if (protoProps) privilegeChange_defineProperties(Constructor.prototype, protoProps); if (staticProps) privilegeChange_defineProperties(Constructor, staticProps); return Constructor; }
 
-function privilegeChange_createSuper(Derived) { return function () { var Super = privilegeChange_getPrototypeOf(Derived), result; if (privilegeChange_isNativeReflectConstruct()) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
+function privilegeChange_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) privilegeChange_setPrototypeOf(subClass, superClass); }
+
+function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return privilegeChange_setPrototypeOf(o, p); }
+
+function privilegeChange_createSuper(Derived) { var hasNativeReflectConstruct = privilegeChange_isNativeReflectConstruct(); return function () { var Super = privilegeChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
 
 function privilegeChange_possibleConstructorReturn(self, call) { if (call && (privilegeChange_typeof(call) === "object" || typeof call === "function")) { return call; } return privilegeChange_assertThisInitialized(self); }
 
@@ -13645,10 +13644,6 @@ function privilegeChange_assertThisInitialized(self) { if (self === void 0) { th
 function privilegeChange_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function privilegeChange_getPrototypeOf(o) { privilegeChange_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return privilegeChange_getPrototypeOf(o); }
-
-function privilegeChange_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) privilegeChange_setPrototypeOf(subClass, superClass); }
-
-function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return privilegeChange_setPrototypeOf(o, p); }
 
 var privilegeChange_React = __webpack_require__(0);
 
@@ -13762,7 +13757,11 @@ function topicChange_defineProperties(target, props) { for (var i = 0; i < props
 
 function topicChange_createClass(Constructor, protoProps, staticProps) { if (protoProps) topicChange_defineProperties(Constructor.prototype, protoProps); if (staticProps) topicChange_defineProperties(Constructor, staticProps); return Constructor; }
 
-function topicChange_createSuper(Derived) { return function () { var Super = topicChange_getPrototypeOf(Derived), result; if (topicChange_isNativeReflectConstruct()) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
+function topicChange_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) topicChange_setPrototypeOf(subClass, superClass); }
+
+function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return topicChange_setPrototypeOf(o, p); }
+
+function topicChange_createSuper(Derived) { var hasNativeReflectConstruct = topicChange_isNativeReflectConstruct(); return function () { var Super = topicChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
 
 function topicChange_possibleConstructorReturn(self, call) { if (call && (topicChange_typeof(call) === "object" || typeof call === "function")) { return call; } return topicChange_assertThisInitialized(self); }
 
@@ -13771,10 +13770,6 @@ function topicChange_assertThisInitialized(self) { if (self === void 0) { throw 
 function topicChange_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function topicChange_getPrototypeOf(o) { topicChange_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return topicChange_getPrototypeOf(o); }
-
-function topicChange_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) topicChange_setPrototypeOf(subClass, superClass); }
-
-function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return topicChange_setPrototypeOf(o, p); }
 
 var topicChange_React = __webpack_require__(0);
 
@@ -13874,7 +13869,11 @@ function sharedFilesAccordionPanel_defineProperties(target, props) { for (var i 
 
 function sharedFilesAccordionPanel_createClass(Constructor, protoProps, staticProps) { if (protoProps) sharedFilesAccordionPanel_defineProperties(Constructor.prototype, protoProps); if (staticProps) sharedFilesAccordionPanel_defineProperties(Constructor, staticProps); return Constructor; }
 
-function sharedFilesAccordionPanel_createSuper(Derived) { return function () { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (sharedFilesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function sharedFilesAccordionPanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) sharedFilesAccordionPanel_setPrototypeOf(subClass, superClass); }
+
+function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return sharedFilesAccordionPanel_setPrototypeOf(o, p); }
+
+function sharedFilesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = sharedFilesAccordionPanel_isNativeReflectConstruct(); return function () { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function sharedFilesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (sharedFilesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return sharedFilesAccordionPanel_assertThisInitialized(self); }
 
@@ -13883,10 +13882,6 @@ function sharedFilesAccordionPanel_assertThisInitialized(self) { if (self === vo
 function sharedFilesAccordionPanel_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function sharedFilesAccordionPanel_getPrototypeOf(o) { sharedFilesAccordionPanel_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return sharedFilesAccordionPanel_getPrototypeOf(o); }
-
-function sharedFilesAccordionPanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) sharedFilesAccordionPanel_setPrototypeOf(subClass, superClass); }
-
-function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return sharedFilesAccordionPanel_setPrototypeOf(o, p); }
 
 var sharedFilesAccordionPanel_React = __webpack_require__(0);
 
@@ -14203,7 +14198,11 @@ function incomingSharesAccordionPanel_defineProperties(target, props) { for (var
 
 function incomingSharesAccordionPanel_createClass(Constructor, protoProps, staticProps) { if (protoProps) incomingSharesAccordionPanel_defineProperties(Constructor.prototype, protoProps); if (staticProps) incomingSharesAccordionPanel_defineProperties(Constructor, staticProps); return Constructor; }
 
-function incomingSharesAccordionPanel_createSuper(Derived) { return function () { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (incomingSharesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function incomingSharesAccordionPanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) incomingSharesAccordionPanel_setPrototypeOf(subClass, superClass); }
+
+function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return incomingSharesAccordionPanel_setPrototypeOf(o, p); }
+
+function incomingSharesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = incomingSharesAccordionPanel_isNativeReflectConstruct(); return function () { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function incomingSharesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (incomingSharesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return incomingSharesAccordionPanel_assertThisInitialized(self); }
 
@@ -14212,10 +14211,6 @@ function incomingSharesAccordionPanel_assertThisInitialized(self) { if (self ===
 function incomingSharesAccordionPanel_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function incomingSharesAccordionPanel_getPrototypeOf(o) { incomingSharesAccordionPanel_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return incomingSharesAccordionPanel_getPrototypeOf(o); }
-
-function incomingSharesAccordionPanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) incomingSharesAccordionPanel_setPrototypeOf(subClass, superClass); }
-
-function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return incomingSharesAccordionPanel_setPrototypeOf(o, p); }
 
 var incomingSharesAccordionPanel_React = __webpack_require__(0);
 
@@ -14408,7 +14403,11 @@ function closeOpenMode_defineProperties(target, props) { for (var i = 0; i < pro
 
 function closeOpenMode_createClass(Constructor, protoProps, staticProps) { if (protoProps) closeOpenMode_defineProperties(Constructor.prototype, protoProps); if (staticProps) closeOpenMode_defineProperties(Constructor, staticProps); return Constructor; }
 
-function closeOpenMode_createSuper(Derived) { return function () { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (closeOpenMode_isNativeReflectConstruct()) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
+function closeOpenMode_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) closeOpenMode_setPrototypeOf(subClass, superClass); }
+
+function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return closeOpenMode_setPrototypeOf(o, p); }
+
+function closeOpenMode_createSuper(Derived) { var hasNativeReflectConstruct = closeOpenMode_isNativeReflectConstruct(); return function () { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
 
 function closeOpenMode_possibleConstructorReturn(self, call) { if (call && (closeOpenMode_typeof(call) === "object" || typeof call === "function")) { return call; } return closeOpenMode_assertThisInitialized(self); }
 
@@ -14417,10 +14416,6 @@ function closeOpenMode_assertThisInitialized(self) { if (self === void 0) { thro
 function closeOpenMode_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function closeOpenMode_getPrototypeOf(o) { closeOpenMode_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return closeOpenMode_getPrototypeOf(o); }
-
-function closeOpenMode_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) closeOpenMode_setPrototypeOf(subClass, superClass); }
-
-function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return closeOpenMode_setPrototypeOf(o, p); }
 
 var closeOpenMode_React = __webpack_require__(0);
 
@@ -14506,7 +14501,11 @@ function chatHandle_defineProperties(target, props) { for (var i = 0; i < props.
 
 function chatHandle_createClass(Constructor, protoProps, staticProps) { if (protoProps) chatHandle_defineProperties(Constructor.prototype, protoProps); if (staticProps) chatHandle_defineProperties(Constructor, staticProps); return Constructor; }
 
-function chatHandle_createSuper(Derived) { return function () { var Super = chatHandle_getPrototypeOf(Derived), result; if (chatHandle_isNativeReflectConstruct()) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
+function chatHandle_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) chatHandle_setPrototypeOf(subClass, superClass); }
+
+function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatHandle_setPrototypeOf(o, p); }
+
+function chatHandle_createSuper(Derived) { var hasNativeReflectConstruct = chatHandle_isNativeReflectConstruct(); return function () { var Super = chatHandle_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
 
 function chatHandle_possibleConstructorReturn(self, call) { if (call && (chatHandle_typeof(call) === "object" || typeof call === "function")) { return call; } return chatHandle_assertThisInitialized(self); }
 
@@ -14515,10 +14514,6 @@ function chatHandle_assertThisInitialized(self) { if (self === void 0) { throw n
 function chatHandle_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function chatHandle_getPrototypeOf(o) { chatHandle_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return chatHandle_getPrototypeOf(o); }
-
-function chatHandle_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) chatHandle_setPrototypeOf(subClass, superClass); }
-
-function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatHandle_setPrototypeOf(o, p); }
 
 var chatHandle_React = __webpack_require__(0);
 
@@ -14614,7 +14609,11 @@ function chatlinkDialog_get(target, property, receiver) { if (typeof Reflect !==
 
 function chatlinkDialog_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = chatlinkDialog_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function chatlinkDialog_createSuper(Derived) { return function () { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (chatlinkDialog_isNativeReflectConstruct()) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
+function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) chatlinkDialog_setPrototypeOf(subClass, superClass); }
+
+function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
+
+function chatlinkDialog_createSuper(Derived) { var hasNativeReflectConstruct = chatlinkDialog_isNativeReflectConstruct(); return function () { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
 
 function chatlinkDialog_possibleConstructorReturn(self, call) { if (call && (chatlinkDialog_typeof(call) === "object" || typeof call === "function")) { return call; } return chatlinkDialog_assertThisInitialized(self); }
 
@@ -14623,10 +14622,6 @@ function chatlinkDialog_assertThisInitialized(self) { if (self === void 0) { thr
 function chatlinkDialog_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function chatlinkDialog_getPrototypeOf(o) { chatlinkDialog_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return chatlinkDialog_getPrototypeOf(o); }
-
-function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) chatlinkDialog_setPrototypeOf(subClass, superClass); }
-
-function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
 
 
 
@@ -14858,7 +14853,11 @@ function conversationaudiovideopanel_get(target, property, receiver) { if (typeo
 
 function conversationaudiovideopanel_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = conversationaudiovideopanel_getPrototypeOf(object); if (object === null) break; } return object; }
 
-function conversationaudiovideopanel_createSuper(Derived) { return function () { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (conversationaudiovideopanel_isNativeReflectConstruct()) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
+function conversationaudiovideopanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) conversationaudiovideopanel_setPrototypeOf(subClass, superClass); }
+
+function conversationaudiovideopanel_setPrototypeOf(o, p) { conversationaudiovideopanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationaudiovideopanel_setPrototypeOf(o, p); }
+
+function conversationaudiovideopanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationaudiovideopanel_isNativeReflectConstruct(); return function () { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
 
 function conversationaudiovideopanel_possibleConstructorReturn(self, call) { if (call && (conversationaudiovideopanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationaudiovideopanel_assertThisInitialized(self); }
 
@@ -14867,10 +14866,6 @@ function conversationaudiovideopanel_assertThisInitialized(self) { if (self === 
 function conversationaudiovideopanel_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function conversationaudiovideopanel_getPrototypeOf(o) { conversationaudiovideopanel_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return conversationaudiovideopanel_getPrototypeOf(o); }
-
-function conversationaudiovideopanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) conversationaudiovideopanel_setPrototypeOf(subClass, superClass); }
-
-function conversationaudiovideopanel_setPrototypeOf(o, p) { conversationaudiovideopanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationaudiovideopanel_setPrototypeOf(o, p); }
 
 
 
@@ -16072,7 +16067,11 @@ function conversationpanel_defineProperties(target, props) { for (var i = 0; i <
 
 function conversationpanel_createClass(Constructor, protoProps, staticProps) { if (protoProps) conversationpanel_defineProperties(Constructor.prototype, protoProps); if (staticProps) conversationpanel_defineProperties(Constructor, staticProps); return Constructor; }
 
-function conversationpanel_createSuper(Derived) { return function () { var Super = conversationpanel_getPrototypeOf(Derived), result; if (conversationpanel_isNativeReflectConstruct()) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
+function conversationpanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) conversationpanel_setPrototypeOf(subClass, superClass); }
+
+function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationpanel_setPrototypeOf(o, p); }
+
+function conversationpanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationpanel_isNativeReflectConstruct(); return function () { var Super = conversationpanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
 
 function conversationpanel_possibleConstructorReturn(self, call) { if (call && (conversationpanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationpanel_assertThisInitialized(self); }
 
@@ -16081,10 +16080,6 @@ function conversationpanel_assertThisInitialized(self) { if (self === void 0) { 
 function conversationpanel_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function conversationpanel_getPrototypeOf(o) { conversationpanel_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return conversationpanel_getPrototypeOf(o); }
-
-function conversationpanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) conversationpanel_setPrototypeOf(subClass, superClass); }
-
-function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationpanel_setPrototypeOf(o, p); }
 
 
 
@@ -19441,13 +19436,22 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     userHandles.forEach(function (user_handle) {
       var contact = M.u[user_handle];
 
-      if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
-        // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-        // removed contact, etc
-        allValid = false;
-        $promise.reject();
-        return false;
-      }
+      if (!contact) {
+        M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, true, {
+          'h': user_handle,
+          'u': user_handle,
+          'm': '',
+          'c': 2
+        }));
+      } // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+      //     debugger;
+      //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+      //     // removed contact, etc
+      //     allValid = false;
+      //     $promise.reject();
+      //     return false;
+      // }
+
     });
 
     if (allValid === false) {
@@ -19798,12 +19802,7 @@ Chat.prototype.processRemovedUser = function (u) {
     if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
       chatRoom.trackDataChange();
     }
-  }); // Account was cancelled/deactivated
-
-  if (megaChat.currentlyOpenedChat && M.u[megaChat.currentlyOpenedChat] && M.u[megaChat.currentlyOpenedChat].c === 2) {
-    loadSubPage('fm/chat');
-  }
-
+  });
   self.renderMyStatus();
 };
 /**
@@ -21486,15 +21485,6 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 /**
- * Check whether given chat is 1-1 w/ cancelled account.
- * @returns {Boolean}
- */
-
-
-ChatRoom.prototype.isCancelled = function () {
-  return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
-};
-/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
@@ -21503,7 +21493,7 @@ ChatRoom.prototype.isCancelled = function () {
 
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
-  return !self.isCancelled() && (self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive());
+  return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
 };
 /**
  * Save chat into info fmdb.
@@ -22904,7 +22894,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -22913,10 +22907,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var React = __webpack_require__(0);
 
@@ -23126,7 +23116,11 @@ function startGroupChatWizard_defineProperties(target, props) { for (var i = 0; 
 
 function startGroupChatWizard_createClass(Constructor, protoProps, staticProps) { if (protoProps) startGroupChatWizard_defineProperties(Constructor.prototype, protoProps); if (staticProps) startGroupChatWizard_defineProperties(Constructor, staticProps); return Constructor; }
 
-function startGroupChatWizard_createSuper(Derived) { return function () { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (startGroupChatWizard_isNativeReflectConstruct()) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
+function startGroupChatWizard_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) startGroupChatWizard_setPrototypeOf(subClass, superClass); }
+
+function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return startGroupChatWizard_setPrototypeOf(o, p); }
+
+function startGroupChatWizard_createSuper(Derived) { var hasNativeReflectConstruct = startGroupChatWizard_isNativeReflectConstruct(); return function () { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
 
 function startGroupChatWizard_possibleConstructorReturn(self, call) { if (call && (startGroupChatWizard_typeof(call) === "object" || typeof call === "function")) { return call; } return startGroupChatWizard_assertThisInitialized(self); }
 
@@ -23135,10 +23129,6 @@ function startGroupChatWizard_assertThisInitialized(self) { if (self === void 0)
 function startGroupChatWizard_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function startGroupChatWizard_getPrototypeOf(o) { startGroupChatWizard_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return startGroupChatWizard_getPrototypeOf(o); }
-
-function startGroupChatWizard_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) startGroupChatWizard_setPrototypeOf(subClass, superClass); }
-
-function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return startGroupChatWizard_setPrototypeOf(o, p); }
 
 var startGroupChatWizard_React = __webpack_require__(0);
 

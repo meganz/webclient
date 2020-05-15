@@ -17149,7 +17149,7 @@ var resultRow_MemberRow = /*#__PURE__*/function (_MegaRenderMixin3) {
           className: "textual"
         }, isGroup ? /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement("span", null, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.topic || room.getRoomTitle())), /*#__PURE__*/external_React_default.a.createElement(contacts["MembersAmount"], {
           room: room
-        })) : /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement("span", null, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, nicknames.getNicknameAndName(data))), /*#__PURE__*/external_React_default.a.createElement(contacts["LastActivity"], {
+        })) : /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, nicknames.getNicknameAndName(data)), /*#__PURE__*/external_React_default.a.createElement(contacts["LastActivity"], {
           contact: contact,
           showLastGreen: true
         })))

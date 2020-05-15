@@ -195,9 +195,7 @@ class MemberRow extends MegaRenderMixin {
                             <MembersAmount room={room} />
                         </> :
                         <>
-                            <span>
-                                <EmojiFormattedContent>{nicknames.getNicknameAndName(data)}</EmojiFormattedContent>
-                            </span>
+                            <EmojiFormattedContent>{nicknames.getNicknameAndName(data)}</EmojiFormattedContent>
                             <LastActivity contact={contact} showLastGreen={true} />
                         </>
                     }

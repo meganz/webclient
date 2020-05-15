@@ -33,10 +33,10 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
 const highlight = (text, matches, dontEscape) => {
     text = dontEscape ? text : escapeHTML(text);
     if (matches) {
-        let highlighted;
+        let highlighted = text;
         for (let i = matches.length; i--;) {
             const match = matches[i].str;
-            highlighted = text.replace(new RegExp(match, 'gi'), word => `<strong>${word}</strong>`);
+            highlighted = highlighted.replace(new RegExp(match, 'gi'), word => `<strong>${word}</strong>`);
         }
         return highlighted;
     }
@@ -57,6 +57,10 @@ const openResult = (room, messageId, index) => {
     $(document).trigger('chatSearchResultOpen');
     if (isString(room)) {
         loadSubPage('fm/chat/p/' + room);
+    }
+    else if (room && room.chatId) {
+        // contact matches
+        loadSubPage('fm/chat/p/' + room.chatId);
     }
     else {
         loadSubPage(room.getRoomUrl());

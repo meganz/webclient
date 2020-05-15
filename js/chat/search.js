@@ -87,7 +87,7 @@ RoomSearch.prototype._matchMembers = function(members) {
             self.logger.error("Unknown user handle", userid);
             continue;
         }
-        self.match(M.getNameByHandle(userid), SearchResultType.kMember, userid);
+        self.parentSearch._match(M.getNameByHandle(userid), SearchResultType.kMember, userid, self);
     }
 };
 
@@ -102,7 +102,7 @@ RoomSearch.prototype.resume = function() {
     if (self.state === SearchState.kNew) {
         // match chat topic
         if (room.topic) {
-            self.match(room.topic, SearchResultType.kChatTopic);
+            self.parentSearch._match(room.topic, SearchResultType.kChatTopic, undefined, self);
         }
         // match room member names
         var members = room.members;
@@ -118,7 +118,13 @@ RoomSearch.prototype.resume = function() {
         for (var i = messages.length - 1; i >= 0; i--) {
             var msg = messages.getItem(i);
             if (msg && msg.textContents && msg.textContents.length > 0) {
-                self.match(msg.textContents, SearchResultType.kMessage, msg, messages.length - i);
+                self.parentSearch._match(
+                    msg.textContents,
+                    SearchResultType.kMessage,
+                    msg,
+                    self,
+                    messages.length - i,
+                );
             }
         }
     }
@@ -161,7 +167,13 @@ RoomSearch.prototype.onHistoryFetched = function() {
         for (var i = 0; i < numFetched; i++) {
             var msg = messages.getItem(i);
             if (msg.textContents) {
-                self.match(msg.textContents, SearchResultType.kMessage, msg, newCount - i);
+                self.parentSearch._match(
+                    msg.textContents,
+                    SearchResultType.kMessage,
+                    msg,
+                    self,
+                    newCount - i
+                );
             }
         }
         if (haveMoreHistory && self.state === SearchState.kInProgress) {
@@ -195,7 +207,7 @@ RoomSearch.prototype._setState = function(newState) {
     "use strict";
     // console.error(
     //     this.room.chatId,
-    //     this.parentSearch.searchRegExp,
+    //     this.parentSearch.searchRegExps,
     //     "setState",
     //     constStateToText(SearchState, this.state), constStateToText(SearchState, newState)
     // );
@@ -217,38 +229,12 @@ RoomSearch.prototype._setComplete = function() {
     this.parentSearch.onRoomSearchComplete(this);
 };
 
-RoomSearch.prototype.match = function(str, type, data, index) {
-    "use strict";
-    var rx = this.parentSearch.searchRegExp;
-    rx.lastIndex = 0;
-    var m = rx.exec(str);
-    if (!m) {
-        return;
-    }
-    var matches = [];
-    do {
-        matches.push({idx: m.index, str: m[0]});
-    } while ((m = rx.exec(str)));
-
-    var result = { type: type, text: str, matches: matches, index: index };
-    if (data) {
-        result.data = data;
-    }
-
-    var stop = this.parentSearch.handler.onResult(this.room, result);
-    if (stop) {
-        this._setComplete();
-    }
-};
 /**
  * Creates a text chat search object. Call .resume() on it to start the search
  * @param {Chat} megaChat The global MegaChat object
  * @param {String} chatId The id of the chat where to perform the search. If it's null, then the search
  * is performed on all chats
- * @param {String|RegExp} searchExpr Either a string to be searched for, or a RegExp object.
- *  If this parameter is a string, a RegExpr object is created with it, with the 'i' and 'g' flags.
- *  In this case, any regex special characters in the string will be treated as such. If they are
- *  to be treated literally, they should be escaped, as in an actual regular expression.
+ * @param {String} searchExpr a string to be searched for
  * @param {Object} handler The user handler that received the search results and the search completion event.
  *  The handler needs to contain two methods:
  *      `onResult(room, result)`
@@ -270,13 +256,11 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
     var self = this;
     self.megaChat = megaChat;
     self.allChats = megaChat.chats;
-    if (searchExpr instanceof RegExp) {
-        assert(searchExpr.flags.indexOf('g') >= 0, "Search RegExpr must have the 'g' flag set");
-        self.searchRegExp = searchExpr;
-    }
-    else {
-        self.searchRegExp = new RegExp(searchExpr, 'gi');
-    }
+
+    self.originalSearchString = searchExpr;
+    self.searchRegExps = searchExpr.split(" ").map(function(w) {
+        return new RegExp(RegExpEscape(w), 'gi');
+    });
 
     self.setupLogger();
     var searches = self.roomSearches = [];
@@ -322,7 +306,7 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
             throw new Error("Could not find a room for chatid " + chatId);
         }
     }
-    else { // search all chatrooms
+    else if (this.originalSearchString.length > 2) { // search all chatrooms
         for (var roomId2 in self.allChats) {
             if (self.allChats.hasOwnProperty(roomId2)) {
                 var room2 = self.allChats[roomId2];
@@ -334,7 +318,7 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
 
 /**
  * Invoke chat search.
- * @param {String|RegExp} [searchExpr] Either a string to be searched for, or a RegExp object.
+ * @param {String} [searchExpr] a string to be searched for
  *  If this parameter is a string, a RegExpr object is created with it, with the 'i' and 'g' flags.
  *  In this case, any regex special characters in the string will be treated as such. If they are
  *  to be treated literally, they should be escaped, as in an actual regular expression.
@@ -368,6 +352,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
 
     var resultId = 0;
 
+    var contactHandleCache = {};
     var handler = {
         'onResult': tryCatch(function(room, resultMeta) {
             resultMeta.room = room;
@@ -378,16 +363,24 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
                 results.MESSAGES.push(resultMeta);
             }
             else {
-                results.CONTACTS_AND_CHATS.push(resultMeta);
+                if (!contactHandleCache[resultMeta.data]) {
+                    results.CONTACTS_AND_CHATS.push(resultMeta);
+                    contactHandleCache[resultMeta.data] = true;
+                }
             }
 
             // console.error(room, resultMeta);
             if (typeof onResult === 'function') {
                 onResult(room.chatId, resultMeta, results);
             }
+        }, function(err) {
+            if (d) {
+                console.error(err);
+            }
         }),
         'onComplete': function(reason) {
             delete ChatSearch.doSearch.cs;
+            contactHandleCache = undefined;
 
             if (reason === SearchState.kDestroying) {
                 reject(SearchState.kDestroying);
@@ -463,9 +456,27 @@ ChatSearch.prototype.setupLogger = function() {
 ChatSearch.prototype.resume = function() {
     "use strict";
 
+    // match contacts
+    if (this._matchedContacts !== true) {
+        for (var userid in M.u) {
+            if (!M.u.hasOwnProperty(userid) || userid === u_handle || M.u[userid].c !== 1) {
+                continue;
+            }
+            this._match(M.getNameByHandle(userid), SearchResultType.kMember, userid, {'chatId': userid});
+
+            if (M.u[userid].m) {
+                this._match(M.u[userid].m, SearchResultType.kMember, userid, {'chatId': userid});
+            }
+        }
+        this._matchedContacts = true;
+    }
     var len = this.roomSearches.length;
     for (var i = 0; i < len; i++) {
         this.roomSearches[i].resume();
+    }
+    if (len === 0) {
+        // no room searches, mark as completed.
+        this.handler.onComplete()
     }
 };
 /**
@@ -521,6 +532,41 @@ ChatSearch.prototype.dumpRoomSearchesStates = function() {
     }
 };
 
+/**
+ * Do string matching
+ *
+ * @internal
+ * @param str {String}
+ * @param type {SearchResultType}
+ * @param data {Object}
+ * @param roomSearch {RoomSearch|String}
+ * @param [index] {Number}
+ */
+ChatSearch.prototype._match = function(str, type, data, roomSearch, index) {
+    "use strict";
+    var matches = [];
+    var words = this.searchRegExps;
+    for (var i = 0; i < words.length; i++) {
+        var rx = words[i];
+        rx.lastIndex = 0;
+        var m = rx.exec(str);
+        if (!m) {
+            return;
+        }
+        do {
+            matches.push({idx: m.index, str: m[0]});
+        } while ((m = rx.exec(str)));
+    }
+    var result = {type: type, text: str, matches: matches, index: index};
+    if (data) {
+        result.data = data;
+    }
+
+    var stop = this.handler.onResult(roomSearch && roomSearch.room ? roomSearch.room : roomSearch, result);
+    if (roomSearch && roomSearch._setComplete && stop) {
+        roomSearch._setComplete();
+    }
+};
 /**
  * Completely aborts the search. No callbacks will be called after call to this method.
  *

@@ -114,7 +114,7 @@ export default class SearchPanel extends MegaRenderMixin {
     doSearch = s => {
         const self = this;
         return ChatSearch.doSearch(
-            RegExpEscape(s),
+            s,
             function(room, result, results) {
                 self.setState({results});
             })
@@ -148,7 +148,7 @@ export default class SearchPanel extends MegaRenderMixin {
 
     handleChange = ev => {
         const value = ev.target.value;
-        const searching = value.length >= 3;
+        const searching = value.length > 0;
 
         this.setState({
             value,

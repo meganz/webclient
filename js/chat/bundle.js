@@ -17553,7 +17553,7 @@ var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
           _onChange(ev);
         },
         className: searching ? 'searching' : ''
-      }), searching && status && this.renderStatus(status, isClickable, onToggle), searching && /*#__PURE__*/external_React_default.a.createElement("i", {
+      }), searching && status && this.renderStatus(status, isClickable, onToggle), /*#__PURE__*/external_React_default.a.createElement("i", {
         className: "small-icon tiny-reset",
         onClick: onReset
       }));
@@ -17673,7 +17673,8 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         if (keyCode && keyCode === 27
         /* ESC */
         && !_this.props.minimized) {
-          _this.toggleMinimize();
+          // Clear the text on the first `ESC` press; minimize on the second
+          return searchField_SearchField.hasValue() ? _this.handleReset() : _this.toggleMinimize();
         }
       });
     };
@@ -17796,18 +17797,20 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.handleReset = function () {
-      _this.setState({
-        value: '',
-        searching: false,
-        status: undefined,
-        results: []
-      }, function () {
-        _this.doToggle('destroy');
+      return (// Clear the text on the first reset; minimize on the second
+        searchField_SearchField.hasValue() ? _this.setState({
+          value: '',
+          searching: false,
+          status: undefined,
+          results: []
+        }, function () {
+          _this.doToggle('destroy');
 
-        Soon(function () {
-          return searchField_SearchField.focus();
-        });
-      });
+          Soon(function () {
+            return searchField_SearchField.focus();
+          });
+        }) : _this.toggleMinimize()
+      );
     };
 
     return _this;
@@ -17875,7 +17878,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         },
         onChange: this.handleChange,
         onToggle: this.handleToggle,
-        onReset: this.toggleMinimize
+        onReset: this.handleReset
       }), /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "search-results-wrapper"
       }, /*#__PURE__*/external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {

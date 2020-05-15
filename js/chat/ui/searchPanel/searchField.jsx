@@ -103,9 +103,7 @@ export default class SearchField extends MegaRenderMixin {
                     this.renderStatus(status, isClickable, onToggle)
                 )}
 
-                {searching && (
-                    <i className="small-icon tiny-reset" onClick={onReset}></i>
-                )}
+                <i className="small-icon tiny-reset" onClick={onReset} />
             </div>
         );
     }

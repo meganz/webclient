@@ -696,10 +696,6 @@ class ConversationsList extends MegaRenderMixin {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
-            // Account has been deleted/deactivated
-            if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
-                return;
-            }
             if (!chatRoom.isDisplayable()) {
                 return;
             }

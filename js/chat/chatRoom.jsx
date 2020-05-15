@@ -609,13 +609,7 @@ ChatRoom.prototype.isArchived = function() {
     return (self.flags & ChatRoom.ARCHIVED);
 };
 
-/**
- * Check whether given chat is 1-1 w/ cancelled account.
- * @returns {Boolean}
- */
-ChatRoom.prototype.isCancelled = function() {
-    return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
-};
+
 
 /**
  * Check whether a chat is displayable.
@@ -624,7 +618,7 @@ ChatRoom.prototype.isCancelled = function() {
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return !self.isCancelled() && ((self.showArchived === true) ||
+    return ((self.showArchived === true) ||
             !self.isArchived() ||
             (self.callManagerCall && self.callManagerCall.isActive()));
 };

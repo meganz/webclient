@@ -141,7 +141,7 @@ export class ContactButton extends ContactAwareComponent {
                 );
             }
 
-            if (contact.c === 2) {
+            if (contact.c === 2 && contact.u === u_handle) {
                 moreDropdowns.push(
                     <DropdownItem
                         key="view0" icon="human-profile" label={__(l[187])} onClick={() => {
@@ -214,7 +214,7 @@ export class ContactButton extends ContactAwareComponent {
                     }} />
                 );
             }
-            else if (!contact.c) {
+            else if (!contact.c || (contact.c === 2 && contact.u !== u_handle)) {
                 moreDropdowns.push(
                     <DropdownItem
                         key="view2"

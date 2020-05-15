@@ -94,23 +94,6 @@ export default class SearchPanel extends MegaRenderMixin {
         this.props.onToggle();
     };
 
-    getRecents = () => {
-        megaChat.getFrequentContacts()
-            .then(frequentContacts => {
-                let recents = [];
-                let len = frequentContacts.length;
-                for (let i = len; i--;) {
-                    const recent = frequentContacts[i];
-                    recents = [...recents, { data: recent.userId, contact: M.u[recent.userId] }];
-                    if (i < len - 30) {
-                        // break if had > 30 results
-                        break;
-                    }
-                }
-                this.setState({ recents });
-            });
-    };
-
     doSearch = s => {
         const self = this;
         return ChatSearch.doSearch(
@@ -204,13 +187,13 @@ export default class SearchPanel extends MegaRenderMixin {
         return (
             <div className={`
                 ${SEARCH_PANEL_CLASS}
+                ${searching ? 'expanded' : ''}
                 ${this.props.minimized ? 'hidden' : ''}
             `}>
                 <SearchField
                     value={value}
                     searching={searching}
                     status={status}
-                    onFocus={() => !searching && this.getRecents()}
                     onChange={this.handleChange}
                     onToggle={this.handleToggle}
                     onReset={this.handleReset} />

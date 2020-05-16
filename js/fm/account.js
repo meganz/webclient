@@ -751,11 +751,14 @@ accountUI.account = {
             var $text = $addPhoneBanner.find('.add-phone-text');
             var $addPhoneButton = $addPhoneBanner.find('.js-add-phone-button');
             var $skipButton = $addPhoneBanner.find('.skip-button');
+            // M.maf is cached in its getter, however, repeated gets will cause unnecessary checks.
+            var ach = M.maf;
 
             // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing. Or if
             // they already have already added a phone number then don't show this banner again. Or if they clicked the
             // skip button then don't show the banner.
-            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig['skipsmsbanner']) {
+            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig.skipsmsbanner
+                || (ach && ach[9] && ach[9].rwd)) {
 
                 // If not a business account
                 if (typeof u_attr.b === 'undefined') {

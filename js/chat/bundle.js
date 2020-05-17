@@ -119,7 +119,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -1058,7 +1058,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -2555,7 +2555,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -2994,7 +2994,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3510,7 +3510,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3992,7 +3992,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4254,7 +4254,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4438,7 +4438,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4875,7 +4875,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -5231,7 +5231,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6723,7 +6723,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6831,7 +6831,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6926,7 +6926,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -8403,7 +8403,7 @@ function emojiDropdown_inherits(subClass, superClass) { if (typeof superClass !=
 
 function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiDropdown_setPrototypeOf(o, p); }
 
-function emojiDropdown_createSuper(Derived) { var hasNativeReflectConstruct = emojiDropdown_isNativeReflectConstruct(); return function () { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
+function emojiDropdown_createSuper(Derived) { return function () { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (emojiDropdown_isNativeReflectConstruct()) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
 
 function emojiDropdown_possibleConstructorReturn(self, call) { if (call && (emojiDropdown_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiDropdown_assertThisInitialized(self); }
 
@@ -8956,7 +8956,7 @@ function emojiAutocomplete_inherits(subClass, superClass) { if (typeof superClas
 
 function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiAutocomplete_setPrototypeOf(o, p); }
 
-function emojiAutocomplete_createSuper(Derived) { var hasNativeReflectConstruct = emojiAutocomplete_isNativeReflectConstruct(); return function () { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
+function emojiAutocomplete_createSuper(Derived) { return function () { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (emojiAutocomplete_isNativeReflectConstruct()) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
 
 function emojiAutocomplete_possibleConstructorReturn(self, call) { if (call && (emojiAutocomplete_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiAutocomplete_assertThisInitialized(self); }
 
@@ -9270,7 +9270,7 @@ function typingArea_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return typingArea_setPrototypeOf(o, p); }
 
-function typingArea_createSuper(Derived) { var hasNativeReflectConstruct = typingArea_isNativeReflectConstruct(); return function () { var Super = typingArea_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
+function typingArea_createSuper(Derived) { return function () { var Super = typingArea_getPrototypeOf(Derived), result; if (typingArea_isNativeReflectConstruct()) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
 
 function typingArea_possibleConstructorReturn(self, call) { if (call && (typingArea_typeof(call) === "object" || typeof call === "function")) { return call; } return typingArea_assertThisInitialized(self); }
 
@@ -10239,7 +10239,7 @@ function whosTyping_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return whosTyping_setPrototypeOf(o, p); }
 
-function whosTyping_createSuper(Derived) { var hasNativeReflectConstruct = whosTyping_isNativeReflectConstruct(); return function () { var Super = whosTyping_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
+function whosTyping_createSuper(Derived) { return function () { var Super = whosTyping_getPrototypeOf(Derived), result; if (whosTyping_isNativeReflectConstruct()) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
 
 function whosTyping_possibleConstructorReturn(self, call) { if (call && (whosTyping_typeof(call) === "object" || typeof call === "function")) { return call; } return whosTyping_assertThisInitialized(self); }
 
@@ -10428,7 +10428,7 @@ function accordion_inherits(subClass, superClass) { if (typeof superClass !== "f
 
 function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return accordion_setPrototypeOf(o, p); }
 
-function accordion_createSuper(Derived) { var hasNativeReflectConstruct = accordion_isNativeReflectConstruct(); return function () { var Super = accordion_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
+function accordion_createSuper(Derived) { return function () { var Super = accordion_getPrototypeOf(Derived), result; if (accordion_isNativeReflectConstruct()) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
 
 function accordion_possibleConstructorReturn(self, call) { if (call && (accordion_typeof(call) === "object" || typeof call === "function")) { return call; } return accordion_assertThisInitialized(self); }
 
@@ -10603,7 +10603,7 @@ function participantsList_inherits(subClass, superClass) { if (typeof superClass
 
 function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return participantsList_setPrototypeOf(o, p); }
 
-function participantsList_createSuper(Derived) { var hasNativeReflectConstruct = participantsList_isNativeReflectConstruct(); return function () { var Super = participantsList_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
+function participantsList_createSuper(Derived) { return function () { var Super = participantsList_getPrototypeOf(Derived), result; if (participantsList_isNativeReflectConstruct()) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
 
 function participantsList_possibleConstructorReturn(self, call) { if (call && (participantsList_typeof(call) === "object" || typeof call === "function")) { return call; } return participantsList_assertThisInitialized(self); }
 
@@ -10974,7 +10974,7 @@ function metaRichpreview_inherits(subClass, superClass) { if (typeof superClass 
 
 function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreview_setPrototypeOf(o, p); }
 
-function metaRichpreview_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreview_isNativeReflectConstruct(); return function () { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
+function metaRichpreview_createSuper(Derived) { return function () { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (metaRichpreview_isNativeReflectConstruct()) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreview_possibleConstructorReturn(self, call) { if (call && (metaRichpreview_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreview_assertThisInitialized(self); }
 
@@ -11121,7 +11121,7 @@ function metaRichpreviewConfirmation_inherits(subClass, superClass) { if (typeof
 
 function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfirmation_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewConfirmation_setPrototypeOf(o, p); }
 
-function metaRichpreviewConfirmation_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewConfirmation_isNativeReflectConstruct(); return function () { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewConfirmation_createSuper(Derived) { return function () { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (metaRichpreviewConfirmation_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewConfirmation_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewConfirmation_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewConfirmation_assertThisInitialized(self); }
 
@@ -11250,7 +11250,7 @@ function metaRichpreviewMegaLinks_inherits(subClass, superClass) { if (typeof su
 
 function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLinks_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewMegaLinks_setPrototypeOf(o, p); }
 
-function metaRichpreviewMegaLinks_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewMegaLinks_isNativeReflectConstruct(); return function () { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewMegaLinks_createSuper(Derived) { return function () { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (metaRichpreviewMegaLinks_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewMegaLinks_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewMegaLinks_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewMegaLinks_assertThisInitialized(self); }
 
@@ -11447,7 +11447,7 @@ function AudioPlayer_inherits(subClass, superClass) { if (typeof superClass !== 
 
 function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioPlayer_setPrototypeOf(o, p); }
 
-function AudioPlayer_createSuper(Derived) { var hasNativeReflectConstruct = AudioPlayer_isNativeReflectConstruct(); return function () { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
+function AudioPlayer_createSuper(Derived) { return function () { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (AudioPlayer_isNativeReflectConstruct()) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
 
 function AudioPlayer_possibleConstructorReturn(self, call) { if (call && (AudioPlayer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioPlayer_assertThisInitialized(self); }
 
@@ -11720,7 +11720,7 @@ function AudioContainer_inherits(subClass, superClass) { if (typeof superClass !
 
 function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioContainer_setPrototypeOf(o, p); }
 
-function AudioContainer_createSuper(Derived) { var hasNativeReflectConstruct = AudioContainer_isNativeReflectConstruct(); return function () { var Super = AudioContainer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
+function AudioContainer_createSuper(Derived) { return function () { var Super = AudioContainer_getPrototypeOf(Derived), result; if (AudioContainer_isNativeReflectConstruct()) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
 
 function AudioContainer_possibleConstructorReturn(self, call) { if (call && (AudioContainer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioContainer_assertThisInitialized(self); }
 
@@ -11896,7 +11896,7 @@ function generic_inherits(subClass, superClass) { if (typeof superClass !== "fun
 
 function generic_setPrototypeOf(o, p) { generic_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return generic_setPrototypeOf(o, p); }
 
-function generic_createSuper(Derived) { var hasNativeReflectConstruct = generic_isNativeReflectConstruct(); return function () { var Super = generic_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
+function generic_createSuper(Derived) { return function () { var Super = generic_getPrototypeOf(Derived), result; if (generic_isNativeReflectConstruct()) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
 
 function generic_possibleConstructorReturn(self, call) { if (call && (generic_typeof(call) === "object" || typeof call === "function")) { return call; } return generic_assertThisInitialized(self); }
 
@@ -13350,7 +13350,7 @@ function alterParticipants_inherits(subClass, superClass) { if (typeof superClas
 
 function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return alterParticipants_setPrototypeOf(o, p); }
 
-function alterParticipants_createSuper(Derived) { var hasNativeReflectConstruct = alterParticipants_isNativeReflectConstruct(); return function () { var Super = alterParticipants_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
+function alterParticipants_createSuper(Derived) { return function () { var Super = alterParticipants_getPrototypeOf(Derived), result; if (alterParticipants_isNativeReflectConstruct()) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
 
 function alterParticipants_possibleConstructorReturn(self, call) { if (call && (alterParticipants_typeof(call) === "object" || typeof call === "function")) { return call; } return alterParticipants_assertThisInitialized(self); }
 
@@ -13536,7 +13536,7 @@ function truncated_inherits(subClass, superClass) { if (typeof superClass !== "f
 
 function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return truncated_setPrototypeOf(o, p); }
 
-function truncated_createSuper(Derived) { var hasNativeReflectConstruct = truncated_isNativeReflectConstruct(); return function () { var Super = truncated_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
+function truncated_createSuper(Derived) { return function () { var Super = truncated_getPrototypeOf(Derived), result; if (truncated_isNativeReflectConstruct()) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
 
 function truncated_possibleConstructorReturn(self, call) { if (call && (truncated_typeof(call) === "object" || typeof call === "function")) { return call; } return truncated_assertThisInitialized(self); }
 
@@ -13635,7 +13635,7 @@ function privilegeChange_inherits(subClass, superClass) { if (typeof superClass 
 
 function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return privilegeChange_setPrototypeOf(o, p); }
 
-function privilegeChange_createSuper(Derived) { var hasNativeReflectConstruct = privilegeChange_isNativeReflectConstruct(); return function () { var Super = privilegeChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
+function privilegeChange_createSuper(Derived) { return function () { var Super = privilegeChange_getPrototypeOf(Derived), result; if (privilegeChange_isNativeReflectConstruct()) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
 
 function privilegeChange_possibleConstructorReturn(self, call) { if (call && (privilegeChange_typeof(call) === "object" || typeof call === "function")) { return call; } return privilegeChange_assertThisInitialized(self); }
 
@@ -13761,7 +13761,7 @@ function topicChange_inherits(subClass, superClass) { if (typeof superClass !== 
 
 function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return topicChange_setPrototypeOf(o, p); }
 
-function topicChange_createSuper(Derived) { var hasNativeReflectConstruct = topicChange_isNativeReflectConstruct(); return function () { var Super = topicChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
+function topicChange_createSuper(Derived) { return function () { var Super = topicChange_getPrototypeOf(Derived), result; if (topicChange_isNativeReflectConstruct()) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
 
 function topicChange_possibleConstructorReturn(self, call) { if (call && (topicChange_typeof(call) === "object" || typeof call === "function")) { return call; } return topicChange_assertThisInitialized(self); }
 
@@ -13873,7 +13873,7 @@ function sharedFilesAccordionPanel_inherits(subClass, superClass) { if (typeof s
 
 function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return sharedFilesAccordionPanel_setPrototypeOf(o, p); }
 
-function sharedFilesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = sharedFilesAccordionPanel_isNativeReflectConstruct(); return function () { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function sharedFilesAccordionPanel_createSuper(Derived) { return function () { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (sharedFilesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function sharedFilesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (sharedFilesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return sharedFilesAccordionPanel_assertThisInitialized(self); }
 
@@ -14202,7 +14202,7 @@ function incomingSharesAccordionPanel_inherits(subClass, superClass) { if (typeo
 
 function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return incomingSharesAccordionPanel_setPrototypeOf(o, p); }
 
-function incomingSharesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = incomingSharesAccordionPanel_isNativeReflectConstruct(); return function () { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function incomingSharesAccordionPanel_createSuper(Derived) { return function () { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (incomingSharesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function incomingSharesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (incomingSharesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return incomingSharesAccordionPanel_assertThisInitialized(self); }
 
@@ -14407,7 +14407,7 @@ function closeOpenMode_inherits(subClass, superClass) { if (typeof superClass !=
 
 function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return closeOpenMode_setPrototypeOf(o, p); }
 
-function closeOpenMode_createSuper(Derived) { var hasNativeReflectConstruct = closeOpenMode_isNativeReflectConstruct(); return function () { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
+function closeOpenMode_createSuper(Derived) { return function () { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (closeOpenMode_isNativeReflectConstruct()) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
 
 function closeOpenMode_possibleConstructorReturn(self, call) { if (call && (closeOpenMode_typeof(call) === "object" || typeof call === "function")) { return call; } return closeOpenMode_assertThisInitialized(self); }
 
@@ -14483,7 +14483,7 @@ var CloseOpenModeMessage = /*#__PURE__*/function (_ConversationMessageM) {
         className: "message user-card-name"
       }, displayName), datetime, /*#__PURE__*/closeOpenMode_React.makeElement("div", {
         className: "message text-block"
-      }, __('switched off chat open mode.'))));
+      }, __(l[23450]))));
     }
   }]);
 
@@ -14505,7 +14505,7 @@ function chatHandle_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatHandle_setPrototypeOf(o, p); }
 
-function chatHandle_createSuper(Derived) { var hasNativeReflectConstruct = chatHandle_isNativeReflectConstruct(); return function () { var Super = chatHandle_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
+function chatHandle_createSuper(Derived) { return function () { var Super = chatHandle_getPrototypeOf(Derived), result; if (chatHandle_isNativeReflectConstruct()) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
 
 function chatHandle_possibleConstructorReturn(self, call) { if (call && (chatHandle_typeof(call) === "object" || typeof call === "function")) { return call; } return chatHandle_assertThisInitialized(self); }
 
@@ -14613,7 +14613,7 @@ function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !
 
 function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
 
-function chatlinkDialog_createSuper(Derived) { var hasNativeReflectConstruct = chatlinkDialog_isNativeReflectConstruct(); return function () { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
+function chatlinkDialog_createSuper(Derived) { return function () { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (chatlinkDialog_isNativeReflectConstruct()) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
 
 function chatlinkDialog_possibleConstructorReturn(self, call) { if (call && (chatlinkDialog_typeof(call) === "object" || typeof call === "function")) { return call; } return chatlinkDialog_assertThisInitialized(self); }
 
@@ -14857,7 +14857,7 @@ function conversationaudiovideopanel_inherits(subClass, superClass) { if (typeof
 
 function conversationaudiovideopanel_setPrototypeOf(o, p) { conversationaudiovideopanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationaudiovideopanel_setPrototypeOf(o, p); }
 
-function conversationaudiovideopanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationaudiovideopanel_isNativeReflectConstruct(); return function () { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
+function conversationaudiovideopanel_createSuper(Derived) { return function () { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (conversationaudiovideopanel_isNativeReflectConstruct()) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
 
 function conversationaudiovideopanel_possibleConstructorReturn(self, call) { if (call && (conversationaudiovideopanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationaudiovideopanel_assertThisInitialized(self); }
 
@@ -16071,7 +16071,7 @@ function conversationpanel_inherits(subClass, superClass) { if (typeof superClas
 
 function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationpanel_setPrototypeOf(o, p); }
 
-function conversationpanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationpanel_isNativeReflectConstruct(); return function () { var Super = conversationpanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
+function conversationpanel_createSuper(Derived) { return function () { var Super = conversationpanel_getPrototypeOf(Derived), result; if (conversationpanel_isNativeReflectConstruct()) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
 
 function conversationpanel_possibleConstructorReturn(self, call) { if (call && (conversationpanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationpanel_assertThisInitialized(self); }
 
@@ -22898,7 +22898,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function () { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -23120,7 +23120,7 @@ function startGroupChatWizard_inherits(subClass, superClass) { if (typeof superC
 
 function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return startGroupChatWizard_setPrototypeOf(o, p); }
 
-function startGroupChatWizard_createSuper(Derived) { var hasNativeReflectConstruct = startGroupChatWizard_isNativeReflectConstruct(); return function () { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
+function startGroupChatWizard_createSuper(Derived) { return function () { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (startGroupChatWizard_isNativeReflectConstruct()) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
 
 function startGroupChatWizard_possibleConstructorReturn(self, call) { if (call && (startGroupChatWizard_typeof(call) === "object" || typeof call === "function")) { return call; } return startGroupChatWizard_assertThisInitialized(self); }
 

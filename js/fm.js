@@ -1055,7 +1055,7 @@ function FMShortcuts() {
             (e.ctrlKey || e.metaKey) &&
             !isContactRootOrShareRoot
         ) {
-            var items = selectionManager.get_selected();
+            var items = clone(selectionManager.get_selected());
             if (items.length === 0 || M.currentdirid === 'ipc' || M.currentdirid === 'opc') {
                 return; // dont do anything.
             }
@@ -1095,12 +1095,12 @@ function FMShortcuts() {
             charCode === 8 &&
             !isContactRootOrShareRoot
         ) {
-            var items = selectionManager.get_selected();
-            if (items.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
+            var remItems = selectionManager.get_selected();
+            if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
                 return; // dont do anything.
             }
 
-            fmremove(items);
+            fmremove(remItems);
 
             // force remove, no confirmation
             if (e.ctrlKey || e.metaKey) {

@@ -17027,8 +17027,8 @@ var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
           data = _this$props.data,
           matches = _this$props.matches,
           room = _this$props.room,
-          contact = _this$props.contact,
           index = _this$props.index;
+      var contact = room.getParticipantsExceptMe();
       var summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
       return /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "".concat(SEARCH_ROW_CLASS, " message"),
@@ -17038,7 +17038,7 @@ var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
       }, /*#__PURE__*/external_React_default.a.createElement("span", {
         className: "title"
       }, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.getRoomTitle())), !roomIsGroup(room) && /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
-        contact: contact
+        contact: M.u[contact]
       }), /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "summary",
         dangerouslySetInnerHTML: {
@@ -17211,8 +17211,7 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
             data: result.data,
             index: result.index,
             matches: result.matches,
-            room: result.room,
-            contact: M.u[result.data.userId]
+            room: result.room
           });
 
         case TYPE.CHAT:

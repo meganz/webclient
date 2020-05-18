@@ -81,7 +81,8 @@ class MessageRow extends MegaRenderMixin {
     }
 
     render() {
-        const { data, matches, room, contact, index } = this.props;
+        const { data, matches, room, index } = this.props;
+        const contact = room.getParticipantsExceptMe();
         const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
 
         return (
@@ -91,7 +92,7 @@ class MessageRow extends MegaRenderMixin {
                 <span className="title">
                     <EmojiFormattedContent>{room.getRoomTitle()}</EmojiFormattedContent>
                 </span>
-                {!roomIsGroup(room) && <ContactPresence contact={contact} />}
+                {!roomIsGroup(room) && <ContactPresence contact={M.u[contact]} />}
                 <div
                     className="summary"
                     dangerouslySetInnerHTML={{ __html: highlight(
@@ -243,8 +244,7 @@ export default class ResultRow extends MegaRenderMixin {
                         data={result.data}
                         index={result.index}
                         matches={result.matches}
-                        room={result.room}
-                        contact={M.u[result.data.userId]} />
+                        room={result.room} />
                 );
             case TYPE.CHAT:
                 return <ChatRow room={result.room} matches={result.matches} />;

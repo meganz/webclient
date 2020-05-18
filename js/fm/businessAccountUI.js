@@ -1331,7 +1331,7 @@ BusinessAccountUI.prototype.viewBusinessAccountOverview = function () {
                     // These labels appear in the legend and in the tooltips when hovering different arcs
                     labels: [
                         l[164],
-                        l[19223],
+                        l[19187],
                         l[16770],
                         l[167]
                     ]

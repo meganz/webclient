@@ -47,10 +47,19 @@ export default class SearchPanel extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        this.unbindEvents();
+    }
+
+    unbindEvents = () => {
+        if (this.pageChangeListener) {
+            mBroadcaster.removeListener(this.pageChangeListener);
+        }
         $(document).unbind('.searchPanel');
     }
 
-    bindEvents = () =>
+    bindEvents = () => {
+        // Pause on page change
+        this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle('pause'));
         $(document)
             // Clicked on search result
             .rebind('chatSearchResultOpen.searchPanel', () => this.toggleMinimize())
@@ -67,6 +76,7 @@ export default class SearchPanel extends MegaRenderMixin {
                     return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
                 }
             });
+    }
 
     clickedOutsideComponent = ev => {
         const $target = ev && $(ev.target);
@@ -84,6 +94,8 @@ export default class SearchPanel extends MegaRenderMixin {
             $target.parents(`.${SEARCH_PANEL_CLASS}`).length === 0 &&
             // current element !== left sidebar container
             $target.parents('div.fm-left-menu.conversations').length === 0 &&
+            // current element !== left sidebar icon controls
+            $target.parents('div.nw-fm-left-icons-panel').length === 0 &&
             // current element !== generic outside element
             outsideElements.every(outsideElement => !$target.is(outsideElement))
         );

@@ -1512,7 +1512,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
  */
 MegaUtils.prototype.getSafeName = function(name) {
     // http://msdn.microsoft.com/en-us/library/aa365247(VS.85)
-    name = ('' + name).replace(/[:\/\\<">|?*]+/g, '.').replace(/\s*\.+/g, '.');
+    name = ('' + name).replace(/["*/:<>?\\|]+/g, '.');
 
     if (name.length > 250) {
         name = name.substr(0, 250) + '.' + name.split('.').pop();

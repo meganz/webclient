@@ -1916,28 +1916,23 @@ FileManager.prototype.createFolderUI = function() {
             return;
         }
 
-        var c = $('.fm-new-folder').attr('class'),
-            c2 = $(e.target).attr('class'),
-            c3 = $(e.target).parent().attr('class'),
-            b1 = $('.fm-new-folder');
+        var $me = $(this);
+        var $nFolderDialog = $('.create-new-folder', 'body').removeClass('filled-input');
 
-        $('.create-new-folder').removeClass('filled-input');
-        var d1 = $('.create-new-folder');
-        if ((!c2 || c2.indexOf('fm-new-folder') === -1) && (!c3 || c3.indexOf('fm-new-folder') === -1)) {
-            return false;
-        }
-        if (c.indexOf('active') === -1) {
-            b1.addClass('active');
-            d1.removeClass('hidden');
-            topPopupAlign(this, '.dropdown.create-new-folder');
-            $('.create-new-folder input').trigger("focus");
+        var $nameInput = $('input', $nFolderDialog).val('');
+
+        if ($me.hasClass('active')) {
+            $me.removeClass('active filled-input');
+            $nFolderDialog.addClass('hidden');
         }
         else {
-            b1.removeClass('active filled-input');
-            d1.addClass('hidden');
-            $('.fm-new-folder input').val('');
+            $me.addClass('active');
+            $nFolderDialog.removeClass('hidden');
+            topPopupAlign(this, '.dropdown.create-new-folder');
+            $nameInput.focus();
         }
         $.hideContextMenu();
+        return false;
     });
 
     $('.create-folder-button').rebind('click', doCreateFolder);

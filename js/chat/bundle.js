@@ -12994,7 +12994,7 @@ var CloseOpenModeMessage = /*#__PURE__*/function (_ConversationMessageM) {
         className: "message user-card-name"
       }, displayName), datetime, /*#__PURE__*/closeOpenMode_React.makeElement("div", {
         className: "message text-block"
-      }, __('switched off chat open mode.'))));
+      }, __(l[23450]))));
     }
   }]);
 

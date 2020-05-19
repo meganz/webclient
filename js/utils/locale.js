@@ -1039,16 +1039,17 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b></b>');
-    l[20922] = escapeHTML(l[20922]).replace(/\[R\/\]/g, '<sup>&reg;</sup>');
     l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l['20923c'] = l[20923].replace('%1', 'Chrome');
     l['20923f'] = l[20923].replace('%1', 'Firefox');
     l['20923o'] = l[20923].replace('%1', 'Opera');
     l['20923t'] = l[20923].replace('%1', 'Thunderbird');
+    l['20923e'] = l[20923].replace('%1', 'Edge');
     l[20924] = escapeHTML(l[20924]);
     l['20924c'] = l[20924].replace('%1', 'Chrome<sup>&reg;</sup>');
     l['20924f'] = l[20924].replace('%1', 'Firefox<sup>&reg;</sup>');
     l['20924o'] = l[20924].replace('%1', 'Opera<sup>&reg;</sup>');
+    l['20924e'] = l[20924].replace('%1', 'Edge<sup>&reg;</sup>');
     l[20932] = l[20932].replace('[R/]', '<sup>&reg;</sup>');
     l[20959] = l[20959].replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
         + 'target="_blank" rel="noopener noreferrer">')
@@ -1059,8 +1060,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="/security" class="clickurl red txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
     l[22077] = l[22077].replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
-    l[22094] = l[22094].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[22095] = l[22095].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[22247] = l[22247].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
     l[22685] = l[22685].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22687] = l[22687].replace('[B]', '<strong>').replace('[/B]', '</strong>');
@@ -1166,6 +1165,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[23376] = escapeHTML(l[23376]).replace('[A]', '<a href="/security" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
+    l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[23447] = escapeHTML(l[23447]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1">').replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="" class="red a2">').replace('[/A2]', '</a>')
+        .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
+    l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

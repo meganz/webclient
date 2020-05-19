@@ -1920,7 +1920,10 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     font-size: 23px;
     line-height: 32px;
 }
-.chrome .bottom-page.top-dark-button.chrome, .firefox .bottom-page.top-dark-button.ff, .opera .bottom-page.top-dark-button.opera {
+.chrome .bottom-page.top-dark-button.chrome,
+.firefox .bottom-page.top-dark-button.ff,
+.opera .bottom-page.top-dark-button.opera,
+.edge .bottom-page.top-dark-button.edge {
     display: inline-block;
 }
 .bottom-page.top-dark-button i {
@@ -1937,7 +1940,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-image: url(../images/mega/pages-sprite_v7.png);
 }
 .bottom-page.icon.new-pages-sprite {
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
 }
 .bottom-page.icon.x96 {
     width: 96px;
@@ -1965,6 +1968,10 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 }
 .bottom-page.icon.new-pages-sprite.chrome {
     background-position: -122px -415px;
+    width: 52px;
+}
+.bottom-page.icon.new-pages-sprite.edge {
+    background-position: 5px -487px;
     width: 52px;
 }
 .bottom-page.icon.new-pages-sprite.opera {
@@ -2096,6 +2103,9 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .unsupported .bottom-page.icon.new-pages-sprite.ff {
     background-position: 4px -309px;
 }
+.unsupported .bottom-page.icon.new-pages-sprite.edge {
+    background-position: 3px -362px;
+}
 .bottom-page.top-button-info a {
     text-decoration: none;
     color: #333333;
@@ -2146,7 +2156,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page.top-copyrights .content, .unsupported .bottom-page.top-copyrights .available, .mobile .ios .bottom-page.top-copyrights .available.desktop, .mobile .android .bottom-page.top-copyrights .available.desktop, .mobile .ios .bottom-page.top-copyrights.small-pad, .mobile .ios .bottom-page.top-dark-button.ff, .mobile .ios.firefox .bottom-page.top-copyrights .content.ff {
     display: none;
 }
-.chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .unsupported .bottom-page.top-copyrights .unsupported {
+.chrome .bottom-page.top-copyrights .content.chrome, .firefox .bottom-page.top-copyrights .content.ff, .opera .bottom-page.top-copyrights .content.opera, .edge .bottom-page.top-copyrights .content.edge, .unsupported .bottom-page.top-copyrights .unsupported {
     display: block;
 }
 .ios .bottom-page.top-copyrights {
@@ -2288,7 +2298,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 188px;
     height: 188px;
     margin: 0 auto;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -2512,7 +2522,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 96px;
     height: 96px;
     margin: 0 auto 16px;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-size: 376px auto;
     background-repeat: no-repeat;
     padding: 0;
@@ -2696,7 +2706,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     width: 28px;
     height: 28px;
     margin: 6px 9px 0 0px;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-repeat: no-repeat;
 }
 .uwp .advertise-chat .mobile-apps-button.red.android span::before {
@@ -2876,7 +2886,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     position: absolute;
     width: 18px;
     height: 9px;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-repeat: no-repeat;
     background-position: -347px -329px;
     top: -9px;
@@ -2887,7 +2897,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .megaapp-linux .default-select {
     color: #333333;
     font-family: 'source_sans_proregular', Arial;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-repeat: no-repeat;
     background-position: right -385px;
 }
@@ -2944,7 +2954,7 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page-icon.white-info {
     width: 18px;
     height: 18px;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-repeat: no-repeat;
     background-position: -355px -433px;
     position: relative;
@@ -2982,7 +2992,7 @@ body:not(.mobile) .bottom-page-icon.white-info:not(.disabled):hover .dark-notifi
     top: 21px;
     width: 8px;
     height: 15px;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-repeat: no-repeat;
     background-position: -328px -436px;
 }
@@ -3114,7 +3124,7 @@ body:not(.mobile) .mobile-apps-button:hover {
     border-radius: 0;
     margin: 54px auto 0;
     background-color: #000;
-    background-image: url(../images/mega/new-pages-sprite_v5.png);
+    background-image: url(../images/mega/new-pages-sprite_v6.png);
     background-size: 376px auto;
 }
 .mobile-apps-button.no-pad {

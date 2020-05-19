@@ -950,11 +950,18 @@ RecentsRender.prototype._countMedia = function(action) {
         images: 0,
         videos: 0
     };
-    for (var nodeIndex = 0; nodeIndex < action.length; nodeIndex++) {
-        if (is_image(action[nodeIndex])) {
+
+    for (var idx = action.length; idx--;) {
+        var n = action[idx];
+
+        if (is_video(n)) {
+            counts.videos++;
+        }
+        else if (is_image3(n)) {
             counts.images += 1;
-        } else {
-            counts.videos += 1;
+        }
+        else if (d) {
+            console.warn('What is this?...', n);
         }
     }
     return counts;

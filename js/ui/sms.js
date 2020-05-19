@@ -47,9 +47,12 @@ var sms = {
             // Set string for non achievement account
             var langString = l[20411];  // Verifying your mobile will make it easier for your contacts to find you...
 
-            // Make sure they are on an achievement account
-            if (typeof M.account.maf !== 'undefined') {
+            // M.maf is cached in its getter, however, repeated gets will cause unnecessary checks.
+            var ach = M.maf;
+            sms.achievementUsed = ach && ach[9] && ach[9].rwd;
 
+            // Make sure they are on an achievement account and not used, maf will be calculated once.
+            if (typeof M.account.maf !== 'undefined' && !sms.achievementUsed) {
                 // Convert storage and bandwidth to 'x GB'
                 var bonuses = M.account.maf.u;
                 var storage = bonuses[9][0];
@@ -637,7 +640,6 @@ sms.verifySuccess = {
         // Show the page
         this.$dialog.removeClass('hidden');
         this.$background.removeClass('hidden');
-        this.$page.removeClass('hidden');
     },
 
     /**
@@ -672,15 +674,15 @@ sms.verifySuccess = {
             loadingDialog.hide();
 
             // If this is a non-achievements account
-            if (typeof M.account.maf === 'undefined') {
+            if (typeof M.account.maf === 'undefined' || sms.achievementUsed) {
 
                 // Set the text to 'Your number (+64) 229876543 has been successfully verified...'
                 var phone = '(+' + sms.phoneInput.countryCallCode + ') ' + sms.phoneInput.phoneNumber;
                 var successText = l[20220].replace('%1', phone);
 
                 // Show a different success dialog state and text
-                $page.addClass('non-achievement-account');
                 $successMessage.text(successText);
+                $page.addClass('non-achievement-account');
             }
             else {
                 // Otherwise if an achievements account, convert storage and bandwidth to 'x GB'
@@ -697,7 +699,7 @@ sms.verifySuccess = {
                 $transferAmount.text(transferQuotaFormatted);
                 $validDaysText.text(days);
             }
-
+            $page.removeClass('hidden');
         }, true); // Show loading spinner
     },
 

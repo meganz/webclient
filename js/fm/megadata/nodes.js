@@ -3831,7 +3831,7 @@ MegaData.prototype.getDashboardData = function() {
     res.rubbish = { cnt: s[this.RubbishID].files, size: s[this.RubbishID].bytes };
     res.ishares = { cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files };
     res.oshares = { cnt: s.outshares.items, size: s.outshares.bytes };
-    res.links = { cnt: s.links.files, size: s.links.bytes };
+    res.links = { cnt: s.links.folders, size: s.links.bytes, xfiles: s.links.files };
     res.versions = { cnt: s[this.RootID].vfiles, size: s[this.RootID].vbytes };
 
     return res;

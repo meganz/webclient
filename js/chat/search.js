@@ -123,7 +123,7 @@ RoomSearch.prototype.resume = function() {
                     SearchResultType.kMessage,
                     msg,
                     self,
-                    messages.length - i,
+                    messages.length - i
                 );
             }
         }
@@ -333,13 +333,14 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
  * @private
  */
 ChatSearch._normalize_str = function(s) {
+    "use strict";
     if (s && s.normalize) {
-        return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
     else {
         return s;
     }
-}
+};
 
 /**
  * Invoke chat search.
@@ -498,7 +499,7 @@ ChatSearch.prototype.resume = function() {
     }
     if (len === 0) {
         // no room searches, mark as completed.
-        this.handler.onComplete()
+        this.handler.onComplete();
     }
 };
 /**

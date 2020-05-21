@@ -268,4 +268,4 @@ characters were removed from the files
 [webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>
-[normalize.js]: <https://github.com/ikr/normalize-for-search/blob/master/src/normalize.js>
+

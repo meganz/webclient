@@ -17705,6 +17705,8 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         self.setState({
           results: results
         });
+      }).catch(function (ex) {
+        console.error(ex);
       }).always(function () {
         self.setState({
           status: STATUS.COMPLETED

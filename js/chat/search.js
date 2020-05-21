@@ -257,9 +257,18 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
     self.megaChat = megaChat;
     self.allChats = megaChat.chats;
 
+
+    // normalize
+    searchExpr = normalizeForSearch(searchExpr);
+
     self.originalSearchString = searchExpr;
-    self.searchRegExps = searchExpr.split(" ").map(function(w) {
-        return new RegExp(RegExpEscape(w), 'gi');
+    var searchWords = searchExpr.split(" ");
+    self.searchRegExps = searchWords.map(function(w) {
+        // prepend ^ if the searchExpr is <= 2 chars length and only one word
+        return new RegExp(
+            (searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(w),
+            'gi'
+        );
     });
 
     self.setupLogger();
@@ -395,18 +404,24 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
         }
     };
 
-    ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler);
-    // console.error('search > doSearch() -> cs:', ChatSearch.doSearch.cs);
+    M.require('normalize_js')
+        .done(function() {
+            ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler);
+            // console.error('search > doSearch() -> cs:', ChatSearch.doSearch.cs);
 
-    results.dump = function() {
-        for (var r in results) {
-            if (results.hasOwnProperty(r)) {
-                console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
-            }
-        }
-    };
+            results.dump = function() {
+                for (var r in results) {
+                    if (results.hasOwnProperty(r)) {
+                        console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
+                    }
+                }
+            };
 
-    ChatSearch.doSearch.cs.resume();
+            ChatSearch.doSearch.cs.resume();
+        })
+        .fail(function() {
+            console.error("Failed to load normalize.js");
+        });
 });
 
 ChatSearch.prototype.setupLogger = function() {
@@ -545,6 +560,7 @@ ChatSearch.prototype.dumpRoomSearchesStates = function() {
 ChatSearch.prototype._match = function(str, type, data, roomSearch, index) {
     "use strict";
     var matches = [];
+    str = normalizeForSearch(str);
     var words = this.searchRegExps;
     for (var i = 0; i < words.length; i++) {
         var rx = words[i];

@@ -113,6 +113,9 @@ export default class SearchPanel extends MegaRenderMixin {
             function(room, result, results) {
                 self.setState({results});
             })
+            .catch(function(ex) {
+                console.error(ex);
+            })
             .always(function() {
                 self.setState({status: STATUS.COMPLETED});
             });

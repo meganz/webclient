@@ -167,7 +167,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [react-dom.js, react.js]: A declarative, efficient, and flexible JavaScript library for building user interfaces.
 
-> react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii 
+> react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii
 characters were removed from the files
 ---
 [smartcrop.js]: Content aware image cropping.
@@ -268,3 +268,4 @@ characters were removed from the files
 [webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>
+[normalize.js]: <https://github.com/ikr/normalize-for-search/blob/master/src/normalize.js>

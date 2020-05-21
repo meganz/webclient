@@ -152,6 +152,9 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                             topmenuUI();
                         }
                     }
+                    if (res.b) {
+                        u_attr.b = res.b;
+                    }
                 }
 
                 if (!ctx.account.downbw_used) {
@@ -239,8 +242,22 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 var links = stats.links;
                 Object.keys(exp)
                     .forEach(function(h) {
-                        links.files++;
-                        links.bytes += Object(M.tree[h]).tb || M.d[h] && M.d[h].s || 0;
+                        if (M.d[h]) {
+                            if (M.d[h].t) {
+                                links.folders++;
+                                links.bytes += M.d[h].tb || 0;
+                            }
+                            else {
+                                links.bytes += M.d[h].s || 0;
+                                links.files++;
+                            }
+                        }
+                        else {
+                            if (d) {
+                                console.error('Not found public node ' + h);
+                            }
+                            links.files++;
+                        }
                     });
 
                 ctx.account.lastupdate = Date.now();

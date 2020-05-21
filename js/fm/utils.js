@@ -1029,19 +1029,15 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     loadSubPage('login');
                     location.reload();
                 }
+                else if (location.href.indexOf('fm/search/') > -1 || location.href.indexOf('fm/chat/') > -1) {
+                    location.replace(getBaseUrl());
+                }
+                else if (location.href.indexOf('fm/user-management/invdet') > -1) {
+                    var myHost = getBaseUrl() + '/fm/user-management/invoices';
+                    location.replace(myHost);
+                }
                 else {
-                    var myHost;
-                    if (location.href.indexOf('/fm/search/') > -1) {
-                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/search/'));
-                        location.replace(myHost);
-                    }
-                    else if (location.href.indexOf('/fm/chat/') > -1){
-                        myHost = location.href.substr(0, location.href.lastIndexOf('/fm/chat/'));
-                        location.replace(myHost);
-                    }
-                    else {
-                        location.reload();
-                    }
+                    location.reload();
                 }
             }
         };

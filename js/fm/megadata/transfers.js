@@ -121,16 +121,32 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
             + '</object>';
     }
 
+    var dowloadedSize = node.loaded || 0;
+    var rightRotate = '';
+    var leftRotate = '';
+
+    if (dowloadedSize > 0 && node.s > 0) {
+        var deg = 360 * dowloadedSize / node.s;
+        if (deg <= 180) {
+            rightRotate = 'style="transform: rotate(' + deg + 'deg);"';
+        }
+        else {
+            rightRotate = 'style="transform: rotate(180deg);"';
+            leftRotate = 'style="transform: rotate(' + (deg - 180) + 'deg);"';
+        }
+    }
+
     this.addToTransferTable(gid, ttl,
         '<tr id="dl_' + htmlentities(handle) + '" class="transfer-queued transfer-download ' + state + '">'
         + '<td><div class="transfer-type download">'
-        + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
+        + '<ul><li class="right-c"><p ' + rightRotate + '>'
+        + '<span></span></p></li><li class="left-c"><p ' + leftRotate + '><span></span></p></li></ul>'
         + '</div>' + flashhtml + '</td>'
         + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
         + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
         + '<td>' + filetype(node) + '</td>'
         + '<td class="transfer-size">' + bytesToSize(node.s) + '</td>'
-        + '<td><span class="downloaded-size">' + bytesToSize(0) + '</span></td>'
+        + '<td><span class="downloaded-size">' + bytesToSize(dowloadedSize) + '</span></td>'
         + '<td><span class="eta"></span><span class="speed">' + pauseTxt + '</span></td>'
         + '<td><span class="transfer-status">' + l[7227] + '</span></td>'
         + '<td class="grid-url-field"><a class="grid-url-arrow"></a>'

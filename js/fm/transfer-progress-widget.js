@@ -383,7 +383,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         // pages to hide always
-        if (page.indexOf('transfers') !== -1 || page.indexOf('register') !== -1) {
+        if (page.indexOf('transfers') !== -1 || page.indexOf('register') !== -1 || page.indexOf('download') !== -1) {
             mega.tpw.hideWidget();
             return;
         }
@@ -842,7 +842,7 @@ mega.tpw = new function TransferProgressWidget() {
 
         updateHeaderAndContent();
 
-        if (!this.isWidgetVisibile()) {
+        if (!this.isWidgetVisibile() && page.indexOf('download') === -1) {
             mega.tpw.showWidget();
         }
 
@@ -1146,7 +1146,7 @@ mega.tpw = new function TransferProgressWidget() {
 
         updateHeaderAndContent();
 
-        if (!this.isWidgetVisibile()) {
+        if (!this.isWidgetVisibile() && page.indexOf('download') === -1) {
             mega.tpw.showWidget();
         }
 

@@ -613,7 +613,7 @@ dashboardUI.updateCloudDataWidget = function() {
     var folder1 = 834;
     var folders = 832;
     var data = M.getDashboardData();
-    var locale = [files, folders, files, folders, folders, files];
+    var locale = [files, folders, files, folders, folders, folders];
     var map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
     var intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
@@ -660,7 +660,7 @@ dashboardUI.updateCloudDataWidget = function() {
                 str += ', ' + String(l[833]).replace('[X]', props.xfiles);
             }
 
-            elm.children[1].textContent = idx < 5 ? String(str).replace('[X]', cnt) : cnt;
+            elm.children[1].textContent = idx < 6 ? String(str).replace('[X]', cnt) : cnt;
             if (props.cnt > 0) {
                 elm.children[2].textContent = bytesToSize(props.size);
                 $(elm).removeClass('empty');

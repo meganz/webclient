@@ -2801,8 +2801,7 @@ else if (!browserUpdate) {
         'downloadapp_js': {f:'html/js/desktop-onboarding.js', n: 'downloadapp_js', j:1},
         'downloadapp': {f:'html/desktop-onboarding.html', n: 'downloadapp', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
-        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
-        'normalize_js': {f:'js/vendor/normalize.noutf.js', n: 'normalize_js', j:1}
+        'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1}
     };
 
     var jsl3 = {

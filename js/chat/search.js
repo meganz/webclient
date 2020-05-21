@@ -398,10 +398,6 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
             if (typeof onResult === 'function') {
                 onResult(room.chatId, resultMeta, results);
             }
-        }, function(err) {
-            if (d) {
-                console.error(err);
-            }
         }),
         'onComplete': function(reason) {
             delete ChatSearch.doSearch.cs;

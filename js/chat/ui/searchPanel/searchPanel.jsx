@@ -180,7 +180,7 @@ export default class SearchPanel extends MegaRenderMixin {
             SearchField.hasValue() ?
                 this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
                     this.doToggle('destroy');
-                    Soon(() => SearchField.focus());
+                    onIdle(() => SearchField.focus());
                 }) :
                 this.toggleMinimize()
         );

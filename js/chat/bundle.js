@@ -17786,7 +17786,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         }, function () {
           _this.doToggle('destroy');
 
-          Soon(function () {
+          onIdle(function () {
             return searchField_SearchField.focus();
           });
         }) : _this.toggleMinimize()

@@ -188,6 +188,7 @@
         "unicorn/regex-shorthand": 2,
 
         "react/no-find-dom-node": "off",
+        "react/prop-types": "off",
         "react/jsx-indent": ["error", 4]
     },
 

@@ -318,7 +318,9 @@ function u_logout(logout) {
             }
         }
 
-        loadfm.loaded = false;
+        if (window.loadfm) {
+            loadfm.loaded = false;
+        }
     }
 }
 

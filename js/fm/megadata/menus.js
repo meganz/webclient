@@ -245,7 +245,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 $('.add-star-item').safeHTML('<i class="small-icon context broken-heart"></i>@@', l[5872]);
             }
             else {
-                $('.add-star-item').safeHTML('<i class="small-icon context heart"/></i>@@', l[5871]);
+                $('.add-star-item').safeHTML('<i class="small-icon context heart"></i>@@', l[5871]);
             }
 
             M.colourLabelcmUpdate(selNode);
@@ -907,7 +907,7 @@ MegaData.prototype.reCalcMenuPosition = function(m, x, y, ico) {
     };
 
     var handleSmall = function(dPos) {
-        m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block" />');
+        m.find('> .dropdown-section').wrapAll('<div id="cm_scroll" class="context-scrolling-block"></div>');
         m.append('<span class="context-top-arrow"></span><span class="context-bottom-arrow"></span>');
         m.addClass('mega-height');
         cmH = wH - TOP_MARGIN * 2;

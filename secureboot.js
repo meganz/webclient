@@ -2288,6 +2288,7 @@ else if (!browserUpdate) {
     jsl.push({f:'sjcl.js', n: 'sjcl_js', j:1});
     jsl.push({f:'nodedec.js', n: 'nodedec_js', j:1});
     jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
+    jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
     jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
@@ -2697,7 +2698,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embeddrop.css', n: 'embeddrop_css', j: 2, w: 5});
     }
     else {
-        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
         jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
         if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {

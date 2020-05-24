@@ -137,7 +137,7 @@
 
         "indent": [2, 4, {
             "SwitchCase": 1,
-//            "outerIIFEBody": 0,
+            "outerIIFEBody": "off",
             "FunctionDeclaration": {"parameters": "first"},
             "FunctionExpression": {"parameters": "first"},
             "CallExpression": {"arguments": "first"},

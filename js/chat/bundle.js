@@ -18318,7 +18318,7 @@ var conversations_ArchConversationsListItem = /*#__PURE__*/function (_MegaRender
 
       if (lastMessage) {
         var lastMsgDivClasses = "conversation-message";
-        var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
+        var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
         lastMessage.renderableSummary = renderableSummary;
         lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
           className: lastMsgDivClasses,

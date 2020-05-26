@@ -487,7 +487,7 @@ ChatSearch.prototype.resume = function() {
             }
             this._match(M.getNameByHandle(userid), SearchResultType.kMember, userid, {'chatId': userid});
 
-            if (M.u[userid].m) {
+            if (this.originalSearchString.length > 2 && M.u[userid].m) {
                 this._match(M.u[userid].m, SearchResultType.kMember, userid, {'chatId': userid});
             }
         }

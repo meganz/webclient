@@ -431,7 +431,9 @@ class ArchConversationsListItem extends MegaRenderMixin {
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
             var lastMsgDivClasses = "conversation-message";
-            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
+            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
+                lastMessage
+            );
             lastMessage.renderableSummary = renderableSummary;
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>

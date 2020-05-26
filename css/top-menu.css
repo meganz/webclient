@@ -754,8 +754,11 @@
 .top-menu-logged.business-acc .loader {
     margin-top: 3px;
 }
-.top-menu-logged.business-acc .top-menu-item.small {
+.top-menu-logged.business-acc .top-green-button.hidden + .top-menu-item.small {
     margin-top: 10px;
+}
+.top-menu-logged.business-acc .top-green-button {
+    margin-top: 9px;
 }
 
 /*menus-sprite */

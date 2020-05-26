@@ -198,7 +198,7 @@ function topMenuDataUpdate() {
     }
 
     // Show only space_used  for business accounts
-    if (u_attr && u_attr.b && u_attr.b.s !== -1) {
+    if (u_attr && u_attr.b) {
         storageHtml = '<span>' +  space_used + '</span>';
     }
     else {
@@ -2312,10 +2312,12 @@ function topmenuUI() {
         }
 
         // if this is a business account sub-user
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $headerAchievements.addClass('hidden');
-            $menuUpgradeAccount.addClass('hidden');
+        if (u_attr && u_attr.b) {
             $menuLoggedBlock.addClass('business-acc');
+            if (u_attr.b.s !== -1) {
+                $headerAchievements.addClass('hidden');
+                $menuUpgradeAccount.addClass('hidden');
+            }
         }
 
         // Show PRO plan expired warning popup (if applicable)

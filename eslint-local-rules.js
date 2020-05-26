@@ -66,7 +66,7 @@ module.exports = {
                     }
                 },
                 NewExpression(node) {
-                    if (node.callee.name === 'MegaPromise' && !node.arguments.length) {
+                    if (node.callee.name === 'MegaPromise' && !node.arguments.length && node.parent.type !== 'CallExpression') {
                         context.report(node,
                             'New code should use the native Promise implementation instead of MegaPromise, ' +
                             'or provide an executor to the MegaPromise constructor. ' +

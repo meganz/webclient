@@ -2681,7 +2681,7 @@ function topmenuUI() {
                 $('.top-clear-button', $headerSearch).addClass('hidden');
                 loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
-            else if (val.length > 2 || !asciionly(val)) {
+            else if (val.length >= 2 || !asciionly(val)) {
                 var $this = $(this);
 
                 M.fmSearchNodes(val).then(function() {

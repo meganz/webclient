@@ -76,8 +76,8 @@ module.exports = {
                 Identifier(node) {
                     // Enforce the use of toArray.apply(null, arguments)
                     if (node.name === "arguments" && xpath(node, 'parent/callee/property/name') !== 'apply') {
-                        // do not complain about safe arguments.length usages
-                        if (xpath(node, 'parent/property/name') !== 'length') {
+                        // do not complain about safe property access (i.e. length, or by idx)
+                        if (xpath(node, 'parent/property/type') === false) {
                             context.report(node, 'The `arguments` object must not be passed or leaked anywhere.');
                         }
                     }

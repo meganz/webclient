@@ -198,7 +198,7 @@ function topMenuDataUpdate() {
     }
 
     // Show only space_used  for business accounts
-    if (u_attr && u_attr.b && u_attr.b.s !== -1) {
+    if (u_attr && u_attr.b) {
         storageHtml = '<span>' +  space_used + '</span>';
     }
     else {
@@ -1719,16 +1719,14 @@ function init_page() {
             }
         }
 
-        M.require('download', 'download_js').done(function() {
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-            }
-            else {
-                parsepage(pages['download']);
-            }
-            dlinfo(dlid, dlkey, false);
-            topmenuUI();
-        });
+        if (is_mobile) {
+            parsepage(pages.mobile);
+        }
+        else {
+            parsepage(pages.download);
+        }
+        dlinfo(dlid, dlkey, false);
+        topmenuUI();
     }
     else if (page.substr(0, 5) === 'reset') {
         localStorage.clear();
@@ -2312,10 +2310,12 @@ function topmenuUI() {
         }
 
         // if this is a business account sub-user
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $headerAchievements.addClass('hidden');
-            $menuUpgradeAccount.addClass('hidden');
+        if (u_attr && u_attr.b) {
             $menuLoggedBlock.addClass('business-acc');
+            if (u_attr.b.s !== -1) {
+                $headerAchievements.addClass('hidden');
+                $menuUpgradeAccount.addClass('hidden');
+            }
         }
 
         // Show PRO plan expired warning popup (if applicable)
@@ -2681,7 +2681,7 @@ function topmenuUI() {
                 $('.top-clear-button', $headerSearch).addClass('hidden');
                 loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
-            else if (val.length > 2 || !asciionly(val)) {
+            else if (val.length >= 2 || !asciionly(val)) {
                 var $this = $(this);
 
                 M.fmSearchNodes(val).then(function() {

@@ -768,7 +768,7 @@ var notify = {
             notify.markAllNotificationsAsSeen();
 
             // Update IPC indicator
-            delay('updateIpcRequests', updateIpcRequests);
+            delay('updateIpcRequests', updateIpcRequests, 1000);
         });
     },
 

@@ -2863,26 +2863,27 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about','about_js'],
+        'about': ['about', 'about_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits'],
-        'backup': ['backup','backup_js','filesaver'],
-        'recovery': ['recovery','recovery_js'],
-        'reset': ['reset','reset_js'],
+        'backup': ['backup', 'backup_js', 'filesaver'],
+        'recovery': ['recovery', 'recovery_js'],
+        'reset': ['reset', 'reset_js'],
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
-        'blog': ['blog','blog_js','blogarticle','blogarticle_js'],
-        'register': ['register','register_js', 'zxcvbn_js'],
-        'newsignup': ['register','register_js', 'zxcvbn_js'],
+        'blog': ['blog', 'blog_js', 'blogarticle', 'blogarticle_js'],
+        'register': ['register', 'register_js', 'zxcvbn_js'],
+        'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download','download_js'],
+        '!': ['download', 'download_js'],
+        'file': ['download', 'download_js'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice','copyright_js'],
-        'privacy': ['privacy','privacycompany'],
+        'copyrightnotice': ['copyrightnotice', 'copyright_js'],
+        'privacy': ['privacy', 'privacycompany'],
         'gdpr': ['gdpr', 'gdpr_js'],
         'takedown': ['takedown'],
         'sync': ['sync', 'sync_js'],
@@ -3656,7 +3657,11 @@ else if (!browserUpdate) {
             }
 
             if (dl_res) {
-                var g = {a: 'g', p: page.split('!')[1], 'ad': showAd(), 'esid': u_sid || ''};
+                var g = {
+                    a: 'g',
+                    esid: u_sid || '',
+                    p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
+                };
 
                 xhr(false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
@@ -3703,7 +3708,7 @@ else if (!browserUpdate) {
 
         loginresponse = true;
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
-        dl_res = (page[0] === '!' || (page[0] === 'E' && page[1] === '!')) && page.length > 2;
+        dl_res = page[0] === '!' || page[0] === 'E' && page[1] === '!' || page.substr(0, 5) === 'file/';
 
         if (localStorage === u_storage) {
             ack();

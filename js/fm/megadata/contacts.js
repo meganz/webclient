@@ -766,6 +766,29 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
     return promise;
 };
 
+/**
+ * syncPendingContacts
+ * @description Keeps M.v synchronized with M.opc and M.ipc based on passed action packet.
+ * @see scparser.$add -- `opc` and `ipc` usages
+ * @param {Object} actionPacket
+ * @returns {void}
+ */
+
+MegaData.prototype.syncPendingContacts = function(actionPacket) {
+    'use strict';
+    if (this.currentdirid === 'opc' || this.currentdirid === 'ipc') {
+        for (var g = 0; g < this.v.length; g++) {
+            if (this.v[g].p === actionPacket.p) {
+                this.v[g] = actionPacket;
+                break;
+            }
+            else if (g === (this.v.length - 1)) {
+                this.v.push(actionPacket);
+            }
+        }
+    }
+};
+
 MegaData.prototype.syncContactEmail = function(userHash) {
     var promise = new MegaPromise();
     if (anonymouschat) {

@@ -1719,16 +1719,14 @@ function init_page() {
             }
         }
 
-        M.require('download', 'download_js').done(function() {
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-            }
-            else {
-                parsepage(pages['download']);
-            }
-            dlinfo(dlid, dlkey, false);
-            topmenuUI();
-        });
+        if (is_mobile) {
+            parsepage(pages.mobile);
+        }
+        else {
+            parsepage(pages.download);
+        }
+        dlinfo(dlid, dlkey, false);
+        topmenuUI();
     }
     else if (page.substr(0, 5) === 'reset') {
         localStorage.clear();
@@ -2683,7 +2681,7 @@ function topmenuUI() {
                 $('.top-clear-button', $headerSearch).addClass('hidden');
                 loadSubPage(page.slice(0, page.indexOf('/search/')));
             }
-            else if (val.length > 2 || !asciionly(val)) {
+            else if (val.length >= 2 || !asciionly(val)) {
                 var $this = $(this);
 
                 M.fmSearchNodes(val).then(function() {

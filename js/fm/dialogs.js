@@ -989,7 +989,7 @@
 
             $('.search-bar input', $dialog).val('');
             handleDialogContent(typeof aTab === 'string' && aTab);
-            setDialogBreadcrumb(aTarget);
+            setDialogBreadcrumb(aTab === 'conversations' ? '' : aTarget);
             setDialogButtonState($('.dialog-picker-button', $dialog).addClass('active'));
             setSelectedItems(true);
         });

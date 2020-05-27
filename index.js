@@ -1719,16 +1719,14 @@ function init_page() {
             }
         }
 
-        M.require('download', 'download_js').done(function() {
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-            }
-            else {
-                parsepage(pages['download']);
-            }
-            dlinfo(dlid, dlkey, false);
-            topmenuUI();
-        });
+        if (is_mobile) {
+            parsepage(pages.mobile);
+        }
+        else {
+            parsepage(pages.download);
+        }
+        dlinfo(dlid, dlkey, false);
+        topmenuUI();
     }
     else if (page.substr(0, 5) === 'reset') {
         localStorage.clear();

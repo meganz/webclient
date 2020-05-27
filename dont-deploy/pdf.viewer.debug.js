@@ -1,4 +1,4 @@
-﻿/* Copyright 2017 Mozilla Foundation
+/* Copyright 2017 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1666,17 +1666,17 @@
                 },
                 fallback: function pdfViewFallback(featureId) { },
                 error: function pdfViewError(message, moreInfo) {
-                    var moreInfoText = 'PDF.js v{{version}} (build: {{build}})' + '\n';
+                    var moreInfoText = 'PDF.js v' + PDFJS.version + ' (build: ' + PDFJS.build + ')' + '\n';
                     if (moreInfo) {
-                        moreInfoText += 'Message: {{message}}';
+                        moreInfoText += 'Message: ' + message;
                         if (moreInfo.stack) {
-                            moreInfoText += '\n' + 'Stack: {{stack}}';
+                            moreInfoText += '\n' + 'Stack: ' + moreInfo.stack;
                         } else {
                             if (moreInfo.filename) {
-                                moreInfoText += '\n' + 'File: {{file}}';
+                                moreInfoText += '\n' + 'File: ' + moreInfo.filename;
                             }
                             if (moreInfo.lineNumber) {
-                                moreInfoText += '\n' + 'Line: {{line}}';
+                                moreInfoText += '\n' + 'Line: ' + moreInfo.lineNumber;
                             }
                         }
                     }
@@ -1708,7 +1708,7 @@
                     closeButton.oncontextmenu = noContextMenuHandler;
                     moreInfoButton.removeAttribute('hidden');
                     lessInfoButton.setAttribute('hidden', 'true');
-                    errorMoreInfo.value = moreInfoText;
+                    errorMoreInfo.value = window.parent.d ? moreInfoText : message;
                 },
                 progress: function pdfViewProgress(level) {
                     var percent = Math.round(level * 100);

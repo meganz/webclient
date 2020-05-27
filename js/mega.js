@@ -1017,17 +1017,7 @@ scparser.$add('opc', {
         processOPC([a]);
 
         if (fminitialized) {
-            if (M.currentdirid === 'opc') {
-                for (var g = 0; g < M.v.length; g++) {
-                    if (M.v[g].p === a.p) {
-                        M.v[g] = a;
-                        break;
-                    }
-                    else if (g === (M.v.length - 1)) {
-                        M.v.push(a);
-                    }
-                }
-            }
+            M.syncPendingContacts(a);
             M.drawSentContactRequests([a]);
         }
     }
@@ -1039,6 +1029,7 @@ scparser.$add('ipc', {
         processIPC([a]);
 
         if (fminitialized) {
+            M.syncPendingContacts(a);
             M.drawReceivedContactRequests([a]);
         }
 

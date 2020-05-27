@@ -66,7 +66,7 @@ module.exports = {
                     }
                 },
                 NewExpression(node) {
-                    if (node.callee.name === 'MegaPromise' && !node.arguments.length) {
+                    if (node.callee.name === 'MegaPromise' && !node.arguments.length && node.parent.type !== 'CallExpression') {
                         context.report(node,
                             'New code should use the native Promise implementation instead of MegaPromise, ' +
                             'or provide an executor to the MegaPromise constructor. ' +
@@ -76,8 +76,8 @@ module.exports = {
                 Identifier(node) {
                     // Enforce the use of toArray.apply(null, arguments)
                     if (node.name === "arguments" && xpath(node, 'parent/callee/property/name') !== 'apply') {
-                        // do not complain about safe arguments.length usages
-                        if (xpath(node, 'parent/property/name') !== 'length') {
+                        // do not complain about safe property access (i.e. length, or by idx)
+                        if (xpath(node, 'parent/property/type') === false) {
                             context.report(node, 'The `arguments` object must not be passed or leaked anywhere.');
                         }
                     }
@@ -108,10 +108,6 @@ module.exports = {
 
                     if (prop === 'forEach') {
                         context.report(node, 'Prefer for() loops instead of Array.forEach');
-                    }
-                    else if (obj === 'Promise' && prop === 'all') {
-                        context.report(node, 'Make sure you are not mixing Promise and MegaPromise instances, ' +
-                            'they are not compatible with each other and may result in unexpected behaviours.');
                     }
                     else if (obj === 'localStorage' && !/^test|[Dd]ebug/.test(prop)) {
                         context.report(node, 'Do not abuse localStorage, ' +

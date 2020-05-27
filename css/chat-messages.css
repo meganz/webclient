@@ -572,10 +572,11 @@
 .message.richpreview.no-description {
     min-height: 80px;
 }
-
-
 .message.richpreview.container.is-loading {
     cursor: wait;
+}
+.message.richpreview.container .loading-spinner {
+    position: absolute;
 }
 
 .message.richpreview.container::before {

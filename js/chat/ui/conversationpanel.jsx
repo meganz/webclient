@@ -6,7 +6,7 @@ import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
 import { Dropdown, DropdownItem, DropdownContactsSelector } from './../../ui/dropdowns.jsx';
-import { ContactCard } from './../ui/contacts.jsx';
+import { ContactCard, MembersAmount } from './../ui/contacts.jsx';
 import { TypingArea } from './../ui/typingArea.jsx';
 import { WhosTyping } from './whosTyping.jsx';
 import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
@@ -640,6 +640,9 @@ export class ConversationPanel extends MegaRenderMixin {
             }, rand_range(5, 10) * 1000);
         }
         self.props.chatRoom._uiIsMounted = true;
+        self.props.chatRoom.$rConversationPanel = self;
+
+        $(self.props.chatRoom).trigger("onComponentDidMount");
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -816,6 +819,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     e.preventDefault();
                 }
             });
+            $(self.props.chatRoom).trigger("onComponentDidUpdate");
         }
     }
     handleWindowResize(e, scrollToBottom) {
@@ -903,11 +907,20 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (self.isComponentEventuallyVisible()) {
-            if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
+            if (
+                self.props.chatRoom.scrolledToBottom &&
+                !self.editDomElement &&
+                !self.props.chatRoom.isScrollingToMessageId
+            ) {
                 ps.scrollToBottom(true);
                 return true;
             }
-            if (self.lastScrollPosition !== ps.getScrollPositionY() && !self.editDomElement) {
+            if (
+                self.lastScrollPosition &&
+                self.lastScrollPosition !== ps.getScrollPositionY() &&
+                !self.editDomElement &&
+                !self.props.chatRoom.isScrollingToMessageId
+            ) {
                 ps.scrollToY(self.lastScrollPosition, true);
                 return true;
             }
@@ -1035,6 +1048,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (
             this.isRetrievingHistoryViaScrollPull ||
             this.loadingShown ||
+            (this.props.chatRoom.activeSearches > 0 && this.loadingShown) ||
             (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
             (
                 this.props.chatRoom.messagesBuff.isDecrypting &&
@@ -1104,6 +1118,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
             ) ||
             (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
+            (self.props.chatRoom.activeSearches && !self.loadingShown) ||
             room.messagesBuff.messagesHistoryIsLoading() === true ||
             room.messagesBuff.joined === false ||
             (
@@ -1909,7 +1924,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         }</utils.EmojiFormattedContent>
                     </span>
                     <span className="txt small">
-                        {(l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length)}
+                        <MembersAmount room={self.props.chatRoom} />
                     </span>
                 </div>
             </div>;
@@ -2121,6 +2136,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                    renderedMessagesCount={messagesList.length}
                                    isLoading={
                                        this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                                       this.props.chatRoom.activeSearches > 0 ||
                                        this.loadingShown
                                    }
                                    options={{
@@ -2190,7 +2206,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 persist={true}
                                 onUpEditPressed={() => {
                                     var foundMessage = false;
-                                    room.messagesBuff.messages.keys().reverse().some(function(k) {
+                                    clone(room.messagesBuff.messages.keys()).reverse().some(function(k) {
                                         if(!foundMessage) {
                                             var message = room.messagesBuff.messages[k];
 

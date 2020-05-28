@@ -10,103 +10,10 @@ import {Button} from './../../ui/buttons.jsx';
 import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
 import ContactsUI  from './../ui/contacts.jsx';
 import {ConversationPanels} from "./../ui/conversationpanel.jsx";
+import SearchPanel from './searchPanel/searchPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
 
-var renderMessageSummary = function(lastMessage) {
-    var renderableSummary;
-    if (lastMessage.renderableSummary) {
-        renderableSummary = lastMessage.renderableSummary;
-    }
-    else {
-        if (lastMessage.isManagement && lastMessage.isManagement()) {
-            renderableSummary = lastMessage.getManagementMessageSummaryText();
-        }
-        else if (!lastMessage.textContents && lastMessage.dialogType) {
-            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
-        }
-        else {
-            renderableSummary = lastMessage.textContents;
-        }
-        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
-
-        var escapeUnescapeArgs = [
-            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
-            {'message': {'textContents': renderableSummary}},
-            ['textContents', 'messageHtml'],
-            'messageHtml'
-        ];
-
-        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-        renderableSummary = escapeUnescapeArgs[1].message.textContents;
-
-        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
-
-        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
-
-        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
-
-        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-
-        renderableSummary = renderableSummary || "";
-        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
-        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
-    }
-
-    var author;
-
-    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
-        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
-    }
-    else if (lastMessage.dialogType === "alterParticipants") {
-        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] ||
-            Message.getContactForMessage(lastMessage);
-    }
-    else {
-        author = Message.getContactForMessage(lastMessage);
-    }
-    if (author) {
-        if (!lastMessage._contactChangeListener && author.addChangeListener) {
-            lastMessage._contactChangeListener = author.addChangeListener(function() {
-                delete lastMessage.renderableSummary;
-                lastMessage.trackDataChange();
-            });
-        }
-
-        if (lastMessage.chatRoom.type === "private") {
-            if (author && author.u === u_handle) {
-                renderableSummary = l[19285] + " " + renderableSummary;
-            }
-        }
-        else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
-            if (author) {
-                if (author.u === u_handle) {
-                    renderableSummary = l[19285] + " " + renderableSummary;
-                }
-                else {
-                    var name = M.getNameByHandle(author.u);
-                    name = ellipsis(name, undefined, 11);
-                    if (name) {
-                        renderableSummary = escapeHTML(name) + ": " + renderableSummary;
-                    }
-                }
-            }
-        }
-    }
-
-    return renderableSummary;
-};
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
@@ -285,7 +192,9 @@ class ConversationsListItem extends MegaRenderMixin {
         else if (lastMessage) {
             lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
             // safe some CPU cycles...
-            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
+            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
+                lastMessage
+            );
             lastMessage.renderableSummary = renderableSummary;
 
             if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
@@ -522,7 +431,9 @@ class ArchConversationsListItem extends MegaRenderMixin {
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         if (lastMessage) {
             var lastMsgDivClasses = "conversation-message";
-            var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
+            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
+                lastMessage
+            );
             lastMessage.renderableSummary = renderableSummary;
 
             lastMessageDiv = <div className={lastMsgDivClasses} dangerouslySetInnerHTML={{__html:renderableSummary}}>
@@ -628,7 +539,6 @@ class ConversationsList extends MegaRenderMixin {
     }
     componentDidUpdate() {
         super.componentDidUpdate && super.componentDidUpdate();
-        M.treeSearchUI();
     }
 
     conversationClicked(room, e) {
@@ -959,9 +869,10 @@ class ConversationsApp extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
-            'leftPaneWidth': mega.config.get('leftPaneWidth'),
-            'startGroupChatDialogShown': false,
-            'quickSearchText': ''
+            leftPaneWidth: mega.config.get('leftPaneWidth'),
+            startGroupChatDialogShown: false,
+            searchActive: false,
+            searchMinimized: true
         };
     }
     startChatClicked(selected) {
@@ -1345,38 +1256,39 @@ class ConversationsApp extends MegaRenderMixin {
                     <div className="left-pane-drag-handle"></div>
 
                     <div className="fm-left-menu conversations">
-                        <div className={"nw-fm-tree-header conversations" + (self.state.quickSearchText ?
-                            ' filled-input' : '')}>
-                            <input type="text" className={"chat-quick-search"}
-                                   onChange={function(e) {
-                                       if (e.target.value) {
-                                           treesearch = e.target.value;
-                                       }
-                                        self.setState({'quickSearchText': e.target.value});
-                                   }}
-                                   onBlur={function(e) {
-                                        if (e.target.value) {
-                                            treesearch = e.target.value;
-                                        }
-                                   }}
-                                   autoComplete='disabled'
-                                   value={self.state.quickSearchText}
-                                   placeholder={l[7997]} />
-                            <div className="small-icon thin-search-icon"></div>
-
-                            <Button
-                                group="conversationsListing"
-                                icon="chat-with-plus"
-                                >
+                        {this.state.searchActive && (
+                            <SearchPanel
+                                minimized={this.state.searchMinimized}
+                                onToggle={() =>
+                                    this.setState(state => ({
+                                        searchMinimized: !state.searchMinimized
+                                    }))
+                                }
+                            />
+                        )}
+                        <div className="nw-fm-tree-header conversations filled-input">
+                            <div
+                                className="search-heading"
+                                onClick={() =>
+                                    this.setState(state => ({
+                                        searchActive: true,
+                                        searchMinimized: !state.searchMinimized
+                                    }))
+                                }>
+                                {l[7997] /* `Chat` */}
+                                <div className="small-icon thin-search-icon" />
+                            </div>
+                            <Button group="conversationsListing" icon="chat-with-plus">
                                 <DropdownContactsSelector
                                     className="main-start-chat-dropdown"
                                     onSelectDone={this.startChatClicked.bind(this)}
                                     multiple={false}
                                     showTopButtons={self.getTopButtonsForContactsPicker()}
-                                    />
+                                />
                             </Button>
                         </div>
                     </div>
+
                     <div className="fm-tree-panel manual-tree-panel-scroll-management" style={leftPanelStyles}>
                         <PerfectScrollbar style={leftPanelStyles} className="conversation-reduce-height"
                                           chats={megaChat.chats}

@@ -417,7 +417,11 @@ export class TypingArea extends MegaRenderMixin {
         var self = this;
         this.$container = $(ReactDOM.findDOMNode(this));
 
-        $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this));
+        chatGlobalEventManager.addEventListener(
+            'resize',
+            'typingArea' + self.getUniqueId(),
+            self.handleWindowResize.bind(this)
+        );
 
         // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
         self._lastTextareaHeight = 20;
@@ -490,7 +494,7 @@ export class TypingArea extends MegaRenderMixin {
         var chatRoom = self.props.chatRoom;
         self.triggerOnUpdate();
         // window.removeEventListener('resize', self.handleWindowResize);
-        $(window).unbind('resize.typingArea' + self.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
     componentDidUpdate() {
         var self = this;

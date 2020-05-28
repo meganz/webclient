@@ -65,7 +65,6 @@ else {
 
 window.megaRenderMixinId = window.megaRenderMixinId ? window.megaRenderMixinId : 0;
 
-
 var FUNCTIONS = [
     'render',
     'shouldComponentUpdate',
@@ -154,10 +153,10 @@ export class MegaRenderMixin extends React.Component {
             super.componentWillUnmount();
         }
         this.__isMounted = false;
-        $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-        $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing2' + this.getUniqueId());
 
-        window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.removeEventListener('hashchange', 'hc' + this.getUniqueId());
 
         if (
             typeof this.__intersectionVisibility !== 'undefined' &&
@@ -242,13 +241,16 @@ export class MegaRenderMixin extends React.Component {
         this._wasRendered = true;
 
         if (this.props.requiresUpdateOnResize) {
-            $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+            chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing' + this.getUniqueId(),
+                this.onResizeDoUpdate.bind(this));
         }
         if (!this.props.skipQueuedUpdatesOnResize) {
-            $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+            chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing2' + this.getUniqueId(),
+                this.onResizeDoUpdate.bind(this));
         }
 
-        window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.addEventListener('hashchange', 'hc' + this.getUniqueId(),
+            this.queuedUpdateOnResize.bind(this));
 
         // init on data structure change events
         if (this.props) {
@@ -451,7 +453,7 @@ export class MegaRenderMixin extends React.Component {
         }
 
         if (!self.props.manualDataChangeTracking) {
-            var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+            var mapKeys = map._dataChangeIndex !== undefined && map.keys ? map.keys() : Object.keys(map);
 
             for (var i = 0; i < mapKeys.length; i++) {
                 var k = mapKeys[i];

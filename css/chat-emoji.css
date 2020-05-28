@@ -73,7 +73,11 @@
     margin-top: 6px;
 }
 
-img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big, .fm-picker-dialog img.emoji.big {
+img.emoji,
+.chat-topic-block img.emoji.big,
+.small-info-txt img.emoji.big,
+.result-table-row img.emoji.big,
+.fm-picker-dialog img.emoji.big {
     width: 20px;
     height: 20px;
     display:inline-block;
@@ -82,9 +86,12 @@ img.emoji, .chat-topic-block img.emoji.big, .small-info-txt img.emoji.big, .fm-p
     margin-left: 2px;
     margin-right: 2px;
 }
-
+.result-table-row img.emoji,
+.result-table-row img.emoji.big {
+    margin-top: 0px;
+}
 /* overrides the class above on chat topic name*/
-.chat-topic-block .chat-topic-text img.emoji, 
+.chat-topic-block .chat-topic-text img.emoji,
 .chat-topic-block .chat-topic-text img.emoji.big {
     width: 18px;
     height: 18px;

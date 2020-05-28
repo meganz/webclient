@@ -18855,10 +18855,13 @@ var conversations_ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
           return;
         }
 
-        if (megaChat.currentlyOpenedChat) {
+        var currentlyOpenedChat = megaChat.currentlyOpenedChat;
+        var currentRoom = megaChat.getCurrentRoom();
+
+        if (currentlyOpenedChat) {
           // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
           // is visible/active at the moment
-          if (megaChat.currentlyOpenedChat && megaChat.getCurrentRoom().isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91
+          if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91
           /* cmd+... */
           || e.keyCode === 17
           /* ctrl+... */

@@ -860,7 +860,14 @@ var strongvelope = {};
                             (parsedMessage.keys[keyIndex].length >= strongvelope._RSA_ENCRYPTION_THRESHOLD)) ?
                                 parsedMessage.ownKey : parsedMessage.keys[keyIndex];
 
-                        tryCatch(function() {
+
+                        // For legacy RSA messages, we need the recipient's keys and since the integrating code is not
+                        // parsing the actual strongvelope message's protocol, it can't know which keys are required,
+                        // so we'd to directly call ChatdIntegration from here.
+                        // Since RSA messages are kinda deprecated now, will leave this like this, but in the future
+                        // we may want to remove this whole legacy decryption code.
+                        // Note: For historical/debugging reasons, please use accounts and chats older then 2016.
+                        crypt.getAllPubKeys(otherHandle).then(function() {
                             var decryptedKeys = self._legacyDecryptKeysFor(
                                 encryptedKey,
                                 parsedMessage.nonce,
@@ -876,12 +883,13 @@ var strongvelope = {};
                             for (var i = 0; i < decryptedKeys.length; i++) {
                                 result.senderKeys[parsedMessage.keyIds[i]] = decryptedKeys[i];
                             }
-                        }, function(e) {
-                            console.error("_legacyDecryptKeysFor failed: ", e);
+
+                            proxyPromise.resolve(result);
+                        }).catch(function(ex) {
+                            console.error("_legacyDecryptKeysFor failed: ", ex);
                             proxyPromise.reject();
-                        })();
+                        });
                     }
-                    proxyPromise.resolve(result);
                 })
                 .fail(function(arg) {
                     if (arg !== 0xDEAD) {

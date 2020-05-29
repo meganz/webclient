@@ -1244,13 +1244,22 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         var allValid = true;
         userHandles.forEach(function(user_handle) {
             var contact = M.u[user_handle];
-            if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
-                // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-                // removed contact, etc
-                allValid = false;
-                $promise.reject();
-                return false;
+            if (!contact) {
+                M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                    'h': user_handle,
+                    'u': user_handle,
+                    'm': '',
+                    'c': 2
+                }));
             }
+            // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+            //     debugger;
+            //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+            //     // removed contact, etc
+            //     allValid = false;
+            //     $promise.reject();
+            //     return false;
+            // }
         });
         if (allValid === false) {
             $promise.reject();
@@ -1645,16 +1654,6 @@ Chat.prototype.processRemovedUser = function(u) {
             chatRoom.trackDataChange();
         }
     });
-
-
-    // Account was cancelled/deactivated
-    if (
-        megaChat.currentlyOpenedChat &&
-        M.u[megaChat.currentlyOpenedChat] &&
-        M.u[megaChat.currentlyOpenedChat].c === 2
-    ) {
-        loadSubPage('fm/chat');
-    }
 
     self.renderMyStatus();
 };

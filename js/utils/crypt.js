@@ -680,6 +680,32 @@ var crypt = (function() {
         return ns.getPubKey(userhandle, 'RSA', callback);
     };
 
+    /**
+     * Retrieve and cache all public keys for the given user/handle
+     * @param {String} userHandle 11-chars-long user-handle
+     * @returns {MegaPromise} fulfilled on completion
+     */
+    ns.getAllPubKeys = function(userHandle) {
+        return new MegaPromise(function(resolve, reject) {
+            var promises = [];
+            assertUserHandle(userHandle);
+
+            if (!pubCu25519[userHandle]) {
+                promises.push(crypt.getPubCu25519(userHandle));
+            }
+
+            if (!pubEd25519[userHandle]) {
+                promises.push(crypt.getPubEd25519(userHandle));
+            }
+
+            if (!u_pubkeys[userHandle]) {
+                promises.push(crypt.getPubRSA(userHandle));
+            }
+
+            MegaPromise.allDone(promises).then(resolve).catch(reject);
+        });
+    };
+
 
     /**
      * Computes a user's Ed25519 key finger print. This function uses the

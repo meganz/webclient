@@ -1215,7 +1215,7 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
         }));
       }
 
-      if (contact.c === 2) {
+      if (contact.c === 2 && contact.u === u_handle) {
         moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
           key: "view0",
           icon: "human-profile",
@@ -1291,7 +1291,7 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
             openCopyShareDialog(contact.u);
           }
         }));
-      } else if (!contact.c) {
+      } else if (!contact.c || contact.c === 2 && contact.u !== u_handle) {
         moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
           key: "view2",
           icon: "small-icon icons-sprite grey-plus",
@@ -18507,11 +18507,6 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
 
         if (!chatRoom || !chatRoom.roomId) {
           return;
-        } // Account has been deleted/deactivated
-
-
-        if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
-          return;
         }
 
         if (!chatRoom.isDisplayable()) {
@@ -20440,13 +20435,22 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     userHandles.forEach(function (user_handle) {
       var contact = M.u[user_handle];
 
-      if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
-        // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-        // removed contact, etc
-        allValid = false;
-        $promise.reject();
-        return false;
-      }
+      if (!contact) {
+        M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, true, {
+          'h': user_handle,
+          'u': user_handle,
+          'm': '',
+          'c': 2
+        }));
+      } // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+      //     debugger;
+      //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+      //     // removed contact, etc
+      //     allValid = false;
+      //     $promise.reject();
+      //     return false;
+      // }
+
     });
 
     if (allValid === false) {
@@ -20797,12 +20801,7 @@ Chat.prototype.processRemovedUser = function (u) {
     if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
       chatRoom.trackDataChange();
     }
-  }); // Account was cancelled/deactivated
-
-  if (megaChat.currentlyOpenedChat && M.u[megaChat.currentlyOpenedChat] && M.u[megaChat.currentlyOpenedChat].c === 2) {
-    loadSubPage('fm/chat');
-  }
-
+  });
   self.renderMyStatus();
 };
 /**
@@ -22585,15 +22584,6 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 /**
- * Check whether given chat is 1-1 w/ cancelled account.
- * @returns {Boolean}
- */
-
-
-ChatRoom.prototype.isCancelled = function () {
-  return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
-};
-/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
@@ -22602,7 +22592,7 @@ ChatRoom.prototype.isCancelled = function () {
 
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
-  return !self.isCancelled() && (self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive());
+  return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
 };
 /**
  * Save chat into info fmdb.

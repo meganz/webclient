@@ -238,7 +238,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'from': title
                             }
                         },
-                        !AppActivityHandler.getGlobalAppActivityHandler()
+                        !AppActivityHandler.getGlobalAppActivityHandler().isActive
                     );
 
                     n.on('onClick', function() {

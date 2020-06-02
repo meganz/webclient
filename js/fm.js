@@ -1304,10 +1304,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         $('#msgDialog .icon').addClass('fm-bin-clear-icon');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML(
-                '<div class="default-green-button button right notification-button confirm semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', extraButton || l[1018], l[82]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
@@ -1326,9 +1326,9 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
     else if (type === 'delete-contact') {
         $('#msgDialog').addClass('delete-contact');
         $('#msgDialog .fm-notifications-bottom')
-            .safeHTML('<div class="default-green-button right notification-button confirm button semi-big">' +
+            .safeHTML('<div class="button default-green-button semi-big right confirm">' +
                 '<span>@@</span></div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[78], l[79]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
@@ -1349,10 +1349,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         if (extraButton) {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML(
-                    '<div class="default-green-button right notification-button confirm  button semi-big">' +
+                    '<div class="button default-green-button semi-big right confirm">' +
                         '<span>@@</span>' +
                     '</div>' +
-                    '<div class="default-white-button right notification-button cancel semi-big">' +
+                    '<div class="button default-white-button semi-big right cancel">' +
                         '<span>@@</span>' +
                     '</div>' +
                     '<div class="clear"></div>', doneButton, extraButton
@@ -1375,7 +1375,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         else {
             $('#msgDialog .fm-notifications-bottom')
                 .safeHTML(
-                    '<div class="default-white-button right notification-button semi-big"><span>@@</span></div>' +
+                    '<div class="button default-white-button semi-big right"><span>@@</span></div>' +
                     '<div class="clear"></div>', l[81]
                 );
 
@@ -1409,10 +1409,10 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                         'id="confirmation-checkbox" class="checkboxOff">' +
                 '</div>' +
                 '<label for="export-checkbox" class="radio-txt">@@</label></div>' +
-                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big"><span>@@</span></div>' +
+                '<div class="button default-white-button semi-big right cancel"><span>@@</span></div>' +
                 '<div class="clear"></div>', l[229], doneButton || l[78], extraButton || l[79]);
 
         $('#msgDialog .default-green-button').rebind('click', function() {
@@ -1454,49 +1454,15 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             });
         }
     }
-    else if (type === 'loginrequired') {
-
-        $('#msgDialog').addClass('loginrequired-dialog');
-
-        $('#msgDialog .fm-notifications-bottom')
-            .addClass('hidden')
-            .html('');
-
-        $('#msgDialog .default-white-button').rebind('click', function() {
-            closeMsg();
-            if ($.warningCallback) {
-                $.warningCallback(true);
-            }
-        });
-        $('#msgDialog').addClass('notification-dialog');
-        title = l[5841];
-        msg = '<p>' + escapeHTML(l[5842]) + '</p>\n' +
-            '<a class="top-login-button clickurl" href="/login">' + escapeHTML(l[171]) + '</a>\n' +
-            '<a class="create-account-button clickurl" href="/register">' + escapeHTML(l[1076]) + '</a><br/>';
-
-        var $selectedPlan = $('.reg-st3-membership-bl.selected');
-        var plan = 1;
-        if ($selectedPlan.is(".pro4")) { plan = 4; }
-        else if ($selectedPlan.is(".pro1")) { plan = 1; }
-        else if ($selectedPlan.is(".pro2")) { plan = 2; }
-        else if ($selectedPlan.is(".pro3")) { plan = 3; }
-
-        $('.loginrequired-dialog .fm-notification-icon')
-            .removeClass('plan1')
-            .removeClass('plan2')
-            .removeClass('plan3')
-            .removeClass('plan4')
-            .addClass('plan' + plan);
-    }
     else if (type === 'import_login_or_register') {
         // Show import confirmation dialog if a user isn't logged in
         $('#msgDialog').addClass('warning-dialog-a wide with-close-btn');
         $('#msgDialog .fm-notifications-bottom')
             .safeHTML('<div class="bottom-bar-link">@@</div>' +
-                '<div class="default-green-button right notification-button confirm button semi-big">' +
+                '<div class="button default-green-button semi-big right confirm">' +
                     '<span>@@</span>' +
                 '</div>' +
-                '<div class="default-white-button right notification-button cancel semi-big">' +
+                '<div class="button default-white-button semi-big right cancel">' +
                     '<span>@@</span>' +
                 '</div>' +
                 '<div class="clear"></div></div>', l[20754], l[170], l[171]);

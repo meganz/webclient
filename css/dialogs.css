@@ -5160,7 +5160,7 @@ body.en .hidden-bar + .register-side-pane.container {
     width: 445px;
 }
 .loginrequired-dialog .fm-notification-body {
-    padding: 0 20px 10px 20px;
+    padding: 0 20px 16px 20px;
 }
 .loginrequired-dialog .fm-notification-icon {
     width: 70px;
@@ -5169,12 +5169,6 @@ body.en .hidden-bar + .register-side-pane.container {
     background-position: center -210px;
     background-repeat: no-repeat;
     margin: 4px 16px 0 0px;
-}
-.pro-login.default-white-button, .pro-register.default-white-button, .loginrequired-dialog .notification-button, .warning-dialog-a.login .notification-button {
-    display: none;
-}
-.loginrequired-dialog .pro-login, .loginrequired-dialog .pro-register, .warning-dialog-a.login .pro-login, .warning-dialog-a.login .pro-register {
-    display: block;
 }
 /* login dialog */
 .pro-login-dialog {

@@ -2327,7 +2327,7 @@ function topmenuUI() {
         }
         else if (!confirmok && page !== 'key') {
 
-            $('.top-menu-item.register', $topMenu).text(l[968]);
+            $('.top-menu-item.register span', $topMenu).text(l[968]);
 
             // If they have purchased Pro but not activated yet, show a warning
             if (isNonActivatedAccount()) {
@@ -2414,32 +2414,32 @@ function topmenuUI() {
         if (e) {
             c = $(e.target).attr('class');
         }
-        if (!e || ($(e.target).parents('.top-menu-popup').length == 0
+        if (!e || ($(e.target).parents('.top-menu-popup').length === 0
             && !$(e.target).hasClass('top-menu-popup')
             && !$('.top-menu-popup', 'body').hasClass('hidden')
             && ((c && c.indexOf('top-icon menu') == -1) || !c))) {
             topMenu(1);
         }
-        if (!e || ($(e.target).parents('.top-warning-popup').length == 0
+        if (!e || ($(e.target).parents('.top-warning-popup').length === 0
             && !$(e.target).hasClass('top-menu-popup')
             && ((c && c.indexOf('top-icon warning') == -1) || !c))) {
             $topHeader.find('.top-warning-popup').addClass('hidden');
             $headerWarningIcon.removeClass('active');
         }
-        if (!e || ($(e.target).parents('.top-user-status-popup').length == 0
-            && ((c && c.indexOf('activity-status') == -1 && c.indexOf('loading') == -1) || !c))) {
+        if (!e || ($(e.target).parents('.top-user-status-popup').length === 0
+            && ((c && c.indexOf('activity-status') === -1 && c.indexOf('loading') === -1) || !c))) {
             $topHeader.find('.top-user-status-popup').addClass('hidden');
             $headerActivityBlock.removeClass('active');
         }
         if (!e || ($(e.target).parents('.notification-popup').length == 0
-            && ((c && c.indexOf('top-icon notification') == -1) || !c))) {
+            && ((c && c.indexOf('top-icon notification') === -1) || !c))) {
 
             if (typeof notify === 'object') {
                 notify.closePopup();
             }
         }
-        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length == 0
-            && ((c && c.indexOf('top-login-button') == -1) || !c))) {
+        if (!e || ($(e.target).parents('.dropdown.top-login-popup').length === 0
+            && ((c && c.indexOf('top-login-popup') === -1 && c.indexOf('top-login-button') === -1) || !c))) {
             $topHeader.find('.dropdown.top-login-popup').addClass('hidden');
         }
         if ((!e || $(e.target).parents('.create-new-folder').length == 0)

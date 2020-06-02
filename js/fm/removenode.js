@@ -340,13 +340,6 @@ function fmremovesync(selectedNodes) {
                     });
             }
         });
-
-        // ToDo: is this necessary?
-        // $('.fm-dialog-button.notification-button').each(function(i, e) {
-        //     if ($(e).text() === l[1018]) {
-        //         $(e).safeHTML('<span>@@</span>', l[83]);
-        //     }
-        // });
     }
 
     // Remove contacts

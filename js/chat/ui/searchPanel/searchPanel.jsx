@@ -114,7 +114,9 @@ export default class SearchPanel extends MegaRenderMixin {
                 self.setState({results});
             })
             .catch(function(ex) {
-                console.error(ex);
+                if (d) {
+                    console.log("Search failed (or was resetted)", ex);
+                }
             })
             .always(function() {
                 self.setState({status: STATUS.COMPLETED});

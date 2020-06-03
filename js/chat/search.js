@@ -87,7 +87,12 @@ RoomSearch.prototype._matchMembers = function(members) {
             self.logger.error("Unknown user handle", userid);
             continue;
         }
-        self.parentSearch._match(M.getNameByHandle(userid), SearchResultType.kMember, userid, self);
+        self.parentSearch._match(
+            M.getNameByHandle(userid),
+            SearchResultType.kMember,
+            self.room.type === "private" ? userid : self.room.chatId,
+            self
+        );
     }
 };
 
@@ -106,9 +111,7 @@ RoomSearch.prototype.resume = function() {
         }
         // match room member names
         var members = room.members;
-        // only search for  "other member name matches" if this is a 1on1, otherwise duplicated results are shown in
-        // the ui
-        if (members && room.type === "private") {
+        if (members) {
             self._matchMembers(members);
         }
         // match messages that are already loaded
@@ -379,6 +382,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
     var resultId = 0;
 
     var contactHandleCache = {};
+    var stime = unixtime();
     var handler = {
         'onResult': tryCatch(function(room, resultMeta) {
             resultMeta.room = room;
@@ -410,6 +414,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
             else {
                 resolve(results);
             }
+            eventlog(99734, JSON.stringify([1, s.length, reason | 0, resultId, unixtime() - stime]));
         },
         'onDestroy': function(ex) {
             delete ChatSearch.doSearch.cs;
@@ -429,6 +434,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
         }
     };
 
+    eventlog(99733, JSON.stringify([1, s.length]));
     ChatSearch.doSearch.cs.resume();
 });
 
@@ -550,6 +556,7 @@ ChatSearch.prototype.dumpRoomSearchesStates = function() {
 
     for (var rs in this.roomSearches) {
         if (this.roomSearches.hasOwnProperty(rs)) {
+            rs = this.roomSearches[rs];
             console.error(constStateToText(SearchState, rs.state), rs);
         }
     }

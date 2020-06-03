@@ -31,6 +31,9 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
  */
 
 const highlight = (text, matches, dontEscape) => {
+    if (!text) {
+        return;
+    }
     text = dontEscape ? text : escapeHTML(text);
     if (matches) {
         let highlighted = text;
@@ -58,9 +61,12 @@ const openResult = (room, messageId, index) => {
     if (isString(room)) {
         loadSubPage('fm/chat/p/' + room);
     }
-    else if (room && room.chatId) {
+    else if (room && room.chatId && !messageId) {
         // contact matches
-        loadSubPage('fm/chat/p/' + room.chatId);
+        var chatRoom = megaChat.getChatById(room.chatId);
+        if (chatRoom) {
+            loadSubPage(chatRoom.getRoomUrl());
+        }
     }
     else {
         loadSubPage(room.getRoomUrl());
@@ -210,7 +216,7 @@ class MemberRow extends MegaRenderMixin {
             <div
                 className={SEARCH_ROW_CLASS}
                 onClick={() => openResult(room ? room : contact.h)}>
-                {isGroup ? <div className="group-chat" /> : <Avatar contact={contact}/>}
+                {isGroup ? <div className="chat-topic-icon" /> : <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
                     {userCard[hasHighlight ? 'graphic' : 'textual']}
                 </div>

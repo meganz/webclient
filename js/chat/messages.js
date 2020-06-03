@@ -2118,7 +2118,13 @@ MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references
     var msgOrder = messageOrdersSource[messageIdentity];
 
     for (var i = 0; i < references.length; i++) {
-        if (messageOrdersSource[references[i]] && messageOrdersSource[references[i]] > msgOrder) {
+        // skip "" references, known bug of native MEGAchat sdk
+        if (
+            references[i] &&
+            references[i] !== "\0\0\0\0\0\0\0\0" &&
+            messageOrdersSource[references[i]] &&
+            messageOrdersSource[references[i]] > msgOrder
+        ) {
             // There might be a potential message order tampering.It should raise an event to UI.
             return false;
         }

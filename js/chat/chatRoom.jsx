@@ -1205,8 +1205,14 @@ ChatRoom.prototype.scrollToChat = function() {
         var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
         if ($li && $li[0]) {
             var pos = $li[0].offsetTop;
-            if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
-                megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+            if (!verge.inViewport($li[0], -72 /* 2 x 36 px height buttons */)) {
+                var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
+                var wrapOuterHeight = $(treePane).outerHeight();
+                var itemOuterHeight = $('li:first', treePane).outerHeight();
+                megaChat.$chatTreePanePs.doProgramaticScroll(
+                    Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight),
+                    true
+                );
                 this._scrollToOnUpdate = false;
             }
         } else {

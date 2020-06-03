@@ -1093,7 +1093,7 @@ Chat.prototype.userPresenceToCssClass = function(presence) {
 /**
  * Used to re-render my own presence/status
  */
-Chat.prototype.renderMyStatus = SoonFc(function() {
+Chat.prototype._renderMyStatus = function() {
     var self = this;
     if (!self.is_initialized) {
         return;
@@ -1168,8 +1168,10 @@ Chat.prototype.renderMyStatus = SoonFc(function() {
             .removeClass("fadeinout");
     }
 
-}, 100);
+};
 
+
+Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
 
 /**
  * Reorders the contact tree by last activity (THIS is going to just move DOM nodes, it will NOT recreate them from

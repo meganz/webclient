@@ -3920,6 +3920,11 @@ MegaData.prototype.disableCircularTargets = function disableCircularTargets(pref
             console.error('M.disableCircularTargets: Invalid node', handle, pref);
         }
 
+        // Disable moving to rubbish from rubbish
+        if (M.getNodeRoot(handle) === M.RubbishID) {
+            $(pref + M.RubbishID).addClass('disabled');
+        }
+
         // Disable all children folders
         this.disableDescendantFolders(handle, pref);
     }

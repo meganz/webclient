@@ -870,6 +870,9 @@
             $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
             $('.fm-picker-dialog-button.conversations', $dialog).addClass('hidden');
         }
+        if (M.getNodeRoot($.selected[0]) === M.RubbishID) {
+            $('.fm-picker-dialog-button.rubbish-bin', $dialog).addClass('hidden');
+        }
 
         if ($.copyToShare || $.selectFolderDialog) {
             $('.fm-picker-dialog-button.shared-with-me', $dialog).addClass('hidden');

@@ -1429,6 +1429,9 @@ FileManager.prototype.initContextUI = function() {
             showExpiredBusiness();
             return;
         }
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
         closeDialog();
         fmremove();
     });

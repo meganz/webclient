@@ -2856,7 +2856,8 @@ else if (!browserUpdate) {
             'crm_js': {f:'js/connectionRetryManager.js', n: 'crm_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
-            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
+            'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1},
+            'search_js': {f:'js/chat/search.js', n: 'search_js', j:1}
         }
     };
 

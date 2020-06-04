@@ -200,6 +200,20 @@ accountUI.general = {
                 loadSubPage('pro');
             }
         });
+
+        $('.download-sync').rebind('click', function() {
+
+            var pf = navigator.platform.toUpperCase();
+
+            // If this is Linux let them goes to sync page to select linux type
+            if (pf.indexOf('LINUX') > -1) {
+                loadSubPage('sync');
+            }
+            // else directly give link of the file.
+            else {
+                window.location = megasync.getMegaSyncUrl();
+            }
+        });
     },
 
     /**
@@ -2855,6 +2869,8 @@ accountUI.transfers = {
 
         'use strict';
 
+        this.$page = $('.fm-account-sections.fm-account-transfers');
+
         // Upload and Download - Bandwidth
         this.uploadAndDownload.bandwidth.render(account);
 
@@ -3051,6 +3067,8 @@ accountUI.transfers = {
 
                 'use strict';
 
+                var $section = $('.transfer-tools', accountUI.transfers.$page);
+
                 accountUI.inputs.switch.init(
                     '#dlThroughMEGAsync',
                     $('#dlThroughMEGAsync').parent(),
@@ -3058,6 +3076,16 @@ accountUI.transfers = {
                     function(val) {
                         mega.config.setn('dlThroughMEGAsync', val);
                     });
+
+                megasync.isInstalled(function(err, is) {
+
+                    if (!err && is) {
+                        $('.green-notification', $section).addClass('hidden');
+                    }
+                    else {
+                        $('.green-notification', $section).removeClass('hidden');
+                    }
+                });
             }
         }
     },

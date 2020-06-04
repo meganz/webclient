@@ -99,7 +99,7 @@ module.exports = React;
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MegaRenderMixin", function() { return MegaRenderMixin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactAwareComponent", function() { return ContactAwareComponent; });
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
@@ -119,7 +119,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -273,9 +273,9 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
       }
 
       this.__isMounted = false;
-      $(window).off('resize.megaRenderMixing' + this.getUniqueId());
-      $(window).off('resize.megaRenderMixing2' + this.getUniqueId());
-      window.removeEventListener('hashchange', this.queuedUpdateOnResize.bind(this));
+      chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing' + this.getUniqueId());
+      chatGlobalEventManager.removeEventListener('resize', 'megaRenderMixing2' + this.getUniqueId());
+      chatGlobalEventManager.removeEventListener('hashchange', 'hc' + this.getUniqueId());
 
       if (typeof this.__intersectionVisibility !== 'undefined' && this.__intersectionObserverInstance && this.__intersectionObserverInstance.unobserve) {
         var node = this.findDOMNode();
@@ -372,14 +372,14 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
       this._wasRendered = true;
 
       if (this.props.requiresUpdateOnResize) {
-        $(window).rebind('resize.megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
+        chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
       }
 
       if (!this.props.skipQueuedUpdatesOnResize) {
-        $(window).rebind('resize.megaRenderMixing2' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this));
+        chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing2' + this.getUniqueId(), this.onResizeDoUpdate.bind(this));
       }
 
-      window.addEventListener('hashchange', this.queuedUpdateOnResize.bind(this)); // init on data structure change events
+      chatGlobalEventManager.addEventListener('hashchange', 'hc' + this.getUniqueId(), this.queuedUpdateOnResize.bind(this)); // init on data structure change events
 
       if (this.props) {
         this._recurseAddListenersIfNeeded("p", this.props);
@@ -595,7 +595,7 @@ var MegaRenderMixin = /*#__PURE__*/function (_React$Component) {
       }
 
       if (!self.props.manualDataChangeTracking) {
-        var mapKeys = map._dataChangeIndex !== undefined ? map.keys() : Object.keys(map);
+        var mapKeys = map._dataChangeIndex !== undefined && map.keys ? map.keys() : Object.keys(map);
 
         for (var i = 0; i < mapKeys.length; i++) {
           var k = mapKeys[i];
@@ -1026,6 +1026,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactButton", function() { return ContactButton; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactVerified", function() { return ContactVerified; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactPresence", function() { return ContactPresence; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LastActivity", function() { return LastActivity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MembersAmount", function() { return MembersAmount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactFingerprint", function() { return ContactFingerprint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Avatar", function() { return Avatar; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactCard", function() { return ContactCard; });
@@ -1036,7 +1038,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(4);
+/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(3);
 /* harmony import */ var _ui_perfectScrollbar_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(10);
 /* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(8);
 /* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(6);
@@ -1058,7 +1060,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -1078,7 +1080,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
-  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'presence', 'm', 'avatar']);
+  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
 };
 
 var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
@@ -1163,13 +1165,213 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
       return -1;
     }
   }, {
+    key: "dropdownItemGenerator",
+    value: function dropdownItemGenerator() {
+      var self = this;
+      var contact = self.props.contact;
+      var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
+      var moreDropdowns = [];
+      var username = M.getNameByHandle(contact.u);
+
+      var onContactClicked = function onContactClicked() {
+        if (contact.c === 2) {
+          loadSubPage('fm/account');
+        }
+
+        if (contact.c === 1) {
+          loadSubPage('fm/' + contact.u);
+        }
+      };
+
+      moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "dropdown-avatar rounded",
+        key: "mainContactInfo"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Avatar, {
+        className: "avatar-wrapper context-avatar",
+        chatRoom: this.props.chatRoom,
+        contact: contact,
+        hideVerifiedBadge: "true",
+        onClick: onContactClicked
+      }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "dropdown-user-name",
+        onClick: onContactClicked
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "name"
+      }, username, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactPresence, {
+        className: "small",
+        contact: contact
+      })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "email"
+      }, contact.m))));
+      moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactFingerprint, {
+        key: "fingerprint",
+        contact: contact
+      }));
+
+      if (dropdowns.length && contact.c !== 2) {
+        moreDropdowns.push(dropdowns);
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
+          key: "top-separator"
+        }));
+      }
+
+      if (contact.c === 2 && contact.u === u_handle) {
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+          key: "view0",
+          icon: "human-profile",
+          label: __(l[187]),
+          onClick: function onClick() {
+            loadSubPage('fm/account');
+          }
+        }));
+      }
+
+      if (contact.c === 1) {
+        var startAudioCall = function startAudioCall() {
+          megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
+            room.setActive();
+            room.startAudioCall();
+          });
+        };
+
+        if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
+          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+            key: "startCall",
+            className: "contains-submenu",
+            icon: "context handset",
+            label: __(l[19125]),
+            onClick: startAudioCall
+          }));
+          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            className: "dropdown body submenu",
+            key: "dropdownGroup"
+          }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+            key: "startAudio",
+            icon: "context handset",
+            label: __(l[1565]),
+            onClick: startAudioCall
+          })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+            key: "startVideo",
+            icon: "context videocam",
+            label: __(l[1566]),
+            onClick: function onClick() {
+              megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
+                room.setActive();
+                room.startVideoCall();
+              });
+            }
+          }))));
+        } else {
+          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+            key: "startChat",
+            icon: "context conversation",
+            label: __(l[5885]),
+            onClick: function onClick() {
+              loadSubPage('fm/chat/p/' + contact.u);
+            }
+          }));
+        }
+
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
+          key: "files-separator"
+        }));
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+          key: "send-files-item",
+          icon: "context arrow-in-circle",
+          label: __(l[6834]),
+          onClick: function onClick() {
+            megaChat.openChatAndSendFilesDialog(contact.u);
+          }
+        }));
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+          key: "share-item",
+          icon: "context share-folder",
+          label: __(l[6775]),
+          onClick: function onClick() {
+            openCopyShareDialog(contact.u);
+          }
+        }));
+      } else if (!contact.c || contact.c === 2 && contact.u !== u_handle) {
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+          key: "view2",
+          icon: "small-icon icons-sprite grey-plus",
+          label: __(l[101]),
+          onClick: function onClick() {
+            loadingDialog.show();
+            var isAnonymousUser = !u_handle || u_type !== 3;
+            var ADD_CONTACT = 'addContact';
+
+            if (anonymouschat && isAnonymousUser) {
+              megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+
+              if (localStorage.getItem(ADD_CONTACT) === null) {
+                localStorage.setItem(ADD_CONTACT, JSON.stringify({
+                  u: contact.u,
+                  unixTime: unixtime()
+                }));
+              }
+            } else {
+              M.syncContactEmail(contact.u).done(function (email) {
+                var exists = false;
+                var opcKeys = Object.keys(M.opc);
+
+                for (var i = 0; i < opcKeys.length; i++) {
+                  if (!exists && M.opc[opcKeys[i]].m === email) {
+                    exists = true;
+                    break;
+                  }
+                }
+
+                if (exists) {
+                  closeDialog();
+                  msgDialog('warningb', '', l[17545]);
+                } else {
+                  M.inviteContact(M.u[u_handle].m, email);
+                  var title = l[150];
+                  var msg = l[5898].replace('[X]', email);
+                  closeDialog();
+                  msgDialog('info', title, msg);
+                }
+              }).always(function () {
+                loadingDialog.hide();
+              });
+            }
+          }
+        }));
+      } // Don't show Set Nickname button if not logged in or clicking your own name
+
+
+      if (u_attr && contact.u !== u_handle) {
+        // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
+          key: "nicknames-separator"
+        }));
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
+          key: "set-nickname",
+          icon: "small-icon context writing-pen",
+          label: __(l[20828]),
+          onClick: function onClick() {
+            nicknames.setNicknameDialog.init(contact.u);
+          }
+        }));
+      }
+
+      if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
+        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
+          key: "remove-separator"
+        }));
+        moreDropdowns.push(self.props.dropdownRemoveButton);
+      }
+
+      return moreDropdowns;
+    }
+  }, {
     key: "render",
     value: function render() {
       var self = this;
       var label = self.props.label ? self.props.label : "";
       var classes = self.props.className ? self.props.className : "";
       var contact = self.props.contact;
-      var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
       var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
       var dropdownPosition = "left top";
       var vertOffset = 0;
@@ -1193,217 +1395,23 @@ var ContactButton = /*#__PURE__*/function (_ContactAwareComponen2) {
         });
       }
 
-      var username = M.getNameByHandle(contact.u);
       var buttonComponent = null;
 
       if (!self.props.noContextMenu) {
-        var moreDropdowns = [];
-
-        var onContactClicked = function onContactClicked() {
-          if (contact.c === 2) {
-            loadSubPage('fm/account');
-          }
-
-          if (contact.c === 1) {
-            loadSubPage('fm/' + contact.u);
-          }
-        };
-
-        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "dropdown-avatar rounded",
-          key: "mainContactInfo"
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Avatar, {
-          className: "avatar-wrapper context-avatar",
-          chatRoom: this.props.chatRoom,
-          contact: contact,
-          hideVerifiedBadge: "true",
-          onClick: onContactClicked
-        }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "dropdown-user-name",
-          onClick: onContactClicked
-        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "name"
-        }, username, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactPresence, {
-          className: "small",
-          contact: contact
-        })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
-          className: "email"
-        }, contact.m))));
-        moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ContactFingerprint, {
-          key: "fingerprint",
-          contact: contact
+        buttonComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__["Button"], {
+          className: classes,
+          icon: icon,
+          disabled: self.props.dropdownDisabled,
+          label: label
+        }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["Dropdown"], {
+          className: "contact-card-dropdown",
+          positionMy: dropdownPosition,
+          positionAt: dropdownPosition,
+          vertOffset: vertOffset,
+          horizOffset: horizOffset,
+          dropdownItemGenerator: self.dropdownItemGenerator.bind(this),
+          noArrow: true
         }));
-
-        if (dropdowns.length && contact.c !== 2) {
-          moreDropdowns.push(dropdowns);
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
-            key: "top-separator"
-          }));
-        }
-
-        if (contact.c === 2) {
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-            key: "view0",
-            icon: "human-profile",
-            label: __(l[187]),
-            onClick: function onClick() {
-              loadSubPage('fm/account');
-            }
-          }));
-        }
-
-        if (contact.c === 1) {
-          var startAudioCall = function startAudioCall() {
-            megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
-              room.setActive();
-              room.startAudioCall();
-            });
-          };
-
-          if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-            moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-              key: "startCall",
-              className: "contains-submenu",
-              icon: "context handset",
-              label: __(l[19125]),
-              onClick: startAudioCall
-            }));
-            moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-              className: "dropdown body submenu",
-              key: "dropdownGroup"
-            }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-              key: "startAudio",
-              icon: "context handset",
-              label: __(l[1565]),
-              onClick: startAudioCall
-            })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-              key: "startVideo",
-              icon: "context videocam",
-              label: __(l[1566]),
-              onClick: function onClick() {
-                megaChat.createAndShowPrivateRoomFor(contact.u).then(function (room) {
-                  room.setActive();
-                  room.startVideoCall();
-                });
-              }
-            }))));
-          } else {
-            moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-              key: "startChat",
-              icon: "context conversation",
-              label: __(l[5885]),
-              onClick: function onClick() {
-                loadSubPage('fm/chat/p/' + contact.u);
-              }
-            }));
-          }
-
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
-            key: "files-separator"
-          }));
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-            key: "send-files-item",
-            icon: "context arrow-in-circle",
-            label: __(l[6834]),
-            onClick: function onClick() {
-              megaChat.openChatAndSendFilesDialog(contact.u);
-            }
-          }));
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-            key: "share-item",
-            icon: "context share-folder",
-            label: __(l[6775]),
-            onClick: function onClick() {
-              openCopyShareDialog(contact.u);
-            }
-          }));
-        } else if (!contact.c) {
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-            key: "view2",
-            icon: "small-icon icons-sprite grey-plus",
-            label: __(l[101]),
-            onClick: function onClick() {
-              loadingDialog.show();
-              var isAnonymousUser = !u_handle || u_type !== 3;
-              var ADD_CONTACT = 'addContact';
-
-              if (anonymouschat && isAnonymousUser) {
-                megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-
-                if (localStorage.getItem(ADD_CONTACT) === null) {
-                  localStorage.setItem(ADD_CONTACT, JSON.stringify({
-                    u: contact.u,
-                    unixTime: unixtime()
-                  }));
-                }
-              } else {
-                M.syncContactEmail(contact.u).done(function (email) {
-                  var exists = false;
-                  var opcKeys = Object.keys(M.opc);
-
-                  for (var i = 0; i < opcKeys.length; i++) {
-                    if (!exists && M.opc[opcKeys[i]].m === email) {
-                      exists = true;
-                      break;
-                    }
-                  }
-
-                  if (exists) {
-                    closeDialog();
-                    msgDialog('warningb', '', l[17545]);
-                  } else {
-                    M.inviteContact(M.u[u_handle].m, email);
-                    var title = l[150];
-                    var msg = l[5898].replace('[X]', email);
-                    closeDialog();
-                    msgDialog('info', title, msg);
-                  }
-                }).always(function () {
-                  loadingDialog.hide();
-                });
-              }
-            }
-          }));
-        } // Don't show Set Nickname button if not logged in or clicking your own name
-
-
-        if (u_attr && contact.u !== u_handle) {
-          // Add a Set Nickname button for contacts and non-contacts (who are visible in a group chat)
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
-            key: "nicknames-separator"
-          }));
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["DropdownItem"], {
-            key: "set-nickname",
-            icon: "small-icon context writing-pen",
-            label: __(l[20828]),
-            onClick: function onClick() {
-              nicknames.setNicknameDialog.init(contact.u);
-            }
-          }));
-        }
-
-        if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
-          moreDropdowns.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
-            key: "remove-separator"
-          }));
-          moreDropdowns.push(self.props.dropdownRemoveButton);
-        }
-
-        if (moreDropdowns.length > 0) {
-          buttonComponent = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_5__["Button"], {
-            className: classes,
-            icon: icon,
-            disabled: moreDropdowns.length === 0 || self.props.dropdownDisabled,
-            label: label
-          }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_6__["Dropdown"], {
-            className: "contact-card-dropdown",
-            positionMy: dropdownPosition,
-            positionAt: dropdownPosition,
-            vertOffset: vertOffset,
-            horizOffset: horizOffset,
-            noArrow: true
-          }, moreDropdowns));
-        }
       }
 
       return buttonComponent;
@@ -1514,15 +1522,70 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
+var LastActivity = /*#__PURE__*/function (_ContactAwareComponen3) {
+  _inherits(LastActivity, _ContactAwareComponen3);
+
+  var _super5 = _createSuper(LastActivity);
+
+  function LastActivity(props) {
+    _classCallCheck(this, LastActivity);
+
+    return _super5.call(this, props);
+  }
+
+  _createClass(LastActivity, [{
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          contact = _this$props.contact,
+          showLastGreen = _this$props.showLastGreen;
+
+      if (!contact) {
+        return null;
+      }
+
+      var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+      var SECONDS = new Date().getTime() / 1000 - lastActivity;
+      var FORTY_FIVE_DAYS = 3888000; // seconds
+
+      var timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
+      var hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, hasActivityStatus ? (l[19994] || "Last seen %s").replace("%s", timeToLast) : M.onlineStatusClass(contact.presence)[0]);
+    }
+  }]);
+
+  return LastActivity;
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
+var MembersAmount = /*#__PURE__*/function (_ContactAwareComponen4) {
+  _inherits(MembersAmount, _ContactAwareComponen4);
+
+  var _super6 = _createSuper(MembersAmount);
+
+  function MembersAmount(props) {
+    _classCallCheck(this, MembersAmount);
+
+    return _super6.call(this, props);
+  }
+
+  _createClass(MembersAmount, [{
+    key: "render",
+    value: function render() {
+      var room = this.props.room;
+      return room ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, (l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)) : null;
+    }
+  }]);
+
+  return MembersAmount;
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
 var ContactFingerprint = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ContactFingerprint, _MegaRenderMixin3);
 
-  var _super5 = _createSuper(ContactFingerprint);
+  var _super7 = _createSuper(ContactFingerprint);
 
   function ContactFingerprint() {
     _classCallCheck(this, ContactFingerprint);
 
-    return _super5.apply(this, arguments);
+    return _super7.apply(this, arguments);
   }
 
   _createClass(ContactFingerprint, [{
@@ -1591,10 +1654,10 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var Avatar = /*#__PURE__*/function (_ContactAwareComponen3) {
-  _inherits(Avatar, _ContactAwareComponen3);
+var Avatar = /*#__PURE__*/function (_ContactAwareComponen5) {
+  _inherits(Avatar, _ContactAwareComponen5);
 
-  var _super6 = _createSuper(Avatar);
+  var _super8 = _createSuper(Avatar);
 
   function Avatar() {
     var _this3;
@@ -1605,7 +1668,7 @@ var Avatar = /*#__PURE__*/function (_ContactAwareComponen3) {
       args[_key3] = arguments[_key3];
     }
 
-    _this3 = _super6.call.apply(_super6, [this].concat(args));
+    _this3 = _super8.call.apply(_super8, [this].concat(args));
     _this3.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this3;
   }
@@ -1702,10 +1765,10 @@ Avatar.defaultProps = {
 Avatar.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
-  _inherits(ContactCard, _ContactAwareComponen4);
+var ContactCard = /*#__PURE__*/function (_ContactAwareComponen6) {
+  _inherits(ContactCard, _ContactAwareComponen6);
 
-  var _super7 = _createSuper(ContactCard);
+  var _super9 = _createSuper(ContactCard);
 
   function ContactCard() {
     var _this4;
@@ -1716,7 +1779,7 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
       args[_key4] = arguments[_key4];
     }
 
-    _this4 = _super7.call.apply(_super7, [this].concat(args));
+    _this4 = _super9.call.apply(_super9, [this].concat(args));
     _this4.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this4;
   }
@@ -1813,19 +1876,6 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
       var className = this.props.className || "";
 
       if (className.indexOf("short") >= 0) {
-        var presenceRow;
-        var lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-
-        if (this.props.showLastGreen && contact.presence <= 2 && lastActivity) {
-          var SECONDS = new Date().getTime() / 1000 - lastActivity;
-          var FORTY_FIVE_DAYS = 3888000; // seconds
-
-          var timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
-          presenceRow = (l[19994] || "Last seen %s").replace("%s", timeToLast);
-        } else {
-          presenceRow = M.onlineStatusClass(contact.presence)[0];
-        }
-
         userCard = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "user-card-data"
         }, usernameBlock, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -1835,7 +1885,10 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen4) {
           className: this.props.presenceClassName
         }), this.props.isInCall ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
           className: "small-icon audio-call"
-        }) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, presenceRow)));
+        }) : null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(LastActivity, {
+          contact: contact,
+          showLastGreen: this.props.showLastGreen
+        })));
       } else {
         userCard = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "user-card-data"
@@ -1904,10 +1957,10 @@ ContactCard.defaultProps = {
 ContactCard.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactItem = /*#__PURE__*/function (_ContactAwareComponen5) {
-  _inherits(ContactItem, _ContactAwareComponen5);
+var ContactItem = /*#__PURE__*/function (_ContactAwareComponen7) {
+  _inherits(ContactItem, _ContactAwareComponen7);
 
-  var _super8 = _createSuper(ContactItem);
+  var _super10 = _createSuper(ContactItem);
 
   function ContactItem() {
     var _this5;
@@ -1918,7 +1971,7 @@ var ContactItem = /*#__PURE__*/function (_ContactAwareComponen5) {
       args[_key5] = arguments[_key5];
     }
 
-    _this5 = _super8.call.apply(_super8, [this].concat(args));
+    _this5 = _super10.call.apply(_super10, [this].concat(args));
     _this5.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this5;
   }
@@ -1975,14 +2028,14 @@ ContactItem.propTypes = {
 var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
-  var _super9 = _createSuper(ContactPickerWidget);
+  var _super11 = _createSuper(ContactPickerWidget);
 
   function ContactPickerWidget(props) {
     var _this6;
 
     _classCallCheck(this, ContactPickerWidget);
 
-    _this6 = _super9.call(this, props);
+    _this6 = _super11.call(this, props);
     _this6.state = {
       'searchValue': '',
       'selected': _this6.props.selected || false
@@ -2049,7 +2102,7 @@ var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
       self._frequents = megaChat.getFrequentContacts();
 
       self._frequents.always(function (r) {
-        self._foundFrequents = r.reverse().splice(0, 30);
+        self._foundFrequents = clone(r).reverse().splice(0, 30);
         self.safeForceUpdate();
       });
     }
@@ -2528,16 +2581,11 @@ ContactPickerWidget.defaultProps = {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-module.exports = ReactDOM;
-
-/***/ }),
-/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EmojiFormattedContent", function() { return EmojiFormattedContent; });
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -2555,7 +2603,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -2567,7 +2615,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 /**
@@ -2665,7 +2713,7 @@ var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
       $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
         self.onResize(forced, scrollPositionYPerc, scrollToElement);
       });
-      $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+      chatGlobalEventManager.addEventListener('resize', 'jsp' + self.getUniqueId(), self.onResize.bind(self));
       self.onResize();
     }
   }, {
@@ -2675,7 +2723,7 @@ var JScrollPane = /*#__PURE__*/function (_MegaRenderMixin) {
 
       var $elem = $(ReactDOM.findDOMNode(this));
       $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
-      $(window).off('resize.jsp' + this.getUniqueId());
+      chatGlobalEventManager.removeEventListener('resize', 'jsp' + this.getUniqueId());
     }
   }, {
     key: "eventuallyReinitialise",
@@ -2856,7 +2904,6 @@ var RenderTo = /*#__PURE__*/function (_React$Component) {
 }(React.Component);
 
 ;
-
 var EmojiFormattedContent = /*#__PURE__*/function (_React$Component2) {
   _inherits(EmojiFormattedContent, _React$Component2);
 
@@ -2915,7 +2962,6 @@ var EmojiFormattedContent = /*#__PURE__*/function (_React$Component2) {
 
   return EmojiFormattedContent;
 }(React.Component);
-
 ;
 
 function SoonFcWrap(milliseconds) {
@@ -2949,6 +2995,12 @@ function SoonFcWrap(milliseconds) {
 });
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = ReactDOM;
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -2975,7 +3027,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Dropdown", function() { return Dropdown; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownContactsSelector", function() { return DropdownContactsSelector; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DropdownItem", function() { return DropdownItem; });
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _chat_ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(2);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -2994,7 +3046,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3152,7 +3204,7 @@ var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
     value: function componentDidMount() {
       _get(_getPrototypeOf(Dropdown.prototype), "componentDidMount", this).call(this);
 
-      $(window).rebind('resize.drpdwn' + this.getUniqueId(), this.onResized);
+      chatGlobalEventManager.addEventListener('resize', 'drpdwn' + this.getUniqueId(), this.onResized.bind(this));
       this.onResized();
       var self = this;
       $(document.body).rebind('closeAllDropdownsExcept.drpdwn' + this.getUniqueId(), function (e, target) {
@@ -3181,7 +3233,7 @@ var Dropdown = /*#__PURE__*/function (_MegaRenderMixin) {
         this.onActiveChange(false);
       }
 
-      $(window).unbind('resize.drpdwn' + this.getUniqueId());
+      chatGlobalEventManager.removeEventListener('resize', 'drpdwn' + this.getUniqueId());
     }
   }, {
     key: "doRerender",
@@ -3490,10 +3542,10 @@ DropdownItem.defaultProps = {
 
 "use strict";
 /* unused harmony export ExtraFooterElement */
-/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var _tooltips_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(11);
-/* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(14);
+/* harmony import */ var _forms_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(13);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
@@ -3510,7 +3562,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -3522,7 +3574,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -3613,7 +3665,6 @@ var ModalDialog = /*#__PURE__*/function (_MegaRenderMixin2) {
       $(document).off('keyup.modalDialog' + this.getUniqueId());
       $(document.body).removeClass('overlayed');
       $('.fm-dialog-overlay').addClass('hidden');
-      $(window).off('resize.modalDialog' + this.getUniqueId());
     }
   }, {
     key: "onCloseClicked",
@@ -3992,7 +4043,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4004,9 +4055,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 var _buttonGroups = {};
@@ -4254,7 +4305,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4438,7 +4489,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4450,7 +4501,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 var x = 0;
@@ -4875,7 +4926,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -4887,9 +4938,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -4984,12 +5035,12 @@ var Tooltip = /*#__PURE__*/function (_MegaRenderMixin3) {
       var self = this;
 
       if (oldState.active === true && this.state.active === false) {
-        $(window).off('resize.tooltip' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'tooltip' + this.getUniqueId());
       }
 
       if (self.state.active === true) {
         self.repositionTooltip();
-        $(window).rebind('resize.tooltip' + this.getUniqueId(), function () {
+        chatGlobalEventManager.addEventListener('resize', 'tooltip' + this.getUniqueId(), function () {
           self.repositionTooltip();
         });
       }
@@ -5205,1519 +5256,6 @@ mega.ui.chat.getMessageString = getMessageString;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
-/* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
-/* harmony import */ var _ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(8);
-/* harmony import */ var _ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
-/* harmony import */ var _ui_contacts_jsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(2);
-/* harmony import */ var _ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(16);
-/* harmony import */ var _ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(7);
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
-
-function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-// libs
-
-
-var React = __webpack_require__(0);
-
-var ReactDOM = __webpack_require__(3);
-
-
-
-var getMessageString = __webpack_require__(12).getMessageString;
-
-var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
-
-
-
-
-
-
-
-
-var StartGroupChatWizard = __webpack_require__(23).StartGroupChatWizard;
-
-var renderMessageSummary = function renderMessageSummary(lastMessage) {
-  var renderableSummary;
-
-  if (lastMessage.renderableSummary) {
-    renderableSummary = lastMessage.renderableSummary;
-  } else {
-    if (lastMessage.isManagement && lastMessage.isManagement()) {
-      renderableSummary = lastMessage.getManagementMessageSummaryText();
-    } else if (!lastMessage.textContents && lastMessage.dialogType) {
-      renderableSummary = Message._getTextContentsForDialogType(lastMessage);
-    } else {
-      renderableSummary = lastMessage.textContents;
-    }
-
-    renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
-    var escapeUnescapeArgs = [{
-      'type': 'onPreBeforeRenderMessage',
-      'textOnly': true
-    }, {
-      'message': {
-        'textContents': renderableSummary
-      }
-    }, ['textContents', 'messageHtml'], 'messageHtml'];
-    megaChat.plugins.btRtfFilter.escapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
-    renderableSummary = escapeUnescapeArgs[1].message.textContents;
-    renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-    renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
-    escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
-    escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
-    renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(escapeUnescapeArgs[0], escapeUnescapeArgs[1], escapeUnescapeArgs[2], escapeUnescapeArgs[3]);
-    renderableSummary = renderableSummary || "";
-    renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
-    renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
-  }
-
-  var author;
-
-  if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
-    author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
-  } else if (lastMessage.dialogType === "alterParticipants") {
-    author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] || Message.getContactForMessage(lastMessage);
-  } else {
-    author = Message.getContactForMessage(lastMessage);
-  }
-
-  if (author) {
-    if (!lastMessage._contactChangeListener && author.addChangeListener) {
-      lastMessage._contactChangeListener = author.addChangeListener(function () {
-        delete lastMessage.renderableSummary;
-        lastMessage.trackDataChange();
-      });
-    }
-
-    if (lastMessage.chatRoom.type === "private") {
-      if (author && author.u === u_handle) {
-        renderableSummary = l[19285] + " " + renderableSummary;
-      }
-    } else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
-      if (author) {
-        if (author.u === u_handle) {
-          renderableSummary = l[19285] + " " + renderableSummary;
-        } else {
-          var name = M.getNameByHandle(author.u);
-          name = ellipsis(name, undefined, 11);
-
-          if (name) {
-            renderableSummary = escapeHTML(name) + ": " + renderableSummary;
-          }
-        }
-      }
-    }
-  }
-
-  return renderableSummary;
-};
-
-var getRoomName = function getRoomName(chatRoom) {
-  return chatRoom.getRoomTitle();
-};
-
-var ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
-  _inherits(ConversationsListItem, _MegaRenderMixin);
-
-  var _super = _createSuper(ConversationsListItem);
-
-  function ConversationsListItem() {
-    _classCallCheck(this, ConversationsListItem);
-
-    return _super.apply(this, arguments);
-  }
-
-  _createClass(ConversationsListItem, [{
-    key: "specShouldComponentUpdate",
-    value: function specShouldComponentUpdate() {
-      if (this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown) {
-        return false;
-      } else {
-        return undefined;
-      }
-    }
-  }, {
-    key: "componentWillMount",
-    value: function componentWillMount() {
-      var self = this;
-
-      self.chatRoomChangeListener = function () {
-        self.debouncedForceUpdate(750);
-      };
-
-      self.props.chatRoom.rebind('onUnreadCountUpdate.convlistitem', function () {
-        delete self.lastMessageId;
-        self.safeForceUpdate();
-      });
-      self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      _get(_getPrototypeOf(ConversationsListItem.prototype), "componentWillUnmount", this).call(this);
-
-      var self = this;
-      self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
-      self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
-    }
-  }, {
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      _get(_getPrototypeOf(ConversationsListItem.prototype), "componentDidMount", this).call(this);
-
-      this.eventuallyScrollTo();
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      _get(_getPrototypeOf(ConversationsListItem.prototype), "componentDidUpdate", this).call(this);
-
-      this.eventuallyScrollTo();
-    }
-  }, {
-    key: "eventuallyScrollTo",
-    value: function eventuallyScrollTo() {
-      if (this.props.chatRoom._scrollToOnUpdate && megaChat.currentlyOpenedChat === this.props.chatRoom.roomId) {
-        this.props.chatRoom.scrollToChat();
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var classString = "";
-      var megaChat = this.props.chatRoom.megaChat;
-      var chatRoom = this.props.chatRoom;
-
-      if (!chatRoom || !chatRoom.chatId) {
-        return null;
-      }
-
-      var roomId = chatRoom.chatId; // selected
-
-      if (chatRoom.isCurrentlyActive) {
-        classString += " active";
-      }
-
-      var nameClassString = "user-card-name conversation-name";
-      var archivedDiv = "";
-
-      if (chatRoom.isArchived()) {
-        archivedDiv = /*#__PURE__*/React.makeElement("div", {
-          className: "archived-badge"
-        }, __(l[19067]));
-      }
-
-      var contactId;
-      var presenceClass;
-      var id;
-
-      if (chatRoom.type === "private") {
-        var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
-
-        if (!contact) {
-          return null;
-        }
-
-        id = 'conversation_' + htmlentities(contact.u);
-        presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
-      } else if (chatRoom.type === "group") {
-        contactId = roomId;
-        id = 'conversation_' + contactId;
-        presenceClass = 'group';
-        classString += ' groupchat';
-      } else if (chatRoom.type === "public") {
-        contactId = roomId;
-        id = 'conversation_' + contactId;
-        presenceClass = 'group';
-        classString += ' groupchat public';
-      } else {
-        return "unknown room type: " + chatRoom.roomId;
-      }
-
-      if (ChatdIntegration._loadingChats[chatRoom.roomId] && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise.state() === 'pending' || chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.joined === false || chatRoom.messagesBuff.joined === true && chatRoom.messagesBuff.haveMessages === true && chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.isDecrypting && chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
-        this.loadingShown = true;
-      } else {
-        delete this.loadingShown;
-      }
-
-      var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-      var isUnread = false;
-      var notificationItems = [];
-
-      if (chatRoom.havePendingCall() && chatRoom.state != ChatRoom.STATE.LEFT) {
-        notificationItems.push( /*#__PURE__*/React.makeElement("i", {
-          className: "tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset",
-          key: "callIcon"
-        }));
-      }
-
-      if (unreadCount > 0) {
-        notificationItems.push( /*#__PURE__*/React.makeElement("span", {
-          key: "unreadCounter"
-        }, unreadCount > 9 ? "9+" : unreadCount));
-        isUnread = true;
-      }
-
-      var inCallDiv = null;
-      var lastMessageDiv = null;
-      var lastMessageDatetimeDiv = null;
-      var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
-      var lastMsgDivClasses;
-
-      if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
-        lastMsgDivClasses = this._lastMsgDivClassesCache;
-        lastMessageDiv = this._lastMessageDivCache;
-        lastMessageDatetimeDiv = this._lastMessageDatetimeDivCache;
-        lastMsgDivClasses += isUnread ? " unread" : "";
-
-        if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-          lastMsgDivClasses += " call";
-          classString += " call-exists";
-        }
-      } else if (lastMessage) {
-        lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : ""); // safe some CPU cycles...
-
-        var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
-        lastMessage.renderableSummary = renderableSummary;
-
-        if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-          lastMsgDivClasses += " call";
-          classString += " call-exists";
-        }
-
-        lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
-          className: lastMsgDivClasses,
-          dangerouslySetInnerHTML: {
-            __html: renderableSummary
-          }
-        });
-        var voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
-
-        if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
-          var playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
-          lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
-            className: lastMsgDivClasses
-          }, /*#__PURE__*/React.makeElement("span", {
-            className: "voice-message-icon"
-          }), playTime);
-        }
-
-        if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
-          lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
-            className: lastMsgDivClasses
-          }, /*#__PURE__*/React.makeElement("span", {
-            className: "geolocation-icon"
-          }), l[20789]);
-        }
-
-        var timestamp = lastMessage.delay;
-        var curTimeMarker;
-        var msgDate = new Date(timestamp * 1000);
-        var iso = msgDate.toISOString();
-
-        if (todayOrYesterday(iso)) {
-          // if in last 2 days, use the time2lastSeparator
-          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
-        } else {
-          // if not in the last 2 days, use 1st June [Year]
-          curTimeMarker = acc_time2date(timestamp, false);
-        }
-
-        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
-          className: "date-time"
-        }, curTimeMarker);
-      } else {
-        lastMsgDivClasses = "conversation-message";
-        /**
-         * Show "Loading" until:
-         * 1. I'd fetched chats from the API.
-         * 2. I'm retrieving history at the moment.
-         * 3. I'd connected to chatd and joined the room.
-          */
-
-        var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
-
-        if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
-          if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
-            ChatdIntegration.mcfHasFinishedPromise.always(function () {
-              megaChat.chats.trackDataChange();
-            });
-            ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
-          }
-        }
-
-        lastMessageDiv = /*#__PURE__*/React.makeElement("div", null, /*#__PURE__*/React.createElement("div", {
-          className: lastMsgDivClasses
-        }, __(emptyMessage)));
-        timestamp = chatRoom.ctime;
-        var msgDate = new Date(timestamp * 1000);
-        var iso = msgDate.toISOString();
-
-        if (todayOrYesterday(iso)) {
-          // if in last 2 days, use the time2lastSeparator
-          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
-        } else {
-          // if not in the last 2 days, use 1st June [Year]
-          curTimeMarker = acc_time2date(timestamp, false);
-        }
-
-        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
-          className: "date-time"
-        }, l[19077].replace("%s1", curTimeMarker));
-      }
-
-      this.lastMessageId = lastMessage && lastMessage.messageId;
-      this._lastMsgDivClassesCache = lastMsgDivClasses.replace(" call-exists", "").replace(" unread", "");
-      this._lastMessageDivCache = lastMessageDiv;
-      this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
-
-      if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
-        var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
-        var mutedMicrophone = null;
-        var activeCamera = null;
-        var onHold = null;
-
-        if (chatRoom.callManagerCall.rtcCall.isOnHold()) {
-          onHold = /*#__PURE__*/React.makeElement("i", {
-            className: "small-icon grey-call-on-hold"
-          });
-        } else {
-          if (!mediaOptions.audio) {
-            mutedMicrophone = /*#__PURE__*/React.makeElement("i", {
-              className: "small-icon grey-crossed-mic"
-            });
-          }
-
-          if (mediaOptions.video) {
-            activeCamera = /*#__PURE__*/React.makeElement("i", {
-              className: "small-icon grey-videocam"
-            });
-          }
-        }
-
-        inCallDiv = /*#__PURE__*/React.makeElement("div", {
-          className: "call-duration"
-        }, mutedMicrophone, activeCamera, onHold, /*#__PURE__*/React.makeElement("span", {
-          className: "call-counter",
-          "data-room-id": chatRoom.chatId
-        }, secondsToTimeShort(chatRoom._currentCallCounter)));
-        classString += " call-active"; // hide archived div when it is in a call.
-
-        archivedDiv = "";
-      }
-
-      if (chatRoom.type !== "public") {
-        nameClassString += " privateChat";
-      }
-
-      if (chatRoom.callManagerCall && (chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
-        classString += " have-incoming-ringing-call";
-      }
-
-      var self = this;
-      return /*#__PURE__*/React.makeElement("li", {
-        className: classString,
-        id: id,
-        "data-room-id": roomId,
-        "data-jid": contactId,
-        onClick: function onClick(e) {
-          self.props.onConversationClicked(e);
-        }
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: nameClassString
-      }, /*#__PURE__*/React.makeElement(_ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "private" ? /*#__PURE__*/React.createElement("span", {
-        className: "user-card-presence " + presenceClass
-      }) : undefined), chatRoom.type === "group" || chatRoom.type === "private" ? /*#__PURE__*/React.makeElement("i", {
-        className: "tiny-icon blue-key simpletip",
-        "data-simpletip": l[20935]
-      }) : undefined, archivedDiv, notificationItems.length > 0 ? /*#__PURE__*/React.makeElement("div", {
-        className: "unread-messages items-" + notificationItems.length
-      }, notificationItems) : null, inCallDiv, lastMessageDiv, lastMessageDatetimeDiv);
-    }
-  }]);
-
-  return ConversationsListItem;
-}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
-;
-
-var ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
-  _inherits(ArchConversationsListItem, _MegaRenderMixin2);
-
-  var _super2 = _createSuper(ArchConversationsListItem);
-
-  function ArchConversationsListItem() {
-    _classCallCheck(this, ArchConversationsListItem);
-
-    return _super2.apply(this, arguments);
-  }
-
-  _createClass(ArchConversationsListItem, [{
-    key: "render",
-    value: function render() {
-      var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
-      var megaChat = this.props.chatRoom.megaChat;
-      var chatRoom = this.props.chatRoom;
-
-      if (!chatRoom || !chatRoom.chatId) {
-        return null;
-      }
-
-      var roomId = chatRoom.chatId; // selected
-
-      if (chatRoom.archivedSelected === true) {
-        classString += " ui-selected";
-      }
-
-      var nameClassString = "user-card-name conversation-name";
-      var contactId;
-      var presenceClass;
-      var id;
-
-      if (chatRoom.type === "private") {
-        var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
-
-        if (!contact) {
-          return null;
-        }
-
-        id = 'conversation_' + htmlentities(contact.u);
-        presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
-      } else if (chatRoom.type === "group") {
-        contactId = roomId;
-        id = 'conversation_' + contactId;
-        presenceClass = 'group';
-        classString += ' groupchat';
-      } else if (chatRoom.type === "public") {
-        contactId = roomId;
-        id = 'conversation_' + contactId;
-        presenceClass = 'group';
-        classString += ' groupchat public';
-      } else {
-        return "unknown room type: " + chatRoom.roomId;
-      }
-
-      var lastMessageDiv = null;
-      var lastMessageDatetimeDiv = null;
-      var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
-
-      if (lastMessage) {
-        var lastMsgDivClasses = "conversation-message";
-        var renderableSummary = lastMessage.renderableSummary || renderMessageSummary(lastMessage);
-        lastMessage.renderableSummary = renderableSummary;
-        lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
-          className: lastMsgDivClasses,
-          dangerouslySetInnerHTML: {
-            __html: renderableSummary
-          }
-        });
-        var timestamp = lastMessage.delay;
-        var curTimeMarker;
-        var msgDate = new Date(timestamp * 1000);
-        var iso = msgDate.toISOString();
-
-        if (todayOrYesterday(iso)) {
-          // if in last 2 days, use the time2lastSeparator
-          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
-        } else {
-          // if not in the last 2 days, use 1st June [Year]
-          curTimeMarker = acc_time2date(timestamp, false);
-        }
-
-        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
-          className: "date-time"
-        }, curTimeMarker);
-      } else {
-        var lastMsgDivClasses = "conversation-message";
-        /**
-         * Show "Loading" until:
-         * 1. I'd fetched chats from the API.
-         * 2. I'm retrieving history at the moment.
-         * 3. I'd connected to chatd and joined the room.
-          */
-
-        var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
-        lastMessageDiv = /*#__PURE__*/React.makeElement("div", null, /*#__PURE__*/React.createElement("div", {
-          className: lastMsgDivClasses
-        }, __(emptyMessage)));
-      }
-
-      if (chatRoom.type !== "public") {
-        nameClassString += " privateChat";
-      }
-
-      return /*#__PURE__*/React.makeElement("tr", {
-        className: classString,
-        id: id,
-        "data-room-id": roomId,
-        "data-jid": contactId,
-        onClick: this.props.onConversationSelected.bind(this),
-        onDoubleClick: this.props.onConversationClicked.bind(this)
-      }, /*#__PURE__*/React.makeElement("td", {
-        className: ""
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "fm-chat-user-info todo-star"
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: nameClassString
-      }, /*#__PURE__*/React.makeElement(_ui_utils_jsx__WEBPACK_IMPORTED_MODULE_0__["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "group" ? /*#__PURE__*/React.createElement("i", {
-        className: "tiny-icon blue-key"
-      }) : undefined), lastMessageDiv, lastMessageDatetimeDiv), /*#__PURE__*/React.makeElement("div", {
-        className: "archived-badge"
-      }, __(l[19067]))), /*#__PURE__*/React.makeElement("td", {
-        width: "330"
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "archived-on"
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "archived-date-time"
-      }, lastMessageDatetimeDiv), /*#__PURE__*/React.makeElement("div", {
-        className: "clear"
-      })), /*#__PURE__*/React.makeElement("div", {
-        className: "button default-white-button semi-big unarchive-chat right",
-        onClick: this.props.onUnarchiveConversationClicked.bind(this)
-      }, /*#__PURE__*/React.makeElement("span", null, __(l[19065])))));
-    }
-  }]);
-
-  return ArchConversationsListItem;
-}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
-;
-
-var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
-  _inherits(ConversationsList, _MegaRenderMixin3);
-
-  var _super3 = _createSuper(ConversationsList);
-
-  _createClass(ConversationsList, [{
-    key: "attachRerenderCallbacks",
-    value: function attachRerenderCallbacks() {
-      var self = this;
-      self._megaChatsListener = megaChat.chats.addChangeListener(function () {
-        self.throttledOnPropOrStateUpdated();
-      });
-    }
-  }, {
-    key: "detachRerenderCallbacks",
-    value: function detachRerenderCallbacks() {
-      if (_get(_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this)) {
-        _get(_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this).call(this);
-      }
-
-      megaChat.chats.removeChangeListener(this._megaChatsListener);
-    }
-  }]);
-
-  function ConversationsList(props) {
-    var _this;
-
-    _classCallCheck(this, ConversationsList);
-
-    _this = _super3.call(this, props);
-    _this.currentCallClicked = _this.currentCallClicked.bind(_assertThisInitialized(_this));
-    _this.endCurrentCall = _this.endCurrentCall.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(ConversationsList, [{
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      _get(_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this) && _get(_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this).call(this);
-      M.treeSearchUI();
-    }
-  }, {
-    key: "conversationClicked",
-    value: function conversationClicked(room, e) {
-      loadSubPage(room.getRoomUrl());
-      e.stopPropagation();
-    }
-  }, {
-    key: "currentCallClicked",
-    value: function currentCallClicked(e) {
-      var activeCallSession = megaChat.activeCallSession;
-
-      if (activeCallSession) {
-        this.conversationClicked(activeCallSession.room, e);
-      }
-    }
-  }, {
-    key: "contactClicked",
-    value: function contactClicked(contact, e) {
-      loadSubPage("fm/chat/p/" + contact.u);
-      e.stopPropagation();
-    }
-  }, {
-    key: "endCurrentCall",
-    value: function endCurrentCall(e) {
-      var activeCallSession = megaChat.activeCallSession;
-
-      if (activeCallSession) {
-        activeCallSession.endCall('hangup');
-        this.conversationClicked(activeCallSession.room, e);
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var self = this;
-      var currentCallingContactStatusProps = {
-        'className': "nw-conversations-item current-calling",
-        'data-jid': ''
-      };
-      var activeCallSession = megaChat.activeCallSession;
-
-      if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
-        var room = activeCallSession.room;
-        var user = room.getParticipantsExceptMe()[0];
-
-        if (user) {
-          currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.userPresenceToCssClass(user.presence);
-          currentCallingContactStatusProps['data-jid'] = room.roomId;
-
-          if (room.roomId == megaChat.currentlyOpenedChat) {
-            currentCallingContactStatusProps.className += " selected";
-          }
-        } else {
-          currentCallingContactStatusProps.className += ' hidden';
-        }
-      } else {
-        currentCallingContactStatusProps.className += ' hidden';
-      }
-
-      var currConvsList = [];
-      var sortedConversations = obj_values(megaChat.chats.toJS());
-      sortedConversations.sort(M.sortObjFn(function (room) {
-        return !room.lastActivity ? room.ctime : room.lastActivity;
-      }, -1));
-      sortedConversations.forEach(function (chatRoom) {
-        var contact;
-
-        if (!chatRoom || !chatRoom.roomId) {
-          return;
-        } // Account has been deleted/deactivated
-
-
-        if (M.u && M.u[chatRoom.roomId] && M.u[chatRoom.roomId].c === 2) {
-          return;
-        }
-
-        if (!chatRoom.isDisplayable()) {
-          return;
-        }
-
-        if (self.props.quickSearchText) {
-          var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
-          var s2 = String(self.props.quickSearchText).toLowerCase();
-
-          if (s1.indexOf(s2) === -1) {
-            return;
-          }
-        } // Checking if this a business user with expired status
-
-
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-          chatRoom.privateReadOnlyChat = true;
-        } else {
-          if (chatRoom.type === "private") {
-            contact = chatRoom.getParticipantsExceptMe()[0];
-
-            if (!contact) {
-              return;
-            }
-
-            contact = M.u[contact];
-
-            if (contact) {
-              if (!chatRoom.privateReadOnlyChat && !contact.c) {
-                // a non-contact conversation, e.g. contact removed - mark as read only
-                Soon(function () {
-                  chatRoom.privateReadOnlyChat = true;
-                });
-              } else if (chatRoom.privateReadOnlyChat && contact.c) {
-                // a non-contact conversation, e.g. contact removed - mark as read only
-                Soon(function () {
-                  chatRoom.privateReadOnlyChat = false;
-                });
-              }
-            }
-          }
-        }
-
-        currConvsList.push( /*#__PURE__*/React.makeElement(ConversationsListItem, {
-          key: chatRoom.roomId,
-          chatRoom: chatRoom,
-          contact: contact,
-          messages: chatRoom.messagesBuff,
-          onConversationClicked: function onConversationClicked(e) {
-            self.conversationClicked(chatRoom, e);
-          }
-        }));
-      });
-      return /*#__PURE__*/React.makeElement("div", {
-        className: "conversationsList"
-      }, /*#__PURE__*/React.makeElement("ul", {
-        className: "conversations-pane"
-      }, currConvsList));
-    }
-  }]);
-
-  return ConversationsList;
-}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
-ConversationsList.defaultProps = {
-  'manualDataChangeTracking': true
-};
-;
-
-var ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
-  _inherits(ArchivedConversationsList, _MegaRenderMixin4);
-
-  var _super4 = _createSuper(ArchivedConversationsList);
-
-  function ArchivedConversationsList(props) {
-    var _this2;
-
-    _classCallCheck(this, ArchivedConversationsList);
-
-    _this2 = _super4.call(this, props);
-    _this2.state = _this2.getInitialState();
-    _this2.onSortNameClicked = _this2.onSortNameClicked.bind(_assertThisInitialized(_this2));
-    _this2.onSortTimeClicked = _this2.onSortTimeClicked.bind(_assertThisInitialized(_this2));
-    return _this2;
-  }
-
-  _createClass(ArchivedConversationsList, [{
-    key: "getInitialState",
-    value: function getInitialState() {
-      return {
-        'items': megaChat.chats,
-        'orderby': 'lastActivity',
-        'nameorder': 1,
-        'timeorder': -1,
-        'confirmUnarchiveChat': null,
-        'confirmUnarchiveDialogShown': false
-      };
-    }
-  }, {
-    key: "conversationClicked",
-    value: function conversationClicked(room, e) {
-      room.showArchived = true;
-      loadSubPage(room.getRoomUrl());
-      e.stopPropagation();
-    }
-  }, {
-    key: "conversationSelected",
-    value: function conversationSelected(room, e) {
-      var self = this;
-      var previousState = room.archivedSelected ? room.archivedSelected : false;
-      var sortedConversations = obj_values(megaChat.chats.toJS());
-      sortedConversations.forEach(function (chatRoom) {
-        if (!chatRoom || !chatRoom.roomId) {
-          return;
-        }
-
-        if (!chatRoom.isArchived()) {
-          return;
-        }
-
-        if (chatRoom.chatId !== room.chatId) {
-          chatRoom.archivedSelected = false;
-        } else {
-          chatRoom.archivedSelected = !chatRoom.archivedSelected;
-        }
-      });
-      room.archivedSelected = !previousState;
-      self.setState({
-        'items': sortedConversations
-      });
-      e.stopPropagation();
-    }
-  }, {
-    key: "unarchiveConversationClicked",
-    value: function unarchiveConversationClicked(room, e) {
-      var self = this;
-      self.setState({
-        'confirmUnarchiveDialogShown': true,
-        'confirmUnarchiveChat': room.roomId
-      });
-    }
-  }, {
-    key: "onSortNameClicked",
-    value: function onSortNameClicked(e) {
-      this.setState({
-        'orderby': 'name',
-        'nameorder': this.state.nameorder * -1
-      });
-    }
-  }, {
-    key: "onSortTimeClicked",
-    value: function onSortTimeClicked(e) {
-      this.setState({
-        'orderby': 'lastActivity',
-        'timeorder': this.state.timeorder * -1
-      });
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var self = this;
-      var currConvsList = [];
-      var sortedConversations = obj_values(megaChat.chats.toJS());
-      var orderValue = -1;
-      var orderKey = "lastActivity";
-      var nameOrderClass = "";
-      var timerOrderClass = "";
-
-      if (self.state.orderby === "name") {
-        orderKey = getRoomName;
-        orderValue = self.state.nameorder;
-        nameOrderClass = self.state.nameorder === 1 ? "desc" : "asc";
-      } else {
-        orderKey = "lastActivity";
-        orderValue = self.state.timeorder;
-        timerOrderClass = self.state.timeorder === 1 ? "desc" : "asc";
-      }
-
-      sortedConversations.sort(M.sortObjFn(orderKey, orderValue));
-      sortedConversations.forEach(function (chatRoom) {
-        var contact;
-
-        if (!chatRoom || !chatRoom.roomId) {
-          return;
-        }
-
-        if (!chatRoom.isArchived()) {
-          return;
-        }
-
-        if (chatRoom.type === "private") {
-          contact = chatRoom.getParticipantsExceptMe()[0];
-
-          if (!contact) {
-            return;
-          }
-
-          contact = M.u[contact];
-
-          if (contact) {
-            if (!chatRoom.privateReadOnlyChat && !contact.c) {
-              // a non-contact conversation, e.g. contact removed - mark as read only
-              Soon(function () {
-                chatRoom.privateReadOnlyChat = true;
-              });
-            } else if (chatRoom.privateReadOnlyChat && contact.c) {
-              // a non-contact conversation, e.g. contact removed - mark as read only
-              Soon(function () {
-                chatRoom.privateReadOnlyChat = false;
-              });
-            }
-          }
-        }
-
-        currConvsList.push( /*#__PURE__*/React.makeElement(ArchConversationsListItem, {
-          key: chatRoom.roomId,
-          chatRoom: chatRoom,
-          contact: contact,
-          messages: chatRoom.messagesBuff,
-          onConversationClicked: function onConversationClicked(e) {
-            self.conversationClicked(chatRoom, e);
-          },
-          onConversationSelected: function onConversationSelected(e) {
-            self.conversationSelected(chatRoom, e);
-          },
-          onUnarchiveConversationClicked: function onUnarchiveConversationClicked(e) {
-            self.unarchiveConversationClicked(chatRoom, e);
-          }
-        }));
-      });
-      var confirmUnarchiveDialog = null;
-
-      if (self.state.confirmUnarchiveDialogShown === true) {
-        var room = megaChat.chats[self.state.confirmUnarchiveChat];
-
-        if (room) {
-          confirmUnarchiveDialog = /*#__PURE__*/React.makeElement(_ui_modalDialogs_jsx__WEBPACK_IMPORTED_MODULE_6__[/* default */ "a"].ConfirmDialog, {
-            chatRoom: room,
-            title: __(l[19063]),
-            name: "unarchive-conversation",
-            onClose: function onClose() {
-              self.setState({
-                'confirmUnarchiveDialogShown': false
-              });
-            },
-            onConfirmClicked: function onConfirmClicked() {
-              room.unarchive();
-              self.setState({
-                'confirmUnarchiveDialogShown': false
-              });
-            }
-          }, /*#__PURE__*/React.makeElement("div", {
-            className: "fm-dialog-content"
-          }, /*#__PURE__*/React.makeElement("div", {
-            className: "dialog secondary-header"
-          }, __(l[19064]))));
-        }
-      }
-
-      return /*#__PURE__*/React.makeElement("div", {
-        className: "chat-content-block archived-chats"
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "files-grid-view archived-chat-view"
-      }, /*#__PURE__*/React.makeElement("table", {
-        className: "grid-table-header",
-        width: "100%",
-        cellSpacing: "0",
-        cellPadding: "0",
-        border: "0"
-      }, /*#__PURE__*/React.makeElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
-        className: "calculated-width",
-        onClick: self.onSortNameClicked
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "is-chat arrow name " + nameOrderClass
-      }, __(l[86]))), /*#__PURE__*/React.makeElement("th", {
-        width: "330",
-        onClick: self.onSortTimeClicked
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "is-chat arrow interaction " + timerOrderClass
-      }, __(l[5904])))))), /*#__PURE__*/React.makeElement("div", {
-        className: "grid-scrolling-table archive-chat-list"
-      }, /*#__PURE__*/React.makeElement("table", {
-        className: "grid-table arc-chat-messages-block"
-      }, /*#__PURE__*/React.makeElement("tbody", null, currConvsList)))), confirmUnarchiveDialog);
-    }
-  }]);
-
-  return ArchivedConversationsList;
-}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
-;
-
-var ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
-  _inherits(ConversationsApp, _MegaRenderMixin5);
-
-  var _super5 = _createSuper(ConversationsApp);
-
-  function ConversationsApp(props) {
-    var _this3;
-
-    _classCallCheck(this, ConversationsApp);
-
-    _this3 = _super5.call(this, props);
-    _this3.state = {
-      'leftPaneWidth': mega.config.get('leftPaneWidth'),
-      'startGroupChatDialogShown': false,
-      'quickSearchText': ''
-    };
-    return _this3;
-  }
-
-  _createClass(ConversationsApp, [{
-    key: "startChatClicked",
-    value: function startChatClicked(selected) {
-      if (selected.length === 1) {
-        megaChat.createAndShowPrivateRoomFor(selected[0]).then(function (room) {
-          room.setActive();
-        });
-      } else {
-        megaChat.createAndShowGroupRoomFor(selected);
-      }
-    }
-  }, {
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      _get(_getPrototypeOf(ConversationsApp.prototype), "componentDidMount", this).call(this);
-
-      var self = this;
-      $(document.body).rebind('startNewChatLink.conversations', function (e) {
-        self.startGroupChatFlow = 2;
-        self.setState({
-          'startGroupChatDialogShown': true
-        });
-      });
-      window.addEventListener('resize', this.handleWindowResize);
-      $(document).rebind('keydown.megaChatTextAreaFocus', function (e) {
-        // prevent recursion!
-        if (e.megaChatHandled) {
-          return;
-        }
-
-        var currentlyOpenedChat = megaChat.currentlyOpenedChat;
-        var currentRoom = megaChat.getCurrentRoom();
-
-        if (currentlyOpenedChat) {
-          // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
-          // is visible/active at the moment
-          if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91
-          /* cmd+... */
-          || e.keyCode === 17
-          /* ctrl+... */
-          || e.keyCode === 27
-          /* esc */
-          || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
-            return;
-          }
-
-          var $typeArea = $('.messages-textarea:visible:first');
-          moveCursortoToEnd($typeArea);
-          e.megaChatHandled = true;
-          $typeArea.triggerHandler(e);
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
-        }
-      });
-      $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
-        // prevent recursion!
-        if (!M.chat || e.megaChatHandled || slideshowid) {
-          return;
-        }
-
-        var $target = $(e.target);
-
-        if (megaChat.currentlyOpenedChat) {
-          // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
-          // is visible/active at the moment
-          if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
-            return;
-          }
-
-          var $typeArea = $('.messages-textarea:visible:first');
-
-          if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
-            $typeArea.trigger("focus");
-            e.megaChatHandled = true;
-          }
-        }
-      });
-      self.fmConfigThrottling = null;
-      self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function () {
-        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-        clearTimeout(self.fmConfigThrottling);
-        self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
-          self.setState({
-            'leftPaneWidth': mega.config.get('leftPaneWidth')
-          });
-          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-          $('.jScrollPaneContainer:visible').trigger('forceResize');
-        }, 75);
-        megaChat.$leftPane.width(mega.config.get('leftPaneWidth'));
-        $('.fm-tree-panel', megaChat.$leftPane).width(mega.config.get('leftPaneWidth'));
-      });
-
-      var lPaneResizableInit = function lPaneResizableInit() {
-        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-        $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
-
-        if (fmconfig.leftPaneWidth) {
-          megaChat.$leftPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
-        }
-
-        $($.leftPaneResizableChat).on('resize', function () {
-          var w = megaChat.$leftPane.width();
-
-          if (w >= $.leftPaneResizableChat.options.maxWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'w-resize');
-          } else if (w <= $.leftPaneResizableChat.options.minWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'e-resize');
-          } else {
-            $('.left-pane-drag-handle').css('cursor', 'we-resize');
-          }
-
-          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-        });
-        $($.leftPaneResizableChat).on('resizestop', function () {
-          $('.fm-left-panel').width(megaChat.$leftPane.width());
-          $('.jScrollPaneContainer:visible').trigger('forceResize');
-          setTimeout(function () {
-            $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-          }, 100);
-        });
-      };
-
-      if (typeof $.leftPaneResizable === 'undefined') {
-        mBroadcaster.once('fm:initialized', function () {
-          lPaneResizableInit();
-        });
-      } else {
-        lPaneResizableInit();
-      }
-
-      megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-
-      if (anonymouschat) {
-        megaChat.$leftPane.addClass('hidden');
-      } else {
-        megaChat.$leftPane.removeClass('hidden');
-      }
-
-      this.handleWindowResize();
-      $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function (e) {
-        self.setState({
-          'quickSearchText': ''
-        });
-        treesearch = false;
-      });
-
-      if (ChatdIntegration.allChatsHadLoaded.state() !== 'resolved') {
-        ChatdIntegration.allChatsHadLoaded.done(function () {
-          self.safeForceUpdate();
-        });
-      }
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      _get(_getPrototypeOf(ConversationsApp.prototype), "componentWillUnmount", this).call(this);
-
-      window.removeEventListener('resize', this.handleWindowResize);
-      $(document).off('keydown.megaChatTextAreaFocus');
-      mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate() {
-      this.handleWindowResize();
-
-      if (megaChat.displayArchivedChats === true) {
-        this.initArchivedChatsScrolling();
-      }
-    }
-  }, {
-    key: "handleWindowResize",
-    value: function handleWindowResize() {
-      if (!M.chat) {
-        return;
-      } // small piece of what is done in fm_resize_handler...
-
-
-      if (anonymouschat) {
-        $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-          'margin-left': "0px"
-        });
-      } else {
-        $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-          'margin-left': $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px"
-        });
-      }
-    }
-  }, {
-    key: "initArchivedChatsScrolling",
-    value: function initArchivedChatsScrolling() {
-      var scroll = '.archive-chat-list';
-      deleteScrollPanel(scroll, 'jsp');
-      $(scroll).jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5
-      });
-      jScrollFade(scroll);
-    }
-  }, {
-    key: "archiveChatsClicked",
-    value: function archiveChatsClicked() {
-      loadSubPage('fm/chat/archived');
-    }
-  }, {
-    key: "calcArchiveChats",
-    value: function calcArchiveChats() {
-      var count = 0;
-      megaChat.chats.forEach(function (chatRoom) {
-        if (!chatRoom || !chatRoom.roomId) {
-          return;
-        }
-
-        if (chatRoom.isArchived()) {
-          count++;
-        }
-      });
-      return count;
-    }
-  }, {
-    key: "getTopButtonsForContactsPicker",
-    value: function getTopButtonsForContactsPicker() {
-      var self = this;
-
-      if (!self._topButtonsContactsPicker) {
-        self._topButtonsContactsPicker = [{
-          'key': 'add',
-          'title': l[71],
-          'icon': 'rounded-plus colorized',
-          'onClick': function onClick(e) {
-            contactAddDialog();
-          }
-        }, {
-          'key': 'newGroupChat',
-          'title': l[19483],
-          'icon': 'conversation-with-plus',
-          'onClick': function onClick(e) {
-            self.startGroupChatFlow = 1;
-            self.setState({
-              'startGroupChatDialogShown': true
-            });
-          }
-        }, {
-          'key': 'newChatLink',
-          'title': l[20638],
-          'icon': 'small-icon blue-chain colorized',
-          'onClick': function onClick(e) {
-            self.startGroupChatFlow = 2;
-            self.setState({
-              'startGroupChatDialogShown': true
-            });
-          }
-        }];
-      }
-
-      return self._topButtonsContactsPicker;
-    }
-  }, {
-    key: "isWaitingForInitialLoadingToFinish",
-    value: function isWaitingForInitialLoadingToFinish() {
-      var self = this; // since in big accounts, a lot chats may finish at the same moment, this requires to be throttled.
-
-      var forceUpdate = SoonFc(function (roomId) {
-        delete self._isWaitingChatsLoad[roomId];
-        self.safeForceUpdate();
-      }, 300);
-      self._isWaitingChatsLoad = self._isWaitingChatsLoad || {};
-      var roomIds = megaChat.chats.keys();
-
-      for (var i = 0; i < roomIds.length; i++) {
-        var roomId = roomIds[i];
-        var chatRoom = megaChat.chats[roomId];
-
-        if (!self._isWaitingChatsLoad[roomId] && chatRoom.initialMessageHistLoaded.state() === 'pending') {
-          self._isWaitingChatsLoad[roomId] = true;
-          chatRoom.initialMessageHistLoaded.always(forceUpdate.bind(undefined, roomId));
-        }
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var self = this;
-      var startGroupChatDialog = null;
-
-      if (self.state.startGroupChatDialogShown === true) {
-        startGroupChatDialog = /*#__PURE__*/React.makeElement(StartGroupChatWizard, {
-          name: "start-group-chat",
-          flowType: self.startGroupChatFlow,
-          onClose: function onClose() {
-            self.setState({
-              'startGroupChatDialogShown': false
-            });
-            delete self.startGroupChatFlow;
-          },
-          onConfirmClicked: function onConfirmClicked() {
-            self.setState({
-              'startGroupChatDialogShown': false
-            });
-            delete self.startGroupChatFlow;
-          }
-        });
-      }
-
-      var leftPanelStyles = {};
-
-      if (self.state.leftPaneWidth) {
-        leftPanelStyles.width = self.state.leftPaneWidth;
-      }
-
-      var loadingOrEmpty = null;
-      var isLoading = false;
-      var nonArchivedChats = megaChat.chats.map(function (r) {
-        return !r.isArchived() ? r : undefined;
-      });
-
-      if (nonArchivedChats.length === 0) {
-        loadingOrEmpty = /*#__PURE__*/React.makeElement("div", {
-          className: "fm-empty-messages hidden"
-        }, /*#__PURE__*/React.makeElement("div", {
-          className: "fm-empty-pad"
-        }, /*#__PURE__*/React.makeElement("div", {
-          className: "fm-empty-messages-bg"
-        }), /*#__PURE__*/React.makeElement("div", {
-          className: "fm-empty-cloud-txt"
-        }, l[6870]), /*#__PURE__*/React.makeElement("div", {
-          className: "fm-not-logged-text"
-        }, /*#__PURE__*/React.makeElement("div", {
-          className: "fm-not-logged-description",
-          dangerouslySetInnerHTML: {
-            __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
-          }
-        }), /*#__PURE__*/React.makeElement("div", {
-          className: "fm-not-logged-button create-account"
-        }, __(l[968])))));
-      } else if (megaChat.allChatsHadInitialLoadedHistory() === false && !megaChat.currentlyOpenedChat && megaChat.displayArchivedChats !== true) {
-        loadingOrEmpty = /*#__PURE__*/React.makeElement("div", {
-          className: "fm-empty-messages"
-        }, /*#__PURE__*/React.makeElement("div", {
-          className: "loading-spinner js-messages-loading light manual-management",
-          style: {
-            "top": "50%"
-          }
-        }, /*#__PURE__*/React.makeElement("div", {
-          className: "main-loader",
-          style: {
-            "position": "fixed",
-            "top": "50%",
-            "left": "50%",
-            "marginLeft": "72px"
-          }
-        })));
-        self.isWaitingForInitialLoadingToFinish();
-        isLoading = true;
-      }
-
-      var rightPaneStyles = {};
-
-      if (anonymouschat) {
-        rightPaneStyles = {
-          'marginLeft': 0
-        };
-      }
-
-      var rightPane = /*#__PURE__*/React.makeElement("div", {
-        className: "fm-right-files-block in-chat",
-        style: rightPaneStyles
-      }, loadingOrEmpty, !isLoading && megaChat.displayArchivedChats === true ? /*#__PURE__*/React.makeElement(ArchivedConversationsList, {
-        key: "archivedchats"
-      }) : null, !isLoading ? /*#__PURE__*/React.makeElement(_ui_conversationpanel_jsx__WEBPACK_IMPORTED_MODULE_5__["ConversationPanels"], _extends({}, this.props, {
-        chatUIFlags: megaChat.chatUIFlags,
-        displayArchivedChats: megaChat.displayArchivedChats,
-        className: megaChat.displayArchivedChats === true ? "hidden" : "",
-        currentlyOpenedChat: megaChat.currentlyOpenedChat,
-        chats: megaChat.chats
-      })) : null);
-      var archivedChatsCount = this.calcArchiveChats();
-      var arcBtnClass = megaChat.displayArchivedChats === true ? "left-pane-button archived active" : "left-pane-button archived";
-      var arcIconClass = megaChat.displayArchivedChats === true ? "small-icon archive white" : "small-icon archive colorized";
-      return /*#__PURE__*/React.makeElement("div", {
-        className: "conversationsApp",
-        key: "conversationsApp"
-      }, startGroupChatDialog, /*#__PURE__*/React.makeElement("div", {
-        className: "fm-left-panel chat-left-panel",
-        style: leftPanelStyles
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "left-pane-drag-handle"
-      }), /*#__PURE__*/React.makeElement("div", {
-        className: "fm-left-menu conversations"
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "nw-fm-tree-header conversations" + (self.state.quickSearchText ? ' filled-input' : '')
-      }, /*#__PURE__*/React.makeElement("input", {
-        type: "text",
-        className: "chat-quick-search",
-        onChange: function onChange(e) {
-          if (e.target.value) {
-            treesearch = e.target.value;
-          }
-
-          self.setState({
-            'quickSearchText': e.target.value
-          });
-        },
-        onBlur: function onBlur(e) {
-          if (e.target.value) {
-            treesearch = e.target.value;
-          }
-        },
-        autoComplete: "disabled",
-        value: self.state.quickSearchText,
-        placeholder: l[7997]
-      }), /*#__PURE__*/React.makeElement("div", {
-        className: "small-icon thin-search-icon"
-      }), /*#__PURE__*/React.makeElement(_ui_buttons_jsx__WEBPACK_IMPORTED_MODULE_2__["Button"], {
-        group: "conversationsListing",
-        icon: "chat-with-plus"
-      }, /*#__PURE__*/React.makeElement(_ui_dropdowns_jsx__WEBPACK_IMPORTED_MODULE_3__["DropdownContactsSelector"], {
-        className: "main-start-chat-dropdown",
-        onSelectDone: this.startChatClicked.bind(this),
-        multiple: false,
-        showTopButtons: self.getTopButtonsForContactsPicker()
-      })))), /*#__PURE__*/React.makeElement("div", {
-        className: "fm-tree-panel manual-tree-panel-scroll-management",
-        style: leftPanelStyles
-      }, /*#__PURE__*/React.makeElement(PerfectScrollbar, {
-        style: leftPanelStyles,
-        className: "conversation-reduce-height",
-        chats: megaChat.chats,
-        ref: function ref(_ref) {
-          megaChat.$chatTreePanePs = _ref;
-        }
-      }, /*#__PURE__*/React.makeElement("div", {
-        className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "")
-      }, /*#__PURE__*/React.makeElement(ConversationsList, {
-        quickSearchText: this.state.quickSearchText
-      }))), /*#__PURE__*/React.makeElement("div", {
-        className: "left-pane-button new-link",
-        onClick: function (e) {
-          self.startGroupChatFlow = 2;
-          self.setState({
-            'startGroupChatDialogShown': true
-          });
-          return false;
-        }.bind(this)
-      }, /*#__PURE__*/React.makeElement("i", {
-        className: "small-icon blue-chain colorized"
-      }), /*#__PURE__*/React.makeElement("div", {
-        className: "heading"
-      }, __(l[20638]))), /*#__PURE__*/React.makeElement("div", {
-        className: arcBtnClass,
-        onClick: this.archiveChatsClicked.bind(this)
-      }, /*#__PURE__*/React.makeElement("i", {
-        className: arcIconClass
-      }), /*#__PURE__*/React.makeElement("div", {
-        className: "heading"
-      }, __(l[19066])), /*#__PURE__*/React.makeElement("div", {
-        className: "indicator"
-      }, archivedChatsCount)))), rightPane);
-    }
-  }]);
-
-  return ConversationsApp;
-}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_1__["MegaRenderMixin"]);
-
-;
-
-if (false) {}
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  ConversationsList: ConversationsList,
-  ArchivedConversationsList: ArchivedConversationsList,
-  ConversationsApp: ConversationsApp
-});
-
-/***/ }),
-/* 14 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var _stores_mixins_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -6731,7 +5269,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6743,9 +5281,9 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 
 
@@ -6821,7 +5359,7 @@ var Checkbox = /*#__PURE__*/function (_MegaRenderMixin) {
 });
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6839,7 +5377,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -6881,7 +5419,7 @@ var MetaRichpreviewLoading = /*#__PURE__*/function (_ConversationMessageM) {
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6899,11 +5437,11 @@ var external_React_ = __webpack_require__(0);
 var external_React_default = /*#__PURE__*/__webpack_require__.n(external_React_);
 
 // EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(3);
+var external_ReactDOM_ = __webpack_require__(4);
 var external_ReactDOM_default = /*#__PURE__*/__webpack_require__.n(external_ReactDOM_);
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -6934,7 +5472,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -8411,7 +6949,7 @@ function emojiDropdown_inherits(subClass, superClass) { if (typeof superClass !=
 
 function emojiDropdown_setPrototypeOf(o, p) { emojiDropdown_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiDropdown_setPrototypeOf(o, p); }
 
-function emojiDropdown_createSuper(Derived) { return function () { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (emojiDropdown_isNativeReflectConstruct()) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
+function emojiDropdown_createSuper(Derived) { var hasNativeReflectConstruct = emojiDropdown_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = emojiDropdown_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiDropdown_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiDropdown_possibleConstructorReturn(this, result); }; }
 
 function emojiDropdown_possibleConstructorReturn(self, call) { if (call && (emojiDropdown_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiDropdown_assertThisInitialized(self); }
 
@@ -8423,7 +6961,7 @@ function emojiDropdown_getPrototypeOf(o) { emojiDropdown_getPrototypeOf = Object
 
 var React = __webpack_require__(0);
 
-var emojiDropdown_utils = __webpack_require__(4);
+var emojiDropdown_utils = __webpack_require__(3);
 
 
 
@@ -8964,7 +7502,7 @@ function emojiAutocomplete_inherits(subClass, superClass) { if (typeof superClas
 
 function emojiAutocomplete_setPrototypeOf(o, p) { emojiAutocomplete_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return emojiAutocomplete_setPrototypeOf(o, p); }
 
-function emojiAutocomplete_createSuper(Derived) { return function () { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (emojiAutocomplete_isNativeReflectConstruct()) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
+function emojiAutocomplete_createSuper(Derived) { var hasNativeReflectConstruct = emojiAutocomplete_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = emojiAutocomplete_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = emojiAutocomplete_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return emojiAutocomplete_possibleConstructorReturn(this, result); }; }
 
 function emojiAutocomplete_possibleConstructorReturn(self, call) { if (call && (emojiAutocomplete_typeof(call) === "object" || typeof call === "function")) { return call; } return emojiAutocomplete_assertThisInitialized(self); }
 
@@ -8976,7 +7514,7 @@ function emojiAutocomplete_getPrototypeOf(o) { emojiAutocomplete_getPrototypeOf 
 
 var emojiAutocomplete_React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -9278,7 +7816,7 @@ function typingArea_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function typingArea_setPrototypeOf(o, p) { typingArea_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return typingArea_setPrototypeOf(o, p); }
 
-function typingArea_createSuper(Derived) { return function () { var Super = typingArea_getPrototypeOf(Derived), result; if (typingArea_isNativeReflectConstruct()) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
+function typingArea_createSuper(Derived) { var hasNativeReflectConstruct = typingArea_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = typingArea_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = typingArea_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return typingArea_possibleConstructorReturn(this, result); }; }
 
 function typingArea_possibleConstructorReturn(self, call) { if (call && (typingArea_typeof(call) === "object" || typeof call === "function")) { return call; } return typingArea_assertThisInitialized(self); }
 
@@ -9291,7 +7829,7 @@ function typingArea_getPrototypeOf(o) { typingArea_getPrototypeOf = Object.setPr
 // libs
 var typingArea_React = __webpack_require__(0);
 
-var typingArea_ReactDOM = __webpack_require__(3);
+var typingArea_ReactDOM = __webpack_require__(4);
 
 
 
@@ -9738,7 +8276,7 @@ var typingArea_TypingArea = /*#__PURE__*/function (_MegaRenderMixin) {
 
       var self = this;
       this.$container = $(typingArea_ReactDOM.findDOMNode(this));
-      $(window).rebind('resize.typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this)); // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
+      chatGlobalEventManager.addEventListener('resize', 'typingArea' + self.getUniqueId(), self.handleWindowResize.bind(this)); // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
 
       self._lastTextareaHeight = 20;
 
@@ -9808,7 +8346,7 @@ var typingArea_TypingArea = /*#__PURE__*/function (_MegaRenderMixin) {
       var chatRoom = self.props.chatRoom;
       self.triggerOnUpdate(); // window.removeEventListener('resize', self.handleWindowResize);
 
-      $(window).unbind('resize.typingArea' + self.getUniqueId());
+      chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
   }, {
     key: "componentDidUpdate",
@@ -10247,7 +8785,7 @@ function whosTyping_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function whosTyping_setPrototypeOf(o, p) { whosTyping_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return whosTyping_setPrototypeOf(o, p); }
 
-function whosTyping_createSuper(Derived) { return function () { var Super = whosTyping_getPrototypeOf(Derived), result; if (whosTyping_isNativeReflectConstruct()) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
+function whosTyping_createSuper(Derived) { var hasNativeReflectConstruct = whosTyping_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = whosTyping_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = whosTyping_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return whosTyping_possibleConstructorReturn(this, result); }; }
 
 function whosTyping_possibleConstructorReturn(self, call) { if (call && (whosTyping_typeof(call) === "object" || typeof call === "function")) { return call; } return whosTyping_assertThisInitialized(self); }
 
@@ -10259,7 +8797,7 @@ function whosTyping_getPrototypeOf(o) { whosTyping_getPrototypeOf = Object.setPr
 
 var whosTyping_React = __webpack_require__(0);
 
-var whosTyping_ReactDOM = __webpack_require__(3);
+var whosTyping_ReactDOM = __webpack_require__(4);
 
 
 
@@ -10420,10 +8958,6 @@ var WhosTyping = /*#__PURE__*/function (_MegaRenderMixin) {
 var perfectScrollbar = __webpack_require__(10);
 
 // CONCATENATED MODULE: ./js/ui/accordion.jsx
-function accordion_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { accordion_get = Reflect.get; } else { accordion_get = function _get(target, property, receiver) { var base = accordion_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return accordion_get(target, property, receiver || target); }
-
-function accordion_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = accordion_getPrototypeOf(object); if (object === null) break; } return object; }
-
 function accordion_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { accordion_typeof = function _typeof(obj) { return typeof obj; }; } else { accordion_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return accordion_typeof(obj); }
 
 function accordion_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -10436,7 +8970,7 @@ function accordion_inherits(subClass, superClass) { if (typeof superClass !== "f
 
 function accordion_setPrototypeOf(o, p) { accordion_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return accordion_setPrototypeOf(o, p); }
 
-function accordion_createSuper(Derived) { return function () { var Super = accordion_getPrototypeOf(Derived), result; if (accordion_isNativeReflectConstruct()) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
+function accordion_createSuper(Derived) { var hasNativeReflectConstruct = accordion_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = accordion_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = accordion_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return accordion_possibleConstructorReturn(this, result); }; }
 
 function accordion_possibleConstructorReturn(self, call) { if (call && (accordion_typeof(call) === "object" || typeof call === "function")) { return call; } return accordion_assertThisInitialized(self); }
 
@@ -10448,7 +8982,7 @@ function accordion_getPrototypeOf(o) { accordion_getPrototypeOf = Object.setProt
 
 var accordion_React = __webpack_require__(0);
 
-var accordion_ReactDOM = __webpack_require__(3);
+var accordion_ReactDOM = __webpack_require__(4);
 
 
 
@@ -10508,37 +9042,6 @@ var Accordion = /*#__PURE__*/function (_MegaRenderMixin2) {
   }
 
   accordion_createClass(Accordion, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      accordion_get(accordion_getPrototypeOf(Accordion.prototype), "componentDidMount", this).call(this);
-
-      var self = this;
-      $(window).rebind('resize.modalDialog' + self.getUniqueId(), function () {
-        self.onResize();
-      });
-    }
-  }, {
-    key: "componentWillUnmount",
-    value: function componentWillUnmount() {
-      accordion_get(accordion_getPrototypeOf(Accordion.prototype), "componentWillUnmount", this).call(this);
-
-      $(window).off('resize.modalDialog' + this.getUniqueId());
-    }
-  }, {
-    key: "onResize",
-    value: function onResize() {// if (!this.domNode) {
-      //     return;
-      // }
-      // always center modal dialogs after they are mounted
-      // $(this.domNode)
-      //     .css({
-      //         'margin': 'auto'
-      //     })
-      //     .position({
-      //         of: $(document.body)
-      //     });
-    }
-  }, {
     key: "onToggle",
     value: function onToggle(e, key) {
       // allow multiple opened panels at a time
@@ -10611,7 +9114,7 @@ function participantsList_inherits(subClass, superClass) { if (typeof superClass
 
 function participantsList_setPrototypeOf(o, p) { participantsList_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return participantsList_setPrototypeOf(o, p); }
 
-function participantsList_createSuper(Derived) { return function () { var Super = participantsList_getPrototypeOf(Derived), result; if (participantsList_isNativeReflectConstruct()) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
+function participantsList_createSuper(Derived) { var hasNativeReflectConstruct = participantsList_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = participantsList_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = participantsList_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return participantsList_possibleConstructorReturn(this, result); }; }
 
 function participantsList_possibleConstructorReturn(self, call) { if (call && (participantsList_typeof(call) === "object" || typeof call === "function")) { return call; } return participantsList_assertThisInitialized(self); }
 
@@ -10982,7 +9485,7 @@ function metaRichpreview_inherits(subClass, superClass) { if (typeof superClass 
 
 function metaRichpreview_setPrototypeOf(o, p) { metaRichpreview_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreview_setPrototypeOf(o, p); }
 
-function metaRichpreview_createSuper(Derived) { return function () { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (metaRichpreview_isNativeReflectConstruct()) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
+function metaRichpreview_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreview_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = metaRichpreview_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreview_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreview_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreview_possibleConstructorReturn(self, call) { if (call && (metaRichpreview_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreview_assertThisInitialized(self); }
 
@@ -10996,7 +9499,7 @@ var metaRichpreview_React = __webpack_require__(0);
 
 var ConversationMessageMixin = __webpack_require__(9).ConversationMessageMixin;
 
-var MetaRichPreviewLoading = __webpack_require__(15).MetaRichpreviewLoading;
+var MetaRichPreviewLoading = __webpack_require__(14).MetaRichpreviewLoading;
 
 var MetaRichpreview = /*#__PURE__*/function (_ConversationMessageM) {
   metaRichpreview_inherits(MetaRichpreview, _ConversationMessageM);
@@ -11129,7 +9632,7 @@ function metaRichpreviewConfirmation_inherits(subClass, superClass) { if (typeof
 
 function metaRichpreviewConfirmation_setPrototypeOf(o, p) { metaRichpreviewConfirmation_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewConfirmation_setPrototypeOf(o, p); }
 
-function metaRichpreviewConfirmation_createSuper(Derived) { return function () { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (metaRichpreviewConfirmation_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewConfirmation_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewConfirmation_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = metaRichpreviewConfirmation_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewConfirmation_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewConfirmation_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewConfirmation_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewConfirmation_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewConfirmation_assertThisInitialized(self); }
 
@@ -11243,7 +9746,7 @@ var MetaRichprevConfirmation = /*#__PURE__*/function (_ConversationMessageM) {
 
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/metaRichPreviewLoading.jsx
-var metaRichPreviewLoading = __webpack_require__(15);
+var metaRichPreviewLoading = __webpack_require__(14);
 
 // CONCATENATED MODULE: ./js/chat/ui/messages/metaRichpreviewMegaLinks.jsx
 function metaRichpreviewMegaLinks_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return typeof obj; }; } else { metaRichpreviewMegaLinks_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return metaRichpreviewMegaLinks_typeof(obj); }
@@ -11258,7 +9761,7 @@ function metaRichpreviewMegaLinks_inherits(subClass, superClass) { if (typeof su
 
 function metaRichpreviewMegaLinks_setPrototypeOf(o, p) { metaRichpreviewMegaLinks_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return metaRichpreviewMegaLinks_setPrototypeOf(o, p); }
 
-function metaRichpreviewMegaLinks_createSuper(Derived) { return function () { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (metaRichpreviewMegaLinks_isNativeReflectConstruct()) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
+function metaRichpreviewMegaLinks_createSuper(Derived) { var hasNativeReflectConstruct = metaRichpreviewMegaLinks_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = metaRichpreviewMegaLinks_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = metaRichpreviewMegaLinks_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return metaRichpreviewMegaLinks_possibleConstructorReturn(this, result); }; }
 
 function metaRichpreviewMegaLinks_possibleConstructorReturn(self, call) { if (call && (metaRichpreviewMegaLinks_typeof(call) === "object" || typeof call === "function")) { return call; } return metaRichpreviewMegaLinks_assertThisInitialized(self); }
 
@@ -11455,7 +9958,7 @@ function AudioPlayer_inherits(subClass, superClass) { if (typeof superClass !== 
 
 function AudioPlayer_setPrototypeOf(o, p) { AudioPlayer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioPlayer_setPrototypeOf(o, p); }
 
-function AudioPlayer_createSuper(Derived) { return function () { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (AudioPlayer_isNativeReflectConstruct()) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
+function AudioPlayer_createSuper(Derived) { var hasNativeReflectConstruct = AudioPlayer_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = AudioPlayer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioPlayer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioPlayer_possibleConstructorReturn(this, result); }; }
 
 function AudioPlayer_possibleConstructorReturn(self, call) { if (call && (AudioPlayer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioPlayer_assertThisInitialized(self); }
 
@@ -11728,7 +10231,7 @@ function AudioContainer_inherits(subClass, superClass) { if (typeof superClass !
 
 function AudioContainer_setPrototypeOf(o, p) { AudioContainer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return AudioContainer_setPrototypeOf(o, p); }
 
-function AudioContainer_createSuper(Derived) { return function () { var Super = AudioContainer_getPrototypeOf(Derived), result; if (AudioContainer_isNativeReflectConstruct()) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
+function AudioContainer_createSuper(Derived) { var hasNativeReflectConstruct = AudioContainer_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = AudioContainer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = AudioContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return AudioContainer_possibleConstructorReturn(this, result); }; }
 
 function AudioContainer_possibleConstructorReturn(self, call) { if (call && (AudioContainer_typeof(call) === "object" || typeof call === "function")) { return call; } return AudioContainer_assertThisInitialized(self); }
 
@@ -11904,7 +10407,7 @@ function generic_inherits(subClass, superClass) { if (typeof superClass !== "fun
 
 function generic_setPrototypeOf(o, p) { generic_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return generic_setPrototypeOf(o, p); }
 
-function generic_createSuper(Derived) { return function () { var Super = generic_getPrototypeOf(Derived), result; if (generic_isNativeReflectConstruct()) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
+function generic_createSuper(Derived) { var hasNativeReflectConstruct = generic_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = generic_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = generic_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return generic_possibleConstructorReturn(this, result); }; }
 
 function generic_possibleConstructorReturn(self, call) { if (call && (generic_typeof(call) === "object" || typeof call === "function")) { return call; } return generic_assertThisInitialized(self); }
 
@@ -13358,7 +11861,7 @@ function alterParticipants_inherits(subClass, superClass) { if (typeof superClas
 
 function alterParticipants_setPrototypeOf(o, p) { alterParticipants_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return alterParticipants_setPrototypeOf(o, p); }
 
-function alterParticipants_createSuper(Derived) { return function () { var Super = alterParticipants_getPrototypeOf(Derived), result; if (alterParticipants_isNativeReflectConstruct()) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
+function alterParticipants_createSuper(Derived) { var hasNativeReflectConstruct = alterParticipants_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = alterParticipants_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = alterParticipants_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return alterParticipants_possibleConstructorReturn(this, result); }; }
 
 function alterParticipants_possibleConstructorReturn(self, call) { if (call && (alterParticipants_typeof(call) === "object" || typeof call === "function")) { return call; } return alterParticipants_assertThisInitialized(self); }
 
@@ -13544,7 +12047,7 @@ function truncated_inherits(subClass, superClass) { if (typeof superClass !== "f
 
 function truncated_setPrototypeOf(o, p) { truncated_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return truncated_setPrototypeOf(o, p); }
 
-function truncated_createSuper(Derived) { return function () { var Super = truncated_getPrototypeOf(Derived), result; if (truncated_isNativeReflectConstruct()) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
+function truncated_createSuper(Derived) { var hasNativeReflectConstruct = truncated_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = truncated_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = truncated_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return truncated_possibleConstructorReturn(this, result); }; }
 
 function truncated_possibleConstructorReturn(self, call) { if (call && (truncated_typeof(call) === "object" || typeof call === "function")) { return call; } return truncated_assertThisInitialized(self); }
 
@@ -13643,7 +12146,7 @@ function privilegeChange_inherits(subClass, superClass) { if (typeof superClass 
 
 function privilegeChange_setPrototypeOf(o, p) { privilegeChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return privilegeChange_setPrototypeOf(o, p); }
 
-function privilegeChange_createSuper(Derived) { return function () { var Super = privilegeChange_getPrototypeOf(Derived), result; if (privilegeChange_isNativeReflectConstruct()) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
+function privilegeChange_createSuper(Derived) { var hasNativeReflectConstruct = privilegeChange_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = privilegeChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = privilegeChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return privilegeChange_possibleConstructorReturn(this, result); }; }
 
 function privilegeChange_possibleConstructorReturn(self, call) { if (call && (privilegeChange_typeof(call) === "object" || typeof call === "function")) { return call; } return privilegeChange_assertThisInitialized(self); }
 
@@ -13769,7 +12272,7 @@ function topicChange_inherits(subClass, superClass) { if (typeof superClass !== 
 
 function topicChange_setPrototypeOf(o, p) { topicChange_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return topicChange_setPrototypeOf(o, p); }
 
-function topicChange_createSuper(Derived) { return function () { var Super = topicChange_getPrototypeOf(Derived), result; if (topicChange_isNativeReflectConstruct()) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
+function topicChange_createSuper(Derived) { var hasNativeReflectConstruct = topicChange_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = topicChange_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = topicChange_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return topicChange_possibleConstructorReturn(this, result); }; }
 
 function topicChange_possibleConstructorReturn(self, call) { if (call && (topicChange_typeof(call) === "object" || typeof call === "function")) { return call; } return topicChange_assertThisInitialized(self); }
 
@@ -13881,7 +12384,7 @@ function sharedFilesAccordionPanel_inherits(subClass, superClass) { if (typeof s
 
 function sharedFilesAccordionPanel_setPrototypeOf(o, p) { sharedFilesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return sharedFilesAccordionPanel_setPrototypeOf(o, p); }
 
-function sharedFilesAccordionPanel_createSuper(Derived) { return function () { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (sharedFilesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function sharedFilesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = sharedFilesAccordionPanel_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = sharedFilesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = sharedFilesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return sharedFilesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function sharedFilesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (sharedFilesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return sharedFilesAccordionPanel_assertThisInitialized(self); }
 
@@ -13893,7 +12396,7 @@ function sharedFilesAccordionPanel_getPrototypeOf(o) { sharedFilesAccordionPanel
 
 var sharedFilesAccordionPanel_React = __webpack_require__(0);
 
-var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(3);
+var sharedFilesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
@@ -14120,7 +12623,7 @@ var SharedFilesAccordionPanel = (_dec = utils["default"].SoonFcWrap(350), (_clas
             className: "chat-dropdown empty-txt"
           }, l[19985]);
         } else {
-          var keys = mb.sharedFiles.keys().reverse();
+          var keys = clone(mb.sharedFiles.keys()).reverse();
 
           for (var i = startPos; i < endPos; i++) {
             var message = mb.sharedFiles[keys[i]];
@@ -14210,7 +12713,7 @@ function incomingSharesAccordionPanel_inherits(subClass, superClass) { if (typeo
 
 function incomingSharesAccordionPanel_setPrototypeOf(o, p) { incomingSharesAccordionPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return incomingSharesAccordionPanel_setPrototypeOf(o, p); }
 
-function incomingSharesAccordionPanel_createSuper(Derived) { return function () { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (incomingSharesAccordionPanel_isNativeReflectConstruct()) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
+function incomingSharesAccordionPanel_createSuper(Derived) { var hasNativeReflectConstruct = incomingSharesAccordionPanel_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = incomingSharesAccordionPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = incomingSharesAccordionPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return incomingSharesAccordionPanel_possibleConstructorReturn(this, result); }; }
 
 function incomingSharesAccordionPanel_possibleConstructorReturn(self, call) { if (call && (incomingSharesAccordionPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return incomingSharesAccordionPanel_assertThisInitialized(self); }
 
@@ -14222,7 +12725,7 @@ function incomingSharesAccordionPanel_getPrototypeOf(o) { incomingSharesAccordio
 
 var incomingSharesAccordionPanel_React = __webpack_require__(0);
 
-var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(3);
+var incomingSharesAccordionPanel_ReactDOM = __webpack_require__(4);
 
 
 
@@ -14415,7 +12918,7 @@ function closeOpenMode_inherits(subClass, superClass) { if (typeof superClass !=
 
 function closeOpenMode_setPrototypeOf(o, p) { closeOpenMode_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return closeOpenMode_setPrototypeOf(o, p); }
 
-function closeOpenMode_createSuper(Derived) { return function () { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (closeOpenMode_isNativeReflectConstruct()) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
+function closeOpenMode_createSuper(Derived) { var hasNativeReflectConstruct = closeOpenMode_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = closeOpenMode_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = closeOpenMode_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return closeOpenMode_possibleConstructorReturn(this, result); }; }
 
 function closeOpenMode_possibleConstructorReturn(self, call) { if (call && (closeOpenMode_typeof(call) === "object" || typeof call === "function")) { return call; } return closeOpenMode_assertThisInitialized(self); }
 
@@ -14513,7 +13016,7 @@ function chatHandle_inherits(subClass, superClass) { if (typeof superClass !== "
 
 function chatHandle_setPrototypeOf(o, p) { chatHandle_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatHandle_setPrototypeOf(o, p); }
 
-function chatHandle_createSuper(Derived) { return function () { var Super = chatHandle_getPrototypeOf(Derived), result; if (chatHandle_isNativeReflectConstruct()) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
+function chatHandle_createSuper(Derived) { var hasNativeReflectConstruct = chatHandle_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = chatHandle_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatHandle_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatHandle_possibleConstructorReturn(this, result); }; }
 
 function chatHandle_possibleConstructorReturn(self, call) { if (call && (chatHandle_typeof(call) === "object" || typeof call === "function")) { return call; } return chatHandle_assertThisInitialized(self); }
 
@@ -14525,9 +13028,9 @@ function chatHandle_getPrototypeOf(o) { chatHandle_getPrototypeOf = Object.setPr
 
 var chatHandle_React = __webpack_require__(0);
 
-var chatHandle_ReactDOM = __webpack_require__(3);
+var chatHandle_ReactDOM = __webpack_require__(4);
 
-var chatHandle_utils = __webpack_require__(4);
+var chatHandle_utils = __webpack_require__(3);
 
 var chatHandle_ContactsUI = __webpack_require__(2);
 
@@ -14621,7 +13124,7 @@ function chatlinkDialog_inherits(subClass, superClass) { if (typeof superClass !
 
 function chatlinkDialog_setPrototypeOf(o, p) { chatlinkDialog_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return chatlinkDialog_setPrototypeOf(o, p); }
 
-function chatlinkDialog_createSuper(Derived) { return function () { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (chatlinkDialog_isNativeReflectConstruct()) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
+function chatlinkDialog_createSuper(Derived) { var hasNativeReflectConstruct = chatlinkDialog_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = chatlinkDialog_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = chatlinkDialog_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return chatlinkDialog_possibleConstructorReturn(this, result); }; }
 
 function chatlinkDialog_possibleConstructorReturn(self, call) { if (call && (chatlinkDialog_typeof(call) === "object" || typeof call === "function")) { return call; } return chatlinkDialog_assertThisInitialized(self); }
 
@@ -14865,7 +13368,7 @@ function conversationaudiovideopanel_inherits(subClass, superClass) { if (typeof
 
 function conversationaudiovideopanel_setPrototypeOf(o, p) { conversationaudiovideopanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationaudiovideopanel_setPrototypeOf(o, p); }
 
-function conversationaudiovideopanel_createSuper(Derived) { return function () { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (conversationaudiovideopanel_isNativeReflectConstruct()) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
+function conversationaudiovideopanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationaudiovideopanel_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = conversationaudiovideopanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationaudiovideopanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationaudiovideopanel_possibleConstructorReturn(this, result); }; }
 
 function conversationaudiovideopanel_possibleConstructorReturn(self, call) { if (call && (conversationaudiovideopanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationaudiovideopanel_assertThisInitialized(self); }
 
@@ -15195,11 +13698,12 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
   }, {
     key: "_hideBottomPanel",
     value: function _hideBottomPanel() {
-      if (!this.isMounted()) {
+      var self = this;
+
+      if (!self.isMounted()) {
         return;
       }
 
-      var self = this;
       var room = self.props.chatRoom;
 
       if (!room.callManagerCall || !room.callManagerCall.isActive()) {
@@ -15452,7 +13956,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       }); // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
       // size mode from full screen...)
 
-      $(window).rebind('resize.chatUI_' + room.roomId, function () {
+      chatGlobalEventManager.addEventListener('resize', 'chatUI_' + room.roomId, function () {
         if ($container.is(":visible")) {
           if (!elementInViewport($localMediaDisplay[0])) {
             $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
@@ -15536,7 +14040,7 @@ var conversationaudiovideopanel_ConversationAVPanel = /*#__PURE__*/function (_Me
       }
 
       $(document).off("fullscreenchange.megaChat_" + room.roomId);
-      $(window).off('resize.chatUI_' + room.roomId);
+      chatGlobalEventManager.removeEventListener('resize', 'chatUI_' + room.roomId);
       $(room).off('toggleMessages.av');
       var $rootContainer = $container.parents('.conversation-panel');
       $('.call-block', $rootContainer).height('');
@@ -16079,7 +14583,7 @@ function conversationpanel_inherits(subClass, superClass) { if (typeof superClas
 
 function conversationpanel_setPrototypeOf(o, p) { conversationpanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversationpanel_setPrototypeOf(o, p); }
 
-function conversationpanel_createSuper(Derived) { return function () { var Super = conversationpanel_getPrototypeOf(Derived), result; if (conversationpanel_isNativeReflectConstruct()) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
+function conversationpanel_createSuper(Derived) { var hasNativeReflectConstruct = conversationpanel_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = conversationpanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversationpanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversationpanel_possibleConstructorReturn(this, result); }; }
 
 function conversationpanel_possibleConstructorReturn(self, call) { if (call && (conversationpanel_typeof(call) === "object" || typeof call === "function")) { return call; } return conversationpanel_assertThisInitialized(self); }
 
@@ -16700,6 +15204,8 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }
 
       self.props.chatRoom._uiIsMounted = true;
+      self.props.chatRoom.$rConversationPanel = self;
+      $(self.props.chatRoom).trigger("onComponentDidMount");
     }
   }, {
     key: "eventuallyInit",
@@ -16872,6 +15378,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
             e.preventDefault();
           }
         });
+        $(self.props.chatRoom).trigger("onComponentDidUpdate");
       }
     }
   }, {
@@ -16946,12 +15453,12 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       }
 
       if (self.isComponentEventuallyVisible()) {
-        if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
+        if (self.props.chatRoom.scrolledToBottom && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
           ps.scrollToBottom(true);
           return true;
         }
 
-        if (self.lastScrollPosition !== ps.getScrollPositionY() && !self.editDomElement) {
+        if (self.lastScrollPosition && self.lastScrollPosition !== ps.getScrollPositionY() && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
           ps.scrollToY(self.lastScrollPosition, true);
           return true;
         }
@@ -17041,7 +15548,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
   }, {
     key: "specShouldComponentUpdate",
     value: function specShouldComponentUpdate() {
-      if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
+      if (this.isRetrievingHistoryViaScrollPull || this.loadingShown || this.props.chatRoom.activeSearches > 0 && this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || !this.props.chatRoom.isCurrentlyActive) {
         return false;
       } else {
         return undefined;
@@ -17093,7 +15600,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var privateChatDiv = room.type === "group" ? "privateChatDiv" : '';
       var messagesList = [];
 
-      if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
+      if (ChatdIntegration._loadingChats[room.roomId] && ChatdIntegration._loadingChats[room.roomId].loadingPromise && ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending' || self.isRetrievingHistoryViaScrollPull && !self.loadingShown || self.props.chatRoom.activeSearches && !self.loadingShown || room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.joined === false || room.messagesBuff.joined === true && room.messagesBuff.haveMessages === true && room.messagesBuff.messagesHistoryIsLoading() === true || room.messagesBuff.isDecrypting && room.messagesBuff.isDecrypting.state() === 'pending') {
         self.loadingShown = true;
       } else if (room.messagesBuff.joined === true) {
         if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
@@ -17823,7 +16330,9 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
           className: "txt"
         }, /*#__PURE__*/external_React_default.a.createElement(utils["default"].EmojiFormattedContent, null, self.props.chatRoom.getRoomTitle())), /*#__PURE__*/external_React_default.a.createElement("span", {
           className: "txt small"
-        }, (l[20233] || "%s Members").replace("%s", Object.keys(self.props.chatRoom.members).length))));
+        }, /*#__PURE__*/external_React_default.a.createElement(ui_contacts["MembersAmount"], {
+          room: self.props.chatRoom
+        }))));
       } else {
         contactHandle = contacts[0];
         contact = M.u[contactHandle];
@@ -18000,7 +16509,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         editingMessageId: self.state.editing,
         confirmDeleteDialog: self.state.confirmDeleteDialog,
         renderedMessagesCount: messagesList.length,
-        isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown,
+        isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
         options: {
           'suppressScrollX': true
         }
@@ -18045,7 +16554,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
         persist: true,
         onUpEditPressed: function onUpEditPressed() {
           var foundMessage = false;
-          room.messagesBuff.messages.keys().reverse().some(function (k) {
+          clone(room.messagesBuff.messages.keys()).reverse().some(function (k) {
             if (!foundMessage) {
               var message = room.messagesBuff.messages[k];
               var contact;
@@ -18313,11 +16822,2499 @@ function isStartCallDisabled(room) {
 }
 
 /***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(3);
+
+// EXTERNAL MODULE: ./js/stores/mixins.js
+var mixins = __webpack_require__(1);
+
+// EXTERNAL MODULE: ./js/ui/buttons.jsx
+var buttons = __webpack_require__(8);
+
+// EXTERNAL MODULE: ./js/ui/dropdowns.jsx
+var dropdowns = __webpack_require__(6);
+
+// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
+var contacts = __webpack_require__(2);
+
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 24 modules
+var conversationpanel = __webpack_require__(15);
+
+// EXTERNAL MODULE: external "React"
+var external_React_ = __webpack_require__(0);
+var external_React_default = /*#__PURE__*/__webpack_require__.n(external_React_);
+
+// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+
+var resultTable_ResultTable = /*#__PURE__*/function (_MegaRenderMixin) {
+  _inherits(ResultTable, _MegaRenderMixin);
+
+  var _super = _createSuper(ResultTable);
+
+  function ResultTable(props) {
+    _classCallCheck(this, ResultTable);
+
+    return _super.call(this, props);
+  }
+
+  _createClass(ResultTable, [{
+    key: "render",
+    value: function render() {
+      var heading = this.props.heading;
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "result-table ".concat(heading ? '' : 'nil')
+      }, heading ? /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "result-table-heading"
+      }, heading) : null, this.props.children);
+    }
+  }]);
+
+  return ResultTable;
+}(mixins["MegaRenderMixin"]);
+
+
+// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultRow.jsx
+function resultRow_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { resultRow_typeof = function _typeof(obj) { return typeof obj; }; } else { resultRow_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return resultRow_typeof(obj); }
+
+function resultRow_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function resultRow_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function resultRow_createClass(Constructor, protoProps, staticProps) { if (protoProps) resultRow_defineProperties(Constructor.prototype, protoProps); if (staticProps) resultRow_defineProperties(Constructor, staticProps); return Constructor; }
+
+function resultRow_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) resultRow_setPrototypeOf(subClass, superClass); }
+
+function resultRow_setPrototypeOf(o, p) { resultRow_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return resultRow_setPrototypeOf(o, p); }
+
+function resultRow_createSuper(Derived) { var hasNativeReflectConstruct = resultRow_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = resultRow_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = resultRow_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return resultRow_possibleConstructorReturn(this, result); }; }
+
+function resultRow_possibleConstructorReturn(self, call) { if (call && (resultRow_typeof(call) === "object" || typeof call === "function")) { return call; } return resultRow_assertThisInitialized(self); }
+
+function resultRow_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function resultRow_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function resultRow_getPrototypeOf(o) { resultRow_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return resultRow_getPrototypeOf(o); }
+
+
+
+
+
+
+var SEARCH_ROW_CLASS = "result-table-row";
+var USER_CARD_CLASS = "user-card";
+/**
+ * roomIsGroup
+ * @description Check whether given chat room is group chat.
+ * @param {ChatRoom} room
+ * @returns {Boolean}
+ */
+
+var roomIsGroup = function roomIsGroup(room) {
+  return room && room.type === 'group' || room.type === 'public';
+};
+/**
+ * highlight
+ * @description Wraps given text within `strong` element based on passed strings to be matched.
+ * @param {string} text The text to be highlighted
+ * @param {Object[]} matches Array of objects specifying the matches
+ * @param {string} matches[].str The match term to check against
+ * @param {number} matches[].idx Number identifier for the match term
+ * @returns {string}
+ *
+ * @example
+ * highlight('Example MEGA string as input.', [{ idx: 0, str: 'MEGA' }, { idx: 1, str: 'input' }]);
+ * => 'Example <strong>MEGA</strong> string as <strong>input</strong>.'
+ */
+
+
+var highlight = function highlight(text, matches, dontEscape) {
+  if (!text) {
+    return;
+  }
+
+  text = dontEscape ? text : escapeHTML(text);
+
+  if (matches) {
+    var highlighted = text;
+
+    for (var i = matches.length; i--;) {
+      var match = matches[i].str;
+      highlighted = highlighted.replace(new RegExp(match, 'gi'), function (word) {
+        return "<strong>".concat(word, "</strong>");
+      });
+    }
+
+    return highlighted;
+  }
+
+  return text;
+};
+/**
+ * openResult
+ * @description Invoked on result click, opens the respective chat room; triggers the `resultOpen` event to notify
+ * the root component for the interaction and do minimize.
+ * @see SearchPanel.bindEvents()
+ * @param {ChatRoom|String} room room or userId
+ * @param {String} [messageId]
+ * @param {Number} [index]
+ */
+
+
+var openResult = function openResult(room, messageId, index) {
+  $(document).trigger('chatSearchResultOpen');
+
+  if (isString(room)) {
+    loadSubPage('fm/chat/p/' + room);
+  } else if (room && room.chatId && !messageId) {
+    // contact matches
+    var chatRoom = megaChat.getChatById(room.chatId);
+
+    if (chatRoom) {
+      loadSubPage(chatRoom.getRoomUrl());
+    }
+  } else {
+    loadSubPage(room.getRoomUrl());
+
+    if (messageId) {
+      room.scrollToMessageId(messageId, index);
+    }
+  }
+}; //
+// MessageRow
+// TODO: add documentation
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
+  resultRow_inherits(MessageRow, _MegaRenderMixin);
+
+  var _super = resultRow_createSuper(MessageRow);
+
+  function MessageRow(props) {
+    resultRow_classCallCheck(this, MessageRow);
+
+    return _super.call(this, props);
+  }
+
+  resultRow_createClass(MessageRow, [{
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          data = _this$props.data,
+          matches = _this$props.matches,
+          room = _this$props.room,
+          index = _this$props.index;
+      var contact = room.getParticipantsExceptMe();
+      var summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "".concat(SEARCH_ROW_CLASS, " message"),
+        onClick: function onClick() {
+          return openResult(room, data.messageId, index);
+        }
+      }, /*#__PURE__*/external_React_default.a.createElement("span", {
+        className: "title"
+      }, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.getRoomTitle())), !roomIsGroup(room) && /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
+        contact: M.u[contact]
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "summary",
+        dangerouslySetInnerHTML: {
+          __html: highlight(summary, matches, true
+          /* already escaped by `getRenderableSummary` */
+          )
+        }
+      }), /*#__PURE__*/external_React_default.a.createElement("span", {
+        className: "date"
+      }, time2date(data.delay)));
+    }
+  }]);
+
+  return MessageRow;
+}(mixins["MegaRenderMixin"]); //
+// ChatRow
+// TODO: add documentation
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+var resultRow_ChatRow = /*#__PURE__*/function (_MegaRenderMixin2) {
+  resultRow_inherits(ChatRow, _MegaRenderMixin2);
+
+  var _super2 = resultRow_createSuper(ChatRow);
+
+  function ChatRow(props) {
+    resultRow_classCallCheck(this, ChatRow);
+
+    return _super2.call(this, props);
+  }
+
+  resultRow_createClass(ChatRow, [{
+    key: "render",
+    value: function render() {
+      var _this$props2 = this.props,
+          room = _this$props2.room,
+          matches = _this$props2.matches;
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: SEARCH_ROW_CLASS,
+        onClick: function onClick() {
+          return openResult(room);
+        }
+      }, /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "chat-topic-icon"
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: USER_CARD_CLASS
+      }, /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "graphic"
+      }, /*#__PURE__*/external_React_default.a.createElement("span", {
+        dangerouslySetInnerHTML: {
+          __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic)), matches, true)
+        }
+      }))), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "clear"
+      }));
+    }
+  }]);
+
+  return ChatRow;
+}(mixins["MegaRenderMixin"]); //
+// MemberRow
+// TODO: add documentation
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+var resultRow_MemberRow = /*#__PURE__*/function (_MegaRenderMixin3) {
+  resultRow_inherits(MemberRow, _MegaRenderMixin3);
+
+  var _super3 = resultRow_createSuper(MemberRow);
+
+  function MemberRow(props) {
+    resultRow_classCallCheck(this, MemberRow);
+
+    return _super3.call(this, props);
+  }
+
+  resultRow_createClass(MemberRow, [{
+    key: "render",
+    value: function render() {
+      var _this$props3 = this.props,
+          data = _this$props3.data,
+          matches = _this$props3.matches,
+          room = _this$props3.room,
+          contact = _this$props3.contact;
+      var hasHighlight = matches && !!matches.length;
+      var isGroup = room && roomIsGroup(room);
+      var userCard = {
+        graphic:
+        /*#__PURE__*/
+        // `Graphic` result of member type -- the last activity status is shown as graphic icon
+        // https://mega.nz/file/0MMymIDZ#_uglL1oUSJnH-bkp4IWfNL_hk6iEsQW77GHYXEvHWOs
+        external_React_default.a.createElement("div", {
+          className: "graphic"
+        }, isGroup ? /*#__PURE__*/external_React_default.a.createElement("span", {
+          dangerouslySetInnerHTML: {
+            __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(room.topic || room.getRoomTitle())), matches, true)
+          }
+        }) : /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement("span", {
+          dangerouslySetInnerHTML: {
+            __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(nicknames.getNicknameAndName(data))), matches, true)
+          }
+        }), /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
+          contact: contact
+        }))),
+        textual:
+        /*#__PURE__*/
+        // `Textual` result of member type -- last activity as plain text
+        // https://mega.nz/file/RcUWiKpC#onYjToPq3whTYyMseLal5v0OxiAge0j2p9I5eO_qwoI
+        external_React_default.a.createElement("div", {
+          className: "textual"
+        }, isGroup ? /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement("span", null, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.topic || room.getRoomTitle())), /*#__PURE__*/external_React_default.a.createElement(contacts["MembersAmount"], {
+          room: room
+        })) : /*#__PURE__*/external_React_default.a.createElement(external_React_default.a.Fragment, null, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, nicknames.getNicknameAndName(data)), /*#__PURE__*/external_React_default.a.createElement(contacts["LastActivity"], {
+          contact: contact,
+          showLastGreen: true
+        })))
+      };
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: SEARCH_ROW_CLASS,
+        onClick: function onClick() {
+          return openResult(room ? room : contact.h);
+        }
+      }, isGroup ? /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "chat-topic-icon"
+      }) : /*#__PURE__*/external_React_default.a.createElement(contacts["Avatar"], {
+        contact: contact
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: USER_CARD_CLASS
+      }, userCard[hasHighlight ? 'graphic' : 'textual']), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "clear"
+      }));
+    }
+  }]);
+
+  return MemberRow;
+}(mixins["MegaRenderMixin"]);
+
+var resultRow_NilRow = function NilRow() {
+  return /*#__PURE__*/external_React_default.a.createElement("div", {
+    className: SEARCH_ROW_CLASS
+  }, /*#__PURE__*/external_React_default.a.createElement("img", {
+    src: "".concat(staticpath, "images/temp/search-icon.png"),
+    alt: LABEL.NO_RESULTS
+  }), /*#__PURE__*/external_React_default.a.createElement("span", null, LABEL.NO_RESULTS));
+}; // ---------------------------------------------------------------------------------------------------------------------
+
+
+var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
+  resultRow_inherits(ResultRow, _MegaRenderMixin4);
+
+  var _super4 = resultRow_createSuper(ResultRow);
+
+  function ResultRow(props) {
+    resultRow_classCallCheck(this, ResultRow);
+
+    return _super4.call(this, props);
+  }
+
+  resultRow_createClass(ResultRow, [{
+    key: "render",
+    value: function render() {
+      var _this$props4 = this.props,
+          type = _this$props4.type,
+          result = _this$props4.result,
+          children = _this$props4.children;
+
+      switch (type) {
+        case TYPE.MESSAGE:
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_MessageRow, {
+            data: result.data,
+            index: result.index,
+            matches: result.matches,
+            room: result.room
+          });
+
+        case TYPE.CHAT:
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_ChatRow, {
+            room: result.room,
+            matches: result.matches
+          });
+
+        case TYPE.MEMBER:
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_MemberRow, {
+            data: result.data,
+            matches: result.matches,
+            room: result.room,
+            contact: M.u[result.data]
+          });
+
+        case TYPE.NIL:
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_NilRow, null);
+
+        default:
+          return /*#__PURE__*/external_React_default.a.createElement("div", {
+            className: SEARCH_ROW_CLASS
+          }, children);
+      }
+    }
+  }]);
+
+  return ResultRow;
+}(mixins["MegaRenderMixin"]);
+
+
+// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultContainer.jsx
+function resultContainer_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { resultContainer_typeof = function _typeof(obj) { return typeof obj; }; } else { resultContainer_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return resultContainer_typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function resultContainer_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function resultContainer_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function resultContainer_createClass(Constructor, protoProps, staticProps) { if (protoProps) resultContainer_defineProperties(Constructor.prototype, protoProps); if (staticProps) resultContainer_defineProperties(Constructor, staticProps); return Constructor; }
+
+function resultContainer_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) resultContainer_setPrototypeOf(subClass, superClass); }
+
+function resultContainer_setPrototypeOf(o, p) { resultContainer_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return resultContainer_setPrototypeOf(o, p); }
+
+function resultContainer_createSuper(Derived) { var hasNativeReflectConstruct = resultContainer_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = resultContainer_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = resultContainer_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return resultContainer_possibleConstructorReturn(this, result); }; }
+
+function resultContainer_possibleConstructorReturn(self, call) { if (call && (resultContainer_typeof(call) === "object" || typeof call === "function")) { return call; } return resultContainer_assertThisInitialized(self); }
+
+function resultContainer_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function resultContainer_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function resultContainer_getPrototypeOf(o) { resultContainer_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return resultContainer_getPrototypeOf(o); }
+
+
+
+
+
+
+var TYPE = {
+  MESSAGE: 1,
+  CHAT: 2,
+  MEMBER: 3,
+  NIL: 4
+};
+var LABEL = {
+  //
+  // Result table & Result row
+  // ------------------------------------
+  MESSAGES: 'Messages',
+  CONTACTS_AND_CHATS: 'Contacts And Chats',
+  NO_RESULTS: 'No Results',
+  RECENT: 'Recent',
+  //
+  // Search field status
+  // ------------------------------------
+  DECRYPTING_RESULTS: 'decrypting results...',
+  PAUSE_SEARCH: 'pause search',
+  RESUME_SEARCH: 'resume search',
+  SEARCH_COMPLETE: 'search complete'
+};
+
+var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
+  resultContainer_inherits(ResultContainer, _MegaRenderMixin);
+
+  var _super = resultContainer_createSuper(ResultContainer);
+
+  function ResultContainer(props) {
+    var _this;
+
+    resultContainer_classCallCheck(this, ResultContainer);
+
+    _this = _super.call(this, props);
+
+    _this.renderRecents = function (recents) {
+      return (
+        /*#__PURE__*/
+        //
+        // `Recent` table
+        // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+        // ----------------------------------------------------------------------
+        external_React_default.a.createElement(resultTable_ResultTable, {
+          heading: LABEL.RECENT
+        }, recents.map(function (recent) {
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            key: recent.data,
+            type: TYPE.MEMBER,
+            result: recent
+          });
+        }))
+      );
+    };
+
+    _this.renderResults = function (results, status) {
+      //
+      // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
+      // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
+      // https://mega.nz/#!tEt3iaIB!XxxZTSnbCdhE0cuzYBP_owiLFvv0cxrOVq4PMiB0Irc
+      // https://mega.nz/#!hd0HRQ4Q!Dhgt8Ju26CXQ3-jKFsYXqaxxllEIUP-0lB_yJ5yZuY8
+      // ----------------------------------------------------------------------
+      if (status === STATUS.COMPLETED && results.length < 1) {
+        return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, null, /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+          type: TYPE.NIL
+        }));
+      }
+
+      var RESULT_TABLE = {
+        CONTACTS_AND_CHATS: [],
+        MESSAGES: []
+      };
+
+      for (var resultTypeGroup in results) {
+        var len = results[resultTypeGroup].length;
+
+        for (var i = 0; i < len; i++) {
+          var result = results[resultTypeGroup].getItem(i);
+          var MESSAGE = TYPE.MESSAGE,
+              MEMBER = TYPE.MEMBER,
+              CHAT = TYPE.CHAT;
+          var resultType = result.type,
+              resultId = result.resultId;
+          var table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+          RESULT_TABLE[table] = [].concat(_toConsumableArray(RESULT_TABLE[table]), [/*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            key: resultId,
+            type: resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT,
+            result: result
+          })]);
+        }
+      }
+
+      return Object.keys(RESULT_TABLE).map(function (key, index) {
+        var table = {
+          ref: RESULT_TABLE[key],
+          hasRows: RESULT_TABLE[key] && RESULT_TABLE[key].length,
+          isEmpty: RESULT_TABLE[key] && RESULT_TABLE[key].length < 1,
+          props: {
+            key: index,
+            heading: key === 'MESSAGES' ? LABEL.MESSAGES : LABEL.CONTACTS_AND_CHATS
+          }
+        };
+
+        if (table.hasRows) {
+          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, table.ref.map(function (row) {
+            return row;
+          }));
+        }
+
+        return null;
+      });
+    };
+
+    return _this;
+  }
+
+  resultContainer_createClass(ResultContainer, [{
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          recents = _this$props.recents,
+          results = _this$props.results,
+          status = _this$props.status;
+      return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status);
+    }
+  }]);
+
+  return ResultContainer;
+}(mixins["MegaRenderMixin"]);
+
+
+// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchField.jsx
+function searchField_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { searchField_typeof = function _typeof(obj) { return typeof obj; }; } else { searchField_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return searchField_typeof(obj); }
+
+function searchField_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function searchField_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function searchField_createClass(Constructor, protoProps, staticProps) { if (protoProps) searchField_defineProperties(Constructor.prototype, protoProps); if (staticProps) searchField_defineProperties(Constructor, staticProps); return Constructor; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = searchField_getPrototypeOf(object); if (object === null) break; } return object; }
+
+function searchField_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) searchField_setPrototypeOf(subClass, superClass); }
+
+function searchField_setPrototypeOf(o, p) { searchField_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return searchField_setPrototypeOf(o, p); }
+
+function searchField_createSuper(Derived) { var hasNativeReflectConstruct = searchField_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = searchField_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = searchField_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return searchField_possibleConstructorReturn(this, result); }; }
+
+function searchField_possibleConstructorReturn(self, call) { if (call && (searchField_typeof(call) === "object" || typeof call === "function")) { return call; } return searchField_assertThisInitialized(self); }
+
+function searchField_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function searchField_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function searchField_getPrototypeOf(o) { searchField_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return searchField_getPrototypeOf(o); }
+
+
+
+
+
+var SEARCH_STATUS_CLASS = "search-field-status";
+
+var searchField_SearchField = /*#__PURE__*/function (_MegaRenderMixin) {
+  searchField_inherits(SearchField, _MegaRenderMixin);
+
+  var _super = searchField_createSuper(SearchField);
+
+  function SearchField(props) {
+    var _this;
+
+    searchField_classCallCheck(this, SearchField);
+
+    _this = _super.call(this, props);
+    _this.state = {
+      hovered: false
+    };
+
+    _this.renderStatus = function (status, isClickable, onToggle) {
+      var className = "".concat(SEARCH_STATUS_CLASS, " ").concat(isClickable ? 'clickable' : '');
+
+      var handleClick = function handleClick() {
+        return isClickable && onToggle();
+      };
+
+      var handleHover = function handleHover() {
+        return _this.setState(function (state) {
+          return {
+            hovered: !state.hovered
+          };
+        });
+      };
+
+      switch (status) {
+        case STATUS.IN_PROGRESS:
+          return /*#__PURE__*/external_React_default.a.createElement("div", {
+            className: "".concat(className, " searching"),
+            onClick: handleClick,
+            onMouseOver: handleHover,
+            onMouseOut: handleHover
+          }, /*#__PURE__*/external_React_default.a.createElement("i", {
+            className: "small-icon tiny-searching"
+          }), _this.state.hovered ? LABEL.PAUSE_SEARCH : LABEL.DECRYPTING_RESULTS);
+
+        case STATUS.PAUSED:
+          return /*#__PURE__*/external_React_default.a.createElement("div", {
+            className: "".concat(className, " paused"),
+            onClick: handleClick
+          }, /*#__PURE__*/external_React_default.a.createElement("i", {
+            className: "small-icon tiny-play"
+          }), LABEL.RESUME_SEARCH);
+
+        case STATUS.COMPLETED:
+          return /*#__PURE__*/external_React_default.a.createElement("div", {
+            className: "".concat(className, " complete"),
+            onClick: handleClick
+          }, /*#__PURE__*/external_React_default.a.createElement("i", {
+            className: "small-icon tiny-complete"
+          }), LABEL.SEARCH_COMPLETE);
+
+        default:
+          return null;
+      }
+    };
+
+    return _this;
+  }
+
+  searchField_createClass(SearchField, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      _get(searchField_getPrototypeOf(SearchField.prototype), "componentDidMount", this).call(this);
+
+      SearchField.focus();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this2 = this;
+
+      var _this$props = this.props,
+          value = _this$props.value,
+          searching = _this$props.searching,
+          status = _this$props.status,
+          onFocus = _this$props.onFocus,
+          _onChange = _this$props.onChange,
+          onToggle = _this$props.onToggle,
+          onReset = _this$props.onReset;
+      var isClickable = status === STATUS.IN_PROGRESS || status === STATUS.PAUSED;
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "search-field"
+      }, /*#__PURE__*/external_React_default.a.createElement("i", {
+        className: "small-icon thin-search-icon"
+      }), /*#__PURE__*/external_React_default.a.createElement("input", {
+        type: "text",
+        autoComplete: "disabled",
+        placeholder: "Search",
+        ref: SearchField.inputRef,
+        value: value,
+        onFocus: onFocus,
+        onChange: function onChange(ev) {
+          // Reset the `pause search` state
+          if (_this2.state.hovered) {
+            _this2.setState({
+              hovered: false
+            });
+          }
+
+          _onChange(ev);
+        },
+        className: searching ? 'searching' : ''
+      }), searching && status && this.renderStatus(status, isClickable, onToggle), /*#__PURE__*/external_React_default.a.createElement("i", {
+        className: "small-icon tiny-reset",
+        onClick: onReset
+      }));
+    }
+  }]);
+
+  return SearchField;
+}(mixins["MegaRenderMixin"]);
+
+searchField_SearchField.inputRef = /*#__PURE__*/external_React_default.a.createRef();
+
+searchField_SearchField.select = function () {
+  var inputElement = searchField_SearchField.inputRef && searchField_SearchField.inputRef.current;
+  var value = inputElement.value;
+
+  if (inputElement && value) {
+    inputElement.selectionStart = 0;
+    inputElement.selectionEnd = value.length;
+  }
+};
+
+searchField_SearchField.focus = function () {
+  return searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && searchField_SearchField.inputRef.current.focus();
+};
+
+searchField_SearchField.hasValue = function () {
+  return searchField_SearchField.inputRef && searchField_SearchField.inputRef.current && !!searchField_SearchField.inputRef.current.value.length;
+};
+
+
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(10);
+
+// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
+function searchPanel_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { searchPanel_typeof = function _typeof(obj) { return typeof obj; }; } else { searchPanel_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return searchPanel_typeof(obj); }
+
+function searchPanel_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function searchPanel_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function searchPanel_createClass(Constructor, protoProps, staticProps) { if (protoProps) searchPanel_defineProperties(Constructor.prototype, protoProps); if (staticProps) searchPanel_defineProperties(Constructor, staticProps); return Constructor; }
+
+function searchPanel_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { searchPanel_get = Reflect.get; } else { searchPanel_get = function _get(target, property, receiver) { var base = searchPanel_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return searchPanel_get(target, property, receiver || target); }
+
+function searchPanel_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = searchPanel_getPrototypeOf(object); if (object === null) break; } return object; }
+
+function searchPanel_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) searchPanel_setPrototypeOf(subClass, superClass); }
+
+function searchPanel_setPrototypeOf(o, p) { searchPanel_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return searchPanel_setPrototypeOf(o, p); }
+
+function searchPanel_createSuper(Derived) { var hasNativeReflectConstruct = searchPanel_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = searchPanel_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = searchPanel_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return searchPanel_possibleConstructorReturn(this, result); }; }
+
+function searchPanel_possibleConstructorReturn(self, call) { if (call && (searchPanel_typeof(call) === "object" || typeof call === "function")) { return call; } return searchPanel_assertThisInitialized(self); }
+
+function searchPanel_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function searchPanel_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function searchPanel_getPrototypeOf(o) { searchPanel_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return searchPanel_getPrototypeOf(o); }
+
+
+
+
+
+
+var STATUS = {
+  IN_PROGRESS: 1,
+  PAUSED: 2,
+  COMPLETED: 3
+};
+var SEARCH_PANEL_CLASS = "search-panel";
+
+var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
+  searchPanel_inherits(SearchPanel, _MegaRenderMixin);
+
+  var _super = searchPanel_createSuper(SearchPanel);
+
+  function SearchPanel(props) {
+    var _this;
+
+    searchPanel_classCallCheck(this, SearchPanel);
+
+    _this = _super.call(this, props);
+    _this.state = {
+      value: '',
+      searching: false,
+      status: undefined,
+      recents: [],
+      results: []
+    };
+
+    _this.unbindEvents = function () {
+      if (_this.pageChangeListener) {
+        mBroadcaster.removeListener(_this.pageChangeListener);
+      }
+
+      $(document).unbind('.searchPanel');
+    };
+
+    _this.bindEvents = function () {
+      // Pause on page change
+      _this.pageChangeListener = mBroadcaster.addListener('pagechange', function () {
+        return _this.doToggle('pause');
+      });
+      $(document) // Clicked on search result
+      .rebind('chatSearchResultOpen.searchPanel', function () {
+        return _this.toggleMinimize();
+      }) // Clicked outside the search panel component
+      .rebind('click.searchPanel', function (ev) {
+        if (_this.clickedOutsideComponent(ev) && !_this.props.minimized) {
+          _this.toggleMinimize();
+        }
+      }) // `ESC` keypress
+      .rebind('keydown.searchPanel', function (_ref) {
+        var keyCode = _ref.keyCode;
+
+        if (keyCode && keyCode === 27
+        /* ESC */
+        && !_this.props.minimized) {
+          // Clear the text on the first `ESC` press; minimize on the second
+          return searchField_SearchField.hasValue() ? _this.handleReset() : _this.toggleMinimize();
+        }
+      });
+    };
+
+    _this.clickedOutsideComponent = function (ev) {
+      var $target = ev && $(ev.target);
+      var outsideElements = ['div.conversationsApp', 'div.fm-main', 'div.fm-left-panel', 'i.tiny-reset', 'div.small-icon.thin-search-icon'];
+      return $target && // current parents !== root component
+      $target.parents(".".concat(SEARCH_PANEL_CLASS)).length === 0 && // current element !== left sidebar container
+      $target.parents('div.fm-left-menu.conversations').length === 0 && // current element !== left sidebar icon controls
+      $target.parents('div.nw-fm-left-icons-panel').length === 0 && // current element !== generic outside element
+      outsideElements.every(function (outsideElement) {
+        return !$target.is(outsideElement);
+      });
+    };
+
+    _this.toggleMinimize = function () {
+      _this.doToggle('pause');
+
+      _this.props.onToggle();
+    };
+
+    _this.doSearch = function (s) {
+      var self = searchPanel_assertThisInitialized(_this);
+
+      return ChatSearch.doSearch(s, function (room, result, results) {
+        self.setState({
+          results: results
+        });
+      }).catch(function (ex) {
+        if (d) {
+          console.log("Search failed (or was resetted)", ex);
+        }
+      }).always(function () {
+        self.setState({
+          status: STATUS.COMPLETED
+        });
+      });
+    };
+
+    _this.doToggle = function (action
+    /* pause || resume || destroy */
+    ) {
+      var cs = ChatSearch.doSearch.cs;
+
+      if (action && cs) {
+        var IN_PROGRESS = STATUS.IN_PROGRESS,
+            PAUSED = STATUS.PAUSED,
+            COMPLETED = STATUS.COMPLETED;
+
+        _this.setState({
+          status: function () {
+            switch (action) {
+              case 'pause':
+                return PAUSED;
+
+              case 'resume':
+                return IN_PROGRESS;
+
+              default:
+                return COMPLETED;
+            }
+          }()
+        }, function () {
+          cs[action]();
+        });
+      }
+    };
+
+    _this.handleChange = function (ev) {
+      var value = ev.target.value;
+      var searching = value.length > 0;
+
+      _this.setState({
+        value: value,
+        searching: searching,
+        status: STATUS.IN_PROGRESS,
+        results: []
+      }, function () {
+        if (searching) {
+          delay('chat-search', _this.doSearch.bind(searchPanel_assertThisInitialized(_this), value), 1600);
+        } else {
+          _this.setState({
+            results: []
+          });
+        }
+      });
+    };
+
+    _this.handleToggle = function () {
+      var inProgress = _this.state.status === STATUS.IN_PROGRESS;
+
+      _this.setState({
+        status: inProgress ? STATUS.PAUSED : STATUS.IN_PROGRESS
+      }, function () {
+        Soon(function () {
+          return searchField_SearchField.focus();
+        });
+        return _this.doToggle(inProgress ? 'pause' : 'resume');
+      });
+    };
+
+    _this.handleReset = function () {
+      return (// Clear the text on the first reset; minimize on the second
+        searchField_SearchField.hasValue() ? _this.setState({
+          value: '',
+          searching: false,
+          status: undefined,
+          results: []
+        }, function () {
+          _this.doToggle('destroy');
+
+          onIdle(function () {
+            return searchField_SearchField.focus();
+          });
+        }) : _this.toggleMinimize()
+      );
+    };
+
+    return _this;
+  }
+
+  searchPanel_createClass(SearchPanel, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      searchPanel_get(searchPanel_getPrototypeOf(SearchPanel.prototype), "componentDidMount", this).call(this);
+
+      this.bindEvents();
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(nextProps, nextContext) {
+      searchPanel_get(searchPanel_getPrototypeOf(SearchPanel.prototype), "componentWillReceiveProps", this).call(this, nextProps, nextContext);
+
+      if (nextProps.minimized !== this.props.minimized) {
+        this.safeForceUpdate(); // Focus and mark the text as selected on re-opening from minimize
+
+        if (!nextProps.minimized) {
+          Soon(function () {
+            searchField_SearchField.focus();
+            searchField_SearchField.select();
+          });
+        }
+      }
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      searchPanel_get(searchPanel_getPrototypeOf(SearchPanel.prototype), "componentWillUnmount", this).call(this);
+
+      this.unbindEvents();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$state = this.state,
+          value = _this$state.value,
+          searching = _this$state.searching,
+          status = _this$state.status,
+          recents = _this$state.recents,
+          results = _this$state.results; //
+      // `SearchPanel`
+      // https://mega.nz/file/UZUz0A5C#j4ctadWqhVT2_m3qyNfgrle11B8NNZgrKTafg1htd1Y
+      // https://mega.nz/file/UR1VjYKR#FhY3j9WZDJlCYYj2skuCScIHnrIsr7OI4KBfTiQLnHQ
+      // https://mega.nz/file/QFExTYpD#Jp9R0CV3ri9B081k1i36kDa57ZEe2W2JPp5havIn8Ww
+      //
+      // Component hierarchy
+      // https://mega.nz/file/lRkwyYwR#XsLtcMV6fe_HiBZ1shOdt0FvJrB-rr6agoIh0N8xQys
+      // -------------------------------------------------------------------------
+
+      return /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "\n                ".concat(SEARCH_PANEL_CLASS, "\n                ").concat(searching ? 'expanded' : '', "\n                ").concat(this.props.minimized ? 'hidden' : '', "\n            ")
+      }, /*#__PURE__*/external_React_default.a.createElement(searchField_SearchField, {
+        value: value,
+        searching: searching,
+        status: status,
+        onChange: this.handleChange,
+        onToggle: this.handleToggle,
+        onReset: this.handleReset
+      }), /*#__PURE__*/external_React_default.a.createElement("div", {
+        className: "search-results-wrapper"
+      }, /*#__PURE__*/external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+        options: {
+          'suppressScrollX': true
+        }
+      }, !!recents.length && !searching && /*#__PURE__*/external_React_default.a.createElement(resultContainer_ResultContainer, {
+        recents: recents
+      }), searching && /*#__PURE__*/external_React_default.a.createElement(resultContainer_ResultContainer, {
+        status: status,
+        results: results
+      }))));
+    }
+  }]);
+
+  return SearchPanel;
+}(mixins["MegaRenderMixin"]);
+
+
+// EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
+var modalDialogs = __webpack_require__(7);
+
+// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+function conversations_typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { conversations_typeof = function _typeof(obj) { return typeof obj; }; } else { conversations_typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return conversations_typeof(obj); }
+
+function conversations_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function conversations_defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function conversations_createClass(Constructor, protoProps, staticProps) { if (protoProps) conversations_defineProperties(Constructor.prototype, protoProps); if (staticProps) conversations_defineProperties(Constructor, staticProps); return Constructor; }
+
+function conversations_get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { conversations_get = Reflect.get; } else { conversations_get = function _get(target, property, receiver) { var base = conversations_superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return conversations_get(target, property, receiver || target); }
+
+function conversations_superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = conversations_getPrototypeOf(object); if (object === null) break; } return object; }
+
+function conversations_inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) conversations_setPrototypeOf(subClass, superClass); }
+
+function conversations_setPrototypeOf(o, p) { conversations_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return conversations_setPrototypeOf(o, p); }
+
+function conversations_createSuper(Derived) { var hasNativeReflectConstruct = conversations_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = conversations_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = conversations_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return conversations_possibleConstructorReturn(this, result); }; }
+
+function conversations_possibleConstructorReturn(self, call) { if (call && (conversations_typeof(call) === "object" || typeof call === "function")) { return call; } return conversations_assertThisInitialized(self); }
+
+function conversations_assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function conversations_isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function conversations_getPrototypeOf(o) { conversations_getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return conversations_getPrototypeOf(o); }
+
+// libs
+
+
+var React = __webpack_require__(0);
+
+var ReactDOM = __webpack_require__(4);
+
+
+
+var getMessageString = __webpack_require__(12).getMessageString;
+
+var PerfectScrollbar = __webpack_require__(10).PerfectScrollbar;
+
+
+
+
+
+
+
+
+
+var StartGroupChatWizard = __webpack_require__(24).StartGroupChatWizard;
+
+var getRoomName = function getRoomName(chatRoom) {
+  return chatRoom.getRoomTitle();
+};
+
+var conversations_ConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin) {
+  conversations_inherits(ConversationsListItem, _MegaRenderMixin);
+
+  var _super = conversations_createSuper(ConversationsListItem);
+
+  function ConversationsListItem() {
+    conversations_classCallCheck(this, ConversationsListItem);
+
+    return _super.apply(this, arguments);
+  }
+
+  conversations_createClass(ConversationsListItem, [{
+    key: "specShouldComponentUpdate",
+    value: function specShouldComponentUpdate() {
+      if (this.loadingShown || this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown || this.props.chatRoom.messagesBuff.isDecrypting && this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' && this.loadingShown) {
+        return false;
+      } else {
+        return undefined;
+      }
+    }
+  }, {
+    key: "componentWillMount",
+    value: function componentWillMount() {
+      var self = this;
+
+      self.chatRoomChangeListener = function () {
+        self.debouncedForceUpdate(750);
+      };
+
+      self.props.chatRoom.rebind('onUnreadCountUpdate.convlistitem', function () {
+        delete self.lastMessageId;
+        self.safeForceUpdate();
+      });
+      self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      conversations_get(conversations_getPrototypeOf(ConversationsListItem.prototype), "componentWillUnmount", this).call(this);
+
+      var self = this;
+      self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
+      self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      conversations_get(conversations_getPrototypeOf(ConversationsListItem.prototype), "componentDidMount", this).call(this);
+
+      this.eventuallyScrollTo();
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      conversations_get(conversations_getPrototypeOf(ConversationsListItem.prototype), "componentDidUpdate", this).call(this);
+
+      this.eventuallyScrollTo();
+    }
+  }, {
+    key: "eventuallyScrollTo",
+    value: function eventuallyScrollTo() {
+      if (this.props.chatRoom._scrollToOnUpdate && megaChat.currentlyOpenedChat === this.props.chatRoom.roomId) {
+        this.props.chatRoom.scrollToChat();
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var classString = "";
+      var megaChat = this.props.chatRoom.megaChat;
+      var chatRoom = this.props.chatRoom;
+
+      if (!chatRoom || !chatRoom.chatId) {
+        return null;
+      }
+
+      var roomId = chatRoom.chatId; // selected
+
+      if (chatRoom.isCurrentlyActive) {
+        classString += " active";
+      }
+
+      var nameClassString = "user-card-name conversation-name";
+      var archivedDiv = "";
+
+      if (chatRoom.isArchived()) {
+        archivedDiv = /*#__PURE__*/React.makeElement("div", {
+          className: "archived-badge"
+        }, __(l[19067]));
+      }
+
+      var contactId;
+      var presenceClass;
+      var id;
+
+      if (chatRoom.type === "private") {
+        var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
+
+        if (!contact) {
+          return null;
+        }
+
+        id = 'conversation_' + htmlentities(contact.u);
+        presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
+      } else if (chatRoom.type === "group") {
+        contactId = roomId;
+        id = 'conversation_' + contactId;
+        presenceClass = 'group';
+        classString += ' groupchat';
+      } else if (chatRoom.type === "public") {
+        contactId = roomId;
+        id = 'conversation_' + contactId;
+        presenceClass = 'group';
+        classString += ' groupchat public';
+      } else {
+        return "unknown room type: " + chatRoom.roomId;
+      }
+
+      if (ChatdIntegration._loadingChats[chatRoom.roomId] && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise && ChatdIntegration._loadingChats[chatRoom.roomId].loadingPromise.state() === 'pending' || chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.joined === false || chatRoom.messagesBuff.joined === true && chatRoom.messagesBuff.haveMessages === true && chatRoom.messagesBuff.messagesHistoryIsLoading() === true || chatRoom.messagesBuff.isDecrypting && chatRoom.messagesBuff.isDecrypting.state() === 'pending') {
+        this.loadingShown = true;
+      } else {
+        delete this.loadingShown;
+      }
+
+      var unreadCount = chatRoom.messagesBuff.getUnreadCount();
+      var isUnread = false;
+      var notificationItems = [];
+
+      if (chatRoom.havePendingCall() && chatRoom.state != ChatRoom.STATE.LEFT) {
+        notificationItems.push( /*#__PURE__*/React.makeElement("i", {
+          className: "tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset",
+          key: "callIcon"
+        }));
+      }
+
+      if (unreadCount > 0) {
+        notificationItems.push( /*#__PURE__*/React.makeElement("span", {
+          key: "unreadCounter"
+        }, unreadCount > 9 ? "9+" : unreadCount));
+        isUnread = true;
+      }
+
+      var inCallDiv = null;
+      var lastMessageDiv = null;
+      var lastMessageDatetimeDiv = null;
+      var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+      var lastMsgDivClasses;
+
+      if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
+        lastMsgDivClasses = this._lastMsgDivClassesCache;
+        lastMessageDiv = this._lastMessageDivCache;
+        lastMessageDatetimeDiv = this._lastMessageDatetimeDivCache;
+        lastMsgDivClasses += isUnread ? " unread" : "";
+
+        if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+          lastMsgDivClasses += " call";
+          classString += " call-exists";
+        }
+      } else if (lastMessage) {
+        lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : ""); // safe some CPU cycles...
+
+        var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
+        lastMessage.renderableSummary = renderableSummary;
+
+        if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
+          lastMsgDivClasses += " call";
+          classString += " call-exists";
+        }
+
+        lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
+          className: lastMsgDivClasses,
+          dangerouslySetInnerHTML: {
+            __html: renderableSummary
+          }
+        });
+        var voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
+
+        if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType) {
+          var playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
+          lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
+            className: lastMsgDivClasses
+          }, /*#__PURE__*/React.makeElement("span", {
+            className: "voice-message-icon"
+          }), playTime);
+        }
+
+        if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
+          lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
+            className: lastMsgDivClasses
+          }, /*#__PURE__*/React.makeElement("span", {
+            className: "geolocation-icon"
+          }), l[20789]);
+        }
+
+        var timestamp = lastMessage.delay;
+        var curTimeMarker;
+        var msgDate = new Date(timestamp * 1000);
+        var iso = msgDate.toISOString();
+
+        if (todayOrYesterday(iso)) {
+          // if in last 2 days, use the time2lastSeparator
+          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
+        } else {
+          // if not in the last 2 days, use 1st June [Year]
+          curTimeMarker = acc_time2date(timestamp, false);
+        }
+
+        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
+          className: "date-time"
+        }, curTimeMarker);
+      } else {
+        lastMsgDivClasses = "conversation-message";
+        /**
+         * Show "Loading" until:
+         * 1. I'd fetched chats from the API.
+         * 2. I'm retrieving history at the moment.
+         * 3. I'd connected to chatd and joined the room.
+          */
+
+        var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+
+        if (ChatdIntegration.mcfHasFinishedPromise.state() === 'pending') {
+          if (!ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached) {
+            ChatdIntegration.mcfHasFinishedPromise.always(function () {
+              megaChat.chats.trackDataChange();
+            });
+            ChatdIntegration.mcfHasFinishedPromise._trackDataChangeAttached = true;
+          }
+        }
+
+        lastMessageDiv = /*#__PURE__*/React.makeElement("div", null, /*#__PURE__*/React.createElement("div", {
+          className: lastMsgDivClasses
+        }, __(emptyMessage)));
+        timestamp = chatRoom.ctime;
+        var msgDate = new Date(timestamp * 1000);
+        var iso = msgDate.toISOString();
+
+        if (todayOrYesterday(iso)) {
+          // if in last 2 days, use the time2lastSeparator
+          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
+        } else {
+          // if not in the last 2 days, use 1st June [Year]
+          curTimeMarker = acc_time2date(timestamp, false);
+        }
+
+        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
+          className: "date-time"
+        }, l[19077].replace("%s1", curTimeMarker));
+      }
+
+      this.lastMessageId = lastMessage && lastMessage.messageId;
+      this._lastMsgDivClassesCache = lastMsgDivClasses.replace(" call-exists", "").replace(" unread", "");
+      this._lastMessageDivCache = lastMessageDiv;
+      this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
+
+      if (chatRoom.callManagerCall && chatRoom.callManagerCall.isActive() === true) {
+        var mediaOptions = chatRoom.callManagerCall.getMediaOptions();
+        var mutedMicrophone = null;
+        var activeCamera = null;
+        var onHold = null;
+
+        if (chatRoom.callManagerCall.rtcCall.isOnHold()) {
+          onHold = /*#__PURE__*/React.makeElement("i", {
+            className: "small-icon grey-call-on-hold"
+          });
+        } else {
+          if (!mediaOptions.audio) {
+            mutedMicrophone = /*#__PURE__*/React.makeElement("i", {
+              className: "small-icon grey-crossed-mic"
+            });
+          }
+
+          if (mediaOptions.video) {
+            activeCamera = /*#__PURE__*/React.makeElement("i", {
+              className: "small-icon grey-videocam"
+            });
+          }
+        }
+
+        inCallDiv = /*#__PURE__*/React.makeElement("div", {
+          className: "call-duration"
+        }, mutedMicrophone, activeCamera, onHold, /*#__PURE__*/React.makeElement("span", {
+          className: "call-counter",
+          "data-room-id": chatRoom.chatId
+        }, secondsToTimeShort(chatRoom._currentCallCounter)));
+        classString += " call-active"; // hide archived div when it is in a call.
+
+        archivedDiv = "";
+      }
+
+      if (chatRoom.type !== "public") {
+        nameClassString += " privateChat";
+      }
+
+      if (chatRoom.callManagerCall && (chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_INCOMING || chatRoom.callManagerCall.state === CallManagerCall.STATE.WAITING_RESPONSE_OUTGOING)) {
+        classString += " have-incoming-ringing-call";
+      }
+
+      var self = this;
+      return /*#__PURE__*/React.makeElement("li", {
+        className: classString,
+        id: id,
+        "data-room-id": roomId,
+        "data-jid": contactId,
+        onClick: function onClick(e) {
+          self.props.onConversationClicked(e);
+        }
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: nameClassString
+      }, /*#__PURE__*/React.makeElement(utils["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "private" ? /*#__PURE__*/React.createElement("span", {
+        className: "user-card-presence " + presenceClass
+      }) : undefined), chatRoom.type === "group" || chatRoom.type === "private" ? /*#__PURE__*/React.makeElement("i", {
+        className: "tiny-icon blue-key simpletip",
+        "data-simpletip": l[20935]
+      }) : undefined, archivedDiv, notificationItems.length > 0 ? /*#__PURE__*/React.makeElement("div", {
+        className: "unread-messages items-" + notificationItems.length
+      }, notificationItems) : null, inCallDiv, lastMessageDiv, lastMessageDatetimeDiv);
+    }
+  }]);
+
+  return ConversationsListItem;
+}(mixins["MegaRenderMixin"]);
+
+;
+
+var conversations_ArchConversationsListItem = /*#__PURE__*/function (_MegaRenderMixin2) {
+  conversations_inherits(ArchConversationsListItem, _MegaRenderMixin2);
+
+  var _super2 = conversations_createSuper(ArchConversationsListItem);
+
+  function ArchConversationsListItem() {
+    conversations_classCallCheck(this, ArchConversationsListItem);
+
+    return _super2.apply(this, arguments);
+  }
+
+  conversations_createClass(ArchConversationsListItem, [{
+    key: "render",
+    value: function render() {
+      var classString = "arc-chat-list ui-droppable ui-draggable ui-draggable-handle";
+      var megaChat = this.props.chatRoom.megaChat;
+      var chatRoom = this.props.chatRoom;
+
+      if (!chatRoom || !chatRoom.chatId) {
+        return null;
+      }
+
+      var roomId = chatRoom.chatId; // selected
+
+      if (chatRoom.archivedSelected === true) {
+        classString += " ui-selected";
+      }
+
+      var nameClassString = "user-card-name conversation-name";
+      var contactId;
+      var presenceClass;
+      var id;
+
+      if (chatRoom.type === "private") {
+        var contact = M.u[chatRoom.getParticipantsExceptMe()[0]];
+
+        if (!contact) {
+          return null;
+        }
+
+        id = 'conversation_' + htmlentities(contact.u);
+        presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
+      } else if (chatRoom.type === "group") {
+        contactId = roomId;
+        id = 'conversation_' + contactId;
+        presenceClass = 'group';
+        classString += ' groupchat';
+      } else if (chatRoom.type === "public") {
+        contactId = roomId;
+        id = 'conversation_' + contactId;
+        presenceClass = 'group';
+        classString += ' groupchat public';
+      } else {
+        return "unknown room type: " + chatRoom.roomId;
+      }
+
+      var lastMessageDiv = null;
+      var lastMessageDatetimeDiv = null;
+      var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+
+      if (lastMessage) {
+        var lastMsgDivClasses = "conversation-message";
+        var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
+        lastMessage.renderableSummary = renderableSummary;
+        lastMessageDiv = /*#__PURE__*/React.makeElement("div", {
+          className: lastMsgDivClasses,
+          dangerouslySetInnerHTML: {
+            __html: renderableSummary
+          }
+        });
+        var timestamp = lastMessage.delay;
+        var curTimeMarker;
+        var msgDate = new Date(timestamp * 1000);
+        var iso = msgDate.toISOString();
+
+        if (todayOrYesterday(iso)) {
+          // if in last 2 days, use the time2lastSeparator
+          curTimeMarker = time2lastSeparator(iso) + ", " + unixtimeToTimeString(timestamp);
+        } else {
+          // if not in the last 2 days, use 1st June [Year]
+          curTimeMarker = acc_time2date(timestamp, false);
+        }
+
+        lastMessageDatetimeDiv = /*#__PURE__*/React.makeElement("div", {
+          className: "date-time"
+        }, curTimeMarker);
+      } else {
+        var lastMsgDivClasses = "conversation-message";
+        /**
+         * Show "Loading" until:
+         * 1. I'd fetched chats from the API.
+         * 2. I'm retrieving history at the moment.
+         * 3. I'd connected to chatd and joined the room.
+          */
+
+        var emptyMessage = ChatdIntegration.mcfHasFinishedPromise.state() !== 'resolved' || chatRoom.messagesBuff.messagesHistoryIsLoading() || this.loadingShown || chatRoom.messagesBuff.joined === false ? l[7006] : l[8000];
+        lastMessageDiv = /*#__PURE__*/React.makeElement("div", null, /*#__PURE__*/React.createElement("div", {
+          className: lastMsgDivClasses
+        }, __(emptyMessage)));
+      }
+
+      if (chatRoom.type !== "public") {
+        nameClassString += " privateChat";
+      }
+
+      return /*#__PURE__*/React.makeElement("tr", {
+        className: classString,
+        id: id,
+        "data-room-id": roomId,
+        "data-jid": contactId,
+        onClick: this.props.onConversationSelected.bind(this),
+        onDoubleClick: this.props.onConversationClicked.bind(this)
+      }, /*#__PURE__*/React.makeElement("td", {
+        className: ""
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "fm-chat-user-info todo-star"
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: nameClassString
+      }, /*#__PURE__*/React.makeElement(utils["default"].EmojiFormattedContent, null, chatRoom.getRoomTitle()), chatRoom.type === "group" ? /*#__PURE__*/React.createElement("i", {
+        className: "tiny-icon blue-key"
+      }) : undefined), lastMessageDiv, lastMessageDatetimeDiv), /*#__PURE__*/React.makeElement("div", {
+        className: "archived-badge"
+      }, __(l[19067]))), /*#__PURE__*/React.makeElement("td", {
+        width: "330"
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "archived-on"
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "archived-date-time"
+      }, lastMessageDatetimeDiv), /*#__PURE__*/React.makeElement("div", {
+        className: "clear"
+      })), /*#__PURE__*/React.makeElement("div", {
+        className: "button default-white-button semi-big unarchive-chat right",
+        onClick: this.props.onUnarchiveConversationClicked.bind(this)
+      }, /*#__PURE__*/React.makeElement("span", null, __(l[19065])))));
+    }
+  }]);
+
+  return ArchConversationsListItem;
+}(mixins["MegaRenderMixin"]);
+
+;
+
+var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
+  conversations_inherits(ConversationsList, _MegaRenderMixin3);
+
+  var _super3 = conversations_createSuper(ConversationsList);
+
+  conversations_createClass(ConversationsList, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      var self = this;
+      self._megaChatsListener = megaChat.chats.addChangeListener(function () {
+        self.throttledOnPropOrStateUpdated();
+      });
+    }
+  }, {
+    key: "detachRerenderCallbacks",
+    value: function detachRerenderCallbacks() {
+      if (conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this)) {
+        conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "detachRerenderCallbacks", this).call(this);
+      }
+
+      megaChat.chats.removeChangeListener(this._megaChatsListener);
+    }
+  }]);
+
+  function ConversationsList(props) {
+    var _this;
+
+    conversations_classCallCheck(this, ConversationsList);
+
+    _this = _super3.call(this, props);
+    _this.currentCallClicked = _this.currentCallClicked.bind(conversations_assertThisInitialized(_this));
+    _this.endCurrentCall = _this.endCurrentCall.bind(conversations_assertThisInitialized(_this));
+    return _this;
+  }
+
+  conversations_createClass(ConversationsList, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this) && conversations_get(conversations_getPrototypeOf(ConversationsList.prototype), "componentDidUpdate", this).call(this);
+    }
+  }, {
+    key: "conversationClicked",
+    value: function conversationClicked(room, e) {
+      loadSubPage(room.getRoomUrl());
+      e.stopPropagation();
+    }
+  }, {
+    key: "currentCallClicked",
+    value: function currentCallClicked(e) {
+      var activeCallSession = megaChat.activeCallSession;
+
+      if (activeCallSession) {
+        this.conversationClicked(activeCallSession.room, e);
+      }
+    }
+  }, {
+    key: "contactClicked",
+    value: function contactClicked(contact, e) {
+      loadSubPage("fm/chat/p/" + contact.u);
+      e.stopPropagation();
+    }
+  }, {
+    key: "endCurrentCall",
+    value: function endCurrentCall(e) {
+      var activeCallSession = megaChat.activeCallSession;
+
+      if (activeCallSession) {
+        activeCallSession.endCall('hangup');
+        this.conversationClicked(activeCallSession.room, e);
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var self = this;
+      var currentCallingContactStatusProps = {
+        'className': "nw-conversations-item current-calling",
+        'data-jid': ''
+      };
+      var activeCallSession = megaChat.activeCallSession;
+
+      if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
+        var room = activeCallSession.room;
+        var user = room.getParticipantsExceptMe()[0];
+
+        if (user) {
+          currentCallingContactStatusProps.className += " " + user.u + " " + megaChat.userPresenceToCssClass(user.presence);
+          currentCallingContactStatusProps['data-jid'] = room.roomId;
+
+          if (room.roomId == megaChat.currentlyOpenedChat) {
+            currentCallingContactStatusProps.className += " selected";
+          }
+        } else {
+          currentCallingContactStatusProps.className += ' hidden';
+        }
+      } else {
+        currentCallingContactStatusProps.className += ' hidden';
+      }
+
+      var currConvsList = [];
+      var sortedConversations = obj_values(megaChat.chats.toJS());
+      sortedConversations.sort(M.sortObjFn(function (room) {
+        return !room.lastActivity ? room.ctime : room.lastActivity;
+      }, -1));
+      sortedConversations.forEach(function (chatRoom) {
+        var contact;
+
+        if (!chatRoom || !chatRoom.roomId) {
+          return;
+        }
+
+        if (!chatRoom.isDisplayable()) {
+          return;
+        }
+
+        if (self.props.quickSearchText) {
+          var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
+          var s2 = String(self.props.quickSearchText).toLowerCase();
+
+          if (s1.indexOf(s2) === -1) {
+            return;
+          }
+        } // Checking if this a business user with expired status
+
+
+        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+          chatRoom.privateReadOnlyChat = true;
+        } else {
+          if (chatRoom.type === "private") {
+            contact = chatRoom.getParticipantsExceptMe()[0];
+
+            if (!contact) {
+              return;
+            }
+
+            contact = M.u[contact];
+
+            if (contact) {
+              if (!chatRoom.privateReadOnlyChat && !contact.c) {
+                // a non-contact conversation, e.g. contact removed - mark as read only
+                Soon(function () {
+                  chatRoom.privateReadOnlyChat = true;
+                });
+              } else if (chatRoom.privateReadOnlyChat && contact.c) {
+                // a non-contact conversation, e.g. contact removed - mark as read only
+                Soon(function () {
+                  chatRoom.privateReadOnlyChat = false;
+                });
+              }
+            }
+          }
+        }
+
+        currConvsList.push( /*#__PURE__*/React.makeElement(conversations_ConversationsListItem, {
+          key: chatRoom.roomId,
+          chatRoom: chatRoom,
+          contact: contact,
+          messages: chatRoom.messagesBuff,
+          onConversationClicked: function onConversationClicked(e) {
+            self.conversationClicked(chatRoom, e);
+          }
+        }));
+      });
+      return /*#__PURE__*/React.makeElement("div", {
+        className: "conversationsList"
+      }, /*#__PURE__*/React.makeElement("ul", {
+        className: "conversations-pane"
+      }, currConvsList));
+    }
+  }]);
+
+  return ConversationsList;
+}(mixins["MegaRenderMixin"]);
+
+ConversationsList.defaultProps = {
+  'manualDataChangeTracking': true
+};
+;
+
+var conversations_ArchivedConversationsList = /*#__PURE__*/function (_MegaRenderMixin4) {
+  conversations_inherits(ArchivedConversationsList, _MegaRenderMixin4);
+
+  var _super4 = conversations_createSuper(ArchivedConversationsList);
+
+  function ArchivedConversationsList(props) {
+    var _this2;
+
+    conversations_classCallCheck(this, ArchivedConversationsList);
+
+    _this2 = _super4.call(this, props);
+    _this2.state = _this2.getInitialState();
+    _this2.onSortNameClicked = _this2.onSortNameClicked.bind(conversations_assertThisInitialized(_this2));
+    _this2.onSortTimeClicked = _this2.onSortTimeClicked.bind(conversations_assertThisInitialized(_this2));
+    return _this2;
+  }
+
+  conversations_createClass(ArchivedConversationsList, [{
+    key: "getInitialState",
+    value: function getInitialState() {
+      return {
+        'items': megaChat.chats,
+        'orderby': 'lastActivity',
+        'nameorder': 1,
+        'timeorder': -1,
+        'confirmUnarchiveChat': null,
+        'confirmUnarchiveDialogShown': false
+      };
+    }
+  }, {
+    key: "conversationClicked",
+    value: function conversationClicked(room, e) {
+      room.showArchived = true;
+      loadSubPage(room.getRoomUrl());
+      e.stopPropagation();
+    }
+  }, {
+    key: "conversationSelected",
+    value: function conversationSelected(room, e) {
+      var self = this;
+      var previousState = room.archivedSelected ? room.archivedSelected : false;
+      var sortedConversations = obj_values(megaChat.chats.toJS());
+      sortedConversations.forEach(function (chatRoom) {
+        if (!chatRoom || !chatRoom.roomId) {
+          return;
+        }
+
+        if (!chatRoom.isArchived()) {
+          return;
+        }
+
+        if (chatRoom.chatId !== room.chatId) {
+          chatRoom.archivedSelected = false;
+        } else {
+          chatRoom.archivedSelected = !chatRoom.archivedSelected;
+        }
+      });
+      room.archivedSelected = !previousState;
+      self.setState({
+        'items': sortedConversations
+      });
+      e.stopPropagation();
+    }
+  }, {
+    key: "unarchiveConversationClicked",
+    value: function unarchiveConversationClicked(room, e) {
+      var self = this;
+      self.setState({
+        'confirmUnarchiveDialogShown': true,
+        'confirmUnarchiveChat': room.roomId
+      });
+    }
+  }, {
+    key: "onSortNameClicked",
+    value: function onSortNameClicked(e) {
+      this.setState({
+        'orderby': 'name',
+        'nameorder': this.state.nameorder * -1
+      });
+    }
+  }, {
+    key: "onSortTimeClicked",
+    value: function onSortTimeClicked(e) {
+      this.setState({
+        'orderby': 'lastActivity',
+        'timeorder': this.state.timeorder * -1
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var self = this;
+      var currConvsList = [];
+      var sortedConversations = obj_values(megaChat.chats.toJS());
+      var orderValue = -1;
+      var orderKey = "lastActivity";
+      var nameOrderClass = "";
+      var timerOrderClass = "";
+
+      if (self.state.orderby === "name") {
+        orderKey = getRoomName;
+        orderValue = self.state.nameorder;
+        nameOrderClass = self.state.nameorder === 1 ? "desc" : "asc";
+      } else {
+        orderKey = "lastActivity";
+        orderValue = self.state.timeorder;
+        timerOrderClass = self.state.timeorder === 1 ? "desc" : "asc";
+      }
+
+      sortedConversations.sort(M.sortObjFn(orderKey, orderValue));
+      sortedConversations.forEach(function (chatRoom) {
+        var contact;
+
+        if (!chatRoom || !chatRoom.roomId) {
+          return;
+        }
+
+        if (!chatRoom.isArchived()) {
+          return;
+        }
+
+        if (chatRoom.type === "private") {
+          contact = chatRoom.getParticipantsExceptMe()[0];
+
+          if (!contact) {
+            return;
+          }
+
+          contact = M.u[contact];
+
+          if (contact) {
+            if (!chatRoom.privateReadOnlyChat && !contact.c) {
+              // a non-contact conversation, e.g. contact removed - mark as read only
+              Soon(function () {
+                chatRoom.privateReadOnlyChat = true;
+              });
+            } else if (chatRoom.privateReadOnlyChat && contact.c) {
+              // a non-contact conversation, e.g. contact removed - mark as read only
+              Soon(function () {
+                chatRoom.privateReadOnlyChat = false;
+              });
+            }
+          }
+        }
+
+        currConvsList.push( /*#__PURE__*/React.makeElement(conversations_ArchConversationsListItem, {
+          key: chatRoom.roomId,
+          chatRoom: chatRoom,
+          contact: contact,
+          messages: chatRoom.messagesBuff,
+          onConversationClicked: function onConversationClicked(e) {
+            self.conversationClicked(chatRoom, e);
+          },
+          onConversationSelected: function onConversationSelected(e) {
+            self.conversationSelected(chatRoom, e);
+          },
+          onUnarchiveConversationClicked: function onUnarchiveConversationClicked(e) {
+            self.unarchiveConversationClicked(chatRoom, e);
+          }
+        }));
+      });
+      var confirmUnarchiveDialog = null;
+
+      if (self.state.confirmUnarchiveDialogShown === true) {
+        var room = megaChat.chats[self.state.confirmUnarchiveChat];
+
+        if (room) {
+          confirmUnarchiveDialog = /*#__PURE__*/React.makeElement(modalDialogs["a" /* default */].ConfirmDialog, {
+            chatRoom: room,
+            title: __(l[19063]),
+            name: "unarchive-conversation",
+            onClose: function onClose() {
+              self.setState({
+                'confirmUnarchiveDialogShown': false
+              });
+            },
+            onConfirmClicked: function onConfirmClicked() {
+              room.unarchive();
+              self.setState({
+                'confirmUnarchiveDialogShown': false
+              });
+            }
+          }, /*#__PURE__*/React.makeElement("div", {
+            className: "fm-dialog-content"
+          }, /*#__PURE__*/React.makeElement("div", {
+            className: "dialog secondary-header"
+          }, __(l[19064]))));
+        }
+      }
+
+      return /*#__PURE__*/React.makeElement("div", {
+        className: "chat-content-block archived-chats"
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "files-grid-view archived-chat-view"
+      }, /*#__PURE__*/React.makeElement("table", {
+        className: "grid-table-header",
+        width: "100%",
+        cellSpacing: "0",
+        cellPadding: "0",
+        border: "0"
+      }, /*#__PURE__*/React.makeElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+        className: "calculated-width",
+        onClick: self.onSortNameClicked
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "is-chat arrow name " + nameOrderClass
+      }, __(l[86]))), /*#__PURE__*/React.makeElement("th", {
+        width: "330",
+        onClick: self.onSortTimeClicked
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "is-chat arrow interaction " + timerOrderClass
+      }, __(l[5904])))))), /*#__PURE__*/React.makeElement("div", {
+        className: "grid-scrolling-table archive-chat-list"
+      }, /*#__PURE__*/React.makeElement("table", {
+        className: "grid-table arc-chat-messages-block"
+      }, /*#__PURE__*/React.makeElement("tbody", null, currConvsList)))), confirmUnarchiveDialog);
+    }
+  }]);
+
+  return ArchivedConversationsList;
+}(mixins["MegaRenderMixin"]);
+
+;
+
+var conversations_ConversationsApp = /*#__PURE__*/function (_MegaRenderMixin5) {
+  conversations_inherits(ConversationsApp, _MegaRenderMixin5);
+
+  var _super5 = conversations_createSuper(ConversationsApp);
+
+  function ConversationsApp(props) {
+    var _this3;
+
+    conversations_classCallCheck(this, ConversationsApp);
+
+    _this3 = _super5.call(this, props);
+    _this3.state = {
+      leftPaneWidth: mega.config.get('leftPaneWidth'),
+      startGroupChatDialogShown: false,
+      searchActive: false,
+      searchMinimized: true
+    };
+    return _this3;
+  }
+
+  conversations_createClass(ConversationsApp, [{
+    key: "startChatClicked",
+    value: function startChatClicked(selected) {
+      if (selected.length === 1) {
+        megaChat.createAndShowPrivateRoomFor(selected[0]).then(function (room) {
+          room.setActive();
+        });
+      } else {
+        megaChat.createAndShowGroupRoomFor(selected);
+      }
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      conversations_get(conversations_getPrototypeOf(ConversationsApp.prototype), "componentDidMount", this).call(this);
+
+      var self = this;
+      $(document.body).rebind('startNewChatLink.conversations', function (e) {
+        self.startGroupChatFlow = 2;
+        self.setState({
+          'startGroupChatDialogShown': true
+        });
+      });
+      window.addEventListener('resize', this.handleWindowResize);
+      $(document).rebind('keydown.megaChatTextAreaFocus', function (e) {
+        // prevent recursion!
+        if (e.megaChatHandled) {
+          return;
+        }
+
+        var currentlyOpenedChat = megaChat.currentlyOpenedChat;
+        var currentRoom = megaChat.getCurrentRoom();
+
+        if (currentlyOpenedChat) {
+          // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
+          // is visible/active at the moment
+          if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91
+          /* cmd+... */
+          || e.keyCode === 17
+          /* ctrl+... */
+          || e.keyCode === 27
+          /* esc */
+          || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
+            return;
+          }
+
+          var $typeArea = $('.messages-textarea:visible:first');
+          moveCursortoToEnd($typeArea);
+          e.megaChatHandled = true;
+          $typeArea.triggerHandler(e);
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      });
+      $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
+        // prevent recursion!
+        if (!M.chat || e.megaChatHandled || slideshowid) {
+          return;
+        }
+
+        var $target = $(e.target);
+
+        if (megaChat.currentlyOpenedChat) {
+          // don't do ANYTHING if the current focus is already into an input/textarea/select or a .fm-dialog
+          // is visible/active at the moment
+          if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $('.call-block').is(":visible") && !$('.call-block:visible').is('.small-block') || $(document.querySelector('.fm-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
+            return;
+          }
+
+          var $typeArea = $('.messages-textarea:visible:first');
+
+          if ($typeArea.length === 1 && !$typeArea.is(":focus")) {
+            $typeArea.trigger("focus");
+            e.megaChatHandled = true;
+          }
+        }
+      });
+      self.fmConfigThrottling = null;
+      self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function () {
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+        clearTimeout(self.fmConfigThrottling);
+        self.fmConfigThrottling = setTimeout(function fmConfigThrottlingLeftPaneResize() {
+          self.setState({
+            'leftPaneWidth': mega.config.get('leftPaneWidth')
+          });
+          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+          $('.jScrollPaneContainer:visible').trigger('forceResize');
+        }, 75);
+        megaChat.$leftPane.width(mega.config.get('leftPaneWidth'));
+        $('.fm-tree-panel', megaChat.$leftPane).width(mega.config.get('leftPaneWidth'));
+      });
+
+      var lPaneResizableInit = function lPaneResizableInit() {
+        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+        $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
+
+        if (fmconfig.leftPaneWidth) {
+          megaChat.$leftPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
+        }
+
+        $($.leftPaneResizableChat).on('resize', function () {
+          var w = megaChat.$leftPane.width();
+
+          if (w >= $.leftPaneResizableChat.options.maxWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'w-resize');
+          } else if (w <= $.leftPaneResizableChat.options.minWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'e-resize');
+          } else {
+            $('.left-pane-drag-handle').css('cursor', 'we-resize');
+          }
+
+          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
+        });
+        $($.leftPaneResizableChat).on('resizestop', function () {
+          $('.fm-left-panel').width(megaChat.$leftPane.width());
+          $('.jScrollPaneContainer:visible').trigger('forceResize');
+          setTimeout(function () {
+            $('.hiden-when-dragging').removeClass('hiden-when-dragging');
+          }, 100);
+        });
+      };
+
+      if (typeof $.leftPaneResizable === 'undefined') {
+        mBroadcaster.once('fm:initialized', function () {
+          lPaneResizableInit();
+        });
+      } else {
+        lPaneResizableInit();
+      }
+
+      megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
+
+      if (anonymouschat) {
+        megaChat.$leftPane.addClass('hidden');
+      } else {
+        megaChat.$leftPane.removeClass('hidden');
+      }
+
+      this.handleWindowResize();
+      $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function (e) {
+        self.setState({
+          'quickSearchText': ''
+        });
+        treesearch = false;
+      });
+
+      if (ChatdIntegration.allChatsHadLoaded.state() !== 'resolved') {
+        ChatdIntegration.allChatsHadLoaded.done(function () {
+          self.safeForceUpdate();
+        });
+      }
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      conversations_get(conversations_getPrototypeOf(ConversationsApp.prototype), "componentWillUnmount", this).call(this);
+
+      window.removeEventListener('resize', this.handleWindowResize);
+      $(document).off('keydown.megaChatTextAreaFocus');
+      mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
+    }
+  }, {
+    key: "componentDidUpdate",
+    value: function componentDidUpdate() {
+      this.handleWindowResize();
+
+      if (megaChat.displayArchivedChats === true) {
+        this.initArchivedChatsScrolling();
+      }
+    }
+  }, {
+    key: "handleWindowResize",
+    value: function handleWindowResize() {
+      if (!M.chat) {
+        return;
+      } // small piece of what is done in fm_resize_handler...
+
+
+      if (anonymouschat) {
+        $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
+          'margin-left': "0px"
+        });
+      } else {
+        $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
+          'margin-left': $('.fm-left-panel').width() + $('.nw-fm-left-icons-panel').width() + "px"
+        });
+      }
+    }
+  }, {
+    key: "initArchivedChatsScrolling",
+    value: function initArchivedChatsScrolling() {
+      var scroll = '.archive-chat-list';
+      deleteScrollPanel(scroll, 'jsp');
+      $(scroll).jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5
+      });
+      jScrollFade(scroll);
+    }
+  }, {
+    key: "archiveChatsClicked",
+    value: function archiveChatsClicked() {
+      loadSubPage('fm/chat/archived');
+    }
+  }, {
+    key: "calcArchiveChats",
+    value: function calcArchiveChats() {
+      var count = 0;
+      megaChat.chats.forEach(function (chatRoom) {
+        if (!chatRoom || !chatRoom.roomId) {
+          return;
+        }
+
+        if (chatRoom.isArchived()) {
+          count++;
+        }
+      });
+      return count;
+    }
+  }, {
+    key: "getTopButtonsForContactsPicker",
+    value: function getTopButtonsForContactsPicker() {
+      var self = this;
+
+      if (!self._topButtonsContactsPicker) {
+        self._topButtonsContactsPicker = [{
+          'key': 'add',
+          'title': l[71],
+          'icon': 'rounded-plus colorized',
+          'onClick': function onClick(e) {
+            contactAddDialog();
+          }
+        }, {
+          'key': 'newGroupChat',
+          'title': l[19483],
+          'icon': 'conversation-with-plus',
+          'onClick': function onClick(e) {
+            self.startGroupChatFlow = 1;
+            self.setState({
+              'startGroupChatDialogShown': true
+            });
+          }
+        }, {
+          'key': 'newChatLink',
+          'title': l[20638],
+          'icon': 'small-icon blue-chain colorized',
+          'onClick': function onClick(e) {
+            self.startGroupChatFlow = 2;
+            self.setState({
+              'startGroupChatDialogShown': true
+            });
+          }
+        }];
+      }
+
+      return self._topButtonsContactsPicker;
+    }
+  }, {
+    key: "isWaitingForInitialLoadingToFinish",
+    value: function isWaitingForInitialLoadingToFinish() {
+      var self = this; // since in big accounts, a lot chats may finish at the same moment, this requires to be throttled.
+
+      var forceUpdate = SoonFc(function (roomId) {
+        delete self._isWaitingChatsLoad[roomId];
+        self.safeForceUpdate();
+      }, 300);
+      self._isWaitingChatsLoad = self._isWaitingChatsLoad || {};
+      var roomIds = megaChat.chats.keys();
+
+      for (var i = 0; i < roomIds.length; i++) {
+        var roomId = roomIds[i];
+        var chatRoom = megaChat.chats[roomId];
+
+        if (!self._isWaitingChatsLoad[roomId] && chatRoom.initialMessageHistLoaded.state() === 'pending') {
+          self._isWaitingChatsLoad[roomId] = true;
+          chatRoom.initialMessageHistLoaded.always(forceUpdate.bind(undefined, roomId));
+        }
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this4 = this;
+
+      var self = this;
+      var startGroupChatDialog = null;
+
+      if (self.state.startGroupChatDialogShown === true) {
+        startGroupChatDialog = /*#__PURE__*/React.makeElement(StartGroupChatWizard, {
+          name: "start-group-chat",
+          flowType: self.startGroupChatFlow,
+          onClose: function onClose() {
+            self.setState({
+              'startGroupChatDialogShown': false
+            });
+            delete self.startGroupChatFlow;
+          },
+          onConfirmClicked: function onConfirmClicked() {
+            self.setState({
+              'startGroupChatDialogShown': false
+            });
+            delete self.startGroupChatFlow;
+          }
+        });
+      }
+
+      var leftPanelStyles = {};
+
+      if (self.state.leftPaneWidth) {
+        leftPanelStyles.width = self.state.leftPaneWidth;
+      }
+
+      var loadingOrEmpty = null;
+      var isLoading = false;
+      var nonArchivedChats = megaChat.chats.map(function (r) {
+        return !r.isArchived() ? r : undefined;
+      });
+
+      if (nonArchivedChats.length === 0) {
+        loadingOrEmpty = /*#__PURE__*/React.makeElement("div", {
+          className: "fm-empty-messages hidden"
+        }, /*#__PURE__*/React.makeElement("div", {
+          className: "fm-empty-pad"
+        }, /*#__PURE__*/React.makeElement("div", {
+          className: "fm-empty-messages-bg"
+        }), /*#__PURE__*/React.makeElement("div", {
+          className: "fm-empty-cloud-txt"
+        }, l[6870]), /*#__PURE__*/React.makeElement("div", {
+          className: "fm-not-logged-text"
+        }, /*#__PURE__*/React.makeElement("div", {
+          className: "fm-not-logged-description",
+          dangerouslySetInnerHTML: {
+            __html: __(l[8762]).replace("[S]", "<span className='red'>").replace("[/S]", "</span>")
+          }
+        }), /*#__PURE__*/React.makeElement("div", {
+          className: "fm-not-logged-button create-account"
+        }, __(l[968])))));
+      } else if (megaChat.allChatsHadInitialLoadedHistory() === false && !megaChat.currentlyOpenedChat && megaChat.displayArchivedChats !== true) {
+        loadingOrEmpty = /*#__PURE__*/React.makeElement("div", {
+          className: "fm-empty-messages"
+        }, /*#__PURE__*/React.makeElement("div", {
+          className: "loading-spinner js-messages-loading light manual-management",
+          style: {
+            "top": "50%"
+          }
+        }, /*#__PURE__*/React.makeElement("div", {
+          className: "main-loader",
+          style: {
+            "position": "fixed",
+            "top": "50%",
+            "left": "50%",
+            "marginLeft": "72px"
+          }
+        })));
+        self.isWaitingForInitialLoadingToFinish();
+        isLoading = true;
+      }
+
+      var rightPaneStyles = {};
+
+      if (anonymouschat) {
+        rightPaneStyles = {
+          'marginLeft': 0
+        };
+      }
+
+      var rightPane = /*#__PURE__*/React.makeElement("div", {
+        className: "fm-right-files-block in-chat",
+        style: rightPaneStyles
+      }, loadingOrEmpty, !isLoading && megaChat.displayArchivedChats === true ? /*#__PURE__*/React.makeElement(conversations_ArchivedConversationsList, {
+        key: "archivedchats"
+      }) : null, !isLoading ? /*#__PURE__*/React.makeElement(conversationpanel["ConversationPanels"], _extends({}, this.props, {
+        chatUIFlags: megaChat.chatUIFlags,
+        displayArchivedChats: megaChat.displayArchivedChats,
+        className: megaChat.displayArchivedChats === true ? "hidden" : "",
+        currentlyOpenedChat: megaChat.currentlyOpenedChat,
+        chats: megaChat.chats
+      })) : null);
+      var archivedChatsCount = this.calcArchiveChats();
+      var arcBtnClass = megaChat.displayArchivedChats === true ? "left-pane-button archived active" : "left-pane-button archived";
+      var arcIconClass = megaChat.displayArchivedChats === true ? "small-icon archive white" : "small-icon archive colorized";
+      return /*#__PURE__*/React.makeElement("div", {
+        className: "conversationsApp",
+        key: "conversationsApp"
+      }, startGroupChatDialog, /*#__PURE__*/React.makeElement("div", {
+        className: "fm-left-panel chat-left-panel",
+        style: leftPanelStyles
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "left-pane-drag-handle"
+      }), /*#__PURE__*/React.makeElement("div", {
+        className: "fm-left-menu conversations"
+      }, this.state.searchActive && /*#__PURE__*/React.makeElement(searchPanel_SearchPanel, {
+        minimized: this.state.searchMinimized,
+        onToggle: function onToggle() {
+          return _this4.setState(function (state) {
+            return {
+              searchMinimized: !state.searchMinimized
+            };
+          });
+        }
+      }), /*#__PURE__*/React.makeElement("div", {
+        className: "nw-fm-tree-header conversations filled-input"
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "search-heading",
+        onClick: function onClick() {
+          return _this4.setState(function (state) {
+            return {
+              searchActive: true,
+              searchMinimized: !state.searchMinimized
+            };
+          });
+        }
+      }, l[7997]
+      /* `Chat` */
+      , /*#__PURE__*/React.makeElement("div", {
+        className: "small-icon thin-search-icon"
+      })), /*#__PURE__*/React.makeElement(buttons["Button"], {
+        group: "conversationsListing",
+        icon: "chat-with-plus"
+      }, /*#__PURE__*/React.makeElement(dropdowns["DropdownContactsSelector"], {
+        className: "main-start-chat-dropdown",
+        onSelectDone: this.startChatClicked.bind(this),
+        multiple: false,
+        showTopButtons: self.getTopButtonsForContactsPicker()
+      })))), /*#__PURE__*/React.makeElement("div", {
+        className: "fm-tree-panel manual-tree-panel-scroll-management",
+        style: leftPanelStyles
+      }, /*#__PURE__*/React.makeElement(PerfectScrollbar, {
+        style: leftPanelStyles,
+        className: "conversation-reduce-height",
+        chats: megaChat.chats,
+        ref: function ref(_ref) {
+          megaChat.$chatTreePanePs = _ref;
+        }
+      }, /*#__PURE__*/React.makeElement("div", {
+        className: "content-panel conversations" + (getSitePath().indexOf("/chat") !== -1 ? " active" : "")
+      }, /*#__PURE__*/React.makeElement(ConversationsList, {
+        quickSearchText: this.state.quickSearchText
+      }))), /*#__PURE__*/React.makeElement("div", {
+        className: "left-pane-button new-link",
+        onClick: function (e) {
+          self.startGroupChatFlow = 2;
+          self.setState({
+            'startGroupChatDialogShown': true
+          });
+          return false;
+        }.bind(this)
+      }, /*#__PURE__*/React.makeElement("i", {
+        className: "small-icon blue-chain colorized"
+      }), /*#__PURE__*/React.makeElement("div", {
+        className: "heading"
+      }, __(l[20638]))), /*#__PURE__*/React.makeElement("div", {
+        className: arcBtnClass,
+        onClick: this.archiveChatsClicked.bind(this)
+      }, /*#__PURE__*/React.makeElement("i", {
+        className: arcIconClass
+      }), /*#__PURE__*/React.makeElement("div", {
+        className: "heading"
+      }, __(l[19066])), /*#__PURE__*/React.makeElement("div", {
+        className: "indicator"
+      }, archivedChatsCount)))), rightPane);
+    }
+  }]);
+
+  return ConversationsApp;
+}(mixins["MegaRenderMixin"]);
+
+;
+
+if (false) {}
+
+/* harmony default export */ var conversations = __webpack_exports__["default"] = ({
+  ConversationsList: ConversationsList,
+  ArchivedConversationsList: conversations_ArchivedConversationsList,
+  ConversationsApp: conversations_ConversationsApp
+});
+
+/***/ }),
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(18);
-module.exports = __webpack_require__(13);
+module.exports = __webpack_require__(16);
 
 
 /***/ }),
@@ -18328,22 +19325,26 @@ module.exports = __webpack_require__(13);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(3);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(13);
+/* harmony import */ var _ui_conversations_jsx__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(16);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 
 
- // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 
-__webpack_require__(21);
+
+__webpack_require__(21); // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
+
+
+__webpack_require__(22);
 
 var EMOJI_DATASET_VERSION = 3;
 
 var _chatui;
 
 var webSocketsSupport = typeof WebSocket !== 'undefined';
+var CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 (function () {
   _chatui = function chatui(id) {
@@ -19444,13 +20445,22 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     userHandles.forEach(function (user_handle) {
       var contact = M.u[user_handle];
 
-      if (!contact || contact.c !== 1 && contact.c !== 2 && contact.c !== 0) {
-        // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-        // removed contact, etc
-        allValid = false;
-        $promise.reject();
-        return false;
-      }
+      if (!contact) {
+        M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, true, {
+          'h': user_handle,
+          'u': user_handle,
+          'm': '',
+          'c': 2
+        }));
+      } // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+      //     debugger;
+      //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+      //     // removed contact, etc
+      //     allValid = false;
+      //     $promise.reject();
+      //     return false;
+      // }
+
     });
 
     if (allValid === false) {
@@ -19801,12 +20811,7 @@ Chat.prototype.processRemovedUser = function (u) {
     if (chatRoom.getParticipantsExceptMe().indexOf(u) > -1) {
       chatRoom.trackDataChange();
     }
-  }); // Account was cancelled/deactivated
-
-  if (megaChat.currentlyOpenedChat && M.u[megaChat.currentlyOpenedChat] && M.u[megaChat.currentlyOpenedChat].c === 2) {
-    loadSubPage('fm/chat');
-  }
-
+  });
   self.renderMyStatus();
 };
 /**
@@ -20628,6 +21633,10 @@ Chat.prototype.onSnActionPacketReceived = function () {
 };
 
 Chat.prototype.getFrequentContacts = function () {
+  if (Chat._frequentsCache) {
+    return Chat._frequentsCache;
+  }
+
   var chats = this.chats;
   var recentContacts = {};
   var promises = [];
@@ -20643,10 +21652,12 @@ Chat.prototype.getFrequentContacts = function () {
   // });
 
   var _calculateLastTsFor = function _calculateLastTsFor(r, maxMessages) {
-    var msgIds = r.messagesBuff.messages.keys().reverse();
-    msgIds = msgIds.splice(0, maxMessages);
-    msgIds.forEach(function (msgId) {
-      var msg = r.messagesBuff.getMessageById(msgId);
+    var mb = r.messagesBuff;
+    var len = mb.messages.length;
+    var msgs = mb.messages.slice(Math.max(0, len - maxMessages), len);
+
+    for (var i = 0; i < msgs.length; i++) {
+      var msg = msgs[i];
       var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
 
       if (r.type === "private" && contactHandle === u_handle) {
@@ -20661,7 +21672,7 @@ Chat.prototype.getFrequentContacts = function () {
           };
         }
       }
-    });
+    }
   };
 
   chats.forEach(function (r) {
@@ -20676,12 +21687,13 @@ Chat.prototype.getFrequentContacts = function () {
         loadingMoreChats[r.chatId] = true;
         r.messagesBuff.retrieveChatHistory(false);
       } else {
-        $(r).unbind('onHistoryDecrypted.recent');
+        $(r).unbind(CHAT_ONHISTDECR_RECNT);
 
         _calculateLastTsFor(r, 32);
 
         delete loadingMoreChats[r.chatId];
         finishedLoadingChats[r.chatId] = true;
+        r.messagesBuff.detachMessages();
       }
     };
 
@@ -20691,12 +21703,12 @@ Chat.prototype.getFrequentContacts = function () {
       }, 500, 10000, undefined, undefined, r.roomId + "FrequentsLoading");
       finishedLoadingChats[r.chatId] = false;
       promises.push(promise);
-      $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+      $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
     } else if (r.messagesBuff.messages.length < 32 && r.messagesBuff.haveMoreHistory()) {
       // console.error("loading:", r.chatId);
       loadingMoreChats[r.chatId] = true;
       finishedLoadingChats[r.chatId] = false;
-      $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+      $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
       var promise = createTimeoutPromise(function () {
         return finishedLoadingChats[r.chatId] === true;
       }, 500, 15000);
@@ -20714,6 +21726,16 @@ Chat.prototype.getFrequentContacts = function () {
       return a.ts < b.ts ? 1 : b.ts < a.ts ? -1 : 0;
     });
     masterPromise.resolve(result.reverse());
+  });
+  Chat._frequentsCache = masterPromise;
+  masterPromise.always(function () {
+    if (Chat._frequentsCacheTimer) {
+      clearTimeout(Chat._frequentsCacheTimer);
+    }
+
+    Chat._frequentsCacheTimer = setTimeout(function () {
+      delete Chat._frequentsCache;
+    }, 6e4 * 5);
   });
   return masterPromise;
 };
@@ -20921,15 +21943,101 @@ module.exports = ReactPropTypesSecret;
 
 /***/ }),
 /* 21 */
+/***/ (function(module, exports) {
+
+(function () {
+  /**
+   * Simplified* and minimalistic `$(window).on('resize', ...)` event listener API that is more optimal then
+   * $.fn.remove/add.
+   *
+   * Automatically initialized globally as `chatGlobalEventManager`.
+   *
+   *  note* - would never support extra Event-like features live bubbling, preventing default, etc, since this is
+   *  only meant to be used for 'resize' event, which can't bubble or be "prevented"
+   *
+   * @constructor
+   * @returns {ChatGlobalEventManager} ChatGlobalEventManager instance
+   */
+  var ChatGlobalEventManager = function ChatGlobalEventManager() {
+    this.initialized = false;
+    this.listeners = {
+      'resize': {},
+      'hashchange': {}
+    };
+  };
+  /**
+   * Called internally to actually do the resize binding when needed.
+   *
+   * @private
+   * @returns {undefined}
+   */
+
+
+  ChatGlobalEventManager.prototype._lateInit = function () {
+    $(window).rebind('resize.chatGlobalEventManager', this.triggered.bind(this, "resize"));
+    window.addEventListener('hashchange', this.triggered.bind(this, "hashchange"));
+    this.initialized = true;
+  };
+  /**
+   * Add an `cb` event listener for `eventName` with namespace `namespace`
+   *
+   * @param {String} eventName eventType/Name
+   * @param {String} namespace the namespace to use for this listener
+   * @param {Function} cb callback to be called for this listener
+   *
+   * @returns {undefined}
+   */
+
+
+  ChatGlobalEventManager.prototype.addEventListener = function (eventName, namespace, cb) {
+    if (this.initialized === false) {
+      this._lateInit();
+    }
+
+    this.listeners[eventName][namespace] = this.listeners[namespace] || cb;
+  };
+  /**
+   * Remove listener with namespace `namespace`
+   *
+   * @param {String} eventName eventType/Name
+   * @param {String} namespace the namespace to use for this listener
+   * @returns {undefined}
+   */
+
+
+  ChatGlobalEventManager.prototype.removeEventListener = function (eventName, namespace) {
+    delete this.listeners[eventName][namespace];
+  };
+  /**
+   * Called by the onResize/hashchange
+   *
+   * @param {String} eventName the eventType/name
+   * @param {Event} e the actual Event object
+   *
+   * @returns {undefined}
+   */
+
+
+  ChatGlobalEventManager.prototype.triggered = SoonFc(function (eventName, e) {
+    for (var k in this.listeners[eventName]) {
+      this.listeners[eventName][k](e);
+    }
+  }, 122); // init globally. will be initialized only when first .addEventListener is called
+
+  window.chatGlobalEventManager = new ChatGlobalEventManager();
+})();
+
+/***/ }),
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var utils = __webpack_require__(22);
+var utils = __webpack_require__(23);
 
 var React = __webpack_require__(0);
 
-var ConversationPanelUI = __webpack_require__(16);
+var ConversationPanelUI = __webpack_require__(15);
 /**
  * Class used to represent a MUC Room in which the current user is present
  *
@@ -20989,6 +22097,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   this.scrolledToBottom = 1;
   this.callRequest = null;
   this.shownMessages = {};
+  this.activeSearches = 0;
   self.members = {};
 
   if (type === "private") {
@@ -21032,15 +22141,11 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   }
 
   self.rebind('onStateChange.chatRoom', function (e, oldState, newState) {
-    if (newState === ChatRoom.STATE.READY) {
-      if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
-        // this should never happen, but just in case...
-        var cim = self.getChatIdMessages();
-        cim.restore();
-        cim.resend();
-      }
-
-      self.loadContactNames();
+    if (newState === ChatRoom.STATE.READY && !self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
+      // this should never happen, but just in case...
+      var cim = self.getChatIdMessages();
+      cim.restore();
+      cim.resend();
     }
   }); // activity on a specific room (show, hidden, got new message, etc)
 
@@ -21489,15 +22594,6 @@ ChatRoom.prototype.isArchived = function () {
   return self.flags & ChatRoom.ARCHIVED;
 };
 /**
- * Check whether given chat is 1-1 w/ cancelled account.
- * @returns {Boolean}
- */
-
-
-ChatRoom.prototype.isCancelled = function () {
-  return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
-};
-/**
  * Check whether a chat is displayable.
  *
  * @returns {Boolean}
@@ -21506,7 +22602,7 @@ ChatRoom.prototype.isCancelled = function () {
 
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
-  return !self.isCancelled() && (self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive());
+  return self.showArchived === true || !self.isArchived() || self.callManagerCall && self.callManagerCall.isActive();
 };
 /**
  * Save chat into info fmdb.
@@ -22050,8 +23146,13 @@ ChatRoom.prototype.scrollToChat = function () {
     if ($li && $li[0]) {
       var pos = $li[0].offsetTop;
 
-      if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
-        megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+      if (!verge.inViewport($li[0], -72
+      /* 2 x 36 px height buttons */
+      )) {
+        var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
+        var wrapOuterHeight = $(treePane).outerHeight();
+        var itemOuterHeight = $('li:first', treePane).outerHeight();
+        megaChat.$chatTreePanePs.doProgramaticScroll(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
         this._scrollToOnUpdate = false;
       }
     } else {
@@ -22814,23 +23915,72 @@ ChatRoom.prototype.isUIMounted = function () {
   return this._uiIsMounted;
 };
 
-ChatRoom.prototype.loadContactNames = function () {
-  var contacts = this.getParticipantsExceptMe();
+ChatRoom.prototype.attachSearch = function () {
+  this.activeSearches++;
+};
 
-  for (var i = 0; i < Math.min(5, contacts.length); i++) {
-    var handle = contacts[i];
+ChatRoom.prototype.detachSearch = function () {
+  if (--this.activeSearches === 0) {
+    this.messagesBuff.detachMessages();
+  }
 
-    if (!M.u[handle]) {
-      continue;
-    }
+  this.activeSearches = Math.max(this.activeSearches, 0);
+  this.trackDataChange();
+};
 
-    if (!M.u[handle].name) {
-      M.syncUsersFullname(handle, this.publicChatHandle);
-    }
+ChatRoom.prototype.scrollToMessageId = function (msgId, index, retryActive) {
+  var self = this;
 
-    if (!M.u[handle].m && !anonymouschat) {
-      M.syncContactEmail(handle);
-    }
+  if (!self.isCurrentlyActive && !retryActive) {
+    // room not shown yet, retry only once again after 1.5s
+    setTimeout(function () {
+      self.scrollToMessageId(msgId, index, true);
+    }, 1500);
+    return;
+  }
+
+  assert(self.isCurrentlyActive, 'chatRoom is not visible');
+  self.isScrollingToMessageId = true;
+
+  if (!self.$rConversationPanel) {
+    $(self).one('onComponentDidMount.scrollToMsgId' + msgId, function () {
+      self.scrollToMessageId(msgId, index);
+    });
+    return;
+  }
+
+  var ps = self.$rConversationPanel.messagesListScrollable;
+  assert(ps);
+  var msgObj = self.messagesBuff.getMessageById(msgId);
+
+  if (msgObj) {
+    var elem = $('.' + msgId + '.message.body')[0];
+    self.scrolledToBottom = false;
+    ps.scrollToElement(elem, true); // cleanup the stored old scroll position, so that the auto scroll won't scroll back to previous position
+    // after all onResizes and componentDidUpdates
+
+    self.$rConversationPanel.lastScrollPosition = undefined;
+    self.isScrollingToMessageId = false;
+  } else if (self.messagesBuff.isRetrievingHistory) {
+    // wait for messages to be received
+    $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+      // wait for UI to update (so that the element is now available in the dom)
+      $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function () {
+        self.scrollToMessageId(msgId, index);
+      });
+    });
+  } else if (self.messagesBuff.haveMoreHistory()) {
+    self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
+    ps.doProgramaticScroll(0, true); // wait for messages to be received
+
+    $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function () {
+      // wait for UI to update (so that the element is now available in the dom)
+      $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function () {
+        self.scrollToMessageId(msgId);
+      });
+    });
+  } else {
+    self.isScrollingToMessageId = false;
   }
 };
 
@@ -22840,7 +23990,7 @@ window.ChatRoom = ChatRoom;
 });
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22872,7 +24022,7 @@ function extendActions(prefix, src, toBeAppended) {
 ;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22883,7 +24033,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, "StartGroupChatWizard", function() { return /* binding */ startGroupChatWizard_StartGroupChatWizard; });
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 // EXTERNAL MODULE: ./js/stores/mixins.js
 var mixins = __webpack_require__(1);
@@ -22892,7 +24042,7 @@ var mixins = __webpack_require__(1);
 var tooltips = __webpack_require__(11);
 
 // EXTERNAL MODULE: ./js/ui/forms.jsx
-var ui_forms = __webpack_require__(14);
+var ui_forms = __webpack_require__(13);
 
 // CONCATENATED MODULE: ./js/ui/miniui.jsx
 function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
@@ -22911,7 +24061,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
-function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
@@ -22923,7 +24073,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var React = __webpack_require__(0);
 
-var ReactDOM = __webpack_require__(3);
+var ReactDOM = __webpack_require__(4);
 
 
 
@@ -23133,7 +24283,7 @@ function startGroupChatWizard_inherits(subClass, superClass) { if (typeof superC
 
 function startGroupChatWizard_setPrototypeOf(o, p) { startGroupChatWizard_setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return startGroupChatWizard_setPrototypeOf(o, p); }
 
-function startGroupChatWizard_createSuper(Derived) { return function () { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (startGroupChatWizard_isNativeReflectConstruct()) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
+function startGroupChatWizard_createSuper(Derived) { var hasNativeReflectConstruct = startGroupChatWizard_isNativeReflectConstruct(); return function _createSuperInternal() { var Super = startGroupChatWizard_getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = startGroupChatWizard_getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return startGroupChatWizard_possibleConstructorReturn(this, result); }; }
 
 function startGroupChatWizard_possibleConstructorReturn(self, call) { if (call && (startGroupChatWizard_typeof(call) === "object" || typeof call === "function")) { return call; } return startGroupChatWizard_assertThisInitialized(self); }
 
@@ -23145,7 +24295,7 @@ function startGroupChatWizard_getPrototypeOf(o) { startGroupChatWizard_getProtot
 
 var startGroupChatWizard_React = __webpack_require__(0);
 
-var startGroupChatWizard_ReactDOM = __webpack_require__(3);
+var startGroupChatWizard_ReactDOM = __webpack_require__(4);
 
 
 

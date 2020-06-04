@@ -240,10 +240,10 @@ class ConversationAVPanel extends MegaRenderMixin {
         this.setState({'selectedStreamSid': sid});
     }
     _hideBottomPanel() {
-        if(!this.isMounted()) {
+        var self = this;
+        if (!self.isMounted()) {
             return;
         }
-        var self = this;
         var room = self.props.chatRoom;
         if (!room.callManagerCall || !room.callManagerCall.isActive()) {
             return;
@@ -529,7 +529,7 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         // REposition the $localMediaDisplay if its OUT of the viewport (in case of dragging -> going back to normal
         // size mode from full screen...)
-        $(window).rebind('resize.chatUI_' + room.roomId, function() {
+        chatGlobalEventManager.addEventListener('resize', 'chatUI_' + room.roomId, function() {
             if ($container.is(":visible")) {
                 if (!elementInViewport($localMediaDisplay[0])) {
                     $localMediaDisplay
@@ -608,7 +608,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         }
 
         $(document).off("fullscreenchange.megaChat_" + room.roomId);
-        $(window).off('resize.chatUI_' + room.roomId);
+        chatGlobalEventManager.removeEventListener('resize', 'chatUI_' + room.roomId);
         $(room).off('toggleMessages.av');
 
         var $rootContainer = $container.parents('.conversation-panel');

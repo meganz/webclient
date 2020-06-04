@@ -75,7 +75,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.callRequest = null;
     this.shownMessages = {};
-
+    this.activeSearches = 0;
     self.members = {};
 
     if (type === "private") {
@@ -121,21 +121,23 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     // Events
     if (d) {
         this.rebind('onStateChange.chatRoomDebug', function(e, oldState, newState) {
-            self.logger.debug("Will change state from: ",
-                ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState)
+            self.logger.debug(
+                "Will change state from: ",
+                ChatRoom.stateToText(oldState),
+                " to ",
+                ChatRoom.stateToText(newState)
             );
         });
     }
 
     self.rebind('onStateChange.chatRoom', function(e, oldState, newState) {
-        if (newState === ChatRoom.STATE.READY) {
-            if (!self.isReadOnly() && self.chatd && self.isOnline() && self.chatIdBin) {
-                // this should never happen, but just in case...
-                var cim = self.getChatIdMessages();
-                cim.restore();
-                cim.resend();
-            }
-            self.loadContactNames();
+        if (newState === ChatRoom.STATE.READY && !self.isReadOnly()
+            && self.chatd && self.isOnline() && self.chatIdBin) {
+
+            // this should never happen, but just in case...
+            var cim = self.getChatIdMessages();
+            cim.restore();
+            cim.resend();
         }
     });
 
@@ -609,13 +611,7 @@ ChatRoom.prototype.isArchived = function() {
     return (self.flags & ChatRoom.ARCHIVED);
 };
 
-/**
- * Check whether given chat is 1-1 w/ cancelled account.
- * @returns {Boolean}
- */
-ChatRoom.prototype.isCancelled = function() {
-    return this.type === 'private' && this.roomId && M.u[this.roomId] && M.u[this.roomId].c === 2;
-};
+
 
 /**
  * Check whether a chat is displayable.
@@ -624,7 +620,7 @@ ChatRoom.prototype.isCancelled = function() {
  */
 ChatRoom.prototype.isDisplayable = function() {
     var self = this;
-    return !self.isCancelled() && ((self.showArchived === true) ||
+    return ((self.showArchived === true) ||
             !self.isArchived() ||
             (self.callManagerCall && self.callManagerCall.isActive()));
 };
@@ -1209,8 +1205,14 @@ ChatRoom.prototype.scrollToChat = function() {
         var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
         if ($li && $li[0]) {
             var pos = $li[0].offsetTop;
-            if (!megaChat.$chatTreePanePs.inViewport($li[0])) {
-                megaChat.$chatTreePanePs.doProgramaticScroll(pos, true);
+            if (!verge.inViewport($li[0], -72 /* 2 x 36 px height buttons */)) {
+                var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
+                var wrapOuterHeight = $(treePane).outerHeight();
+                var itemOuterHeight = $('li:first', treePane).outerHeight();
+                megaChat.$chatTreePanePs.doProgramaticScroll(
+                    Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight),
+                    true
+                );
                 this._scrollToOnUpdate = false;
             }
         } else {
@@ -2005,19 +2007,74 @@ ChatRoom.prototype.isUIMounted = function() {
     return this._uiIsMounted;
 };
 
-ChatRoom.prototype.loadContactNames = function() {
-    var contacts = this.getParticipantsExceptMe();
-    for (var i = 0; i < Math.min(5, contacts.length); i++) {
-        var handle = contacts[i];
-        if (!M.u[handle]) {
-            continue;
-        }
-        if (!M.u[handle].name) {
-            M.syncUsersFullname(handle, this.publicChatHandle);
-        }
-        if (!M.u[handle].m && !anonymouschat) {
-            M.syncContactEmail(handle);
-        }
+ChatRoom.prototype.attachSearch = function() {
+    this.activeSearches++;
+};
+
+ChatRoom.prototype.detachSearch = function() {
+    if (--this.activeSearches === 0) {
+        this.messagesBuff.detachMessages();
+    }
+    this.activeSearches = Math.max(this.activeSearches, 0);
+    this.trackDataChange();
+};
+
+ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
+    var self = this;
+    if (!self.isCurrentlyActive && !retryActive) {
+        // room not shown yet, retry only once again after 1.5s
+        setTimeout(function() {
+            self.scrollToMessageId(msgId, index, true);
+        }, 1500);
+        return;
+    }
+
+    assert(self.isCurrentlyActive, 'chatRoom is not visible');
+    self.isScrollingToMessageId = true;
+
+    if (!self.$rConversationPanel) {
+        $(self).one('onComponentDidMount.scrollToMsgId' + msgId, function() {
+            self.scrollToMessageId(msgId, index);
+        });
+        return;
+    }
+    var ps = self.$rConversationPanel.messagesListScrollable;
+    assert(ps);
+
+    var msgObj = self.messagesBuff.getMessageById(msgId);
+    if (msgObj) {
+        var elem = $('.' + msgId + '.message.body')[0];
+        self.scrolledToBottom = false;
+
+        ps.scrollToElement(elem, true);
+
+        // cleanup the stored old scroll position, so that the auto scroll won't scroll back to previous position
+        // after all onResizes and componentDidUpdates
+        self.$rConversationPanel.lastScrollPosition = undefined;
+        self.isScrollingToMessageId = false;
+    }
+    else if (self.messagesBuff.isRetrievingHistory) {
+        // wait for messages to be received
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+            // wait for UI to update (so that the element is now available in the dom)
+            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId, index);
+            });
+        });
+    }
+    else if (self.messagesBuff.haveMoreHistory()) {
+        self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
+        ps.doProgramaticScroll(0, true);
+        // wait for messages to be received
+        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+            // wait for UI to update (so that the element is now available in the dom)
+            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+                self.scrollToMessageId(msgId);
+            });
+        });
+    }
+    else {
+        self.isScrollingToMessageId = false;
     }
 };
 

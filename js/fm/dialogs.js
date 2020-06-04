@@ -989,7 +989,12 @@
 
             $('.search-bar input', $dialog).val('');
             handleDialogContent(typeof aTab === 'string' && aTab);
-            setDialogBreadcrumb(aTab === 'conversations' ? '' : aTarget);
+            if (aTab === 'conversations') {
+                setDialogBreadcrumb(M.currentrootid === 'chat' && aTarget !== M.RootID ? aTarget : '');
+            }
+            else {
+                setDialogBreadcrumb(aTarget);
+            }
             setDialogButtonState($('.dialog-picker-button', $dialog).addClass('active'));
             setSelectedItems(true);
         });

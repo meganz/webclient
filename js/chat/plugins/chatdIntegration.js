@@ -1044,68 +1044,27 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
         return MegaPromise.resolve();
     }
 
+    var i;
     var promises = [];
+    var queue = function(userId) {
+        if (userId && userId !== strongvelope.COMMANDER) {
+            promises.push(crypt.getAllPubKeys(userId));
+        }
+    };
 
     if (Array.isArray(messages)) {
-        for (var i = 0; i < messages.length; i++) {
-            var msgObject = messages[i];
-            if (typeof(msgObject.userId) === "undefined" || msgObject.userId === null) {
-                continue;
-            }
-            if (msgObject.userId === strongvelope.COMMANDER) {
-                continue;
-            }
-            else {
-                if (!pubCu25519[msgObject.userId]) {
-                    promises.push(
-                        crypt.getPubCu25519(msgObject.userId)
-                    );
-                }
-
-                if (!pubEd25519[msgObject.userId]) {
-                    promises.push(
-                        crypt.getPubEd25519(msgObject.userId)
-                    );
-                }
-
-                if (!u_pubkeys[msgObject.userId]) {
-                    promises.push(
-                        crypt.getPubRSA(msgObject.userId)
-                    );
-                }
-            }
+        for (i = messages.length; i--;) {
+            queue(messages[i].userId);
         }
     }
-    if (Array.isArray(users) || users instanceof Set) {
-        for (var i2 = 0; i2 < users.length; i2++) {
-            var userId = users[i2];
-            if (typeof(userId) === "undefined" || userId === null) {
-                continue;
-            }
 
-            if (userId === strongvelope.COMMANDER) {
-                continue;
-            }
-            else {
-                if (!pubCu25519[userId]) {
-                    promises.push(
-                        crypt.getPubCu25519(userId)
-                    );
-                }
-
-                if (!pubEd25519[userId]) {
-                    promises.push(
-                        crypt.getPubEd25519(userId)
-                    );
-                }
-
-                if (!u_pubkeys[userId]) {
-                    promises.push(
-                        crypt.getPubRSA(userId)
-                    );
-                }
-            }
+    if (Array.isArray(users)) {
+        for (i = users.length; i--;) {
+            queue(users[i]);
         }
+    }
+    else if (users instanceof Set) {
+        users.forEach(queue);
     }
 
     return MegaPromise.allDone(promises);

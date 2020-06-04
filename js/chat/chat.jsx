@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ConversationsUI from "./ui/conversations.jsx";
 
+require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
 require("./chatRoom.jsx");
 
@@ -9,6 +10,8 @@ const EMOJI_DATASET_VERSION = 3;
 
 var chatui;
 var webSocketsSupport = typeof(WebSocket) !== 'undefined';
+
+var CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 (function() {
     chatui = function(id) {
@@ -1241,13 +1244,22 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         var allValid = true;
         userHandles.forEach(function(user_handle) {
             var contact = M.u[user_handle];
-            if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
-                // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-                // removed contact, etc
-                allValid = false;
-                $promise.reject();
-                return false;
+            if (!contact) {
+                M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                    'h': user_handle,
+                    'u': user_handle,
+                    'm': '',
+                    'c': 2
+                }));
             }
+            // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
+            //     debugger;
+            //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
+            //     // removed contact, etc
+            //     allValid = false;
+            //     $promise.reject();
+            //     return false;
+            // }
         });
         if (allValid === false) {
             $promise.reject();
@@ -1642,16 +1654,6 @@ Chat.prototype.processRemovedUser = function(u) {
             chatRoom.trackDataChange();
         }
     });
-
-
-    // Account was cancelled/deactivated
-    if (
-        megaChat.currentlyOpenedChat &&
-        M.u[megaChat.currentlyOpenedChat] &&
-        M.u[megaChat.currentlyOpenedChat].c === 2
-    ) {
-        loadSubPage('fm/chat');
-    }
 
     self.renderMyStatus();
 };
@@ -2503,6 +2505,10 @@ Chat.prototype.onSnActionPacketReceived = function() {
 
 
 Chat.prototype.getFrequentContacts = function() {
+    if (Chat._frequentsCache) {
+        return Chat._frequentsCache;
+    }
+
     var chats = this.chats;
     var recentContacts = {};
     var promises = [];
@@ -2521,13 +2527,14 @@ Chat.prototype.getFrequentContacts = function() {
     // });
 
     var _calculateLastTsFor = function(r, maxMessages) {
-        var msgIds = r.messagesBuff.messages.keys().reverse();
-        msgIds = msgIds.splice(0, maxMessages);
-        msgIds.forEach(function(msgId) {
-            var msg = r.messagesBuff.getMessageById(msgId);
+        var mb = r.messagesBuff;
+        var len = mb.messages.length;
+        var msgs = mb.messages.slice(Math.max(0, len - maxMessages), len);
+        for (var i = 0; i < msgs.length; i++) {
+            var msg = msgs[i];
             var contactHandle = msg.userId === "gTxFhlOd_LQ" && msg.meta ? msg.meta.userId : msg.userId;
             if (r.type === "private" && contactHandle === u_handle) {
-                contactHandle = contactHandle || r.getParticipantsExceptMe()[0]
+                contactHandle = contactHandle || r.getParticipantsExceptMe()[0];
             }
 
             if (
@@ -2536,10 +2543,10 @@ Chat.prototype.getFrequentContacts = function() {
                 contactHandle !== u_handle
             ) {
                 if (!recentContacts[contactHandle] || recentContacts[contactHandle].ts < msg.delay) {
-                    recentContacts[contactHandle] = {'userId': contactHandle, 'ts': msg.delay};
+                    recentContacts[contactHandle] = { 'userId': contactHandle, 'ts': msg.delay };
                 }
             }
-        });
+        }
     };
 
     chats.forEach(function(r) {
@@ -2549,24 +2556,23 @@ Chat.prototype.getFrequentContacts = function() {
             // r = r;
 
         var _histDecryptedCb = function(r) {
-                // console.error("loading?", r.chatId, r.messagesBuff.messages.length);
-                if (!loadingMoreChats[r.chatId] &&
-                    r.messagesBuff.messages.length < 32 &&
-                    r.messagesBuff.haveMoreHistory()
-                ) {
-                    // console.error("loading:", r.chatId);
-                    loadingMoreChats[r.chatId] = true;
-                    r.messagesBuff.retrieveChatHistory(false);
-                }
-                else {
-                    $(r).unbind('onHistoryDecrypted.recent');
-                    _calculateLastTsFor(r, 32);
-                    delete loadingMoreChats[r.chatId];
-                    finishedLoadingChats[r.chatId] = true;
-                }
-
-
-            };
+            // console.error("loading?", r.chatId, r.messagesBuff.messages.length);
+            if (!loadingMoreChats[r.chatId] &&
+                r.messagesBuff.messages.length < 32 &&
+                r.messagesBuff.haveMoreHistory()
+            ) {
+                // console.error("loading:", r.chatId);
+                loadingMoreChats[r.chatId] = true;
+                r.messagesBuff.retrieveChatHistory(false);
+            }
+            else {
+                $(r).unbind(CHAT_ONHISTDECR_RECNT);
+                _calculateLastTsFor(r, 32);
+                delete loadingMoreChats[r.chatId];
+                finishedLoadingChats[r.chatId] = true;
+                r.messagesBuff.detachMessages();
+            }
+        };
 
 
         if (r.isLoading()) {
@@ -2582,13 +2588,13 @@ Chat.prototype.getFrequentContacts = function() {
 
             finishedLoadingChats[r.chatId] = false;
             promises.push(promise);
-            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+            $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
         }
         else if (r.messagesBuff.messages.length < 32 && r.messagesBuff.haveMoreHistory()) {
             // console.error("loading:", r.chatId);
             loadingMoreChats[r.chatId] = true;
             finishedLoadingChats[r.chatId] = false;
-            $(r).rebind('onHistoryDecrypted.recent', _histDecryptedCb.bind(this, r));
+            $(r).rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb.bind(this, r));
             var promise = createTimeoutPromise(function() {
                 return finishedLoadingChats[r.chatId] === true;
             }, 500, 15000);
@@ -2607,6 +2613,15 @@ Chat.prototype.getFrequentContacts = function() {
             return a.ts < b.ts ? 1 : (b.ts < a.ts ? -1 : 0);
         });
         masterPromise.resolve(result.reverse());
+    });
+    Chat._frequentsCache = masterPromise;
+    masterPromise.always(function() {
+        if (Chat._frequentsCacheTimer) {
+            clearTimeout(Chat._frequentsCacheTimer);
+        }
+        Chat._frequentsCacheTimer = setTimeout(function() {
+            delete Chat._frequentsCache;
+        }, 6e4 * 5);
     });
     return masterPromise;
 };

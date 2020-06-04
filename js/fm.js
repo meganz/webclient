@@ -3890,8 +3890,10 @@ function bindDropdownEvents($dropdown, saveOption, contentBlock) {
 
     // hidden input for keyboard search
     if (!$hiddenInput.length) {
-        $hiddenInput = $('<input class="dropdown-hidden-input">');
-        $dropdown.prepend($hiddenInput);
+
+        // Skip tab action for hidden input by tabindex="-1"
+        $dropdown.safePrepend('<input class="dropdown-hidden-input" tabindex="-1" autocomplete="disabled">');
+        $hiddenInput = $('input.dropdown-hidden-input', $dropdown);
     }
 
     $dropdown.rebind('click', function(e) {

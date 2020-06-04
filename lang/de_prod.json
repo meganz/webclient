@@ -1823,7 +1823,7 @@
     "17595": "Bei deaktivierter Dateiversionierung wird die bestehende Datei beim \u00dcberschreiben gel\u00f6scht (der \u00c4nderungsverlauf bleibt dadurch nicht erhalten). Wollen Sie die Dateiversionierung wirklich abschalten?",
     "17597": "Dateiversionen in Ihnen freigegebenen Ordnern sind hiervon nicht betroffen.",
     "17598": "Alle \u00e4lteren Dateiversionen l\u00f6schen",
-    "17600": "Alle alten Dateiversionen werden gel\u00f6scht. Dateiversionen in Ordnerfreigaben eines Kontakts m\u00fcssen vom Eigent\u00fcmer entfernt werden werden.",
+    "17600": "Alle alten Dateiversionen werden gel\u00f6scht. Dateiversionen in Ordnerfreigaben eines Kontakts m\u00fcssen vom Eigent\u00fcmer entfernt werden.",
     "17601": "Aktiv",
     "17602": "Die aktuelle Dateiversion wird durch die hochgeladene Datei ersetzt.",
     "17603": "Download via MEGAsync wird wiederholt",
@@ -3698,5 +3698,6 @@
     "23448": "Auch f\u00fcr [A1]Chrome[\/A1], [A2]Firefox[\/A2] und [A3]Opera[\/A3] verf\u00fcgbar",
     "23449": "MEGA-Erweiterung f\u00fcr Chrome[R\/], Firefox[R\/], Opera[R\/], Edge[R\/]",
     "23450": "hat den offenen Chat geschlossen",
-    "23451": "Ihr Mikrofon scheint nicht zu funktionieren"
+    "23451": "Ihr Mikrofon scheint nicht zu funktionieren",
+    "23462": "Installieren Sie die MEGA-Desktop App f\u00fcr komfortable Transfers und Echtzeitsynchronisierung."
 }

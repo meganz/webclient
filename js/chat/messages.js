@@ -761,10 +761,12 @@ var MessagesBuff = function(chatRoom, chatdInt) {
             chatRoom.trigger('onMessagesBuffAppend', msg);
         }
 
-        if (self.chatRoom.scrolledToBottom === true) {
-            if (self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2) {
-                self.detachMessages();
-            }
+        if (
+            self.chatRoom.scrolledToBottom === true &&
+            self.chatRoom.activeSearches === 0 &&
+            self.messages.length > Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2
+        ) {
+            self.detachMessages();
         }
 
         return res;
@@ -1888,8 +1890,11 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
 MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var self = this;
 
-    var len = isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT;
-
+    var len = (
+        Number.isInteger(isInitialRetrivalCall) ?
+            isInitialRetrivalCall :
+            isInitialRetrivalCall ? Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL : Chatd.MESSAGE_HISTORY_LOAD_COUNT
+    );
     if (self.messagesHistoryIsLoading()) {
         return self.$msgsHistoryLoading;
     }
@@ -1924,7 +1929,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
 
     var timeoutPromise = createTimeoutPromise(function() {
         return self.$msgsHistoryLoading.state() !== 'pending';
-    }, 500, 10000)
+    }, 500, 6e4 * 5)
         .always(function() {
             self.chatdIsProcessingHistory = false;
         })
@@ -2007,36 +2012,28 @@ MessagesBuff.prototype.markAllAsReceived = function() {
  * @returns {boolean}
  */
 MessagesBuff.prototype.getMessageById = function(messageId) {
-    var self = this;
-    var found = false;
-    for (var i = 0; i < self.messages.length; i++) {
-        var v = self.messages.getItem(i);
-        if (v && v.messageId === messageId) {
-            return v;
-        }
-    }
+    "use strict";
 
-    return found;
+    var self = this;
+    return self.messages[messageId] || false;
 };
 
 MessagesBuff.prototype.removeMessageById = function(messageId) {
+    "use strict";
+
     var self = this;
-    self.messages.forEach(function(v, k) {
-        if (v.deleted === 1) {
-            return; // skip
-        }
+    var msg = self.getMessageById(messageId);
+    if (msg.deleted) {
+        return;
+    }
 
-        if (v.messageId === messageId) {
-            v.deleted = 1;
-            if (!v.seen) {
-                v.seen = true;
-            }
+    msg.deleted = 1;
+    if (!msg.seen) {
+        msg.seen = true;
+    }
 
-            // cleanup the messagesIndex
-            self.messages.removeByKey(v.messageId);
-            return false; // break;
-        }
-    });
+    // cleanup the messagesIndex
+    self.messages.removeByKey(msg.messageId);
 };
 MessagesBuff.prototype.removeMessageBy = function(cb) {
     var self = this;
@@ -2121,7 +2118,13 @@ MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references
     var msgOrder = messageOrdersSource[messageIdentity];
 
     for (var i = 0; i < references.length; i++) {
-        if (messageOrdersSource[references[i]] && messageOrdersSource[references[i]] > msgOrder) {
+        // skip "" references, known bug of native MEGAchat sdk
+        if (
+            references[i] &&
+            references[i] !== "\0\0\0\0\0\0\0\0" &&
+            messageOrdersSource[references[i]] &&
+            messageOrdersSource[references[i]] > msgOrder
+        ) {
             // There might be a potential message order tampering.It should raise an event to UI.
             return false;
         }
@@ -2182,6 +2185,8 @@ MessagesBuff.prototype.dumpBufferToConsole = function() {
 /**
  * Remove messages from the buff. Typically used when the user has scrolled to the bottom of the chat, so it does
  * not make sense to render too old messages and waste cpu/mem/dom tree usage.
+ *
+ * @returns {Boolean} if removed any messages
  */
 MessagesBuff.prototype.detachMessages = function() {
     var self = this;
@@ -2191,24 +2196,54 @@ MessagesBuff.prototype.detachMessages = function() {
     // and detaching of messages from the UI, we would need to simply disable the detaching of messages for
     // indexedDB incompatible browsers
     if (!room.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
-        return;
+        return false;
     }
     if (room.type === "public" && !anonymouschat && room.publicChatHandle && room.publicChatKey) {
         // do not detach messages in pub mode..otherwise, IF the user joins - the chat history that would get
         // persisted may contain missing messages in the iDB db.
-        return;
+        return false;
+    }
+    if (room.isScrollingToMessageId) {
+        // do not detach messages if we are programatically retrieving history and scrolling to specific messageId
+        return false;
     }
 
 
     var removedAnyMessage = false;
-    while (msg = self.messages.getItem(self.messages.length - Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2)) {
-        self.messages.removeByKey(msg.messageId, true);
+    var detachCount = self.chatRoom.isCurrentlyActive ? Chatd.MESSAGE_HISTORY_LOAD_COUNT * 2 : 3;
+    if (self.messages.length > detachCount) {
+        var deletedItems = self.messages.splice(0,  self.messages.length - detachCount);
+
+        // detach attachments?
+        if (M.chc[self.chatRoom.roomId]) {
+            var attachmentsIndex = {};
+            var atts = M.chc[self.chatRoom.roomId];
+            for (var k in atts) {
+                attachmentsIndex[atts[k].m] = k;
+            }
+
+            for (var i = 0; i < deletedItems.length; i++) {
+                // cleanup the `messageId` index
+                delete M.chc[deletedItems[i]];
+
+                // search and optionally cleanup the [roomId] index in M.chc (atts)
+                var foundKey = attachmentsIndex[deletedItems[i]];
+
+                if (typeof foundKey !== "undefined") {
+                    delete atts[foundKey];
+                }
+            }
+        }
         removedAnyMessage = true;
+    }
+    else {
+        removedAnyMessage = false;
     }
 
     if (removedAnyMessage === true && self.retrievedAllMessages) {
         self.retrievedAllMessages = false;
     }
+    return removedAnyMessage;
 };
 
 /**
@@ -2284,4 +2319,101 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
         (returnNumsInsteadOfIds ? foundFirst.orderValue : foundFirst.messageId),
         (returnNumsInsteadOfIds ? foundLast.orderValue : foundLast.messageId)
     ] : false;
+};
+
+// eslint-disable-next-line complexity
+MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
+    "use strict";
+
+    var renderableSummary;
+    if (lastMessage.renderableSummary) {
+        renderableSummary = lastMessage.renderableSummary;
+    }
+    else {
+        if (lastMessage.isManagement && lastMessage.isManagement()) {
+            renderableSummary = lastMessage.getManagementMessageSummaryText();
+        }
+        else if (!lastMessage.textContents && lastMessage.dialogType) {
+            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+        }
+        else {
+            renderableSummary = lastMessage.textContents;
+        }
+        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
+
+        var escapeUnescapeArgs = [
+            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
+            {'message': {'textContents': renderableSummary}},
+            ['textContents', 'messageHtml'],
+            'messageHtml'
+        ];
+
+        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+            escapeUnescapeArgs[0],
+            escapeUnescapeArgs[1],
+            escapeUnescapeArgs[2],
+            escapeUnescapeArgs[3]
+        );
+        renderableSummary = escapeUnescapeArgs[1].message.textContents;
+
+        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+
+        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+
+        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+
+        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
+            escapeUnescapeArgs[0],
+            escapeUnescapeArgs[1],
+            escapeUnescapeArgs[2],
+            escapeUnescapeArgs[3]
+        );
+
+        renderableSummary = renderableSummary || "";
+        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+    }
+
+    var author;
+
+    if (lastMessage.dialogType === "privilegeChange" && lastMessage.meta && lastMessage.meta.targetUserId) {
+        author = M.u[lastMessage.meta.targetUserId[0]] || Message.getContactForMessage(lastMessage);
+    }
+    else if (lastMessage.dialogType === "alterParticipants") {
+        author = M.u[lastMessage.meta.included[0] || lastMessage.meta.excluded[0]] ||
+            Message.getContactForMessage(lastMessage);
+    }
+    else {
+        author = Message.getContactForMessage(lastMessage);
+    }
+
+    if (author) {
+        if (!lastMessage._contactChangeListener && author.addChangeListener) {
+            lastMessage._contactChangeListener = author.addChangeListener(function() {
+                delete lastMessage.renderableSummary;
+                lastMessage.trackDataChange();
+            });
+        }
+
+        if (lastMessage.chatRoom.type === "private") {
+            if (author.u === u_handle) {
+                renderableSummary = l[19285] + " " + renderableSummary;
+            }
+        }
+        else if (lastMessage.chatRoom.type === "group" || lastMessage.chatRoom.type === "public") {
+            if (author.u === u_handle) {
+                renderableSummary = l[19285] + " " + renderableSummary;
+            }
+            else {
+                var name = M.getNameByHandle(author.u);
+                name = ellipsis(name, undefined, 11);
+                if (name) {
+                    renderableSummary = escapeHTML(name) + ": " + renderableSummary;
+                }
+            }
+        }
+    }
+
+    return renderableSummary;
 };

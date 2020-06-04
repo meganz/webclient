@@ -384,12 +384,14 @@
                         $('.red-header', $a1).text(l[17551]);
                         $('.red-header', $a2).text(l[16500]);
                         $('.light-grey', $a1).text(l[17552]);
+                        $('.light-grey', $a2).text(l[19598]);
                     }
                     else {
                         $('.red-header', $a1).text(l[16496]);
                         $('.red-header', $a2).text(l[16500]);
                         $('.red-header', $a3).text(l[17095]);
                         $('.light-grey', $a1).text(l[16498]);
+                        $('.light-grey', $a2).text(l[16491]);
                         $('.light-grey', $a3).text(l[16515]);
                     }
                     break;
@@ -398,12 +400,14 @@
                         $('.red-header', $a1).text(l[17553]);
                         $('.red-header', $a2).text(l[16499]);
                         $('.light-grey', $a1).text(l[17554]);
+                        $('.light-grey', $a2).text(l[19598]);
                     }
                     else {
                         $('.red-header', $a1).text(l[16495]);
                         $('.red-header', $a2).text(l[16499]);
                         $('.red-header', $a3).text(l[17096]);
                         $('.light-grey', $a1).text(l[16497]);
+                        $('.light-grey', $a2).text(l[16491]);
                         $('.light-grey', $a3).text(l[16514]);
                     }
                     break;

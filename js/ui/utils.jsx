@@ -107,7 +107,7 @@ class JScrollPane extends MegaRenderMixin {
         $elem.rebind('forceResize.jsp'+self.getUniqueId(), function(e, forced, scrollPositionYPerc, scrollToElement) {
             self.onResize(forced, scrollPositionYPerc, scrollToElement);
         });
-        $(window).rebind('resize.jsp' + self.getUniqueId(), self.onResize.bind(self));
+        chatGlobalEventManager.addEventListener('resize', 'jsp' + self.getUniqueId(), self.onResize.bind(self));
         self.onResize();
     }
     componentWillUnmount() {
@@ -115,7 +115,7 @@ class JScrollPane extends MegaRenderMixin {
         var $elem = $(ReactDOM.findDOMNode(this));
         $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
 
-        $(window).off('resize.jsp' + this.getUniqueId());
+        chatGlobalEventManager.removeEventListener('resize', 'jsp' + this.getUniqueId());
     }
     eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
@@ -254,7 +254,7 @@ class RenderTo extends React.Component {
 };
 
 
-class EmojiFormattedContent extends React.Component {
+export class EmojiFormattedContent extends React.Component {
     _eventuallyUpdateInternalState(props) {
         if (!props) {
             props = this.props;

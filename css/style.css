@@ -4576,9 +4576,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     font-size: 14px;
     cursor: pointer;
 }
-.notification-button {
-    position: relative;
-}
 .new-notification-info {
     height: 24px;
     line-height: 23px;
@@ -9345,6 +9342,10 @@ body:not(.en) .warning-dialog-a.wide {
 #msgDialog.with-close-btn .fm-notification-body {
     padding-top: 36px;
 }
+#msgDialog .fm-notifications-bottom .button {
+    position: relative;
+    display: block;
+}
 .fm-dialog.warning-dialog-a.login .fm-notification-body .fm-notification-info p {
     color: #333;
     font-size: 16px;
@@ -9422,7 +9423,7 @@ body:not(.en) .warning-dialog-a.wide {
     margin-left: 90px;
     display: table-cell;
     vertical-align: middle;
-    height: 78px;
+    height: 75px;
     font-family: 'LatoWeb', 'source_sans_proregular';
 }
 .fm-notification-info p, .fm-notification-info h1, .fm-notification-info h2 {
@@ -9441,6 +9442,9 @@ body:not(.en) .warning-dialog-a.wide {
     line-height: 20px;
     color: #888888;
     padding: 9px 0 0 0;
+}
+.fm-notification-info p:first-child {
+    padding-top: 0;
 }
 .warning-dialog-a .fm-notification-info p {
     overflow-wrap: break-word;

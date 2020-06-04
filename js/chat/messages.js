@@ -1254,7 +1254,7 @@ var MessagesBuff = function(chatRoom, chatdInt) {
                     $(chatRoom).trigger('onMessageUpdateDecrypted', editedMessage);
 
                     if (decrypted.type === strongvelope.MESSAGE_TYPES.TRUNCATE) {
-                        var messageKeys = chatRoom.messagesBuff.messages.keys();
+                        var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
                         for (var i = 0; i < messageKeys.length; i++) {
                             var v = self.messages[messageKeys[i]];

@@ -245,6 +245,22 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             }
         });
 
+    // event handlers for focus and blur on checkBoxes
+    var $regChk = $('.bus-reg-checkbox input', $pageContainer);
+    $regChk.rebind(
+        'focus.chkRegisterb',
+        function regsiterbInputFocus() {
+            $(this).parent().addClass('focused');
+        }
+    );
+
+    $regChk.rebind(
+        'blur.chkRegisterb',
+        function regsiterbInputBlur() {
+            $(this).parent().removeClass('focused');
+        }
+    );
+
     /**input values validation
      * @param {Object}  $element    the single element to validate, if not passed all will be validated
      * @returns {Boolean}   whether the validation passed or not*/
@@ -347,7 +363,9 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     );
 
     // event handler for register button, validation + basic check
-    $('#business-reg-btn, #business-reg-btn-mob', $pageContainer).off('click.suba').on('click.suba',
+    var $regBtns = $('#business-reg-btn, #business-reg-btn-mob', $pageContainer);
+    $regBtns.rebind(
+        'click.regBtns',
         function registerBusinessAccButtonClickHandler() {
 
             if ($(this).hasClass('disabled')) {
@@ -365,6 +383,37 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 $passInput.val());
         }
     );
+
+    $regBtns.rebind(
+        'keydown.regBtns',
+        function regBusinessKeyDownHandler(e) {
+            if (e.keyCode === 9) {
+                e.preventDefault();
+                $nbUsersInput.focus();
+            }
+            else if (e.keyCode === 32 || e.keyCode === 13) {
+                e.preventDefault();
+                $(this).triggerHandler('click');
+            }
+            return false;
+        }
+    );
+
+    // event handlers for focus and blur on registerBtn
+    $regBtns.rebind(
+        'focus.regBtns',
+        function regsiterbBtnFocus() {
+            $(this).addClass('focused');
+        }
+    );
+
+    $regBtns.rebind(
+        'blur.regBtns',
+        function regsiterbBtnBlur() {
+            $(this).removeClass('focused');
+        }
+    );
+
 
     M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
         var business = new BusinessAccount();

@@ -2357,7 +2357,10 @@ function dbfetchfm() {
                                 _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
                             },
                             suba: process_suba,
-                            puf: mega.megadrop.pufProcessDb,
+                            puf: function _(r) {
+                                mega.megadrop.pufProcessDb(r);
+                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
+                            },
                             pup: mega.megadrop.pupProcessDb,
                             tree: function(r) {
                                 for (var i = r.length; i--;) {
@@ -2367,6 +2370,7 @@ function dbfetchfm() {
                             mcf: 1
                         };
                         tables.ps.promise = new MegaPromise();
+                        tables.puf.promise = new MegaPromise();
 
                         // Prevent MEGAdrop tables being created for mobile
                         if (is_mobile) {

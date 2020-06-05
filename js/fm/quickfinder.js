@@ -24,6 +24,9 @@ var QuickFinder = function(searchable_elements, containers) {
     var last_key = null;
     var next_idx = 0;
 
+    // Defined allowed dialogs' name
+    var allowedDialogs = {'copy':true, 'move':true};
+
     // hide on page change
     if (QuickFinder._pageChangeListenerId) {
         mBroadcaster.removeListener(QuickFinder._pageChangeListenerId);
@@ -42,7 +45,7 @@ var QuickFinder = function(searchable_elements, containers) {
         e = e || window.event;
         // DO NOT start the search in case that the user is typing something in a form field... (eg.g. contacts -> add
         // contact field)
-        if ($(e.target).is("input, textarea, select") || $.dialog) {
+        if ($(e.target).is("input, textarea, select") || ($.dialog && !allowedDialogs[$.dialog])) {
             return;
         }
 
@@ -73,7 +76,32 @@ var QuickFinder = function(searchable_elements, containers) {
 
             charTyped = charTyped.toLowerCase();
 
-            foundIds = M.v.filter(function(v) {
+            var nodesList = M.v;
+            var isSharedPanel = false;
+            if ($.dialog && allowedDialogs[$.dialog]) {
+                // Assign different nodes list depending on different dialogs
+                var activePanel = $('.dialog-content-block').closest('.fm-picker-dialog-tree-panel.active');
+                if (activePanel.hasClass('cloud-drive')) {
+                    nodesList = Object.values(M.tree[M.RootID]);
+                }
+                else if (activePanel.hasClass('shared-with-me')) {
+                    isSharedPanel = true;
+                    nodesList = Object.values(M.tree.shares);
+                }
+                else {
+                    // Other tabs rather than cloud-drive and sharing
+                    return;
+                }
+
+                // Sort the node list by name
+                nodesList.sort(function(a, b) {
+                    var aName = a.name.toUpperCase();
+                    var bName = b.name.toUpperCase();
+                    return M.compareStrings(aName, bName, d);
+                });
+            }
+
+            foundIds = nodesList.filter(function(v) {
                 var nameStr = "";
                 if (v.name) {
                     nameStr = v.name;
@@ -89,7 +117,32 @@ var QuickFinder = function(searchable_elements, containers) {
                 if (nameStr && nameStr[0] && nameStr[0].toLowerCase() === charTyped) {
                     return true;
                 }
+
+                return false;
             });
+
+            if ($.dialog && allowedDialogs[$.dialog]) {
+                if (foundIds.length > 0) {
+                    // Fetch the first node after quick finding
+                    var dialogQuickIndex = 0;
+
+                    if (isSharedPanel) {
+                        // Acquire the first node with the write permission if it's the share-with-me panel
+                        for (var i = 0; i < foundIds.length; i++) {
+                            if (M.d[foundIds[i].h] && M.d[foundIds[i].h].r > 0) {
+                                dialogQuickIndex = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    var $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
+                    if (!$dialogQuickFindNode.hasClass('selected')) {
+                        $dialogQuickFindNode.trigger('click');
+                    }
+                }
+                return;
+            }
 
             if (
                 /* repeat key press, but show start from the first element */
@@ -135,9 +188,9 @@ var QuickFinder = function(searchable_elements, containers) {
         }
         else if (charCode >= 33 && charCode <= 36)
         {
-            var e = '.files-grid-view.fm';
+            var elem = '.files-grid-view.fm';
             if (M.viewmode == 1) {
-                e = '.fm-blocks-view.fm';
+                elem = '.fm-blocks-view.fm';
             }
 
             if (M.megaRender && M.megaRender.megaList) {
@@ -156,26 +209,24 @@ var QuickFinder = function(searchable_elements, containers) {
                         break;
                 }
             }
-            else {
-                if ($(e + ':visible').length) {
-                    e = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                    var jsp = e.data('jsp');
+            else if ($(elem + ':visible').length) {
+                elem = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
+                var jsp = elem.data('jsp');
 
-                    if (jsp) {
-                        switch (charCode) {
-                            case 33: /* Page Up   */
-                                jsp.scrollByY(-e.height(), !0);
-                                break;
-                            case 34: /* Page Down */
-                                jsp.scrollByY(e.height(), !0);
-                                break;
-                            case 35: /* End       */
-                                jsp.scrollToBottom(!0);
-                                break;
-                            case 36: /* Home      */
-                                jsp.scrollToY(0, !0);
-                                break;
-                        }
+                if (jsp) {
+                    switch (charCode) {
+                        case 33: /* Page Up   */
+                            jsp.scrollByY(-elem.height(), !0);
+                            break;
+                        case 34: /* Page Down */
+                            jsp.scrollByY(elem.height(), !0);
+                            break;
+                        case 35: /* End       */
+                            jsp.scrollToBottom(!0);
+                            break;
+                        case 36: /* Home      */
+                            jsp.scrollToY(0, !0);
+                            break;
                     }
                 }
             }
@@ -216,7 +267,7 @@ var QuickFinder = function(searchable_elements, containers) {
 };
 
 var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username',
+    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username, li span.nw-fm-tree-folder',
     '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table, .contacts-blocks-scrolling,' +
-    '.contact-requests-grid, .sent-requests-grid'
+    '.contact-requests-grid, .sent-requests-grid, .fm-picker-dialog .dialog-content-block'
 );

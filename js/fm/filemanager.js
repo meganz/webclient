@@ -715,6 +715,13 @@ FileManager.prototype.initFileManagerUI = function() {
         $('#csb_' + M.RootID).empty();
 
         $(window).off('resize.ccmui');
+        $('.jspContainer', '#bodyel').off('mousewheel.context');
+
+        // enable scrolling
+        if ($.disabledContianer) {
+            Ps.enable($.disabledContianer[0]);
+            delete $.disabledContianer;
+        }
     };
 
     $fmholder.rebind('click.contextmenu', function(e) {

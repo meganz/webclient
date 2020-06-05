@@ -1644,7 +1644,9 @@
 
 
         var chatRoom = self.chatd.megaChat.getChatById(chatId);
-        if (chatRoom && chatRoom.type !== "public") {
+        if (chatRoom) {
+            // if all messages are from chatdPersist, chatd's buf would be empty, but messagesBuff would still contain
+            // messages to be removed.
             promise.always(function() {
 
                 if (
@@ -1683,7 +1685,7 @@
             chatRoom.messagesBuff.messages.replace(editedMessage.messageId, editedMessage);
 
 
-            var messageKeys = chatRoom.messagesBuff.messages.keys();
+            var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
             for (var i = 0; i < messageKeys.length; i++) {
                 var v = chatRoom.messagesBuff.messages[messageKeys[i]];
@@ -1747,7 +1749,7 @@
 
         promise.always(function() {
             var chatRoom = self.chatd.megaChat.getChatById(chatId);
-            var messageKeys = chatRoom.messagesBuff.messages.keys();
+            var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
             for (var i = 0; i < messageKeys.length; i++) {
                 var v = chatRoom.messagesBuff.messages[messageKeys[i]];

@@ -403,6 +403,19 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         m.find('.dropdown-section:visible:last hr').addClass('hidden');
 
         $(window).rebind('resize.ccmui', SoonFc(findNewPosition));
+
+        $('.jspContainer','#bodyel').rebind('mousewheel.context', function() {
+            $(this).off('mousewheel.context');
+            $.hideContextMenu();
+        });
+
+        // disable scrolling
+        var $psContainer = $(e.currentTarget).closest('.ps-container');
+        if ($psContainer.length) {
+            Ps.disable($psContainer[0]);
+            $.disabledContianer = $psContainer;
+        }
+
     };
 
     $.hideContextMenu();

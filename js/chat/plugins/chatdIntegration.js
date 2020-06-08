@@ -1743,7 +1743,7 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
         }
 
         if (decryptedResult.type === strongvelope.MESSAGE_TYPES.TRUNCATE && msgInstance) {
-            var messageKeys = chatRoom.messagesBuff.messages.keys();
+            var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
             for (var i = 0; i < messageKeys.length; i++) {
                 var v = chatRoom.messagesBuff.messages[messageKeys[i]];

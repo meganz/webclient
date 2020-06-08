@@ -2650,7 +2650,7 @@ Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     }
     else {
         var chatRoom = self.megaChat.getChatById(chatIdEnc);
-        var messageKeys = chatRoom.messagesBuff.messages.keys();
+        var messageKeys = clone(chatRoom.messagesBuff.messages.keys());
 
         for (var i = 0; i < messageKeys.length; i++) {
             var v = chatRoom.messagesBuff.messages[messageKeys[i]];

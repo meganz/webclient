@@ -111,15 +111,15 @@ export default class SearchPanel extends MegaRenderMixin {
         return ChatSearch.doSearch(
             s,
             function(room, result, results) {
-                self.setState({results});
+                self.setState({ results });
             })
             .catch(function(ex) {
                 if (d) {
-                    console.log("Search failed (or was resetted)", ex);
+                    console.log("Search failed (or was reset)", ex);
                 }
             })
             .always(function() {
-                self.setState({status: STATUS.COMPLETED});
+                self.setState({ status: STATUS.COMPLETED });
             });
     };
 

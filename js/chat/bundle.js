@@ -17715,7 +17715,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         });
       }).catch(function (ex) {
         if (d) {
-          console.log("Search failed (or was resetted)", ex);
+          console.log("Search failed (or was reset)", ex);
         }
       }).always(function () {
         self.setState({

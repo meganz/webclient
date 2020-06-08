@@ -475,6 +475,245 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
     });
 };
 
+MegaData.prototype.hideClickHint = function() {
+    'use strict';
+
+    if (mega.cttHintTimer) {
+        clearTimeout(mega.cttHintTimer);
+        delete mega.cttHintTimer;
+    }
+
+    // implicitly invoking this function will cause that the hint won't be seen anymore.
+    onIdle(function() {
+        mega.config.set('ctt', 1);
+    });
+
+    $('.show-hints').removeAttr('style');
+    $('.dropdown.click-hint').addClass('hidden').removeAttr('style');
+};
+
+MegaData.prototype.showClickHint = function(force) {
+    'use strict';
+
+    this.hideClickHint();
+
+    // if the click-tooltip was not seen already
+    if (force || !mega.config.get('ctt')) {
+        mega.cttHintTimer = setTimeout(function() {
+            $('.show-hints').fadeIn(300, function() {
+                $(this).removeClass('hidden');
+
+                var $hint = $('.dropdown.click-hint');
+                var $thumb = $('.hint-thumb', $hint);
+                $hint.position({
+                    of: this,
+                    my: 'left top-5px',
+                    at: 'left+27px top'
+                });
+                $hint.fadeIn(450, function() {
+                    $(this).removeClass('hidden');
+                    $('.close-button', $hint).rebind('click', M.hideClickHint.bind(M));
+                });
+
+                var imageSwapTimer = setInterval(function() {
+                    if (!mega.cttHintTimer) {
+                        return clearInterval(imageSwapTimer);
+                    }
+                    if ($thumb.hasClass('left-click')) {
+                        $thumb.switchClass("left-click", "right-click", 1000, "easeInOutQuad");
+                    }
+                    else {
+                        $thumb.switchClass("right-click", "left-click", 1000, "easeInOutQuad");
+                    }
+                }, 5e3);
+            }).rebind('click', M.showClickHint.bind(M, true));
+        }, force || 300);
+    }
+
+    return false;
+};
+
+/**
+ * Show storage overquota dialog
+ * @param {*} quota Storage quota data, as returned from M.getStorageQuota()
+ * @param {Object} [options] Additional options
+ */
+MegaData.prototype.showOverStorageQuota = function(quota, options) {
+    'use strict';
+
+    var promise = new MegaPromise();
+
+    if (!pro.membershipPlans || !pro.membershipPlans.length) {
+        pro.loadMembershipPlans(function() {
+            M.showOverStorageQuota(quota, options);
+        });
+        // no caller relay on the promise really, 1 call has .always
+        return promise.reject();
+    }
+
+
+    var prevState = $('.fm-main').is('.almost-full, .full');
+    $('.fm-main').removeClass('fm-notification almost-full full');
+
+    if (this.showOverStorageQuotaPromise) {
+        promise = this.showOverStorageQuotaPromise;
+    }
+    this.showOverStorageQuotaPromise = promise;
+
+    if (quota === -1) {
+        quota = { percent: 100 };
+        quota.isFull = quota.isAlmostFull = true;
+        options = { custom: 1 };
+    }
+
+    var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+    $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
+        replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+    $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+
+    $('.fm-notification-block.almost-full')
+        .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
+
+    if (Object(u_attr).p) {
+        // update texts with "for free accounts" sentences removed.
+
+        $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
+
+        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
+        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
+            .safeHTML(l[16361] + ' ' + l[16314]);
+    }
+    else {
+        var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
+            .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
+
+        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
+            .safeHTML(minStorage);
+        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
+            .safeHTML(minStorage + ' ' + l[16314]);
+    }
+
+    if (quota.isAlmostFull || Object(options).custom) {
+        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
+
+        if (quota.isFull) {
+            $('.fm-main').addClass('fm-notification full');
+            $strgdlg.addClass('full')
+                .find('.fm-dialog-body.full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16302])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16360]);
+        }
+        else {
+            if (quota.isAlmostFull) {
+                $('.fm-main').addClass('fm-notification almost-full');
+            }
+            $strgdlg.addClass('almost-full')
+                .find('.fm-dialog-body.almost-full')
+                .find('.fm-dialog-title')
+                .text(Object(options).title || l[16311])
+                .end()
+                .find('.body-header')
+                .safeHTML(Object(options).body || l[16312]);
+
+            // Storage chart and info
+            var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
+            var strQuotaUsed = bytesToSize(quota.cstrg);
+            var deg = 230 * quota.percent / 100;
+            var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
+
+            // Storage space chart
+            if (deg <= 180) {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
+                $storageChart.find('.right-chart span').removeAttr('style');
+            }
+            else {
+                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
+                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+            }
+
+            $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
+            $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
+            $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
+            $('.chart.data .perc-txt', $strgdlg).text(quota.percent + '%');
+        }
+
+        var closeDialog = function() {
+            $strgdlg.off('dialog-closed');
+            window.closeDialog();
+
+            promise.resolve();
+            delete M.showOverStorageQuotaPromise;
+        };
+
+        $strgdlg.rebind('dialog-closed', closeDialog);
+
+        $('.button', $strgdlg).rebind('click', function() {
+            var $this = $(this);
+
+            closeDialog();
+
+            if ($this.hasClass('choose-plan')) {
+                loadSubPage('pro');
+            }
+            else if ($this.hasClass('get-bonuses')) {
+                mega.achievem.achievementsListDialog();
+            }
+
+            return false;
+        });
+        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
+
+        $('.fm-notification-block .fm-notification-close')
+            .rebind('click', function() {
+                $('.fm-main').removeClass('fm-notification almost-full full');
+                $.tresizer();
+            });
+
+        mega.achievem.enabled()
+            .done(function() {
+                $strgdlg.addClass('achievements')
+                    .find('.semi-small-icon.rocket')
+                    .rebind('click', function() {
+                        closeDialog();
+                        mega.achievem.achievementsListDialog();
+                        return false;
+                    });
+            });
+
+        clickURLs();
+        $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
+            .rebind('click', function() {
+                closeDialog();
+                loadSubPage('fm/' + M.RubbishID);
+                return false;
+            });
+
+        if (Object(u_attr).p) {
+            $('.choose-plan', $strgdlg).text(l[16386]);
+        }
+
+        // if another dialog wasn't opened previously
+        if (!prevState || Object(options).custom) {
+            M.safeShowDialog('over-storage-quota', $strgdlg);
+        }
+        else {
+            promise.reject();
+        }
+    }
+
+    // On the banner appearance or disappearance, lets resize height of fm.
+    $.tresizer();
+
+    return promise;
+};
+
+// ---------------------------------------------------------------------------
+
 function voucherData(arr) {
     var vouchers = [];
     var varr = arr[0];

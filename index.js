@@ -2305,7 +2305,7 @@ function topmenuUI() {
             $headerActivityStatus.removeClass('hidden');
             $menuAvatar.addClass('presence');
             if (megaChatIsReady) {
-                megaChat.renderMyStatus();
+                megaChat._renderMyStatus();
             }
         }
 

@@ -123,26 +123,14 @@ export default class SearchPanel extends MegaRenderMixin {
             });
     };
 
-    doToggle = action /* pause || resume || destroy */ => {
-        const cs = ChatSearch.doSearch.cs;
-
-        if (action && cs) {
-            const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
-
-            this.setState({
-                status: (() => {
-                    switch (action) {
-                        case 'pause':
-                            return PAUSED;
-                        case 'resume':
-                            return IN_PROGRESS;
-                        default:
-                            return COMPLETED;
-                    }
-                })()
-            }, () => {
-                cs[action]();
-            });
+    doToggle = action /* pause || resume */ => {
+        const searching = this.state.status === STATUS.IN_PROGRESS || this.state.status === STATUS.PAUSED;
+        if (action && searching) {
+            const cs = ChatSearch.doSearch.cs;
+            if (!cs) {
+                return delay('chat-toggle', () => this.doToggle(action), 600);
+            }
+            cs[action]();
         }
     };
 
@@ -155,14 +143,9 @@ export default class SearchPanel extends MegaRenderMixin {
             searching,
             status: STATUS.IN_PROGRESS,
             results: []
-        }, () => {
-            if (searching) {
-                delay('chat-search', this.doSearch.bind(this, value), 1600);
-            }
-            else {
-                this.setState({results: []});
-            }
-        });
+        }, () =>
+            searching && delay('chat-search', () => this.doSearch(value), 1600)
+        );
     };
 
     handleToggle = () => {
@@ -181,8 +164,10 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clear the text on the first reset; minimize on the second
             SearchField.hasValue() ?
                 this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
-                    this.doToggle('destroy');
                     onIdle(() => SearchField.focus());
+                    if (ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs) {
+                        ChatSearch.doSearch.cs.destroy();
+                    }
                 }) :
                 this.toggleMinimize()
         );

@@ -17725,31 +17725,20 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.doToggle = function (action
-    /* pause || resume || destroy */
+    /* pause || resume */
     ) {
-      var cs = ChatSearch.doSearch.cs;
+      var searching = _this.state.status === STATUS.IN_PROGRESS || _this.state.status === STATUS.PAUSED;
 
-      if (action && cs) {
-        var IN_PROGRESS = STATUS.IN_PROGRESS,
-            PAUSED = STATUS.PAUSED,
-            COMPLETED = STATUS.COMPLETED;
+      if (action && searching) {
+        var cs = ChatSearch.doSearch.cs;
 
-        _this.setState({
-          status: function () {
-            switch (action) {
-              case 'pause':
-                return PAUSED;
+        if (!cs) {
+          return delay('chat-toggle', function () {
+            return _this.doToggle(action);
+          }, 600);
+        }
 
-              case 'resume':
-                return IN_PROGRESS;
-
-              default:
-                return COMPLETED;
-            }
-          }()
-        }, function () {
-          cs[action]();
-        });
+        cs[action]();
       }
     };
 
@@ -17763,13 +17752,9 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         status: STATUS.IN_PROGRESS,
         results: []
       }, function () {
-        if (searching) {
-          delay('chat-search', _this.doSearch.bind(searchPanel_assertThisInitialized(_this), value), 1600);
-        } else {
-          _this.setState({
-            results: []
-          });
-        }
+        return searching && delay('chat-search', function () {
+          return _this.doSearch(value);
+        }, 1600);
       });
     };
 
@@ -17794,11 +17779,13 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
           status: undefined,
           results: []
         }, function () {
-          _this.doToggle('destroy');
-
           onIdle(function () {
             return searchField_SearchField.focus();
           });
+
+          if (ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs) {
+            ChatSearch.doSearch.cs.destroy();
+          }
         }) : _this.toggleMinimize()
       );
     };

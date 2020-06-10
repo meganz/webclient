@@ -1,0 +1,99 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Chat</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" type="text/css" href="../../css/fonts.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/general.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/account.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/settings.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/user-card.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/business.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/top-menu.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/avatars.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/icons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dropdowns.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/popups.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/data-blocks-view.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/affiliate-program.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs-common.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/dialogs.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/retina-images.css" />
+
+    <script type="text/javascript" src="../../js/vendor/jquery.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.jscrollpane.js"></script>
+    <script type="text/javascript" src="../../js/vendor/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="../../js/jquery.misc.js"></script>
+    <script type="text/javascript">
+        var is_chrome_firefox = document.location.protocol === 'chrome:' && document.location.host === 'mega' || document.location.protocol === 'mega:';
+    </script>
+    <script type="text/javascript" src="../../js/utils/dom.js"></script>
+    <script type="text/javascript" src="../../js/ui/megaInputs.js"></script>
+    <script type="text/javascript" src="../../js/ui/megaInputs-titleTop.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            var $dialog = $('.fm-dialog.affiliate-redeem');
+
+            dialogPositioning();
+        });
+        
+        
+
+    </script>
+</head>
+<body class="logged fontsize2 en">
+    
+    <div class="dark-overlay"></div>
+    
+    <div class="fm-dialog affiliate-request big-radius lato">
+        <div class="affiliate-request body">
+            
+            <div class="fm-dialog-title small dark">Redemption request has been submitted</div>
+            <div class="dialog-sprite dots"></div>
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="affiliate-request status-cell complete">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    Redemption requested
+                </div>
+            </div>
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="affiliate-request status-cell loading">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress" style="width: 50%"><span class="dialog-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    Processing
+                </div>
+            </div>
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="affiliate-request status-cell">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    Processed
+                </div>
+            </div>
+            
+            <div class="button default-green-button gradient height-48 big-txt">
+                <span>OK</span>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

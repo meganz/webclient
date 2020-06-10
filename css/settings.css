@@ -570,16 +570,6 @@
 .mega-input-title-ontop.birth input::placeholder {
     opacity: 1;
 }
-.fm-right-account-block .underline-dropdown-input .list-arrow {
-    width: 16px;
-    height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
-    background-position: -4px -12309px;
-    right: 8px;
-    bottom:10px;
-    position: absolute;
-}
 .fm-right-account-block .mega-input-title-ontop .birth-arrow-container {
     width: 24px;
     height: 32px;
@@ -589,34 +579,29 @@
     cursor: pointer;
     margin-right: 4px;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control {
+.fm-right-account-block .birth-arrow-container .birth-arrow {
     width: 24px;
     height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
     background-position: 0px -12311px;
     opacity: 0.4;
     -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg); /* IE 9 */
-    -webkit-transform: rotate(180deg); /* Safari */
+    -ms-transform: rotate(180deg);
+    -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
     transition: 0.3s;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control {
-    width: 24px;
-    height: 16px;
-    background-image: url(../images/mega/fm-main-sprite_v15.png);
-    background-repeat: no-repeat;
-    background-position: 0px -12311px;
-    opacity: 0.4;
-    transition: 0.3s;
+.fm-right-account-block .birth-arrow-container .down-control {
+    -o-transform: none;
+    -ms-transform: none;
+    -webkit-transform: none;
+    transform: none;
 }
-.fm-right-account-block .mega-input-title-ontop .birth-arrow-container .up-control:hover, .fm-right-account-block .mega-input-title-ontop .birth-arrow-container .down-control:hover {
+.fm-right-account-block .birth-arrow-container .birth-arrow:hover {
     opacity: 1;
 }
-.fm-right-account-block .underline-dropdown-input select{
+.fm-right-account-block .underline-dropdown-input select {
     background:transparent;
-    border:none;
+    border: none;
     font-size: 14px;
     color: #333333;
     height: 40px;

@@ -172,8 +172,10 @@ mega.ui.MegaInputs.prototype.titleTop._updateShowHideErrorAndMessage = function(
      * Title top - show gray colored message on bottom of the underline.
      *
      * @param {String} msg - Massage to show.
+     * @param {Boolean} fix - Fix message, the message will not disappear.
+     * @returns {Void}
      */
-    this.showMessage = function(msg) {
+    this.showMessage = function(msg, fix) {
 
         if (typeof this.options.onShowMessage === 'function') {
             this.options.onShowMessage(msg);
@@ -184,15 +186,22 @@ mega.ui.MegaInputs.prototype.titleTop._updateShowHideErrorAndMessage = function(
 
             $wrapper.addClass('msg');
             $msgContainer.safeHTML(msg);
-            this.origBotSpace = this.origBotSpace || parseInt($wrapper.css('margin-bottom'));
+            if (this.origBotSpace === undefined) {
+                this.origBotSpace = this.origBotSpace || parseInt($wrapper.css('margin-bottom'));
+            }
             $wrapper.css('margin-bottom', this.origBotSpace + $msgContainer.outerHeight());
      
+            if (fix) {
+                $wrapper.addClass('fix-msg');
+                this.fixMessage = msg;
+            }
         }
     };
+
     /**
      * Title top - hide error or message.
      */
-    this.hideError = this.hideMessage = function() {
+    this.hideError = this.hideMessage = function(force) {
 
         if (typeof this.options.onHideError === 'function') {
             this.options.onHideError();
@@ -201,8 +210,15 @@ mega.ui.MegaInputs.prototype.titleTop._updateShowHideErrorAndMessage = function(
             var $wrapper = this.$input.parent();
 
             this.$input.removeClass('errored');
-            $wrapper.removeClass('msg error');
-            $wrapper.css('margin-bottom', '');
+            $wrapper.removeClass('error');
+
+            if ($wrapper.hasClass('fix-msg') && !force) {
+                this.showMessage(this.fixMessage);
+            }
+            else {
+                $wrapper.removeClass('msg').removeClass('fix-msg');
+                $wrapper.css('margin-bottom', '');
+            }
         }
     };
 
@@ -329,7 +345,32 @@ mega.ui.MegaInputs.prototype.titleTop._extendedFunctions = function() {
      * @param {String} [title] - New title.
      */
     this.updateTitle = function(title) {
-        title = escapeHTML(title || this.$input.attr('title') || this.$input.attr('placeholder'));
+
+        title = title || this.$input.attr('title') || this.$input.attr('placeholder');
+
+        // Note: This should remain as text() as some place use third party pulling text as title.
         this.$input.parent().find('.mega-input-title').text(title);
+    };
+
+    /**
+     * Update value of the input, with or without titletop animation.
+     *
+     * @param {String} [value] - New value.
+     * @param {Boolean} [noAnimation] - Show animation or not.
+     */
+    this.setValue = function(value, noAnimation) {
+
+        var self = this;
+
+        if (noAnimation) {
+            this.$input.prev().addClass('no-trans');
+        }
+
+        this.hideError();
+        this.$input.val(value).trigger('change');
+
+        onIdle(function() {
+            self.$input.prev().removeClass('no-trans');
+        });
     };
 };

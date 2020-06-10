@@ -570,19 +570,34 @@ function daysSince1Jan2000() {
  *                  'symbol' - use a localized currency symbol such as "$" - Default,
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
+ *                  'number' - just number with correct decimal
  * @returns {String} formated currency value
  */
 function formatCurrency(value, currency, display) {
 
     'use strict';
 
+    value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
     display = display || 'symbol';
+    var displayNumber = false;
+
+    if (display === 'number') {
+        display = 'code';
+        displayNumber = true;
+    }
 
     var locales = getCountryAndLocales().locales;
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
 
-    return value.toLocaleString(locales, options);
+    var result = value.toLocaleString(locales, options);
+
+    // If this is number only, remove currency code
+    if (displayNumber) {
+        result = result.replace(currency, '').trim();
+    }
+
+    return result;
 }
 
 /**
@@ -1163,6 +1178,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A3]', '</a>');
     l[23354] = escapeHTML(l[23354]).replace('[A]', '<a href="/pro" class="clickurl">')
         .replace('[/A]', '</a>');
+    l[23370] = l[23370].replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[23371] = l[23371].replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[23372] = l[23372].replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
+    l[23373] = l[23373].replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[23376] = escapeHTML(l[23376]).replace('[A]', '<a href="/security" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
     l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
@@ -1178,7 +1197,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
         18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
         19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
-        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23351
+        22674, 22669, 22671, 22784, 22789, 22881, 22883, 23098, 23296, 23299, 23304, 23351
     ];
     for (i = common.length; i--;) {
         var num = common[i];

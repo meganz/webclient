@@ -138,6 +138,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $('.fm-dialog-overlay').rebind('click.fm', function(ev) {
         if ($.dialog === 'pro-login-dialog'
+            || $.dialog === 'affiliate-redeem-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -735,7 +736,7 @@ FileManager.prototype.initFileManagerUI = function() {
             return;
         }
         var $target = $(e.target);
-        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red';
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red, a.mailto';
 
         if (!$target.is('.account-history-dropdown-button')) {
             $('.account-history-dropdown').addClass('hidden');

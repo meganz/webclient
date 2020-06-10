@@ -127,6 +127,9 @@ var mobile = {
         // Unhide back button, then add on click/tap handler
         $page.find('.fm-icon.back').removeClass('hidden').off('tap').on('tap', function() {
 
+            // Hide current page
+            $page.addClass('hidden');
+
             // If page to go back to is specified, render that
             if (typeof targetPage !== 'undefined') {
                 loadSubPage(targetPage);
@@ -134,6 +137,33 @@ var mobile = {
             else {
                 // Otherwise open the previous folder/page
                 window.history.back();
+            }
+
+            // Prevent double taps
+            return false;
+        });
+    },
+
+    /**
+     * Initialise the back arrow icon in the header to go back to a specific page without URL
+     * @param {Object} $page The jQuery selector for the current page
+     * @param {Object} $page The jQuery selector for the previuos page
+     */
+    initStepBackButton: function($page, $targetPage) {
+
+        'use strict';
+
+        // Unhide back button, then add on click/tap handler
+        $('.fm-icon.back', $page).removeClass('hidden').rebind('tap', function() {
+
+            // If page to go back to is specified, show that and hide current one
+            if (typeof $targetPage === 'object') {
+
+                // Hide current page
+                $page.addClass('hidden');
+
+                // Show previous page
+                $targetPage.removeClass('hidden');
             }
 
             // Prevent double taps

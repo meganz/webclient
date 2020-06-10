@@ -909,6 +909,7 @@ function api_reqfailed(channel, error) {
             showToast('clipboard', l[19]);
         });
         loadingInitDialog.hide();
+        loadingDialog.hide('force'); // subjected loading dialog is not hide by loadsubpage, so force hide it.
         loadSubPage('login');
     }
     else if ((c === 2 || c === 5) && e === ETOOMANY) {

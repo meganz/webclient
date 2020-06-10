@@ -2962,3 +2962,17 @@ function registerLinuxDownloadButton($links) {
     });
 }
 
+/**
+ * Validate entered address is on correct structure, if there is more type of bitcoin structure please update.
+ * Reference - https://stackoverflow.com/a/59756959
+ * Use in Referral program redemption
+ * @param {String} address Bitcoin address
+ *
+ * @returns {Boolean} result Validity of entered address
+ */
+function validateBitcoinAddress(address) {
+
+    'use strict';
+
+    return address.match(/(^[13][\1-9A-HJ-NP-Za-km-z]{25,34}$)|(^(bc1)[\dA-HJ-NP-Za-z]{8,87}$)/) === null;
+}

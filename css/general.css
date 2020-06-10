@@ -25,7 +25,7 @@
 .txt-dark {
     color: #333;
 }
-..underline-txt {
+.underline-txt {
     text-decoration: underline;
     outline-color: none;
 }
@@ -193,6 +193,9 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     position: relative;
     z-index: 11;
 }
+.mega-input-title-ontop .dialog-input.default-select {
+    z-index: auto;
+}
 .mega-input-title-ontop input.strengthChecker {
     width: calc(100% - 80px);
     width: -webkit-calc(100% - 80px);
@@ -329,7 +332,7 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
 .mega-input-title-ontop.error .message-container{
     color: rgba(229,76,81,1);
 }
-.mega-input-title-ontop.msg .message-container {
+.mega-input-title-ontop.msg .message-container, .mega-input-title-ontop.fix-msg .message-container {
     display: inline-block;
 }
 .mega-input-title-ontop.msg.strengthChecker .message-container {
@@ -346,6 +349,20 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
 }
 .mega-input-title-ontop.with-icon .account-pass-lines {
     margin-top: 9px;
+}
+.underline-dropdown-input:not(.disabled) span {
+    cursor: pointer;
+}
+.underline-dropdown-input .list-arrow {
+    width: 16px;
+    height: 16px;
+    background-image: url(../images/mega/fm-main-sprite_v15.png);
+    right: 8px;
+    bottom: 10px;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: -27px -2588px;
+    opacity: 0.55;
 }
 
 /* Password strength Checker - Bar */
@@ -490,7 +507,6 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     box-sizing: border-box;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-weight: normal;
-    box-sizing: border-box;
 }
 .mega-data-box table th::before {
     content: '';
@@ -538,7 +554,7 @@ a.green, a.green:link, a.green:visited, a.green:hover, a.green:active {
     color: #999;
     border-top: 1px solid rgba(0,0,0,0.1);
 }
-.mega-data-box table tr:nth-child(2) td {
+.mega-data-box table tr:nth-child(2) td, .mega-data-box table tr.hidden + tr td, .mega-data-box table tr.template + tr td  {
     border: 0;
 }
 .mega-data-box .colored-label {

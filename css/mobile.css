@@ -4031,6 +4031,9 @@ input.radioOn, input.radioOff {
 .mobile.cancel-account .confirm-close-account-button {
     margin: 0 20px 20px 20px;
 }
+.mobile.cancel-account .radio-button-form .radio-txt {
+    padding-top: 5px;
+}
 .mobile.header-icon {
     width: 36px;
     height: 36px;

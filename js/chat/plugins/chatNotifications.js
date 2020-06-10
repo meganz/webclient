@@ -56,6 +56,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                     }
                     self.notifications.resetCounterGroup(megaRoom.chatId);
                 }
+                megaChat.updateSectionUnreadCount();
             };
 
             megaRoom
@@ -249,6 +250,8 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
 
                     n.setUnread(false);
+
+                    megaChat.updateSectionUnreadCount();
                 });
         })
         .rebind('onIncomingCall.chatNotifications', function(e,

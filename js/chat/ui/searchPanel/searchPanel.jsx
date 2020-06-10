@@ -124,26 +124,32 @@ export default class SearchPanel extends MegaRenderMixin {
     };
 
     doToggle = action /* pause || resume */ => {
-        const searching = this.state.status === STATUS.IN_PROGRESS || this.state.status === STATUS.PAUSED;
+        const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
+        const searching = this.state.status === IN_PROGRESS || this.state.status === PAUSED;
+
         if (action && searching) {
             const cs = ChatSearch.doSearch.cs;
+
             if (!cs) {
                 return delay('chat-toggle', () => this.doToggle(action), 600);
             }
-            cs[action]();
+
+            this.setState({
+                status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
+            }, () =>
+                cs[action]()
+            );
         }
     };
+
+    doDestroy = () => ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs && ChatSearch.doSearch.cs.destroy();
 
     handleChange = ev => {
         const value = ev.target.value;
         const searching = value.length > 0;
 
-        this.setState({
-            value,
-            searching,
-            status: STATUS.IN_PROGRESS,
-            results: []
-        }, () =>
+        this.doDestroy();
+        this.setState({ value, searching, status: STATUS.IN_PROGRESS, results: [] }, () =>
             searching && delay('chat-search', () => this.doSearch(value), 1600)
         );
     };
@@ -165,9 +171,7 @@ export default class SearchPanel extends MegaRenderMixin {
             SearchField.hasValue() ?
                 this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
                     onIdle(() => SearchField.focus());
-                    if (ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs) {
-                        ChatSearch.doSearch.cs.destroy();
-                    }
+                    this.doDestroy();
                 }) :
                 this.toggleMinimize()
         );

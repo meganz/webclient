@@ -2734,19 +2734,19 @@ function modifyPdfViewerScript(pdfViewerSrcCode) {
         'return  \'{{size_mb}} MB ({{size_b}} bytes)\'',
         'return (kb / 1024) + \' MB (\' + fileSize + \' bytes)\'');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
-        'var moreInfoText = \'PDF.js v{{ version }} (build: {{ build }})\' + \'\n\'',
+        'var moreInfoText =  \'PDF.js v{{version}} (build: {{build}})\' + \'\n\'',
         'var moreInfoText = \'PDF.js v\' + PDFJS.version + \'(build: \' + PDFJS.build + \')\' + \'\n\'');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
-        'moreInfoText += \'Message: {{ message }}\'',
+        'moreInfoText +=  \'Message: {{message}}\'',
         'moreInfoText += \'Message: \' + message');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
-        'moreInfoText += \'\n\' + \'Stack: {{ stack }}\'',
+        'moreInfoText += \'\n\' +  \'Stack: {{stack}}\'',
         'moreInfoText += \'\n\' + \'Stack: \' + moreInfo.stack');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
-        'moreInfoText += \'\n\' + \'File: {{ file }}\'',
+        'moreInfoText += \'\n\' +  \'File: {{file}}\'',
         'moreInfoText += \'\n\' + \'File: \' + moreInfo.filename');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
-        'moreInfoText += \'\n\' + \'Line: {{ line }}\'',
+        'moreInfoText += \'\n\' +  \'Line: {{line}}\'',
         'moreInfoText += \'\n\' + \'Line: \' + moreInfo.lineNumber');
     pdfViewerSrcCode = pdfViewerSrcCode.replace(
         'errorMoreInfo.value = moreInfoText',

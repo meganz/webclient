@@ -17727,7 +17727,10 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     _this.doToggle = function (action
     /* pause || resume */
     ) {
-      var searching = _this.state.status === STATUS.IN_PROGRESS || _this.state.status === STATUS.PAUSED;
+      var IN_PROGRESS = STATUS.IN_PROGRESS,
+          PAUSED = STATUS.PAUSED,
+          COMPLETED = STATUS.COMPLETED;
+      var searching = _this.state.status === IN_PROGRESS || _this.state.status === PAUSED;
 
       if (action && searching) {
         var cs = ChatSearch.doSearch.cs;
@@ -17738,13 +17741,23 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
           }, 600);
         }
 
-        cs[action]();
+        _this.setState({
+          status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
+        }, function () {
+          return cs[action]();
+        });
       }
+    };
+
+    _this.doDestroy = function () {
+      return ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs && ChatSearch.doSearch.cs.destroy();
     };
 
     _this.handleChange = function (ev) {
       var value = ev.target.value;
       var searching = value.length > 0;
+
+      _this.doDestroy();
 
       _this.setState({
         value: value,
@@ -17783,9 +17796,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
             return searchField_SearchField.focus();
           });
 
-          if (ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs) {
-            ChatSearch.doSearch.cs.destroy();
-          }
+          _this.doDestroy();
         }) : _this.toggleMinimize()
       );
     };

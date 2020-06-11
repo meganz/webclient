@@ -128,16 +128,16 @@ export default class SearchPanel extends MegaRenderMixin {
         const searching = this.state.status === IN_PROGRESS || this.state.status === PAUSED;
 
         if (action && searching) {
-            const cs = ChatSearch.doSearch.cs;
+            const chatSearch = ChatSearch.doSearch.cs;
 
-            if (!cs) {
+            if (!chatSearch) {
                 return delay('chat-toggle', () => this.doToggle(action), 600);
             }
 
             this.setState({
                 status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
             }, () =>
-                cs[action]()
+                chatSearch[action]()
             );
         }
     };

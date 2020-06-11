@@ -17733,9 +17733,9 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       var searching = _this.state.status === IN_PROGRESS || _this.state.status === PAUSED;
 
       if (action && searching) {
-        var cs = ChatSearch.doSearch.cs;
+        var chatSearch = ChatSearch.doSearch.cs;
 
-        if (!cs) {
+        if (!chatSearch) {
           return delay('chat-toggle', function () {
             return _this.doToggle(action);
           }, 600);
@@ -17744,7 +17744,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         _this.setState({
           status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
         }, function () {
-          return cs[action]();
+          return chatSearch[action]();
         });
       }
     };

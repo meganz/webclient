@@ -485,7 +485,10 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    if (!is_extension && (window.dd || (location.host !== 'mega.nz' && location.host !== 'webcache.googleusercontent.com'))) {
+    if (!is_extension && (window.dd ||
+        (location.host !== 'mega.nz' &&
+            location.host !== 'mega.io' &&
+            location.host !== 'webcache.googleusercontent.com'))) {
 
         if (location.host === 'smoketest.mega.nz') {
             staticpath = 'https://smoketest.static.mega.nz/3/';

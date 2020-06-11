@@ -1831,10 +1831,12 @@ affiliateUI.registrationIndex = {
 
         $datesWrapper.rebind('click.selectDateRange', function(e) {
 
-            if (e.target.classList.contains('prev-arrow')) {
+            var classList = e.target.classList;
+
+            if (classList.contains('prev-arrow') && !classList.contains('disabled')) {
                 self.setChartTimeBlock(self.start - 1);
             }
-            else if (e.target.classList.contains('next-arrow')) {
+            else if (classList.contains('next-arrow') && !classList.contains('disabled')) {
                 self.setChartTimeBlock(self.end + 1);
             }
             else {
@@ -1896,6 +1898,19 @@ affiliateUI.registrationIndex = {
         }
         else if (this.type === 'y') {
             $datesBlock.text(new Date(this.start * 1000).getFullYear());
+        }
+
+        var startlimit = 1577836800;
+        var endlimit = Date.now() / 1000;
+        var $prevBtn = $('.fm-affiliate.chart-dates .prev-arrow', affiliateUI.$body).removeClass('disabled');
+        var $nextBtn = $('.fm-affiliate.chart-dates .next-arrow', affiliateUI.$body).removeClass('disabled');
+
+        if (this.start < startlimit) {
+            $prevBtn.addClass('disabled');
+        }
+
+        if (this.end > endlimit) {
+            $nextBtn.addClass('disabled');
         }
     },
 

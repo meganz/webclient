@@ -1138,6 +1138,11 @@ function init_page() {
         mobile.affiliate.initMainPage();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/refer/redeem') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initRedeemPage();
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/refer/guide') {
         parsepage(pages.mobile);
         mobile.affiliate.initGuidePage();

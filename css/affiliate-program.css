@@ -509,6 +509,10 @@
 .fm-affiliate.redeem-scroll.expanded-item {
     max-height: 590px;
 }
+.fm-affiliate.redeem-summary {
+    -webkit-transition: background-color 200ms linear;
+    transition: background-color 200ms linear;
+}
 .fm-affiliate.redeem-details {
     background-color: #FAFAFA;
     display: none;
@@ -520,9 +524,10 @@
     display: table-row;
 }
 .fm-affiliate.redeem-table .expanded .link.open {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
 }
-.fm-affiliate.redeem-table .expanded {
+.fm-affiliate.redeem-table .expanded, .fm-affiliate.redeem-summary:hover {
     background-color: #FAFAFA;
 }
 .fm-affiliate.redeem-table .link.close {
@@ -550,7 +555,7 @@
     width: 17.5%;
 }
 .fm-affiliate.redeem-cell {
-    padding: 0 16px 0 21px;
+    padding: 0 66px 0 36px;
     float: right;
     width: 50%;
     box-sizing: border-box;
@@ -558,12 +563,14 @@
 }
 .fm-affiliate.redeem-cell:first-child {
     float: left;
+    padding: 0 36px 0 66px;
 }
 .fm-affiliate.redeem-data {
-    border-top:1px solid rgba(0,0,0,0.08);
+    border-top: 1px solid rgba(0,0,0,0.08);
     font-size: 0;
     line-height: 0;
     padding: 10px 0px;
+    max-width: 366px;
 }
 .fm-affiliate.redeem-data:first-child {
     border: 0;
@@ -571,22 +578,38 @@
 .fm-affiliate.redeem-data span {
     display: inline-block;
     vertical-align: top;
-    width: 50%;
+    width: 59%;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 24px;
     color: #333;
     padding: 6px 0;
-}
-.fm-affiliate.redeem-data span.full-size {
-    display: block;
-    width: auto;
+    overflow-wrap: break-word;
+    text-align: right;
 }
 .fm-affiliate.redeem-data span.strong {
     font-size: 14px;
     font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial;
+    width: 40%;
+    margin-right: 1%;
+    text-align: left;
 }
-.fm-affiliate.redeem-data span.grey {
+.fm-affiliate.redeem-data span.grey{
     color: #999;
+    text-align: left;
+}
+.fm-affiliate.redeem-data span.grey:not(.full-size) {
+    width: 40%;
+    margin-right: 1%;
+}
+.fm-affiliate.redeem-data span.full-size {
+    display: block;
+    margin-right: auto;
+    width: auto;
+    text-align: left;
+}
+.fm-affiliate.redeem-data span.grey a {
+    color: #777;
+    text-decoration: underline;
 }
 .fm-affiliate.redeem-data span .status {
     display: inline;
@@ -599,7 +622,7 @@
     color: #D90007;
 }
 .fm-affiliate.redeem-data span .status.orange {
-    color: #D90007;
+    color: #FF6F00;
 }
 .fm-affiliate.redeem-data span .euro {
     padding: 0 5px;
@@ -607,9 +630,20 @@
     border-radius: 12px;
     line-height: 18px;
     border: 1px solid rgba(0,0,0,0.1);
-    margin-left: 2px;
+    margin-right: 8px;
     background-color: #FAFAFA;
     width: auto;
+}
+.fm-affiliate.redeem-data span .local {
+    padding: 0 5px;
+    line-height: 18px;
+    width: auto;
+    white-space: nowrap;
+}
+.fm-affiliate.redeem-data span.bitcoin-address {
+    white-space: nowrap;
+    width: auto;
+    display: block;
 }
 @media only screen and (max-width: 783px) {
     .fm-affiliate.half-sized-box {

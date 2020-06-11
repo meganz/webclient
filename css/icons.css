@@ -1009,7 +1009,7 @@
     height: 106px;
     background-position: 0px -4455px;
 }
-.small-icon.fm-s, .big-icon.fm-s {
+.small-icon.fm-s, .big-icon.fm-s, .fm-s {
     background-image: url(../images/mega/fm-main-sprite_v15.png);
 }
 .small-icon.double-l-arrows.fm-s {

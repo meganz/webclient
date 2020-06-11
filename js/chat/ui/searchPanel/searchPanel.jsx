@@ -149,7 +149,15 @@ export default class SearchPanel extends MegaRenderMixin {
         const searching = value.length > 0;
 
         this.doDestroy();
-        this.setState({ value, searching, status: STATUS.IN_PROGRESS, results: [] }, () =>
+        this.setState({
+            value,
+            searching,
+            // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
+            // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
+            // because `pause search` will not be available yet.
+            status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
+            results: []
+        }, () =>
             searching && delay('chat-search', () => this.doSearch(value), 1600)
         );
     };

@@ -13,6 +13,8 @@ export const TYPE = {
 
 export const LABEL = {
 
+    // [...] TODO: Add translations
+
     //
     // Result table & Result row
     // ------------------------------------
@@ -21,6 +23,9 @@ export const LABEL = {
     CONTACTS_AND_CHATS: 'Contacts And Chats',
     NO_RESULTS: 'No Results',
     RECENT: 'Recent',
+
+    SEARCH_MESSAGES_CTA: 'Search messages',
+    SEARCH_MESSAGES_INLINE: 'Click <a>here</a> to search for messages',
 
     //
     // Search field status
@@ -51,7 +56,7 @@ export default class ResultContainer extends MegaRenderMixin {
         </ResultTable>
     );
 
-    renderResults = (results, status) => {
+    renderResults = (results, status, isFirstQuery, onSearchMessages) => {
 
         //
         // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
@@ -63,7 +68,10 @@ export default class ResultContainer extends MegaRenderMixin {
         if (status === STATUS.COMPLETED && results.length < 1) {
             return (
                 <ResultTable>
-                    <ResultRow type={TYPE.NIL} />
+                    <ResultRow
+                        type={TYPE.NIL}
+                        isFirstQuery={isFirstQuery}
+                        onSearchMessages={onSearchMessages} />
                 </ResultTable>
             );
         }
@@ -86,7 +94,7 @@ export default class ResultContainer extends MegaRenderMixin {
                     <ResultRow
                         key={resultId}
                         type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
-                        result={result}/>
+                        result={result} />
                 ];
             }
         }
@@ -111,13 +119,28 @@ export default class ResultContainer extends MegaRenderMixin {
                     );
                 }
 
+                if (status === STATUS.COMPLETED && key === 'MESSAGES') {
+                    return (
+                        <ResultTable {...table.props}>
+                            <div
+                                className="search-messages default-white-button"
+                                style={{ width: '50%', margin: '10px auto' }}
+                                onClick={onSearchMessages}>
+                                {LABEL.SEARCH_MESSAGES_CTA}
+                            </div>
+                        </ResultTable>
+                    );
+                }
+
                 return null;
             })
         );
     };
 
     render() {
-        const { recents, results, status } = this.props;
-        return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status);
+        const { recents, results, status, isFirstQuery, onSearchMessages } = this.props;
+        return recents && recents.length ?
+            this.renderRecents(recents) :
+            this.renderResults(results, status, isFirstQuery, onSearchMessages);
     }
 }

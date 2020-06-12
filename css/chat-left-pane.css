@@ -680,3 +680,13 @@
     font-size: 20px;
     color: #333;
 }
+
+.result-table.nil .result-table-row .search-messages {
+    margin: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.result-table.nil .result-table-row .search-messages a {
+    text-decoration: underline;
+}

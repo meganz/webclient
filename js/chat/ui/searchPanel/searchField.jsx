@@ -10,7 +10,7 @@ export default class SearchField extends MegaRenderMixin {
 
     static select = () => {
         const inputElement = SearchField.inputRef && SearchField.inputRef.current;
-        const value = inputElement.value;
+        const value = inputElement && inputElement.value;
 
         if (inputElement && value) {
             inputElement.selectionStart = 0;

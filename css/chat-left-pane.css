@@ -657,6 +657,11 @@
     color: #999;
 }
 
+.result-table .search-messages {
+    width: 80%;
+    margin: 10px auto;
+}
+
 
 /* --- Result Row: No Results --- */
 

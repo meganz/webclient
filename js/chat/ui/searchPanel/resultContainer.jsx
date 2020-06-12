@@ -124,7 +124,6 @@ export default class ResultContainer extends MegaRenderMixin {
                         <ResultTable {...table.props}>
                             <div
                                 className="search-messages default-white-button"
-                                style={{ width: '50%', margin: '10px auto' }}
                                 onClick={onSearchMessages}>
                                 {LABEL.SEARCH_MESSAGES_CTA}
                             </div>

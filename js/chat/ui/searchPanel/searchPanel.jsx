@@ -183,7 +183,7 @@ export default class SearchPanel extends MegaRenderMixin {
 
     handleSearchMessages = () =>
         SearchField.hasValue() && (
-            this.setState({ isFirstQuery: false }, () => {
+            this.setState({ status: STATUS.IN_PROGRESS, isFirstQuery: false }, () => {
                 this.doSearch(this.state.value, true);
                 SearchField.focus();
                 SearchField.select();

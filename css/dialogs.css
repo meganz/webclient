@@ -5128,9 +5128,10 @@ body.en .hidden-bar + .register-side-pane.container {
     min-width: 142px;
 }
 .pro-register-dialog .dialog-dark-bottom.login {
-    height: 36px;
-    padding: 7px 48px 0 48px;
+    height: 48px;
+    padding: 0 48px;
     color: #ddd;
+    line-height: 48px;
 }
 .pro-register-dialog .dialog-dark-bottom.login a {
     font-size: 15px;

@@ -1041,6 +1041,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20846] = l[20846]
         .replace('[A]', '<a href="https://mega.nz/linux/MEGAsync/" target="_blank" class="download-all-link">')
         .replace('[/A]', '</a>');
+    l['20635.a'] = escapeHTML(l[20635]).replace('[A]', '<a class="clickurl" href="/register">').replace('[/A]', '</a>');
     l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[20707] = escapeHTML(l[20707]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');

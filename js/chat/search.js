@@ -130,14 +130,14 @@ RoomSearch.prototype.resume = function() {
                 );
             }
         }
-    }
 
-    if (room.messagesBuff.haveMoreHistory()) {
-        self._setState(SearchState.kInProgress); // in case it was paused or new
-        self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
-    }
-    else {
-        self._setComplete();
+        if (room.messagesBuff.haveMoreHistory()) {
+            self._setState(SearchState.kInProgress); // in case it was paused or new
+            self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
+        }
+        else {
+            self._setComplete();
+        }
     }
 };
 
@@ -318,7 +318,7 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
             throw new Error("Could not find a room for chatid " + chatId);
         }
     }
-    else if (this.originalSearchString.length > 2) { // search all chatrooms
+    else { // search all chatrooms
         for (var roomId2 in self.allChats) {
             if (self.allChats.hasOwnProperty(roomId2)) {
                 var room2 = self.allChats[roomId2];

@@ -530,7 +530,7 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         .replace("%2", action.length - 1)
         .replace("%3", '<span class="link action-user-name"></span>')
         .replace("[A]", '<span class="link more-less-toggle">')
-        .replace("[/A]", '<i class="small-icon icons-sprite gray-arrow"/></span>');
+        .replace("[/A]", '<i class="small-icon icons-sprite gray-arrow"></i></span>');
 
     $fileName.safeHTML(titleString);
 

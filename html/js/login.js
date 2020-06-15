@@ -274,7 +274,7 @@ function init_login() {
     var $formWrapper = $('.main-mid-pad.login');
     var $inputs = $formWrapper.find('input');
     var $button = $formWrapper.find('.big-red-button');
-    var $forgotPassLink = $('.top-login-forgot-pass', $.formWrapper);
+    var $forgotPassLink = $('.top-login-forgot-pass', $formWrapper);
 
     if (is_extension) {
         $('.extension-advise').addClass('hidden');

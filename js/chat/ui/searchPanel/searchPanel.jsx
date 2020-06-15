@@ -149,8 +149,10 @@ export default class SearchPanel extends MegaRenderMixin {
             searching,
             // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
             // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
-            // because `pause search` will not be available yet.
-            status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
+            // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
+            // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
+            // `MESSAGES`. Hence, we do status reset to `undefined`.
+            status: undefined,
             isFirstQuery: true,
             results: []
         }, () =>

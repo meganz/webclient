@@ -17186,6 +17186,8 @@ var resultRow_NilRow = function NilRow(_ref) {
       isFirstQuery = _ref.isFirstQuery;
   return /*#__PURE__*/external_React_default.a.createElement("div", {
     className: SEARCH_ROW_CLASS
+  }, /*#__PURE__*/external_React_default.a.createElement("div", {
+    className: "nil-container"
   }, /*#__PURE__*/external_React_default.a.createElement("img", {
     src: "".concat(staticpath, "images/temp/search-icon.png"),
     alt: LABEL.NO_RESULTS
@@ -17196,7 +17198,7 @@ var resultRow_NilRow = function NilRow(_ref) {
   external_React_default.a.createElement("div", {
     className: "search-messages",
     onClick: onSearchMessages
-  }, "Click ", /*#__PURE__*/external_React_default.a.createElement("a", null, "here"), " to search for messages"));
+  }, "Click ", /*#__PURE__*/external_React_default.a.createElement("a", null, "here"), " to search for messages")));
 }; // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17416,10 +17418,16 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
         }
 
         if (status === STATUS.COMPLETED && key === 'MESSAGES') {
-          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, /*#__PURE__*/external_React_default.a.createElement("div", {
+          var SEARCH_MESSAGES = /*#__PURE__*/external_React_default.a.createElement("div", {
             className: "search-messages default-white-button",
             onClick: onSearchMessages
-          }, LABEL.SEARCH_MESSAGES_CTA));
+          }, LABEL.SEARCH_MESSAGES_CTA);
+          var NO_RESULTS = /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            type: TYPE.NIL,
+            isFirstQuery: isFirstQuery,
+            onSearchMessages: onSearchMessages
+          });
+          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, isFirstQuery ? SEARCH_MESSAGES : NO_RESULTS);
         }
 
         return null;

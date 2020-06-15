@@ -120,13 +120,21 @@ export default class ResultContainer extends MegaRenderMixin {
                 }
 
                 if (status === STATUS.COMPLETED && key === 'MESSAGES') {
+                    const SEARCH_MESSAGES =
+                        <div
+                            className="search-messages default-white-button"
+                            onClick={onSearchMessages}>
+                            {LABEL.SEARCH_MESSAGES_CTA}
+                        </div>;
+                    const NO_RESULTS =
+                        <ResultRow
+                            type={TYPE.NIL}
+                            isFirstQuery={isFirstQuery}
+                            onSearchMessages={onSearchMessages} />;
+
                     return (
                         <ResultTable {...table.props}>
-                            <div
-                                className="search-messages default-white-button"
-                                onClick={onSearchMessages}>
-                                {LABEL.SEARCH_MESSAGES_CTA}
-                            </div>
+                            {isFirstQuery ? SEARCH_MESSAGES : NO_RESULTS}
                         </ResultTable>
                     );
                 }

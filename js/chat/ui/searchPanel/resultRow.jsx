@@ -225,17 +225,19 @@ class MemberRow extends MegaRenderMixin {
 
 const NilRow = ({ onSearchMessages, isFirstQuery }) => (
     <div className={SEARCH_ROW_CLASS}>
-        <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
-        <span>{LABEL.NO_RESULTS}</span>
-        {isFirstQuery && (
-            // [...] TODO: add translation
-            // LABEL.SEARCH_MESSAGES_INLINE
-            <div
-                className="search-messages"
-                onClick={onSearchMessages}>
-                Click <a>here</a> to search for messages
-            </div>
-        )}
+        <div className="nil-container">
+            <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
+            <span>{LABEL.NO_RESULTS}</span>
+            {isFirstQuery && (
+                // [...] TODO: add translation
+                // LABEL.SEARCH_MESSAGES_INLINE
+                <div
+                    className="search-messages"
+                    onClick={onSearchMessages}>
+                    Click <a>here</a> to search for messages
+                </div>
+            )}
+        </div>
     </div>
 );
 

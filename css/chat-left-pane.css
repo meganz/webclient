@@ -679,7 +679,13 @@
     vertical-align: middle;
 }
 
-.result-table.nil .result-table-row span {
+.result-table .result-table-row .nil-container {
+    text-align: center;
+    cursor: default;
+}
+
+.result-table.nil .result-table-row span,
+.result-table .result-table-row .nil-container span {
     display: block;
     padding: 10px 0 0 0;
     font-size: 20px;

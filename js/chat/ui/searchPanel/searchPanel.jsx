@@ -111,58 +111,55 @@ export default class SearchPanel extends MegaRenderMixin {
         return ChatSearch.doSearch(
             s,
             function(room, result, results) {
-                self.setState({results});
+                self.setState({ results });
             })
             .catch(function(ex) {
                 if (d) {
-                    console.log("Search failed (or was resetted)", ex);
+                    console.log("Search failed (or was reset)", ex);
                 }
             })
             .always(function() {
-                self.setState({status: STATUS.COMPLETED});
+                self.setState({ status: STATUS.COMPLETED });
             });
     };
 
-    doToggle = action /* pause || resume || destroy */ => {
-        const cs = ChatSearch.doSearch.cs;
+    doToggle = action /* pause || resume */ => {
+        const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
+        const searching = this.state.status === IN_PROGRESS || this.state.status === PAUSED;
 
-        if (action && cs) {
-            const { IN_PROGRESS, PAUSED, COMPLETED } = STATUS;
+        if (action && searching) {
+            const chatSearch = ChatSearch.doSearch.cs;
+
+            if (!chatSearch) {
+                return delay('chat-toggle', () => this.doToggle(action), 600);
+            }
 
             this.setState({
-                status: (() => {
-                    switch (action) {
-                        case 'pause':
-                            return PAUSED;
-                        case 'resume':
-                            return IN_PROGRESS;
-                        default:
-                            return COMPLETED;
-                    }
-                })()
-            }, () => {
-                cs[action]();
-            });
+                status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
+            }, () =>
+                chatSearch[action]()
+            );
         }
     };
+
+    doDestroy = () => ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs && ChatSearch.doSearch.cs.destroy();
 
     handleChange = ev => {
         const value = ev.target.value;
         const searching = value.length > 0;
 
+        this.doDestroy();
         this.setState({
             value,
             searching,
-            status: STATUS.IN_PROGRESS,
+            // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
+            // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
+            // because `pause search` will not be available yet.
+            status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
             results: []
-        }, () => {
-            if (searching) {
-                delay('chat-search', this.doSearch.bind(this, value), 1600);
-            }
-            else {
-                this.setState({results: []});
-            }
-        });
+        }, () =>
+            searching && delay('chat-search', () => this.doSearch(value), 1600)
+        );
     };
 
     handleToggle = () => {
@@ -181,8 +178,8 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clear the text on the first reset; minimize on the second
             SearchField.hasValue() ?
                 this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
-                    this.doToggle('destroy');
                     onIdle(() => SearchField.focus());
+                    this.doDestroy();
                 }) :
                 this.toggleMinimize()
         );

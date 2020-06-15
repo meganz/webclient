@@ -108,10 +108,13 @@ function initFileblocksScrolling2() {
 }
 
 function initSelectScrolling(scrollBlock) {
-
     "use strict";
 
     var $scrollBlock = $(scrollBlock);
+
+    if ($scrollBlock.length === 0) {
+        return false;
+    }
 
     // Remember current position of scroll
     var currentPos = $scrollBlock.data('jsp') ? $scrollBlock.data('jsp').getContentPositionY() : 0;
@@ -119,7 +122,12 @@ function initSelectScrolling(scrollBlock) {
 
     // Need to reselect scrollblock due to update.
     $scrollBlock = $(scrollBlock);
-    $scrollBlock.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
+    $scrollBlock.jScrollPane({
+        enableKeyboardNavigation: false,
+        showArrows: true,
+        arrowSize: 5,
+        contentWidth: 0
+    });
     $scrollBlock.data('jsp').scrollToY(currentPos);
     jScrollFade(scrollBlock);
 }

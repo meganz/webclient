@@ -1138,6 +1138,11 @@ function init_page() {
         mobile.affiliate.initMainPage();
         return false;
     }
+    else if (is_mobile && u_type && page === 'fm/refer/redeem') {
+        parsepage(pages.mobile);
+        mobile.affiliate.initRedeemPage();
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/refer/guide') {
         parsepage(pages.mobile);
         mobile.affiliate.initGuidePage();
@@ -2305,7 +2310,7 @@ function topmenuUI() {
             $headerActivityStatus.removeClass('hidden');
             $menuAvatar.addClass('presence');
             if (megaChatIsReady) {
-                megaChat.renderMyStatus();
+                megaChat._renderMyStatus();
             }
         }
 
@@ -2375,6 +2380,13 @@ function topmenuUI() {
                 }
             }
         });
+
+        if (page === 'login') {
+            $loginButton.addClass('hidden');
+        }
+        if (page === 'register' || page === 'registerb') {
+            $headerRegisterBotton.addClass('hidden');
+        }
 
         // Only show top language change icon if not logged in
         if (u_type === false) {

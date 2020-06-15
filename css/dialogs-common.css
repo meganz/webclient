@@ -43,7 +43,7 @@
 .fm-dialog-title.top-pad {
     padding-top: 30px;
 }
-.contrast .fm-dialog-title {
+.contrast .fm-dialog-title, .fm-dialog-title.dark {
     color: #333333;
 }
 .mobile .fm-dialog-title {

@@ -335,7 +335,7 @@
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">
-                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
+                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
                     <span class="chat-unread-count hidden"></span>
                 </div>
                 <div class="dark-tooltip">[$5902]</div>
@@ -434,7 +434,7 @@
             <div class="nw-fm-left-icon conversations">
                 <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">
-                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset" /></span>
+                    <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
                     <span class="chat-unread-count hidden"></span>
                 </div>
                 <div class="dark-tooltip">[$5902]</div>
@@ -2369,18 +2369,18 @@
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -2388,18 +2388,18 @@
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -2407,18 +2407,18 @@
                                         <div class="mega-input-title">[$995]</div>
                                         <input class="short-input bmonth" type="text" maxlength="2" placeholder="[$17698]" min="1" max="12" data-title="Birth month">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input bdate" type="text" maxlength="2" placeholder="[$17699]" min="1" max="31" data-title="Birth date">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <input class="short-input byear" type="text" maxlength="4" placeholder="[$17697]" min="1900" data-title="Birth year">
                                         <div class="birth-arrow-container">
-                                            <div class="birth-arrow up-control"></div>
-                                            <div class="birth-arrow down-control"></div>
+                                            <div class="birth-arrow up-control fm-s"></div>
+                                            <div class="birth-arrow down-control fm-s"></div>
                                         </div>
                                         <div class="message-container"></div>
                                     </div>
@@ -4157,13 +4157,15 @@
                 </div>
 
                 <!-- Redemption block - Phase 2 !-->
-                <div  class="fm-affiliate dropdown-wrap">
-                    <div class="default-select affilite-redemtion disabled">[$22820]</div>
-                    <div class="default-select-dropdown hidden">
-                        <div class="default-dropdown-item active">[$22820]</div>
-                        <div class="default-dropdown-item label green">[$1418]</div>
-                        <div class="default-dropdown-item label orange">[$18443]</div>
-                        <div class="default-dropdown-item label red">[$22819]</div>
+                <div  class="fm-affiliate dropdown-wrap redemption">
+                    <div class="default-select affiliate-redemption">
+                        <span>[$22820]</span>
+                        <div class="default-select-dropdown hidden">
+                            <div class="default-dropdown-item active" data-type="all">[$22820]</div>
+                            <div class="default-dropdown-item label green" data-type="complete">[$23277]</div>
+                            <div class="default-dropdown-item label orange" data-type="processing">[$22833]</div>
+                            <div class="default-dropdown-item label red" data-type="failed">[$22819]</div>
+                        </div>
                     </div>
                 </div>
 
@@ -4171,14 +4173,14 @@
                     [$22808]
                 </div>
                 <div class="clear"></div>
-                <div class="mega-data-box">
+                <div class="mega-data-box redemption">
                     <table class="fm-affiliate redeem-table clone">
                         <tr>
-                            <th class="sortable">[$19297]</th>
-                            <th class="sortable">[$17023]</th>
-                            <th class="sortable">[$22809]</th>
-                            <th class="sortable">[$477]</th>
-                            <th class="sortable">[$89]</th>
+                            <th class="sortable" data-type="rid">[$19297]</th>
+                            <th class="sortable" data-type="ts">[$17023]</th>
+                            <th class="sortable" data-type="gw">[$22809]</th>
+                            <th class="sortable" data-type="a">[$477]</th>
+                            <th class="sortable" data-type="s">[$89]</th>
                             <th></th>
                         </tr>
                     </table>
@@ -4189,7 +4191,7 @@
                     </div>
 
                     <!-- Redeem content block !-->
-                    <div class="fm-affiliate redeem-scroll expanded-item hidden">
+                    <div class="fm-affiliate redeem-scroll hidden">
                         <table class="fm-affiliate redeem-table main">
                             <tr>
                                 <th>[$19297]</th>
@@ -4198,63 +4200,51 @@
                                 <th>[$477]</th>
                                 <th>[$89]</th>
                             </tr>
-                            <tr class="expanded">
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td><span class="colored-label orange">Processing</span></td>
-                                <td><a class="link open">View</a></td>
+                            <tr class="fm-affiliate redeem-summary template hidden">
+                                <td class="receipt"></td>
+                                <td class="date"></td>
+                                <td class="method"></td>
+                                <td class="amount"></td>
+                                <td class="status"><span class="colored-label"></span></td>
+                                <td><a class="link open">[$16797]</a></td>
                             </tr>
-                            <tr class="fm-affiliate redeem-details">
+                            <tr class="fm-affiliate redeem-details template">
                                 <td colspan="6">
                                     <div class="fm-affiliate redeem-cell">
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong">Receipt:</span>
-                                            <span></span>
+                                            <span class="strong">[$23398]</span>
+                                            <span class="receipt"></span>
                                         </div>
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong">Method:</span>
-                                            <span></span>
+                                            <span class="strong">[$23308]</span>
+                                            <span class="method"></span>
                                         </div>
                                          <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Withdraw info:</span>
-                                            <span class="grey">Country</span>
-                                            <span></span>
-                                             <span class="grey">Currency</span>
-                                            <span></span>
+                                            <span class="strong full-size">[$23309]</span>
+                                            <span class="grey">[$481]</span>
+                                            <span class="country"></span>
+                                            <span class="grey">[$20952]</span>
+                                            <span class="currency"></span>
                                         </div>
-                                        <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Bank account:</span>
-                                            <span class="grey">Account name</span>
-                                            <span></span>
-                                            <span class="grey">Account number</span>
-                                            <span></span>
-                                            <span class="grey">Account type</span>
-                                            <span>Save account</span>
-                                            <span class="grey">SWIFT BIC</span>
-                                            <span></span>
-                                        </div>
+                                        <div class="fm-affiliate redeem-data account-details"></div>
                                     </div>
                                     <div class="fm-affiliate redeem-cell">
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Amount:</span>
-                                            <span class="grey">Request amount</span>
-                                            <span></span>
-                                            <span class="grey">Fee charged</span>
-                                            <span><span class="euro">&euro;0</span></span>
-                                            <span class="grey">Received amount</span>
-                                            <span></span>
+                                            <span class="strong full-size">[$23399]</span>
+                                            <span class="grey">[$23400]</span>
+                                            <span class="request-amount"></span>
+                                            <span class="grey">[$23401]</span>
+                                            <span class="fee-charged"><span class="euro">&euro;0</span></span>
+                                            <span class="grey">[$23402]</span>
+                                            <span class="recived-amount"></span>
                                         </div>
                                         <div class="fm-affiliate redeem-data">
-                                            <span class="strong full-size">Status: <span class="status red">Failed</span></span>
-                                            <span class="grey full-size">
-                                                The funds from this failed redemption were returned to your MEGA available commission balance. Please check your withdraw details carefully before future redemptions.
-                                            </span>
+                                            <span class="strong full-size">[$23255]<span class="status"></span></span>
+                                            <span class="grey full-size status-message"></span>
                                         </div>
                                     </div>
                                     <div class="clear"></div>
-                                    <a class="link close">Close</a>
+                                    <a class="link close">[$148]</a>
                                 </td>
                             </tr>
                         </table>

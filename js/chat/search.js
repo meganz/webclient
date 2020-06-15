@@ -387,6 +387,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
         'onResult': tryCatch(function(room, resultMeta) {
             resultMeta.room = room;
             resultMeta.chatId = room.chatId;
+            resultMeta.data = resultMeta.data || room.chatId;
             resultMeta.resultId = resultId++;
 
             if (resultMeta.type === SearchResultType.kMessage) {

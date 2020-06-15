@@ -5128,9 +5128,10 @@ body.en .hidden-bar + .register-side-pane.container {
     min-width: 142px;
 }
 .pro-register-dialog .dialog-dark-bottom.login {
-    height: 36px;
-    padding: 7px 48px 0 48px;
+    height: 48px;
+    padding: 0 48px;
     color: #ddd;
+    line-height: 48px;
 }
 .pro-register-dialog .dialog-dark-bottom.login a {
     font-size: 15px;
@@ -5917,6 +5918,459 @@ a.affiliate-guide.grey-link:hover {
     padding: 16px 0 55px 0;
 }
 /* end of Joined to affiliate program dialog */
+
+
+/* Affiliate redemtion dialog */
+.fm-dialog.affiliate-redeem {
+    width: 686px;
+    margin: -228px 0 0 -343px;
+    border-radius: 24px;
+    text-align: center;
+}
+.affiliate-redeem.body {
+    padding: 16px 32px 28px 28px;
+    position: relative;
+}
+.affiliate-redeem.timing {
+    display: inline-block;
+    background-color: rgba(0,191,165,0.05);
+    border: 1px solid rgba(0,191,165,0.1);
+    box-sizing: border-box;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 22px;
+    padding: 0 10px;
+    color: #00BFA5;
+}
+.affiliate-redeem.timing span {
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    white-space: nowrap;
+}
+.affiliate-redeem.timing.orange {
+    background-color: rgba(255,11,0,0.05);
+    border: 1px solid rgba(255,11,0,0.1);
+    color: #FF6F00;
+}
+.affiliate-redeem.timing.orange i {
+    background-color: #FF6F00;
+}
+.affiliate-redeem.cells {
+    width: 330px;
+    float: left;
+    border-radius: 4px;
+    text-align: left;
+    box-sizing: border-box;
+}
+.affiliate-redeem.cells.left {
+    margin: 8px 0 0 -12px;
+}
+.affiliate-redeem.cells.scrollable {
+    max-height: 412px;
+}
+.affiliate-redeem.cells.jspScrollable {
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+.affiliate-redeem.cells .cell-content {
+    padding: 20px 18px 0 18px;
+}
+.affiliate-redeem.cells.jspScrollable .cell-content {
+    padding: 20px 18px;
+}
+.affiliate-redeem.cells.step3 {
+    max-height: 500px;
+    min-height: 290px;
+}
+.affiliate-redeem.cells.step4 .cell-content {
+    padding: 0 18px;
+}
+.affiliate-redeem.cells.right {
+    width: 280px;
+    float: right;
+    margin-top: 24px;
+}
+.affiliate-redeem.summary-wrap {
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    padding: 20px 18px 0 18px;
+}
+.affiliate-redeem.header {
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    font-size: 16px;
+    line-height: 24px;
+    color: #333333;
+}
+.affiliate-redeem .template {
+    display: none;
+}
+.affiliate-redeem.summary {
+    padding: 15px 0 6px 0;
+}
+.affiliate-redeem.summary-wrap .info {
+    font-size: 14px;
+    line-height: 20px;
+    color: #999;
+    padding: 7px 5px 0 0;
+    margin-top: 3px;
+    float: left;
+}
+.affiliate-redeem.summary-wrap .local:not(.hidden) {
+    margin: 3px 0 0 13px;
+    display: inline-block;
+    vertical-align: top;
+}
+.affiliate-redeem.summary .local {
+    /*float: right;*/
+}
+.affiliate-redeem.summary-wrap .price {
+    color: #333;
+    padding-bottom: 12px;
+    text-align: right;
+    float: none;
+    margin-top: 0;
+    padding-right: 0;
+}
+.affiliate-redeem.summary-wrap .euro:not(.hidden) {
+    height: 20px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: #FAFAFA;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 18px;
+    padding: 0 5px;
+    margin: 3px -5px 0 0;
+    color: #999;
+    white-space: nowrap;
+}
+.affiliate-redeem hr {
+    border: 0;
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    margin: 0;
+    padding: 0;
+    clear: both;
+}
+.affiliate-redeem.amount {
+    background-color: #3C434D;
+    margin: 0 -18px;
+    padding: 8px 18px 3px;
+}
+.affiliate-redeem.amount .info {
+    color: #FFF;
+}
+.affiliate-redeem.amount .price {
+    font-size: 16px;
+}
+.affiliate-redeem.amount .euro:not(.hidden) {
+    background-color: #333;
+    border: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 3px;
+}
+.affiliate-redeem.amount .local:not(.hidden) {
+   margin: 3px 0 3px 13px;
+}
+.affiliate-redeem.local-info {
+    font-size: 13px;
+    line-height: 20px;
+    color: #AAA;
+    padding: 10px 0 0 0;
+}
+.affiliate-redeem.input-wrap  {
+    display: table;
+    width: 100%;
+    margin: 20px 0 0 0;
+    white-space: nowrap;
+    font-size: 0;
+}
+.affiliate-redeem.input-wrap .input {
+    display: table-cell;
+    height: 32px;
+    box-shadow: 0 1px 0 0 rgba(0,0,0,0.2);
+}
+.affiliate-redeem.input-wrap .button {
+    display: table-cell;
+    width: 10px;
+}
+.affiliate-redeem.input-wrap .default-green-button {
+    min-width: 0;
+    margin-left: 8px;
+}
+.affiliate-redeem.input-wrap .button {
+    display: table-cell;
+    width: 10px;
+    min-width: 0;
+}
+.affiliate-redeem.input-wrap .currency  {
+    display: inline-block;
+    line-height: 32px;
+    font-size: 14px;
+    color: #999999;
+    padding: 0 8px;
+}
+.affiliate-redeem.input-wrap input {
+    font-size: 14px;
+    line-height: 32px;
+    color: #333;
+    height: 32px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    font-family: 'LatoWeb', 'source_sans_proregular', Arial;
+    width: calc(100% - 25px);
+}
+.affiliate-redeem.available-comission {
+    font-size: 13px;
+    line-height: 18px;
+    color: rgba(0,191,165,0.8);
+    background-color:  rgba(0,191,165,0.05);
+    border: 1px solid rgba(0,191,165,0.1);
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin: 8px 0 42px 0;
+    padding: 2px 10px;
+    text-align: center;
+}
+.affiliate-redeem .amount-message-container {
+    margin: -32px 0 32px;
+}
+.affiliate-redeem.available-comission span {
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    white-space: nowrap;
+}
+.affiliate-redeem.payment-type {
+    padding: 10px 0 6px 0;
+}
+.affiliate-redeem.payment-type .radio-txt {
+    font-size: 14px;
+    color: #333;
+    padding-top: 5px;
+    padding-right: 28px;
+}
+.affiliate-redeem .button.height-48 {
+    margin: 40px 0 12px 0;
+    min-width: 232px;
+}
+.affiliate-redeem.withdraw-txt {
+    font-size: 14px;
+    line-height: 20px;
+    color: #666;
+    padding: 16px 0 42px 0;
+}
+.affiliate-redeem.withdraw-txt a, .affiliate-redeem.withdraw-txt a:visited {
+    font-size: 13px;
+    line-height: 20px;
+    float: right;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.affiliate-redeem.withdraw-txt a:hover {
+    text-decoration: none;
+}
+.affiliate-redeem .default-select {
+    cursor: pointer;
+    box-shadow: none;
+    min-width: auto;
+    width: 100%;
+    padding: 0px;
+    background: transparent;
+}
+#affi-country {
+    z-index: auto;
+}
+.affiliate-redeem .default-select span {
+    padding-top: 3px;
+    padding-right: 16px;
+}
+.affiliate-redeem form.withdraw-details {
+    padding: 16px 0 0 0;
+}
+.affiliate-redeem .mega-input-title-ontop:last-child {
+    margin-bottom: 0;
+}
+.affiliate-redeem .affi-dynamic-acc-type .mega-input-title-ontop, .affiliate-redeem .affi-dynamic-acc-name .mega-input-title-ontop, .affiliate-redeem .affi-dynamic-acc-info .mega-input-title-ontop {
+    margin-bottom: 8px;
+}
+.affiliate-redeem .affi-dynamic-acc-info .default-select-dropdown {
+    max-width: 100%;
+}
+.affiliate-redeem.bitcoin-tip, .affiliate-redeem.currency-tip, .affiliate-redeem.bitcoin-org {
+    font-size: 13px;
+    line-height: 20px;
+    color: #999;
+    padding: 0 0 0 25px;
+    position: relative;
+}
+.affiliate-redeem.bitcoin-org {
+    padding: 0;
+    margin-top: 20px;
+}
+.affiliate-redeem.bitcoin-org a {
+    color: #999;
+    text-decoration: underline;
+}
+.affiliate-redeem.bitcoin-tip i, .affiliate-redeem.currency-tip i {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    background-color: rgba(0,0,0,0.4);
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    color: #FFF;
+    text-align: center;
+    font-size: 14px;
+    line-height: 16px;
+    font-style: normal;
+}
+.affiliate-redeem.back.button {
+    position: absolute;
+    font-size: 13px;
+    line-height: 32px;
+    color: #666;
+    text-transform: uppercase;
+    margin-top: 54px;
+}
+.affiliate-redeem.back.button i {
+    display: inline-block;
+    vertical-align: top;
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+    opacity: 0.5;
+    margin-right: -8px;
+    width: 22px;
+}
+.affiliate-redeem .checkboxOff, .affiliate-redeem .checkboxOn {
+    margin-top: 2px;
+}
+.affiliate-redeem label.radio-txt {
+    padding: 0;
+    color: #999;
+}
+.affiliate-redeem .account-details {
+    padding: 15px 0 0 0;
+}
+.affiliate-redeem.save-data-checkbox {
+    padding: 9px 0 0 0;
+}
+.affiliate-redeem.auto-fill-checkbox {
+    padding: 0px 0 14px 0;
+}
+.affiliate-redeem.save-data-tip {
+    display: inline-block;
+    background-color: rgba(0,191,165,0.05);
+    box-sizing: border-box;
+    border: 1px solid rgba(0,191,165,0.1);
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 20px;
+    color: #00BFA5;
+    padding: 6px;
+    margin: 8px 0 0 0;
+    max-height: 100px;
+}
+.affiliate-redeem.save-data-tip .right {
+    font-size: 14px;
+    text-transform: uppercase;
+    margin: 5px 0 0 12px;
+    font-family: 'LatoWebBold', 'source_sans_probold', Arial;
+    cursor: pointer;
+}
+
+.affiliate-redeem .hidden {
+    display: none;
+}
+
+.affiliate-redeem .mega-input-title-ontop input {
+    padding: 0px 12px 0 8px; 
+}
+/* end of Affiliate redemtion dialog */
+
+/* Affiliate Redemtion request dialog */
+.fm-dialog.affiliate-request {
+    width: 594px;
+    margin: -160px 0 0 -297px;
+    text-align: center;
+}
+.affiliate-request.body {
+    margin: 5px 32px 40px 28px;
+    font-size: 0;
+    position: relative;
+}
+.affiliate-request.status-cell {
+    width: 33.333333%;
+    display: inline-block;
+    text-align: center;
+    padding: 64px 0 3px 0;
+    vertical-align: top;
+}
+.affiliate-request.status-message {
+    color: #999;
+    font-size: 13px;
+    line-height: 20px;
+    padding-bottom: 33px;
+}
+.affiliate-request.status {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+    border: 2px solid #FFF;
+    box-sizing: border-box;
+    box-shadow: 0 0 4px 0 rgba(0,0,0,0.2);
+    position: relative;
+    background: #eeeeee;
+    background: -moz-linear-gradient(top, #eeeeee 0%, #d8d8d8 100%);
+    background: -webkit-linear-gradient(top, #eeeeee 0%,#d8d8d8 100%);
+    background: linear-gradient(to bottom, #eeeeee 0%,#d8d8d8 100%);
+    border-radius: 100%;
+    overflow: hidden;
+}
+.affiliate-request.status-txt {
+    font-size: 16px;
+    line-height: 20px;
+    color: #999;
+    padding: 10px 0 0 0;
+}
+.loading .affiliate-request.progress {
+    width: 50%;
+}
+.loading .affiliate-request.status-txt {
+    color: #333;
+}
+.affiliate-request.progress {
+    overflow: hidden;
+    position: relative;
+    height: 28px;
+    width: 0;
+    background: #00b6aa;
+    background: -moz-linear-gradient(top, #00b6aa 0%, #009883 100%);
+    background: -webkit-linear-gradient(top, #00b6aa 0%,#009883 100%);
+    background: linear-gradient(to bottom, #00b6aa 0%,#009883 100%);
+}
+.complete .affiliate-request.progress {
+    min-width: 100%
+}
+.complete .affiliate-request.progress span {
+    display: block;
+    width: 28px;
+    height: 28px;
+    background-position: 5px -6722px;
+}
+.dialog-sprite.dots {
+    position: absolute;
+    width: 350px;
+    left: 81px;
+    margin-top: 78px;
+    height: 4px;
+    background-position: 0 -6708px;
+    background-repeat: repeat-x;
+}
+/* end of  Affiliate redemtion request dialog */
 
 .fm-picker-dialog .summary-input #f-name-input {
     border: none;

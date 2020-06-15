@@ -2131,7 +2131,7 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             // $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-date').text(time2date(invoicesList[k].ts, 1));
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
-            $newInvoiceRow.find('.inv-total').text('\u20ac' + invoicesList[k].tot);
+            $('.inv-total', $newInvoiceRow).text(formatCurrency(invoicesList[k].tot));
             $newInvoiceRow.removeClass('hidden'); // if it was hidden
             $newInvoiceRow.off('click.suba').on('click.suba', function invoiceDetailButtonClick() {
                 var clickedInvoiceId = $(this).closest("tr").attr('id');
@@ -2288,7 +2288,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
             var $invItem = $invItemContentTemplate.clone(true);
             $invItem.find('.inv-pay-date').text(time2date(invoiceDetail.items[k].ts, 1));
             $invItem.find('.inv-pay-desc').text(invoiceDetail.items[k].d);
-            $invItem.find('.inv-pay-amou').text(Number(invoiceDetail.items[k].net).toFixed(2));
+            $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].net));
             $invItem.insertAfter($invItemHeader);
             taxSum += invoiceDetail.items[k].tax;
         }
@@ -2298,10 +2298,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                 .text((invoiceDetail.taxname || invoiceDetail.u.taxnum[0])
                     + ': ' + Number(invoiceDetail.taxrate).toFixed(2) + '%');
         }
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')
-            .text('\u20ac' + Number(taxSum).toFixed(2));
-        $invoiceItemsContainer.find('.inv-payment-price.inv-li-total .inv-total-val')
-            .text('\u20ac' + Number(invoiceDetail.tot).toFixed(2));
+        $('.inv-payment-price.inv-li-gst .inv-gst-val', $invoiceItemsContainer).text(formatCurrency(taxSum));
+        $('.inv-payment-price.inv-li-total .inv-total-val', $invoiceItemsContainer)
+            .text(formatCurrency(invoiceDetail.tot));
 
         if (taxSum > 0) {
             $invoiceTopTitle.find('.inv-title.invv').text(l[19989]);

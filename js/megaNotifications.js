@@ -174,6 +174,11 @@
         if (oldVal != self._counters[group]) {
             self.trigger("onCounterUpdated", [self, group, type]);
         }
+
+        if (window.megaChatIsReady) {
+            megaChat.updateSectionUnreadCount();
+        }
+
         return this;
     };
 
@@ -196,6 +201,11 @@
         if (oldVal != this._counters[group]) {
             this.trigger("onCounterUpdated", [this, group, notificationObj]);
         }
+
+        if (window.megaChatIsReady) {
+            megaChat.updateSectionUnreadCount();
+        }
+
         return this;
     };
 
@@ -221,6 +231,11 @@
         if (oldVal != this._counters[group]) {
             this.trigger("onCounterUpdated", [this, group, notificationObj]);
         }
+
+        if (window.megaChatIsReady) {
+            megaChat.updateSectionUnreadCount();
+        }
+
         return this;
     };
 

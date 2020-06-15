@@ -536,19 +536,19 @@
     <div class="mobile context-menu-header">
         [$22821]
     </div>
-    <div class="context-menu-item active" data-filter="1">
+    <div class="context-menu-item active" data-filter="all">
         <div class="mobile colored-label"></div>
         <span class="mobile text">[$22820]</span>
     </div>
-     <div class="context-menu-item" data-filter="2">
+     <div class="context-menu-item" data-filter="complete">
         <div class="mobile colored-label green"></div>
-        <span class="mobile text">[$1418]</span>
+        <span class="mobile text">[$23277]</span>
     </div>
-     <div class="context-menu-item" data-filter="3">
+     <div class="context-menu-item" data-filter="processing">
         <div class="mobile colored-label orange"></div>
         <span class="mobile text">[$22833]</span>
     </div>
-     <div class="context-menu-item"  data-filter="4">
+     <div class="context-menu-item" data-filter="failed">
         <div class="mobile colored-label red"></div>
         <span class="mobile text">[$22819]</span>
     </div>
@@ -992,8 +992,377 @@
         <i class="mobile fm-icon down-arrow"></i>
     </div>
     <div class="mobile top-hr-pad">
-         <div class="mobile affiliate-empty-data">
+        
+        <!--Affiliate - no redemptions !-->
+        <div class="mobile affiliate-empty-data hidden">
             [$22822]
+        </div>
+        
+        <!--Affiliate redemptions !-->
+        <div class="mobile affiliate-redemptions-list"></div>
+
+        <div class="mobile affiliate-redemption-item template">
+            <div class="mobile button-block data-list affiliate-transfer">
+                <div class="mobile fm-icon method-icon"></div>
+                <div class="mobile label small">
+                    <span class="sum"></span>
+                    <span class="transfer"></span>
+                </div>
+                <div class="mobile  label-info small">
+                    <span class="date"></span>
+                    <span class="status"></span>
+                </div>
+                <div class="mobile fm-icon right-arrow"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate redemption details page -->
+<div class="mobile main-block affiliate-details-page grey-bg hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$1724]</span></div>
+    </div>
+
+    <div class="mobile top-hr-pad">
+
+        <div class="mobile affiliate redeem-details">
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23398]</span>
+                <span class="receipt"></span>
+            </div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23308]</span>
+                <span class="method"></span>
+            </div>
+             <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23309]</span>
+                <span class="grey">[$481]</span>
+                <span class="country"></span>
+                 <span class="grey">[$20952]</span>
+                <span class="currency"></span>
+            </div>
+            <div class="mobile affiliate redeem-data account-details"></div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23399]</span>
+                <span class="grey">[$23400]</span>
+                <span class="request-amount">0<span class="euro">&euro;0</span></span>
+                <span class="grey">[$23401]</span>
+                <span class="fee-charged">0<span class="euro">&euro;0</span></span>
+                <span class="grey">[$23402]</span>
+                <span class="recived-amount">0<span class="euro">&euro;0</span></span>
+            </div>
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23255]</span>
+                <span class="status"></span>
+                <span class="grey full-size status-message"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Affiliate redeem page -->
+<div class="mobile main-block affiliate-redeem-page hidden">
+    <div class="mobile fm-header fm-hr fixed">
+        <div class="mobile fm-icon top-icon menu right"></div>
+        <div class="mobile fm-icon back left"></div>
+        <div class="mobile fm-header-txt"><span>[$23403]</span></div>
+    </div>
+
+    <!-- Please add "hidden" class on STEP 6 !-->
+    <div class="mobile affiliate redeem-progress">
+        <div class="text">
+            [$23404]
+        </div>
+        <div class="mobile affiliate timing hidden">
+            <div class="timing-block">
+                [$23296]
+            </div>
+        </div>
+        <div class="bar">
+            <div class="progress">
+                <span>0%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Redeem Step 1. Select transfer type. !-->
+    <div class="mobile affiliate redeem-body step1 hidden">
+        <div class="mobile affiliate redeem-wrap payment-type">
+            <div class="mobile affiliate redeem-header">
+                [$23405]
+            </div>
+            <div class="payment-type-wrapper hidden">
+                <div class="radioOn small">
+                    <input type="radio" id="affiliate-payment-type2" class="radioOn" value="2" name="affiliate-payment-type">
+                </div>
+                <label class="radio-txt" for="affiliate-payment-type2">[$6802]</label>
+            </div>
+            <div class="hr"></div>
+            <div class="payment-type-wrapper hidden">
+                <div class="radioOff small">
+                    <input type="radio" id="affiliate-payment-type1" class="radioOff" value="1" name="affiliate-payment-type">
+                </div>
+                <label class="radio-txt" for="affiliate-payment-type1">[$23301]</label>
+            </div>
+            <div class="clear"></div>
+            <div class="mobile affiliate-bitcoin-org">
+                <a href="https://bitcoin.org/" target="_blank">[$23536]</a>
+            </div>
+        </div>
+        <div class="default-green-button h-40 redeem-button" data-step="1">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step 2. How much to redeem !-->
+    <div class="mobile affiliate redeem-body step2 hidden">
+        <div class="mobile affiliate redeem-header">
+            [$23297]
+        </div>
+        
+        <div class="mobile default-input affiliate-redeem-sum">
+            <span>
+                EUR
+            </span>
+            <input type="number" value="" name="affiliate-redemption" id="affiliate-redemption-amount" step="any">
+        </div>
+        <div class="default-white-button h-40 redeem-all-button">
+            [$23298]
+        </div>
+        <div class="mobile affiliate comission">
+            [$23299]
+        </div>
+
+        <div class="default-green-button h-40 redeem-button" data-step="2">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step3. Withdraw details !-->
+    <div class="mobile affiliate redeem-body step3 hidden">
+        <div class="mobile affiliate redeem-header no-pad">
+            [$23303]
+        </div>
+
+        <div class="mobile  default-select-label ">
+            [$481]
+        </div>
+        <div class="mobile default-grey-select country">
+            <span></span>
+            <select id="affi-country"></select>
+        </div>
+
+        <!-- Currency dropdown for bank transfer !-->
+        <div class="affiliate-redeem bank-data hidden">
+            <div class="mobile  default-select-label">
+                [$20952]
+            </div>
+            <div class="mobile default-grey-select currency">
+                <span></span>
+                <select id="affi-currency"></select>
+            </div>
+            <div class="mobile affiliate-currency-tip">
+                <i>i</i>
+                [$23512]
+            </div>
+        </div>
+
+        <!-- Bitcoin address input and tip !-->
+        <div class="affiliate-redeem bitcoin-data">
+            <div class="mobile default-input top-pad">
+                <input type="text" value="" name="affi-bitcoin-address" id="affi-bitcoin-address" placeholder="[$23361]">
+            </div>
+            <div class="mobile affiliate-bitcoin-tip">
+                <i>i</i>
+                [$23304]
+            </div>
+        </div>
+
+        <div class="default-green-button h-40 redeem-button" data-step="3">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step4. Account details !-->
+    <div class="mobile affiliate redeem-body step4 hidden">
+        <div class="mobile affiliate redeem-header">
+            [$427]
+        </div>
+
+        <form autocomplete="disabled">
+            
+            <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
+            <div class="affiliate-redeem auto-fill-checkbox">
+                <div class="square checkboxOff">
+                    <i></i>
+                    <input class="checkbox"  id="affi-auto-fill" name="affi-auto-fill" type="checkbox">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-auto-fill">
+                    [$23305]
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="mobile affi-dynamic-acc-input template">
+                <div class="mobile default-input-label"></div>
+                <div class="mobile default-input">
+                    <input type="text" value="" placeholder="" name=""/>
+                </div>
+            </div>
+
+            <div class="mobile affi-dynamic-acc-select template">
+                <div class="mobile default-select-label"></div>
+                <div class="mobile default-grey-select">
+                    <span></span>
+                    <select>
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="affi-dynamic-acc-name"></div>
+            <div class="affi-dynamic-acc-type"></div>
+            <div class="affi-dynamic-acc-info"></div>
+            
+            <!-- Save information checkbox. Please add/remove "hidden" class !-->
+            <div class="affiliate-redeem save-data-checkbox">
+                <div class="square checkdiv checkboxOff">
+                    <i></i>
+                    <input class="checkbox hidden" type="checkbox" id="affi-save-info" name="affi-save-info">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-save-info">
+                    [$23306]
+                </div>
+                <div class="clear"></div>
+            </div>
+            
+        </form>
+
+        <div class="default-green-button h-40 redeem-button" data-step="4">
+            [$556]
+        </div>
+        <div class="mobile affiliate cancel-redeem">
+            [$82]
+        </div>
+    </div>
+
+    <!-- Redeem Step5. Redeem details !-->
+    <div class="mobile affiliate redeem-body no-pad step5 hidden">
+        <div class="mobile affiliate redeem-sum-body">
+            <div class="mobile affiliate redeem-sum-header">
+                <span>[$23406]</span>
+            </div>
+            <div class="mobile affiliate redeem-summary">
+                <div class="info">
+                    [$23312]
+                </div>
+                <div class="info price requested">
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <hr>
+                <div class="info">
+                    [$23313]
+                </div>
+                <div class="info price fee">
+                    <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <hr>
+                <div class="info bold">
+                    [$23314]
+                </div>
+                <div class="info bold price received">
+                    <!-- Local currency tip.Please Add/Rove "hidden" class !-->
+                    <span class="euro">0</span><span class="local">0</span>
+                </div>
+                <dv class="clear"></dv>
+                <!-- Local currency tip.Please Add/Remove "hidden" class !-->
+                <div class="affiliate-redeem local-info">
+                    [$23315]
+                </div>
+            </div>
+        </div>
+        
+        <div class="mobile affiliate redeem-pad">
+            <div class="mobile affiliate redeem-data">
+                <span class="strong">[$23308]</span>
+                <span class="method"></span>
+            </div>
+             <div class="mobile affiliate redeem-data">
+                <span class="strong full-size">[$23309]</span>
+                <span class="grey">[$481]</span>
+                <span class="country"></span>
+                <span class="grey">[$20952]</span>
+                <span class="currency"></span>
+            </div>
+            <div class="mobile affiliate redeem-data account-details"></div>
+
+            <div class="default-green-button h-40 redeem-button" data-step="5">
+                [$23368]
+            </div>
+            <div class="mobile affiliate cancel-redeem">
+                [$82]
+            </div>
+        </div>
+    </div>
+    
+    <!-- Redeem Step6. Redeemption progress !-->
+    <div class="mobile affiliate redeem-body last step6 hidden">
+        <div class="mobile affiliate submit-header">
+            [$23316]
+        </div>
+        <div class="mobile affiliate redeem-wrap  last-step">
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle complete">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$23403]
+                </div>
+            </div>
+            <div class="mobile fm-icon vertical-dots"></div>
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle loading">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$22833]
+                </div>
+            </div>
+            <div class="mobile fm-icon vertical-dots"></div>
+            
+            <!-- Please add "loading" or "complete" classname !-->
+            <div class="progress-circle">
+                <div class="affiliate-request status">
+                    <!-- Please set width in percents !-->
+                    <div class="affiliate-request progress"><span class="mobile-sprite"></span></div>
+                </div>
+                <div class="affiliate-request status-txt">
+                    [$23277]
+                </div>
+            </div>
+        </div>
+        
+        <div class="default-green-button h-40 redeem-button close" data-step="6">
+            [$81]
         </div>
     </div>
 </div>
@@ -1164,31 +1533,31 @@
                     <div class="mobile red-heading">[$6844]</div>
                     <form class="mobile inline-labels radio-button-form">
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="5" data-english-log-text="I find the interface too confusing to use"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="5" data-english-log-text="I find the interface too confusing to use"></div>
                             <label class="radio-txt">[$6229]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="1" data-english-log-text="I don't use my account anymore"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="1" data-english-log-text="I don't use my account anymore"></div>
                             <label class="radio-txt">[$6845]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="2" data-english-log-text="I have another MEGA account"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="2" data-english-log-text="I have another MEGA account"></div>
                             <label class="radio-txt">[$6226]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="3" data-english-log-text="I have experienced too many problems"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="3" data-english-log-text="I have experienced too many problems"></div>
                             <label class="radio-txt">[$6227]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="4" data-english-log-text="I am moving to another cloud storage provider"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="4" data-english-log-text="I am moving to another cloud storage provider"></div>
                             <label class="radio-txt">[$23422]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="6" data-english-log-text="MEGA has under delivered on its promise"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="6" data-english-log-text="MEGA has under delivered on its promise"></div>
                             <label class="radio-txt">[$6847]</label>
                         </div>
                         <div class="mobile radio-option">
-                            <div class="radioOff"><input type="radio" name="feedback-radio" value="7" data-english-log-text="Other"></div>
+                            <div class="radioOff"><input class="radioOff" type="radio" name="feedback-radio" value="7" data-english-log-text="Other"></div>
                             <label class="radio-txt">[$2007]</label>
                         </div>
                     </form>

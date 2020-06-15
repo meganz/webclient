@@ -17725,51 +17725,52 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
     };
 
     _this.doToggle = function (action
-    /* pause || resume || destroy */
+    /* pause || resume */
     ) {
-      var cs = ChatSearch.doSearch.cs;
+      var IN_PROGRESS = STATUS.IN_PROGRESS,
+          PAUSED = STATUS.PAUSED,
+          COMPLETED = STATUS.COMPLETED;
+      var searching = _this.state.status === IN_PROGRESS || _this.state.status === PAUSED;
 
-      if (action && cs) {
-        var IN_PROGRESS = STATUS.IN_PROGRESS,
-            PAUSED = STATUS.PAUSED,
-            COMPLETED = STATUS.COMPLETED;
+      if (action && searching) {
+        var chatSearch = ChatSearch.doSearch.cs;
+
+        if (!chatSearch) {
+          return delay('chat-toggle', function () {
+            return _this.doToggle(action);
+          }, 600);
+        }
 
         _this.setState({
-          status: function () {
-            switch (action) {
-              case 'pause':
-                return PAUSED;
-
-              case 'resume':
-                return IN_PROGRESS;
-
-              default:
-                return COMPLETED;
-            }
-          }()
+          status: action === 'pause' ? PAUSED : action === 'resume' ? IN_PROGRESS : COMPLETED
         }, function () {
-          cs[action]();
+          return chatSearch[action]();
         });
       }
+    };
+
+    _this.doDestroy = function () {
+      return ChatSearch && ChatSearch.doSearch && ChatSearch.doSearch.cs && ChatSearch.doSearch.cs.destroy();
     };
 
     _this.handleChange = function (ev) {
       var value = ev.target.value;
       var searching = value.length > 0;
 
+      _this.doDestroy();
+
       _this.setState({
         value: value,
         searching: searching,
-        status: STATUS.IN_PROGRESS,
+        // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
+        // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
+        // because `pause search` will not be available yet.
+        status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
         results: []
       }, function () {
-        if (searching) {
-          delay('chat-search', _this.doSearch.bind(searchPanel_assertThisInitialized(_this), value), 1600);
-        } else {
-          _this.setState({
-            results: []
-          });
-        }
+        return searching && delay('chat-search', function () {
+          return _this.doSearch(value);
+        }, 1600);
       });
     };
 
@@ -17794,11 +17795,11 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
           status: undefined,
           results: []
         }, function () {
-          _this.doToggle('destroy');
-
           onIdle(function () {
             return searchField_SearchField.focus();
           });
+
+          _this.doDestroy();
         }) : _this.toggleMinimize()
       );
     };

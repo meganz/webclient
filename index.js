@@ -2381,6 +2381,13 @@ function topmenuUI() {
             }
         });
 
+        if (page === 'login') {
+            $loginButton.addClass('hidden');
+        }
+        if (page === 'register' || page === 'registerb') {
+            $headerRegisterBotton.addClass('hidden');
+        }
+
         // Only show top language change icon if not logged in
         if (u_type === false) {
 

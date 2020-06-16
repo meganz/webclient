@@ -1908,6 +1908,9 @@
     transform: rotate(-90deg);
     opacity: 0.6;
 }
+.small-icon.icons-sprite.prev-arrow.disabled, .small-icon.icons-sprite.next-arrow.disabled {
+    opacity: 0.2;
+}
 .small-icon.icons-sprite.next-arrow {
      transform: rotate(90deg);
 }

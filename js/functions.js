@@ -2961,6 +2961,96 @@ function registerLinuxDownloadButton($links) {
         return false;
     });
 }
+/* eslint-disable complexity */
+/**
+ * Function that takes users attributes, then prepare content texts of ODQ paywall dialog
+ * @param {Object} user_attr        u_attr or {}
+ * @param {Object} accountData      M.account, caller must populate then pass
+ * @returns {Object}                contains {dialogText, dlgFooterText,fmBannerText}
+ */
+function odqPaywallDialogTexts(user_attr, accountData) {
+    'use strict';
+
+    var dialogText = l[23525];
+    var dlgFooterText = l[23524];
+    var fmBannerText = l[23534];
+
+    if (user_attr.uspw) {
+        if (user_attr.uspw.dl) {
+            var deadline = new Date(user_attr.uspw.dl * 1000);
+            var currDate = new Date();
+            var remainDays = Math.floor((deadline - currDate) / 864e5);
+            var remainHours = Math.floor((deadline - currDate) / 36e5);
+
+            if (remainDays > 0) {
+                dlgFooterText = remainDays > 1 ? l[23521].replace('%1', remainDays) : l[23522];
+                fmBannerText = remainDays > 1 ? l[23532].replace('%1', remainDays) : l[23533];
+            }
+            else if (remainDays === 0 && remainHours > 0) {
+                dlgFooterText = l[23523].replace('%1', remainHours);
+            }
+        }
+        if (user_attr.uspw.wts && user_attr.uspw.wts.length) {
+            dialogText = l[23520];
+            if (user_attr.uspw.wts.length === 1) {
+                dialogText = l[23530];
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1));
+            }
+            if (user_attr.uspw.wts.length === 2) {
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1)).replace('%3', '')
+                    .replace('%4', time2date(user_attr.uspw.wts[1], 1));
+            }
+            else if (user_attr.uspw.wts.length === 3) {
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1))
+                    .replace('%3', time2date(user_attr.uspw.wts[1], 1))
+                    .replace('%4', time2date(user_attr.uspw.wts[2], 1));
+            }
+            else {
+                // more than 3
+                var datesString = time2date(user_attr.uspw.wts[1], 1);
+                for (var k = 2; k < user_attr.uspw.wts.length - 1; k++) {
+                    datesString += ', ' + time2date(user_attr.uspw.wts[k], 1);
+                }
+
+                dialogText = dialogText.replace('%2', time2date(user_attr.uspw.wts[0], 1))
+                    .replace('%3', datesString)
+                    .replace('%4', time2date(user_attr.uspw.wts[user_attr.uspw.wts.length - 1], 1));
+            }
+        }
+    }
+
+    var filesText = l[23259]; // 0 files
+    if (accountData.stats[M.RootID].files === 1) {
+        filesText = l[23257];
+    }
+    else if (accountData.stats[M.RootID].files > 1) {
+        filesText = l[23261].replace('[X]', accountData.stats[M.RootID].files);
+    }
+
+    dialogText = dialogText.replace('%1', user_attr.email || ' ');
+    dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used))
+        .replace('%5', filesText);
+
+    var neededPro = 4;
+    if (user_attr.p) {
+        neededPro = user_attr.p + 1;
+        if (neededPro === 3) {
+            neededPro = 100;
+        }
+        else if (neededPro === 5) {
+            neededPro = 1;
+        }
+    }
+
+    dialogText = dialogText.replace('%7', pro.getProPlanName(neededPro));
+
+    return {
+        dialogText: dialogText,
+        dlgFooterText: dlgFooterText,
+        fmBannerText: fmBannerText
+    };
+}
+/* eslint-enable complexity */
 
 /**
  * Validate entered address is on correct structure, if there is more type of bitcoin structure please update.

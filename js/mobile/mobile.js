@@ -936,3 +936,30 @@ accountUI.account = {
     renderCountry: function() {},
     renderRubsched: function() {},
 };
+
+/** Global function to be used in mobile mode, checking if the action can be taken by the user.
+ * It checks the user validity (Expired business, or ODQ Paywall)
+ * @param   {Boolean} hideContext   Hide context menu
+ * @returns {Boolean}               True if the caller can proceed. False if not
+ */
+function validateUserAction(hideContext) {
+    if (u_attr) {
+        if (u_attr.b && u_attr.b.s === -1) {
+            if (u_attr.b.m) {
+                msgDialog('warningb', '', l[20401], l[20402]);
+            }
+            else {
+                msgDialog('warningb', '', l[20462], l[20463]);
+            }
+            return false;
+        }
+        else if (u_attr.uspw) {
+            if (hideContext) {
+                mobile.cloud.contextMenu.hide();
+            }
+            M.showOverStorageQuota(EPAYWALL);
+            return false;
+        }
+    }
+    return true;
+}

@@ -1903,10 +1903,7 @@ mega.megadrop = (function() {
         // Context menu create widget
         $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function () {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 
@@ -1922,10 +1919,7 @@ mega.megadrop = (function() {
         // Context menu manage widget
         $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function() {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 
@@ -1941,10 +1935,7 @@ mega.megadrop = (function() {
         // Context menu Remove upload page
         $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function() {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 

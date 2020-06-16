@@ -18,10 +18,7 @@ MegaData.prototype.sharesUI = function() {
 MegaData.prototype.openSharingDialog = function() {
     'use strict';
 
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
     if (u_type === 0) {

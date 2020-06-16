@@ -155,6 +155,12 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     if (res.b) {
                         u_attr.b = res.b;
                     }
+                    if (res.uspw) {
+                        u_attr.uspw = res.uspw;
+                    }
+                    else {
+                        delete u_attr.uspw;
+                    }
                 }
 
                 if (!ctx.account.downbw_used) {
@@ -542,6 +548,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     'use strict';
 
     var promise = new MegaPromise();
+    if (quota === undefined && options === undefined) {
+        return promise.reject();
+    }
 
     if (!pro.membershipPlans || !pro.membershipPlans.length) {
         pro.loadMembershipPlans(function() {
@@ -551,74 +560,88 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         return promise.reject();
     }
 
+    if (quota && quota.isFull && Object(u_attr).uspw) {
+        // full quota, and uspw exist --> overwrite the full quota warning.
+        quota = EPAYWALL;
+    }
+
+    var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
+    var $strgdlgBodyFull = $('.fm-dialog-body.storage-dialog.full', $strgdlg).removeClass('odq');
+    var $strgdlgBodyAFull = $('.fm-dialog-body.storage-dialog.almost-full', $strgdlg);
 
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('fm-notification almost-full full');
+    var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
+    var $fullExtras = $('.full-extras', $strgdlgBodyFull).removeClass('hidden');
+    var $upgradeBtn = $('.choose-plan', $strgdlg).text(l[8696]);
 
-    if (this.showOverStorageQuotaPromise) {
-        promise = this.showOverStorageQuotaPromise;
-    }
-    this.showOverStorageQuotaPromise = promise;
+    if (quota === EPAYWALL) { // ODQ paywall
 
-    if (quota === -1) {
-        quota = { percent: 100 };
-        quota.isFull = quota.isAlmostFull = true;
-        options = { custom: 1 };
-    }
+        if (!M.account) {
+            M.accountData(function() {
+                M.showOverStorageQuota(quota, options);
+            });
+            return promise.reject();
+        }
+        $('.fm-main').addClass('fm-notification full');
 
-    var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+        $strgdlg.addClass('full');
+        $('.body-header', $strgdlgBodyFull).text(l[23519]);
 
-    $('.fm-dialog-body.storage-dialog.full .body-p.long').safeHTML(l[22674].replace('%1', maxStorage).
-        replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
-    $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+        var dlgTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
+        $('.body-p.long', $strgdlgBodyFull).safeHTML(dlgTexts.dialogText);
 
-    $('.fm-notification-block.almost-full')
-        .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
+        $strgdlgBodyFull.addClass('odq');
+        $odqWarn.removeClass('hidden');
+        $fullExtras.addClass('hidden');
+        $upgradeBtn.text(l[5549]);
+        $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
 
-    if (Object(u_attr).p) {
-        // update texts with "for free accounts" sentences removed.
-
-        $('.fm-dialog-body.storage-dialog.full .body-header').safeHTML(l[16360]);
-
-        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p').safeHTML(l[16361]);
-        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(l[16361] + ' ' + l[16314]);
+        $('.fm-notification-block.full').safeHTML(dlgTexts.fmBannerText);
     }
     else {
-        var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
-            .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
+        if (quota === -1) {
+            quota = { percent: 100 };
+            quota.isFull = quota.isAlmostFull = true;
+            options = { custom: 1 };
+        }
 
-        $('.fm-dialog-body.storage-dialog.almost-full .no-achievements-bl .body-p')
-            .safeHTML(minStorage);
-        $('.fm-dialog-body.storage-dialog.almost-full .achievements-bl .body-p')
-            .safeHTML(minStorage + ' ' + l[16314]);
-    }
+        var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
 
-    if (quota.isAlmostFull || Object(options).custom) {
-        var $strgdlg = $('.fm-dialog.storage-dialog').removeClass('full almost-full');
+        $('.body-p.long', $strgdlgBodyFull).safeHTML(l[22674].replace('%1', maxStorage).
+            replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
 
-        if (quota.isFull) {
-            $('.fm-main').addClass('fm-notification full');
-            $strgdlg.addClass('full')
-                .find('.fm-dialog-body.full')
-                .find('.fm-dialog-title')
-                .text(Object(options).title || l[16302])
-                .end()
-                .find('.body-header')
-                .safeHTML(Object(options).body || l[16360]);
+        if (Object(u_attr).p) {
+            // update texts with "for free accounts" sentences removed.
+
+            $('.body-header', $strgdlgBodyFull).safeHTML(l[16360]);
+
+            $('.no-achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(l[16361]);
+            $('.achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(l[16361] + ' ' + l[16314]);
         }
         else {
+            var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
+                .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
+
+            $('.no-achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(minStorage);
+            $('.achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(minStorage + ' ' + l[16314]);
+        }
+
+        var myOptions = Object(options);
+        if (quota.isFull) {
+            $strgdlg.addClass('full');
+            $('.fm-main').addClass('fm-notification full');
+            $('.fm-dialog-title', $strgdlgBodyFull).text(myOptions.title || l[16302]);
+            $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
+        }
+        else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
                 $('.fm-main').addClass('fm-notification almost-full');
             }
-            $strgdlg.addClass('almost-full')
-                .find('.fm-dialog-body.almost-full')
-                .find('.fm-dialog-title')
-                .text(Object(options).title || l[16311])
-                .end()
-                .find('.body-header')
-                .safeHTML(Object(options).body || l[16312]);
+            $strgdlg.addClass('almost-full');
+            $('.fm-dialog-title', $strgdlgBodyAFull).text(myOptions.title || l[16311]);
+            $('.body-header', $strgdlgBodyAFull).safeHTML(myOptions.body || l[16312]);
 
             // Storage chart and info
             var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
@@ -628,82 +651,95 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
             // Storage space chart
             if (deg <= 180) {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(' + deg + 'deg)');
-                $storageChart.find('.right-chart span').removeAttr('style');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(' + deg + 'deg)');
+                $('.right-chart span', $storageChart).removeAttr('style');
             }
             else {
-                $storageChart.find('.left-chart span').css('transform', 'rotate(180deg)');
-                $storageChart.find('.right-chart span').css('transform', 'rotate(' + (deg - 180) + 'deg)');
+                $('.left-chart span', $storageChart).css('transform', 'rotate(180deg)');
+                $('.right-chart span', $storageChart).css('transform', 'rotate(' + (deg - 180) + 'deg)');
             }
 
             $('.chart.data .size-txt', $strgdlg).text(strQuotaUsed);
             $('.chart.data .pecents-txt', $strgdlg).text(strQuotaLimit[0]);
             $('.chart.data .gb-txt', $strgdlg).text(strQuotaLimit[1]);
             $('.chart.data .perc-txt', $strgdlg).text(quota.percent + '%');
+
+        }
+        $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
+
+        $('.fm-notification-block.almost-full')
+            .safeHTML('<div class="fm-notification-close"></div>' + l[22668].replace('%1', maxStorage));
+
+    }
+
+    if (this.showOverStrgQuotaPr) {
+        promise = this.showOverStrgQuotaPr;
+    }
+    this.showOverStrgQuotaPr = promise;
+
+    var closeDialog = function() {
+        $strgdlg.off('dialog-closed');
+        window.closeDialog();
+
+        promise.resolve();
+        delete M.showOverStrgQuotaPr;
+    };
+
+    $strgdlg.rebind('dialog-closed', closeDialog);
+
+    $('.button', $strgdlg).rebind('click', function() {
+        var $this = $(this);
+
+        closeDialog();
+
+        if ($this.hasClass('choose-plan')) {
+            loadSubPage('pro');
+        }
+        else if ($this.hasClass('get-bonuses')) {
+            mega.achievem.achievementsListDialog();
         }
 
-        var closeDialog = function() {
-            $strgdlg.off('dialog-closed');
-            window.closeDialog();
+        return false;
+    });
+    $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
 
-            promise.resolve();
-            delete M.showOverStorageQuotaPromise;
-        };
+    $('.fm-notification-block .fm-notification-close')
+        .rebind('click', function() {
+            $('.fm-main').removeClass('fm-notification almost-full full');
+            $.tresizer();
+        });
 
-        $strgdlg.rebind('dialog-closed', closeDialog);
+    mega.achievem.enabled()
+        .done(function() {
+            $strgdlg.addClass('achievements');
+            $('.semi-small-icon.rocket', $strgdlg).rebind(
+                'click',
+                function() {
+                    closeDialog();
+                    mega.achievem.achievementsListDialog();
+                    return false;
+                }
+            );
+        });
 
-        $('.button', $strgdlg).rebind('click', function() {
-            var $this = $(this);
-
+    clickURLs();
+    $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
+        .rebind('click', function() {
             closeDialog();
-
-            if ($this.hasClass('choose-plan')) {
-                loadSubPage('pro');
-            }
-            else if ($this.hasClass('get-bonuses')) {
-                mega.achievem.achievementsListDialog();
-            }
-
+            loadSubPage('fm/' + M.RubbishID);
             return false;
         });
-        $('.fm-dialog-close, .button.skip', $strgdlg).rebind('click', closeDialog);
 
-        $('.fm-notification-block .fm-notification-close')
-            .rebind('click', function() {
-                $('.fm-main').removeClass('fm-notification almost-full full');
-                $.tresizer();
-            });
+    if (Object(u_attr).p) {
+        $upgradeBtn.text(l[16386]);
+    }
 
-        mega.achievem.enabled()
-            .done(function() {
-                $strgdlg.addClass('achievements')
-                    .find('.semi-small-icon.rocket')
-                    .rebind('click', function() {
-                        closeDialog();
-                        mega.achievem.achievementsListDialog();
-                        return false;
-                    });
-            });
-
-        clickURLs();
-        $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
-            .rebind('click', function() {
-                closeDialog();
-                loadSubPage('fm/' + M.RubbishID);
-                return false;
-            });
-
-        if (Object(u_attr).p) {
-            $('.choose-plan', $strgdlg).text(l[16386]);
-        }
-
-        // if another dialog wasn't opened previously
-        if (!prevState || Object(options).custom) {
-            M.safeShowDialog('over-storage-quota', $strgdlg);
-        }
-        else {
-            promise.reject();
-        }
+    // if another dialog wasn't opened previously
+    if (!prevState || Object(options).custom || quota === EPAYWALL) {
+        M.safeShowDialog('over-storage-quota', $strgdlg);
+    }
+    else {
+        promise.reject();
     }
 
     // On the banner appearance or disappearance, lets resize height of fm.

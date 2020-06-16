@@ -260,13 +260,7 @@ mobile.cloud.contextMenu = {
         // If the Preview button is tapped
         $contextMenu.find('.preview-file-button').off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction(true)) {
                 return false;
             }
 
@@ -294,13 +288,7 @@ mobile.cloud.contextMenu = {
         // When the Download button is tapped
         $contextMenu.find('.download-file-button').off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction(true)) {
                 return false;
             }
 
@@ -336,13 +324,7 @@ mobile.cloud.contextMenu = {
         // When the Link button is tapped
         $linkButton.off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction(true)) {
                 return false;
             }
 
@@ -365,13 +347,7 @@ mobile.cloud.contextMenu = {
         // When the Delete button is tapped
         $contextMenu.find('.delete-button').off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction(true)) {
                 return false;
             }
 

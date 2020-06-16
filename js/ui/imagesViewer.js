@@ -213,10 +213,8 @@ var slideshowid;
 
             $removeButton.rebind('click', function() {
 
-                // check if this is a business expired account
-                if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (M.isInvalidUserStatus()) {
                     history.back();
-                    showExpiredBusiness();
                     return false;
                 }
 
@@ -594,9 +592,7 @@ var slideshowid;
 
     // Viewer Init
     function slideshow(id, close, hideCounter) {
-        if (!close && u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (!close && M.isInvalidUserStatus()) {
             return;
         }
 

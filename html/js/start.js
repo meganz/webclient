@@ -10,7 +10,8 @@ function init_start() {
 
     if (u_type > 0) {
         $('.startpage.register:not(.business-reg)', $page).text(l[164]);
-        $('.mid-green-link.register-lnk, .startpage.register', $page).attr('href', '/fm');
+        $('.mid-green-link.register-lnk.fm, .startpage.register', $page).attr('href', '/fm');
+        $('.mid-green-link.register-lnk.chat', $page).attr('href', '/fm/chat');
 
         if (is_mobile) {
             $('.startpage.account', $page).attr('href', '/fm/account');

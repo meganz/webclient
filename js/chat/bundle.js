@@ -17191,14 +17191,14 @@ var resultRow_NilRow = function NilRow(_ref) {
   }, /*#__PURE__*/external_React_default.a.createElement("img", {
     src: "".concat(staticpath, "images/temp/search-icon.png"),
     alt: LABEL.NO_RESULTS
-  }), /*#__PURE__*/external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery &&
-  /*#__PURE__*/
-  // [...] TODO: add translation
-  // LABEL.SEARCH_MESSAGES_INLINE
-  external_React_default.a.createElement("div", {
+  }), /*#__PURE__*/external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && /*#__PURE__*/external_React_default.a.createElement("div", {
     className: "search-messages",
-    onClick: onSearchMessages
-  }, "Click ", /*#__PURE__*/external_React_default.a.createElement("a", null, "here"), " to search for messages")));
+    onClick: onSearchMessages,
+    dangerouslySetInnerHTML: {
+      /* `Click <a>here</a> to search for messages.` */
+      __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    }
+  })));
 }; // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17311,23 +17311,22 @@ var TYPE = {
   NIL: 4
 };
 var LABEL = {
-  // [...] TODO: Add translations
   //
   // Result table & Result row
   // ------------------------------------
-  MESSAGES: 'Messages',
-  CONTACTS_AND_CHATS: 'Contacts And Chats',
-  NO_RESULTS: 'No Results',
-  RECENT: 'Recent',
-  SEARCH_MESSAGES_CTA: 'Search messages',
-  SEARCH_MESSAGES_INLINE: 'Click <a>here</a> to search for messages',
+  MESSAGES: l[6868],
+  CONTACTS_AND_CHATS: l[20174],
+  NO_RESULTS: l[8674],
+  RECENT: l[20141],
+  SEARCH_MESSAGES_CTA: l[23547],
+  SEARCH_MESSAGES_INLINE: l[23548],
   //
   // Search field status
   // ------------------------------------
-  DECRYPTING_RESULTS: 'decrypting results...',
-  PAUSE_SEARCH: 'pause search',
-  RESUME_SEARCH: 'resume search',
-  SEARCH_COMPLETE: 'search complete'
+  DECRYPTING_RESULTS: l[23543],
+  PAUSE_SEARCH: l[23544],
+  RESUME_SEARCH: l[23545],
+  SEARCH_COMPLETE: l[23546]
 };
 
 var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {

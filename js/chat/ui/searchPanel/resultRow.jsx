@@ -229,12 +229,13 @@ const NilRow = ({ onSearchMessages, isFirstQuery }) => (
             <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
             <span>{LABEL.NO_RESULTS}</span>
             {isFirstQuery && (
-                // [...] TODO: add translation
-                // LABEL.SEARCH_MESSAGES_INLINE
                 <div
                     className="search-messages"
-                    onClick={onSearchMessages}>
-                    Click <a>here</a> to search for messages
+                    onClick={onSearchMessages}
+                    dangerouslySetInnerHTML={{
+                        /* `Click <a>here</a> to search for messages.` */
+                        __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+                    }}>
                 </div>
             )}
         </div>

@@ -13,28 +13,26 @@ export const TYPE = {
 
 export const LABEL = {
 
-    // [...] TODO: Add translations
-
     //
     // Result table & Result row
     // ------------------------------------
 
-    MESSAGES: 'Messages',
-    CONTACTS_AND_CHATS: 'Contacts And Chats',
-    NO_RESULTS: 'No Results',
-    RECENT: 'Recent',
+    MESSAGES: l[6868],
+    CONTACTS_AND_CHATS: l[20174],
+    NO_RESULTS: l[8674],
+    RECENT: l[20141],
 
-    SEARCH_MESSAGES_CTA: 'Search messages',
-    SEARCH_MESSAGES_INLINE: 'Click <a>here</a> to search for messages',
+    SEARCH_MESSAGES_CTA: l[23547],
+    SEARCH_MESSAGES_INLINE: l[23548],
 
     //
     // Search field status
     // ------------------------------------
 
-    DECRYPTING_RESULTS: 'decrypting results...',
-    PAUSE_SEARCH: 'pause search',
-    RESUME_SEARCH: 'resume search',
-    SEARCH_COMPLETE: 'search complete'
+    DECRYPTING_RESULTS: l[23543],
+    PAUSE_SEARCH: l[23544],
+    RESUME_SEARCH: l[23545],
+    SEARCH_COMPLETE: l[23546]
 };
 
 export default class ResultContainer extends MegaRenderMixin {

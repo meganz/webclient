@@ -507,6 +507,12 @@ if (!browserUpdate) try
             }
         }
     }
+    else if (location.host === 'mega.io') {
+        // this means we are not in special modes, and we are in MEGA.io
+        document.head.querySelectorAll('meta[property="og:url"]')[0].content = 'https://mega.io/';
+        document.head.querySelectorAll('meta[property="twitter:url"]')[0].content = 'https://mega.io/';
+        document.head.querySelectorAll('link[rel="icon"]')[0].href = 'https://mega.io/favicon.ico?v=3';
+    }
 
     // Override any set static path with the one from localStorage to test standard static server failure
     if (localStorage.getItem('staticpath') !== null) {
@@ -4062,5 +4068,28 @@ mBroadcaster.once('startMega', function() {
         onIdle(function() {
             M.transferFromMegaCoNz(data);
         });
+    }
+
+    if (location.host === 'mega.io') {
+        window.addEventListener('click', function(ev) {
+            var target = ev.target || false;
+
+            if (target.nodeName === 'A' && target.classList.contains('top-login-button')) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                location.href = "https://mega.nz/login";
+            }
+        }, true);
+
+        var redirect = {login: 1, register: 1};
+        var checkPage = function _(page) {
+            if (redirect[page] || String(page).substr(0, 9) === 'registerb') {
+                location.href = "https://mega.nz/" + page;
+                loadSubPage('start');
+            }
+        };
+
+        checkPage(page);
+        mBroadcaster.addListener('pagechange', checkPage);
     }
 });

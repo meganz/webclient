@@ -4403,9 +4403,9 @@ li.token-input-token-invite .input-close {
     text-align: center;
 }
 .voucher-info-redeem .voucher-logo {
-    width: 335px;
+    width: 370px;
     height: 100px;
-    margin-left: calc(50% - 166px);
+    margin-left: calc(50% - 185px);
     margin-top: 52px;
     margin-bottom: 26px;
     background-color: #EB4444;
@@ -4418,6 +4418,11 @@ li.token-input-token-invite .input-close {
     background-color: #FFAF00;
     border: 1px solid #FD8116;
     color: #fff;
+}
+.voucher-info-redeem .voucher-logo.business-v {
+    background-color: #46B4E5;
+    border: unset;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
 }
 .voucher-info-redeem .voucher-logo .voucher-head{
     border-radius: 4px 4px 0 0;
@@ -4457,6 +4462,11 @@ li.token-input-token-invite .input-close {
 .voucher-logo .plan-icon.pro4 {
     background-position: -0px -1620px;
 }
+.voucher-logo .plan-icon.pro100 {
+    background-image: url(../images/mega/business-p-32.png) !important;
+    background-size: 32px auto;
+    background-position: unset;
+}
 .voucher-logo .v-separator {
     height: 32px;
     width: 1px;
@@ -4467,7 +4477,7 @@ li.token-input-token-invite .input-close {
     display: inline-block;
 }
 .voucher-logo .plan-info {
-    width: 122px;
+    width: 135px;
     display: inline-block;
     text-align: center;
 }
@@ -4478,12 +4488,18 @@ li.token-input-token-invite .input-close {
 	line-height: 21px;
 	text-align: center;
 }
-.voucher-logo .plan-info .size-bottom{
-	height: 15px;
-	color: #FFFFFF;
-	font-size: 12px;
-	line-height: 15px;
-    text-transform:uppercase;
+body.ru .voucher-logo .plan-info .size-head {
+    font-size: 12px;
+}
+.voucher-logo .plan-info .size-bottom {
+    height: 15px;
+    color: #FFFFFF;
+    font-size: 12px;
+    line-height: 15px;
+    text-transform: uppercase;
+}
+.voucher-logo .plan-info .size-bottom {
+    font-size: 10px;
 }
 .payment-reminder-logo {
     background-position: -20px -969px;

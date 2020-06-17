@@ -26,7 +26,7 @@ RepayPage.prototype.initPage = function() {
     var mySelf = this;
     loadingDialog.show();
 
-    var $repaySection = $('.main-mid-pad.bus-repay');
+    var $repaySection = $('.main-mid-pad.bus-repay').removeClass('hidden');
     var $leftSection = $('.main-left-block', $repaySection);
     var $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 

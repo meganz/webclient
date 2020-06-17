@@ -2019,7 +2019,7 @@ ul, li {
     width: 102px;
 }
 .mobile.empty-icon.big-green-tick {
-    background-position: -178px -826px;
+    background-position: -178px -825px;
     height: 84px;
     width: 84px;
 }
@@ -12033,6 +12033,11 @@ code, c {
     text-align: initial;
     display: inline-block;
 }
+.voucher-info-redeem .voucher-logo.business-v {
+    background-color: #46B4E5;
+    border: unset;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+}
 .voucher-info-redeem .voucher-logo.pro-l {
     background-color: #FFAF00;
     border: 1px solid #FD8116;
@@ -12078,6 +12083,11 @@ code, c {
 }
 .voucher-logo .plan-icon.pro4 {
     background-position: -0px -1620px;
+}
+.voucher-logo .plan-icon.pro100 {
+    background-image: url(../images/mega/business-p-32.png) !important;
+    background-size: 32px auto;
+    background-position: unset;
 }
 .voucher-logo .v-separator {
     height: 32px;

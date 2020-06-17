@@ -47,11 +47,11 @@
 }
 
 .bus-reg-radio-block {
-	margin-top: 32px 0;
-	width: 100%;
-	height: 24px;
-	position: relative;
-	padding-bottom: 12px;
+    margin-top: 32px 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding-bottom: 12px;
 }
 .card-container.bus-repay .bus-reg-radio-block {
 	margin: 0;

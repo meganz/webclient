@@ -5786,11 +5786,6 @@ input.radioOn, input.radioOff {
     margin: 2px 40px 0 60px;
     text-align: left;
 }
-.mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
-    left: 10px;
-    position: absolute;
-    top: 10px;
-}
 .mobile.my-account-page .account-cancel-subscription-block .subscription-heading, .mobile.my-account-page .account-recovery-key-block .recovery-key-heading, .mobile.my-account-page .two-factor-heading {
     color: #262F3B;
     font-size: 17px;

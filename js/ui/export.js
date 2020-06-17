@@ -1926,6 +1926,7 @@ var exportExpiry = {
 
         loadingDialog.show();
         this.logger.debug('getExportLink');
+        $.getExportLinkInProgress = nodes;
 
         for (var i = 0; i < nodes.length; i++) {
             var h = nodes[i];
@@ -2058,6 +2059,12 @@ var exportExpiry = {
                 if (self.options.showExportLinkDialog) {
                     var exportLinkDialog = new mega.Dialog.ExportLink();
                     exportLinkDialog.linksDialog();
+                }
+
+                console.assert($.getExportLinkInProgress);
+                if ($.getExportLinkInProgress) {
+                    mBroadcaster.sendMessage('export-link:completed', handle);
+                    $.getExportLinkInProgress = false;
                 }
             }
 

@@ -144,9 +144,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
 
         // clear the payment block
-        $pageContainer.find('.bus-reg-radio-block').empty();
-
-        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer);
+        var $paymentBlock = $('.bus-reg-radio-block', $pageContainer).empty();
 
         var radioHtml = '<div class="bus-reg-radio-option"> <div class="bus-reg-radio payment-[x] checkOff"></div>';
         var textHtml = '<div class="provider">[x]</div>';
@@ -156,17 +154,21 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
             return failureExit(l[20431]);
         }
 
-        var paymentGatewayToAdd = '';
-        for (var k = 0; k < list.length; k++) {
-            var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
-            var payText = textHtml.replace('[x]', list[k].displayName);
-            var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
-            paymentGatewayToAdd += payRadio + payText + payIcon;
+        if (!window.businessVoucher) {
+            var paymentGatewayToAdd = '';
+            for (var k = 0; k < list.length; k++) {
+                var payRadio = radioHtml.replace('[x]', list[k].gatewayName);
+                var payText = textHtml.replace('[x]', list[k].displayName);
+                var payIcon = iconHtml.replace('[x]', list[k].gatewayName);
+                paymentGatewayToAdd += payRadio + payText + payIcon;
+            }
+            if (paymentGatewayToAdd) {
+                $paymentBlock.safeAppend(paymentGatewayToAdd);
+            }
         }
-        if (paymentGatewayToAdd) {
-            $paymentBlock.append(paymentGatewayToAdd);
-        }
-
+        $paymentBlock.safeAppend(
+            radioHtml.replace('[x]', 'Voucher') + textHtml.replace('[x]', l[23494]) + '</div>'
+        );
 
         // setting the first payment provider as chosen
         $($pageContainer.find('.bus-reg-radio-block .bus-reg-radio')[0]).removeClass('checkOff')
@@ -448,6 +450,12 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
  */
 BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, tel, email, pass) {
     "use strict";
+    var $paymentMethod = $('.bus-reg-radio-option .bus-reg-radio.checkOn', '.bus-reg-body');
+    var pMethod;
+    if ($paymentMethod.hasClass('payment-Voucher')) {
+        pMethod = 'voucher';
+    }
+
     if (is_mobile) {
         parsepage(pages['mobile']);
     }
@@ -492,7 +500,9 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
             var userInfo = {
                 fname: fname,
                 lname: lname,
-                nbOfUsers: nbusers
+                nbOfUsers: nbusers,
+                pMethod: pMethod,
+                isUpgrade: isUpgrade
             };
             mySelf.goToPayment(userInfo);
         });
@@ -515,8 +525,15 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
  */
 BusinessRegister.prototype.goToPayment = function(userInfo) {
     "use strict";
-
-    addressDialog.init(this.planInfo, userInfo, this);
+    if (userInfo.pMethod === 'voucher') {
+        if (!userInfo.isUpgrade) {
+            window.bCreatedVoucher = true;
+        }
+        loadSubPage('redeem');
+    }
+    else {
+        addressDialog.init(this.planInfo, userInfo, this);
+    }
 
 };
 

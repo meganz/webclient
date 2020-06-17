@@ -4255,6 +4255,12 @@ a.opensource-icon-txt.coming-soon {
     border: 1px solid #d90007;
     color: #fff;
 }
+.onboarding-suggestions .promo-voucher-card.blue-block {
+    background-color: #46B4E5;
+    border: unset;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+    color: #fff;
+}
 .onboarding-suggestions .promo-voucher-block {
     margin: 0 auto 36px;
 }

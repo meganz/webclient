@@ -237,6 +237,9 @@ function dashboardUI() {
                         'data-simpletip-style=\'{"max-width":"220px", "text-align":"center"}\' data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
                 }
+                else if (u_attr.b && u_attr.b.m) {
+                    $('.account.left-pane.plan-date-info').text(l[987]);
+                }
                 else {
                     $('.account.left-pane.plan-date-info').text(l[20153]);
                 }

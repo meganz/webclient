@@ -1969,7 +1969,11 @@ body:not(.de) .membership-step2 .charge-information .duration-text {
 .onboarding-suggestions .pro4 .mobile.membership-icon {
     background-position: -0px -1620px;
 }
-
+.onboarding-suggestions .pro100 .mobile.membership-icon {
+    background-image: url(../images/mega/business-p-32.png) !important;
+    background-size: 32px auto;
+    background-position: unset;
+}
 /* Promotion Voucher code, I will remove once I have more time */
 .redeem-promo-page .mega-input-title-ontop input {
     text-transform: uppercase;

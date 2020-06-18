@@ -1053,6 +1053,16 @@ ul, li {
 .mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
     background-position: -240px -1748px;
 }
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+
 .mobile.bottom-action-bar .fm-icon.upload-file {
     background-position: 10px -1748px;
 }
@@ -1120,7 +1130,7 @@ ul, li {
     -webkit-tap-highlight-color: transparent;
 }
 .mobile-sprite {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
 }
 .mobile.fm-icon.small {
@@ -1225,7 +1235,16 @@ ul, li {
     background-position: -198px -1625px;
 }
 .mobile.fm-icon.open-folder {
-    background-position: -200px -1749px;
+    background-position: -200px -1750px;
+}
+.mobile.fm-icon.create-megadrop {
+    background-position: -98px -1748px;
+}
+.mobile.fm-icon.manage-megadrop {
+    background-position: -187px -3498px;
+}
+.mobile.fm-icon.cancel-megadrop {
+    background-position: -187px -3533px;
 }
 .mobile.fm-icon.download {
     background-position: -50px -1625px;
@@ -2019,7 +2038,7 @@ ul, li {
     width: 102px;
 }
 .mobile.empty-icon.big-green-tick {
-    background-position: -178px -826px;
+    background-position: -178px -825px;
     height: 84px;
     width: 84px;
 }
@@ -2142,7 +2161,7 @@ ul, li {
     -webkit-border-radius: 3px;
     border-radius: 3px;
     position: relative;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: right -2350px;
 }
@@ -5801,11 +5820,6 @@ input.radioOn, input.radioOff {
     line-height: 18px;
     margin: 2px 40px 0 60px;
     text-align: left;
-}
-.mobile.my-account-page .account-cancel-subscription-block .fm-icon.cancel-subscription {
-    left: 10px;
-    position: absolute;
-    top: 10px;
 }
 .mobile.my-account-page .account-cancel-subscription-block .subscription-heading, .mobile.my-account-page .account-recovery-key-block .recovery-key-heading, .mobile.my-account-page .two-factor-heading {
     color: #262F3B;
@@ -12101,6 +12115,11 @@ code, c {
     text-align: initial;
     display: inline-block;
 }
+.voucher-info-redeem .voucher-logo.business-v {
+    background-color: #46B4E5;
+    border: unset;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
+}
 .voucher-info-redeem .voucher-logo.pro-l {
     background-color: #FFAF00;
     border: 1px solid #FD8116;
@@ -12146,6 +12165,11 @@ code, c {
 }
 .voucher-logo .plan-icon.pro4 {
     background-position: -0px -1620px;
+}
+.voucher-logo .plan-icon.pro100 {
+    background-image: url(../images/mega/business-p-32.png) !important;
+    background-size: 32px auto;
+    background-position: unset;
 }
 .voucher-logo .v-separator {
     height: 32px;

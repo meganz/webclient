@@ -81,6 +81,9 @@ function initMegasync() {
 
     resetMegasync();
 
+    // Hide windows options as default
+    $('.megaapp-windows', $content).addClass('hidden');
+
     // Preload linux options if on a linux client
     if (pf.indexOf('LINUX') >= 0) {
         $('.nav-buttons-bl a.linux').addClass('active');
@@ -91,7 +94,11 @@ function initMegasync() {
         var $this = $(this);
         var osData = $this.attr('data-os');
 
+        // Hide windows options as default
+        $('.megaapp-windows', $content).addClass('hidden');
+
         if (osData === 'windows') {
+            $('.megaapp-windows', $content).removeClass('hidden');
             window.location = megasync.getMegaSyncUrl('windows');
             resetMegasync();
         }
@@ -107,6 +114,11 @@ function initMegasync() {
             megasync.getLinuxReleases(renderLinuxOptions);
         }
 
+        return false;
+    });
+
+    $('.megaapp-windows-info a', $content).rebind('click', function() {
+        window.location = megasync.getMegaSyncUrl('windows_x32');
         return false;
     });
 

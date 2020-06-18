@@ -1678,7 +1678,11 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
 
     // If MEGAdrop windows exists and upload
     if (id && mega.megadrop.isInit()) {
-        mega.megadrop.onItemCompletion('#ul_' + id);
+        var gid = 'ul_' + id;
+        if (is_mobile) {
+            gid = 'md_' + gid;
+        }
+        mega.megadrop.onItemCompletion('#' + gid);
     }
 
     delay('tfscomplete', function() {

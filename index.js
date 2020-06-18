@@ -1226,12 +1226,9 @@ function init_page() {
     else if (page.substr(0, 8) === 'megadrop') {
         if (is_mobile) {
             parsepage(pages['mobile']);
-            mobile.megadrop.show();
         }
-        else {
-            var pupHandle = page.substr(9, 11);
-            mega.megadrop.pupCheck(pupHandle);
-        }
+        var pupHandle = page.substr(9, 11);
+        mega.megadrop.pupCheck(pupHandle);
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');
@@ -1788,6 +1785,10 @@ function init_page() {
             });
         }
         else {
+            // Show the voucher info to the user before proceeding to redeem.
+            if (redeem && mega.voucher.businessmonths) {
+                return redeem.showVoucherInfoDialog();
+            }
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog
             loadSubPage('redeem');
             return false;
@@ -1796,7 +1797,7 @@ function init_page() {
 
     // Load the direct voucher redeem page
     else if (page.substr(0, 6) === 'redeem') {
-        if (localStorage.voucher && u_type > 2) {
+        if (localStorage.voucher && (u_type > 2 || window.bCreatedVoucher)) {
             // To complete the redeem voucher process after user logs in if the voucher code exists
             parsepage(pages[is_mobile ? 'mobile' : 'redeem']);
             redeem.init();

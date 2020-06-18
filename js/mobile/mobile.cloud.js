@@ -533,8 +533,13 @@ mobile.cloud = {
             }
 
             if (share.isShareExist([node.h], true, true, false)) {
-                $template.find('.shared-folder').removeClass('hidden');
-                $template.find('.regular-folder').addClass('hidden');
+                $('.shared-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
+            }
+
+            if (mega.megadrop.pufs[node.h]) {
+                $('.megadrop-folder', $template).removeClass('hidden');
+                $('.regular-folder', $template).addClass('hidden');
             }
         }
 

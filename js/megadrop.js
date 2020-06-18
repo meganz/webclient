@@ -86,23 +86,38 @@ mega.megadrop = (function() {
             ? l[17626]
             : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
 
-        msgDialog(
-            'confirmation',
-            l[1003],
-            fldName,
-            l[18229],
-            function(e) {
-                if (e) {
+        if (is_mobile) {
+
+            mobile.messageOverlay.show(fldName, l[18229], false, ['No', 'Yes'])
+                .then(function() {
                     closeDialog();
                     mega.megadrop.pufRemove(list).done(function() {
                         promise.resolve();
                     });
-                }
-                else {
+                })
+                .catch(function() {
                     promise.reject();
+                });
+        }
+        else {
+            msgDialog(
+                'confirmation',
+                l[1003],
+                fldName,
+                l[18229],
+                function(e) {
+                    if (e) {
+                        closeDialog();
+                        mega.megadrop.pufRemove(list).done(function() {
+                            promise.resolve();
+                        });
+                    }
+                    else {
+                        promise.reject();
+                    }
                 }
-            }
-        );
+            );
+        }
 
         return promise;
     };
@@ -393,7 +408,13 @@ mega.megadrop = (function() {
 
                 // PUF handle is available and PUP is enabled/active
                 if (puf.items[handle] && puf.items[handle].p && puf.items[handle].s !== 1) {
-                    ui.widgetDialog(puf.items[handle].p);
+
+                    if (is_mobile) {
+                        ui.mobileWidgetDialog(puf.items[handle].p);
+                    }
+                    else {
+                        ui.widgetDialog(puf.items[handle].p);
+                    }
                 }
                 else {// Create new PUF
                     loadingDialog.show();// .hide() is called in ui.widgetDialog() or on res != 0
@@ -984,7 +1005,12 @@ mega.megadrop = (function() {
                 pupAddAndUpdate();
 
                 // Show dialog if this is local packet and not update action
-                ui.widgetDialog(pupId);
+                if (is_mobile) {
+                    ui.mobileWidgetDialog(pupId);
+                }
+                else {
+                    ui.widgetDialog(pupId);
+                }
             };
 
             for (var i = ap.length; i--;) {
@@ -1620,6 +1646,36 @@ mega.megadrop = (function() {
             M.safeShowDialog('megadrop.info-dialog', uiOpts.dlg.create.$[0]);
         };
 
+        var mobileInfoDialog = function uiMobileInfoDialog(handle, creation) {
+
+            var name = M.d[handle].name;
+            var $overlay = $('#mobile-ui-megadrop-info');
+
+            $('.wu-folder-name-text', $overlay).text(name);
+
+            if (creation) {
+                $('.wu-title-text', $overlay).text(l[17412]);
+                $('.default-green-button.wu-btn span', $overlay).text(l[158]);
+            }
+            else {
+                $('.wu-title-text', $overlay).text(l[17399]);
+                $('.default-green-button.wu-btn span', $overlay).text(l[17490]);
+            }
+
+            $overlay.removeClass('hidden');
+
+            mobile.initOverlayPopstateHandler($overlay);
+
+            $('.wu-btn').rebind('tap', function() {
+                puf.create(handle);
+                $overlay.addClass('hidden');
+            });
+
+            $('.cancel.text-button').rebind('tap', function() {
+                $overlay.addClass('hidden');
+            });
+        };
+
         var generateUrl = function uiGenerateUrl(pupHandle) {
             return getAppBaseUrl() + (is_extension ? '#' : '/') + 'megadrop/' + pupHandle;
         };
@@ -1651,12 +1707,95 @@ mega.megadrop = (function() {
             loadingDialog.hide();
         };
 
+        var mobileWidgetDialog = function uiMobileWidgetDialog(pupHandle) {
+
+            var nodeHandle = pup.items[pupHandle].h;
+
+            // Is there a related public upload page handle
+            if (puf.items[nodeHandle] && puf.items[nodeHandle].p) {
+
+                // Lets borrow link from public link ui as it is using same structure
+                var $overlay = mobile.linkOverlay.$overlay = $('#mobile-ui-copy-link').addClass('megadrop');
+
+                // Get initial overlay details
+                var node = M.d[nodeHandle];
+                var fileName = node.name;
+                var fileIconName = fileIcon(node);
+                var fileIconPath = mobile.imagePath + fileIconName + '.png';
+
+                // Set file name, size and image
+                $('.filename', $overlay).text(fileName);
+                $('.filesize', $overlay).text(l[17410]);
+                $('.filetype-img', $overlay).attr('src', fileIconPath);
+
+                mobile.initOverlayPopstateHandler($overlay);
+
+                var $linkField = $('#mobile-public-link', $overlay);
+
+                $linkField.val(getBaseUrl() + '/megadrop/' + pupHandle);
+                $linkField.css('height', '48px');
+
+                // Initialise the buttons
+                mobile.linkOverlay.initCloseButton();
+
+                $('.copy', $overlay).rebind('tap', function() {
+
+                    mobile.linkOverlay.copyPublicLink(nodeHandle);
+
+                    return false;
+                });
+
+                $('.copy', $overlay).removeClass('disabled');
+
+                var removeMDClass = function() {
+
+                    $overlay.removeClass('megadrop');
+                    $linkField.val('');
+                    $('.fm-dialog-close', $overlay).off('tap.removeMDClass');
+                    $('.text-button', $overlay).off('tap.removeMDClass');
+                };
+
+                // Some extra binding for Megadrop
+                $('.fm-dialog-close', $overlay).rebind('tap.removeMDClass', removeMDClass);
+                $('.text-button', $overlay).rebind('tap.removeMDClass', removeMDClass);
+
+                // Disable scrolling of the file manager in the background to fix a bug on iOS Safari
+                $('.mobile.file-manager-block').addClass('disable-scroll');
+
+                // Show the overlay
+                $overlay.removeClass('hidden').addClass('overlay');
+            }
+
+            loadingDialog.hide();
+        };
+
+        var nodeIconMobile = function uiNodeIconMobile(nodeHandle, render) {
+
+            var $node = $('.mobile.file-manager-block #' + nodeHandle);
+
+            $('.fm-item-img img', $node).addClass('hidden');
+
+            if (render) {
+                $('.megadrop-folder', $node).removeClass('hidden');
+            }
+            else {
+                $('.regular-folder', $node).removeClass('hidden');
+            }
+        };
+
         /**
          * Check is widget exists for folder and render or remove appropriate icon
          * @param {String} nodeHandle Folder handle
          * @param {Boolean} render To draw or to delete
          */
         var nodeIcon = function uiNodeIcon(nodeHandle, render) {
+
+            if (is_mobile) {
+
+                nodeIconMobile(nodeHandle, render);
+                return false;
+            }
+
             var icon = 'puf-folder';
 
             if (render) {
@@ -1700,8 +1839,8 @@ mega.megadrop = (function() {
         };
 
         /**
-         *
-         * @param {Stringf} id Upload queue item id e.g. '#ul_8001'
+         * Caching dom item
+         * @param {Stringf} id Upload queue item id e.g. '#md_ul_8001'
          */
         var _cacheUploadItem = function _uiCacheUploadItem(id) {
             var item = uiOpts.window.queueItems[id];
@@ -1731,14 +1870,14 @@ mega.megadrop = (function() {
         var addItem = function uiAddItem(id, name, status, size) {
             var sData = numOfBytes(size, 1);
             var itemsNum = uiOpts.window.queueItems.number += 1;
-
-            var $tmpl = $('#md_ultmpl').clone().removeClass('hidden').attr('id', 'ul_' + id);
+            var prefix = is_mobile ? 'md_ul_' : 'ul_';
+            var $tmpl = $('#md_ultmpl').clone().removeClass('hidden').attr('id', prefix + id);
             $tmpl.find('.wu-queue-item-name').text(str_mtrunc(name, 37));
             $tmpl.find('.wu-queue-item-size').text(' | ' + sData.size + ' ' + sData.unit);
             $tmpl.find('.wu-queue-item-status').text(status);
 
             // When scroll is added add items inside it
-            if (itemsNum > 6) {
+            if (itemsNum > 6 && !is_mobile) {
                 $(uiOpts.window.queueClass + ' .jspPane').prepend($tmpl);
             }
             else {
@@ -1748,16 +1887,20 @@ mega.megadrop = (function() {
             $('.widget-upload .wu-upload-form').removeClass('hidden');
             $('.widget-upload .wu-empty-upload').addClass('hidden');
 
-            _cacheUploadItem('#ul_' + id);
-            _addToTotalStat(size);
-            _queueScroll(itemsNum);
+            _cacheUploadItem('#' + prefix + id);
+
+            if (!is_mobile) {
+                _addToTotalStat(size);
+                _queueScroll(itemsNum);
+            }
         };
 
         var updateItem = function uiUpdateItem(id, bps, time, perc, bl) {
             var retime = secondsToTimeShort(time);
             var speed = numOfBytes(bps, 1, true);
-            var ulSize = uiOpts.window.queueItems['#ul_' + id].ulSize;
-            var $item = _cacheUploadItem('#ul_' + id);
+            var prefix = is_mobile ? 'md_ul_' : 'ul_';
+            var ulSize = uiOpts.window.queueItems['#' + prefix + id].ulSize;
+            var $item = _cacheUploadItem('#' + prefix + id);
 
             // Update specific upload item
             if (retime) {
@@ -1793,23 +1936,36 @@ mega.megadrop = (function() {
 
         // Widget upload window event listeners
         var _winEventListeners = function _uiWinEventListeners() {
-            $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
-                $('#fileselect5').click();
-            });
 
-            $('.wu-lang').rebind('click.widget_change_lang', function() {
-                langDialog.show();
-            });
+            if (is_mobile) {
 
-            $('.fm-dialog-overlay').rebind('click.widget_window', function(e) {
-                closeDialog(e);
-            });
+                $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('tap.widget_upload', function() {
+                    $('#fileselect5').click();
+                });
 
-            $(window).rebind('keyup.widget_esc', function(e) {
-                if (e.keyCode === 27) {// ESC key pressed
+                $('.fm-dialog-overlay').rebind('tap.widget_window', function(e) {
                     closeDialog(e);
-                }
-            });
+                });
+            }
+            else {
+                $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('click.widget_upload', function() {
+                    $('#fileselect5').click();
+                });
+
+                $('.wu-lang').rebind('click.widget_change_lang', function() {
+                    langDialog.show();
+                });
+
+                $('.fm-dialog-overlay').rebind('click.widget_window', function(e) {
+                    closeDialog(e);
+                });
+
+                $(window).rebind('keyup.widget_esc', function(e) {
+                    if (e.keyCode === 27) {// ESC key pressed
+                        closeDialog(e);
+                    }
+                });
+            }
         };
 
         var cacheWindowDOM = function uiCacheWindowDOM() {
@@ -1881,18 +2037,24 @@ mega.megadrop = (function() {
             updateData: updateData,
             updateItem: updateItem,
             infoDialog: infoDialog,
+            mobileInfoDialog: mobileInfoDialog,
             generateUrl: generateUrl,
             initDialogs: initDialogs,
             generateCode: generateCode,
             onCompletion: onCompletion,
             widgetDialog: widgetDialog,
+            mobileWidgetDialog: mobileWidgetDialog,
             cacheWindowDOM: cacheWindowDOM,
             onItemCompletion: onItemCompletion,
-            updateTotalProgress: updateTotalProgress
+            updateTotalProgress: updateTotalProgress,
         };
     }(widgetOpts));// END mega.megadrop.ui
 
     mBroadcaster.addListener('fm:initialized', function () {
+
+        if (is_mobile) {
+            return false;
+        }
 
         // Prevent multiple initializations
         if (!ui.isDlgInit()) {
@@ -1944,13 +2106,13 @@ mega.megadrop = (function() {
     });
 
     mBroadcaster.addListener('MEGAdrop:checked', function() {
-        parsepage(pages['megadrop']);
+        parsepage(pages[is_mobile ? 'mobile_megadrop' : 'megadrop']);
         pup.pubk(widgetOpts.ownerHandle);
         ui.updateData();
     });
 
     mBroadcaster.addListener('MEGAdrop:disabled', function() {
-        parsepage(pages['nomegadrop']);
+        parsepage(pages[is_mobile ? 'mobile_nomegadrop' : 'nomegadrop']);
         mega.megadrop.disableDragDrop();
         $('.wu-change-lang').text(lang);
         $('.wu-lang').rebind('click.widget_change_lang', function() {
@@ -1959,7 +2121,7 @@ mega.megadrop = (function() {
     });
 
     mBroadcaster.addListener('MEGAdrop:overquota', function() {
-        parsepage(pages['nomegadrop']);
+        parsepage(pages[is_mobile ? 'mobile_nomegadrop' : 'nomegadrop']);
         $('.wu-name-text').text(widgetOpts.pageData.name);
         $('.widget-upload .wu-folder-name-text')
             .text(l[16302]);
@@ -1988,6 +2150,13 @@ mega.megadrop = (function() {
 
         InitFileDrag();
         ui.cacheWindowDOM();
+
+        if (is_mobile) {
+
+            // initialise upload overlay
+            mobile.uploadOverlay.init();
+            $('.fm-header .fm-icon.mega').off('tap');
+        }
     };
 
     mBroadcaster.addListener('MEGAdrop:initialized', function() {
@@ -2059,6 +2228,10 @@ mega.megadrop = (function() {
                     ul_queue.push(file);
                     var status = l[7227];
                     ui.addItem(file.id, file.name, status, filesize);
+
+                    if (is_mobile) {
+                        M.addToTransferTable('ul_' + file.id, file);
+                    }
                 }
                 catch (ex) {
                     if (d) {
@@ -2230,6 +2403,7 @@ mega.megadrop = (function() {
         // PUF
         pufs: puf.items,
         pufCallbacks: puf.callbacks,
+        pufCreate: puf.create,
         pufRemove: puf.remove,
         pufHandle: puf.getHandle,
         pufProcessDb: puf.processDb,
@@ -2249,6 +2423,8 @@ mega.megadrop = (function() {
         onCompletion: ui.onCompletion,
         onItemCompletion: ui.onItemCompletion,
         uiUpdateTotalProgress: ui.updateTotalProgress,
+        uiMobileInfoDialog: ui.mobileInfoDialog,
+        uiSkipDialog: ui.skipInfoDlg,
 
         // Settings
         stngsDraw: settings.widget

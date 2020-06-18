@@ -1027,6 +1027,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactVerified", function() { return ContactVerified; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactPresence", function() { return ContactPresence; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LastActivity", function() { return LastActivity; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactAwareName", function() { return ContactAwareName; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MembersAmount", function() { return MembersAmount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContactFingerprint", function() { return ContactFingerprint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Avatar", function() { return Avatar; });
@@ -1556,15 +1557,35 @@ var LastActivity = /*#__PURE__*/function (_ContactAwareComponen3) {
 
   return LastActivity;
 }(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
-var MembersAmount = /*#__PURE__*/function (_ContactAwareComponen4) {
-  _inherits(MembersAmount, _ContactAwareComponen4);
+var ContactAwareName = /*#__PURE__*/function (_ContactAwareComponen4) {
+  _inherits(ContactAwareName, _ContactAwareComponen4);
 
-  var _super6 = _createSuper(MembersAmount);
+  var _super6 = _createSuper(ContactAwareName);
+
+  function ContactAwareName(props) {
+    _classCallCheck(this, ContactAwareName);
+
+    return _super6.call(this, props);
+  }
+
+  _createClass(ContactAwareName, [{
+    key: "render",
+    value: function render() {
+      return this.props.contact ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, this.props.children) : null;
+    }
+  }]);
+
+  return ContactAwareName;
+}(_stores_mixins_js__WEBPACK_IMPORTED_MODULE_2__["ContactAwareComponent"]);
+var MembersAmount = /*#__PURE__*/function (_ContactAwareComponen5) {
+  _inherits(MembersAmount, _ContactAwareComponen5);
+
+  var _super7 = _createSuper(MembersAmount);
 
   function MembersAmount(props) {
     _classCallCheck(this, MembersAmount);
 
-    return _super6.call(this, props);
+    return _super7.call(this, props);
   }
 
   _createClass(MembersAmount, [{
@@ -1580,12 +1601,12 @@ var MembersAmount = /*#__PURE__*/function (_ContactAwareComponen4) {
 var ContactFingerprint = /*#__PURE__*/function (_MegaRenderMixin3) {
   _inherits(ContactFingerprint, _MegaRenderMixin3);
 
-  var _super7 = _createSuper(ContactFingerprint);
+  var _super8 = _createSuper(ContactFingerprint);
 
   function ContactFingerprint() {
     _classCallCheck(this, ContactFingerprint);
 
-    return _super7.apply(this, arguments);
+    return _super8.apply(this, arguments);
   }
 
   _createClass(ContactFingerprint, [{
@@ -1654,10 +1675,10 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 ;
-var Avatar = /*#__PURE__*/function (_ContactAwareComponen5) {
-  _inherits(Avatar, _ContactAwareComponen5);
+var Avatar = /*#__PURE__*/function (_ContactAwareComponen6) {
+  _inherits(Avatar, _ContactAwareComponen6);
 
-  var _super8 = _createSuper(Avatar);
+  var _super9 = _createSuper(Avatar);
 
   function Avatar() {
     var _this3;
@@ -1668,7 +1689,7 @@ var Avatar = /*#__PURE__*/function (_ContactAwareComponen5) {
       args[_key3] = arguments[_key3];
     }
 
-    _this3 = _super8.call.apply(_super8, [this].concat(args));
+    _this3 = _super9.call.apply(_super9, [this].concat(args));
     _this3.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this3;
   }
@@ -1765,10 +1786,10 @@ Avatar.defaultProps = {
 Avatar.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactCard = /*#__PURE__*/function (_ContactAwareComponen6) {
-  _inherits(ContactCard, _ContactAwareComponen6);
+var ContactCard = /*#__PURE__*/function (_ContactAwareComponen7) {
+  _inherits(ContactCard, _ContactAwareComponen7);
 
-  var _super9 = _createSuper(ContactCard);
+  var _super10 = _createSuper(ContactCard);
 
   function ContactCard() {
     var _this4;
@@ -1779,7 +1800,7 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen6) {
       args[_key4] = arguments[_key4];
     }
 
-    _this4 = _super9.call.apply(_super9, [this].concat(args));
+    _this4 = _super10.call.apply(_super10, [this].concat(args));
     _this4.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this4;
   }
@@ -1957,10 +1978,10 @@ ContactCard.defaultProps = {
 ContactCard.propTypes = {
   chatRoom: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.object, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool])
 };
-var ContactItem = /*#__PURE__*/function (_ContactAwareComponen7) {
-  _inherits(ContactItem, _ContactAwareComponen7);
+var ContactItem = /*#__PURE__*/function (_ContactAwareComponen8) {
+  _inherits(ContactItem, _ContactAwareComponen8);
 
-  var _super10 = _createSuper(ContactItem);
+  var _super11 = _createSuper(ContactItem);
 
   function ContactItem() {
     var _this5;
@@ -1971,7 +1992,7 @@ var ContactItem = /*#__PURE__*/function (_ContactAwareComponen7) {
       args[_key5] = arguments[_key5];
     }
 
-    _this5 = _super10.call.apply(_super10, [this].concat(args));
+    _this5 = _super11.call.apply(_super11, [this].concat(args));
     _this5.attachRerenderCallbacks = _attchRerenderCbContacts;
     return _this5;
   }
@@ -2028,14 +2049,14 @@ ContactItem.propTypes = {
 var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
   _inherits(ContactPickerWidget, _MegaRenderMixin4);
 
-  var _super11 = _createSuper(ContactPickerWidget);
+  var _super12 = _createSuper(ContactPickerWidget);
 
   function ContactPickerWidget(props) {
     var _this6;
 
     _classCallCheck(this, ContactPickerWidget);
 
-    _this6 = _super11.call(this, props);
+    _this6 = _super12.call(this, props);
     _this6.state = {
       'searchValue': '',
       'selected': _this6.props.selected || false
@@ -16932,6 +16953,7 @@ function resultRow_getPrototypeOf(o) { resultRow_getPrototypeOf = Object.setProt
 
 
 
+
 var SEARCH_ROW_CLASS = "result-table-row";
 var USER_CARD_CLASS = "user-card";
 /**
@@ -17045,7 +17067,9 @@ var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
         }
       }, /*#__PURE__*/external_React_default.a.createElement("span", {
         className: "title"
-      }, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.getRoomTitle())), !roomIsGroup(room) && /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
+      }, /*#__PURE__*/external_React_default.a.createElement(contacts["ContactAwareName"], {
+        contact: M.u[contact]
+      }, /*#__PURE__*/external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.getRoomTitle()))), !roomIsGroup(room) && /*#__PURE__*/external_React_default.a.createElement(contacts["ContactPresence"], {
         contact: M.u[contact]
       }), /*#__PURE__*/external_React_default.a.createElement("div", {
         className: "summary",

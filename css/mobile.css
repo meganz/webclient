@@ -41,6 +41,13 @@ body * {
     user-select: none;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
+body .selectable, body .selectable * {
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
 body.pro:after {
     display: none;
     content: url(../images/mega/payment-animation.gif);
@@ -13473,6 +13480,7 @@ p a.blog-new-read-more {
 /* Affiliate redemption details */
 .mobile.affiliate.redeem-details {
     padding: 0 25px 5px 25px;
+    overflow: hidden;
 }
 .mobile.affiliate.redeem-data {
     border-top:1px solid rgba(0,0,0,0.08);

@@ -3019,12 +3019,12 @@ function odqPaywallDialogTexts(user_attr, accountData) {
         }
     }
 
-    var filesText = l[23259]; // 0 files
+    var filesText = l[23253]; // 0 files
     if (accountData.stats[M.RootID].files === 1) {
-        filesText = l[23257];
+        filesText = l[835];
     }
     else if (accountData.stats[M.RootID].files > 1) {
-        filesText = l[23261].replace('[X]', accountData.stats[M.RootID].files);
+        filesText = l[833].replace('[X]', accountData.stats[M.RootID].files);
     }
 
     dialogText = dialogText.replace('%1', user_attr.email || ' ');

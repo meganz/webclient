@@ -617,8 +617,8 @@ class ConversationsList extends MegaRenderMixin {
                 }
             }
 
-
-            if (M.isInvalidUserStatus()) {
+            // Checking if this a business user with expired status
+            if (u_attr && ((u_attr.b && u_attr.b.s === -1) || u_attr.uspw)) {
                 chatRoom.privateReadOnlyChat = true;
             }
             else {

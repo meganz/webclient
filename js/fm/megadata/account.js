@@ -665,6 +665,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.chart.data .perc-txt', $strgdlg).text(quota.percent + '%');
 
         }
+        else {
+            return promise.reject();
+        }
         $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
 
         $('.fm-notification-block.almost-full')
@@ -742,8 +745,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         promise.reject();
     }
 
-    // On the banner appearance or disappearance, lets resize height of fm.
-    $.tresizer();
+    if (!prevState) {
+        // On the banner appearance or disappearance, lets resize height of fm.
+        $.tresizer();
+    }
 
     return promise;
 };

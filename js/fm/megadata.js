@@ -206,6 +206,9 @@ function MegaData() {
                         var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
                         ab.showError(overlayTexts.fmBannerText);
                         mobile.overStorageQuotaOverlay.show(overlayTexts.dialogText, overlayTexts.dlgFooterText);
+                        ab.onTap(function() {
+                            loadSubPage('pro');
+                        });
                     }
                     else {
                         var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +

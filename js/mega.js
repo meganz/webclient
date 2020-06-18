@@ -2372,11 +2372,6 @@ function dbfetchfm() {
                         tables.ps.promise = new MegaPromise();
                         tables.puf.promise = new MegaPromise();
 
-                        // Prevent MEGAdrop tables being created for mobile
-                        if (is_mobile) {
-                            delete tables.pup;
-                        }
-
                         Object.keys(tables).forEach(function(t) {
                             promise = fmdb.get(t);
                             promise.always(function(r) {

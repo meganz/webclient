@@ -57,6 +57,7 @@ mobile.cloud.contextMenu = {
         // Get the node type
         var nodeType = M.d[nodeHandle].t;
         var share = M.getNodeShare(nodeHandle);
+        var sourceRoot = M.getNodeRoot(nodeHandle);
 
         // Show overlay
         $overlay.removeClass('hidden');
@@ -68,7 +69,7 @@ mobile.cloud.contextMenu = {
         });
 
         // If folder type
-        if (M.getNodeRoot(nodeHandle) === M.RubbishID) {
+        if (sourceRoot === M.RubbishID) {
 
             mobile.cloud.contextMenu.initCloseButton($rubbishBinContextMenu);
             mobile.cloud.contextMenu.initRestoreButton($rubbishBinContextMenu, nodeHandle);
@@ -83,15 +84,36 @@ mobile.cloud.contextMenu = {
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initMegadropButtons($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
+
+            $('.create-megadrop', $folderContextMenu).addClass('hidden');
+            $('.manage-megadrop', $folderContextMenu).addClass('hidden');
+            $('.cancel-megadrop', $folderContextMenu).addClass('hidden');
 
             if (share && share.down) {
                 $folderContextMenu.find('.link-button').addClass('hidden');
             } else {
                 $folderContextMenu.find('.link-button').removeClass('hidden');
                 mobile.cloud.contextMenu.initLinkButton($folderContextMenu, nodeHandle);
+
+                if (u_type === 3
+                    && !M.getShareNodesSync(nodeHandle).length
+                    && !folderlink) {
+
+                    // Create or Remove upload page context menu action
+                    if (mega.megadrop.pufs[nodeHandle]
+                        && mega.megadrop.pufs[nodeHandle].s !== 1
+                        && mega.megadrop.pufs[nodeHandle].p) {
+                        $('.manage-megadrop', $folderContextMenu).removeClass('hidden');
+                        $('.cancel-megadrop', $folderContextMenu).removeClass('hidden');
+                    }
+                    else {
+                        $('.create-megadrop', $folderContextMenu).removeClass('hidden');
+                    }
+                }
             }
 
             // Hide the file context menu if open and show the folder context menu
@@ -311,6 +333,83 @@ mobile.cloud.contextMenu = {
         });
     },
 
+    initMegadropButtons: function($contextMenu, nodeHandle) {
+
+        'use strict';
+
+        var $makeBtn = $('.create-megadrop', $contextMenu);
+        var $manageBtn = $('.manage-megadrop', $contextMenu);
+        var $cancelBtn = $('.cancel-megadrop', $contextMenu);
+
+        // When the button is tapped
+        $makeBtn.rebind('tap', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
+            mobile.cloud.contextMenu.hide();
+
+            // Go to widget creation directly don't display PUF info dialog
+            if (mega.megadrop.uiSkipDialog()) {
+                mega.megadrop.pufCreate(nodeHandle);
+            }
+            else {// Display PUF info dialog
+                mega.megadrop.uiMobileInfoDialog(nodeHandle, true);
+            }
+
+            return false;
+        });
+
+        $manageBtn.rebind('tap', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
+            mobile.cloud.contextMenu.hide();
+
+            // Go to widget creation directly don't display PUF info dialog
+            if (mega.megadrop.uiSkipDialog()) {
+                mega.megadrop.pufCreate(nodeHandle);
+            }
+            else {// Display PUF info dialog
+                mega.megadrop.uiMobileInfoDialog(nodeHandle, false);
+            }
+
+            return false;
+        });
+
+        $cancelBtn.rebind('tap', function() {
+
+            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+                if (u_attr.b.m) {
+                    msgDialog('warningb', '', l[20401], l[20402]);
+                }
+                else {
+                    msgDialog('warningb', '', l[20462], l[20463]);
+                }
+                return false;
+            }
+
+            mobile.cloud.contextMenu.hide();
+            mega.megadrop.pufRemove([nodeHandle]);
+            return false;
+        });
+    },
+
     /**
      * Functionality for showing the overlay which will let the user create and copy a file/folder link
      * @param {Object} $contextMenu A jQuery object for the folder/file context menu container
@@ -347,8 +446,8 @@ mobile.cloud.contextMenu = {
             }
 
             // Show the Get/Manage link overlay and close the context menu
-            mobile.linkOverlay.show(nodeHandle);
             mobile.cloud.contextMenu.hide();
+            mobile.linkOverlay.show(nodeHandle);
             return false;
         });
     },

@@ -2497,6 +2497,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/notifyConfig.js', n: 'notify_config_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
 
+    jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
@@ -2514,7 +2516,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -2593,7 +2594,10 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-megadrop.css', n: 'megadrop_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'html/mobile-megadrop.html', n: 'mobile_megadrop', j: 0, w: 1});
+        jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile_nomegadrop', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
@@ -2633,7 +2637,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
@@ -2921,7 +2924,8 @@ else if (!browserUpdate) {
         'uwp': ['uwp'],
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
-        'developersettings': ['developersettings', 'developersettings_js']
+        'developersettings': ['developersettings', 'developersettings_js'],
+        'megadrop': ['megadrop', 'nomegadrop'],
     };
 
     if (is_mobile) {

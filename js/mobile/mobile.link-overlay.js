@@ -17,6 +17,9 @@ mobile.linkOverlay = {
         // Store the selector as it is re-used
         this.$overlay = $('#mobile-ui-copy-link');
 
+        // Lets make sure remove megadrop class from this overlay
+        this.$overlay.removeClass('megadrop');
+
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
@@ -25,6 +28,7 @@ mobile.linkOverlay = {
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
         var fileIconPath = mobile.imagePath + fileIconName + '.png';
+        var self = this;
 
         // Set file name, size and image
         this.$overlay.find('.filename').text(fileName);
@@ -34,6 +38,7 @@ mobile.linkOverlay = {
         // By default show the remove and copy buttons as disabled
         this.$overlay.find('.copy').addClass('disabled');
         this.$overlay.find('.remove').addClass('disabled');
+        $('#mobile-public-link', this.$overlay).val('');
 
         mobile.initOverlayPopstateHandler(this.$overlay);
 
@@ -67,8 +72,12 @@ mobile.linkOverlay = {
         };
 
         var mdList = mega.megadrop.isDropExist(nodeHandle);
+
         if (mdList.length) {
-            mega.megadrop.pufRemove(mdList).done(tmpFn.bind(this));
+
+            mega.megadrop.showRemoveWarning(mdList).done(function() {
+                mega.megadrop.pufRemove(mdList).done(tmpFn.bind(self));
+            });
         }
         else {
             tmpFn.call(this);

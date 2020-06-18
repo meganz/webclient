@@ -704,24 +704,6 @@ mega.tpw = {
     clearRows: function() {}
 };
 
-mega.megadrop = {
-    pufs: function() { return mobile.megadrop.pufs; },
-    isInit: function() { return false; },
-    pufProcessDb: function(data) { mobile.megadrop.pufProcessDb(data); },
-    onRename: function() { return false; },
-    pupProcessPUP: function(ap) {  mobile.megadrop.processPUP(ap); },
-    pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
-    pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
-    processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
-    preMoveCheck: function(handles, target) {
-        var sel = Array.isArray(handles) ? handles : [handles];
-        var p = new MegaPromise();
-        p.resolve(sel, target);
-        return p;
-    },
-    isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
-};
-
 var nicknames = {
     cache: {},
     getNicknameAndName: function() {},

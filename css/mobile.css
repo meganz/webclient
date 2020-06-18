@@ -228,7 +228,7 @@ ul, li {
     width: 38px;
     height: 38px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -94px -1073px;
     position: absolute;
@@ -275,7 +275,7 @@ ul, li {
 }
 .mobile.homepage .company-logo {
     height: 120px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: center -1955px;
     background-repeat: no-repeat;
     margin: 0;
@@ -291,7 +291,7 @@ ul, li {
     max-width: 500px;
 }
 .mobile.homepage .feature-icon {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -2px top;
     background-repeat: no-repeat;
     margin: 0 auto 32px auto;
@@ -344,7 +344,7 @@ ul, li {
 .mobile.homepage .bottom-link {
     cursor: pointer;
     display: inline-block;
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: left -1190px;
     color: #aaa;
@@ -498,12 +498,12 @@ ul, li {
 .mobile.download-speed, .mobile.upload-speed {
     text-align: right;
     padding: 0 28px 0 0;
-    background: url(../images/mobile/mobile-sprite_v37.png) no-repeat -172px -246px;
+    background: url(../images/mobile/mobile-sprite_v39.png) no-repeat -172px -246px;
 }
 .mobile.download-percents, .mobile.upload-percents {
     text-align: left;
     padding: 0 0 0 28px;
-    background: url(../images/mobile/mobile-sprite_v37.png) no-repeat -247px -246px;
+    background: url(../images/mobile/mobile-sprite_v39.png) no-repeat -247px -246px;
 }
 .mobile.public-link, .mobile.recovery-key-string, .mobile.two-factor-qr-seed {
     background-color: rgba(250,250,250,0.75);
@@ -787,7 +787,7 @@ ul, li {
 .mobile.warning-icon {
     width: 60px;
     height: 62px;
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -3px -100px;
     display: inline-block;
@@ -1053,6 +1053,16 @@ ul, li {
 .mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
     background-position: -240px -1748px;
 }
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+.mobile.bottom-action-bar .fm-icon.mobile-create-new-folder {
+    background-position: -240px -1748px;
+}
+
 .mobile.bottom-action-bar .fm-icon.upload-file {
     background-position: 10px -1748px;
 }
@@ -1113,14 +1123,14 @@ ul, li {
 .mobile.fm-icon {
     width: 42px;
     height: 40px;
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     cursor: pointer;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-tap-highlight-color: transparent;
 }
 .mobile-sprite {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
 }
 .mobile.fm-icon.small {
@@ -1225,7 +1235,16 @@ ul, li {
     background-position: -198px -1625px;
 }
 .mobile.fm-icon.open-folder {
-    background-position: -200px -1749px;
+    background-position: -200px -1750px;
+}
+.mobile.fm-icon.create-megadrop {
+    background-position: -98px -1748px;
+}
+.mobile.fm-icon.manage-megadrop {
+    background-position: -187px -3498px;
+}
+.mobile.fm-icon.cancel-megadrop {
+    background-position: -187px -3533px;
 }
 .mobile.fm-icon.download {
     background-position: -50px -1625px;
@@ -1495,7 +1514,7 @@ ul, li {
     display: none;
 }
 .mobile.fm-dialog-close {
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -1618,7 +1637,7 @@ ul, li {
     background-color: #818993;
 }
 .mobile.session-history-page .sh-round-button::before {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -264px -1832px;
     width: 16px;
@@ -1843,7 +1862,7 @@ ul, li {
     font-size: 13px;
     line-height: 17px;
     color: #FF5555;
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: left -1192px;
     text-align: center;
@@ -1987,7 +2006,7 @@ ul, li {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
 }
 .mobile.empty-cloud .empty-icon {
@@ -2142,7 +2161,7 @@ ul, li {
     -webkit-border-radius: 3px;
     border-radius: 3px;
     position: relative;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: right -2350px;
 }
@@ -2199,7 +2218,7 @@ ul, li {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -130px -1148px;
     position: absolute;
@@ -2455,7 +2474,7 @@ input[type='checkbox'] {
     display: block;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -49px -1179px;
 }
 .checkboxOn.square input, .checkboxOff.square input {
@@ -2850,7 +2869,7 @@ input.radioOn, input.radioOff {
     left: 50%;
     top: 50%;
     margin: -29px 0 0 -29px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -7px -1212px;
     -webkit-animation: rotate-loading 0.8s infinite linear;
@@ -3703,7 +3722,7 @@ input.radioOn, input.radioOff {
     margin: 17px auto 4px auto;
     height: 32px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     height: 32px;
     vertical-align: middle;
@@ -4040,7 +4059,7 @@ input.radioOn, input.radioOff {
     display: block;
     margin: 0 auto;
     margin-top: 20px;
-    background: url(../images/mobile/mobile-sprite_v37@2x.png);
+    background: url(../images/mobile/mobile-sprite_v39@2x.png);
     background-repeat: no-repeat;
     cursor: pointer;
     display: block;
@@ -4492,7 +4511,7 @@ input.radioOn, input.radioOff {
     border-radius: 4px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: right -2351px;
     -webkit-box-sizing: border-box;
@@ -4953,7 +4972,7 @@ input.radioOn, input.radioOff {
     margin: 20px 15px 30px 15px;
 }
 .mobile.top-menu-popup .top-icon.close {
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -65px -1143px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -5110,7 +5129,7 @@ input.radioOn, input.radioOff {
     top: 50%;
     width: 36px;
     margin-top: -18px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -148px -1897px;
     background-repeat: no-repeat;
     z-index: 10;
@@ -5593,7 +5612,7 @@ input.radioOn, input.radioOff {
 #mobile-ui-contact-card .contact-verification i {
     width: 36px;
     height: 36px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-size: -280px -2232px;
     background-position: -50px -2163px;
@@ -5640,7 +5659,7 @@ input.radioOn, input.radioOff {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite_v37.png);
+    background: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -81px -2275px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -5918,7 +5937,7 @@ select.mobile.dropdown-style {
     top: 45px;
     right: 38px;
     background-position: -110px -1972px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     -webkit-transform: rotate(90deg);
     -moz-transform: rotate(90deg);
@@ -6294,7 +6313,7 @@ textarea.mobile.support-text-field {
     width: 20px;
     height: 20px;
     display: block;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -164px -1149px;
     position: absolute;
@@ -7625,7 +7644,7 @@ textarea.mobile.support-text-field {
 .mobile.white-mega-logo {
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -236px -292px;
     background-repeat: no-repeat;
     background-size: 280px auto;
@@ -9192,7 +9211,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
 }
 .mobile.auth-app-select-dialog .cancel-button-icon {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-position: -76px -1138px;
     background-repeat: no-repeat;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -9287,7 +9306,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 32px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     position: initial;
     left: initial;
@@ -9521,7 +9540,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     all: initial;
     display: inline-block;
     height: 28px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     position: absolute;
     left: 10px;
@@ -10150,7 +10169,7 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     margin: 22px 0 0 0;
     width: 24px;
     height: 24px;
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-size: 280px auto;
     background-position: -120px -1579px;
 }
@@ -11851,7 +11870,7 @@ code, c {
     padding: 32px 0 0;
 }
 .mobile .bus-reg-icon {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     width: 24px;
     height: 24px;
     opacity: 0.6;
@@ -11888,7 +11907,7 @@ code, c {
     background-position: -121px -3095px;
 }
 .mobile .card-container .dialog-heading-img {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
 }
 .mobile .payment-reminder-logo {
     background-position: -56px -2946px;
@@ -11993,7 +12012,7 @@ code, c {
     margin: 0 auto;
 }
 .mobile.password-reminder-overlay .mobile.head-icon {
-    background-image: url(../images/mobile/mobile-sprite_v37.png);
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -11px -3247px;
     width: 88px;
@@ -14082,7 +14101,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
         .mobile.default-grey-select,
         .mobile-sprite
     {
-        background-image: url(../images/mobile/mobile-sprite_v37@2x.png) !important;
+        background-image: url(../images/mobile/mobile-sprite_v39@2x.png) !important;
         background-size: 280px auto;
     }
     .mobile.registration-confirm-email .email-icon {
@@ -14102,7 +14121,7 @@ body.landscape .upload-overlay .mobile.filetype-img {
         background-size: 38px auto;
     }
     .mobile.session-history-page .sh-round-button::before  {
-        background-image: url(../images/mobile/mobile-sprite_v37@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v39@2x.png);
         background-size: 280px auto;
     }
     .mobile.auth-app-select-dialog .app-link-icon, .mobile.auth-app-select-dialog .app-link-arrow {
@@ -14118,11 +14137,11 @@ body.landscape .upload-overlay .mobile.filetype-img {
         background-size: 755px auto;
     }
     .mobile .bus-reg-icon {
-        background-image: url(../images/mobile/mobile-sprite_v37@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v39@2x.png);
         background-size: 280px auto;
     }
     .mobile .card-container .dialog-heading-img {
-        background-image: url(../images/mobile/mobile-sprite_v37@2x.png);
+        background-image: url(../images/mobile/mobile-sprite_v39@2x.png);
         background-size: 280px auto;
     }
 }

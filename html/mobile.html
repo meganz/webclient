@@ -275,6 +275,7 @@
                     <div class="mobile fm-item-img">
                         <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
                         <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
+                        <img class="megadrop-folder hidden" alt="" src="{staticpath}images/mobile/extensions/puf-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -567,6 +568,18 @@
     <div class="context-menu-item open-folder">
         <div class="mobile fm-icon open-folder"></div>
         <span class="mobile text">[$17086]</span>
+    </div>
+    <div class="context-menu-item create-megadrop">
+        <div class="mobile fm-icon create-megadrop"></div>
+        <span class="mobile text">[$17450]</span>
+    </div>
+    <div class="context-menu-item manage-megadrop">
+        <div class="mobile fm-icon manage-megadrop"></div>
+        <span class="mobile text">[$17399]</span>
+    </div>
+    <div class="context-menu-item cancel-megadrop">
+        <div class="mobile fm-icon cancel-megadrop"></div>
+        <span class="mobile text">[$17400]</span>
     </div>
     <div class="context-menu-item download-file-button">
         <div class="mobile fm-icon download"></div>
@@ -2611,7 +2624,7 @@
                 </div>
                 <textarea id="mobile-public-link" class="mobile public-link" readonly></textarea>
                 <div class="mobile buttons inline-buttons">
-                    <a class="mobile red-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
+                    <a class="mobile green-button first copy disabled"> <i></i> <span>[$1394]</span> </a>
                     <a class="mobile red-button second remove disabled"> <i></i> <span>[$6821]</span> </a>
                 </div>
                  <a class="mobile text-button third cancel"><span>[$148]</span> </a>
@@ -2620,6 +2633,36 @@
     </div>
 </div>
 
+<!-- Megadrop info overlay !-->
+<div class="mobile main-block hidden overlay" id="mobile-ui-megadrop-info">
+    <div class="wu-main">
+        <div class="wu-items">
+            <div class="wu-empty-upload">
+                <div class="wu-large-logo">
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="wu-data">
+            <div class="wu-folder-name">
+                <span class="wu-folder-name-text"></span>
+            </div>
+            <div class="wu-title">
+                <span class="wu-title-text"></span>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <div class="wu-main-bottom">
+            <div class="wu-upload-text">
+                    [$17413]
+                </div>
+            <div class="default-green-button wu-btn">
+                <span>[$372]</span>
+            </div>
+        </div>
+        <a class="mobile text-button third cancel"><span>[$82]</span></a>
+    </div>
+</div>
 
 <!-- Generic error overlay !-->
 <div class="mobile main-block error-overlay hidden" id="mobile-ui-error">
@@ -4164,31 +4207,6 @@
         </div>
     </div>
 </div>
-
-
-<!-- MEGAdrop public folder not supported page -->
-<div class="mobile fm-block megadrop hidden">
-    <div class="mobile fm-row">
-        <div class="mobile fm-header fm-hr">
-            <div class="mobile fm-icon top-icon menu right"></div>
-            <div class="mobile fm-icon mega left"></div>
-        </div>
-    </div>
-
-    <div class="mobile fm-row">
-        <div class="mobile fm-content">
-            <div class="mobile fm-scrolling">
-                <div class="mobile content">
-                    <h1>[$17687]</h1>
-                    <p>
-                        <span>[$17686]</span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- Get Support page -->
 <div class="mobile main-block get-support hidden">

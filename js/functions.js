@@ -30,6 +30,21 @@ function clickURLs() {
                 return false;
             }
         });
+        if (is_extension) {
+            $(nodeList).rebind('auxclick', function(e) {
+
+                // if this is middle click on mouse to open it on new tab and this is extension
+                if (e.which === 2) {
+
+                    var $this = $(this);
+                    var url = $this.attr('href') || $this.data('fxhref');
+
+                    open(getBaseUrl() + url);
+
+                    return false;
+                }
+            });
+        }
     }
     nodeList = undefined;
 }

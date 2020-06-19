@@ -5785,6 +5785,22 @@ input.radioOn, input.radioOff {
 .mobile.my-account-page .account-usage-block.over-quota .over-quota-message {
     display: block;
 }
+.mobile.my-account-page .account-usage-block.over-quota .over-quota-message.odq-red-alert {
+    background-color: #EB4444;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    line-height: 18px;
+    margin: inherit;
+    padding-left: 20px;
+    padding-right: 50px;
+    padding-top: 16px;
+    padding-bottom: 30px;
+    margin-bottom: -22px;
+}
+.mobile.my-account-page .account-usage-block.over-quota .over-quota-message.odq-red-alert a {
+    text-decoration: underline;
+    color: #FFFFFF;
+}
 .mobile.my-account-page .over-quota-message a {
     color: #818993;
 }
@@ -9107,6 +9123,53 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     white-space: normal;
     margin: 12px auto 20px;
     font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
+}
+#mobile-ui-over-storage-quota-overlay .odq-warning {
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #FFCC00;
+    border-radius: 8px;
+    background-color: rgba(255,204,0,0.15);
+    margin-top: 40px;
+    margin-bottom: 70px;
+    line-height: initial;
+    text-align: initial;
+    white-space: initial;
+}
+#mobile-ui-over-storage-quota-overlay .odq-warning .odq-warn-text {
+    width: calc(100% - 80px);
+    color: rgba(0,0,0,0.8);
+    font-family: 'source_sans_proregular', sans-serif;
+    font-size: 14px;
+    letter-spacing: -0.14px;
+    line-height: 21px;
+    font-weight: bold;
+    display: inline-block;
+    text-align: initial;
+    margin-left: 12px;
+    margin-top: 10px;
+    vertical-align: top;
+    margin-bottom: 8px;
+}
+#mobile-ui-over-storage-quota-overlay .odq-warning .odq-warn-text span {
+    color: #D90007;
+}
+#mobile-ui-over-storage-quota-overlay .odq-warning .odq-warn-icon {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    margin-top: 1px;
+    background-image: url(../images/mobile/mobile-sprite_v39.png);
+    background-position: -132px -6699px;
+}
+#mobile-ui-over-storage-quota-overlay .odq-subtitle {
+    color: #676D75;
+    font-size: 14px;
+    letter-spacing: 0;
+    line-height: 21px;
+    text-align: center;
+    margin-top: -15px;
+    margin-bottom: 26px;
 }
 .mobile.auth-app-select-dialog {
     background-color: #fff;
@@ -14148,7 +14211,8 @@ body.landscape .upload-overlay .mobile.filetype-img {
         background-image: url(../images/mobile/mobile-sprite_v39@2x.png);
         background-size: 280px auto;
     }
-    .mobile .card-container .dialog-heading-img {
+    .mobile .card-container .dialog-heading-img,
+    #mobile-ui-over-storage-quota-overlay .odq-warning .odq-warn-icon {
         background-image: url(../images/mobile/mobile-sprite_v39@2x.png);
         background-size: 280px auto;
     }

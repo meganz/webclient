@@ -121,6 +121,7 @@ var EGOINGOVERQUOTA = -24;
 
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
+var EPAYWALL = -29;     // ODQ paywall state
 
 // custom errors
 var ETOOERR = -400;
@@ -717,7 +718,7 @@ function api_proc(q) {
 
                 if (typeof t === 'object') {
                     var ctxs = this.q.ctxsBuffer;
-
+                    var paywall;
                     for (var i = 0; i < ctxs.length; i++) {
                         var ctx = ctxs[i];
 
@@ -732,8 +733,14 @@ function api_proc(q) {
                                 ctx.v2APIError = res;
                                 res = res.err;
                             }
+                            if (res === EPAYWALL) {
+                                paywall = true;
+                            }
                             ctx.callback(res, ctx, this, t);
                         }
+                    }
+                    if (paywall) {
+                        api_reqerror(this.q, EPAYWALL, status);
                     }
 
                     // reset state for next request
@@ -1000,6 +1007,17 @@ function api_reqfailed(channel, error) {
                 );
             }
         });
+    }
+    else if (e === EPAYWALL) {
+        if (window.M) {
+            if (M.account && u_attr && !u_attr.uspw) {
+                M.account = null;
+            }
+            if (window.loadingDialog) {
+                loadingDialog.hide();
+            }
+            M.showOverStorageQuota(e);
+        }
     }
     else {
         api_reqerror(apixs[c], EAGAIN, 0);
@@ -3157,7 +3175,7 @@ function crypto_share_rsa2aes() {
         });
     }
 }
-
+/* eslint-disable indent */
 // FIXME: add to translations?
 function api_strerror(errno) {
     switch (errno) {
@@ -3205,8 +3223,11 @@ function api_strerror(errno) {
         return "Not enough quota";
     case ESHAREROVERQUOTA:
         return l[19597] || 'Share owner is over storage quota.';
+    case EPAYWALL:
+        return "Over Disk Quota paywall";
     default:
         break;
     }
     return "Unknown error (" + errno + ")";
 }
+/* eslint-enable indent */

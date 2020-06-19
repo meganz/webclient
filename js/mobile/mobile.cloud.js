@@ -638,13 +638,7 @@ mobile.cloud = {
         // If a file row is tapped
         $fileRows.off('tap').on('tap', function() {
 
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
+            if (!validateUserAction()) {
                 return false;
             }
 

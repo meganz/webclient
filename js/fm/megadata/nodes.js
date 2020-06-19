@@ -320,9 +320,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
 MegaData.prototype.clearRubbish = function(all) {
     "use strict";
 
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -453,10 +451,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
         promise.always(tmp);
     }
 
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -792,10 +787,8 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree) {
 MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConflictResolution) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
     if (!quiet) {
@@ -1205,10 +1198,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
  */
 MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1274,10 +1265,8 @@ MegaData.prototype.safeMoveNodes = function safeMoveNodes(target, nodes) {
  */
 MegaData.prototype.safeRemoveNodes = function(handles) {
     'use strict';
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
     var masterPromise = new MegaPromise();
@@ -1340,10 +1329,8 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
 MegaData.prototype.revertRubbishNodes = function(handles) {
     'use strict'; /* jshint -W089 */
     var masterPromise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1526,10 +1513,8 @@ MegaData.prototype.moveToRubbish = function(handles) {
 MegaData.prototype.revokeShares = function(handles) {
     'use strict'; /* jshint -W089, -W074 */
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1640,10 +1625,8 @@ MegaData.prototype.revokeShares = function(handles) {
 MegaData.prototype.revokeFolderShare = function(h, usr, isps) {
     'use strict';
     var promise = new MegaPromise();
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        M.showExpiredBusiness();
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 

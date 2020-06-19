@@ -510,8 +510,7 @@ affiliateUI.referUsers = {
 
             case 'invite':
                 $.hideContextMenu();
-                if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                    M.showExpiredBusiness();
+                if (M.isInvalidUserStatus()) {
                     return;
                 }
                 contactAddDialog(false, true);

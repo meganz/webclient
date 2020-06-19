@@ -51,6 +51,10 @@
     color: #ddd;
     line-height: 48px;
 }
+.main-left-block.confirm .account.login-form .dialog-dark-bottom.register,
+.main-left-block.businessSubAc .account.register-form .dialog-dark-bottom.login  {
+    display: none;
+}
 .account.register-form .dialog-dark-bottom.login a, .account.login-form .dialog-dark-bottom.register a {
     font-size: 15px;
     color: #fff;

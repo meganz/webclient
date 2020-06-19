@@ -423,7 +423,7 @@ function init_register() {
         return false;
     });
 
-    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block');
+    var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block').removeClass('businessSubAc');
     $('.mega-input-title-ontop', $regInfoContainer).removeClass('hidden');
     $('.account.top-header', $regInfoContainer).safeHTML(l[1095]);
 
@@ -441,6 +441,7 @@ function init_register() {
         $email.addClass('hidden');
         $lastName.addClass('hidden');
         $firstName.addClass('hidden');
+        $regInfoContainer.addClass('businessSubAc');
     }
 
     // Init inputs events

@@ -52,7 +52,7 @@ FileManager.prototype.isInvalidUserStatus = function() {
             if ($.hideContextMenu) {
                 $.hideContextMenu();
             }
-            showExpiredBusiness();
+            M.showExpiredBusiness();
             return true;
         }
         if (u_attr.uspw) {

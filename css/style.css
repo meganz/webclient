@@ -1243,7 +1243,7 @@ div.radioOn::after {
 div.radioOn.small, div.radioOff.small {
     width: 16px;
     height: 16px;
-} 
+}
 div.radioOn.green-active::after {
     background: #00e5c5;
     background: -moz-linear-gradient(top, #00e5c5 0%, #007465 100%);
@@ -8759,12 +8759,7 @@ body:not(.en) .warning-dialog-a.wide {
     margin: -262px 0 0 -312px;
     overflow: hidden;
 }
-.fm-dialog.chrome-dialog {
-    width: 404px;
-    min-height: 272px;
-    margin: -136px 0 0 -202px;
-    overflow: hidden;
-}
+
 .fm-dialog.bandwidth-quota {
     width: 604px;
     min-height: 522px;
@@ -9628,50 +9623,7 @@ body:not(.en) .warning-dialog-a.wide {
 label.radio-txt {
     cursor: pointer;
 }
-.chrome-dialog-body {
-    height: 186px;
-    padding: 10px 0 0 0;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    position: relative;
-    text-align: center;
-}
-.chrome-dialog-logo {
-    width: 90px;
-    height: 90px;
-    background-image: url(../images/mega/browsers-sprite.png);
-    background-position: center -509px;
-    background-repeat: repeat-x;
-    background-size: 100px auto;
-    margin: 0 auto 0 auto;
-    cursor: pointer;
-}
-.chrome-dialog-notification {
-    font-size: 14px;
-    line-height: 16px;
-    background-color: black;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    padding: 0 10px 6px 10px;
-    color: white;
-    text-align: center;
-    margin: 0 0 0 0;
-    display: inline-block;
-    margin: 10px 0 0 0;
-}
-.chrome-dialog-arrow {
-    background-image: url(../images/mega/browsers-sprite.png);
-    background-position: center -808px;
-    background-repeat: no-repeat;
-    background-size: 100px auto;
-    height: 5px;
-    width: 10px;
-    margin: 0 auto 0 auto;
-    position: relative;
-    top: -5px;
-}
+
 .fm-bandwidth-body {
     min-height: 436px;
 }

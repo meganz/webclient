@@ -710,11 +710,6 @@ MegaData.prototype.dlcomplete = function(dl) {
             .addClass('safari-downloaded')
             .text('Save File');
     }
-    if (dlMethod == FileSystemAPI) {
-        setTimeout(fm_chromebar, 250, $.dlheight);
-        setTimeout(fm_chromebar, 500, $.dlheight);
-        setTimeout(fm_chromebar, 1000, $.dlheight);
-    }
 
     if ($.transferprogress && $.transferprogress[id]) {
         if (!$.transferprogress['dlc']) {
@@ -731,7 +726,6 @@ MegaData.prototype.dlcomplete = function(dl) {
 };
 
 MegaData.prototype.dlbeforecomplete = function() {
-    $.dlheight = $('body').height();
 };
 
 MegaData.prototype.dlerror = function(dl, error) {
@@ -1985,26 +1979,6 @@ function resetOverQuotaTransfers(ids) {
 
     mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
 }
-
-function fm_chromebar(height) {
-    if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {
-        return false;
-    }
-    var h = height - $('body').height();
-    if ((h > 33) && (h < 41)) {
-        setTimeout(fm_chromebarcatchclick, 500, $('body').height());
-        chromeDialog();
-    }
-}
-
-function fm_chromebarcatchclick(height) {
-    if ($('body').height() != height) {
-        chromeDialog(1);
-        return false;
-    }
-    setTimeout(fm_chromebarcatchclick, 200, height);
-}
-
 
 function fm_tfsorderupd() {
     'use strict';

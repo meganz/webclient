@@ -666,6 +666,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         }
         else {
+            if ($strgdlg.is(':visible')) {
+                window.closeDialog();
+            }
+            $('.fm-main').removeClass('fm-notification almost-full full');
             return promise.reject();
         }
         $('.fm-notification-block.full').safeHTML(l[22667].replace('%1', maxStorage));
@@ -675,17 +679,11 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     }
 
-    if (this.showOverStrgQuotaPr) {
-        promise = this.showOverStrgQuotaPr;
-    }
-    this.showOverStrgQuotaPr = promise;
 
     var closeDialog = function() {
         $strgdlg.off('dialog-closed');
         window.closeDialog();
-
         promise.resolve();
-        delete M.showOverStrgQuotaPr;
     };
 
     $strgdlg.rebind('dialog-closed', closeDialog);

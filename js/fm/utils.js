@@ -1645,6 +1645,9 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
                 if (is_mobile) {
                     mobile.overStorageQuotaOverlay.close();
                 }
+                if (u_attr) {
+                    delete u_attr.uspw;
+                }
             }
             M.showOverStorageQuota(data);
         });

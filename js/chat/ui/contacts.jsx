@@ -426,10 +426,6 @@ export class LastActivity extends ContactAwareComponent {
 }
 
 export class ContactAwareName extends ContactAwareComponent {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return this.props.contact ? <span>{this.props.children}</span> : null;
     }

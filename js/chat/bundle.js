@@ -1562,10 +1562,10 @@ var ContactAwareName = /*#__PURE__*/function (_ContactAwareComponen4) {
 
   var _super6 = _createSuper(ContactAwareName);
 
-  function ContactAwareName(props) {
+  function ContactAwareName() {
     _classCallCheck(this, ContactAwareName);
 
-    return _super6.call(this, props);
+    return _super6.apply(this, arguments);
   }
 
   _createClass(ContactAwareName, [{

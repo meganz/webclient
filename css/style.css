@@ -311,7 +311,7 @@ a.nlanguage-lnk.language-template {
     color: #F0373B;
 }
 .languages-dialog-body {
-    padding: 10px 28px 10px 16px;
+    padding: 10px 28px 65px 16px;
 }
 .languages-dialog .tier-one-languages {
     margin-top: 15px;
@@ -319,7 +319,7 @@ a.nlanguage-lnk.language-template {
 .languages-dialog .tier-two-languages {
     display: none;
     margin-top: 20px;
-    padding-bottom: 65px;
+    margin-bottom: 10px;
 }
 .languages-dialog .native-language-name {
     line-height: 28px;
@@ -329,6 +329,9 @@ a.nlanguage-lnk.language-template {
     display: table;
     margin-top: 30px;
     width: 100%;
+}
+.languages-dialog .show-more-languages.hidden {
+    display: none;
 }
 .languages-dialog .show-more-languages .show-more-text {
     color: #999;
@@ -8552,7 +8555,7 @@ body:not(.en) .warning-dialog-a.wide {
 }
 .fm-dialog.languages-dialog {
     margin: -167px 0 0 -365px;
-    min-height: 345px;
+    min-height: 320px;
     width: 730px;
 }
 .fm-dialog.share-dialog, .fm-dialog.share-with-contact-dialog {

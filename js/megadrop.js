@@ -2065,10 +2065,7 @@ mega.megadrop = (function() {
         // Context menu create widget
         $('.dropdown.body.context .dropdown-item.createwidget-item').rebind('click.create_widget', function () {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 
@@ -2084,10 +2081,7 @@ mega.megadrop = (function() {
         // Context menu manage widget
         $('.dropdown.body.context .dropdown-item.managewidget-item').rebind('click.manage_widget', function() {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 
@@ -2103,10 +2097,7 @@ mega.megadrop = (function() {
         // Context menu Remove upload page
         $('.dropdown.body.context .dropdown-item.removewidget-item').rebind('click.remove_widget', function() {
 
-            // check if this is an expired business account
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                $.hideContextMenu();
-                M.showExpiredBusiness();
+            if (M.isInvalidUserStatus()) {
                 return;
             }
 
@@ -2115,13 +2106,13 @@ mega.megadrop = (function() {
     });
 
     mBroadcaster.addListener('MEGAdrop:checked', function() {
-        parsepage(pages[is_mobile ? 'mobile_megadrop' : 'megadrop']);
+        parsepage(pages[is_mobile ? 'mobile-megadrop' : 'megadrop']);
         pup.pubk(widgetOpts.ownerHandle);
         ui.updateData();
     });
 
     mBroadcaster.addListener('MEGAdrop:disabled', function() {
-        parsepage(pages[is_mobile ? 'mobile_nomegadrop' : 'nomegadrop']);
+        parsepage(pages[is_mobile ? 'mobile-nomegadrop' : 'nomegadrop']);
         mega.megadrop.disableDragDrop();
         $('.wu-change-lang').text(lang);
         $('.wu-lang').rebind('click.widget_change_lang', function() {
@@ -2130,7 +2121,7 @@ mega.megadrop = (function() {
     });
 
     mBroadcaster.addListener('MEGAdrop:overquota', function() {
-        parsepage(pages[is_mobile ? 'mobile_nomegadrop' : 'nomegadrop']);
+        parsepage(pages[is_mobile ? 'mobile-nomegadrop' : 'nomegadrop']);
         $('.wu-name-text').text(widgetOpts.pageData.name);
         $('.widget-upload .wu-folder-name-text')
             .text(l[16302]);

@@ -2594,10 +2594,10 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-megadrop.css', n: 'megadrop_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile-megadrop.css', n: 'mobile_megadrop_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
-        jsl.push({f:'html/mobile-megadrop.html', n: 'mobile_megadrop', j: 0, w: 1});
-        jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile_nomegadrop', j: 0, w: 1});
+        jsl.push({f:'html/mobile-megadrop.html', n: 'mobile-megadrop', j: 0, w: 1});
+        jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile-nomegadrop', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
@@ -2925,7 +2925,7 @@ else if (!browserUpdate) {
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
-        'megadrop': ['megadrop', 'nomegadrop'],
+        'megadrop': ['megadrop', 'nomegadrop']
     };
 
     if (is_mobile) {

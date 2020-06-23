@@ -2190,6 +2190,42 @@ li.token-input-token-invite .input-close {
     color: #666666;
     padding: 0 5px 12px 5px;
 }
+.fm-dialog.storage-dialog .odq-warning .storage-dialog.body-p {
+    font-weight: bold;
+    color: #333333;
+    display: inline-block;
+    width: 400px;
+    padding: initial;
+    margin-bottom: 16px;
+    text-align: initial;
+    margin-left: 16px;
+    vertical-align: middle;
+    margin-top: -35px;
+}
+.fm-dialog.storage-dialog .odq-warning .storage-dialog.body-p span {
+    color: orange;
+}
+.fm-dialog.storage-dialog .odq-warning .odq-warn-icon {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-position: -50px -6703px;
+}
+.fm-dialog.storage-dialog .odq-warning {
+    margin-top: 11px;
+    margin-bottom: 24px;
+}
+.fm-dialog.storage-dialog .odq-warning .odq-divider {
+    height: 1px;
+    width: 100%;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+}
+.fm-dialog-body.storage-dialog.full.odq {
+    padding-bottom: 36px;
+}
 .storage-dialog.body-p a {
     color: #D90007;
     cursor: pointer;
@@ -3545,11 +3581,11 @@ li.token-input-token-invite .input-close {
     opacity: 0.8;
 }
 .embed-content-block .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v11.png);
+    background-image: url(../images/mega/dialog-sprite_v12.png);
     background-position: -128px -5818px;
 }
 .embed-content-block .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v11.png);
+    background-image: url(../images/mega/dialog-sprite_v12.png);
     background-position: -88px -5818px;
 }
 .embed-content-block .fm-subheading {
@@ -4611,7 +4647,7 @@ body.ru .voucher-logo .plan-info .size-head {
     bottom: 0;
     left: 50%;
     margin: 0 0 0 -61px;
-    background-image: url(../images/mega/dialog-sprite_v11.png);
+    background-image: url(../images/mega/dialog-sprite_v12.png);
 }
 .verify-ph-icon {
     background-position: -19px -6008px;

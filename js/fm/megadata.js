@@ -187,28 +187,48 @@ function MegaData() {
 
         // this['check' + 'StorageQuota'] = dummy;
         this['show' + 'OverStorageQuota'] = function(data) {
+            if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
+                data = Object.create(null);
+                data.isFull = data.isAlmostFull = data.EPAYWALL = true;
+            }
             if (data.isAlmostFull) {
                 var ab = mobile.alertBanner;
                 var isPro = Object(u_attr).p;
 
                 var action = function() {
-                    var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-                        ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
-
-                    var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
-                        l[22671].replace('%1', mStoragePossible)
-
-                    if (data.isFull) {
-
-                        ab.showError(msg); // Your account is full
-
-                        mobile.overStorageQuotaOverlay.show(msg);
+                    if (data.EPAYWALL) {
+                        if (!M.account) {
+                            M.accountData(function() {
+                                action();
+                            });
+                            return;
+                        }
+                        var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
+                        ab.showError(overlayTexts.fmBannerText);
+                        mobile.overStorageQuotaOverlay.show(overlayTexts.dialogText, overlayTexts.dlgFooterText);
+                        ab.onTap(function() {
+                            loadSubPage('pro');
+                        });
                     }
                     else {
-                        ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
-                            l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
-                                .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
-                        ); // Your account is almost full.
+                        var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+                            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+                        var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
+                            l[22671].replace('%1', mStoragePossible);
+
+                        if (data.isFull) {
+
+                            ab.showError(msg); // Your account is full
+
+                            mobile.overStorageQuotaOverlay.show(msg);
+                        }
+                        else {
+                            ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
+                                l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                            ); // Your account is almost full.
+                        }
                     }
                 };
 

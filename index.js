@@ -2034,6 +2034,7 @@ function init_page() {
             if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
+                    $.tapioca = Array.isArray(fdl.url);
 
                     Soon(function () {
                         M.putToTransferTable(fdl);

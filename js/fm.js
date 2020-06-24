@@ -825,6 +825,11 @@ function fmtopUI() {
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(true);
     });
+}
+
+function fmLeftMenu() {
+
+    "use strict";
 
     // handle the Inbox section use cases
     if (M.hasInboxItems()) {
@@ -841,8 +846,8 @@ function fmtopUI() {
     // handle the RubbishBin icon changes
     var $icon = $('.nw-fm-left-icon.rubbish-bin');
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
+
     if (rubNodes.length) {
-        $('.fm-tree-header.recycle-item').addClass('recycle-notification contains-subfolders');
 
         if (!$icon.hasClass('filled')) {
             $icon.addClass('filled');
@@ -855,10 +860,6 @@ function fmtopUI() {
         }
     }
     else {
-        $('.fm-tree-header.recycle-item')
-            .removeClass('recycle-notification expanded contains-subfolders')
-            .prev('.fm-connector-first').removeClass('active');
-
         $icon.removeClass('filled glow');
     }
 

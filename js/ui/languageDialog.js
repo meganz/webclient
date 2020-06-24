@@ -32,11 +32,18 @@ var langDialog = {
 
         // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
         var tierOneHtml = langDialog.renderLanguages(tierOneLangCodes, false);
-        var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
 
         // Display the HTML
         $tierOneLanguages.safeHTML(tierOneHtml);
-        $tierTwoLanguages.safeHTML(tierTwoHtml);
+
+        if (tierTwoLangCodes.length) {
+
+            var tierTwoHtml = langDialog.renderLanguages(tierTwoLangCodes, true);
+            $tierTwoLanguages.safeHTML(tierTwoHtml);
+        }
+        else {
+            $('.show-more-languages', langDialog.$dialog).addClass('hidden');
+        }
 
         // Cache some selectors for performance
         var $languageLinks = langDialog.$dialog.find('.nlanguage-lnk');

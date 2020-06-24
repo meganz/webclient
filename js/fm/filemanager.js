@@ -104,7 +104,7 @@ FileManager.prototype.initFileManager = function() {
             var path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
 
             if (path) {
-                mBroadcaster.once('fm:initialized', SoonFc(fmLeftMenu));
+                mBroadcaster.once('fm:initialized', SoonFc(fmLeftMenuUI));
             }
 
             M.openFolder(path, true)

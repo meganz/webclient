@@ -905,6 +905,7 @@ function openRecents() {
 
 // Not required for mobile
 function fmtopUI() {}
+function fmLeftMenuUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}

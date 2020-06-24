@@ -98,14 +98,17 @@ FileManager.prototype.initFileManager = function() {
         .always(function() {
             var $treesub = $('#treesub_' + M.RootID);
             if (!$treesub.hasClass('opened')) {
-                $('.fm-tree-header.cloud-drive-item').addClass('opened');
                 $treesub.addClass('opened');
             }
 
-            M.openFolder(
-                $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage(),
-                true
-            ).always(function() {
+            var path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
+
+            if (path) {
+                mBroadcaster.once('fm:initialized', SoonFc(fmLeftMenu));
+            }
+
+            M.openFolder(path, true)
+                .always(function() {
                     if (megaChatIsReady) {
                         megaChat.renderMyStatus();
                     }
@@ -236,8 +239,6 @@ FileManager.prototype.initFileManagerUI = function() {
     }
     else {
         $('.nw-fm-left-icons-panel .logo').addClass('hidden');
-        $('.fm-tree-header.cloud-drive-item').text(l[164]);
-        $('.fm-tree-header').not('.cloud-drive-item').show();
         $('.fm-main').removeClass('active-folder-link');
         $('.fm-products-nav').text('');
     }
@@ -720,7 +721,6 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
         $('.dropdown-item.dropdown').removeClass('active');
-        $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
@@ -802,12 +802,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.fm-right-header.fm').removeClass('hidden');
     }
 
-    if (folderlink) {
-        $('.fm-tree-header.cloud-drive-item span').text('');
-    }
-    else {
-        folderlink = 0;
-    }
+    folderlink = folderlink || 0;
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
         importFile();

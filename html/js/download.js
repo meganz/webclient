@@ -972,15 +972,6 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
             $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit);
         }
     }
-    if (page !== 'download' || $.infoscroll)
-    {
-        $('.widget-block').removeClass('hidden');
-        $('.widget-block').show();
-        $('.widget-circle').attr('class','widget-circle percents-'+perc);
-        $('.widget-icon.downloading').removeClass('hidden');
-        $('.widget-speed-block.dlspeed').text(bytesToSpeed(bps, 1));
-        $('.widget-block').addClass('active');
-    }
 }
 
 function dlstart(id,name,filesize)
@@ -1088,18 +1079,6 @@ function dlcomplete(dl) {
             });
         });
     }
-    var a=0;
-    for(var i in dl_queue) if (typeof dl_queue[i] == 'object' && dl_queue[i]['dl_id']) a++;
-    if (a < 2 && !ulmanager.isUploading)
-    {
-        $('.widget-block').fadeOut('slow',function(e)
-        {
-            $('.widget-block').addClass('hidden');
-            $('.widget-block').css({opacity:1});
-        });
-    }
-    else if (a < 2) $('.widget-icon.downloading').addClass('hidden');
-    else $('.widget-circle').attr('class','widget-circle percents-0');
     Soon(M.resetUploadDownload);
     $('.download.top-bar').removeClass('downloading').addClass('download-complete');
     if (mega.tpw) {

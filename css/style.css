@@ -1664,7 +1664,7 @@ a.blog-button:hover {
     display: none;
 }
 .notification-loading-icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
     height: 225px;
@@ -3271,7 +3271,7 @@ img.blog-new-logos {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: 2px -496px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -3337,7 +3337,7 @@ img.blog-new-logos {
     bottom: -16px;
     left: 50%;
     margin: 0 0 0 -8px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -3379,7 +3379,7 @@ img.blog-new-logos {
     height: 18px;
     left: 11px;
     top: 6px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -132px -3180px;
     background-repeat: no-repeat;
     -webkit-transition: all 200ms ease-in-out;
@@ -5882,7 +5882,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     width: 24px;
     height: 24px;
     background-position: -55px -4827px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -8186,7 +8186,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .dlkey-dialog .decryption-key .icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -8211,7 +8211,7 @@ table.grid-table .dragover td, table.grid-share-table .dragover td, table.contac
     position: relative;
 }
 .password-dialog .decryption-password .icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -6px -5510px;
     background-repeat: no-repeat;
     height: 22px;
@@ -8880,7 +8880,7 @@ body:not(.en) .warning-dialog-a.wide {
     height: 30px;
     width: 30px;
     background-position: -53px -4825px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     position: absolute;
     right: 10px;
@@ -9314,7 +9314,7 @@ body:not(.en) .warning-dialog-a.wide {
     float: left;
     width: 92px;
     height: 75px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
 }
 .notification-dialog .fm-notification-icon {
@@ -9422,7 +9422,7 @@ body:not(.en) .warning-dialog-a.wide {
     display: inline;
 }
 .delete-contact.multiple .fm-del-contact-avatar {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: -5px -3080px;
     background-color: rgba(0,0,0,0.2);
@@ -9467,7 +9467,7 @@ body:not(.en) .warning-dialog-a.wide {
     content: '';
     display: block;
     position: absolute;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: 0px -1848px;
     background-repeat: no-repeat;
     width: 18px;
@@ -9493,7 +9493,7 @@ body:not(.en) .warning-dialog-a.wide {
     width: 100%;
     position: absolute;
     left: 0;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: left -2771px;
     background-repeat: repeat-x;
     z-index: 100;
@@ -9575,7 +9575,7 @@ body:not(.en) .warning-dialog-a.wide {
     position: relative;
 }
 .export-link-expiry-icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -138px -5513px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -9744,7 +9744,7 @@ span.orange {
     width: 30px;
     float: right;
     background-position: -54px -4874px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
     -moz-transition: opacity 200ms ease-in-out;
@@ -9881,20 +9881,20 @@ span.orange {
 }
 .shared-with-me.read-only .properties-elements-counter span {
     background-color: #61D2FF;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -81px -238px;
     background-repeat: no-repeat;
 }
 .shared-with-me.read-and-write .properties-elements-counter span {
     background-color: #FFD300;
     background-position: -83px -205px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
 }
 .shared-with-me.full-access .properties-elements-counter span {
     background-color: #00E22C;
     background-position: -81px -174px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
 }
 .multiple .properties-file-icon div:nth-child(2) {
@@ -10619,7 +10619,7 @@ table {
     background-position: 5px -3716px;
 }
 .full-access .context-menu-icon, .read-and-write .context-menu-icon, .read-only .context-menu-icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
 }
 .full-access .context-menu-icon {
@@ -12319,7 +12319,7 @@ h5.main-italic-header {
     position: absolute;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: center -5880px;
 }
@@ -14369,7 +14369,7 @@ code, c {
 }
 .notification-empty-icon {
     height: 225px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: center -3245px;
     background-repeat: no-repeat;
 }
@@ -15553,7 +15553,7 @@ span.incoming-call-name {
     top: 4px;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -2px -3669px;
     background-repeat: no-repeat;
     cursor: pointer;
@@ -15594,7 +15594,7 @@ span.incoming-call-name {
     display: block;
     width: 32px;
     height: 16px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -122px -3719px;
     background-repeat: no-repeat;
 }
@@ -16376,7 +16376,7 @@ li.token-input-token-mega p {
 li.token-input-token-mega .input-close, li.token-input-token-invite .input-close {
     height: 20px;
     width: 10px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -94px -460px;
     background-repeat: no-repeat;
     display: block;
@@ -16611,7 +16611,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     left: 50%;
     margin-left: -9px;
     width: 18px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: left -3831px;
 }
@@ -16648,7 +16648,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position:absolute;
     width: 100%;
     height: 100%;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: center -535px;
 }
@@ -16705,13 +16705,13 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .share-search-result.selected {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: right -748px;
 }
 .share-dialog-img {
     height: 90px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: center 4px;
     margin: 24px 0;
@@ -16721,7 +16721,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 30px;
     height: 28px;
     z-index: 10;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -76px -82px;
     background-repeat: no-repeat;
 }
@@ -16764,7 +16764,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: 25px;
     height: 25px;
     left: 0;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -89px -134px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -16978,12 +16978,12 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     text-align: center;
 }
 #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-w {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v12.png) no-repeat scroll -138px -5392px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v14.png) no-repeat scroll -138px -5392px;
     height: 24px;
     width: 24px;
 }
 #ui-datepicker-div .ui-icon.ui-icon-circle-triangle-e {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v12.png) no-repeat scroll -138px -5431px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v14.png) no-repeat scroll -138px -5431px;
     height: 24px;
     width: 24px;
 }
@@ -17053,7 +17053,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     border: medium none;
 }
 #ui-datepicker-div.ui-widget-content .ui-datepicker-buttonpane .ui-datepicker-close {
-    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v12.png) no-repeat scroll -135px -5350px;
+    background: rgba(0, 0, 0, 0) url(../images/mega/dialog-sprite_v14.png) no-repeat scroll -135px -5350px;
     height: 24px;
     position: absolute;
     right: 12px;
@@ -17133,7 +17133,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     vertical-align: top;
 }
 .link-handle .icon, .link-decryption-key .icon, .link-handle-and-key .icon, .file-link-block .icon {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -5px -5352px;
     background-repeat: no-repeat;
     height: 22px;
@@ -17245,7 +17245,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: center -5194px;
     background-repeat: no-repeat;
     position: absolute;
@@ -17286,7 +17286,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     display: block;
     left: 50%;
     margin-left: -12px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: center -5028px;
     background-repeat: no-repeat;
 }
@@ -17301,7 +17301,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     top: 3px;
     left: 12px;
     display: block;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: -87px -277px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17338,7 +17338,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     height: 20px;
     float: right;
     margin: 13px 0 0 7px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: -91px -826px;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -17406,7 +17406,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     cursor: pointer;
 }
 .import-contacts-service.imported {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: right -2163px;
     background-repeat: no-repeat;
 }
@@ -17418,7 +17418,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     float: left;
     margin: 12px 0 0 10px;
     font-family: 'source_sans_prosemibold', Arial;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -11px -2074px;
     background-repeat: no-repeat;
 }
@@ -17432,7 +17432,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     -webkit-border-radius: 100%;
     border-radius: 100%;
     background-color: rgba(0,0,0,0.2);
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: 1px -2137px;
     background-repeat: no-repeat;
     -webkit-transition: background-color 200ms ease-in-out;
@@ -17468,7 +17468,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     position: absolute;
     bottom: -6px;
     right: 12px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -5px -2117px;
     background-repeat: no-repeat;
 }
@@ -17478,7 +17478,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     top: 5px;
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -2px -3178px;
     background-repeat: no-repeat;
     -webkit-transition: opacity 200ms ease-in-out;
@@ -18026,7 +18026,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     float: left;
     width: 60px;
     height: 60px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: 0 -3927px;
     margin-left: 20px;
@@ -18054,7 +18054,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     padding: 0;
 }
 .feedback-label-txt div.checkboxOn, .feedback-label-txt .checkboxOff {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: 0 -4112px;
     background-size: auto;
     cursor: pointer;
@@ -18106,7 +18106,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     font-size: 14px;
     line-height: 18px;
     font-family: 'source_sans_proregular', Arial;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-repeat: no-repeat;
     background-position: 2px -4011px;
     margin: 0 0 0 12px;
@@ -19770,7 +19770,7 @@ body.pro:after {
 }
 .nw-fm-dialog-title span, .bandwidth-text-bl .star {
     width: 15px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -50px -1551px;
     background-repeat: no-repeat;
     display: inline-block;
@@ -19820,7 +19820,7 @@ body.pro:after {
     padding-top: 9px;
 }
 .bandwidth-back-button {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -95px -1551px;
     background-repeat: no-repeat;
     font-size: 14px;
@@ -20091,7 +20091,7 @@ div.camera-bottom-txt {
     width: 100px;
     height: 100px;
     margin: 8px auto 31px auto;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -29px -4228px;
     background-repeat: no-repeat;
 }
@@ -21635,7 +21635,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     width: 36px;
     height: 44px;
     margin-right: 12px;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -8px -5749px;
 }
 .widget-dialog .fm-body-text span {
@@ -21860,11 +21860,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     margin-top: 2px;
 }
 .tab-icon.url {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
         background-position: -128px -5818px;
 }
 .tab-icon.embed {
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -88px -5818px;
 }
 .widget-dialog .close-button{
@@ -21932,7 +21932,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     right: 0;
     top:0;
     position:absolute;
-    background-image: url(../images/mega/dialog-sprite_v12.png);
+    background-image: url(../images/mega/dialog-sprite_v14.png);
     background-position: -8px -5816px;
     opacity: 0.73;
     cursor: pointer;

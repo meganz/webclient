@@ -2,10 +2,14 @@
     /** Our trusted public keys {{{ */
     var signPubKey = {
         "__global": [
-            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=", // Elroy
-            "gKfbvYMQhEamAEb2tIcL0NpslOGbXkHC1opfPXfZIlE=", // Gustavo
-            "WJbsItfJfXhGZlq6D1tz\/Wy\/AVjmvQoK7ZgBSOrrCQE=", // Guy
-            "nJ0DVETXN6Fgd+nK70bsngaPlbM9zedn14Exh\/fAoyU=" // Shuan
+            "rRHOm8BpMsYsSnSlk1AD2xxm9vKIFd\/tMoKxc35FTXQ=", // Elroy v2
+            "WJbsItfJfXhGZlq6D1tz\/Wy\/AVjmvQoK7ZgBSOrrCQE=", // Guy v2
+            "nJ0DVETXN6Fgd+nK70bsngaPlbM9zedn14Exh\/fAoyU=", // Shaun v2
+            "WpDw5Q4L/7AfEMsGeW79BAheALabCdK3uYNNZB+Bq5o=", // Elroy v3
+            "TJi9yWiE3tj15ER3W2kLcV4uVuE2GftUm54XQQLPTGg=", // Guy v3
+            "nX9lIbNNyZPnnMr7aFMENHlescfDbp+ZmUIpGTcDp0w=", // Shaun v3
+            "c/1i2Cq85V8n1I3tixV4bjLTRn9ZqYqtOVhxavHKoYM=", // Mark v3
+            "PuXh6QXVRVVKPPdeLfYgG0VNxG6mUn2XioNCnxHzq1A=" // Harry v3
         ]
     };
     /** }}} */

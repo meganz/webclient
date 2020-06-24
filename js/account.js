@@ -1438,8 +1438,10 @@ function setLandingPage(page) {
                     mega.config.set('ul_maxSlots', 4);// Default ul slots value
                     ulQueue.setSize(4);
                 }
-                if (fmconfig.dl_maxSlots) {
-                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                // quick&dirty(tm) hack, change me whenever we rewrite the underlying logic..
+                var dlSlots = $.tapioca ? 1 : fmconfig.dl_maxSlots;
+                if (dlSlots) {
+                    dlQueue.setSize(dlSlots);
                 }
                 else {
                     mega.config.set('dl_maxSlots', 4);// Default dl slots value

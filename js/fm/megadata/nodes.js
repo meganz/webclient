@@ -57,7 +57,7 @@
 
         if (fminitialized) {
             // Handle Inbox/RubbishBin UI changes
-            delay(fmtopUI);
+            delay(fmLeftMenuUI);
         }
 
         if (this.d[h] && !this.d[h].t && this.d[h].tvf) {
@@ -127,7 +127,7 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
         newnodes.push(n);
 
         // Handle Inbox/RubbishBin UI changes
-        delay(fmtopUI);
+        delay(fmLeftMenuUI);
     }
 };
 
@@ -887,7 +887,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             }
 
             renderPromise.always(function() {
-                Soon(fmtopUI);
+                Soon(fmLeftMenuUI);
                 $.tresizer();
 
                 onMoveNodesDone(ctx.pending.cnt);

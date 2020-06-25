@@ -605,7 +605,7 @@ mobile.downloadOverlay = {
 
         // Display the download progress and speed
         $downloadPercent.text(percentCompleteRounded + '%');
-        $downloadProgressBar.width(percentComplete + '%');
+        $downloadProgressBar.css('width', percentComplete + '%');
         $downloadSpeed.text(speedText);
 
         // If the download is complete e.g. 99/100%, change button text to Decrypting... which can take some time
@@ -625,7 +625,7 @@ mobile.downloadOverlay = {
         var $downloadButtonText = this.$overlay.find('.download-progress span');
         var $downloadPercent = this.$overlay.find('.download-percents');
         var $downloadSpeed = this.$overlay.find('.download-speed');
-        this.$overlay.find('.download-progress .bar').width(100 + '%');
+        $('.download-progress .bar', this.$overlay).css('width', 100 + '%');
 
         // Change button text to full white and hide the download percentage and speed
         $downloadButton.addClass('complete').off('tap');

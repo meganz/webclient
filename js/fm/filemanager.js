@@ -36,6 +36,36 @@ function FileManager() {
 }
 FileManager.prototype.constructor = FileManager;
 
+FileManager.prototype.showExpiredBusiness = function() {
+    'use strict';
+    M.require('businessAcc_js', 'businessAccUI_js').done(function() {
+        var business_ui = new BusinessAccountUI();
+        business_ui.showExpiredDialog(u_attr.b.m);
+    });
+};
+
+/** Check if this is a business expired account, or ODW paywall. */
+FileManager.prototype.isInvalidUserStatus = function() {
+    'use strict';
+    if (u_attr) {
+        if (u_attr.b && u_attr.b.s === -1) {
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
+            M.showExpiredBusiness();
+            return true;
+        }
+        if (u_attr.uspw) {
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
+            M.showOverStorageQuota(EPAYWALL);
+            return true;
+        }
+    }
+    return false;
+};
+
 /**
  * Initialize the rendering of the cloud/file-manager
  * @details Former renderfm()
@@ -68,14 +98,17 @@ FileManager.prototype.initFileManager = function() {
         .always(function() {
             var $treesub = $('#treesub_' + M.RootID);
             if (!$treesub.hasClass('opened')) {
-                $('.fm-tree-header.cloud-drive-item').addClass('opened');
                 $treesub.addClass('opened');
             }
 
-            M.openFolder(
-                $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage(),
-                true
-            ).always(function() {
+            var path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
+
+            if (path) {
+                mBroadcaster.once('fm:initialized', SoonFc(fmLeftMenuUI));
+            }
+
+            M.openFolder(path, true)
+                .always(function() {
                     if (megaChatIsReady) {
                         megaChat.renderMyStatus();
                     }
@@ -206,8 +239,6 @@ FileManager.prototype.initFileManagerUI = function() {
     }
     else {
         $('.nw-fm-left-icons-panel .logo').addClass('hidden');
-        $('.fm-tree-header.cloud-drive-item').text(l[164]);
-        $('.fm-tree-header').not('.cloud-drive-item').show();
         $('.fm-main').removeClass('active-folder-link');
         $('.fm-products-nav').text('');
     }
@@ -535,7 +566,8 @@ FileManager.prototype.initFileManagerUI = function() {
             'nw-conversations-name'
         ];
         var ALLOWED_PARENTS =
-            '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs';
+            '#startholder, .fm-account-main, .export-link-item, .contact-fingerprint-txt, .fm-breadcrumbs, ' +
+            '.fm-affiliate';
         var ALLOWED_CLOSEST =
             '.multiple-input, .create-folder-input-bl, .content-panel.conversations, ' +
             '.messages.content-area, .chat-right-pad .user-card-data';
@@ -689,7 +721,6 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
         $('.dropdown-item.dropdown').removeClass('active');
-        $('.fm-tree-header').removeClass('dragover');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
@@ -771,12 +802,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.fm-right-header.fm').removeClass('hidden');
     }
 
-    if (folderlink) {
-        $('.fm-tree-header.cloud-drive-item span').text('');
-    }
-    else {
-        folderlink = 0;
-    }
+    folderlink = folderlink || 0;
 
     if ((typeof dl_import !== 'undefined') && dl_import) {
         importFile();
@@ -1249,14 +1275,6 @@ FileManager.prototype.initContextUI = function() {
         return false;
     };
 
-    var showExpiredBusiness = function() {
-        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-            var business_ui = new BusinessAccountUI();
-            business_ui.showExpiredDialog(u_attr.b.m);
-        });
-    };
-    M.showExpiredBusiness = showExpiredBusiness;
-
     $(c + '.cloud-item').rebind('click', safeMoveNodes);
 
     $('.dropdown.body.files-menu').off('click', '.folder-item');
@@ -1281,9 +1299,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.syncmegasync-item').rebind('click', function () {
         // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 
@@ -1304,9 +1320,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.removelink-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 
@@ -1359,9 +1373,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.rename-item').rebind('click', function() {
         // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         renameDialog();
@@ -1375,9 +1387,7 @@ FileManager.prototype.initContextUI = function() {
     $(c + '.copy-item').rebind('click', openCopyDialog);
 
     $(c + '.revert-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         loadingDialog.pshow();
@@ -1385,10 +1395,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.import-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         ASSERT(folderlink, 'Import needs to be used in folder links.');
@@ -1397,10 +1404,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.newfolder-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         createFolderDialog();
@@ -1411,30 +1415,21 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.fileupload-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         $('#fileselect3').click();
     });
 
     $(c + '.folderupload-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         $('#fileselect4').click();
     });
 
     $(c + '.remove-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         if ($(this).hasClass('disabled')) {
@@ -1445,19 +1440,14 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.addcontact-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         contactAddDialog();
     });
 
     $(c + '.startchat-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var $this = $(this);
@@ -1474,9 +1464,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startaudio-item,' + c + '.startaudiovideo-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var $this = $(this);
@@ -1492,9 +1480,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.startvideo-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var $this = $(this);
@@ -1519,9 +1505,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.send-files-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var $this = $(this);
@@ -1533,9 +1517,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.share-folder-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var $this = $(this);
@@ -1548,10 +1530,7 @@ FileManager.prototype.initContextUI = function() {
 
 
     $(c + '.removeshare-item').rebind('click', function() {
-        // check if this is a business expired account
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         fmremove();
@@ -1559,7 +1538,9 @@ FileManager.prototype.initContextUI = function() {
 
     // Bind Set Nickname context menu button
     $(c + '.set-nickname').rebind('click', function() {
-
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         var userHandle = $.selected && $.selected[0];
         userHandle = userHandle.replace('contact_', '');
 
@@ -1568,9 +1549,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.remove-contact').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         if ($(this).hasClass('disabled')) {
@@ -1588,6 +1567,9 @@ FileManager.prototype.initContextUI = function() {
 
     // eslint-disable-next-line local-rules/jquery-scopes
     $(c + '.edit-file-item').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         var nodeHandle = $.selected && $.selected[0];
         if (!nodeHandle) {
             return;
@@ -1610,6 +1592,9 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearprevious-versions').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         if ($.selected && $.selected[0]) {
             var fh = $.selected[0];
             msgDialog('remove', l[1003], l[17154], l[1007], function(e) {
@@ -1630,6 +1615,9 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.add-star-item').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         var newFavState = Number(!M.isFavourite($.selected));
 
         M.favourite($.selected, newFavState);
@@ -1647,6 +1635,9 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
         var labelId = parseInt(this.dataset.labelId);
 
         if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
@@ -1766,9 +1757,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.preview-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         closeDialog();
@@ -1776,9 +1765,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.play-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         var n = $.selected[0];
@@ -1790,9 +1777,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.clearbin-item').rebind('click', function() {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
         doClearbin(true);
@@ -1921,9 +1906,7 @@ FileManager.prototype.createFolderUI = function() {
 
     $('.fm-new-folder').rebind('click', function(e) {
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 
@@ -3230,14 +3213,17 @@ FileManager.prototype.addGridUI = function(refresh) {
     // enable add star on first column click (make favorite)
     $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
         .add('.grid-table.fm tr td:first-child').rebind('click', function() {
-        var id = [$(this).parent().attr('id')];
-        var newFavState = Number(!M.isFavourite(id));
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+            var id = [$(this).parent().attr('id')];
+            var newFavState = Number(!M.isFavourite(id));
 
-        // Handling favourites is allowed for full permissions shares only
-        if (M.getNodeRights(id) > 1) {
-            M.favourite(id, newFavState);
-        }
-    });
+            // Handling favourites is allowed for full permissions shares only
+            if (M.getNodeRights(id) > 1) {
+                M.favourite(id, newFavState);
+            }
+        });
 
     $('.dropdown-item.do-sort').rebind('click', function() {
         M.setLastColumn($(this).data('by'));
@@ -4011,10 +3997,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 FileManager.prototype.getLinkAction = function() {
     'use strict';
 
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        $.hideContextMenu();
-        showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 

@@ -1339,9 +1339,7 @@ var exportExpiry = {
      */
     ExportLinkDialog.prototype.linksDialog = function(close) {
 
-        // Checking if this a business user with expired status
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 
@@ -1926,6 +1924,7 @@ var exportExpiry = {
 
         loadingDialog.show();
         this.logger.debug('getExportLink');
+        $.getExportLinkInProgress = nodes;
 
         for (var i = 0; i < nodes.length; i++) {
             var h = nodes[i];
@@ -1952,9 +1951,7 @@ var exportExpiry = {
      * @returns {MegaPromise}
      */
     ExportLink.prototype.removeExportLink = function(quiet) {
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 
@@ -2058,6 +2055,12 @@ var exportExpiry = {
                 if (self.options.showExportLinkDialog) {
                     var exportLinkDialog = new mega.Dialog.ExportLink();
                     exportLinkDialog.linksDialog();
+                }
+
+                console.assert($.getExportLinkInProgress);
+                if ($.getExportLinkInProgress) {
+                    mBroadcaster.sendMessage('export-link:completed', handle);
+                    $.getExportLinkInProgress = false;
                 }
             }
 
@@ -2230,9 +2233,7 @@ var exportExpiry = {
     var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
         'use strict';
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return;
         }
 

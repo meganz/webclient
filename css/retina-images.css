@@ -332,8 +332,9 @@ li.token-input-token-invite .input-close,
 .notification-loading-icon,
 .verify-ph-icon,
 .dialog-sprite,
-i.dialog-sprite {
-    background-image: url(../images/mega/dialog-sprite_v11@2x.png);
+i.dialog-sprite,
+.fm-dialog.storage-dialog .odq-warning .odq-warn-icon {
+    background-image: url(../images/mega/dialog-sprite_v14@2x.png);
     background-size: 160px auto;
 }
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .huge-grey-warning, .round-icon, .call-icon, .verified .verified_icon, .icon-dropdown:not(.disabled):hover, .icon-dropdown.active, .user-card-verified, div.message.richpreview.confirmation-icon, .dropdown-fingerprint, div.chat-topic-icon::before, div.chat-share-nav.button::before, div.chat-topic-icon::before, div.chat-share-nav.button::before, .chat-topic-block.privateChat .privateChatDiv, .privateChat + .privateChatDiv {

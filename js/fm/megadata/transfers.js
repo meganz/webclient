@@ -167,12 +167,8 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
 
 MegaData.prototype.addDownload = function(n, z, preview) {
     "use strict";
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-            var business_ui = new BusinessAccountUI();
-            business_ui.showExpiredDialog(u_attr.b.m);
-        });
+
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -714,11 +710,6 @@ MegaData.prototype.dlcomplete = function(dl) {
             .addClass('safari-downloaded')
             .text('Save File');
     }
-    if (dlMethod == FileSystemAPI) {
-        setTimeout(fm_chromebar, 250, $.dlheight);
-        setTimeout(fm_chromebar, 500, $.dlheight);
-        setTimeout(fm_chromebar, 1000, $.dlheight);
-    }
 
     if ($.transferprogress && $.transferprogress[id]) {
         if (!$.transferprogress['dlc']) {
@@ -735,7 +726,6 @@ MegaData.prototype.dlcomplete = function(dl) {
 };
 
 MegaData.prototype.dlbeforecomplete = function() {
-    $.dlheight = $('body').height();
 };
 
 MegaData.prototype.dlerror = function(dl, error) {
@@ -1023,12 +1013,7 @@ var __ul_id = 8000;
 MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) {
     'use strict'; /* jshint -W074 */
 
-    // check if this is a business expired account
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-            var business_ui = new BusinessAccountUI();
-            business_ui.showExpiredDialog(u_attr.b.m);
-        });
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -1687,7 +1672,11 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
 
     // If MEGAdrop windows exists and upload
     if (id && mega.megadrop.isInit()) {
-        mega.megadrop.onItemCompletion('#ul_' + id);
+        var gid = 'ul_' + id;
+        if (is_mobile) {
+            gid = 'md_' + gid;
+        }
+        mega.megadrop.onItemCompletion('#' + gid);
     }
 
     delay('tfscomplete', function() {
@@ -1990,26 +1979,6 @@ function resetOverQuotaTransfers(ids) {
 
     mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
 }
-
-function fm_chromebar(height) {
-    if (window.navigator.userAgent.toLowerCase().indexOf('mac') >= 0 || localStorage.chromeDialog == 1) {
-        return false;
-    }
-    var h = height - $('body').height();
-    if ((h > 33) && (h < 41)) {
-        setTimeout(fm_chromebarcatchclick, 500, $('body').height());
-        chromeDialog();
-    }
-}
-
-function fm_chromebarcatchclick(height) {
-    if ($('body').height() != height) {
-        chromeDialog(1);
-        return false;
-    }
-    setTimeout(fm_chromebarcatchclick, 200, height);
-}
-
 
 function fm_tfsorderupd() {
     'use strict';

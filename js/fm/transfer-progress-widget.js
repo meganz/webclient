@@ -260,7 +260,9 @@ mega.tpw = new function TransferProgressWidget() {
                 ulmanager.abort(id);
             }
             $('.transfer-table tr#' + id).remove();
-            $.clearTransferPanel();
+            if ($.clearTransferPanel) {
+                $.clearTransferPanel();
+            }
 
             $transferRow.fadeOut(400, function() {
                 removeRow($transferRow);

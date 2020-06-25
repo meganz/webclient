@@ -507,6 +507,12 @@ if (!browserUpdate) try
             }
         }
     }
+    else if (location.host === 'mega.io') {
+        // this means we are not in special modes, and we are in MEGA.io
+        document.head.querySelectorAll('meta[property="og:url"]')[0].content = 'https://mega.io/';
+        document.head.querySelectorAll('meta[property="twitter:url"]')[0].content = 'https://mega.io/';
+        document.head.querySelectorAll('link[rel="icon"]')[0].href = 'https://mega.io/favicon.ico?v=3';
+    }
 
     // Override any set static path with the one from localStorage to test standard static server failure
     if (localStorage.getItem('staticpath') !== null) {
@@ -897,9 +903,6 @@ var languages = {
     'ro': [['ro', 'ro-'], 'Romanian', 'Română'],
     'ru': [['ru', 'ru-mo'], 'Russian', 'Pусский'],
     'th': [['||'], 'Thai', 'ไทย'],
-    'tr': [['tr', 'tr-'], 'Turkish', 'Türkçe'],
-    'tl': [['en-ph'], 'Tagalog', 'Tagalog'],
-    'uk': [['||'], 'Ukrainian', 'Українська'],
     'vi': [['vn', 'vi'], 'Vietnamese', 'Tiếng Việt']
 };
 
@@ -2491,6 +2494,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/notifyConfig.js', n: 'notify_config_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
 
+    jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+
     if (!is_mobile) {
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
@@ -2508,7 +2513,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
-        jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -2587,7 +2591,10 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-megadrop.css', n: 'mobile_megadrop_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
+        jsl.push({f:'html/mobile-megadrop.html', n: 'mobile-megadrop', j: 0, w: 1});
+        jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile-nomegadrop', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
@@ -2627,7 +2634,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.megadrop.js', n: 'mobile_megadrop_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
@@ -2915,7 +2921,8 @@ else if (!browserUpdate) {
         'uwp': ['uwp'],
         'unsub': ['unsub', 'unsub_js'],
         'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
-        'developersettings': ['developersettings', 'developersettings_js']
+        'developersettings': ['developersettings', 'developersettings_js'],
+        'megadrop': ['megadrop', 'nomegadrop']
     };
 
     if (is_mobile) {
@@ -4062,5 +4069,28 @@ mBroadcaster.once('startMega', function() {
         onIdle(function() {
             M.transferFromMegaCoNz(data);
         });
+    }
+
+    if (location.host === 'mega.io') {
+        window.addEventListener('click', function(ev) {
+            var target = ev.target || false;
+
+            if (target.nodeName === 'A' && target.classList.contains('top-login-button')) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                location.href = "https://mega.nz/login";
+            }
+        }, true);
+
+        var redirect = {login: 1, register: 1};
+        var checkPage = function _(page) {
+            if (redirect[page] || String(page).substr(0, 9) === 'registerb') {
+                location.href = "https://mega.nz/" + page;
+                loadSubPage('start');
+            }
+        };
+
+        checkPage(page);
+        mBroadcaster.addListener('pagechange', checkPage);
     }
 });

@@ -3,6 +3,7 @@ import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
 import { EmojiFormattedContent } from './../../../ui/utils.jsx';
+import { ContactAwareName } from '../contacts.jsx';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
 const USER_CARD_CLASS = `user-card`;
@@ -95,7 +96,11 @@ class MessageRow extends MegaRenderMixin {
                 className={`${SEARCH_ROW_CLASS} message`}
                 onClick={() => openResult(room, data.messageId, index)}>
                 <span className="title">
-                    <EmojiFormattedContent>{room.getRoomTitle()}</EmojiFormattedContent>
+                    <ContactAwareName contact={M.u[contact]}>
+                        <EmojiFormattedContent>
+                            {room.getRoomTitle()}
+                        </EmojiFormattedContent>
+                    </ContactAwareName>
                 </span>
                 {!roomIsGroup(room) && <ContactPresence contact={M.u[contact]} />}
                 <div

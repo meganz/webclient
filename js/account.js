@@ -115,7 +115,7 @@ function u_checklogin3a(res, ctx) {
         u_attr = res;
         var exclude = [
             'aav', 'aas', '*!>alias', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
-            'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut'
+            'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ];
 
         for (var n in u_attr) {
@@ -1438,8 +1438,10 @@ function setLandingPage(page) {
                     mega.config.set('ul_maxSlots', 4);// Default ul slots value
                     ulQueue.setSize(4);
                 }
-                if (fmconfig.dl_maxSlots) {
-                    dlQueue.setSize(fmconfig.dl_maxSlots);
+                // quick&dirty(tm) hack, change me whenever we rewrite the underlying logic..
+                var dlSlots = $.tapioca ? 1 : fmconfig.dl_maxSlots;
+                if (dlSlots) {
+                    dlQueue.setSize(dlSlots);
                 }
                 else {
                     mega.config.set('dl_maxSlots', 4);// Default dl slots value

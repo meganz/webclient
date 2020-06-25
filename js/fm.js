@@ -827,7 +827,7 @@ function fmtopUI() {
     });
 }
 
-function fmLeftMenu() {
+function fmLeftMenuUI() {
 
     "use strict";
 

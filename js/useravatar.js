@@ -63,7 +63,7 @@ var useravatar = (function() {
     function _getAvatarProperties(user) {
         user = String(user.u || user);
         var name  = M.getNameByHandle(user) || user;
-        if (name === user && M.suba[user]) {
+        if (name === user && M.suba[user] && M.suba[user].firstname) {
             // Acquire the avatar matches the first letter for pending accounts in business account
             name = from8(base64urldecode(M.suba[user].firstname)).trim();
         }

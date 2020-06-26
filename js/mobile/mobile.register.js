@@ -214,6 +214,7 @@ mobile.register = {
 
             // Set a flag indicating the registration came from the webclient.
             localStorage.signUpStartedInWebclient = '1';
+            loadingDialog.show();
 
             // Business accounts have different flow
             if (registerInfo || localStorage.businessSubAc) {
@@ -222,6 +223,7 @@ mobile.register = {
                 signupcode = window.businessSubAc.signupcode;
                 var ctx = {
                     checkloginresult: function(u_ctx, r) {
+                        loadingDialog.hide();
                         if (typeof r[0] === 'number' && r[0] < 0) {
                             msgDialog('warningb', l[135], l[200]);
                         }
@@ -505,7 +507,7 @@ mobile.register.old = {
     completeRegistration: function(firstName, lastName, email, password, fromProPage) {
 
         'use strict';
-
+        loadingDialog.hide();
         var registrationVars = {
             password: password,
             first: firstName,
@@ -675,7 +677,7 @@ mobile.register.new = {
     completeRegistration: function(result, firstName, lastName, email) {
 
         'use strict';
-
+        loadingDialog.hide();
         // Set some variables which are saved for use later
         var registrationVars = {
             first: firstName,

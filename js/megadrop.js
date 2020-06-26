@@ -361,9 +361,7 @@ mega.megadrop = (function() {
                 }
                 else {
                     add(puh).done(function () {
-                        if (requesti === puh.i) {
-                            mBroadcaster.sendMessageAfterReady('MEGAdrop:puhProcessed');
-                        }
+                        mBroadcaster.sendMessageAfterReady('MEGAdrop:puhProcessed');
                     });
                 }
             }
@@ -984,13 +982,13 @@ mega.megadrop = (function() {
             if (d) {
                 console.log('pup.processPUP');
             }
-            var item = {};
+
             var state = 0;
             var folderId = '';
             var pupId = '';
             var delayHide = false;
 
-            var pupAddAndUpdate = function _pupAddAndUpdate() {
+            var pupAddAndUpdate = function _pupAddAndUpdate(item) {
                 add(item);
                 folderId = pupOpts.items[pupId].h;
 
@@ -1001,8 +999,8 @@ mega.megadrop = (function() {
                 settings.add(pupId, folderId);
             };
 
-            var onPuhProcessed = function _onPuhProcessed() {
-                pupAddAndUpdate();
+            var onPuhProcessed = function _onPuhProcessed(item) {
+                pupAddAndUpdate(item);
 
                 // Show dialog if this is local packet and not update action
                 if (is_mobile) {
@@ -1013,19 +1011,30 @@ mega.megadrop = (function() {
                 }
             };
 
+            var afterPuh =  function(item) {
+
+                if (requesti === item.i && !item.u) {
+                    onPuhProcessed(item);
+                }
+                else {
+                    pupAddAndUpdate(item);
+                }
+            };
+
             for (var i = ap.length; i--;) {
-                item = Object.assign({}, ap[i]);
+                var item = Object.assign({}, ap[i]);
                 pupId = item.p;
                 pufHandle = item.ph;
                 state = item.s ? item.s : 0;
 
                 if (state === 2) { // Active PUP
-                    // If this is local action of create or delete, waiting for puh to be processed
-                    if (requesti === item.i && !item.u) {
-                        mBroadcaster.onceAfterReady('MEGAdrop:puhProcessed', onPuhProcessed);
+
+                    if (item.u) {
+                        pupAddAndUpdate();
                     }
                     else {
-                        pupAddAndUpdate();
+                        // If this is create or delete, waiting for puh to be processed
+                        mBroadcaster.onceAfterReady('MEGAdrop:puhProcessed', afterPuh.bind(this, item));
                     }
                 }
                 else { // Inactive PUP

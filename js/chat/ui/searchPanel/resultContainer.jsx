@@ -17,19 +17,22 @@ export const LABEL = {
     // Result table & Result row
     // ------------------------------------
 
-    MESSAGES: 'Messages',
-    CONTACTS_AND_CHATS: 'Contacts And Chats',
-    NO_RESULTS: 'No Results',
-    RECENT: 'Recent',
+    MESSAGES: l[6868],
+    CONTACTS_AND_CHATS: l[20174],
+    NO_RESULTS: l[8674],
+    RECENT: l[20141],
+
+    SEARCH_MESSAGES_CTA: l[23547],
+    SEARCH_MESSAGES_INLINE: l[23548],
 
     //
     // Search field status
     // ------------------------------------
 
-    DECRYPTING_RESULTS: 'decrypting results...',
-    PAUSE_SEARCH: 'pause search',
-    RESUME_SEARCH: 'resume search',
-    SEARCH_COMPLETE: 'search complete'
+    DECRYPTING_RESULTS: l[23543],
+    PAUSE_SEARCH: l[23544],
+    RESUME_SEARCH: l[23545],
+    SEARCH_COMPLETE: l[23546]
 };
 
 export default class ResultContainer extends MegaRenderMixin {
@@ -51,7 +54,7 @@ export default class ResultContainer extends MegaRenderMixin {
         </ResultTable>
     );
 
-    renderResults = (results, status) => {
+    renderResults = (results, status, isFirstQuery, onSearchMessages) => {
 
         //
         // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
@@ -63,7 +66,10 @@ export default class ResultContainer extends MegaRenderMixin {
         if (status === STATUS.COMPLETED && results.length < 1) {
             return (
                 <ResultTable>
-                    <ResultRow type={TYPE.NIL} />
+                    <ResultRow
+                        type={TYPE.NIL}
+                        isFirstQuery={isFirstQuery}
+                        onSearchMessages={onSearchMessages} />
                 </ResultTable>
             );
         }
@@ -86,7 +92,7 @@ export default class ResultContainer extends MegaRenderMixin {
                     <ResultRow
                         key={resultId}
                         type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
-                        result={result}/>
+                        result={result} />
                 ];
             }
         }
@@ -111,13 +117,35 @@ export default class ResultContainer extends MegaRenderMixin {
                     );
                 }
 
+                if (status === STATUS.COMPLETED && key === 'MESSAGES') {
+                    const SEARCH_MESSAGES =
+                        <div
+                            className="search-messages default-white-button"
+                            onClick={onSearchMessages}>
+                            {LABEL.SEARCH_MESSAGES_CTA}
+                        </div>;
+                    const NO_RESULTS =
+                        <ResultRow
+                            type={TYPE.NIL}
+                            isFirstQuery={isFirstQuery}
+                            onSearchMessages={onSearchMessages} />;
+
+                    return (
+                        <ResultTable {...table.props}>
+                            {isFirstQuery ? SEARCH_MESSAGES : NO_RESULTS}
+                        </ResultTable>
+                    );
+                }
+
                 return null;
             })
         );
     };
 
     render() {
-        const { recents, results, status } = this.props;
-        return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status);
+        const { recents, results, status, isFirstQuery, onSearchMessages } = this.props;
+        return recents && recents.length ?
+            this.renderRecents(recents) :
+            this.renderResults(results, status, isFirstQuery, onSearchMessages);
     }
 }

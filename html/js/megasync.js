@@ -25,7 +25,8 @@ var megasync = (function() {
     }
     var retryTimer;
     var clients = {
-        windows: 'https://mega.nz/MEGAsyncSetup.exe',
+        windows: 'https://mega.nz/MEGAsyncSetup64.exe',
+        windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
         mac: 'https://mega.nz/MEGAsyncSetup.dmg'
     };
 

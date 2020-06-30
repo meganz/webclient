@@ -153,14 +153,22 @@ function is_text(node) {
         return false;
     }
 
-    if (!fileext(node.name)) {
+    var fext = fileext(node.name);
+    if (!fext) {
         return true;
     }
 
     var fType = filetype(node, true)[0];
-    return fType === 'text' || fType === 'web-data' || fType === 'web-lang';
-}
+    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+        return true;
+    }
 
+    if (fmconfig.editorext && fmconfig.editorext.indexOf(fext.toLowerCase()) > -1) {
+        return true;
+    }
+
+    return false;
+}
 
 var mThumbHandler = {
     sup: Object.create(null),

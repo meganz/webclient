@@ -2861,6 +2861,13 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .mobile .bottom-page.nav-buttons-bl.contrast, .mobile .bottom-page.top-dark-info.small {
     display: none;
 }
+.bottom-page .megaapp-windows {
+    width: 398px;
+    position: relative;
+    margin: -30px auto 50px auto;
+    text-align: center;
+    white-space: nowrap;
+}
 .bottom-page .megaapp-linux {
     background-color: #333333;
     -moz-box-sizing: border-box;
@@ -2906,6 +2913,21 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 }
 .very-dark-blue-bg .megaapp-linux-arrow {
     background-position: -347px -349px;
+}
+.very-dark-blue-bg .megaapp-windows-info {
+    color: #fff;
+    font-size: 14px;
+    line-height: 24px;
+    opacity: 0.8;
+}
+.white-block .megaapp-windows-info {
+    color: #999;
+    font-size: 14px;
+    line-height: 24px;
+    opacity: 0.8;
+}
+.megaapp-windows-info a {
+    text-decoration: underline;
 }
 .megaapp-linux-info {
     font-size: 16px;
@@ -4231,6 +4253,12 @@ a.opensource-icon-txt.coming-soon {
 .onboarding-suggestions .promo-voucher-card.red-block {
     background-color: #eb4444;
     border: 1px solid #d90007;
+    color: #fff;
+}
+.onboarding-suggestions .promo-voucher-card.blue-block {
+    background-color: #46B4E5;
+    border: unset;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
     color: #fff;
 }
 .onboarding-suggestions .promo-voucher-block {

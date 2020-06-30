@@ -618,7 +618,7 @@ class ConversationsList extends MegaRenderMixin {
             }
 
             // Checking if this a business user with expired status
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
+            if (u_attr && ((u_attr.b && u_attr.b.s === -1) || u_attr.uspw)) {
                 chatRoom.privateReadOnlyChat = true;
             }
             else {

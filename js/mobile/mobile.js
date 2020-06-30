@@ -704,24 +704,6 @@ mega.tpw = {
     clearRows: function() {}
 };
 
-mega.megadrop = {
-    pufs: function() { return mobile.megadrop.pufs; },
-    isInit: function() { return false; },
-    pufProcessDb: function(data) { mobile.megadrop.pufProcessDb(data); },
-    onRename: function() { return false; },
-    pupProcessPUP: function(ap) {  mobile.megadrop.processPUP(ap); },
-    pufProcessPUH:  function(ap) { mobile.megadrop.processPUH(ap); },
-    pufRemove: function(ids) { return mobile.megadrop.pufRemove(ids); },
-    processUPHAP: function (ap) { mobile.megadrop.processUPH(ap); },
-    preMoveCheck: function(handles, target) {
-        var sel = Array.isArray(handles) ? handles : [handles];
-        var p = new MegaPromise();
-        p.resolve(sel, target);
-        return p;
-    },
-    isDropExist: function (sel) { return mobile.megadrop.isDropExist(sel); }
-};
-
 var nicknames = {
     cache: {},
     getNicknameAndName: function() {},
@@ -923,6 +905,7 @@ function openRecents() {
 
 // Not required for mobile
 function fmtopUI() {}
+function fmLeftMenuUI() {}
 function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
@@ -936,3 +919,30 @@ accountUI.account = {
     renderCountry: function() {},
     renderRubsched: function() {},
 };
+
+/** Global function to be used in mobile mode, checking if the action can be taken by the user.
+ * It checks the user validity (Expired business, or ODQ Paywall)
+ * @param   {Boolean} hideContext   Hide context menu
+ * @returns {Boolean}               True if the caller can proceed. False if not
+ */
+function validateUserAction(hideContext) {
+    if (u_attr) {
+        if (u_attr.b && u_attr.b.s === -1) {
+            if (u_attr.b.m) {
+                msgDialog('warningb', '', l[20401], l[20402]);
+            }
+            else {
+                msgDialog('warningb', '', l[20462], l[20463]);
+            }
+            return false;
+        }
+        else if (u_attr.uspw) {
+            if (hideContext) {
+                mobile.cloud.contextMenu.hide();
+            }
+            M.showOverStorageQuota(EPAYWALL);
+            return false;
+        }
+    }
+    return true;
+}

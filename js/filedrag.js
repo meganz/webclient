@@ -182,10 +182,8 @@
 
     function FileSelectHandlerMegaSyncClick(e) {
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
+        if (M.isInvalidUserStatus()) {
             e.preventDefault();
-            $.hideContextMenu();
-            M.showExpiredBusiness();
             return false;
         }
 
@@ -314,9 +312,7 @@
             e.preventDefault();
         }
 
-        if (u_attr && u_attr.b && u_attr.b.s === -1) {
-            $.hideContextMenu();
-            M.showExpiredBusiness();
+        if (M.isInvalidUserStatus()) {
             return false;
         }
 

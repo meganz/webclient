@@ -34,7 +34,7 @@ find . -type f -not -name '*_prod.json' -not -name 'lang.tar.gz' -delete
 tar xfvzm lang.tar.gz
 
 # Display any errors from Babel e.g. missing strings to the console
-if [[ "$arg1" != "--ignore-errors" ]]; then
+if [[ "$arg1" = "--show-errors" ]]; then
     cat error.json
 
     # If the error.json file does not exist, then this command will fail which is fine, so continue as normal

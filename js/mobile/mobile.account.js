@@ -195,6 +195,7 @@ mobile.account = {
         var $usedStorage = $accountUsageBlock.find('.used');
         var $totalStorage = $accountUsageBlock.find('.total');
         var $percentageUsed = $accountUsageBlock.find('.percentage');
+        var $message = $('.over-quota-message', $accountUsageBlock).text(l[16136]).removeClass('odq-red-alert');
 
         // Format percentage used to X.XX%, used space to 'X.X GB' and total space to 'X GB' format
         var spaceUsed = M.account.cstrg;
@@ -212,6 +213,11 @@ mobile.account = {
         // Colour text red and show a message if over quota, or use orange if close to using all quota
         if (percentageUsed >= 100) {
             $accountUsageBlock.addClass('over-quota');
+            if (u_attr.uspw) {
+                $message.safeHTML(
+                    odqPaywallDialogTexts(u_attr, M.account).fmBannerText)
+                    .addClass('odq-red-alert');
+            }
         }
         else if (percentageUsed >= 85) {
             $accountUsageBlock.addClass('warning');

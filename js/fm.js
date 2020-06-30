@@ -825,6 +825,11 @@ function fmtopUI() {
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(true);
     });
+}
+
+function fmLeftMenuUI() {
+
+    "use strict";
 
     // handle the Inbox section use cases
     if (M.hasInboxItems()) {
@@ -841,8 +846,8 @@ function fmtopUI() {
     // handle the RubbishBin icon changes
     var $icon = $('.nw-fm-left-icon.rubbish-bin');
     var rubNodes = Object.keys(M.c[M.RubbishID] || {});
+
     if (rubNodes.length) {
-        $('.fm-tree-header.recycle-item').addClass('recycle-notification contains-subfolders');
 
         if (!$icon.hasClass('filled')) {
             $icon.addClass('filled');
@@ -855,10 +860,6 @@ function fmtopUI() {
         }
     }
     else {
-        $('.fm-tree-header.recycle-item')
-            .removeClass('recycle-notification expanded contains-subfolders')
-            .prev('.fm-connector-first').removeClass('active');
-
         $icon.removeClass('filled glow');
     }
 
@@ -2693,9 +2694,7 @@ function closeDialog(ev) {
 function createFolderDialog(close) {
     "use strict";
 
-    // Checking if this a business user with expired status
-    if (u_attr && u_attr.b && u_attr.b.s === -1) {
-        M.showExpiredBusiness();
+    if (M.isInvalidUserStatus()) {
         return;
     }
 
@@ -2988,41 +2987,6 @@ function createFileDialog(close, action, params) {
         $('.fm-dialog-body.mid-pad input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
-    });
-}
-
-
-function chromeDialog(close) {
-    'use strict';
-
-    var $dialog = $('.fm-dialog.chrome-dialog');
-
-    if (close) {
-        closeDialog();
-        return true;
-    }
-    M.safeShowDialog('chrome', $dialog);
-
-    $('.chrome-dialog .browsers-button,.chrome-dialog .fm-dialog-close').rebind('click', function()
-    {
-        chromeDialog(1);
-    });
-    $('#chrome-checkbox').rebind('click', function()
-    {
-        if ($(this).attr('class').indexOf('checkboxOn') === -1)
-        {
-            localStorage.chromeDialog = 1;
-            $(this).attr('class', 'checkboxOn');
-            $(this).parent().attr('class', 'checkboxOn');
-            $(this).prop('checked', true);
-        }
-        else
-        {
-            delete localStorage.chromeDialog;
-            $(this).attr('class', 'checkboxOff');
-            $(this).parent().attr('class', 'checkboxOff');
-            $(this).prop('checked', false);
-        }
     });
 }
 

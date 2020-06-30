@@ -9,17 +9,40 @@ var aboutus = {
         // Cache selectors
         var $page = $('.bottom-page.scroll-block.about', 'body');
 
+        this.fetchCMS($page);
+
         aboutus.openSubSection($page);
-        this.randomMemberOrderMix($page);
         if (page === 'about/main') {
             this.dynamicCount($page);
         }
     },
 
+    fetchCMS: function() {
+        "use strict";
+        M.xhr({url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_" + lang, type: 'json'})
+            .then(function(ev, members) {
+                members.sort(function() {
+                    return 0.5 - Math.random();
+                });
+                var aboutContent = '';
+                for (var i = members.length; i--;) {
+                    aboutContent +=
+                        '<div class="bottom-page inline-block col-6 fadein">' +
+                            '<img class="shadow" src="' + escapeHTML(members[i].photo)
+                                + '" alt="' + escapeHTML(members[i].name) + '">' +
+                            '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
+                            '<span>' + escapeHTML(members[i].role) + '</span>' +
+                        '</div>';
+                }
+                aboutContent = aboutContent.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+                $('.members', '.bottom-page').safeHTML(aboutContent);
+            });
+    },
+
     /**
      * Show blocks related to subpage name
      * @param {Object} $page The jQuery selector for the current page
-     * @param {Scring} subsection Subsection name to show
+     * @param {String} subsection Subsection name to show
      * @returns {void}
      */
     showSubsectionContent: function($page, subsection) {
@@ -63,25 +86,6 @@ var aboutus = {
         $('.about.main-menu.item', $page).rebind('click.about', function() {
             aboutus.showSubsectionContent($page, $(this).data('page'));
         });
-    },
-
-    /**
-     * Lets mix order of memebers list
-     * @param {Object} $page The jQuery selector for the current page
-     * @returns {void}
-     */
-    randomMemberOrderMix: function($page) {
-
-        "use strict";
-
-        var $aboutMember = $('.about.members', $page);
-        var $randomed = $aboutMember.children().sort(function() {
-            return 0.5 - Math.random();
-        });
-
-        for (var i = 0; i < $randomed.length; i++) {
-            $aboutMember[0].appendChild($randomed[i]);
-        }
     },
 
     dynamicCount: function($page) {

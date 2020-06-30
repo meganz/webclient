@@ -657,6 +657,11 @@
     color: #999;
 }
 
+.result-table .search-messages {
+    width: 80%;
+    margin: 10px auto;
+}
+
 
 /* --- Result Row: No Results --- */
 
@@ -674,9 +679,25 @@
     vertical-align: middle;
 }
 
-.result-table.nil .result-table-row span {
+.result-table .result-table-row .nil-container {
+    text-align: center;
+    cursor: default;
+}
+
+.result-table.nil .result-table-row span,
+.result-table .result-table-row .nil-container span {
     display: block;
     padding: 10px 0 0 0;
     font-size: 20px;
     color: #333;
+}
+
+.result-table.nil .result-table-row .search-messages {
+    margin: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.result-table.nil .result-table-row .search-messages a {
+    text-decoration: underline;
 }

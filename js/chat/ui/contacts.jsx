@@ -7,7 +7,9 @@ import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
-var _attchRerenderCbContacts = function() {
+const EMPTY_ARR = [];
+
+var _attchRerenderCbContacts = function(others) {
     this.addDataStructListenerForProperties(this.props.contact, [
         'name',
         'firstName',
@@ -15,8 +17,9 @@ var _attchRerenderCbContacts = function() {
         'nickname',
         'm',
         'avatar'
-    ]);
+    ].concat(others ? others : EMPTY_ARR));
 };
+
 
 export class ContactsListItem extends ContactAwareComponent {
     static defaultProps = {
@@ -617,7 +620,9 @@ export class ContactCard extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+    attachRerenderCallbacks() {
+        _attchRerenderCbContacts.call(this, ['presence']);
+    }
     specShouldComponentUpdate(nextProps, nextState) {
         var self = this;
 

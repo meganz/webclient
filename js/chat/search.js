@@ -260,19 +260,22 @@ function ChatSearch(megaChat, chatId, searchExpr, handler) {
     self.megaChat = megaChat;
     self.allChats = megaChat.chats;
 
-
     // normalize
     searchExpr = ChatSearch._normalize_str(searchExpr);
 
     self.originalSearchString = searchExpr;
+    self.searchRegExps = [];
+
     var searchWords = searchExpr.split(" ");
-    self.searchRegExps = searchWords.map(function(w) {
-        // prepend ^ if the searchExpr is <= 2 chars length and only one word
-        return new RegExp(
-            (searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(w),
-            'gi'
-        );
-    });
+    for (var i = 0; i < searchWords.length; i++) {
+        var word = searchWords[i];
+        if (word !== '') {
+            // prepend ^ if the searchExpr is <= 2 chars length and only one word
+            self.searchRegExps.push(
+                new RegExp((searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(word), 'gi')
+            );
+        }
+    }
 
     self.setupLogger();
     var searches = self.roomSearches = [];

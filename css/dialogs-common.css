@@ -11,6 +11,12 @@
     box-shadow: 0 4px 18px 0 rgba(0,0,0,0.1);
     border: 0;
 }
+.fm-dialog.verify-email-login-to-account.big-radius .fm-dialog-close {
+    top: 23px;
+}
+.mobile .verify-email-login-to-account .button.cancel-email-verify {
+    margin-right: 12px;
+}
 .nw-fm-dialog-title, .fm-dialog-title {
     font-size: 20px;
     color: #333333;
@@ -265,7 +271,7 @@
     padding: 10px 25px 25px 25px;
 }
 .mobile .login-set-pass .dialog-login-form.low-pad {
-    margin-top: -10px; 
+    margin-top: -10px;
 }
 .mobile .login-set-pass .text {
     padding: 2px 0 10px 0;

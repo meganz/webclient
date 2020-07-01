@@ -1079,9 +1079,10 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 
 
+var EMPTY_ARR = [];
 
-var _attchRerenderCbContacts = function _attchRerenderCbContacts() {
-  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar']);
+var _attchRerenderCbContacts = function _attchRerenderCbContacts(others) {
+  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar'].concat(others ? others : EMPTY_ARR));
 };
 
 var ContactsListItem = /*#__PURE__*/function (_ContactAwareComponen) {
@@ -1792,20 +1793,17 @@ var ContactCard = /*#__PURE__*/function (_ContactAwareComponen7) {
   var _super10 = _createSuper(ContactCard);
 
   function ContactCard() {
-    var _this4;
-
     _classCallCheck(this, ContactCard);
 
-    for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
-      args[_key4] = arguments[_key4];
-    }
-
-    _this4 = _super10.call.apply(_super10, [this].concat(args));
-    _this4.attachRerenderCallbacks = _attchRerenderCbContacts;
-    return _this4;
+    return _super10.apply(this, arguments);
   }
 
   _createClass(ContactCard, [{
+    key: "attachRerenderCallbacks",
+    value: function attachRerenderCallbacks() {
+      _attchRerenderCbContacts.call(this, ['presence']);
+    }
+  }, {
     key: "specShouldComponentUpdate",
     value: function specShouldComponentUpdate(nextProps, nextState) {
       var self = this;
@@ -1984,17 +1982,17 @@ var ContactItem = /*#__PURE__*/function (_ContactAwareComponen8) {
   var _super11 = _createSuper(ContactItem);
 
   function ContactItem() {
-    var _this5;
+    var _this4;
 
     _classCallCheck(this, ContactItem);
 
-    for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {
-      args[_key5] = arguments[_key5];
+    for (var _len4 = arguments.length, args = new Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+      args[_key4] = arguments[_key4];
     }
 
-    _this5 = _super11.call.apply(_super11, [this].concat(args));
-    _this5.attachRerenderCallbacks = _attchRerenderCbContacts;
-    return _this5;
+    _this4 = _super11.call.apply(_super11, [this].concat(args));
+    _this4.attachRerenderCallbacks = _attchRerenderCbContacts;
+    return _this4;
   }
 
   _createClass(ContactItem, [{
@@ -2052,16 +2050,16 @@ var ContactPickerWidget = /*#__PURE__*/function (_MegaRenderMixin4) {
   var _super12 = _createSuper(ContactPickerWidget);
 
   function ContactPickerWidget(props) {
-    var _this6;
+    var _this5;
 
     _classCallCheck(this, ContactPickerWidget);
 
-    _this6 = _super12.call(this, props);
-    _this6.state = {
+    _this5 = _super12.call(this, props);
+    _this5.state = {
       'searchValue': '',
-      'selected': _this6.props.selected || false
+      'selected': _this5.props.selected || false
     };
-    return _this6;
+    return _this5;
   }
 
   _createClass(ContactPickerWidget, [{
@@ -18605,7 +18603,7 @@ var ConversationsList = /*#__PURE__*/function (_MegaRenderMixin3) {
         } // Checking if this a business user with expired status
 
 
-          if (u_attr && ((u_attr.b && u_attr.b.s === -1) || u_attr.uspw)) {
+        if (u_attr && (u_attr.b && u_attr.b.s === -1 || u_attr.uspw)) {
           chatRoom.privateReadOnlyChat = true;
         } else {
           if (chatRoom.type === "private") {

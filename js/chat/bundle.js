@@ -16968,12 +16968,15 @@ var roomIsGroup = function roomIsGroup(room) {
 };
 /**
  * highlight
- * @description Wraps given text within `strong` element based on passed strings to be matched.
+ * @description Wraps given text within `strong` element based on passed strings to be matched; performs the highlight
+ * while taking into account the presence of DOM tags and/or Emoji content.
+ *
  * @param {string} text The text to be highlighted
  * @param {Object[]} matches Array of objects specifying the matches
+ * @param {boolean} dontEscape flag indicating whether to perform escaping
  * @param {string} matches[].str The match term to check against
  * @param {number} matches[].idx Number identifier for the match term
- * @returns {string}
+ * @returns {string|void}
  *
  * @example
  * highlight('Example MEGA string as input.', [{ idx: 0, str: 'MEGA' }, { idx: 1, str: 'input' }]);

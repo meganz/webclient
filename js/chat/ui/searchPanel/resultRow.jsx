@@ -90,7 +90,6 @@ const openResult = (room, messageId, index) => {
 
 //
 // MessageRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MessageRow extends MegaRenderMixin {
@@ -133,7 +132,6 @@ class MessageRow extends MegaRenderMixin {
 
 //
 // ChatRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class ChatRow extends MegaRenderMixin {
@@ -166,7 +164,6 @@ class ChatRow extends MegaRenderMixin {
 
 //
 // MemberRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MemberRow extends MegaRenderMixin {
@@ -242,10 +239,22 @@ class MemberRow extends MegaRenderMixin {
     }
 }
 
-const NilRow = () => (
+const NilRow = ({ onSearchMessages, isFirstQuery }) => (
     <div className={SEARCH_ROW_CLASS}>
-        <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
-        <span>{LABEL.NO_RESULTS}</span>
+        <div className="nil-container">
+            <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
+            <span>{LABEL.NO_RESULTS}</span>
+            {isFirstQuery && (
+                <div
+                    className="search-messages"
+                    onClick={onSearchMessages}
+                    dangerouslySetInnerHTML={{
+                        /* `Click <a>here</a> to search for messages.` */
+                        __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+                    }}>
+                </div>
+            )}
+        </div>
     </div>
 );
 
@@ -257,7 +266,7 @@ export default class ResultRow extends MegaRenderMixin {
     }
 
     render() {
-        const { type, result, children } = this.props;
+        const { type, result, children, onSearchMessages, isFirstQuery } = this.props;
 
         switch (type) {
             case TYPE.MESSAGE:
@@ -279,7 +288,7 @@ export default class ResultRow extends MegaRenderMixin {
                         contact={M.u[result.data]} />
                 );
             case TYPE.NIL:
-                return <NilRow />;
+                return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery} />;
             default:
                 return (
                     <div className={SEARCH_ROW_CLASS}>

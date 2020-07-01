@@ -17046,7 +17046,6 @@ var openResult = function openResult(room, messageId, index) {
   }
 }; //
 // MessageRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17098,7 +17097,6 @@ var resultRow_MessageRow = /*#__PURE__*/function (_MegaRenderMixin) {
   return MessageRow;
 }(mixins["MegaRenderMixin"]); //
 // ChatRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17143,7 +17141,6 @@ var resultRow_ChatRow = /*#__PURE__*/function (_MegaRenderMixin2) {
   return ChatRow;
 }(mixins["MegaRenderMixin"]); //
 // MemberRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17219,13 +17216,24 @@ var resultRow_MemberRow = /*#__PURE__*/function (_MegaRenderMixin3) {
   return MemberRow;
 }(mixins["MegaRenderMixin"]);
 
-var resultRow_NilRow = function NilRow() {
+var resultRow_NilRow = function NilRow(_ref) {
+  var onSearchMessages = _ref.onSearchMessages,
+      isFirstQuery = _ref.isFirstQuery;
   return /*#__PURE__*/external_React_default.a.createElement("div", {
     className: SEARCH_ROW_CLASS
+  }, /*#__PURE__*/external_React_default.a.createElement("div", {
+    className: "nil-container"
   }, /*#__PURE__*/external_React_default.a.createElement("img", {
     src: "".concat(staticpath, "images/temp/search-icon.png"),
     alt: LABEL.NO_RESULTS
-  }), /*#__PURE__*/external_React_default.a.createElement("span", null, LABEL.NO_RESULTS));
+  }), /*#__PURE__*/external_React_default.a.createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && /*#__PURE__*/external_React_default.a.createElement("div", {
+    className: "search-messages",
+    onClick: onSearchMessages,
+    dangerouslySetInnerHTML: {
+      /* `Click <a>here</a> to search for messages.` */
+      __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    }
+  })));
 }; // ---------------------------------------------------------------------------------------------------------------------
 
 
@@ -17246,7 +17254,9 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
       var _this$props4 = this.props,
           type = _this$props4.type,
           result = _this$props4.result,
-          children = _this$props4.children;
+          children = _this$props4.children,
+          onSearchMessages = _this$props4.onSearchMessages,
+          isFirstQuery = _this$props4.isFirstQuery;
 
       switch (type) {
         case TYPE.MESSAGE:
@@ -17272,7 +17282,10 @@ var resultRow_ResultRow = /*#__PURE__*/function (_MegaRenderMixin4) {
           });
 
         case TYPE.NIL:
-          return /*#__PURE__*/external_React_default.a.createElement(resultRow_NilRow, null);
+          return /*#__PURE__*/external_React_default.a.createElement(resultRow_NilRow, {
+            onSearchMessages: onSearchMessages,
+            isFirstQuery: isFirstQuery
+          });
 
         default:
           return /*#__PURE__*/external_React_default.a.createElement("div", {
@@ -17336,17 +17349,19 @@ var LABEL = {
   //
   // Result table & Result row
   // ------------------------------------
-  MESSAGES: 'Messages',
-  CONTACTS_AND_CHATS: 'Contacts And Chats',
-  NO_RESULTS: 'No Results',
-  RECENT: 'Recent',
+  MESSAGES: l[6868],
+  CONTACTS_AND_CHATS: l[20174],
+  NO_RESULTS: l[8674],
+  RECENT: l[20141],
+  SEARCH_MESSAGES_CTA: l[23547],
+  SEARCH_MESSAGES_INLINE: l[23548],
   //
   // Search field status
   // ------------------------------------
-  DECRYPTING_RESULTS: 'decrypting results...',
-  PAUSE_SEARCH: 'pause search',
-  RESUME_SEARCH: 'resume search',
-  SEARCH_COMPLETE: 'search complete'
+  DECRYPTING_RESULTS: l[23543],
+  PAUSE_SEARCH: l[23544],
+  RESUME_SEARCH: l[23545],
+  SEARCH_COMPLETE: l[23546]
 };
 
 var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
@@ -17380,7 +17395,7 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
       );
     };
 
-    _this.renderResults = function (results, status) {
+    _this.renderResults = function (results, status, isFirstQuery, onSearchMessages) {
       //
       // Result table -- `Contacts and Chats` and `Messages`, incl. `No Results`
       // https://mega.nz/#!VUkHRS4L!S2fz1aQ9Y93RZe5ky75Th9zBbdudGnApNs90TNO4eG8
@@ -17389,7 +17404,9 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
       // ----------------------------------------------------------------------
       if (status === STATUS.COMPLETED && results.length < 1) {
         return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, null, /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
-          type: TYPE.NIL
+          type: TYPE.NIL,
+          isFirstQuery: isFirstQuery,
+          onSearchMessages: onSearchMessages
         }));
       }
 
@@ -17434,6 +17451,19 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
           }));
         }
 
+        if (status === STATUS.COMPLETED && key === 'MESSAGES') {
+          var SEARCH_MESSAGES = /*#__PURE__*/external_React_default.a.createElement("div", {
+            className: "search-messages default-white-button",
+            onClick: onSearchMessages
+          }, LABEL.SEARCH_MESSAGES_CTA);
+          var NO_RESULTS = /*#__PURE__*/external_React_default.a.createElement(resultRow_ResultRow, {
+            type: TYPE.NIL,
+            isFirstQuery: isFirstQuery,
+            onSearchMessages: onSearchMessages
+          });
+          return /*#__PURE__*/external_React_default.a.createElement(resultTable_ResultTable, table.props, isFirstQuery ? SEARCH_MESSAGES : NO_RESULTS);
+        }
+
         return null;
       });
     };
@@ -17447,8 +17477,10 @@ var resultContainer_ResultContainer = /*#__PURE__*/function (_MegaRenderMixin) {
       var _this$props = this.props,
           recents = _this$props.recents,
           results = _this$props.results,
-          status = _this$props.status;
-      return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status);
+          status = _this$props.status,
+          isFirstQuery = _this$props.isFirstQuery,
+          onSearchMessages = _this$props.onSearchMessages;
+      return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status, isFirstQuery, onSearchMessages);
     }
   }]);
 
@@ -17611,7 +17643,7 @@ searchField_SearchField.inputRef = /*#__PURE__*/external_React_default.a.createR
 
 searchField_SearchField.select = function () {
   var inputElement = searchField_SearchField.inputRef && searchField_SearchField.inputRef.current;
-  var value = inputElement.value;
+  var value = inputElement && inputElement.value;
 
   if (inputElement && value) {
     inputElement.selectionStart = 0;
@@ -17685,6 +17717,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       value: '',
       searching: false,
       status: undefined,
+      isFirstQuery: true,
       recents: [],
       results: []
     };
@@ -17725,7 +17758,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
 
     _this.clickedOutsideComponent = function (ev) {
       var $target = ev && $(ev.target);
-      var outsideElements = ['div.conversationsApp', 'div.fm-main', 'div.fm-left-panel', 'i.tiny-reset', 'div.small-icon.thin-search-icon'];
+      var outsideElements = ['div.conversationsApp', 'div.fm-main', 'div.fm-left-panel', 'i.tiny-reset', 'div.small-icon.thin-search-icon', 'div.search-messages, div.search-messages a'];
       return $target && // current parents !== root component
       $target.parents(".".concat(SEARCH_PANEL_CLASS)).length === 0 && // current element !== left sidebar container
       $target.parents('div.fm-left-menu.conversations').length === 0 && // current element !== left sidebar icon controls
@@ -17741,19 +17774,15 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
       _this.props.onToggle();
     };
 
-    _this.doSearch = function (s) {
-      var self = searchPanel_assertThisInitialized(_this);
-
+    _this.doSearch = function (s, searchMessages) {
       return ChatSearch.doSearch(s, function (room, result, results) {
-        self.setState({
+        return _this.setState({
           results: results
         });
-      }).catch(function (ex) {
-        if (d) {
-          console.log("Search failed (or was reset)", ex);
-        }
+      }, searchMessages).catch(function (ex) {
+        return d && console.error('Search failed (or was reset)', ex);
       }).always(function () {
-        self.setState({
+        return _this.setState({
           status: STATUS.COMPLETED
         });
       });
@@ -17799,12 +17828,15 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         searching: searching,
         // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
         // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
-        // because `pause search` will not be available yet.
-        status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
+        // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
+        // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
+        // `MESSAGES`. Hence, we do status reset to `undefined`.
+        status: undefined,
+        isFirstQuery: true,
         results: []
       }, function () {
         return searching && delay('chat-search', function () {
-          return _this.doSearch(value);
+          return _this.doSearch(value, false);
         }, 1600);
       });
     };
@@ -17837,6 +17869,18 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
           _this.doDestroy();
         }) : _this.toggleMinimize()
       );
+    };
+
+    _this.handleSearchMessages = function () {
+      return searchField_SearchField.hasValue() && _this.setState({
+        status: STATUS.IN_PROGRESS,
+        isFirstQuery: false
+      }, function () {
+        _this.doSearch(_this.state.value, true);
+
+        searchField_SearchField.focus();
+        searchField_SearchField.select();
+      });
     };
 
     return _this;
@@ -17879,6 +17923,7 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
           value = _this$state.value,
           searching = _this$state.searching,
           status = _this$state.status,
+          isFirstQuery = _this$state.isFirstQuery,
           recents = _this$state.recents,
           results = _this$state.results; //
       // `SearchPanel`
@@ -17909,7 +17954,9 @@ var searchPanel_SearchPanel = /*#__PURE__*/function (_MegaRenderMixin) {
         recents: recents
       }), searching && /*#__PURE__*/external_React_default.a.createElement(resultContainer_ResultContainer, {
         status: status,
-        results: results
+        results: results,
+        isFirstQuery: isFirstQuery,
+        onSearchMessages: this.handleSearchMessages
       }))));
     }
   }]);

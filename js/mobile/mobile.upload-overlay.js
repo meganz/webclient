@@ -227,6 +227,7 @@ mobile.uploadOverlay = {
             var $viewFileButton = $('.upload-progress', $overlay);
             $('.text', $viewFileButton.addClass('complete')).removeClass('starting-upload').text(l[59]);
             $('.ul-status-header span:first', $overlay).text(l[1418]);
+            $('.close-button span', $overlay).text(l[148]);
             mobile.uploadOverlay.initUploadAnotherFileButton();
             mobile.uploadOverlay.initGetLinkButton(M.d[h]);
         }
@@ -333,6 +334,8 @@ mobile.uploadOverlay = {
         var self = this;
         var $overlay = this.$overlay;
         var $closeIcon = $('.fm-dialog-close, .close-button', $overlay);
+
+        $('span', $closeIcon).text(l[1597]);
 
         $('.up.left', $overlay).rebind('tap.up', function() {
             self.$ttable.addClass('hidden');

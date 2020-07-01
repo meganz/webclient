@@ -1948,11 +1948,14 @@ mega.megadrop = (function() {
 
             if (is_mobile) {
 
-                $('.widget-upload .wu-items,.widget-upload .wu-btn').rebind('tap.widget_upload', function() {
+                var $mobiledrop = $('.megadrop-upload');
+
+                $('.widget-upload .wu-items, .widget-upload .wu-btn', $mobiledrop)
+                    .rebind('tap.widget_upload', function() {
                     $('#fileselect5').click();
                 });
 
-                $('.fm-dialog-overlay').rebind('tap.widget_window', function(e) {
+                $('.fm-dialog-overlay', $mobiledrop).rebind('tap.widget_window', function(e) {
                     closeDialog(e);
                 });
             }

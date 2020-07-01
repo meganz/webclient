@@ -331,6 +331,9 @@
 .megadrop-upload .pages-menu-wrap .mobile.fm-header .fm-icon.menu {
     display: none;
 }
+.megadrop-upload .upload-overlay .mobile.text-button {
+    margin: 12px auto 0;
+}
 #mobile-ui-megadrop-info .wu-main {
     display: table-cell;
     vertical-align: middle;

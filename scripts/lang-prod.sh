@@ -36,7 +36,7 @@ tar xfvz lang.tar.gz
 cat error.json
 
 # If the error.json file does not exist, then this command will fail which is fine, so continue as normal
-if [ $? -ne 0 ]; then
+if [ 1 -ne 0 ]; then
 
     echo "No errors from Babel, continuing as normal..."
 

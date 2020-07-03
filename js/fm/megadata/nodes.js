@@ -116,7 +116,7 @@ MegaData.prototype.addNode = function(n, ignoreDB) {
     if (this.u[n.h] && this.u[n.h] !== n) {
         for (var k in n) {
             // merge changes from n->M.u[n.h]
-            if (n.hasOwnProperty(k) && k !== 'name') {
+            if (k !== 'name' && k in MEGA_USER_STRUCT) {
                 this.u[n.h][k] = n[k];
             }
         }
@@ -3575,6 +3575,9 @@ MegaData.prototype.getUserByHandle = function(handle) {
     }
     else if (this.opc[handle]) {
         user = this.opc[handle];
+    }
+    else if (this.ipc[handle]) {
+        user = this.ipc[handle];
     }
 
     if (!user && handle === u_handle) {

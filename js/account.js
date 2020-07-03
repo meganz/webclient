@@ -938,7 +938,7 @@ function setLandingPage(page) {
                 $elem.text(l[1051]);
             }
 
-            if ($.sortTreePanel && $.sortTreePanel.contacts.by === 'last-interaction') {
+            if (M.getTreePanelSortingValue('contacts') === 'last-interaction') {
                 // we need to resort
                 M.contacts();
             }

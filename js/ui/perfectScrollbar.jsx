@@ -1,8 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
+import {MegaRenderMixin, SoonFcWrap} from "../stores/mixins.js";
 
-import {MegaRenderMixin} from "../stores/mixins.js";
-var x = 0;
 /**
  * perfect-scrollbar React helper
  * @type {*|Function}
@@ -12,7 +10,6 @@ export class PerfectScrollbar extends MegaRenderMixin {
         className: "perfectScrollbarContainer",
         requiresUpdateOnResize: true
     };
-    static MAX_BOTTOM_POS = 9999999;
 
     constructor(props) {
         super(props);
@@ -20,47 +17,54 @@ export class PerfectScrollbar extends MegaRenderMixin {
         this.isUserScroll = true;
         this.scrollEventIncId = 0;
     }
+
     get$Node() {
         if (!this.$Node) {
             this.$Node = $(this.findDOMNode());
         }
         return this.$Node;
     }
-    doProgramaticScroll(newPos, forced, isX) {
+
+    doProgramaticScroll(newPos, forced, isX, skipReinitialised) {
         if (!this.isMounted()) {
             return;
         }
+        // console.error("%s.doProgramaticScroll", this.getReactId(), newPos, forced, isX, skipReinitialised, [this]);
+
         var self = this;
         var $elem = self.get$Node();
         var animFrameInner = false;
-
         var prop = !isX ? 'scrollTop' : 'scrollLeft';
+        var event = 'scroll.progscroll' + self.scrollEventIncId++;
 
-
-
-
-        var idx = self.scrollEventIncId++;
-
-        $elem.rebind('scroll.progscroll' + idx, (function (idx, e) {
+        $elem.rebind(event, () => {
             if (animFrameInner) {
                 cancelAnimationFrame(animFrameInner);
                 animFrameInner = false;
             }
-            $elem.off('scroll.progscroll' + idx);
+            $elem.off(event);
+
+            if (!skipReinitialised) {
+                self.reinitialised(true);
+            }
+            else if (typeof skipReinitialised === 'function') {
+                onIdle(skipReinitialised);
+            }
+
             self.isUserScroll = true;
-        }).bind(this, idx));
+        });
 
         // do the actual scroll
         self.isUserScroll = false;
-        $elem[0][prop] = newPos;
+        $elem[0][prop] = Math.round(newPos);
         Ps.update($elem[0]);
 
         // reset the flag on next re-paint of the browser
-        animFrameInner = requestAnimationFrame(function (idx) {
+        animFrameInner = requestAnimationFrame(() => {
             animFrameInner = false;
             self.isUserScroll = true;
-            $elem.off('scroll.progscroll' + idx);
-        }.bind(this, idx));
+            $elem.off(event);
+        });
 
         return true;
     }
@@ -72,7 +76,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
         $elem.height('100%');
 
 
-        var options = $.extend({}, {
+        var options = Object.assign({}, {
             'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
             'minScrollbarLength': 20
         }, self.props.options);
@@ -125,10 +129,10 @@ export class PerfectScrollbar extends MegaRenderMixin {
 
     }
     attachAnimationEvents() {
-        var self = this;
-        if (!self.isMounted()) {
-            return;
-        }
+        // var self = this;
+        // if (!self.isMounted()) {
+        //     return;
+        // }
 
         // var $haveAnimationNode = self._haveAnimNode;
         //
@@ -146,97 +150,86 @@ export class PerfectScrollbar extends MegaRenderMixin {
         //         }
         //     });
     }
+    @SoonFcWrap(30, true)
     eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
         var self = this;
 
-        if (!self.isMounted()) {
-            return;
-        }
         if (!self.isComponentEventuallyVisible()) {
             return;
         }
 
         var $elem = self.get$Node();
 
-        if (forced || self._currHeight != self.getContentHeight()) {
-            self._currHeight = self.getContentHeight();
+        var h = self.getContentHeight();
+        if (forced || self._currHeight !== h) {
+            self._currHeight = h;
             self._doReinit(scrollPositionYPerc, scrollToElement, forced, $elem);
         }
     }
     _doReinit(scrollPositionYPerc, scrollToElement, forced, $elem) {
-        var self = this;
-
-        // triggers an
-        self.doProgramaticScroll($elem[0].scrollTop, true);
-
-        var manualReinitialiseControl = false;
-        if (self.props.onReinitialise) {
-            manualReinitialiseControl = self.props.onReinitialise(
-                self,
-                $elem,
-                forced,
-                scrollPositionYPerc,
-                scrollToElement
-            );
+        var fired = false;
+        if (this.props.onReinitialise) {
+            fired = this.props.onReinitialise(this, $elem, forced, scrollPositionYPerc, scrollToElement);
         }
 
-        if (manualReinitialiseControl === false) {
+        if (fired === false) {
             if (scrollPositionYPerc) {
                 if (scrollPositionYPerc === -1) {
-                    self.scrollToBottom(true);
+                    this.scrollToBottom(true);
                 }
                 else {
-                    self.scrollToPercentY(scrollPositionYPerc, true);
+                    this.scrollToPercentY(scrollPositionYPerc, true);
                 }
             }
             else if (scrollToElement) {
-                self.scrollToElement(scrollToElement, true);
+                this.scrollToElement(scrollToElement, true);
             }
         }
     }
-    scrollToBottom(skipReinitialised) {
-        if (!this.doProgramaticScroll(PerfectScrollbar.MAX_BOTTOM_POS)) {
-            return false;
-        }
 
-        if (!skipReinitialised) {
-            this.reinitialised(true);
-        }
+    scrollToBottom(skipReinitialised) {
+        this.reinitialise(skipReinitialised, true);
     }
-    reinitialise(skipReinitialised) {
-        var $elem = this.get$Node();
+
+    reinitialise(skipReinitialised, bottom) {
+        var $elem = this.get$Node()[0];
         this.isUserScroll = false;
-        Ps.update($elem[0]);
+        if (bottom) {
+            $elem.scrollTop = this.getScrollHeight();
+        }
+        Ps.update($elem);
         this.isUserScroll = true;
 
         if (!skipReinitialised) {
             this.reinitialised(true);
         }
     }
+
+    getDOMRect(node) {
+        return (node || this.get$Node()[0]).getBoundingClientRect();
+    }
+
+    getScrollOffset(value) {
+        var $elem = this.get$Node()[0];
+        return this.getDOMRect($elem.children[0])[value] - this.getDOMRect($elem)[value] || 0;
+    }
+
     getScrollHeight() {
-        var $elem = this.get$Node();
-        var outerHeightContainer = $($elem[0].children[0]).outerHeight();
-        var outerHeightScrollable = $elem.outerHeight();
+        var res = this.getScrollOffset('height');
 
-        var res = outerHeightContainer - outerHeightScrollable;
-
-        if (res <= 0) {
+        if (res < 1) {
             // can happen if the element is now hidden.
-            return this._lastKnownScrollHeight ? this._lastKnownScrollHeight : 0;
+            return this._lastKnownScrollHeight || 0;
         }
         this._lastKnownScrollHeight = res;
         return res;
     }
     getScrollWidth() {
-        var $elem = this.get$Node();
-        var outerWidthContainer = $($elem[0].children[0]).outerWidth();
-        var outerWidthScrollable = $elem.outerWidth();
+        var res = this.getScrollOffset('width');
 
-        var res = outerWidthContainer - outerWidthScrollable;
-
-        if (res <= 0) {
+        if (res < 1) {
             // can happen if the element is now hidden.
-            return this._lastKnownScrollWidth ? this._lastKnownScrollWidth : 0;
+            return this._lastKnownScrollWidth || 0;
         }
         this._lastKnownScrollWidth = res;
         return res;
@@ -250,62 +243,43 @@ export class PerfectScrollbar extends MegaRenderMixin {
         return $elem.css('height', h);
     }
     isAtTop() {
-        return this.findDOMNode().scrollTop === 0;
+        return this.get$Node()[0].scrollTop === 0;
     }
     isAtBottom() {
-        return this.findDOMNode().scrollTop === this.getScrollHeight();
+        return Math.round(this.getScrollPositionY()) === Math.round(this.getScrollHeight());
     }
     isCloseToBottom(minPixelsOff) {
         return (this.getScrollHeight() - this.getScrollPositionY()) <= minPixelsOff;
     }
     getScrolledPercentY() {
-        return 100/this.getScrollHeight() * this.findDOMNode().scrollTop;
+        return 100 / this.getScrollHeight() * this.getScrollPositionY();
     }
     getScrollPositionY() {
-        return this.findDOMNode().scrollTop;
+        return this.get$Node()[0].scrollTop;
     }
     scrollToPercentY(posPerc, skipReinitialised) {
         var $elem = this.get$Node();
         var targetPx = this.getScrollHeight()/100 * posPerc;
         if ($elem[0].scrollTop !== targetPx) {
-            if (this.doProgramaticScroll(targetPx)) {
-                if (!skipReinitialised) {
-                    this.reinitialised(true);
-                }
-            }
+            this.doProgramaticScroll(targetPx, 0, 0, skipReinitialised);
         }
     }
     scrollToPercentX(posPerc, skipReinitialised) {
         var $elem = this.get$Node();
         var targetPx = this.getScrollWidth()/100 * posPerc;
         if ($elem[0].scrollLeft !== targetPx) {
-            if (this.doProgramaticScroll(targetPx, false, true)) {
-                if (!skipReinitialised) {
-                    this.reinitialised(true);
-                }
-            }
+            this.doProgramaticScroll(targetPx, false, true, skipReinitialised);
         }
     }
     scrollToY(posY, skipReinitialised) {
         var $elem = this.get$Node();
         if ($elem[0].scrollTop !== posY) {
-            if (this.doProgramaticScroll(posY)) {
-                if (!skipReinitialised) {
-                    this.reinitialised(true);
-                }
-            }
+            this.doProgramaticScroll(posY, 0, 0, skipReinitialised);
         }
     }
     scrollToElement(element, skipReinitialised) {
-        var $elem = this.get$Node();
-        if (!element || !element.offsetParent) {
-            return;
-        }
-
-        if (this.doProgramaticScroll(element.offsetTop)) {
-            if (!skipReinitialised) {
-                this.reinitialised(true);
-            }
+        if (element && element.offsetParent) {
+            this.doProgramaticScroll(element.offsetTop, 0, 0, skipReinitialised);
         }
     }
     disable() {
@@ -330,9 +304,10 @@ export class PerfectScrollbar extends MegaRenderMixin {
                 this,
                 this.get$Node(),
                 forced ? forced : false
-            )
+            );
         }
     }
+    @SoonFcWrap(30, true)
     onResize(forced, scrollPositionYPerc, scrollToElement) {
         if (forced && forced.originalEvent) {
             forced = true;
@@ -349,6 +324,10 @@ export class PerfectScrollbar extends MegaRenderMixin {
             this.onResize(true);
         }
         this.attachAnimationEvents();
+    }
+    customIsEventuallyVisible() {
+        const chatRoom = this.props.chatRoom;
+        return !chatRoom || chatRoom.isCurrentlyActive;
     }
     render() {
         var self = this;

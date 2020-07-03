@@ -31,13 +31,20 @@
 
         options.parentLogger = megaChat.logger;
 
-        megaChat.rebind("onInit.ChatStats", function() {
-            self.attachToChat(megaChat);
-        });
-
         this.unwrapOnDone = [];
         this.eventsForUnbinding = [];
         self.done = false;
+
+        if (!megaChat.chatStats) {
+            megaChat.chatStats = self;
+            self.megaChat = megaChat;
+            self.initialized = Date.now();
+            if (localStorage.debugChatStats) {
+                console.error("Stats generation start.");
+            }
+            self.initDataCollectors();
+        }
+
         return this;
     };
 
@@ -93,32 +100,6 @@
 
 
     /**
-     * Called when the megaChat is initialized, to init also the chatStats internals.
-     *
-     * @param megaChat
-     */
-    ChatStats.prototype.attachToChat = function(megaChat) {
-        var self = this;
-
-        if (!megaChat.chatStats) {
-            megaChat.chatStats = self;
-            self.megaChat = megaChat;
-            self.initialized = microtime();
-            if (localStorage.debugChatStats) {
-                console.error("Stats generation start.");
-            }
-            self.initDataCollectors();
-
-            ChatdIntegration.mcfHasFinishedPromise.done(function(r) {
-                if (!r) {
-                    // no chats. destroy/cleanup immediately.
-                    self.cleanup();
-                }
-            });
-        }
-    };
-
-    /**
      * Check if all chats are loaded and if yes, then it would send the calculated chat stats via api_req('log')
      */
     ChatStats.prototype.sendIfChatsReady = function() {
@@ -129,70 +110,39 @@
             return;
         }
 
-        if (!ChatdIntegration.allChatsHadLoaded) {
-            return;
+        var chatIds = megaChat.chats.keys();
+
+        for (var i = 0; i < chatIds.length; i++) {
+            var chatRoom = megaChat.chats[chatIds[i]];
+            var promise = chatRoom.messagesBuff.$msgsHistoryLoading || chatRoom.messagesBuff.isDecrypting;
+
+            if (promise) {
+                promise.finally(self.sendIfChatsReady.bind(self));
+                return;
+            }
         }
-        if (ChatdIntegration.allChatsHadLoaded.state() === 'resolved') {
-            ChatdIntegration.allChatsHadLoaded.done(function(chats) {
-                var chatIds = megaChat.chats.keys();
 
-                for (var i = 0; i < chatIds.length; i++) {
-                    var chatRoom = megaChat.chats[chatIds[i]];
-                    if (
-                        chatRoom.messagesBuff.messagesHistoryIsLoading() === true ||
-                        chatRoom.messagesBuff.joined === false ||
-                        (
-                            chatRoom.messagesBuff.joined === true &&
-                            chatRoom.messagesBuff.haveMessages === true &&
-                            chatRoom.messagesBuff.messagesHistoryIsLoading() === true
-                        ) ||
-                        (
-                            chatRoom.messagesBuff.isDecrypting &&
-                            chatRoom.messagesBuff.isDecrypting.state() === 'pending'
-                        )
-                    ) {
-                        if (
-                            chatRoom.messagesBuff.isDecrypting &&
-                            chatRoom.messagesBuff.isDecrypting.state() === 'pending'
-                        ) {
-                            chatRoom.messagesBuff.isDecrypting.always(self.sendIfChatsReady.bind(self));
-                        }
-                        else if (
-                            chatRoom.messagesBuff.$msgsHistoryLoading &&
-                            chatRoom.messagesBuff.$msgsHistoryLoading.state() === 'pending'
-                        ) {
-                            chatRoom.messagesBuff.$msgsHistoryLoading.always(self.sendIfChatsReady.bind(self));
-                        }
-                        return;
-                    }
-                }
+        self.done = true;
 
-                self.done = true;
+        // send data, if any
+        if (chatIds.length) {
+            self.data.cr = microtime() - self.initialized;
+            self.data.idb = typeof megaChat.plugins.chatdIntegration.chatd.chatdPersist === 'undefined' ? 0 : 1;
+            self.data.tc = megaChat.chats.length;
 
-                // send data, if any
-                if (chatIds.length === 0) {
-                    self.cleanup();
-                }
-                else {
-                    self.data['cr'] = microtime() - self.initialized;
-                    self.data['idb'] = typeof(megaChat.plugins.chatdIntegration.chatd.chatdPersist) !== 'undefined' ?
-                        1 : 0;
-                    self.data['tc'] = megaChat.chats.length;
-
-                    var totalMsgs = 0;
-                    megaChat.chats.forEach(function(chat) {
-                        totalMsgs += chat.messagesBuff.messages.length;
-                    });
-                    self.data['tm'] = totalMsgs;
-
-                    var result = self.aggregateAndLog();
-
-                    api_req({a: 'log', e: 99670, m: JSON.stringify(result)});
-
-                    self.cleanup();
-                }
+            var totalMsgs = 0;
+            // eslint-disable-next-line local-rules/misc-warnings
+            megaChat.chats.forEach(function(chat) {
+                totalMsgs += chat.messagesBuff.messages.length;
             });
+            self.data.tm = totalMsgs;
+
+            var result = self.aggregateAndLog();
+
+            api_req({a: 'log', e: 99670, m: JSON.stringify(result)});
         }
+
+        self.cleanup();
     };
 
     /**
@@ -287,8 +237,8 @@
 
         var decryptionStart = {};
         self.megaChat.rebind("onRoomInitialized.chatStats", function(e, chatRoom) {
-            $(chatRoom).rebind('onChatdIntegrationReady.chatStats', function() {
-                $(chatRoom.messagesBuff).rebind('onHistoryFinished.chatStats', function(e, data) {
+            chatRoom.rebind('onChatdIntegrationReady.chatStats', function() {
+                chatRoom.messagesBuff.rebind('onHistoryFinished.chatStats', function() {
                     var chatId = base64urldecode(chatRoom.chatId);
                     decryptionStart[chatId] = microtime();
                 });
@@ -297,7 +247,7 @@
                 [chatRoom, 'onChatdIntegrationReady.chatStats']
             );
 
-            $(chatRoom).rebind('onHistoryDecrypted.chatStats', function(e) {
+            chatRoom.rebind('onHistoryDecrypted.chatStats', function() {
                 var chatId = base64urldecode(chatRoom.chatId);
                 var messagesCount = receivedMsgs[chatId];
                 var startTime = decryptionStart[chatId];
@@ -313,7 +263,7 @@
                 [chatRoom, 'onHistoryDecrypted.chatStats']
             );
 
-            $(chatRoom).rebind('onHistoryDone.chatStats', function(e) {
+            chatRoom.rebind('onHistoryDone.chatStats', function() {
                 // eventually send if HistDone is triggered for a chat with no history (it would not trigger
                 // the HistoryDecrypted/HistoryDecryptedDone events)
                 self.sendIfChatsReady();
@@ -322,7 +272,7 @@
                 [chatRoom, 'onHistoryDone.chatStats']
             );
 
-            $(chatRoom).rebind('onHistoryDecryptedDone.chatStats', function(e) {
+            chatRoom.rebind('onHistoryDecryptedDone.chatStats', function() {
                 self.sendIfChatsReady();
             });
 
@@ -449,7 +399,7 @@
         });
 
         self.eventsForUnbinding.forEach(function(eventInfo) {
-            $(eventInfo[0]).off(eventInfo[1]);
+            eventInfo[0].off(eventInfo[1]);
         });
         self.unwrapOnDone = [];
         self.eventsForUnbinding = [];

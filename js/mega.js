@@ -1405,34 +1405,32 @@ scparser.$add('pses', function(a) {
 
 scparser.mcpc = scparser.mcc = function (a) {
     // MEGAchat
-    if (!megaChatIsDisabled) {
-        if (megaChatIsReady) {
-            megaChat._queuedMccPackets.push(a);
-        } else if (typeof ChatdIntegration !== 'undefined') {
-            ChatdIntegration._queuedChats[a.id] = a;
-        } else if (Array.isArray(loadfm.chatmcf)) {
-            // Merge if exists.
-            // This can happen in case some data came from fmdb, but there were still queued ap's (mcpc for
-            // added/removed participants). If this doesn't merge the chatmcf entry, this would end up removing the
-            // 'ck', since mcpc doesn't contain 'ck' properties and the chat would render useless (no key).
-            var exists = false;
-            for (var i = 0; i < loadfm.chatmcf.length; i++) {
-                var entry = loadfm.chatmcf[i];
-                if (entry.id === a.id) {
-                    delete a.a;
-                    Object.assign(entry, a);
-                    exists = true;
-                    a = entry;
-                    break;
-                }
+    if (megaChatIsReady) {
+        megaChat._queuedMccPackets.push(a);
+    }
+    else if (Array.isArray(loadfm.chatmcf)) {
+        // Merge if exists.
+        // This can happen in case some data came from fmdb, but there were still queued ap's (mcpc for
+        // added/removed participants). If this doesn't merge the chatmcf entry, this would end up removing the
+        // 'ck', since mcpc doesn't contain 'ck' properties and the chat would render useless (no key).
+        var i = loadfm.chatmcf.length;
+        while (i--) {
+            var entry = loadfm.chatmcf[i];
+            if (entry.id === a.id) {
+                delete a.a;
+                Object.assign(entry, a);
+                a = entry;
+                break;
             }
-            if (!exists) {
-                loadfm.chatmcf.push(a);
-            }
-        } else {
-            srvlog('@lp unable to parse mcc packet');
+        }
+        if (i < 0) {
+            loadfm.chatmcf.push(a);
         }
     }
+    else {
+        console.error('unable to parse mcc packet');
+    }
+
     if (fmdb) {
         delete a.a;
         fmdb.add('mcf', {id: a.id, d: a});
@@ -1473,7 +1471,7 @@ scparser.$add('_sn', function(a) {
     // reset state
     scinshare = Object.create(null);
 
-    if (!megaChatIsDisabled && megaChatIsReady) {
+    if (megaChatIsReady) {
         megaChat.onSnActionPacketReceived();
     }
 });
@@ -3159,17 +3157,9 @@ function process_u(users, ignoreDB) {
         var userHandle = users[i].u;
         var userStatus = users[i].c;
 
-        users[i].nickname = '';
-
         // If this user had a nickname in the past, don't delete it if they are now added as a contact
-        if (M.u && typeof M.u[userHandle] !== 'undefined' && M.u[userHandle].nickname !== '') {
-            users[i].nickname = M.u[userHandle].nickname;
-        }
-
         // Or if the nickname is set in the initial 'ug' API request, then set it
-        else if (nicknames.cache[userHandle]) {
-            users[i].nickname = nicknames.cache[userHandle];
-        }
+        users[i].nickname = userHandle in M.u && M.u[userHandle].nickname || nicknames.cache[userHandle] || '';
 
         if (userStatus === 1) {
             users[i].h = userHandle;
@@ -3324,45 +3314,28 @@ function process_ok(ok, ignoreDB) {
 
 
 function processMCF(mcfResponse, ignoreDB) {
-    if (typeof ChatdIntegration !== 'undefined') {
-        ChatdIntegration.requiresUpdate = true;
-    }
+    'use strict';
 
     if (mcfResponse === EEXPIRED) {
         return;
     }
 
-    // reopen chats from the MCF response.
-    if (typeof mcfResponse !== 'undefined' && typeof mcfResponse.length !== 'undefined' && mcfResponse.forEach) {
-        // sort by ctime DESC
-        mcfResponse.sort(function(a, b) {
-            return (a.ts < b.ts ? -1 : (a.ts > b.ts ? 1 : 0)) * -1;
-        });
+    // Process mcf response from API (i.e. gettree) or indexedDB
+    if (Array.isArray(mcfResponse)) {
+        for (var i = mcfResponse.length; i--;) {
+            var chatRoomInfo = mcfResponse[i];
 
-        mcfResponse.forEach(function(chatRoomInfo) {
             if (fmdb && !pfkey && !ignoreDB) {
-                fmdb.add('mcf', { id : chatRoomInfo.id, d : chatRoomInfo });
+                fmdb.add('mcf', {id: chatRoomInfo.id, d: chatRoomInfo});
             }
 
-            if (typeof ChatdIntegration !== 'undefined') {
-                ChatdIntegration._queuedChats[chatRoomInfo.id] = chatRoomInfo;
+            if (typeof Chat !== 'undefined') {
+                Chat.mcf[chatRoomInfo.id] = chatRoomInfo;
             }
-        });
-
-        if (typeof ChatdIntegration !== 'undefined') {
-            ChatdIntegration.deviceId = mcfResponse.d;
-
-            ChatdIntegration.mcfHasFinishedPromise.resolve(mcfResponse);
         }
     }
-    else if (typeof ChatdIntegration !== 'undefined') {
-        if (mcfResponse === -1) {
-            // new user, empty chat list.
-            ChatdIntegration.mcfHasFinishedPromise.resolve();
-        }
-        else {
-            ChatdIntegration.mcfHasFinishedPromise.reject(mcfResponse);
-        }
+    else if (d) {
+        console.error('Unexpected mcf response.', mcfResponse);
     }
 }
 
@@ -3425,7 +3398,7 @@ function folderreqerr(c, e) {
  */
 function init_chat(action) {
     'use strict';
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         var __init_chat = function() {
             var result = false;
 
@@ -3438,17 +3411,8 @@ function init_chat(action) {
                 // `megaChatIsDisabled` might be set if `new Karere()` failed (Ie, in older browsers)
                 if (!window.megaChatIsDisabled) {
                     window.megaChat = _chat;
-                    megaChat.init();
-
-                    if (anonymouschat || fminitialized) {
-                        if (String(M.currentdirid).substr(0, 5) === 'chat/') {
-                            chatui(M.currentdirid);
-                        }
-                        // megaChat.renderContactTree();
-                        megaChat.renderMyStatus();
-                    }
-
-                    result = true;
+                    megaChat.init().then(resolve).catch(reject);
+                    resolve = null;
                 }
             }
 
@@ -3457,7 +3421,9 @@ function init_chat(action) {
                 window.loadingInitDialog.hide();
             }
 
-            resolve(result);
+            if (resolve) {
+                resolve(result);
+            }
         };
 
         if (window.megaChatIsReady) {
@@ -3750,10 +3716,11 @@ function loadfm_done(mDBload) {
                         loadfm.chatloaded  = Date.now();
                     });
 
+                /*
                 if (getSitePath().substr(0, 8) === '/fm/chat') {
                     // Keep the "decrypting" step until the chat have loaded.
                     hideLoadingDialog = false;
-                }
+                }*/
             }
         }
 

@@ -76,8 +76,9 @@ describe("chat.emoticon_shortcuts unit test", function() {
         ];
 
 
-        var fakeChat = {};
+        var fakeChat = function() {};
         makeObservable(fakeChat);
+        fakeChat = new fakeChat();
 
         var filter = new EmoticonShortcutsFilter(fakeChat);
 

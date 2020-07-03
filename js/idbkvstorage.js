@@ -174,4 +174,3 @@ IndexedDBKVStorage.prototype.clear = function __IDBKVClear() {
 
     return promise;
 };
-makeObservable(IndexedDBKVStorage);

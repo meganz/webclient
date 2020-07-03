@@ -315,7 +315,7 @@
         // Init inputs events
         accountinputs.init($dialog);
 
-        if (typeof page !== 'undefined' && page === 'chat') {
+        if (M.chat) {
             $('.dialog-dark-bottom.login', $dialog).removeClass('hidden').find('a')
                 .rebind('click.doSignup', function() {
                     closeRegisterDialog($dialog, true);

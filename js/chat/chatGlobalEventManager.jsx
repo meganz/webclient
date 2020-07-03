@@ -12,11 +12,7 @@
      * @returns {ChatGlobalEventManager} ChatGlobalEventManager instance
      */
     var ChatGlobalEventManager = function() {
-        this.initialized = false;
-        this.listeners = {
-            'resize': {},
-            'hashchange': {}
-        };
+        /* dummy */
     };
 
 
@@ -25,13 +21,18 @@
      *
      * @private
      * @returns {undefined}
+     * @name listeners
+     * @memberOf ChatGlobalEventManager.prototype
      */
-    ChatGlobalEventManager.prototype._lateInit = function() {
-        $(window).rebind('resize.chatGlobalEventManager', this.triggered.bind(this, "resize"));
-        window.addEventListener('hashchange', this.triggered.bind(this, "hashchange"));
+    lazy(ChatGlobalEventManager.prototype, 'listeners', function() {
+        window.addEventListener('hashchange', ev => this.triggered(ev));
+        $(window).rebind('resize.chatGlobalEventManager', ev => this.triggered(ev));
 
-        this.initialized = true;
-    };
+        var listeners = Object.create(null);
+        listeners.resize = Object.create(null);
+        listeners.hashchange = Object.create(null);
+        return listeners;
+    });
 
     /**
      * Add an `cb` event listener for `eventName` with namespace `namespace`
@@ -43,9 +44,6 @@
      * @returns {undefined}
      */
     ChatGlobalEventManager.prototype.addEventListener = function(eventName, namespace, cb) {
-        if (this.initialized === false) {
-            this._lateInit();
-        }
         this.listeners[eventName][namespace] = this.listeners[namespace] || cb;
     };
 
@@ -68,11 +66,16 @@
      *
      * @returns {undefined}
      */
-    ChatGlobalEventManager.prototype.triggered = SoonFc(function(eventName, e) {
-        for (var k in this.listeners[eventName]) {
-            this.listeners[eventName][k](e);
+    ChatGlobalEventManager.prototype.triggered = SoonFc(140, function _chatEVDispatcher(ev) {
+        if (M.chat) {
+            var listeners = this.listeners[ev.type];
+
+            // eslint-disable-next-line guard-for-in
+            for (var k in listeners) {
+                listeners[k](ev);
+            }
         }
-    }, 122);
+    });
 
     // init globally. will be initialized only when first .addEventListener is called
     window.chatGlobalEventManager = new ChatGlobalEventManager();

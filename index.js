@@ -1934,7 +1934,16 @@ function init_page() {
                 pchandle = id.substr(5, 8);
 
                 loadingInitDialog.show();
-                init_chat(0x104DF11E5);
+                init_chat(0x104DF11E5)
+                    .always(function() {
+                        M.chat = true;
+                        megaChat.renderListing(id)
+                            .always(function() {
+                                // @todo is this needed?..
+                                megaChat.renderMyStatus();
+                            });
+                    })
+                    .dump('init_chat');
             }
             else if (u_type === 0) {
                 // ephemeral
@@ -3035,8 +3044,7 @@ function loadSubPage(tpage, event) {
 
     if (window.textEditorVisible) {
         // if we are loading a page and text editor was visible, then hide it.
-        // eslint-disable-next-line no-unused-expressions
-        mega && mega.textEditorUI && mega.textEditorUI.doClose();
+        mega.textEditorUI.doClose();
     }
 
     if (window.versiondialogid) {
@@ -3046,9 +3054,19 @@ function loadSubPage(tpage, event) {
     if (folderlink) {
         flhashchange = true;
     }
-
-    if ((tpage === page) && !folderlink) {
+    else if (tpage === page) {
         return false;
+    }
+
+    if (M.chat && megaChatIsReady) {
+        // navigating within the chat, skip the bloatware
+        if (tpage.indexOf('chat') > -1) {
+            megaChat.navigate(tpage, event);
+            return false;
+        }
+
+        // clear the flag if navigating to an static page..
+        M.chat = tpage.substr(0, 2) === 'fm';
     }
 
     // TODO: check what this was for and its relevance

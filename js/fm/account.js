@@ -3298,13 +3298,15 @@ accountUI.contactAndChat = {
 
         // Only call this if the call of this function is the first one, made by fm.js -> accountUI
         if (autoaway === undefined) {
-            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                              autoaway,
-                                                                              autoawaylock,
-                                                                              autoawaytimeout,
-                                                                              persist,
-                                                                              persistlock,
-                                                                              lastSeen) {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
                 self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
 
@@ -3313,13 +3315,15 @@ accountUI.contactAndChat = {
         }
 
         if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
-            $(presenceInt).rebind('settingsUIUpdated.settings', function(e,
-                                                                              autoaway,
-                                                                              autoawaylock,
-                                                                              autoawaytimeout,
-                                                                              persist,
-                                                                              persistlock,
-                                                                              lastSeen) {
+            presenceInt.rebind('settingsUIUpdated.settings', function(
+                e,
+                autoaway,
+                autoawaylock,
+                autoawaytimeout,
+                persist,
+                persistlock,
+                lastSeen
+            ) {
                 self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
             });
         }

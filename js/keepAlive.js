@@ -18,6 +18,7 @@
 
         this.interval = interval;
         this.cb = cb;
+        this.pid = '__keepalive_' + String(Math.random()).substr(2);
 
         this.restart();
     };
@@ -27,12 +28,7 @@
      */
     KeepAlive.prototype.restart = function () {
         var self = this;
-
-        if (self.timer) {
-            clearTimeout(self.timer);
-        }
-
-        self.timer = setTimeout(function keepAliveTimerFn() {
+        delay(self.pid, function keepAliveTimerFn() {
             self.restart();
             self.cb();
         }, self.interval);
@@ -42,10 +38,7 @@
      * Call this when you want to stop the KeepAlive interval.
      */
     KeepAlive.prototype.stop = function () {
-        var self = this;
-        if (self.timer) {
-            clearTimeout(self.timer);
-        }
+        delay.cancel(this.pid);
     };
 
     /**

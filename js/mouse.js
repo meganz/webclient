@@ -37,18 +37,25 @@ else {
 }
 
 function keyPressEntropy(e) {
+    'use strict';
+    lastactive = Date.now();
+
     bioSeed[bioCounter++ & 255] ^= (e.keyCode << 16) | timeValue();
+
+    if (typeof onactivity === 'function') {
+        delay('ev:on.activity', onactivity, 800);
+    }
 }
 
 var mouseApiRetryT = false;
 
 function mouseMoveEntropy(e) {
-
+    'use strict';
     lastactive = Date.now();
 
     var v = (((e.screenX << 8) | (e.screenY & 255)) << 16) | timeValue();
 
-    if (!localStorage.randseed) {
+    if (saveRandSeed.needed) {
         if (bioCounter < 45) {
             // `bioCounter` is incremented once per 4 move events in average
             // 45 * 4 = 180 first move events should provide at about 270 bits of entropy
@@ -85,14 +92,21 @@ function mouseMoveEntropy(e) {
         mouseApiRetryT = lastactive + 2000;
         api_retry();
     }
+
+    if (typeof onactivity === 'function') {
+        delay('ev:on.activity', onactivity, 700);
+    }
 }
 
 // Store some random bits for reseeding RNG in the future
 function saveRandSeed() {
+    'use strict';
     var randseed = new Uint8Array(32);
     asmCrypto.getRandomValues(randseed);
     localStorage.randseed = base64urlencode(asmCrypto.bytes_to_string(randseed));
+    saveRandSeed.needed = false;
 }
+saveRandSeed.needed = !localStorage.randseed;
 
 // ----------------------------------------
 

@@ -372,29 +372,24 @@ Chatd.Shard = function(chatd, shard) {
         {
             functions: {
                 reconnect: function(connectionRetryManager) {
-                    // TODO: change this to use the new API method for retrieving a mcurl for a specific shard
-                    // (not chat)
-                    var firstChatId = Object.keys(self.chatIds)[0];
                     connectionRetryManager.pause();
-                    self.retrieveMcurlAndExecOnce(
-                        base64urlencode(firstChatId),
-                        function(mcurl) {
+
+                    self.retrieveMcurlAndExecOnce(base64urlencode(Object.keys(self.chatIds)[0]))
+                        .then(function(mcurl) {
                             connectionRetryManager.unpause();
                             self.url = mcurl;
                             self.reconnect();
-                        },
-                        function(r) {
-                            if (r === EEXPIRED) {
-                                if (megaChat && megaChat.plugins && megaChat.plugins.chatdIntegration) {
-                                    megaChat.plugins.chatdIntegration.requiresUpdate();
-                                    return;
-                                }
+                        })
+                        .catch(function(ex) {
+                            self.logger.warn(ex);
+
+                            if (ex === EEXPIRED) {
+                                megaChat.plugins.chatdIntegration.requiresUpdate();
                             }
-                            if (connectionRetryManager._$connectingPromise) {
-                                connectionRetryManager._$connectingPromise.reject();
+                            else {
+                                connectionRetryManager.resetConnectionRetries();
                             }
-                        }
-                    );
+                        });
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection
@@ -448,7 +443,7 @@ Chatd.Shard = function(chatd, shard) {
                 isUserForcedDisconnect: function(connectionRetryManager) {
                     return (
                         self.chatd.destroyed === true ||
-                            self.destroyed === true
+                        self.destroyed === true
                     );
                 }
             }
@@ -456,19 +451,27 @@ Chatd.Shard = function(chatd, shard) {
         self.logger
     );
 
-    if (!AppActivityHandler.hasSubscriber("chatdShard" + shard)) {
-        self.userIsActive = AppActivityHandler.getGlobalAppActivityHandler().isActive;
-        AppActivityHandler.addSubscriber("chatdShard" + shard, function(isActive) {
-            // restart would also "start" the keepalive tracker, which is not something we want in case chatd is not
-            // yet connected.
+    Object.defineProperty(self, 'userIsActive', {
+        get: function() {
+            return megaChat.activeCallManagerCall || mega.active;
+        }
+    });
+
+    var ooa = window.onactivity;
+    window.onactivity = function() {
+        if (ooa) {
+            onIdle(ooa);
+        }
+        delay('chatd:shard:activity.' + shard, function() {
+            // restart would also "start" the keepalive tracker, which is
+            // not something we want in case chatd is not yet connected.
             if (self.isOnline()) {
-                self.userIsActive = megaChat.activeCallManagerCall ? true : isActive;
                 self.sendKeepAlive(true);
                 self.keepAlive.restart();
                 self.keepAlivePing.restart();
             }
-        });
-    }
+        }, 3e4);
+    };
 
     // HistoryDone queue manager
 
@@ -513,7 +516,8 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
 };
 
 
-Chatd.Shard.prototype.retrieveMcurlAndExecOnce = function(chatId, resolvedCb, failedCb) {
+Chatd.Shard.prototype.retrieveMcurlAndExecOnce = promisify(function(resolve, reject, chatId) {
+    'use strict';
     var isPublic = anonymouschat && pchandle;
     var chatHandleOrId = chatId;
 
@@ -528,25 +532,20 @@ Chatd.Shard.prototype.retrieveMcurlAndExecOnce = function(chatId, resolvedCb, fa
         }
     }
 
-    megaChat.plugins.chatdIntegration._retrieveShardUrl(
-        isPublic,
-        chatHandleOrId
-    )
-        .done(function(ret) {
+    megaChat.plugins.chatdIntegration._retrieveShardUrl(isPublic, chatHandleOrId)
+        .then(function(ret) {
             if (typeof ret === "string") {
-                resolvedCb(ret);
+                resolve(ret);
             }
             else if (ret && ret.url) {
-                resolvedCb(ret.url);
+                resolve(ret.url);
             }
             else {
-                failedCb(ret);
+                reject(ret);
             }
         })
-        .fail(function(r) {
-            failedCb(r);
-        });
-};
+        .catch(reject);
+});
 
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {
@@ -1224,7 +1223,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                         // do JOINRANGE after our buffer is filled
 
                         self.chatd.chatdPersist.getLowHighIds(base64urlencode(chatId))
-                            .done(function(result) {
+                            .then(function(result) {
                                 var chatIdMessagesObj = self.chatd.chatIdMessages[chatId];
                                 if (chatIdMessagesObj) {
                                     if (result[2]) {
@@ -1240,7 +1239,10 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                     base64urldecode(result[0]) + base64urldecode(result[1]));
 
                             })
-                            .fail(function() {
+                            .catch(function(ex) {
+                                if (ex && d) {
+                                    console.warn(ex);
+                                }
                                 // in case low/high fails, proceed w/ joining anyway so that further commands would not
                                 // get stuck w/ no response from chatd.
                                 self.markAsJoinRequested(chatId);
@@ -1255,7 +1257,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                                 });
 
                                 if (chatRoom) {
-                                    $(chatRoom).trigger('onHistoryDecrypted');
+                                    chatRoom.trigger('onHistoryDecrypted');
                                 }
                             });
                     }
@@ -1280,7 +1282,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                             });
 
                             if (chatRoom) {
-                                $(chatRoom).trigger('onHistoryDecrypted');
+                                chatRoom.trigger('onHistoryDecrypted');
                             }
                         }
                     }
@@ -1306,6 +1308,25 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
 
 };
 
+Chatd.Shard.prototype.arrayBufferToString = function arrayBufferToString(buffer) {
+    'use strict';
+    // Thanks to https://stackoverflow.com/a/20604561
+    var result = '';
+    var addition = Math.pow(2, 16) - 1;
+    var bufView = new Uint16Array(buffer);
+    var length = bufView.length;
+
+    for (var i = 0; i < length; i += addition) {
+
+        if (i + addition > length) {
+            addition = length - i;
+        }
+        result += String.fromCharCode.apply(null, bufView.subarray(i, i + addition));
+    }
+
+    return result;
+};
+
 // inbound command processing
 // multiple commands can appear as one WebSocket frame, but commands never cross frame boundaries
 // CHECK: is this assumption correct on all browsers and under all circumstances?
@@ -1314,7 +1335,7 @@ Chatd.Shard.prototype.exec = function(a) {
     var chatd = self.chatd;
 
     // TODO: find more optimised way of doing this...fromCharCode may also cause exceptions if too big array is passed
-    var cmd = ab_to_str(a);
+    var cmd = this.arrayBufferToString(a);
     if (self.loggerIsEnabled) {
         Chatd.logCmdsToString(self.logger, cmd, false);
     }
@@ -2413,7 +2434,7 @@ Chatd.Messages.prototype.joinrangehist = function() {
         // iDB
 
         self.chatd.chatdPersist.getLowHighIds(base64urlencode(chatId))
-            .done(function(result) {
+            .then(function(result) {
                 var chatIdMessagesObj = self.chatd.chatIdMessages[chatId];
                 if (chatIdMessagesObj) {
                     if (result[2]) {
@@ -2434,7 +2455,10 @@ Chatd.Messages.prototype.joinrangehist = function() {
                 self.chatd.cmd(Chatd.Opcode.JOINRANGEHIST, chatId,
                     base64urldecode(result[0]) + base64urldecode(result[1]));
             })
-            .fail(function(e) {
+            .catch(function(ex) {
+                if (ex && d) {
+                    console.warn(ex);
+                }
                 // This may be triggered by chatdPersist crashing and causing a re-connection + re-hist sync. In this
                 // case, we need to run JOINRANGEHIST otherwise, it would cause the client to (eventually) move
                 // existing msgs to lownum IDs (e.g. back to the top of the list of msgs)

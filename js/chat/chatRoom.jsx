@@ -25,7 +25,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.megaChat = megaChat;
 
-    MegaDataObject.attachToExistingJSObject(
+    MegaDataObject.call(
         this,
         {
             state: null,
@@ -51,8 +51,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             archivedSelected: false,
             showArchived: false,
             observers: 0
-        },
-        true
+        }
     );
 
     this.roomId = roomId;
@@ -303,7 +302,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
         else {
             var contact = M.u[eventData.userId];
-            if (contact && contact.addChangeListener && contact.removeChangeListener) {
+            if (contact instanceof MegaDataMap) {
                 if (eventData.priv === 255 || eventData.priv === -1) {
                     if (contact._onMembUpdUIListener) {
                         contact.removeChangeListener(contact._onMembUpdUIListener);
@@ -354,42 +353,34 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
-    self.rebind('onCallParticipantsUpdated.chatRoom', function (e, userid, clientid, participants) {
-        self.callParticipantsUpdated();
-    });
+    self.rebind('onClientLeftCall.chatRoom', () => self.callParticipantsUpdated());
+    self.rebind('onClientJoinedCall.chatRoom', () => self.callParticipantsUpdated());
+    self.rebind('onCallParticipantsUpdated.chatRoom', () => self.callParticipantsUpdated());
 
+    self.initialMessageHistLoaded = false;
 
-    self.rebind('onClientLeftCall.chatRoom', self.callParticipantsUpdated.bind(self));
-    self.rebind('onClientJoinedCall.chatRoom', self.callParticipantsUpdated.bind(self));
+    var timer = null;
+    var _historyIsAvailable = (ev) => {
+        self.initialMessageHistLoaded = ev ? true : -1;
 
-    self.initialMessageHistLoaded = new MegaPromise();
-    self._initialMessageHistLoadedTimer = null;
-    self.initialMessageHistLoaded.always(function() {
+        clearTimeout(timer);
         self.unbind('onMarkAsJoinRequested.initHist');
         self.unbind('onHistoryDecrypted.initHist');
         self.unbind('onMessagesHistoryDone.initHist');
-    });
 
-    var _historyIsAvailable = function() {
-        if (self.initialMessageHistLoaded.state() === 'pending') {
-            self.initialMessageHistLoaded.resolve();
-            if (self._initialMessageHistLoadedTimer) {
-                clearTimeout(self._initialMessageHistLoadedTimer);
-            }
-        }
+        self.megaChat.safeForceUpdate();
     };
     self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
     self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
 
-    self.rebind('onMarkAsJoinRequested.initHist', function(e, eventData) {
-        self._initialMessageHistLoadedTimer = setTimeout(function () {
+    self.rebind('onMarkAsJoinRequested.initHist', () => {
+        timer = setTimeout(function() {
             if (d) {
                 console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
-            self.initialMessageHistLoaded.reject();
-        }, 30000);
+            _historyIsAvailable(false);
+        }, 3e5);
     });
-
 
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
@@ -400,10 +391,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     return this;
 };
 
-/**
- * Add support for .on, .bind, .unbind, etc
- */
-makeObservable(ChatRoom);
+inherits(ChatRoom, MegaDataObject);
 
 /**
  * Room states
@@ -956,7 +944,7 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
 
     if (triggerLeaveRequest) {
         if (self.type === "group" || self.type === "public") {
-            $(self).trigger('onLeaveChatRequested');
+            self.trigger('onLeaveChatRequested');
         }
         else {
             self.logger.error("Can't leave room of type: " + self.type);
@@ -1141,71 +1129,62 @@ ChatRoom.prototype.show = function() {
 
     if (self.isCurrentlyActive) {
         if (!self.messagesBlockEnabled && self.callManagerCall && self.getUnreadCount() > 0) {
-            $(self).trigger('toggleMessages');
+            self.trigger('toggleMessages');
         }
         return false;
     }
     self.megaChat.hideAllChats();
 
+    if (d) {
+        self.logger.debug(' ---- show');
+    }
+
+    $.tresizer();
+    onIdle(function() {
+        self.scrollToChat();
+        self.trackDataChange();
+    });
     self.isCurrentlyActive = true;
     self.lastShownInUI = Date.now();
-
-    $('.files-grid-view').addClass('hidden');
-    $('.fm-blocks-view').addClass('hidden');
-    $('.contacts-grid-view').addClass('hidden');
-    $('.fm-contacts-blocks-view').addClass('hidden');
-
-    $('.fm-right-files-block.in-chat').removeClass('hidden');
-    $('.fm-right-files-block:not(.in-chat)').addClass('hidden');
-
-    //$('.nw-conversations-item').removeClass('selected');
-
-
-    if (self.megaChat.currentlyOpenedChat && self.megaChat.currentlyOpenedChat != self.roomId) {
-        var oldRoom = self.megaChat.getCurrentRoom();
-        if (oldRoom) {
-            oldRoom.hide();
-        }
-    }
-
-    M.onSectionUIOpen('conversations');
-
-    self.megaChat.currentlyOpenedChat = self.roomId;
-    self.megaChat.lastOpenedChat = self.roomId;
-    if (self.isArchived()) {
-        self.showArchived = true;
-    }
-    else {
-        self.showArchived = false;
-    }
+    self.showArchived = self.isArchived();
     self.megaChat.setAttachments(self.roomId);
+    self.megaChat.lastOpenedChat = self.roomId;
+    self.megaChat.currentlyOpenedChat = self.roomId;
 
     self.trigger('activity');
     self.trigger('onChatShown');
 
-    if (self.type !== 'public') {
-        $('.section.conversations').addClass('privatechat');
+    var tmp = self.megaChat.domSectionNode;
+
+    if (self.type === 'public') {
+        tmp.classList.remove('privatechat');
     }
     else {
-        $('.section.conversations').removeClass('privatechat');
+        tmp.classList.add('privatechat');
     }
 
-    Soon(function() {
-        megaChat.chats.trackDataChange();
-    });
-    $('.conversation-panel[data-room-id="' + self.chatId + '"]').removeClass('hidden');
-    $.tresizer();
+    if ((tmp = tmp.querySelector('.conversation-panels'))) {
+        tmp.classList.remove('hidden');
 
-    self.scrollToChat();
+        if ((tmp = tmp.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]'))) {
+            tmp.classList.remove('hidden');
+        }
+    }
+
+    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+        // do not wait for ConversationsListItem to set the active class..
+        tmp.classList.add('active');
+    }
 };
 
-
 ChatRoom.prototype.scrollToChat = function() {
+    this._scrollToOnUpdate = true;
+
     if (megaChat.$chatTreePanePs) {
-        var $li = $('ul.conversations-pane li#conversation_' + this.roomId + '');
-        if ($li && $li[0]) {
-            var pos = $li[0].offsetTop;
-            if (!verge.inViewport($li[0], -72 /* 2 x 36 px height buttons */)) {
+        var li = document.querySelector('ul.conversations-pane li#conversation_' + this.roomId);
+        if (li) {
+            var pos = li.offsetTop;
+            if (!verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
                 var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
                 var wrapOuterHeight = $(treePane).outerHeight();
                 var itemOuterHeight = $('li:first', treePane).outerHeight();
@@ -1215,8 +1194,6 @@ ChatRoom.prototype.scrollToChat = function() {
                 );
                 this._scrollToOnUpdate = false;
             }
-        } else {
-            this._scrollToOnUpdate = true;
         }
     }
 };
@@ -1232,14 +1209,8 @@ ChatRoom.prototype.isActive = function() {
  * Shows the current room (changes url if needed)
  */
 ChatRoom.prototype.setActive = function() {
-    // We need to delay this, since it can get called BY openFolder and it would then call again openFolder, which
-    // would cause .currentdirid to not be set correctly.
-    var self = this;
-    Soon(function() {
-        loadSubPage(self.getRoomUrl());
-    });
+    loadSubPage(this.getRoomUrl());
 };
-
 
 /**
  * Returns true if messages are still being retrieved from chatd OR in decrypting state
@@ -1247,9 +1218,8 @@ ChatRoom.prototype.setActive = function() {
  * @returns {MegaPromise|boolean}
  */
 ChatRoom.prototype.isLoading = function() {
-    var self = this;
-    var mb = self.messagesBuff;
-    return (mb.messagesHistoryIsLoading() || (mb.isDecrypting && mb.isDecrypting.state() === 'pending'));
+    var mb = this.messagesBuff;
+    return mb.messagesHistoryIsLoading() || mb.isDecrypting;
 };
 
 /**
@@ -1296,13 +1266,27 @@ ChatRoom.prototype.activateWindow = function() {
 ChatRoom.prototype.hide = function() {
     var self = this;
 
+    if (d) {
+        self.logger.debug(' ---- hide', self.isCurrentlyActive);
+    }
     self.isCurrentlyActive = false;
     self.lastShownInUI = Date.now();
 
     if (self.megaChat.currentlyOpenedChat === self.roomId) {
         self.megaChat.currentlyOpenedChat = null;
     }
-    $('.conversation-panel[data-room-id="' + self.chatId + '"]').addClass('hidden');
+
+    var tmp = self.megaChat.domSectionNode.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]');
+    if (tmp) {
+        tmp.classList.add('hidden');
+    }
+
+    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+        // do not wait for ConversationsListItem to remove the active class..
+        tmp.classList.remove('active');
+    }
+
+    self.trigger('onChatHidden', self.isCurrentlyActive);
 };
 
 /**
@@ -2033,7 +2017,7 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     self.isScrollingToMessageId = true;
 
     if (!self.$rConversationPanel) {
-        $(self).one('onComponentDidMount.scrollToMsgId' + msgId, function() {
+        self.one('onComponentDidMount.scrollToMsgId' + msgId, function() {
             self.scrollToMessageId(msgId, index);
         });
         return;
@@ -2055,9 +2039,9 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     }
     else if (self.messagesBuff.isRetrievingHistory) {
         // wait for messages to be received
-        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+        self.one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
             // wait for UI to update (so that the element is now available in the dom)
-            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+            self.one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
                 self.scrollToMessageId(msgId, index);
             });
         });
@@ -2066,9 +2050,9 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
         self.messagesBuff.retrieveChatHistory(!index || index <= 0 ? undefined : index);
         ps.doProgramaticScroll(0, true);
         // wait for messages to be received
-        $(self).one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
+        self.one('onHistoryDecrypted.scrollToMsgId' + msgId, function() {
             // wait for UI to update (so that the element is now available in the dom)
-            $(self).one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
+            self.one('onComponentDidUpdate.scrollToMsgId' + msgId, function() {
                 self.scrollToMessageId(msgId);
             });
         });

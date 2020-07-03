@@ -90,6 +90,8 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
     });
 };
 
+inherits(SharedLocalKVStorage, MegaDataEmitter);
+
 /**
  * Worst case scenario of an inactive tab, that is heavily throttled by Chrome, so we need to set the query time out
  * when running in realworld cases to a bit higher value.
@@ -109,7 +111,7 @@ SharedLocalKVStorage._replyToQuery = function(watchdog, token, query, value) {
 
 SharedLocalKVStorage.prototype.triggerOnChange = function(k, v) {
     var self = this;
-    $(self).trigger('onChange', [k, v]);
+    self.trigger('onChange', [k, v]);
 };
 
 SharedLocalKVStorage.prototype._setupPersistance = function() {
@@ -214,7 +216,7 @@ SharedLocalKVStorage.prototype._initPersistance = function() {
     self._setupPersistance();
 
     if (d) {
-        $(self).rebind("onChange.logger" + self.name, function(e, k, v) {
+        self.rebind("onChange.logger" + self.name, function(e, k, v) {
             self.logger.debug("Got onChange event:", k, v);
         });
     }
@@ -556,6 +558,7 @@ SharedLocalKVStorage.Utils.DexieStorage = function(name, manualFlush, wdID) {
     self.dbState = SharedLocalKVStorage.DB_STATE.NOT_READY;
     this.wdID = wdID;
 };
+inherits(SharedLocalKVStorage.Utils.DexieStorage, MegaDataEmitter);
 
 SharedLocalKVStorage.Utils.DexieStorage._requiresDbReady = function SLKVDBConnRequired(fn) {
     return function __requiresDBConnWrapper() {
@@ -1105,7 +1108,3 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.close = function __SLKVClose()
             return this._queuedExecution(origFunc, toArray.apply(null, arguments), methodName);
         };
     });
-/**
- * add support for .bind, .rebind, .unbind, .trigger
- */
-makeObservable(SharedLocalKVStorage.Utils.DexieStorage);

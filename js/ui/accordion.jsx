@@ -1,7 +1,5 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 import {MegaRenderMixin} from "../stores/mixins.js";
-var RenderDebugger = require("../stores/mixins.js").RenderDebugger;
 
 class AccordionPanel extends MegaRenderMixin {
     render() {
@@ -53,10 +51,9 @@ class Accordion extends MegaRenderMixin {
         var classes = "accordion-panels " + (self.props.className ? self.props.className : '');
 
         var accordionPanels = [];
-        var otherElements = [];
 
         var x = 0;
-        React.Children.forEach(self.props.children, function (child) {
+        React.Children.forEach(self.props.children, child => {
             if (!child) {
                 // skip if undefined
                 return;
@@ -84,9 +81,9 @@ class Accordion extends MegaRenderMixin {
                     })
                 );
             }
-        }.bind(this));
+        });
 
-        return <div className={classes}>{accordionPanels}{otherElements}</div>;
+        return <div className={classes}>{accordionPanels}</div>;
     }
 };
 

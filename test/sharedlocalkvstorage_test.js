@@ -759,7 +759,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             sharedLocalKvInstance2,
             sharedLocalKvInstance3,
         ].forEach(function(kvInstance) {
-            $(kvInstance).bind('onChange.unittest', function(e, k, v) {
+            kvInstance.on('onChange.unittest', function(e, k, v) {
                 onChangeCalls.push({
                     'src': kvInstance.broadcaster.id,
                     'k': k,

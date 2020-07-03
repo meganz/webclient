@@ -43,7 +43,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     'name': megaLinkInfo.info.fn + " " + megaLinkInfo.info.ln,
                 };
                 if (!M.u[fakeContact.u]) {
-                    M.u.set(fakeContact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                    M.u.set(fakeContact.u, new MegaDataObject(MEGA_USER_STRUCT, {
                         'u': fakeContact.u,
                         'name': fakeContact.firstName + " " + fakeContact.lastName,
                         'm': fakeContact.m ? fakeContact.m : "",

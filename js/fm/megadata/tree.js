@@ -465,6 +465,13 @@ MegaData.prototype.initTreePanelSorting = function() {
     }
 };
 
+MegaData.prototype.getTreePanelSortingValue = function(column, property) {
+    'use strict';
+
+    column = $.sortTreePanel && $.sortTreePanel[column] || false;
+    return column[property || 'by'];
+};
+
 var treesearch = false;
 
 MegaData.prototype.treeSearchUI = function() {

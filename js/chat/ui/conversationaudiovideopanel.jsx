@@ -544,13 +544,12 @@ class ConversationAVPanel extends MegaRenderMixin {
             self.resizePanes();
             self.resizeVideos();
         });
-        $(room).rebind('toggleMessages.av', function() {
+        room.rebind('toggleMessages.av', function() {
             self.toggleMessages();
         });
 
         room.messagesBlockEnabled = self.state.messagesBlockEnabled;
 
-        var self = this;
         this.props.chatRoom.rebind('onLocalMuteInProgress.ui', function() {
             self.setState({'muteInProgress': true});
         });
@@ -609,7 +608,7 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         $(document).off("fullscreenchange.megaChat_" + room.roomId);
         chatGlobalEventManager.removeEventListener('resize', 'chatUI_' + room.roomId);
-        $(room).off('toggleMessages.av');
+        room.off('toggleMessages.av');
 
         var $rootContainer = $container.parents('.conversation-panel');
         $('.call-block', $rootContainer).height('');

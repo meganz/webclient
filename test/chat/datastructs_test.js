@@ -21,94 +21,24 @@ describe("Mega Data Structs Test", function() {
                 'u': undefined,
                 'm': undefined,
                 'name': undefined
-            },
-            true
+            }
         );
 
         expect(obj._dataChangeIndex).to.eql(0);
 
         var listenerWasCalled = false;
         var changeListenerCb = function() {
-            listenerWasCalled = true;
+            listenerWasCalled++;
         };
 
         obj.addChangeListener(changeListenerCb);
 
         obj.u = 123;
         setTimeout(function() {
-            expect(listenerWasCalled).to.eql(true);
+            expect(listenerWasCalled).to.eql(1);
             expect(obj._dataChangeIndex).to.eql(1);
             done();
-        }, TRACK_CHANGES_THROTTLING_MS + 1);
-
-    });
-
-    it("MegaDataArray", function(done) {
-        var arr = new MegaDataArray();
-
-        var obj1 = new MegaDataObject(
-            {
-                'u': undefined,
-                'm': undefined,
-                'name': undefined
-            },
-            true,
-            {
-                'u': 'u1',
-                'm': 'u1@email.com',
-                'name': 'u1 name'
-            }
-        );
-        arr.push(obj1);
-
-        var obj2 = new MegaDataObject(
-            {
-                'u': undefined,
-                'm': undefined,
-                'name': undefined
-            },
-            true,
-            {
-                'u': 'u2',
-                'm': 'u2@email.com',
-                'name': 'u2 name'
-            }
-        );
-
-        arr.push(obj2);
-
-
-        expect(obj1._dataChangeIndex).to.eql(0);
-
-        var listenerWasCalled = false;
-        var changeListenerCb = function() {
-            listenerWasCalled = true;
-        };
-
-        arr.addChangeListener(changeListenerCb);
-
-        obj1.u = 123;
-        setTimeout(function() {
-            expect(listenerWasCalled).to.eql(true);
-            expect(obj1._dataChangeIndex).to.eql(1);
-            expect(obj2._dataChangeIndex).to.eql(0);
-            expect(arr._dataChangeIndex).to.eql(1);
-
-            listenerWasCalled = false;
-            arr.removeChangeListener(changeListenerCb);
-
-
-            obj2.u = 321;
-
-            setTimeout(function() {
-                expect(listenerWasCalled).to.eql(false);
-                expect(obj1._dataChangeIndex).to.eql(1);
-                expect(obj2._dataChangeIndex).to.eql(1);
-                expect(arr._dataChangeIndex).to.eql(2);
-
-                done();
-            }, TRACK_CHANGES_THROTTLING_MS + 50);
-        }, TRACK_CHANGES_THROTTLING_MS + 50);
+        }, 60);
 
     });
 
@@ -121,7 +51,6 @@ describe("Mega Data Structs Test", function() {
                 'm': undefined,
                 'name': undefined
             },
-            true,
             {
                 'u': 'u1',
                 'm': 'u1@email.com',
@@ -136,7 +65,6 @@ describe("Mega Data Structs Test", function() {
                 'm': undefined,
                 'name': undefined
             },
-            true,
             {
                 'u': 'u2',
                 'm': 'u2@email.com',
@@ -147,21 +75,23 @@ describe("Mega Data Structs Test", function() {
         objMap.set(obj2.u, obj2);
 
 
-        expect(obj1._dataChangeIndex).to.eql(0);
+        expect(obj1._dataChangeIndex).to.eql(0, 'unexpected obj1 change index [a]');
+        expect(obj2._dataChangeIndex).to.eql(0, 'unexpected obj2 change index [a]');
+        expect(objMap._dataChangeIndex).to.eql(0, 'unexpected change index [a]');
 
         var listenerWasCalled = false;
         var changeListenerCb = function() {
-            listenerWasCalled = true;
+            listenerWasCalled++;
         };
 
         objMap.addChangeListener(changeListenerCb);
 
         obj1.u = 123;
         setTimeout(function() {
-            expect(listenerWasCalled).to.eql(true);
-            expect(obj1._dataChangeIndex).to.eql(1);
-            expect(obj2._dataChangeIndex).to.eql(0);
-            expect(objMap._dataChangeIndex).to.eql(1);
+            expect(listenerWasCalled).to.eql(2, 'listener called unexpected number of times');
+            expect(obj1._dataChangeIndex).to.eql(1, 'unexpected obj1 change index [b]');
+            expect(obj2._dataChangeIndex).to.eql(0, 'unexpected obj2 change index [b]');
+            expect(objMap._dataChangeIndex).to.eql(2, 'unexpected change index [b]');
 
             listenerWasCalled = false;
             objMap.removeChangeListener(changeListenerCb);
@@ -170,14 +100,14 @@ describe("Mega Data Structs Test", function() {
             obj2.u = 321;
 
             setTimeout(function() {
-                expect(listenerWasCalled).to.eql(false);
-                expect(obj1._dataChangeIndex).to.eql(1);
-                expect(obj2._dataChangeIndex).to.eql(1);
-                expect(objMap._dataChangeIndex).to.eql(2);
+                expect(listenerWasCalled).to.eql(false, 'listener called unexpectedly');
+                expect(obj1._dataChangeIndex).to.eql(1, 'unexpected obj1 change index [c]');
+                expect(obj2._dataChangeIndex).to.eql(1, 'unexpected obj2 change index [c]');
+                expect(objMap._dataChangeIndex).to.eql(3, 'unexpected change index [c]');
 
                 done();
-            }, TRACK_CHANGES_THROTTLING_MS + 50);
-        }, TRACK_CHANGES_THROTTLING_MS + 50);
+            }, 60);
+        }, 60);
     });
 
     it("MegaDataSortedMap", function(done) {
@@ -316,5 +246,61 @@ describe("Mega Data Structs Test", function() {
         // insert first test
         sortedMap.push({'orderValue': 500, 'messageId': 500});
         expect(sortedMap.getItem(0).orderValue).to.eql(500);
+    });
+
+    it('MegaDataEmitter - basic', function() {
+        var obj = new MegaDataObject();
+        var stack = [];
+        var save = function(ev) {
+            return stack.push(ev.type + ev.namespace + (ev.data | 0));
+        };
+        expect(obj instanceof MegaDataEmitter).to.eql(true, 'Invalid instance');
+        expect(String(obj)).to.eql('[object MegaDataObject]');
+
+        obj.on('e1.a', save);
+        obj.bind('e1.a', save);
+        obj.rebind('e1.b', save);
+        expect(obj.trigger('e1', [3])).to.eql(3);
+        obj.one('e1.c', save);
+        expect(obj.trigger('e1.b', [4])).to.eql(4);
+        expect(obj.trigger('e1', [8])).to.eql(8);
+        expect(obj.trigger('e1.c')).to.eql(undefined);
+        obj.off('e1.a');
+        expect(obj.trigger('e1', [9])).to.eql(9);
+        obj.rebind('e1.b', save);
+        expect(obj.trigger('e1', [0])).to.eql(10);
+        obj.unbind('e1.b');
+        expect(obj.trigger('e1')).to.eql(undefined);
+
+        expect(stack.join('|')).to.eql('e13|e13|e13|e1b4|e18|e18|e18|e18|e19|e10');
+
+        var testPropagation = function(event) {
+            var trap = mRandomToken('evz');
+            var type = event.type;
+            obj.one(type, function(ev) {
+                expect(ev.type).to.eql(type);
+                expect(ev.data).to.eql(undefined);
+                type = trap;
+                return false;
+            });
+            expect(obj.trigger(event)).to.eql(false);
+            expect(event.isPropagationStopped()).to.eql(true);
+            expect(type).to.eql(trap);
+
+            var data = {ts: Date.now()};
+            event = new MegaDataEvent(type);
+            obj['on' + type] = function(ev) {
+                expect(ev.originalEvent).to.eql(event);
+                expect(ev.originalEvent).to.deep.equal(event);
+                expect(ev.data).to.eql(data);
+                ev.preventDefault();
+                return stack.length;
+            };
+            expect(obj.trigger(event, data)).to.eql(stack.length);
+            expect(obj.trigger(event, data)).to.eql(undefined);
+        };
+
+        testPropagation(new $.Event('p1'));
+        testPropagation(new MegaDataEvent('p2'));
     });
 });

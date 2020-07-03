@@ -8,15 +8,15 @@ function later(callback) {
     }, 1000);
 }
 
-var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
-    if (typeof callback !== 'function') {
-        throw new Error('Invalid function parameter.');
-    }
-
-    return setTimeout(function() {
-        callback();
-    }, 20);
-};
+/**
+ * @param {Function} callback function
+ * @returns {void}
+ * @deprecated we shall use onIdle() or delay()
+ */
+function Soon(callback) {
+    'use strict';
+    delay.tbsp.then(callback);
+}
 
 /**
  *  Delays the execution of a function
@@ -29,23 +29,59 @@ var Soon = is_chrome_firefox ? mozRunAsync : function(callback) {
  *  All argument and *this* is passed to the callback
  *  after the 100ms (default)
  *
- *  @param {Function} func  Function to wrap
- *  @param {Number}   ms    Timeout
+ *  @param {Number} [ms] Timeout in milliseconds, 160 by default
+ *  @param {Boolean} [global] Set to false to attach to instantiated class.
+ *  @param {Function} callback  Function to wrap
  *  @returns {Function} wrapped function
  */
-function SoonFc(func, ms) {
-    return function __soonfc() {
-        var self = this;
-        var args = toArray.apply(null, arguments);
+function SoonFc(ms, global, callback) {
+    'use strict';
+    var expando = '__delay_call_wrap_' + Math.random() * Math.pow(2, 56);
 
-        if (func.__sfc) {
-            clearTimeout(func.__sfc);
+    // Handle arguments optionality
+    ms = global = callback = null;
+    for (var i = arguments.length; i--;) {
+        var value = arguments[i];
+        var type = typeof value;
+
+        if (type === 'number' || type === 'string') {
+            ms = value | 0;
         }
-        func.__sfc = setTimeout(function() {
-            delete func.__sfc;
-            func.apply(self, args);
-        }, ms || 122);
+        else if (type === 'boolean') {
+            global = value;
+        }
+        else {
+            callback = value;
+        }
+    }
+    ms = ms || 160;
+
+    var sfc = function __soonfc() {
+        var self = this;
+        var idx = arguments.length;
+        var args = new Array(idx);
+        while (idx--) {
+            args[idx] = arguments[idx];
+        }
+
+        idx = expando;
+
+        if (global === false) {
+            if (!(expando in this)) {
+                Object.defineProperty(this, expando, {value: makeUUID()});
+            }
+
+            idx += this[expando];
+        }
+
+        delay(idx, function() {
+            callback.apply(self, args);
+        }, ms);
     };
+    if (d > 1) {
+        Object.defineProperty(sfc, smbl(callback.name || 'callback'), {value: callback});
+    }
+    return sfc;
 }
 
 /**
@@ -59,6 +95,7 @@ function SoonFc(func, ms) {
  * @param {Number}   [aTimeout]  The timeout, in ms, to wait.
  */
 function delay(aProcID, aFunction, aTimeout) {
+    'use strict';
 
     // Let aProcID be optional...
     if (typeof aProcID === 'function') {
@@ -70,60 +107,52 @@ function delay(aProcID, aFunction, aTimeout) {
     if (d > 2) {
         console.debug("delay'ing", aProcID, delay.queue[aProcID]);
     }
-    delay.cancel(aProcID);
 
-    delay.queue[aProcID] =
-        setTimeout(function() {
-            if (d > 1) {
+    var t = aTimeout | 0 || 350;
+    var q = delay.queue[aProcID];
+    if (!q) {
+        q = delay.queue[aProcID] = Object.create(null);
+
+        q.pun = aProcID;
+        q.tid = setTimeout(function(q) {
+            if (d > 2) {
                 console.debug('dispatching delayed function...', aProcID);
             }
-            delete delay.queue[aProcID];
-            aFunction();
-        }, (aTimeout | 0) || 350);
+            delete delay.queue[q.pun];
+
+            var rem = q.tde - (performance.now() - q.tik);
+            if (rem < 20) {
+                delay.tbsp.then(q.tsk);
+            }
+            else {
+                delay(q.pun, q.tsk, rem);
+            }
+        }, t, q);
+    }
+    q.tde = t;
+    q.tsk = aFunction;
+    q.tik = performance.now();
 
     return aProcID;
 }
 delay.queue = Object.create(null);
 delay.has = function(aProcID) {
+    'use strict';
     return delay.queue[aProcID] !== undefined;
 };
 delay.cancel = function(aProcID) {
+    'use strict';
+
     if (delay.has(aProcID)) {
-        clearTimeout(delay.queue[aProcID]);
+        clearTimeout(delay.queue[aProcID].tid);
         delete delay.queue[aProcID];
         return true;
     }
     return false;
 };
 
-
-var _IDLE_OR_TIMEOUT = window.requestIdleCallback ? 1 : 2;
-
-/**
- * Tries to use `requestIdleCallback` or fallback to `setTimeout` if not available
- */
-var _onIdleOrTimeout = _IDLE_OR_TIMEOUT === 1 ? function(cb, interval) {
-        "use strict";
-        return window.requestIdleCallback(function () {
-            cb();
-        }, {
-            timeout: 5000
-        });
-    } :
-    function(cb, interval) {
-        return setTimeout(function() {
-            cb();
-        }, interval);
-    };
-
-
-/**
- * Tries to use `cancelIdleCallback` or fallback to `clearTimeout` if not available
- */
-var _cancelOnIdleOrTimeout = _IDLE_OR_TIMEOUT === 1 ? function(id) {
-        "use strict";
-        return window.cancelIdleCallback(id);
-    } :
-    function(id) {
-        return clearTimeout(id);
-    };
+/** @property delay.tbsp */
+lazy(delay, 'tbsp', function() {
+    'use strict';
+    return Promise.resolve();
+});

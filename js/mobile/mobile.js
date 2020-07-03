@@ -926,7 +926,7 @@ accountUI.account = {
  * @returns {Boolean}               True if the caller can proceed. False if not
  */
 function validateUserAction(hideContext) {
-    if (u_attr) {
+    if (mega.paywall) {
         if (u_attr.b && u_attr.b.s === -1) {
             if (u_attr.b.m) {
                 msgDialog('warningb', '', l[20401], l[20402]);

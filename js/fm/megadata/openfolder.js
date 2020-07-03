@@ -35,6 +35,7 @@
             id = M.d[fid].p;
         }
         this.previousdirid = this.currentdirid;
+        this.previousrootid = this.currentrootid;
         this.currentdirid = id;
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
@@ -81,14 +82,6 @@
         if (this.chat) {
             this.v = [];
             sharedFolderUI(); // remove shares-specific UI
-
-            if (megaChatIsReady) {
-                var roomId = String(id).split('/').pop();
-
-                if (roomId.length === 11) {
-                    megaChat.setAttachments(roomId);
-                }
-            }
         }
         else if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -303,43 +296,30 @@
             }
             this.lastSeenFolderLink = newHashLocation;
         }
-        else if (id && id !== "chat/archived" && (id.startsWith('chat/') && id[6] !== '/')) {
-            // is a chat link, e.g. chat/[^/]
-            newHashLocation = this.currentdirid;
+        else if (!newHashLocation) {
+            newHashLocation = 'fm/' + this.currentdirid;
         }
-        else {
-            // new hash location can be altered already by the chat logic in the previous lines in this func
-            if (!newHashLocation) {
-                newHashLocation = 'fm/' + this.currentdirid;
-            }
-        }
-        try {
+
+        tryCatch(function() {
 
             if (hashLogic) {
                 document.location.hash = '#' + newHashLocation;
             }
-            else {
-                if (!isLinkV2) {
-                    if (window.location.pathname !== "/" + newHashLocation && !pfid) {
-                        loadSubPage(newHashLocation);
-                    }
-                    else if (pfid && document.location.hash !== '#' + newHashLocation) {
-                        history.pushState({fmpage: newHashLocation}, "", "#" + newHashLocation);
-                        page = newHashLocation;
-                    }
-                }
-                else {
-                    // this is new link.
-                    var currURL = getSitePath();
-                    if (currURL !== newHashLocation) {
-                        loadSubPage(newHashLocation);
-                    }
+            else if (isLinkV2) {
+                // this is new link.
+                var currURL = getSitePath();
+                if (currURL !== newHashLocation) {
+                    loadSubPage(newHashLocation);
                 }
             }
-        }
-        catch (ex) {
-            console.error(ex);
-        }
+            else if (window.location.pathname !== "/" + newHashLocation && !pfid && !M.chat) {
+                loadSubPage(newHashLocation);
+            }
+            else if (pfid && document.location.hash !== '#' + newHashLocation) {
+                history.pushState({fmpage: newHashLocation}, "", "#" + newHashLocation);
+                page = newHashLocation;
+            }
+        })();
 
         this.currentTreeType = this.currentCustomView.type || M.treePanelType();
 
@@ -350,7 +330,9 @@
         M.initLabelFilter(this.v);
         M.redrawTreeFilterUI();
 
-        promise.resolve(id);
+        if (promise) {
+            promise.resolve(id);
+        }
         mBroadcaster.sendMessage('mega:openfolder');
     };
 
@@ -426,13 +408,45 @@
         else if (id === 'ipc') {
             id = 'ipc';
         }
-        else if (is_mobile && String(id).startsWith('chat')) {
-            id = this.RootID;
+        else if (id && id.substr(0, 4) === 'chat') {
+            if (is_mobile) {
+                // @todo implement the chat on mobile :)
+
+                id = this.RootID;
+            }
+            else {
+                var self = this;
+                this.chat = true;
+
+                return new MegaPromise(function(resolve, reject) {
+                    _openFolderCompletion.call(self, id, false, firstopen);
+
+                    if (firstopen) {
+                        // do not wait for the chat to load on the first call
+                        resolve(id);
+                    }
+
+                    onIdle(function _() {
+                        if (!megaChatIsReady) {
+                            // Wait for the chat to be ready (lazy loading)
+                            M.renderChatIsLoading();
+                            return mBroadcaster.once('chat_initialized', SoonFc(20, _));
+                        }
+                        if (!self.chat) {
+                            // We moved elsewhere meanwhile
+                            return reject(EACCESS);
+                        }
+
+                        M.addTreeUI();
+                        megaChat.renderListing(id).then(resolve).catch(reject);
+                    });
+                });
+            }
         }
         else if (id && id.substr(0, 15) === 'user-management') {
             // id = 'user-management';
-            M.require('businessAcc_js', 'businessAccUI_js').done(function () {
-                M.onFileManagerReady(function () {
+            M.require('businessAcc_js', 'businessAccUI_js').done(function() {
+                M.onFileManagerReady(function() {
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
                         return M.openFolder('cloudroot');
                     }
@@ -484,53 +498,6 @@
         else if (id === 'public-links') {
             id = 'public-links';
         }
-        else if (id === 'chat/archived' && !megaChatIsReady) {
-            this.chat = true;
-
-            this.renderChatIsLoading();
-            mBroadcaster.once('chat_initialized', function() {
-                if (M.currentdirid === 'chat/archived') {
-                    megaChat.displayArchivedChats = true;
-                }
-            });
-        }
-        else if (id === 'chat') {
-            this.chat = true;
-            var initChatUI = function() {
-                megaChat.refreshConversations();
-                M.addTreeUI();
-                var room = megaChat.renderListing();
-
-                if (room) {
-                    newHashLocation = room.getRoomUrl();
-                }
-                else if (megaChat.displayArchivedChats) {
-                    newHashLocation = 'fm/chat/archived';
-                }
-                else {
-                    if (megaChat.$conversationsAppInstance) {
-                        megaChat.safeForceUpdate();
-                    }
-                }
-            };
-
-            if (megaChatIsReady) {
-                initChatUI();
-            }
-            else {
-                this.renderChatIsLoading();
-                mBroadcaster.once('chat_initialized', function() {
-                    if (M.currentdirid === 'chat') {
-                        setTimeout(function () {
-                            loadSubPage('fm/chat');
-                            M.openFolder('chat');
-                            initChatUI();
-                        }, 100);
-                    }
-                });
-            }
-
-        }
         else if (id && id.substr(0, 7) === 'account') {
             M.onFileManagerReady(accountUI);
         }
@@ -548,15 +515,6 @@
         }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
-        }
-        else if (id && id.substr(0, 5) === 'chat/') {
-            this.chat = true;
-            this.addTreeUI();
-
-            if (megaChatIsReady) {
-                // XX: using the old code...for now
-                chatui(id);
-            }
         }
         else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
             fetchdbnodes = true;
@@ -582,11 +540,10 @@
             }
         }
 
-        if (megaChatIsReady) {
-            if (!this.chat) {
-                if (megaChat.getCurrentRoom()) {
-                    megaChat.getCurrentRoom().hide();
-                }
+        if (!this.chat && megaChatIsReady) {
+            var room = megaChat.getCurrentRoom();
+            if (room) {
+                room.hide();
             }
         }
 

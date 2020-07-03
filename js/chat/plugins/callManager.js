@@ -39,7 +39,17 @@ var CallManager = function (megaChat) {
                 megaChat.options.rtc.iceServers
             );
 
-            self._attachToChat(megaChat);
+            megaChat.rtc.statsUrl = "https://stats.karere.mega.nz";
+
+            if (d) {
+                megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
+                    CallManager.assert(chatRoom.type, 'missing room type');
+                });
+
+                megaChat.rebind("onRoomInitialized.chatStore", function(e, chatRoom) {
+                    CallManager.assert(chatRoom.type, 'missing room type');
+                });
+            }
         }
         catch (exc) {
             // no RTC support.
@@ -75,23 +85,6 @@ function makeStreamId(rtcSess) {
         ":" + base64urlencode(rtcSess.peerClient) +
         ":" + base64urlencode(rtcSess.sid);
 }
-
-/**
- * Entry point, for attaching the chat store to a specific `Chat` instance
- *
- * @param megaChat
- */
-CallManager.prototype._attachToChat = function (megaChat) {
-    megaChat.rtc.statsUrl = "https://stats.karere.mega.nz";
-
-    megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
-        CallManager.assert(chatRoom.type, 'missing room type');
-    });
-
-    megaChat.rebind("onRoomInitialized.chatStore", function(e, chatRoom) {
-        CallManager.assert(chatRoom.type, 'missing room type');
-    });
-};
 
 CallManager.prototype.registerCall = function (chatRoom, rtcCall, fromUser) {
     var self = this;

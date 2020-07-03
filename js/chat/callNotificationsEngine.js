@@ -74,22 +74,22 @@ var CallNotificationsEngine = function(chatRoom, callManagerCall) {
         }
     });
 
-    $(chatRoom).rebind('onClientJoinedCall.cne' + self.idx, function(e, eventData) {
+    chatRoom.rebind('onClientJoinedCall.cne' + self.idx, function(e, eventData) {
         self.notify(CallNotificationsEngine.ACTIONS.JOIN, [eventData.userId]);
     });
-    $(chatRoom).rebind('onClientLeftCall.cne' + self.idx, function(e, eventData) {
+    chatRoom.rebind('onClientLeftCall.cne' + self.idx, function(e, eventData) {
         if (eventData.userId) {
             self.notify(CallNotificationsEngine.ACTIONS.LEFT, [eventData.userId]);
         }
     });
 
-    $(chatRoom).rebind('onCallSessReconnecting.cne' + self.idx, function(e, eventData) {
+    chatRoom.rebind('onCallSessReconnecting.cne' + self.idx, function() {
         self.notify(CallNotificationsEngine.ACTIONS.SESS_RECONNECTING);
         chatRoom.callReconnecting = true;
         chatRoom.trackDataChange();
     });
 
-    $(chatRoom).rebind('onCallSessReconnected.cne' + self.idx, function(e, eventData) {
+    chatRoom.rebind('onCallSessReconnected.cne' + self.idx, function() {
         self.notify(CallNotificationsEngine.ACTIONS.SESS_RECONNECTED);
         delete chatRoom.callReconnecting;
         chatRoom.trackDataChange();
@@ -420,6 +420,6 @@ CallNotificationsEngine.prototype.destroy = function() {
     $(window).unbind("offline.callNotificationsEngine" + self.idx);
     $(window).unbind("online.callNotificationsEngine" + self.idx);
 
-    $(chatRoom).unbind('onClientJoinedCall.cne' + self.idx);
-    $(chatRoom).unbind('onClientLeftCall.cne' + self.idx);
+    chatRoom.unbind('onClientJoinedCall.cne' + self.idx);
+    chatRoom.unbind('onClientLeftCall.cne' + self.idx);
 };

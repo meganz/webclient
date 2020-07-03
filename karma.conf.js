@@ -123,7 +123,6 @@ module.exports = function(config) {
         'js/vendor/avatar.js',
         'js/vendor/int64.js',
         'js/cms.js',
-        'js/appActivityHandler.js',
         'js/keepAlive.js',
 
         // Transfers

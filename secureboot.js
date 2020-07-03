@@ -122,9 +122,7 @@ function getSitePath() {
         return document.location.pathname + document.location.hash;
     }
 
-    return (document.location.pathname.substr(0, 6) === '/chat/') ?
-            document.location.pathname + '#' + hash :
-            document.location.pathname;
+    return hash && location.pathname.substr(0, 6) === '/chat/' ? location.pathname + '#' + hash : location.pathname;
 }
 
 // remove dangling characters from the pathname/hash
@@ -680,6 +678,24 @@ Object.defineProperty(mega, 'flags', {
     }
 });
 
+Object.defineProperty(mega, 'paywall', {
+    get: function() {
+        'use strict';
+        return typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+    }
+});
+
+Object.defineProperty(mega, 'active', {
+    get: (function() {
+        'use strict';
+        // Number of milliseconds past the user will be considered inactive.
+        var THRESHOLD = 3e4;
+        return function() {
+            return Date.now() - lastactive < THRESHOLD;
+        };
+    })()
+});
+
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
 if (localStorage.testMobileSite) is_mobile = m = true;
@@ -794,8 +810,8 @@ if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
 }
-else if (getSitePath().substr(0, 6) === '/chat/') {
-    page = getSitePath().substring(1).split("#")[0] + "#" + document.location.hash.split("#")[1];
+else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
+    page = tmp.substr(1);
     history.replaceState({subpage: page}, "", '/' + page);
 }
 else if ((page = isPublicLink(document.location.hash))) {
@@ -2830,7 +2846,6 @@ else if (!browserUpdate) {
             /* chat related js */
             'react_js': {f:'js/vendor/react.js', n: 'react_js', j:1},
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
-            'appactivityhandler_js': {f:'js/appActivityHandler.js', n: 'appactivityhandler_js', j:1},
             'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
             'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
@@ -3971,22 +3986,42 @@ function makeUUID(a) {
 function inherits(target, source) {
     'use strict';
 
-    target.prototype = Object.create(source.prototype || source);
+    target.prototype = Object.create(source && source.prototype || source);
     Object.defineProperty(target.prototype, 'constructor', {
         value: target,
         enumerable: false
     });
+
+    Object.defineProperty(target.prototype, 'toString', {
+        value: function() {
+            return '[object ' + this.constructor.name + ']';
+        },
+        configurable: true
+    });
+
+    if (!target.prototype.valueOf) {
+        Object.defineProperty(target.prototype, 'valueOf', {
+            value: function() {
+                return this;
+            },
+            configurable: true
+        });
+    }
+
+    if (source) {
+        Object.setPrototypeOf(target, source);
+    }
 }
 
 function lazy(target, property, stub) {
     'use strict';
     Object.defineProperty(target, property, {
         get: function() {
-            Object.defineProperty(target, property, {
-                value: stub(),
-                enumerable: true
+            Object.defineProperty(this, property, {
+                value: stub.call(this),
+                enumerable: property[0] !== '_'
             });
-            return target[property];
+            return this[property];
         },
         configurable: true
     });
@@ -4060,6 +4095,11 @@ mutex.unlock = promisify(function(resolve, reject, name) {
     resolve();
 });
 Object.freeze(mutex);
+
+var smbl = typeof Symbol === 'function' ? Symbol : function(s) {
+    'use strict';
+    return '<<<' + s;
+};
 
 mBroadcaster.once('startMega', function() {
     var data = sessionStorage.sitet;

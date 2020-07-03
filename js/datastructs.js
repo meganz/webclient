@@ -5,573 +5,774 @@
  * 2. reactive/optimised way
  */
 
-var TRACK_CHANGES_THROTTLING_MS = 75;
-var MAX_INDEX_NUMBER = 65000;
+(function _dataStruct(global) {
+'use strict';
 
-var _arrayAliases = [
-    'concat',
-    'copyWithin',
-    'entries',
-    'every',
-    'fill',
-    'filter',
-    'forEach',
-    'includes',
-    'indexOf',
-    'join',
-    'keys',
-    'lastIndexOf',
-    'map',
-    'pop',
-    'push',
-    'reduce',
-    'reduceRight',
-    'reverse',
-    'shift',
-    'slice',
-    'some',
-    'sort',
-    'splice',
-    'toLocaleString',
-    'toSource',
-    'toString',
-    'unshift',
-    'values'
-];
+var dsIncID = 0;
 
-
-/**
- * Helper Exception to be used for "break"-ing .forEach calls
- */
-if (typeof StopIteration == "undefined") {
-    StopIteration = new Error("StopIteration");
+var VALUE_DESCRIPTOR = {configurable: true, value: null};
+function _defineValue(target, prop, value) {
+    VALUE_DESCRIPTOR.value = value;
+    Object.defineProperty(target, prop, VALUE_DESCRIPTOR);
+    VALUE_DESCRIPTOR.value = null;
 }
 
-function breakableForEach(arr, cb) {
-    try {
-        return Array.prototype.forEach.call(arr, cb);
-    }
-    catch(e) {
-        if (e !== StopIteration) {
-            throw e;
-        }
-    }
-};
+var VNE_DESCRIPTOR = {configurable: true, writable: true, value: null};
+function _defineNonEnum(target, prop, value) {
+    VNE_DESCRIPTOR.value = value;
+    Object.defineProperty(target, prop, VNE_DESCRIPTOR);
+    VNE_DESCRIPTOR.value = null;
+}
 
-var _createObjectDataMethods = function(kls) {
-    var obj = kls.prototype ? kls.prototype : kls;
+function _cmp(a, b) {
+    return a === b || a === null && b === undefined || b === null && a === undefined;
+}
 
-    obj.forEach = function(cb) {
-        var self = this;
-        self.keys().forEach(function(k) {
-            cb(self._data[k], k);
-        });
-    };
-    obj.breakableForEach = function(cb) {
-        var self = this;
-        breakableForEach(self.keys(), function(k) {
-            cb(self._data[k], k);
-        });
-    };
-    obj.every = function(cb) {
-        var self = this;
-        return self.keys().every(function(k) {
-            return cb(self._data[k], k);
-        });
-    };
-    obj.some = function(cb) {
-        var self = this;
-        return self.keys().some(function(k) {
-            return cb(self._data[k], k);
-        });
-    };
-
-    obj.map = function(cb) {
-        var self = this;
-        var res = [];
-        self.forEach(function(v, k) {
-            var intermediateResult = cb(v, k);
-            if (intermediateResult !== null && intermediateResult !== undefined) {
-                res.push(intermediateResult);
+function _timing(proto, min, max) {
+    min = min || 10;
+    max = max || 70;
+    var wrap = function(f, m) {
+        return function() {
+            var t = performance.now();
+            var r = m.apply(this, arguments);
+            if ((t = performance.now() - t) > min) {
+                var fn = t > max ? 'error' : 'warn';
+                console[fn]('[timing] %s.%s: %fms', this, f, t, [this], toArray.apply(null, arguments));
             }
-        });
-        return res;
-    };
-
-    obj.keys = function() {
-        return Object.keys(this._data);
-    };
-
-    obj.size = function() {
-        return this.keys().length;
-    };
-
-    obj.hasOwnProperty = function(prop) {
-        return this._data.hasOwnProperty(prop);
-    };
-
-    obj.propertyIsEnumerable = function(prop) {
-        return this._data.propertyIsEnumerable(prop);
-    };
-
-    obj.destroyStructure = function() {
-        this.trackDataChange();
-        for (var k in this.keys()) {
-            delete this[k];
-        }
-        delete this._data;
-        delete this;
-        Object.freeze(this); // TODO: is this needed?
-    };
-};
-
-var _arrayMethodsThatAltersData = [
-    'push',
-    'pop',
-    'remove',
-    'unshift',
-    'sort',
-    'fill',
-    'splice',
-    'reverse',
-    'shift'
-];
-
-var _trackedId = 0;
-
-
-var _properJSCmp = function(a, b) {
-    if (Number.isNaN(a) && Number.isNaN(b)) {
-        return true;
-    }
-    else if (typeof(a) == 'boolean' || typeof(b) == 'boolean') {
-        return a === b;
-    }
-    else {
-        return a == b;
-    }
-};
-
-var _fromJSDecorator = function(kls) {
-    return function(obj, implementChangeListener) {
-        var props = Object.keys(obj);
-        var actualPropsMap = {};
-        props.forEach(function(k) {
-            actualPropsMap[k] = undefined;
-        });
-        return new kls(actualPropsMap, implementChangeListener, obj);
-    };
-};
-
-var _toJS = function() {
-    return this._data;
-};
-
-var manualTrackChangesOnStructure = function(obj, implementChangeListener) {
-    if (obj.prototype) { // if called on a class...
-        obj = obj.prototype;
-    }
-
-    implementChangeListener = implementChangeListener || false;
-
-    obj._dataChangeIndex = 0;
-    obj._dataChangeTrackedId = _trackedId++;
-
-    obj.trackDataChange = function() {
-        var self = this;
-
-        if (self._dataChangeThrottlingTimer) {
-            _cancelOnIdleOrTimeout(self._dataChangeThrottlingTimer);
-        }
-
-        var args = toArray.apply(null, arguments);
-
-        self._dataChangeThrottlingTimer = _onIdleOrTimeout(function() {
-            delete self._dataChangeThrottlingTimer;
-            if (self._dataChangeIndex > MAX_INDEX_NUMBER) {
-                self._dataChangeIndex = 0;
-            }
-            else {
-                self._dataChangeIndex++;
-            }
-
-            if (implementChangeListener === true) {
-                if (window.RENDER_DEBUG) {
-                    console.error("changed: ", self);
-                }
-
-                var startTime;
-                if (window.RENDER_PROFILING) {
-                    startTime = new Date();
-                }
-
-                mBroadcaster.sendMessage.apply(
-                    mBroadcaster,
-                    [
-                        self._getDataChangeEventName(),
-                        self
-                    ].concat(args.length > 0 ? args : [])
-                );
-
-                if (window.RENDER_PROFILING) {
-                    var endTime = new Date() - startTime;
-                    console.error(self._getDataChangeEventName(), args, self, endTime);
-                }
-            }
-
-        }, TRACK_CHANGES_THROTTLING_MS);
-
-
-        if (self._parent && self._parent.trackDataChange) {
-            self._parent.trackDataChange.apply(
-                self._parent,
-                [
-                    self,
-                ].concat(args)
-            ); // trigger bubble-like effect, in the order of: child -> parent
-        }
-    };
-
-
-    obj.isUpdateDelayed = function() {
-        return !!this._dataChangeThrottlingTimer;
-    };
-
-    obj._getDataChangeEventName = function() {
-        return 'datastructs:change_' + this._dataChangeTrackedId;
-    };
-
-    if (implementChangeListener === true) {
-        obj.addChangeListener = function(cb) {
-            cb._changeListenerId = mBroadcaster.addListener(this._getDataChangeEventName(), cb.bind(obj));
-            return cb._changeListenerId;
+            return r;
         };
-        obj.removeChangeListener = function(cb) {
-            assert(
-                typeof cb === 'string' || typeof cb._changeListenerId != 'undefined',
-                'this method/cb was not used as a change listener'
-            );
+    };
+    proto = proto.prototype || proto;
+    var keys = Object.keys(proto);
 
-            if (typeof cb === 'string') {
-                mBroadcaster.removeListener(cb);
-            }
-            else {
-                mBroadcaster.removeListener(cb._changeListenerId);
-            }
-        };
-    }
-};
+    console.warn('timing %s...', Object(proto.constructor).name || '', keys);
 
-var trackPropertyChanges = function(obj, properties, implementChangeListener) {
-    if (obj.prototype) { // if called on a class...
-        obj = obj.prototype;
-    }
-
-    manualTrackChangesOnStructure(obj, implementChangeListener);
-
-    if (!obj._data) {
-        obj._data = {};
-    }
-
-
-    Object.keys(properties).forEach(function(k) {
-        var v = properties[k];
-
-        Object.defineProperty(obj, k, {
-            get: function () {
-                return obj.get(k, v);
-            },
-            set: function (value) {
-                obj.set(k, value, false, v);
-            },
-            enumerable: true
-        });
-    });
-
-    if (!obj.set) {
-        obj.set = function (k, v, ignoreDataChange, defaultVal) {
-            if (typeof(this._data[k]) === 'undefined' || _properJSCmp(this._data[k], v) !== true) {
-                if (
-                    typeof(this._data[k]) === 'undefined' &&
-                    _properJSCmp(defaultVal, v) === true
-                ) {
-                    // this._data[...] is empty and defaultVal == newVal, DON'T track updates.
-                    return false;
-                }
-
-                if (!ignoreDataChange) {
-                    this.trackDataChange(this._data, k, v);
-                }
-                this._data[k] = v;
-            }
-        };
-    }
-
-    if (!obj.get) {
-        obj.get = function (k, defaultVal) {
-            return this._data && typeof(this._data[k]) !== 'undefined' ? this._data[k] : defaultVal;
-        };
-    }
-};
-
-/**
- * Simple array-like implementation that tracks changes
- *
- * @param [parent]
- * @constructor
- */
-var MegaDataArray = function(parent) {
-    var self = this;
-    self._data = [];
-    self._parent = parent || undefined;
-
-    manualTrackChangesOnStructure(self, true);
-
-    Object.defineProperty(self, 'length', {
-        get: function() { return self._data.length; },
-        enumerable: false,
-        configurable: true
-    });
-};
-
-_arrayAliases.forEach(function(methodName) {
-    MegaDataArray.prototype[methodName] = function() {
-        var ret;
-        try {
-            if (methodName == "push") {
-                if (
-                    arguments.length > 0 &&
-                    (typeof(arguments[0]._dataChangeIndex) !== 'undefined') &&
-                    !arguments[0]._parent
-                ) {
-                    arguments[0]._parent = this;
-                }
-            }
-            if (methodName == "breakableForEach") {
-                return breakableForEach(this._data, arguments[0]);
-            }
-            else {
-                ret = this._data[methodName].apply(this._data, arguments);
-            }
-
-            if (_arrayMethodsThatAltersData.indexOf(methodName) >= 0) {
-                this.trackDataChange(this._data, ret);
-            }
-            return ret;
-        } catch(e) {
-            throw e;
+    for (var i = keys.length; i--;) {
+        if (typeof proto[keys[i]] === 'function') {
+            proto[keys[i]] = wrap(keys[i], proto[keys[i]]);
         }
+    }
+}
+
+var _warnOnce = SoonFc(400, function _warnOnce(where) {
+    var args = toArray.apply(null, arguments).slice(1);
+    var prop = '__warn_once_' + MurmurHash3(args[0], -0x7ff);
+
+    if (!where[prop]) {
+        _defineNonEnum(where, prop, 1);
+        console.warn.apply(console, args);
     }
 });
 
+function returnFalse() {
+    return false;
+}
+function returnTrue() {
+    return true;
+}
 
-MegaDataArray.prototype.getItem = function(idx) {
-    return this._data[idx];
+function MegaDataEvent(src, target) {
+    if (typeof src === 'object') {
+        this.originalEvent = src;
+
+        if (src.defaultPrevented || src.defaultPrevented === undefined
+            && src.returnValue === false || src.isDefaultPrevented && src.isDefaultPrevented()) {
+
+            this.isDefaultPrevented = returnTrue;
+        }
+    }
+    else {
+        src = {type: src};
+    }
+
+    this.type = src.type;
+    this.target = src.target || target;
+}
+
+inherits(MegaDataEvent, null);
+
+MegaDataEvent.prototype.isDefaultPrevented = returnFalse;
+MegaDataEvent.prototype.isPropagationStopped = returnFalse;
+
+MegaDataEvent.prototype.preventDefault = function() {
+    this.isDefaultPrevented = returnTrue;
+    if (this.originalEvent) {
+        this.originalEvent.preventDefault();
+    }
 };
 
-MegaDataArray.prototype.keys = function() {
-    return Object.keys(this._data);
+MegaDataEvent.prototype.stopPropagation = function() {
+    this.isPropagationStopped = returnTrue;
+    if (this.originalEvent) {
+        this.originalEvent.stopPropagation();
+    }
 };
 
-/**
- * Plain Object-like container for storing data, with the following features:
- * - track changes ONLY on predefined list of properties
- *
- * @param properties {Object}
- * @param [implementChangeListener]
- * @param [defaultData] {Object} default/initial data
- * @constructor
- */
-var MegaDataObject = function(properties, implementChangeListener, defaultData) {
-    var self = this;
-    self._data = clone(defaultData !== undefined ? defaultData : {});
+// Very simple replacement for jQuery.event
+function MegaDataEmitter() {
+    /* dummy */
+}
 
-    trackPropertyChanges(self, properties, implementChangeListener)
+inherits(MegaDataEmitter, null);
+
+_defineValue(MegaDataEmitter, 'seen', Object.create(null));
+_defineValue(MegaDataEmitter, 'expando', '__event_emitter_' + (Math.random() * Math.pow(2, 56) - 1));
+
+/** @function MegaDataEmitter.getEmitter */
+_defineValue(MegaDataEmitter, 'getEmitter', function(event, target) {
+    var emitter = target[MegaDataEmitter.expando];
+    if (!emitter) {
+        emitter = Object.create(null);
+        _defineValue(target, MegaDataEmitter.expando, emitter);
+    }
+    var pos;
+    var src = event.type && event;
+    var types = String(event.type || event).split(/\s+/).filter(String);
+    var namespaces = Array(types.length);
+
+    for (var i = types.length; i--;) {
+        namespaces[i] = '';
+        if ((pos = types[i].indexOf('.')) >= 0) {
+            namespaces[i] = types[i].substr(pos + 1).split('.').sort().join('.');
+            types[i] = types[i].substr(0, pos);
+        }
+    }
+    return {types: types, namespaces: namespaces, event: src || types[0], events: emitter};
+});
+
+/** @function MegaDataEmitter.wrapOne */
+_defineValue(MegaDataEmitter, 'wrapOne', function(handler) {
+    return function _one(event) {
+        this.off(event, _one);
+        return handler.apply(this, arguments);
+    };
+});
+
+MegaDataEmitter.prototype.off = function(event, handler) {
+    if (event instanceof MegaDataEvent) {
+        event.currentTarget.off(event.type + (event.namespace ? '.' + event.namespace : ''), handler);
+        return this;
+    }
+
+    var emitter = MegaDataEmitter.getEmitter(event, this);
+    for (var j = emitter.types.length; j--;) {
+        var type = emitter.types[j];
+        var namespace = emitter.namespaces[j];
+        var handlers = emitter.events[type] || [];
+
+        for (var i = handlers.length; i--;) {
+            var tmp = handlers[i];
+
+            if (type === tmp.type
+                && (!handler || handler.pid === tmp.pid)
+                && (!namespace || namespace === tmp.namespace)) {
+
+                handlers.splice(i, 1);
+            }
+        }
+
+        if (!handlers.length) {
+            delete emitter.events[type];
+        }
+    }
+
+    return this;
 };
 
-_createObjectDataMethods(MegaDataObject);
-MegaDataObject.fromJS = _fromJSDecorator(MegaDataObject);
-MegaDataObject.prototype.toJS = _toJS;
-MegaDataObject.attachToExistingJSObject = function(obj, properties, implementChangeListener, defaultData) {
-    MegaDataObject.apply(obj, [properties, implementChangeListener, defaultData]);
-
-    _createObjectDataMethods(obj);
-    obj.toJS = _toJS;
+MegaDataEmitter.prototype.one = function(event, handler, data) {
+    return this.on(event, handler, data, true);
 };
+
+MegaDataEmitter.prototype.on = function(event, handler, data, one) {
+    var emitter = MegaDataEmitter.getEmitter(event, this);
+    var events = emitter.events;
+
+    handler = one ? MegaDataEmitter.wrapOne(handler) : handler;
+    if (!handler.pid) {
+        handler.pid = ++dsIncID;
+    }
+
+    for (var i = emitter.types.length; i--;) {
+        var type = emitter.types[i];
+        var namespace = emitter.namespaces[i];
+
+        if (!events[type]) {
+            events[type] = [];
+        }
+
+        events[type].push({
+            type: type,
+            data: data,
+            pid: handler.pid,
+            handler: handler,
+            namespace: namespace
+        });
+
+        if (d) {
+            MegaDataEmitter.seen[type] = 1;
+        }
+    }
+    return this;
+};
+
+// eslint-disable-next-line complexity
+MegaDataEmitter.prototype.trigger = function(event, data) {
+    var emitter = MegaDataEmitter.getEmitter(event, this);
+
+    event = new MegaDataEvent(emitter.event, this);
+    event.data = data;
+
+    // @todo require all trigger() calls to provide an array to prevent checking for isArray()
+    data = data ? Array.isArray(data) ? data : [data] : [];
+
+    var idx = data.length;
+    var tmp = new Array(idx + 1);
+    while (idx) {
+        tmp[idx--] = data[idx];
+    }
+    tmp[0] = event;
+    data = tmp;
+
+    var res;
+    var type = emitter.types[0];
+    var namespace = emitter.namespaces[0];
+    var handlers = [].concat(emitter.events[type] || []);
+    while ((tmp = handlers[idx++]) && !event.isPropagationStopped()) {
+        event.currentTarget = this;
+        event.namespace = namespace;
+
+        if ((!namespace || namespace === tmp.namespace)
+            && (res = tmp.handler.apply(this, data)) !== undefined) {
+
+            event.result = res;
+            if (res === false) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        }
+    }
+
+    if (!event.isDefaultPrevented()) {
+        tmp = this['on' + type];
+
+        if (typeof tmp === 'function') {
+            event.result = tmp.apply(this, data);
+            if (event.result === false) {
+                event.preventDefault();
+            }
+        }
+    }
+
+    if (event.originalEvent && event.result !== undefined) {
+        event.originalEvent.returnValue = event.result;
+    }
+
+    return event.result;
+};
+
+MegaDataEmitter.prototype.rebind = function(event, handler) {
+    return this.off(event).on(event, handler);
+};
+MegaDataEmitter.prototype.bind = MegaDataEmitter.prototype.on;
+MegaDataEmitter.prototype.unbind = MegaDataEmitter.prototype.off;
+
+Object.freeze(MegaDataEmitter);
 
 /**
  * Simple map-like implementation that tracks changes
  *
  * @param [parent]
+ * @param [defaultData]
  * @constructor
  */
-var MegaDataMap = function(parent) {
+function MegaDataMap(parent, defaultData) {
+    // MegaDataEmitter.call(this);
+
+    /** @property MegaDataMap._parent */
+    _defineNonEnum(this, '_parent', parent || false);
+
+    /** @property MegaDataMap._dataChangeIndex */
+    _defineNonEnum(this, '_dataChangeIndex', 0);
+    /** @property MegaDataMap._dataChangeListeners */
+    _defineNonEnum(this, '_dataChangeListeners', []);
+    /** @property MegaDataMap._dataChangeTrackedId */
+    _defineNonEnum(this, '_dataChangeTrackedId', ++dsIncID);
+
+    /** @property MegaDataMap._data */
+    _defineNonEnum(this, '_data', defaultData || {});
+    Object.setPrototypeOf(this._data, null);
+
+    if (d > 1) {
+        if (!MegaDataMap.__instancesOf) {
+            MegaDataMap.__instancesOf = new WeakMap();
+        }
+        MegaDataMap.__instancesOf.set(this, Object.getPrototypeOf(this));
+    }
+}
+
+inherits(MegaDataMap, MegaDataEmitter);
+
+/** @property MegaDataMap.__ident_0 */
+lazy(MegaDataMap.prototype, '__ident_0', function() {
+    return this.constructor.name + '.' + ++dsIncID;
+});
+
+/** @function MegaDataMap.prototype._schedule */
+lazy(MegaDataMap.prototype, '_schedule', function() {
+    var task = null;
     var self = this;
-    self._data = {};
-    self._parent = parent || undefined;
+    var tbsp = Promise.resolve();
+    var callTask = function _callTask() {
+        if (task) {
+            tbsp.then(task);
+            task = null;
+        }
+    };
+    return function _scheduler(callback) {
+        if (!task) {
+            tbsp.then(callTask);
+        }
+        task = function _task() {
+            callback.call(self);
+        };
+    };
+});
 
-    manualTrackChangesOnStructure(self, true);
+Object.defineProperty(MegaDataMap.prototype, 'length', {
+    get: function() {
+        return Object.keys(this._data).length;
+    },
+    configurable: true
+});
 
-    Object.defineProperty(self, 'length', {
+_defineValue(MegaDataMap.prototype, 'valueOf', function() {
+    return this.__ident_0;
+});
+
+MegaDataMap.prototype.trackDataChange = function() {
+    var idx = arguments.length;
+    var args = new Array(idx);
+    while (idx--) {
+        args[idx] = arguments[idx];
+    }
+
+    var self = this;
+    this._schedule(function _trackDataChange() {
+        var that = self;
+
+        do {
+            args.unshift(that);
+            that._dataChangeIndex++;
+            that._dispatchChangeListeners(args);
+
+        } while ((that = that._parent) instanceof MegaDataMap);
+    });
+};
+
+MegaDataMap.prototype.addChangeListener = function(cb) {
+    if (d) {
+        var h = this._dataChangeListeners;
+        if (d > 1 && h.length > 200) {
+            _warnOnce(this, '%s: Too many handlers added(%d)! race?', this, h.length, [this]);
+        }
+        console.assert(h.indexOf(cb) < 0, 'handler exists');
+
+        if (typeof cb === 'function') {
+            console.assert(!cb.__mdmChangeListenerID, 'reusing handler');
+        }
+        else {
+            console.assert(typeof cb.handleChangeEvent === 'function', 'invalid instance');
+        }
+    }
+
+    if (typeof cb === 'function') {
+        /** @property Function.__mdmChangeListenerID */
+        _defineValue(cb, '__mdmChangeListenerID', dsIncID + 1);
+    }
+
+    this._dataChangeListeners.push(cb);
+    return ++dsIncID;
+};
+
+MegaDataMap.prototype.removeEventHandler = function(handler) {
+    var result = false;
+    var listeners = this._dataChangeListeners;
+
+    if (d) {
+        console.assert(handler && typeof handler.handleChangeEvent === 'function');
+    }
+
+    for (var i = listeners.length; i--;) {
+        if (listeners[i] === handler) {
+            listeners.splice(i, 1);
+            ++result;
+        }
+    }
+
+    return result;
+};
+
+MegaDataMap.prototype.removeChangeListener = function(cb) {
+    var cId = cb && cb.__mdmChangeListenerID || cb;
+
+    if (d) {
+        console.assert(cId > 0, 'invalid listener id');
+    }
+
+    if (cId > 0) {
+        var listeners = this._dataChangeListeners;
+
+        for (var i = listeners.length; i--;) {
+            if (listeners[i].__mdmChangeListenerID === cId) {
+                _defineValue(listeners[i], '__mdmChangeListenerID', 'nop');
+                listeners.splice(i, 1);
+
+                if (d) {
+                    while (--i > 0) {
+                        console.assert(listeners[i].__mdmChangeListenerID !== cId);
+                    }
+                }
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+};
+
+MegaDataMap.prototype._dispatchChangeListeners = function(args) {
+    var listeners = this._dataChangeListeners;
+
+    if (d > 1) {
+        console.debug('%s: dispatching %s awaiting listeners', this, listeners.length, [this]);
+    }
+
+    for (var i = listeners.length; i--;) {
+        var result;
+        var listener = listeners[i];
+
+        if (typeof listener === 'function') {
+            result = listener.apply(this, args);
+        }
+        else {
+            result = listener.handleChangeEvent.apply(listener, args);
+        }
+
+        if (result === 0xDEAD) {
+            this.removeChangeListener(listener);
+        }
+    }
+};
+
+// eslint-disable-next-line local-rules/misc-warnings
+MegaDataMap.prototype.forEach = function(cb) {
+    // this._data is a dict, so no guard-for-in needed
+    // eslint-disable-next-line guard-for-in
+    for (var k in this._data) {
+        if (cb(this._data[k], k) === false) {
+            break;
+        }
+    }
+};
+MegaDataMap.prototype.every = function(cb) {
+    var self = this;
+    return self.keys().every(function(k) {
+        return cb(self._data[k], k);
+    });
+};
+MegaDataMap.prototype.some = function(cb) {
+    var self = this;
+    return self.keys().some(function(k) {
+        return cb(self._data[k], k);
+    });
+};
+
+MegaDataMap.prototype.map = function(cb) {
+    var self = this;
+    var res = [];
+    self.forEach(function(v, k) {
+        var intermediateResult = cb(v, k);
+        if (intermediateResult !== null && intermediateResult !== undefined) {
+            res.push(intermediateResult);
+        }
+    });
+    return res;
+};
+
+MegaDataMap.prototype.keys = function() {
+    return Object.keys(this._data);
+};
+
+MegaDataMap.prototype.size = function() {
+    return this.keys().length;
+};
+
+MegaDataMap.prototype.destroy = tryCatch(function() {
+    var self = this;
+    Object.keys(self).map(function(k) {
+        return self._removeDefinedProperty(k);
+    });
+    Object.freeze(this);
+});
+
+MegaDataMap.prototype.setObservable = function(k, defaultValue) {
+    Object.defineProperty(this, k, {
         get: function() {
-            return this._sortedVals ? this._sortedVals.length : Object.keys(self._data).length;
+            return this.get(k, defaultValue);
         },
-        enumerable: false,
-        configurable: true
+        set: function(value) {
+            this.set(k, value, false, defaultValue);
+        },
+        enumerable: true
     });
 };
 
 MegaDataMap.prototype.exists = function(keyValue) {
-    var self = this;
-    return (typeof(self._data[keyValue]) !== 'undefined');
+    return keyValue in this._data;
 };
 
 MegaDataMap.prototype.set = function(k, v, ignoreTrackDataChange) {
-
-    assert(typeof(k) !== 'undefined' && k !== false, "missing key");
-
-    var self = this;
-    if (typeof v._dataChangeIndex != 'undefined' &&  !v._parent) {
-        v._parent = this;
+    if (d) {
+        console.assert(k !== undefined && k !== false, "missing key");
     }
 
-    if (_properJSCmp(self._data[k], v) === true) {
+    if (v instanceof MegaDataMap && !v._parent) {
+        _defineNonEnum(v, '_parent', this);
+    }
+
+    if (_cmp(this._data[k], v) === true) {
         return;
     }
 
-    self._data[k] = v;
+    this._data[k] = v;
 
-    if (typeof(this[k]) !== 'undefined') {
-        self[k] = v;
+    if (k in this) {
+        this[k] = v;
     }
     else {
         Object.defineProperty(this, k, {
-            get: function () {
-                return self._data[k];
+            get: function() {
+                return this._data[k];
             },
-            set: function (value) {
-                if (value !== self._data[k]) {
-                    self._data[k] = value;
-
-                    self.trackDataChange(self._data, k, v);
+            set: function(value) {
+                if (value !== this._data[k]) {
+                    this._data[k] = value;
+                    this.trackDataChange(this._data, k, v);
                 }
             },
-            enumerable: true
+            enumerable: true,
+            configurable: true
         });
     }
 
     if (!ignoreTrackDataChange) {
-        self.trackDataChange(self._data, k, v);
+        this.trackDataChange(this._data, k, v);
     }
 };
 
 MegaDataMap.prototype.remove = function(k) {
+    var v = this._data[k];
 
-    var self = this;
-
-    var v = self._data[k];
-
-    if (v && v._parent && v._parent == this) {
-        v._parent = null;
+    if (v instanceof MegaDataMap && v._parent === this) {
+        _defineNonEnum(v, '_parent', null);
     }
 
-    if (v) {
-        delete self._data[k];
-        delete this[k];
-    }
-
-
-    self.trackDataChange(self._data, k, v);
+    this._removeDefinedProperty(k);
+    this.trackDataChange(this._data, k, v);
 };
 
-_createObjectDataMethods(MegaDataMap);
+/** @function MegaDataMap.prototype._removeDefinedProperty */
+_defineValue(MegaDataMap.prototype, '_removeDefinedProperty', function(k) {
+    if (k in this) {
+        Object.defineProperty(this, k, {
+            writable: true,
+            value: undefined,
+            configurable: true
+        });
+        delete this[k];
+    }
+    if (k in this._data) {
+        delete this._data[k];
+    }
+});
 
-MegaDataMap.prototype.toJS = _toJS;
+/** @function MegaDataMap.prototype.toJS */
+_defineValue(MegaDataMap.prototype, 'toJS', function() {
+    return this._data;
+});
+
+_defineValue(MegaDataMap.prototype, 'hasOwnProperty', function(prop) {
+    return prop in this._data;
+});
+
+_defineValue(MegaDataMap.prototype, 'propertyIsEnumerable', function(prop) {
+    return this.hasOwnProperty(prop);
+});
+
+
+
+/**
+ * Plain Object-like container for storing data, with the following features:
+ * - track changes ONLY on predefined list of properties
+ *
+ * @param {Object} [trackProperties] properties to observe for changes
+ * @param {Object} [defaultData] default/initial data
+ * @constructor
+ */
+function MegaDataObject(trackProperties, defaultData) {
+    MegaDataMap.call(this, null, defaultData);
+
+    if (trackProperties) {
+        for (var k in trackProperties) {
+            if (Object.hasOwnProperty.call(trackProperties, k)) {
+                this.setObservable(k, trackProperties[k]);
+            }
+        }
+    }
+
+    /*
+    if (d && typeof Proxy === 'function') {
+        var slave = Object.create(Object.getPrototypeOf(this));
+        Object.setPrototypeOf(this, new Proxy(slave, {
+            defineProperty: function(target, property, descriptor) {
+                if (String(property).startsWith('jQuery')) {
+                    debugger
+                    console.assert(false);
+                }
+                Object.defineProperty(target, property, descriptor);
+                return true;
+            }
+        }));
+    }*/
+}
+
+inherits(MegaDataObject, MegaDataMap);
+
+MegaDataObject.prototype.set = function(k, v, ignoreDataChange, defaultVal) {
+    var notSet = !(k in this._data);
+
+    if (notSet || _cmp(this._data[k], v) !== true) {
+        if (notSet && _cmp(defaultVal, v) === true) {
+            // this._data[...] is empty and defaultVal == newVal, DON'T track updates.
+            return false;
+        }
+
+        if (!ignoreDataChange) {
+            this.trackDataChange(this._data, k, v);
+        }
+        this._data[k] = v;
+    }
+};
+
+MegaDataObject.prototype.get = function(k, defaultVal) {
+    return this._data && k in this._data ? this._data[k] : defaultVal;
+};
 
 
 /**
  * MegaDataSortedMap
+ * @param keyField
+ * @param sortField
+ * @param parent
+ * @constructor
  */
-
-var MegaDataSortedMap = function(keyField, sortField, parent) {
+function MegaDataSortedMap(keyField, sortField, parent) {
     MegaDataMap.call(this, parent);
 
-    this._keyField = keyField;
-    this._sortField = sortField;
+    /** @property MegaDataSortedMap._parent */
+    _defineNonEnum(this, '_parent', parent || false);
+    /** @property MegaDataSortedMap._sortedVals */
+    _defineNonEnum(this, '_sortedVals', []);
+    /** @property MegaDataSortedMap._keyField */
+    _defineNonEnum(this, '_keyField', keyField);
+    /** @property MegaDataSortedMap._sortField */
+    _defineNonEnum(this, '_sortField', sortField);
+}
 
-    this._sortedVals = [];
-};
+inherits(MegaDataSortedMap, MegaDataMap);
 
-Object.keys(MegaDataMap.prototype).forEach(function(k) {
-    MegaDataSortedMap.prototype[k] = MegaDataMap.prototype[k];
+Object.defineProperty(MegaDataSortedMap.prototype, 'length', {
+    get: function() {
+        return this._sortedVals.length;
+    },
+    configurable: true
 });
 
+// eslint-disable-next-line local-rules/misc-warnings
+MegaDataSortedMap.prototype.forEach = function(cb) {
+    for (var i = 0; i < this._sortedVals.length; ++i) {
+        var k = this._sortedVals[i];
+        cb(this._data[k], k);
+    }
+};
+
 MegaDataSortedMap.prototype.replace = function(k, newValue) {
-    var self = this;
-    if (self._data[k] === newValue) {
+    if (this._data[k] === newValue) {
         // already the same, save some CPU and do nothing.
         return true;
     }
-    if (self._data[k]) {
+
+    if (k in this._data) {
         // cleanup
-        if (newValue[self._keyField] !== k) {
-            self.removeByKey(k);
+        if (newValue[this._keyField] !== k) {
+            this.removeByKey(k);
         }
-        self.push(newValue);
+        this.push(newValue);
         return true;
     }
 
     return false;
 };
 
-MegaDataSortedMap.prototype.getComparator = function() {
+/** @property MegaDataSortedMap._comparator */
+lazy(MegaDataSortedMap.prototype, '_comparator', function() {
     var self = this;
-    if (self._comparatorFn) {
-        return self._comparatorFn;
+
+    if (this._sortField === undefined) {
+        return indexedDB.cmp.bind(indexedDB);
     }
 
-    if (self._sortField) {
-        if (typeof(self._sortField) === "function") {
-            self._comparatorFn = function (a, b) {
-                return self._sortField(self._data[a], self._data[b]);
-            };
-        }
-        else {
-            self._comparatorFn = function (a, b) {
-                var sortFields = self._sortField.split(",");
-                for (var i = 0; i < sortFields.length; i++) {
-                    var sortField = sortFields[i];
-                    var ascOrDesc = 1;
-                    if (sortField.substr(0, 1) === "-") {
-                        ascOrDesc = -1;
-                        sortField = sortField.substr(1);
-                    }
+    if (typeof self._sortField === "function") {
+        return function(a, b) {
+            return self._sortField(self._data[a], self._data[b]);
+        };
+    }
 
-                    if (self._data[a][sortField] && self._data[b][sortField]) {
-                        if (self._data[a][sortField] < self._data[b][sortField]) {
-                            return -1 * ascOrDesc;
-                        }
-                        else if (self._data[a][sortField] > self._data[b][sortField]) {
-                            return 1 * ascOrDesc;
-                        }
-                        else {
-                            return 0;
-                        }
-                    }
+    return function(a, b) {
+        var sortFields = self._sortField.split(",");
+
+        for (var i = 0; i < sortFields.length; i++) {
+            var sortField = sortFields[i];
+            var ascOrDesc = 1;
+            if (sortField[0] === '-') {
+                ascOrDesc = -1;
+                sortField = sortField.substr(1);
+            }
+
+            var _a = self._data[a][sortField];
+            var _b = self._data[b][sortField];
+
+            if (_a !== undefined && _b !== undefined) {
+                if (_a < _b) {
+                    return -1 * ascOrDesc;
+                }
+                if (_a > _b) {
+                    return ascOrDesc;
                 }
                 return 0;
-            };
+            }
         }
-    }
-    return self._comparatorFn;
-};
+        return 0;
+    };
+});
 
 MegaDataSortedMap.prototype.push = function(v) {
     var self = this;
 
     var keyVal = v[self._keyField];
 
-    if (self._data[keyVal]) {
+    if (keyVal in self._data) {
         self.removeByKey(keyVal);
     }
 
@@ -581,8 +782,7 @@ MegaDataSortedMap.prototype.push = function(v) {
     var maxIndex = this._sortedVals.length - 1;
     var currentIndex;
     var currentElement;
-
-    var cmp = self.getComparator();
+    var cmp = self._comparator;
 
     var result = false;
     while (minIndex <= maxIndex) {
@@ -603,7 +803,7 @@ MegaDataSortedMap.prototype.push = function(v) {
     }
 
     if (!result) {
-        if (typeof currentElement === 'undefined') {
+        if (currentElement === undefined) {
             // first
             self._sortedVals.push(keyVal);
         }
@@ -621,17 +821,47 @@ MegaDataSortedMap.prototype.push = function(v) {
 };
 
 MegaDataSortedMap.prototype.removeByKey = MegaDataSortedMap.prototype.remove = function(keyValue) {
-    var self = this;
-
-    if (self._data[keyValue]) {
-        array.remove(self._sortedVals, keyValue);
-        delete self._data[keyValue];
-        delete self[keyValue];
-        self.trackDataChange();
+    if (keyValue in this._data) {
+        array.remove(this._sortedVals, keyValue);
+        this._removeDefinedProperty(keyValue);
+        this.trackDataChange();
         return true;
     }
-
     return false;
+};
+
+MegaDataSortedMap.prototype.exists = function(keyValue) {
+    return keyValue in this._data;
+};
+
+MegaDataSortedMap.prototype.keys = function() {
+    return this._sortedVals;
+};
+
+MegaDataSortedMap.prototype.values = function() {
+    var res = [];
+    // eslint-disable-next-line local-rules/misc-warnings
+    this.forEach(function(v) {
+        res.push(v);
+    });
+
+    return res;
+};
+
+MegaDataSortedMap.prototype.getItem = function(num) {
+    return this._data[this._sortedVals[num]];
+};
+
+MegaDataSortedMap.prototype.indexOfKey = function(value) {
+    return this._sortedVals.indexOf(value);
+};
+
+MegaDataSortedMap.prototype.clear = function() {
+    _defineNonEnum(this, '_sortedVals', []);
+    _defineNonEnum(this, '_data', Object.create(null));
+    if (this.trackDataChange) {
+        this.trackDataChange();
+    }
 };
 
 /**
@@ -642,26 +872,16 @@ MegaDataSortedMap.prototype.removeByKey = MegaDataSortedMap.prototype.remove = f
  * @returns {Array} array of deleted item ids
  */
 MegaDataSortedMap.prototype.splice = function(start, deleteCount) {
-    "use strict";
-    if (arguments.length > 2) {
-        // right now we only support deleting items and no actual replacement/addition of new ones
-        assert(false, 'Not implemented');
+    var deletedItemIds = this._sortedVals.splice(start, deleteCount);
+
+    for (var i = deletedItemIds.length; i--;) {
+        this._removeDefinedProperty(deletedItemIds[i]);
     }
 
-    var self = this;
-
-    // retrieve removed vals first
-    var deletedItemIds = self._sortedVals.splice(start, deleteCount);
-
-    for (var i = 0; i < deletedItemIds.length; i++) {
-        delete self._data[deletedItemIds[i]];
-    }
-
-    self.trackDataChange();
+    this.trackDataChange();
 
     return deletedItemIds;
 };
-
 
 /**
  * Returns a regular array (not a sorted map!) of values sliced as with `Array.prototype.slice`
@@ -671,61 +891,14 @@ MegaDataSortedMap.prototype.splice = function(start, deleteCount) {
  * @returns {Array} array of removed IDs
  */
 MegaDataSortedMap.prototype.slice = function(begin, end) {
-    "use strict";
     var results = this._sortedVals.slice(begin, end);
-    for (var i = 0; i < results.length; i++) {
+    for (var i = results.length; i--;) {
         results[i] = this._data[results[i]];
     }
     return results;
 };
 
-
-MegaDataSortedMap.prototype.exists = function(keyValue) {
-    var self = this;
-    return (self._data[keyValue] ? true : false);
-};
-
-/**
- * For performance reason, the returned data is not cloned.
- *
- * @returns {Array} returns a *non-cloned* array containing all keys
- */
-MegaDataSortedMap.prototype.keys = function() {
-    var self = this;
-    return self._sortedVals;
-};
-
-MegaDataSortedMap.prototype.values = function() {
-    var self = this;
-    var res = [];
-    self.forEach(function(v) {
-        res.push(v);
-    });
-
-    return res;
-};
-
-MegaDataSortedMap.prototype.getItem = function(num) {
-    var self = this;
-
-    var foundKeyVal = self._sortedVals[num];
-    return self._data[foundKeyVal];
-};
-
-MegaDataSortedMap.prototype.indexOfKey = function(value) {
-    var self = this;
-    return self._sortedVals.indexOf(value);
-};
-
-MegaDataSortedMap.prototype.clear = function() {
-    this._data = {};
-    this._sortedVals = [];
-    if (this.trackDataChange) {
-        this.trackDataChange();
-    }
-};
-
-testMegaDataSortedMap = function() {
+var testMegaDataSortedMap = function() {
     var arr1 = new MegaDataSortedMap("id", "orderValue,ts");
     arr1.push({
         'id': 1,
@@ -755,9 +928,11 @@ testMegaDataSortedMap = function() {
  *
  * @constructor
  */
-var MegaDataBitMapManager = function() {
-    this._bitmaps = {};
-};
+function MegaDataBitMapManager() {
+    this._bitmaps = Object.create(null);
+}
+
+inherits(MegaDataBitMapManager, null);
 
 /**
  * Register a MegaDataBitMap
@@ -765,7 +940,7 @@ var MegaDataBitMapManager = function() {
  * @param {MegaDataBitMap} megaDataBitMap
  */
 MegaDataBitMapManager.prototype.register = function(name, megaDataBitMap) {
-    if (typeof(this._bitmaps[name]) !== 'undefined') {
+    if (this._bitmaps[name] !== undefined) {
         console.error("Tried to register a MegaDataBitMap that already exists (at least with that name).");
         return;
     }
@@ -802,11 +977,12 @@ MegaDataBitMapManager.prototype.get = function(name) {
  * @param {String} name Should be unique.
  * @param {Boolean} isPub should the attribute be public or private?
  * @param {Array} keys Array of keys
- * @param {*} [parent] not used yet.
  * @constructor
  */
-var MegaDataBitMap = function(name, isPub, keys, parent) {
+function MegaDataBitMap(name, isPub, keys) {
     var self = this;
+    MegaDataObject.call(self, array.to.object(keys, 0));
+
     self.name = name;
     self._keys = keys;
     self._isPub = isPub;
@@ -815,58 +991,35 @@ var MegaDataBitMap = function(name, isPub, keys, parent) {
     self._version = null;
     self._readyPromise = new MegaPromise();
 
-
-    Object.defineProperty(self, 'length', {
-        get: function() { return self._data.length; },
-        enumerable: false,
-        configurable: true
-    });
-
-    var properties = {};
-    keys.forEach(function(k) {
-        properties[k] = 0;
-    });
-
-    trackPropertyChanges(self, properties, true);
-
-    if (typeof(attribCache) === 'undefined' || typeof(attribCache.bitMapsManager) === 'undefined') {
-        console.error('Tried to initialise a MegaDataBitMap, before the bitMapsManager/attribCache is ready.');
-        return;
-    }
-
     attribCache.bitMapsManager.register(name, self);
 
-    mega.attr.get(
-            u_handle,
-            name,
-            self.isPublic() ? true : -2,
-            true
-        )
-            .done(function(r) {
-                if (typeof(r) === 'string') {
-                    self.mergeFrom(r, false);
-                }
-                else if (r === -9) {
-                    // its ok, -9 means the attribute does not exists on the server
-                }
-                else {
-                    console.error("mega.attr.get failed:", arguments);
-                }
-            })
-            .fail(function(r) {
-                if (r === -9) {
-                    // its ok, -9 means the attribute does not exists on the server
-                    return;
-                }
-                else {
-                    console.error("mega.attr.get failed:", arguments);
-                }
-            })
-            .always(function() {
-                self._readyPromise.resolve();
-            });
-};
+    mega.attr.get(u_handle, name, self.isPublic() ? true : -2, true)
+        .then(function(r) {
+            if (typeof r !== 'string') {
+                throw r;
+            }
+            self.mergeFrom(r, false);
+        })
+        .catch(function(ex) {
+            if (ex !== -9) {
+                // -9 is ok, means the attribute does not exists on the server
+                console.error("mega.attr.get failed:", ex);
+            }
+        })
+        .always(SoonFc(function() {
+            self._readyPromise.resolve();
+        }));
+}
 
+inherits(MegaDataBitMap, MegaDataObject);
+
+Object.defineProperty(MegaDataBitMap.prototype, 'length', {
+    get: function() {
+        return this._data.length;
+    },
+    enumerable: false,
+    configurable: true
+});
 
 /**
  * Returns a list of keys that are currently registered with this MegaDataBitMap instance.
@@ -874,7 +1027,7 @@ var MegaDataBitMap = function(name, isPub, keys, parent) {
  * @returns {Array}
  */
 MegaDataBitMap.prototype.keys = function() {
-    return clone(this._keys);
+    return this._keys;
 };
 
 
@@ -931,7 +1084,7 @@ MegaDataBitMap.prototype.set = function(key, v, ignoreDataChange, defaultVal) {
             (
                 typeof(self._data[keyIdx]) === 'undefined' &&
                 typeof(defaultVal) !== 'undefined' &&
-                _properJSCmp(defaultVal, v) === true
+                _cmp(defaultVal, v) === true
             ) || (
                 self._data[keyIdx] === v /* already the same value... */
             )
@@ -1034,11 +1187,9 @@ MegaDataBitMap.prototype.mergeFrom = function(str, requiresCommit) {
  *
  * @returns {String}
  */
-MegaDataBitMap.prototype.toString = function() {
-    return base64urlencode(
-        String.fromCharCode.apply(null, this._data)
-    );
-};
+_defineValue(MegaDataBitMap.prototype, 'toString', function() {
+    return base64urlencode(String.fromCharCode.apply(null, this._data));
+});
 
 /**
  * Convert the mask to a base64urlencoded string
@@ -1067,9 +1218,7 @@ MegaDataBitMap.prototype.toDebugString = function() {
  * @returns {String}
  */
 MegaDataBitMap.prototype.setVersion = function(ver) {
-    /*jshint -W093 */
     return this._version = ver;
-    /*jshint +W093 */
 };
 
 /**
@@ -1218,7 +1367,7 @@ MegaDataBitMap.prototype.reset = function() {
  *
  * @returns {MegaDataBitMap}
  */
-testMegaDataBitMap = function() {
+var testMegaDataBitMap = function() {
     var keys = [
         'key1',
         'key2',
@@ -1257,7 +1406,6 @@ testMegaDataBitMap = function() {
  * @constructor
  */
 function MegaIntBitMap(attribute, map, pub, nonHistoric, autoSaveTimeout) {
-    'use strict';
     this.value = undefined;
     this.attribute = attribute;
     this.map = map;
@@ -1274,7 +1422,6 @@ function MegaIntBitMap(attribute, map, pub, nonHistoric, autoSaveTimeout) {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.get = function(key) {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         self.isReady().then(function() {
@@ -1312,7 +1459,6 @@ MegaIntBitMap.prototype.get = function(key) {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.set = function(key, newValue) {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         self.isReady().then(function() {
@@ -1352,7 +1498,6 @@ MegaIntBitMap.prototype.set = function(key, newValue) {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.getAll = function() {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         self.isReady().then(function() {
@@ -1371,7 +1516,6 @@ MegaIntBitMap.prototype.getAll = function() {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.setAll = function(newValue) {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         self.isReady().then(function() {
@@ -1390,7 +1534,6 @@ MegaIntBitMap.prototype.setAll = function(newValue) {
  * @param key The bit key.
  */
 MegaIntBitMap.prototype.getMask = function(key) {
-    'use strict';
     var idx = this.map.indexOf(key);
     if (idx >= 0) {
         return 1 << idx;
@@ -1403,7 +1546,6 @@ MegaIntBitMap.prototype.getMask = function(key) {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.load = function() {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         mega.attr.get(u_attr.u, self.attribute, self.pub, self.nonHistoric).then(function(value) {
@@ -1425,7 +1567,6 @@ MegaIntBitMap.prototype.load = function() {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.save = function() {
-    'use strict';
     return mega.attr.set(
         this.attribute,
         this.value,
@@ -1439,7 +1580,6 @@ MegaIntBitMap.prototype.save = function() {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.isReady = function() {
-    'use strict';
     if (this.isReadyPromise === null) {
         var self = this;
         this.isReadyPromise = new MegaPromise(function(resolve, reject) {
@@ -1455,7 +1595,6 @@ MegaIntBitMap.prototype.isReady = function() {
  * @returns {MegaPromise}
  */
 MegaIntBitMap.prototype.setValue = function(newValue) {
-    'use strict';
     var self = this;
     return new MegaPromise(function(resolve, reject) {
         self.isReady().then(function() {
@@ -1471,7 +1610,6 @@ MegaIntBitMap.prototype.setValue = function(newValue) {
  * Note: Call this whenever the value is changed.
  */
 MegaIntBitMap.prototype.valueChanged = function() {
-    'use strict';
     if (this.autoSaveTimeout) {
         var self = this;
         clearTimeout(this.autoSaveTimer);
@@ -1487,7 +1625,35 @@ MegaIntBitMap.prototype.valueChanged = function() {
  * @return {MegaPromise}
  */
 MegaIntBitMap.prototype.handleAttributeUpdate = function() {
-    'use strict';
     this.isReadyPromise = null;
     return this.isReady();
 };
+
+// ----------------------------------------------------------------------------------------
+
+Object.defineProperty(global, 'MegaDataMap', {value: MegaDataMap});
+Object.defineProperty(global, 'MegaDataObject', {value: MegaDataObject});
+Object.defineProperty(global, 'MegaDataSortedMap', {value: MegaDataSortedMap});
+
+/** @constructor MegaDataEvent */
+Object.defineProperty(global, 'MegaDataEvent', {value: MegaDataEvent});
+/** @constructor MegaDataEmitter */
+Object.defineProperty(global, 'MegaDataEmitter', {value: MegaDataEmitter});
+
+Object.defineProperty(global, 'MegaIntBitMap', {value: MegaIntBitMap});
+Object.defineProperty(global, 'MegaDataBitMap', {value: MegaDataBitMap});
+Object.defineProperty(global, 'MegaDataBitMapManager', {value: MegaDataBitMapManager});
+
+if (d) {
+    if (d > 1) {
+        _timing(MegaDataMap);
+        _timing(MegaDataObject);
+        _timing(MegaDataEmitter);
+        _timing(MegaDataSortedMap);
+    }
+    global._timing = _timing;
+    global.testMegaDataBitMap = testMegaDataBitMap;
+    global.testMegaDataSortedMap = testMegaDataSortedMap;
+}
+
+})(self);

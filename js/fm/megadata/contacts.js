@@ -55,21 +55,31 @@ MegaData.prototype.onlineStatusClass = function(os) {
 };
 
 MegaData.prototype.onlineStatusEvent = function(u, status) {
-    if (u && megaChatIsReady) {
-        var e = $('.ustatus.' + u.u);
-        if (e.length > 0) {
-            $(e).removeClass('offline online busy away');
-            $(e).addClass(this.onlineStatusClass(status)[1]);
-        }
-        e = $('#contact_' + u.u);
-        if (e.length > 0) {
-            $(e).removeClass('offline online busy away');
-            $(e).addClass(this.onlineStatusClass(status)[1]);
+    'use strict';
+
+    if (u instanceof MegaDataObject) {
+        var $elm = $('.ustatus.' + u.u);
+        if ($elm.length) {
+            $elm.removeClass('offline online busy away');
+            $elm.addClass(this.onlineStatusClass(status)[1]);
         }
 
-        e = $('.fm-chat-user-status.' + u.u);
-        if (e.length > 0) {
-            $(e).safeHTML(this.onlineStatusClass(status)[0]);
+        $elm = $('#contact_' + u.u);
+        if ($elm.length) {
+            $elm.removeClass('offline online busy away');
+            $elm.addClass(this.onlineStatusClass(status)[1]);
+        }
+
+        $elm = $('.fm-chat-user-status.' + u.u);
+        if ($elm.length) {
+            u = this.onlineStatusClass(status)[0];
+
+            if (u) {
+                $elm.safeHTML(u);
+            }
+            else {
+                $elm.text('');
+            }
         }
     }
 };
@@ -550,7 +560,7 @@ MegaData.prototype.contacts = function() {
                     if (!$this.is('.disabled')) {
                         var user_handle = $userDiv.attr('id').replace('contact_', '');
 
-                        megaChat.createAndShowPrivateRoomFor(user_handle)
+                        megaChat.createAndShowPrivateRoom(user_handle)
                             .then(function(room) {
                                 room.setActive();
                                 room.startAudioCall();
@@ -570,7 +580,7 @@ MegaData.prototype.contacts = function() {
                     if (!$this.is('.disabled')) {
                         var user_handle = $userDiv.attr('id').replace('contact_', '');
 
-                        megaChat.createAndShowPrivateRoomFor(user_handle)
+                        megaChat.createAndShowPrivateRoom(user_handle)
                             .then(function(room) {
                                 room.setActive();
                                 room.startVideoCall();
@@ -628,40 +638,32 @@ MegaData.prototype.getContacts = function(n) {
     return folders;
 };
 
-MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
+MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
     "use strict";
     var self = this;
+    var user = userId in this.u && this.u[userId] || false;
 
-    if (this.u[userId].firstName || this.u[userId].lastName) {
+    if (!user || user.firstName || user.lastName) {
         // already loaded.
-        return MegaPromise.resolve();
+        return promise ? promise.resolve() : false;
     }
 
-    // eslint-disable-next-line local-rules/hints
-    var promise = new MegaPromise();
-
-    var lastName = {name: 'lastname', value: null};
-    var firstName = {name: 'firstname', value: null};
-
-    var fnameEncoded = '';
-    var lnameEncoded = '';
-
-    MegaPromise.allDone([
+    Promise.allSettled([
+        mega.attr.get(userId, 'lastname', -1, false, undefined, undefined, chatHandle),
         mega.attr.get(userId, 'firstname', -1, false, undefined, undefined, chatHandle)
-            .done(function(r) {
-                firstName.value = r;
-                fnameEncoded = r;
-            }),
-        mega.attr.get(userId, 'lastname', -1, false, undefined, undefined, chatHandle)
-            .done(function(r) {
-                lastName.value = r;
-                lnameEncoded = r;
-            })
-    ]).done(function() {
-        if (!self.u[userId]) {
-            promise.reject();
+        // @todo ..
+        // eslint-disable-next-line complexity
+    ]).then(function(r) {
+        var user = self.u[userId];
+
+        if (!user) {
+            if (promise) {
+                promise.reject();
+            }
             return;
         }
+        var lastName = {name: 'lastname', value: r[0].value};
+        var firstName = {name: 'firstname', value: r[1].value};
 
         [firstName, lastName].forEach(function(obj) {
 
@@ -683,18 +685,17 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
         lastName = lastName.value;
         firstName = firstName.value;
 
-        self.u[userId].firstName = firstName;
-        self.u[userId].lastName = lastName;
-        var user = self.u[userId];
+        user.name = "";
+        user.lastName = lastName;
+        user.firstName = firstName;
 
         if (firstName && $.trim(firstName).length > 0 || lastName && $.trim(lastName).length > 0) {
-            self.u[userId].name = "";
 
             if (firstName && $.trim(firstName).length > 0) {
-                self.u[userId].name = firstName;
+                user.name = firstName;
             }
             if (lastName && $.trim(lastName).length > 0) {
-                self.u[userId].name += (self.u[userId].name.length > 0 ? " " : "") + lastName;
+                user.name += (user.name.length > 0 ? " " : "") + lastName;
             }
 
             // Get the nickname (if available) and name
@@ -715,23 +716,20 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
                 M.contacts();
             }
         }
-        else {
-            self.u[userId].name = "";
-        }
 
         if (nicknames.cache[userId]) {
-            self.u[userId].nickname = nicknames.cache[userId];
+            user.nickname = nicknames.cache[userId];
         }
 
-        if (self.u[userId].avatar && self.u[userId].avatar.type != "image") {
-            self.u[userId].avatar = false;
+        if (user.avatar && user.avatar.type !== "image") {
+            user.avatar = false;
             useravatar.loaded(userId);
         }
 
         if (userId === u_handle) {
             u_attr.firstname = firstName;
             u_attr.lastname = lastName;
-            u_attr.name = self.u[userId].name;
+            u_attr.name = user.name;
 
             $('.user-name').text(u_attr.fullname);
             $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.fullname);
@@ -741,28 +739,30 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
                 accountUI.account.profiles.renderLastName();
             }
         }
+
         // check if this first name + last belongs to business sub-user
         // we added here to avoid re-calling get attribute + minimize the need of code refactoring
-        if (u_attr && u_attr.b && u_attr.b.m) {
-            if (M.suba && M.suba[userId]) {
-                M.require('businessAcc_js', 'businessAccUI_js').done(
-                    function () {
-                        var business = new BusinessAccount();
+        if (u_attr && u_attr.b && u_attr.b.m && M.suba && M.suba[userId]) {
+            M.require('businessAcc_js', 'businessAccUI_js').done(
+                function() {
+                    var business = new BusinessAccount();
+                    var subUser = M.suba[userId];
+                    subUser.lastname = r[0].value;
+                    subUser.firstname = r[1].value;
 
-                        var subUser = M.suba[userId];
-                        subUser.firstname = fnameEncoded;
-                        subUser.lastname = lnameEncoded;
-
-                        business.parseSUBA(subUser, false, true);
-                    }
-                );
-            }
+                    business.parseSUBA(subUser, false, true);
+                }
+            );
         }
-        promise.resolve();
+
+        if (promise) {
+            promise.resolve();
+        }
     });
 
-    return promise;
+    return promise || true;
 };
+
 
 /**
  * syncPendingContacts
@@ -771,7 +771,6 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle) {
  * @param {Object} actionPacket
  * @returns {void}
  */
-
 MegaData.prototype.syncPendingContacts = function(actionPacket) {
     'use strict';
     if (this.currentdirid === 'opc' || this.currentdirid === 'ipc') {
@@ -787,75 +786,62 @@ MegaData.prototype.syncPendingContacts = function(actionPacket) {
     }
 };
 
-MegaData.prototype.syncContactEmail = function(userHash) {
-    var promise = new MegaPromise();
-    if (anonymouschat) {
-        return promise.reject();
+MegaData.prototype.syncContactEmail = function(userHash, promise) {
+    'use strict';
+    var user = userHash in this.u && this.u[userHash] || false;
+
+    if (!user || anonymouschat) {
+        return promise ? promise.reject() : false;
     }
 
-    if (M.u[userHash]) {
-        if (!M.u[userHash].m) {
-            attribCache.getItem(userHash + "_uge")
-                .done(function (r) {
-                    M.u[userHash].m = r;
-                    promise.resolve(r);
-                })
-                .fail(function () {
-                    asyncApiReq({
-                        'a': 'uge',
-                        'u': userHash
-                    })
-                        .done(function (r) {
-                            if (r && isString(r)) {
-                                if (M.u[userHash]) {
-                                    M.u[userHash].m = r;
-                                    attribCache.setItem(userHash + "_uge", r);
-                                    promise.resolve(r);
-                                }
-                                else {
-                                    promise.reject();
-                                }
-                            }
-                            else {
-                                promise.reject();
-                            }
-                        });
+    if (user.m) {
+        return promise ? promise.resolve(user.m) : user.m;
+    }
+
+    attribCache.getItem(userHash + "_uge")
+        .done(function(r) {
+            M.u[userHash].m = r;
+            if (promise) {
+                promise.resolve(r);
+            }
+        })
+        .fail(function() {
+            asyncApiReq({a: 'uge', u: userHash})
+                .done(function(r) {
+                    if (r && isString(r) && M.u[userHash]) {
+                        M.u[userHash].m = r;
+                        attribCache.setItem(userHash + "_uge", r);
+
+                        if (promise) {
+                            promise.resolve(r);
+                        }
+                        return;
+                    }
+
+                    if (promise) {
+                        promise.reject();
+                    }
                 });
-        } else {
-            promise.resolve(M.u[userHash].m);
-        }
-    }
-    else {
-        promise.reject();
-    }
+        });
 
-    return promise;
+    return promise || true;
 };
 
-(function(global) {
+(function() {
     "use strict";
 
-    var eventuallyReorderContactsTreePane = function() {
-        if (
-            (
-                M.currentdirid === "contacts" ||
-                M.currentdirid === "ipc" ||
-                M.currentdirid === "opc" ||
-                M.u[M.currentdirid]
-            ) &&
-            typeof $.sortTreePanel !== 'undefined' &&
-            typeof $.sortTreePanel.contacts !== 'undefined' &&
-            $.sortTreePanel.contacts.by === 'status'
-        ) {
-            M.contacts(); // we need to resort
-        }
-    };
+    var contactChangeWatcher = {
+        reorder: false,
+        sections: {'contacts': 1, 'ipc': 2, 'opc': 3},
+        handleChangeEvent: function(contact) {
+            var self = this;
 
-    /**
-     * Callback, that would be called when a contact is changed.
-     */
-    var onContactChanged = function(contact) {
-        if (fminitialized) {
+            if (!fminitialized) {
+                return;
+            }
+
+            this.reorder = this.reorder || contact && contact.h in M.u && M.u[contact.h].c;
+
             // throttle updates, since a lot of batched updates may come at
             // pretty much the same moment (+/- few ms, enough to trigger tons of updates)
             delay('onContactChanged', function() {
@@ -866,11 +852,38 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 else if (M.currentdirid === 'contacts') {
                     M.openFolder(M.currentdirid, true);
                 }
-                if (M.u[contact.h] && M.u[contact.h].c) {
-                    eventuallyReorderContactsTreePane();
+
+                if (self.reorder) {
+                    self.reorder = false;
+
+                    if (self.sections[M.currentdirid] || M.currentdirid in M.u
+                        || M.getTreePanelSortingValue('contacts') === 'status') {
+
+                        // we need to resort
+                        M.contacts();
+                    }
                 }
             }, 1000);
         }
+    };
+
+    /**
+     * Set new user into map store and returns it
+     * @param {String} u_h user handle
+     * @param {MegaDataObject|Object} [obj] store
+     * @returns {MegaDataObject} stored user
+     */
+    MegaData.prototype.setUser = function(u_h, obj) {
+        if (!(u_h in this.u)) {
+            if (!(obj instanceof MegaDataObject)) {
+                if (!obj) {
+                    obj = {h: u_h, u: u_h, m: '', c: undefined};
+                }
+                obj = new MegaDataObject(MEGA_USER_STRUCT, obj);
+            }
+            this.u.set(u_h, obj);
+        }
+        return this.u[u_h];
     };
 
     /**
@@ -882,25 +895,22 @@ MegaData.prototype.syncContactEmail = function(userHash) {
      */
     MegaData.prototype.addUser = function(u, ignoreDB) {
         if (u && u.u) {
-            var userId = u.u;
+            var user = u.u in this.u && this.u[u.u];
 
-            if (this.u[userId]) {
+            if (user) {
                 for (var key in u) {
-                    if (MEGA_USER_STRUCT.hasOwnProperty(key) && key !== 'name') {
-                        this.u[userId][key] = u[key];
+                    if (key !== 'name' && key in MEGA_USER_STRUCT) {
+                        user[key] = u[key];
                     }
                     else if (d) {
                         console.warn('addUser: property "%s" not updated.', key, u[key]);
                     }
                 }
-
-                u = this.u[userId];
             }
             else {
-                this.u.set(userId, new MegaDataObject(MEGA_USER_STRUCT, true, u));
+                user = this.setUser(u.u, u);
+                user.addChangeListener(contactChangeWatcher);
             }
-
-            this.u[userId].addChangeListener(onContactChanged);
 
             if (fmdb && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
@@ -914,19 +924,19 @@ MegaData.prototype.syncContactEmail = function(userHash) {
                 delete cleanedUpUserData.avatar;
                 delete cleanedUpUserData.ats;
                 fmdb.add('u', {u: u.u, d: cleanedUpUserData});
-                M.u[userId].firstName = '';
-                M.u[userId].lastName = '';
-                attribCache.removeItem(userId + "_firstname");
-                attribCache.removeItem(userId + "_lastname");
+                user.firstName = '';
+                user.lastName = '';
+                attribCache.removeItem(user.u + "_firstname");
+                attribCache.removeItem(user.u + "_lastname");
             }
 
-            this.syncUsersFullname(userId);
-            if (!megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.plugins.presencedIntegration) {
-                megaChat.plugins.presencedIntegration.eventuallyAddPeer(userId);
+            this.syncUsersFullname(user.u);
+            if (megaChatIsReady && megaChat.plugins.presencedIntegration) {
+                megaChat.plugins.presencedIntegration.eventuallyAddPeer(user.u);
             }
         }
     };
-})(this);
+})();
 
 // Update M.opc and related localStorage
 MegaData.prototype.addOPC = function(u, ignoreDB) {
@@ -1410,14 +1420,14 @@ MegaData.prototype.contactsUI = function() {
             loadSubPage("fm/chat/p/" + user_handle);
         }
         else if ($this.hasClass('start-audio-call')) {
-            megaChat.createAndShowPrivateRoomFor(user_handle)
+            megaChat.createAndShowPrivateRoom(user_handle)
                 .then(function(room) {
                     room.setActive();
                     room.startAudioCall();
                 });
         }
         else if ($this.hasClass('start-video-call')) {
-            megaChat.createAndShowPrivateRoomFor(user_handle)
+            megaChat.createAndShowPrivateRoom(user_handle)
                 .then(function(room) {
                     room.setActive();
                     room.startVideoCall();

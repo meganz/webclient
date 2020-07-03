@@ -1,5 +1,6 @@
 import React from 'react';
 import {MegaRenderMixin} from './../../stores/mixins.js';
+
 var DropdownsUI = require('./../../ui/dropdowns.jsx');
 var ContactsUI = require('./../ui/contacts.jsx');
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
@@ -16,19 +17,18 @@ class ParticipantsList extends MegaRenderMixin {
             'scrollHeight': 36 * 4
         };
 
-        this.doResizesOnComponentUpdate = SoonFc(function() {
+        this.doResizesOnComponentUpdate = SoonFc(10, function() {
             var self = this;
             if (!self.isMounted()) {
                 return;
             }
-            var $node = $(self.findDOMNode());
-            var scrollHeight = self.contactsListScroll.getContentHeight();
-            var fitHeight = scrollHeight;
-            if (fitHeight === 0) {
+            var fitHeight = self.contactsListScroll.getContentHeight();
+            if (!fitHeight) {
                 // not visible at the moment.
                 return null;
             }
 
+            var $node = $(self.findDOMNode());
             var $parentContainer = $node.closest('.chat-right-pad');
             var maxHeight = $parentContainer.outerHeight(true) -
                 $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
@@ -39,7 +39,7 @@ class ParticipantsList extends MegaRenderMixin {
             else if (maxHeight < fitHeight) {
                 fitHeight = Math.max(maxHeight, 53);
             }
-            fitHeight = Math.min(this.calculateListHeight($parentContainer), fitHeight);
+            fitHeight = Math.min(self.calculateListHeight($parentContainer), fitHeight);
 
             var $contactsList = $('.chat-contacts-list', $parentContainer);
 
@@ -47,7 +47,7 @@ class ParticipantsList extends MegaRenderMixin {
                 $('.chat-contacts-list', $parentContainer).height(
                     fitHeight
                 );
-                self.contactsListScroll.eventuallyReinitialise(true);
+                self.contactsListScroll.reinitialise();
             }
 
 
@@ -55,7 +55,7 @@ class ParticipantsList extends MegaRenderMixin {
                 self.setState({'scrollHeight': fitHeight});
             }
             self.onUserScroll();
-        }, 100);
+        });
     }
     onUserScroll() {
         if (!this.contactsListScroll) {
@@ -190,12 +190,12 @@ class ParticipantsListInner extends MegaRenderMixin {
         }
 
         var onRemoveClicked = (contactHash) => {
-            $(room).trigger('onRemoveUserRequest', [contactHash]);
+            room.trigger('onRemoveUserRequest', [contactHash]);
         };
 
         var onSetPrivClicked = (contactHash, priv) => {
             if (room.members[contactHash] !== priv) {
-                $(room).trigger('alterUserPrivilege', [contactHash, priv]);
+                room.trigger('alterUserPrivilege', [contactHash, priv]);
             }
         };
 

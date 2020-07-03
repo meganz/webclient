@@ -960,7 +960,7 @@
     ) {
         var self = this;
 
-        if (!msgObject || !msgObject.toPersistableObject) {
+        if (!(msgObject instanceof Message)) {
             return MegaPromise.resolve();
         }
 
@@ -1415,62 +1415,25 @@
      */
     ChatdPersist.prototype.getLowHighIds = function(chatId) {
         var self = this;
-
-        var promise = new MegaPromise();
-
         var encChatId = ChatdPersist.encrypt(chatId);
-
-        var low = false;
-        var high = false;
-
-        var lowNum;
-        var highNum;
-
-        var p1 = MegaPromise.asMegaPromiseProxy(
-            self.db.msgs
-                .where('[chatId+orderValue]')
-                .between([encChatId, -Infinity], [encChatId, Infinity]).last()
-        ).then(
-                function(r) {
-                    if (r) {
-                        high = r.msgId;
-                        highNum = r.orderValue;
-                    }
-                    else {
-                        promise.reject();
-                    }
-                },
-                function() {
-                    promise.reject();
-                });
-
-        var p2 = MegaPromise.asMegaPromiseProxy(
-            self.db.msgs
-                .where('[chatId+orderValue]')
-                .between([encChatId, -Infinity], [encChatId, Infinity]).first()
-        ).then(
-                function(r) {
-                    if (r) {
-                        low = r.msgId;
-                        lowNum = r.orderValue;
-                    }
-                    else {
-                        promise.reject();
-                    }
-                },
-                function() {
-                    promise.reject();
-                });
-
-        MegaPromise.allDone([
-            p1,
-            p2,
-        ])
-            .done(function() {
-                promise.resolve([low, high, lowNum, highNum]);
-            });
-
-        return promise;
+        return new MegaPromise(function(resolve, reject) {
+            // @todo do a single DB query (?)..
+            Promise.all([
+                self.db.msgs
+                    .where('[chatId+orderValue]')
+                    .between([encChatId, -Infinity], [encChatId, Infinity]).last(),
+                self.db.msgs
+                    .where('[chatId+orderValue]')
+                    .between([encChatId, -Infinity], [encChatId, Infinity]).first()
+            ]).then(function(result) {
+                var low = result[1];
+                var high = result[0];
+                if (!(low && high)) {
+                    return reject();
+                }
+                resolve([low.msgId, high.msgId, low.orderValue, high.orderValue]);
+            }).catch(reject);
+        });
     };
 
     /**
@@ -1649,15 +1612,9 @@
             // messages to be removed.
             promise.always(function() {
 
-                if (
-                    chatRoom &&
-                    chatRoom.messagesBuff.isDecrypting &&
-                    chatRoom.messagesBuff.isDecrypting.state() === 'pending'
-                ) {
-                    chatRoom.messagesBuff.isDecrypting.done(function() {
-                        Soon(function() {
-                            self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
-                        });
+                if (chatRoom.messagesBuff.isDecrypting) {
+                    chatRoom.messagesBuff.isDecrypting.finally(function() {
+                        self._cleanupMessagesAfterTruncate(chatId, firstNumToStartFrom);
                     });
                 }
                 else {

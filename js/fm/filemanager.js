@@ -47,7 +47,7 @@ FileManager.prototype.showExpiredBusiness = function() {
 /** Check if this is a business expired account, or ODW paywall. */
 FileManager.prototype.isInvalidUserStatus = function() {
     'use strict';
-    if (u_attr) {
+    if (mega.paywall) {
         if (u_attr.b && u_attr.b.s === -1) {
             if ($.hideContextMenu) {
                 $.hideContextMenu();
@@ -1471,7 +1471,7 @@ FileManager.prototype.initContextUI = function() {
         var user_handle = $.selected && $.selected[0];
 
         if (!$this.is('.disabled') && user_handle) {
-            megaChat.createAndShowPrivateRoomFor(user_handle)
+            megaChat.createAndShowPrivateRoom(user_handle)
                 .then(function(room) {
                     room.setActive();
                     room.startAudioCall();
@@ -1487,7 +1487,7 @@ FileManager.prototype.initContextUI = function() {
         var user_handle = $.selected && $.selected[0];
 
         if (!$this.is('.disabled') && user_handle) {
-            megaChat.createAndShowPrivateRoomFor(user_handle)
+            megaChat.createAndShowPrivateRoom(user_handle)
                 .then(function(room) {
                     room.setActive();
                     room.startVideoCall();

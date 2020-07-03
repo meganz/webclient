@@ -28,6 +28,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
         this.state = {
             'editing': this.props.editing,
         };
+        this.pid = '__geom_' + String(Math.random()).substr(2);
     }
     isBeingEdited() {
         return this.state.editing === true || this.props.editing === true;
@@ -54,7 +55,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
             self.props.onUpdate();
         }
 
-        $(self.props.message).rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
+        self.props.message.rebind('onChange.GenericConversationMessage' + self.getUniqueId(), function() {
             Soon(function() {
                 if (self.isMounted()) {
                     self.eventuallyUpdate();
@@ -117,7 +118,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
         var self = this;
         var $node = $(self.findDOMNode());
 
-        $(self.props.message).off('onChange.GenericConversationMessage' + self.getUniqueId());
+        self.props.message.off('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
     }
     haveMoreContactListeners() {
@@ -385,7 +386,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 };
 
                 megaChat.trigger('onPreBeforeRenderMessage', evtObj);
-                var event = new $.Event("onBeforeRenderMessage");
+                var event = new MegaDataEvent("onBeforeRenderMessage");
                 megaChat.trigger(event, evtObj);
                 megaChat.trigger('onPostBeforeRenderMessage', evtObj);
 
@@ -411,7 +412,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                     if (message.sending === true) {
                         message.sending = false;
-                        $(message).trigger('onChange', [message, "sending", true, false]);
+                        message.trigger('onChange', [message, "sending", true, false]);
                     }
 
                     if (!message.requiresManualRetry) {
@@ -429,10 +430,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                     if (!message.sending) {
                         message.sending = true;
-                        if (self._rerenderTimer) {
-                            clearTimeout(self._rerenderTimer);
-                        }
-                        self._rerenderTimer = setTimeout(function() {
+                        delay(this.pid + message.messageId, function() {
                             if (chatRoom.messagesBuff.messages[message.messageId] && message.sending === true) {
                                 chatRoom.messagesBuff.trackDataChange();
                                 if (self.isMounted()) {
@@ -788,7 +786,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         }
                         var dropdown = null;
                         if (!M.u[contact.u]) {
-                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, true, {
+                            M.u.set(contact.u, new MegaDataObject(MEGA_USER_STRUCT, {
                                 'u': contact.u,
                                 'name': contact.name,
                                 'm': contact.email ? contact.email : contactEmail,

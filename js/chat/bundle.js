@@ -409,6 +409,19 @@ var MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       this.__intersectionObserverInstance = undefined;
     }
 
+    var instanceId = this.getUniqueId();
+    var listeners = _propertyTrackChangesVars._listenersMap[instanceId];
+
+    if (listeners) {
+      for (var k in listeners) {
+        var v = listeners[k];
+        v[0].removeChangeListener(v[1]);
+      }
+    }
+
+    _propertyTrackChangesVars._listenersMap[instanceId] = null;
+    _propertyTrackChangesVars._dataChangedHistory[instanceId] = null;
+
     if (this._dataStructListeners) {
       this._internalDetachRenderCallbacks();
     }
@@ -588,7 +601,7 @@ var MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
   };
 
   _proto._getUniqueIDForMap = function _getUniqueIDForMap(map, payload) {
-    return this.getUniqueId() + '.' + map + '.' + payload;
+    return map + '.' + payload;
   };
 
   _proto._recurseAddListenersIfNeeded = function _recurseAddListenersIfNeeded(idx, map, depth) {
@@ -599,10 +612,16 @@ var MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     if (map instanceof MegaDataMap) {
       var cacheKey = this._getUniqueIDForMap(map, idx);
 
-      if (!_propertyTrackChangesVars._listenersMap[cacheKey]) {
-        _propertyTrackChangesVars._listenersMap[cacheKey] = map.addChangeListener(function () {
+      var instanceId = this.getUniqueId();
+
+      if (!_propertyTrackChangesVars._listenersMap[instanceId]) {
+        _propertyTrackChangesVars._listenersMap[instanceId] = Object.create(null);
+      }
+
+      if (!_propertyTrackChangesVars._listenersMap[instanceId][cacheKey]) {
+        _propertyTrackChangesVars._listenersMap[instanceId][cacheKey] = [map, map.addChangeListener(function () {
           return _this5.onPropOrStateUpdated();
-        });
+        })];
       }
     }
 
@@ -636,13 +655,18 @@ var MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       var cacheKey = this._getUniqueIDForMap(v, idx);
 
       var dataChangeHistory = _propertyTrackChangesVars._dataChangedHistory;
+      var instanceId = this.getUniqueId();
 
-      if (dataChangeHistory[cacheKey] !== v._dataChangeIndex) {
+      if (!dataChangeHistory[instanceId]) {
+        dataChangeHistory[instanceId] = Object.create(null);
+      }
+
+      if (dataChangeHistory[instanceId][cacheKey] !== v._dataChangeIndex) {
         if (window.RENDER_DEBUG) {
           console.error("changed: ", this.getElementName(), cacheKey, v._dataChangeTrackedId, v._dataChangeIndex, v);
         }
 
-        dataChangeHistory[cacheKey] = v._dataChangeIndex;
+        dataChangeHistory[instanceId][cacheKey] = v._dataChangeIndex;
         return true;
       }
 

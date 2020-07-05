@@ -3966,15 +3966,6 @@ if (window.requestIdleCallback) {
     };
 }
 
-/** Helper to replace process.nextTick in videostream.js */
-function onIdleA(boundCallBack) {
-    'use strict';
-
-    onIdle(function() {
-        boundCallBack();
-    });
-}
-
 function makeUUID(a) {
     'use strict';
 
@@ -3996,6 +3987,7 @@ function inherits(target, source) {
         value: function() {
             return '[object ' + this.constructor.name + ']';
         },
+        writable: true,
         configurable: true
     });
 

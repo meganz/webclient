@@ -643,8 +643,21 @@ var security = {
                         u_handle = res[4];
                         u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
 
+                        if (is_mobile) {
+                            $('.fm-dialog-close', $dialog).addClass('hidden');
+                            $('.cancel-email-verify', $dialog).removeClass('hidden').rebind('click.cancel', function() {
+                                loadSubPage("start");
+                            });
+                        }
+                        else {
+                            $('.fm-dialog-close', $dialog).removeClass('hidden').rebind('click.cancel', function() {
+                                loadSubPage("start");
+                            });
+                            $('.cancel-email-verify', $dialog).addClass('hidden');
+                        }
+
                         $('.mail', $dialog).val(u_attr.email);
-                        $('.button', $dialog).rebind('click.ve', function() {
+                        $('.button.default-green-button', $dialog).rebind('click.ve', function() {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 

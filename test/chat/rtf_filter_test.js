@@ -12,7 +12,10 @@ describe("chat.rtf_filter unit test", function() {
 
     beforeEach(function() {
         var EMOJI_DATASET_VERSION = 2;
-        megaChat = {
+        megaChat = function() {};
+        makeObservable(megaChat);
+        megaChat = new megaChat();
+        Object.assign(megaChat, {
             'getEmojiDataSet': function(name) {
                 var self = this;
                 assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
@@ -46,8 +49,7 @@ describe("chat.rtf_filter unit test", function() {
                     return self._emojiDataLoading[name];
                 }
             }
-        };
-        makeObservable(megaChat);
+        });
         megaChat.plugins = {
             // 'chatStats': ChatStats,
             // 'chatdIntegration': ChatdIntegration,

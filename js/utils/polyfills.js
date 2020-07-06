@@ -51,6 +51,15 @@ if (!Object.hasOwnProperty('getOwnPropertyDescriptors')) {
     });
 }
 
+/** setPrototypeOf (weak) polyfill */
+if (Object.setPrototypeOf === undefined) {
+    Object.setPrototypeOf = function(target, proto) {
+        'use strict';
+        target.__proto__ = proto;
+        return target;
+    };
+}
+
 if (!String.prototype.startsWith) {
     // determines whether a string begins with the characters of a specified string
     String.prototype.startsWith = function(searchString, position) {
@@ -171,8 +180,7 @@ mBroadcaster.once('boot_done', function() {
 mBroadcaster.once('boot_done', function() {
     'use strict';
     Promise.prototype.always = function(fc) {
-        this.then(fc).catch(fc);
-        return this;
+        return this.then(fc).catch(fc);
     };
     Promise.prototype.dump = function(tag) {
         // XXX: No more then/catch after invoking this!
@@ -180,6 +188,21 @@ mBroadcaster.once('boot_done', function() {
             .catch(console.warn.bind(console, tag || 'FAIL'));
         return this;
     };
+
+    if (Promise.allSettled === undefined) {
+        Promise.allSettled = function(promises) {
+            var done = function(result) {
+                return {status: 'fulfilled', value: result};
+            };
+            var fail = function(result) {
+                return {status: 'rejected', reason: result};
+            };
+            var map = function(promise) {
+                return promise.then(done).catch(fail);
+            };
+            return Promise.all(promises.map(map));
+        };
+    }
 });
 
 mBroadcaster.once('boot_done', function() {

@@ -16,7 +16,7 @@ var notify = {
     numOfNotifications: 50,
 
     /** Locally cached emails and pending contact emails */
-    userEmails: {},
+    userEmails: Object.create(null),
 
     /** jQuery objects for faster lookup */
     $popup: null,
@@ -89,6 +89,11 @@ var notify = {
                         var timestamp = currentTime - timeDelta;        // Timestamp of the notification
                         var userHandle = notification.u;                // User handle e.g. new share from this user
 
+                        if (!userHandle && notification.t === 'ipc') {
+                            // incoming pending contact
+                            userHandle = notification.p;
+                        }
+
                         // Add notifications to list
                         notify.notifications.push({
                             data: notification, // The full notification object
@@ -143,14 +148,12 @@ var notify = {
             newNotification.userHandle = actionPacket.orig;
         }
 
-        // Update store of user emails that it knows about if a contact request was recently accepted
-        notify.addUserEmails();
-
         // If the user handle is not known to the local state we need to fetch the email from the API. This happens in
         // some sharing scenarios where a user is part of a share then another user adds files to the share but they
         // are not contacts with that other user so the local state has no information about them and would display a
         // broken notification if the email is not known.
-        if (newNotification.type === 'put' && typeof notify.userEmails[newNotification.userHandle] === 'undefined') {
+        if (newNotification.type === 'put' && !this.getUserEmailByTheirHandle(newNotification.userHandle)) {
+            console.assert(newNotification.userHandle && newNotification.userHandle.length === 11);
 
             // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
             notify.fetchUserEmailFromApi(newNotification.userHandle, actionPacket);
@@ -509,11 +512,12 @@ var notify = {
      * @param {Array} pendingContactUsers An array of objects (with user handle and email) for the pending contacts
      */
     addUserEmails: function(pendingContactUsers) {
+        'use strict';
 
         // Add the pending contact email addresses
-        if (typeof pendingContactUsers !== 'undefined') {
+        if (Array.isArray(pendingContactUsers)) {
 
-            for (var i = 0, length = pendingContactUsers.length; i < length; i++) {
+            for (var i = pendingContactUsers.length; i--;) {
 
                 var userHandle = pendingContactUsers[i].u;
                 var userEmail = pendingContactUsers[i].m;
@@ -521,15 +525,16 @@ var notify = {
                 notify.userEmails[userHandle] = userEmail;
             }
         }
+    },
 
-        // Add the emails from the user's list of known contacts
-        if (M && M.u) {
-            M.u.forEach(function(contact, userHandle) {
-
-                // Add the email
-                notify.userEmails[userHandle] = contact.m;
-            });
-        }
+    /**
+     * Retrieve the email associated to an user by his/their handle.
+     * @param {String} userHandle the
+     * @returns {Object} or false if not found.
+     */
+    getUserEmailByTheirHandle: function(userHandle) {
+        'use strict';
+        return M.getUserByHandle(userHandle).m || this.userEmails[userHandle] || false;
     },
 
     /**
@@ -784,27 +789,29 @@ var notify = {
         $notificationHtml.removeClass('template');
 
         var date = time2last(notification.timestamp);
+        var data = notification.data;
         var userHandle = notification.userHandle;
         var customIconNotifications = ['psts', 'pses', 'ph'];   // Payment & Takedown notification types
         var userEmail = l[7381];    // Unknown
         var avatar = '';
 
         // If a contact action packet
-        if ((typeof userHandle === 'object') && (typeof notification.data.u[0].m !== 'undefined')) {
-            userEmail = notification.data.u[0].m;
+        if (typeof userHandle !== 'string') {
+            if (Array.isArray(userHandle)) {
+                userHandle = userHandle[0] || false;
+            }
+            if (typeof userHandle !== 'object' && data) {
+                userHandle = Array.isArray(data.u) && data.u[0] || data;
+            }
+            userEmail = userHandle.m || userEmail;
+            userHandle = userHandle.u || userHandle.ou;
         }
 
         // Use the email address in the notification/action packet if the contact doesn't exist locally
         // or if it was populated partially locally (i.e from chat, without email)
         // or if the notification is closed account notification, M.u cannot be exist, so just using attached email.
-        else if ((typeof M.u[userHandle] === 'undefined' || !M.u[userHandle].m || notification.type === 'c')
-            && (typeof notification.data.m !== 'undefined')) {
-            userEmail = notification.data.m;
-        }
-
-        // Otherwise get from the list of emails we know about
-        else if (typeof notify.userEmails[userHandle] !== 'undefined') {
-            userEmail = notify.userEmails[userHandle];
+        if (userEmail === l[7381]) {
+            userEmail = this.getUserEmailByTheirHandle(userHandle) || data && data.m || userEmail;
         }
 
         // If the notification is not one of the custom ones, generate an avatar from the user information
@@ -1165,7 +1172,7 @@ var notify = {
         }
         else {
             var folderName = M.getNameByHandle(notification.data.n) || '';
-            var removerEmail = notify.userEmails[notificationTarget];
+            var removerEmail = notify.getUserEmailByTheirHandle(notificationTarget);
             if (removerEmail) {
                 title = l[19153].replace('{0}', removerEmail).replace('{1}', folderName);
             }

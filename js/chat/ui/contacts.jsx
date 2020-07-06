@@ -7,7 +7,9 @@ import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
-var _attchRerenderCbContacts = function() {
+const EMPTY_ARR = [];
+
+var _attchRerenderCbContacts = function(others) {
     this.addDataStructListenerForProperties(this.props.contact, [
         'name',
         'firstName',
@@ -15,8 +17,9 @@ var _attchRerenderCbContacts = function() {
         'nickname',
         'm',
         'avatar'
-    ]);
+    ].concat(others ? others : EMPTY_ARR));
 };
+
 
 export class ContactsListItem extends ContactAwareComponent {
     static defaultProps = {
@@ -126,7 +129,7 @@ export class ContactButton extends ContactAwareComponent {
             if (contact.c === 1) {
 
             var startAudioCall = function() {
-                megaChat.createAndShowPrivateRoomFor(contact.u)
+                megaChat.createAndShowPrivateRoom(contact.u)
                     .then(function(room) {
                         room.setActive();
                         room.startAudioCall();
@@ -152,7 +155,7 @@ export class ContactButton extends ContactAwareComponent {
                         <div>
                             <DropdownItem
                                 key="startVideo" icon="context videocam" label={__(l[1566])} onClick={() => {
-                                    megaChat.createAndShowPrivateRoomFor(contact.u)
+                                    megaChat.createAndShowPrivateRoom(contact.u)
                                         .then(function(room) {
                                             room.setActive();
                                             room.startVideoCall();
@@ -208,7 +211,7 @@ export class ContactButton extends ContactAwareComponent {
                                 }
                             }
                             else {
-                                M.syncContactEmail(contact.u)
+                                M.syncContactEmail(contact.u, new MegaPromise())
                                     .done(function(email) {
                                         var exists = false;
                                         var opcKeys = Object.keys(M.opc);
@@ -340,38 +343,27 @@ export class ContactVerified extends MegaRenderMixin {
         if (anonymouschat) {
             return null;
         }
-        var self = this;
-
         var contact = this.props.contact;
-
         if (!contact) {
             return null;
         }
 
-        var verifiedElement = null;
-
         if (u_authring && u_authring.Ed25519) {
             var verifyState = u_authring.Ed25519[contact.u] || {};
-            verifiedElement = (
-                verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON ?
-                    <div className={"user-card-verified " + this.props.className}></div> : null
-            );
+            if (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
+                return <div className={"user-card-verified " + this.props.className}/>;
+            }
         }
-        else {
-            var self = this;
-
-            !pubEd25519[contact.u] && crypt.getPubEd25519(contact.u)
-                .done(function() {
-                    onIdle(function() {
-                        if (pubEd25519[contact.u] && self.isMounted()) {
-                            self.safeForceUpdate();
-                        }
-                    });
+        else if (!pubEd25519[contact.u]) {
+            crypt.getPubEd25519(contact.u)
+                .then(() => {
+                    if (pubEd25519[contact.u]) {
+                        this.safeForceUpdate();
+                    }
                 });
         }
 
-
-        return verifiedElement;
+        return null;
     }
 };
 
@@ -617,7 +609,9 @@ export class ContactCard extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+    attachRerenderCallbacks() {
+        _attchRerenderCbContacts.call(this, ['presence']);
+    }
     specShouldComponentUpdate(nextProps, nextState) {
         var self = this;
 
@@ -625,27 +619,18 @@ export class ContactCard extends ContactAwareComponent {
         if (foundKeys.indexOf('dropdowns') >= 0) {
             array.remove(foundKeys, 'dropdowns', true);
         }
-        var shouldUpdate = undefined;
-        foundKeys.forEach(function(k) {
-            if (typeof(shouldUpdate) === 'undefined') {
-                if (!shallowEqual(nextProps[k], self.props[k])) {
-                    shouldUpdate = false;
-                }
-                else {
-                    shouldUpdate = true;
-                }
-            }
-        });
+
+        let shouldUpdate;
+        if (foundKeys.length) {
+            let k = foundKeys[0];
+            shouldUpdate = shallowEqual(nextProps[k], self.props[k]);
+        }
 
         if (!shouldUpdate) {
             // ^^ if false or undefined.
-            if (!shallowEqual(nextState, self.state)) {
-                shouldUpdate = false;
-            }
-            else {
-                shouldUpdate = true;
-            }
+            shouldUpdate = shallowEqual(nextState, self.state);
         }
+
         if (!shouldUpdate && self.state.props.dropdowns && nextProps.state.dropdowns) {
             // ^^ if still false or undefined.
             if (self.state.props.dropdowns.map && nextProps.state.dropdowns.map) {
@@ -673,7 +658,7 @@ export class ContactCard extends ContactAwareComponent {
             (M.getNameByHandle(contact.u) || contact.m);
 
         if (contact.u === u_handle) {
-            username += " (Me)";
+            username += " (" + escapeHTML(l[19285]).replace(':', '') + ")";
         }
         var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
         var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";

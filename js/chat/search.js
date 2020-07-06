@@ -114,30 +114,33 @@ RoomSearch.prototype.resume = function() {
         if (members) {
             self._matchMembers(members);
         }
+
         // match messages that are already loaded
-        var messages = room.messagesBuff.messages;
-        self._lastMsgCount = messages.length;
-        self.logger.debug("Initial message count:", self._lastMsgCount);
-        for (var i = messages.length - 1; i >= 0; i--) {
-            var msg = messages.getItem(i);
-            if (msg && msg.textContents && msg.textContents.length > 0) {
-                self.parentSearch._match(
-                    msg.textContents,
-                    SearchResultType.kMessage,
-                    msg,
-                    self,
-                    messages.length - i
-                );
+        if (self.parentSearch.searchMessages) {
+            var messages = room.messagesBuff.messages;
+            self._lastMsgCount = messages.length;
+            self.logger.debug("Initial message count:", self._lastMsgCount);
+            for (var i = messages.length - 1; i >= 0; i--) {
+                var msg = messages.getItem(i);
+                if (msg && msg.textContents && msg.textContents.length > 0) {
+                    self.parentSearch._match(
+                        msg.textContents,
+                        SearchResultType.kMessage,
+                        msg,
+                        self,
+                        messages.length - i
+                    );
+                }
             }
         }
+    }
 
-        if (room.messagesBuff.haveMoreHistory()) {
-            self._setState(SearchState.kInProgress); // in case it was paused or new
-            self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
-        }
-        else {
-            self._setComplete();
-        }
+    if (room.messagesBuff.haveMoreHistory() && self.parentSearch.searchMessages) {
+        self._setState(SearchState.kInProgress); // in case it was paused or new
+        self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
+    }
+    else {
+        self._setComplete();
     }
 };
 
@@ -239,6 +242,7 @@ RoomSearch.prototype._setComplete = function() {
  * is performed on all chats
  * @param {String} searchExpr a string to be searched for
  * @param {Object} handler The user handler that received the search results and the search completion event.
+ * @param {Boolean} searchMessages Flag indicating whether to search additionally for messages
  *  The handler needs to contain two methods:
  *      `onResult(room, result)`
  *          Receives results in realtime, as soon as they are found.
@@ -254,25 +258,29 @@ RoomSearch.prototype._setComplete = function() {
  *
  * @returns {ChatSearch} ChatSearch instance
  */
-function ChatSearch(megaChat, chatId, searchExpr, handler) {
+function ChatSearch(megaChat, chatId, searchExpr, handler, searchMessages) {
     "use strict";
     var self = this;
     self.megaChat = megaChat;
     self.allChats = megaChat.chats;
-
+    self.searchMessages = searchMessages;
 
     // normalize
     searchExpr = ChatSearch._normalize_str(searchExpr);
 
     self.originalSearchString = searchExpr;
+    self.searchRegExps = [];
+
     var searchWords = searchExpr.split(" ");
-    self.searchRegExps = searchWords.map(function(w) {
-        // prepend ^ if the searchExpr is <= 2 chars length and only one word
-        return new RegExp(
-            (searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(w),
-            'gi'
-        );
-    });
+    for (var i = 0; i < searchWords.length; i++) {
+        var word = searchWords[i];
+        if (word !== '') {
+            // prepend ^ if the searchExpr is <= 2 chars length and only one word
+            self.searchRegExps.push(
+                new RegExp((searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(word), 'gi')
+            );
+        }
+    }
 
     self.setupLogger();
     var searches = self.roomSearches = [];
@@ -354,7 +362,7 @@ ChatSearch._normalize_str = function(s) {
  * @param {Function} [onResult] Callback to invoke per each result found.
  * @returns {Promise}
  */
-ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
+ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMessages) {
     "use strict";
 
     if (ChatSearch.doSearch.cs) {
@@ -424,7 +432,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult) {
     };
 
 
-    ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler);
+    ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler, searchMessages);
     // console.error('search > doSearch() -> cs:', ChatSearch.doSearch.cs);
 
     results.dump = function() {

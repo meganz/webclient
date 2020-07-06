@@ -258,14 +258,15 @@ function acc_time2date(unixtime, yearIsOptional) {
 
     if (locale === 'en') {
         var date = MyDate.getDate();
+        var lb = date.toString().slice(-1);
         var th = 'th';
-        if ((date.toString()).slice(-1) === '1' && date !== 11) {
+        if (lb === '1' && date !== 11) {
             th = 'st';
         }
-        else if ((date.toString()).slice(-1) === '2' && date !== 12) {
+        else if (lb === '2' && date !== 12) {
             th = 'nd';
         }
-        else if ((date.toString()).slice(-1) === '3' && date !== 13) {
+        else if (lb === '3' && date !== 13) {
             th = 'rd';
         }
 
@@ -429,11 +430,18 @@ function getDateStructure() {
  * @returns {Boolean}
  */
 function todayOrYesterday(dateString, refDate) {
-    var momentDate = moment(dateString);
-    var today = moment(refDate ? refDate : undefined).startOf('day');
-    var yesterday = today.clone().subtract(1, 'days');
+    "use strict";
+    var targetDate = new Date(dateString);
+    var today = refDate ? new Date(refDate) : new Date();
 
-    return (momentDate.isSame(today, 'd') || momentDate.isSame(yesterday, 'd'));
+    // 24h only limit
+    if ((today - targetDate) / 1e3 < 172800) {
+        var yesterday = new Date(today / 1);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        return today.getDay() === targetDate.getDay() || yesterday.getDay() === targetDate.getDay();
+    }
+    return false;
 }
 
 /**
@@ -677,6 +685,31 @@ function getCountryAndLocales() {
         return timestamp;
     };
 }(Date));
+
+
+/**
+ * Returns "Today" (or "Today, 16:32" if verbose is true) if  the specific timestamp was in the past 2 days, otherwise
+ * uses an absolute date stamp (1st June 2020)
+ *
+ * @param {Number} unixtime
+ * @param {Boolean} [verbose]
+ * @returns {String}
+ */
+function getTimeMarker(unixtime, verbose) {
+    'use strict';
+    var result;
+    if (todayOrYesterday(unixtime * 1000)) {
+        // if in last 2 days, use the time2lastSeparator
+        var iso = (new Date(unixtime * 1e3)).toISOString();
+        result = time2lastSeparator(iso) + (verbose ? ", " + unixtimeToTimeString(unixtime) : "");
+    }
+    else {
+        // if not in the last 2 days, use 1st June [Year]
+        result = acc_time2date(unixtime, false);
+    }
+    return result;
+
+}
 
 //----------------------------------------------------------------------------
 

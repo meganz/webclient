@@ -58,7 +58,7 @@ describe("MegaRenderMixinTest", function() {
             expect(relement2.forceUpdate.callCount).to.eql(1);
 
             done();
-        }, TRACK_CHANGES_THROTTLING_MS)
+        }, 60)
     });
 
 
@@ -96,14 +96,14 @@ describe("MegaRenderMixinTest", function() {
         setTimeout(function() {
             obj1.f2 = 11;
             dataMap.remove('obj2');
-        }, TRACK_CHANGES_THROTTLING_MS/2);
+        }, 60);
 
         setTimeout(function() {
             expect(relement1.forceUpdate.callCount).to.eql(1);
             expect(relement2.forceUpdate.callCount).to.eql(1);
 
             done();
-        }, TRACK_CHANGES_THROTTLING_MS * 1.6)
+        }, 90)
     });
 
 });

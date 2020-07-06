@@ -449,36 +449,14 @@ function isValidEmail(email) {
  * Adds on, bind, unbind, one and trigger methods to a specific class's prototype.
  *
  * @param kls class on which prototype this method should add the on, bind, unbind, etc methods
+ * @deprecated
  */
 function makeObservable(kls) {
     'use strict';
-
-    var target = kls.prototype || kls;
-    var aliases = [['on'], ['off'], ['bind', 'on'], ['unbind', 'off'], ['one'], ['trigger'], ['rebind']];
-
-    aliases.forEach(function(fn) {
-        var prop = fn[0];
-        fn = fn[1] || prop;
-
-        Object.defineProperty(target, prop, {
-            value: function() {
-                return this.$__eventEmitter___[fn].apply(this.$__eventEmitter___, arguments);
-            },
-            writable: true,
-            configurable: true
-        });
-    });
-
-    Object.defineProperty(target, '$__eventEmitter___', {
-        get: function() {
-            // TODO: Get a real event emitter and deprecate jQuery here.
-            Object.defineProperty(this, '$__eventEmitter___', {value: $(this)});
-            return this.$__eventEmitter___;
-        },
-        configurable: true
-    });
-
-    target = aliases = kls = undefined;
+    if (d > 1) {
+        console.warn('makeObservable() is deprecated.');
+    }
+    inherits(kls, MegaDataEmitter);
 }
 
 /**
@@ -647,11 +625,11 @@ function createTimeoutPromise(validateFunction, tick, timeout,
 
     var $promise = new MegaPromise();
     resolveRejectArgs = resolveRejectArgs || [];
-    if (!$.isArray(resolveRejectArgs)) {
+    if (!Array.isArray(resolveRejectArgs)) {
         resolveRejectArgs = [resolveRejectArgs];
     }
 
-    $promise.verify = function() {
+    $promise.verify = SoonFc(20, function _ctpVerify() {
         if (validateFunction()) {
             if (window.d && typeof(window.promisesDebug) !== 'undefined') {
                 console.debug("Resolving timeout promise", name,
@@ -660,7 +638,8 @@ function createTimeoutPromise(validateFunction, tick, timeout,
             }
             $promise.resolve.apply($promise, resolveRejectArgs);
         }
-    };
+    });
+
     $promise.stopTimers = function() {
         if (tickInterval !== false) {
             clearInterval(tickInterval);
@@ -1269,6 +1248,14 @@ function getAppBaseUrl() {
         base += l.pathname;
     }
     return base;
+}
+
+if (d && location.hostname === 'localhost') {
+    // eslint-disable-next-line no-func-assign
+    getBaseUrl = function() {
+        'use strict';
+        return location.origin;
+    };
 }
 
 /**

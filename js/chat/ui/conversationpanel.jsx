@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import utils from './../../ui/utils.jsx';
-import {MegaRenderMixin} from './../../stores/mixins.js';
+import {MegaRenderMixin, timing, SoonFcWrap} from './../../stores/mixins.js';
 import {Button} from './../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
@@ -92,16 +92,6 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (!room || !room.roomId) {
             // destroyed
             return null;
-        }
-        var contactHandle;
-        var contact;
-        var contacts = room.getParticipantsExceptMe();
-        if (contacts && contacts.length > 0) {
-            contactHandle = contacts[0];
-            contact = M.u[contactHandle];
-        }
-        else {
-            contact = {};
         }
 
         // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
@@ -282,20 +272,20 @@ export class ConversationRightArea extends MegaRenderMixin {
                 chatRoom={self.props.chatRoom}>
                 <div className="chat-right-pad">
                     <Accordion
-                        onToggle={function() {
+                        chatRoom={room}
+                        onToggle={SoonFc(20, function() {
                             // wait for animations.
-                            setTimeout(function() {
-                                if (self.rightScroll) {
-                                    self.rightScroll.reinitialise();
-                                }
-                                if (self.participantsListRef) {
-                                    self.participantsListRef.safeForceUpdate();
-                                }
-                            }, 250);
-                        }}
+                            if (self.rightScroll) {
+                                self.rightScroll.reinitialise();
+                            }
+                            if (self.participantsListRef) {
+                                self.participantsListRef.safeForceUpdate();
+                            }
+                        })}
                         expandedPanel={expandedPanel}
                     >
-                       {participantsList ? <AccordionPanel className="small-pad" title={l[8876]} key="participants">
+                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]}
+                            chatRoom={room} key="participants">
                             {participantsList}
                         </AccordionPanel> : null}
                         {room.type === "public" && room.observers > 0 ? <div className="accordion-text observers">
@@ -306,7 +296,8 @@ export class ConversationRightArea extends MegaRenderMixin {
                             </span>
                         </div> : <div></div>}
 
-                        <AccordionPanel className="have-animation buttons" title={l[7537]} key="options">
+                        <AccordionPanel className="have-animation buttons" title={l[7537]} key="options"
+                            chatRoom={room}>
                             <div>
                             {addParticipantBtn}
                             {startAudioCallButton}
@@ -526,7 +517,6 @@ export class ConversationRightArea extends MegaRenderMixin {
 }
 
 export class ConversationPanel extends MegaRenderMixin {
-    static lastScrollPositionPerc = 1;
     constructor(props) {
         super(props);
         this.state = {
@@ -544,8 +534,8 @@ export class ConversationPanel extends MegaRenderMixin {
             editing: false
         };
 
-        this.handleWindowResize = this.handleWindowResize.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
+        this.handleWindowResize = SoonFc(80, (ev) => this._handleWindowResize(ev));
     }
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
@@ -556,37 +546,30 @@ export class ConversationPanel extends MegaRenderMixin {
         this.props.chatRoom.uploadFromComputer();
     }
     refreshUI() {
-        var self = this;
-        var room = self.props.chatRoom;
+        if (this.isComponentEventuallyVisible()) {
+            const room = this.props.chatRoom;
 
-        if (!self.props.chatRoom.isCurrentlyActive) {
-            return;
+            room.renderContactTree();
+            room.megaChat.refreshConversations();
+            room.trigger('RefreshUI');
         }
-
-        room.renderContactTree();
-
-        room.megaChat.refreshConversations();
-
-        room.trigger('RefreshUI');
     }
 
-    @utils.SoonFcWrap(150)
-    onMouseMove(e) {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        if (self.isMounted()) {
-            chatRoom.trigger("onChatIsFocused");
+    @utils.SoonFcWrap(360)
+    onMouseMove() {
+        if (this.isComponentEventuallyVisible()) {
+            this.props.chatRoom.trigger("onChatIsFocused");
         }
-    };
+    }
 
-    @utils.SoonFcWrap(150)
-    handleKeyDown(e) {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        if (self.isMounted() && chatRoom.isActive() && !chatRoom.isReadOnly()) {
-            chatRoom.trigger("onChatIsFocused");
+    _handleKeyDown() {
+        if (this.__isMounted) {
+            const chatRoom = this.props.chatRoom;
+            if (chatRoom.isActive() && !chatRoom.isReadOnly()) {
+                chatRoom.trigger("onChatIsFocused");
+            }
         }
-    };
+    }
 
     componentDidMount() {
         super.componentDidMount();
@@ -627,9 +610,13 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.props.chatRoom.type === "private") {
             var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
             if (M.u[otherContactHash]) {
-                M.u[otherContactHash].addChangeListener(function() {
+                self._privateChangeListener = M.u[otherContactHash].addChangeListener(function() {
+                    if (!self.isMounted()) {
+                        // theoretical chance of leaking - M.u[...] removed before the listener is removed
+                        return 0xDEAD;
+                    }
                     self.safeForceUpdate();
-                })
+                });
             }
         }
 
@@ -642,7 +629,7 @@ export class ConversationPanel extends MegaRenderMixin {
         self.props.chatRoom._uiIsMounted = true;
         self.props.chatRoom.$rConversationPanel = self;
 
-        $(self.props.chatRoom).trigger("onComponentDidMount");
+        self.props.chatRoom.trigger("onComponentDidMount");
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -695,13 +682,10 @@ export class ConversationPanel extends MegaRenderMixin {
         // collapse on ESC pressed (exited fullscreen)
         $(document)
             .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
-                if (!$(document).fullScreen() && room.isCurrentlyActive) {
-                    self.setState({isFullscreenModeEnabled: false});
+                if (self.isComponentEventuallyVisible()) {
+                    self.setState({isFullscreenModeEnabled: !!$(document).fullScreen()});
+                    self.forceUpdate();
                 }
-                else if (!!$(document).fullScreen() && room.isCurrentlyActive) {
-                    self.setState({isFullscreenModeEnabled: true});
-                }
-                self.forceUpdate();
             });
 
         if (doResize !== false) {
@@ -718,16 +702,15 @@ export class ConversationPanel extends MegaRenderMixin {
     componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        var megaChat = self.props.chatRoom.megaChat;
 
-        $(chatRoom).rebind('onHistoryDecrypted.cp', function() {
+        chatRoom.rebind('onHistoryDecrypted.cp', function() {
             self.eventuallyUpdate();
         });
 
         this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(function() {
             // wait for scrolling (if such is happening at the moment) to finish
             Soon(function() {
-                if (self.isMounted()) {
+                if (self.isComponentEventuallyVisible()) {
                     $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
                 }
             });
@@ -739,12 +722,18 @@ export class ConversationPanel extends MegaRenderMixin {
         super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
-        var megaChat = chatRoom.megaChat;
 
         chatRoom._uiIsMounted = true;
         if (this._messagesBuffChangeHandler) {
             chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
             delete this._messagesBuffChangeHandler;
+        }
+        if (this._privateChangeListener) {
+            var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
+            if (M.u[otherContactHash]) {
+                M.u[otherContactHash].removeChangeListener(this._privateChangeListener);
+                delete this._privateChangeListener;
+            }
         }
 
         window.removeEventListener('resize', self.handleWindowResize);
@@ -759,13 +748,16 @@ export class ConversationPanel extends MegaRenderMixin {
 
         room.megaChat.updateSectionUnreadCount();
 
-        var $node = $(self.findDOMNode());
+        var domNode = self.findDOMNode();
+        var jml = domNode && domNode.querySelector('.js-messages-loading');
 
-        if (self.loadingShown) {
-            $('.js-messages-loading', $node).removeClass('hidden');
-        }
-        else {
-            $('.js-messages-loading', $node).addClass('hidden');
+        if (jml) {
+            if (self.loadingShown) {
+                jml.classList.remove('hidden');
+            }
+            else {
+                jml.classList.add('hidden');
+            }
         }
         self.handleWindowResize();
 
@@ -783,7 +775,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (prevProps.isActive === false && self.props.isActive === true) {
-            var $typeArea = $('.messages-textarea:visible:first', $node);
+            var $typeArea = $('.messages-textarea:visible:first', domNode);
             if ($typeArea.length === 1) {
                 $typeArea.trigger("focus");
                 moveCursortoToEnd($typeArea[0]);
@@ -812,17 +804,24 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         }
 
-        if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
-            $(window).rebind('pastedimage.chatRoom', function (e, blob, fileName) {
-                if (self.isMounted() && self.$messages && self.isComponentEventuallyVisible()) {
+        if (self.$messages && self.isComponentEventuallyVisible()) {
+            $(window).rebind('pastedimage.chatRoom', function(e, blob, fileName) {
+                if (self.$messages && self.isComponentEventuallyVisible()) {
                     self.setState({'pasteImageConfirmDialog': [blob, fileName, URL.createObjectURL(blob)]});
                     e.preventDefault();
                 }
             });
-            $(self.props.chatRoom).trigger("onComponentDidUpdate");
+            self.props.chatRoom.trigger("onComponentDidUpdate");
+        }
+
+        if (self._reposOnUpdate !== undefined) {
+            var ps = self.messagesListScrollable;
+            ps.__prevPosY = ps.getScrollHeight() - self._reposOnUpdate + self.lastScrollPosition;
+            ps.scrollToY(ps.__prevPosY, true);
         }
     }
-    handleWindowResize(e, scrollToBottom) {
+
+    _handleWindowResize(e, scrollToBottom) {
         if (!M.chat) {
             return;
         }
@@ -832,7 +831,7 @@ export class ConversationPanel extends MegaRenderMixin {
             return;
         }
 
-        if (!this.props.chatRoom.isCurrentlyActive) {
+        if (!this.isComponentEventuallyVisible()) {
             return;
         }
 
@@ -841,7 +840,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
         self.eventuallyInit(false);
 
-        if (!self.isMounted() || !self.$messages || !self.isComponentEventuallyVisible()) {
+        if (!self.$messages) {
             return;
         }
 
@@ -877,6 +876,8 @@ export class ConversationPanel extends MegaRenderMixin {
     isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     }
+
+    @utils.SoonFcWrap(50)
     onMessagesScrollReinitialise(
                             ps,
                             $elem,
@@ -889,13 +890,14 @@ export class ConversationPanel extends MegaRenderMixin {
         var mb = chatRoom.messagesBuff;
 
         // don't do anything if history is being retrieved at the moment.
-        if (self.isRetrievingHistoryViaScrollPull || mb.isRetrievingHistory) {
+        if (self.scrollPullHistoryRetrieval || mb.isRetrievingHistory) {
             return;
         }
 
         if (forced) {
             if (!scrollPositionYPerc && !scrollToElement) {
                 if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
+                    // wait for the DOM update, if such.
                     ps.scrollToBottom(true);
                     return true;
                 }
@@ -906,37 +908,26 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         }
 
-        if (self.isComponentEventuallyVisible()) {
-            if (
-                self.props.chatRoom.scrolledToBottom &&
-                !self.editDomElement &&
-                !self.props.chatRoom.isScrollingToMessageId
-            ) {
+        if (self.isComponentEventuallyVisible()
+            && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
+
+            if (self.props.chatRoom.scrolledToBottom) {
                 ps.scrollToBottom(true);
                 return true;
             }
-            if (
-                self.lastScrollPosition &&
-                self.lastScrollPosition !== ps.getScrollPositionY() &&
-                !self.editDomElement &&
-                !self.props.chatRoom.isScrollingToMessageId
-            ) {
+
+            if (self.lastScrollPosition && self.lastScrollPosition !== ps.getScrollPositionY()) {
                 ps.scrollToY(self.lastScrollPosition, true);
                 return true;
             }
-
         }
     }
-    onMessagesScrollUserScroll(
-                        ps,
-                        $elem,
-                        e
-    ) {
+
+    onMessagesScrollUserScroll(ps) {
         var self = this;
 
         var scrollPositionY = ps.getScrollPositionY();
         var isAtTop = ps.isAtTop();
-        var isAtBottom = ps.isAtBottom();
         var chatRoom = self.props.chatRoom;
         var mb = chatRoom.messagesBuff;
 
@@ -958,116 +949,69 @@ export class ConversationPanel extends MegaRenderMixin {
             self.props.chatRoom.scrolledToBottom = false;
         }
 
-        if (isAtTop || (ps.getScrollPositionY() < 5 && ps.getScrollHeight() > 500)) {
-            if (mb.haveMoreHistory() && !self.isRetrievingHistoryViaScrollPull && !mb.isRetrievingHistory) {
-                ps.disable();
+        if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory
+            && (isAtTop || scrollPositionY < 5 && ps.getScrollHeight() > 500)
+            && mb.haveMoreHistory()) {
 
+            ps.disable();
+            self.scrollPullHistoryRetrieval = true;
+            self.lastScrollPosition = scrollPositionY;
 
+            let msgAppended = 0;
+            const scrYOffset = ps.getScrollHeight();
 
-                self.isRetrievingHistoryViaScrollPull = true;
-                self.lastScrollPosition = scrollPositionY;
+            chatRoom.one('onMessagesBuffAppend.pull', function() {
+                msgAppended++;
+            });
 
-                self.lastContentHeightBeforeHist = ps.getScrollHeight();
-                // console.error('start:', self.lastContentHeightBeforeHist, self.lastScrolledToBottom);
+            chatRoom.off('onHistoryDecrypted.pull');
+            chatRoom.one('onHistoryDecrypted.pull', function() {
+                chatRoom.off('onMessagesBuffAppend.pull');
 
+                // wait for all msgs to be rendered.
+                chatRoom.messagesBuff.addChangeListener(function() {
+                    if (msgAppended > 0) {
+                        self._reposOnUpdate = scrYOffset;
+                    }
 
-                var msgsAppended = 0;
-                $(chatRoom).rebind('onMessagesBuffAppend.pull', function() {
-                    msgsAppended++;
+                    self.scrollPullHistoryRetrieval = -1;
+                    // self.eventuallyUpdate();
 
-                    // var prevPosY = (
-                    //     ps.getScrollHeight() - self.lastContentHeightBeforeHist
-                    // ) + self.lastScrollPosition;
-                    //
-                    //
-                    // ps.scrollToY(
-                    //     prevPosY,
-                    //     true
-                    // );
-                    //
-                    // self.lastContentHeightBeforeHist = ps.getScrollHeight();
-                    // self.lastScrollPosition = prevPosY;
+                    return 0xDEAD;
                 });
+            });
 
-                $(chatRoom).off('onHistoryDecrypted.pull');
-                $(chatRoom).one('onHistoryDecrypted.pull', function(e) {
-                    $(chatRoom).off('onMessagesBuffAppend.pull');
-                    var prevPosY = (
-                        ps.getScrollHeight() - self.lastContentHeightBeforeHist
-                    ) + self.lastScrollPosition;
-
-                    ps.scrollToY(
-                        prevPosY,
-                        true
-                    );
-
-                    // wait for all msgs to be rendered.
-                    chatRoom.messagesBuff.addChangeListener(function() {
-                        if (msgsAppended > 0) {
-                            var prevPosY = (
-                                ps.getScrollHeight() - self.lastContentHeightBeforeHist
-                            ) + self.lastScrollPosition;
-
-                            ps.scrollToY(
-                                prevPosY,
-                                true
-                            );
-
-                            self.lastScrollPosition = prevPosY;
-                        }
-
-                        delete self.lastContentHeightBeforeHist;
-
-                        setTimeout(function() {
-                            self.isRetrievingHistoryViaScrollPull = false;
-                            // because of mousewheel animation, we would delay the re-enabling of the "pull to load
-                            // history", so that it won't re-trigger another hist retrieval request
-
-                            ps.enable();
-                            self.forceUpdate();
-                        }, 1150);
-
-                        return 0xDEAD;
-                    });
-
-
-
-                });
-
-                mb.retrieveChatHistory();
-            }
+            mb.retrieveChatHistory();
         }
 
-        if (self.lastScrollPosition !== ps.getScrollPositionY()) {
-            self.lastScrollPosition = ps.getScrollPositionY();
+        if (self.lastScrollPosition !== scrollPositionY) {
+            self.lastScrollPosition = scrollPositionY;
         }
-
-
     }
+
+    isLoading() {
+        const chatRoom = this.props.chatRoom;
+        const mb = chatRoom.messagesBuff;
+
+        return this.scrollPullHistoryRetrieval === true
+            || chatRoom.activeSearches || mb.messagesHistoryIsLoading()
+            || mb.joined === false || mb.isDecrypting;
+    }
+
     specShouldComponentUpdate() {
-        if (
-            this.isRetrievingHistoryViaScrollPull ||
-            this.loadingShown ||
-            (this.props.chatRoom.activeSearches > 0 && this.loadingShown) ||
-            (this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() && this.loadingShown) ||
-            (
-                this.props.chatRoom.messagesBuff.isDecrypting &&
-                this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' &&
-                this.loadingShown
-            ) ||
-            (
-                this.props.chatRoom.messagesBuff.isDecrypting &&
-                this.props.chatRoom.messagesBuff.isDecrypting.state() === 'pending' &&
-                this.loadingShown
-            ) ||
-            !this.props.chatRoom.isCurrentlyActive
-        ) {
-            return false;
-        }
-        else {
-            return undefined;
-        }
+        return !this.loadingShown && this.isComponentEventuallyVisible();
     }
+
+    @SoonFcWrap(450, true)
+    enableScrollbar() {
+        const ps = this.messagesListScrollable;
+
+        ps.enable();
+        this._reposOnUpdate = undefined;
+        this.lastScrollPosition = ps.__prevPosY | 0;
+    }
+
+    @timing(0.7, 9)
     render() {
         var self = this;
 
@@ -1094,10 +1038,9 @@ export class ConversationPanel extends MegaRenderMixin {
         }
         else if (contacts && contacts.length > 1) {
             contactName = room.getRoomTitle(true);
-
         }
 
-        var conversationPanelClasses = "conversation-panel " +  (room.type === "public" ? "group-chat " : "") +
+        var conversationPanelClasses = "conversation-panel " + (room.type === "public" ? "group-chat " : "") +
             room.type + "-chat";
 
         if (!room.isCurrentlyActive) {
@@ -1108,39 +1051,22 @@ export class ConversationPanel extends MegaRenderMixin {
         if (room.type !== "public") {
             topicBlockClass += " privateChat";
         }
-        var privateChatDiv = (room.type === "group") ? "privateChatDiv" : '' ;
         var messagesList = [];
 
-        if (
-            (
-                ChatdIntegration._loadingChats[room.roomId] &&
-                ChatdIntegration._loadingChats[room.roomId].loadingPromise &&
-                ChatdIntegration._loadingChats[room.roomId].loadingPromise.state() === 'pending'
-            ) ||
-            (self.isRetrievingHistoryViaScrollPull && !self.loadingShown) ||
-            (self.props.chatRoom.activeSearches && !self.loadingShown) ||
-            room.messagesBuff.messagesHistoryIsLoading() === true ||
-            room.messagesBuff.joined === false ||
-            (
-                room.messagesBuff.joined === true &&
-                room.messagesBuff.haveMessages === true &&
-                room.messagesBuff.messagesHistoryIsLoading() === true
-            ) ||
-            (
-                room.messagesBuff.isDecrypting &&
-                room.messagesBuff.isDecrypting.state() === 'pending'
-            )
-        ) {
-
+        if (this.isLoading()) {
             self.loadingShown = true;
         }
-        else if (room.messagesBuff.joined === true) {
-            if (!self.isRetrievingHistoryViaScrollPull && room.messagesBuff.haveMoreHistory() === false) {
-                var headerText = (
-                    room.messagesBuff.messages.length === 0 ?
-                        __(l[8002]) :
-                        __(l[8002])
-                );
+        else {
+            const mb = room.messagesBuff;
+
+            if (this.scrollPullHistoryRetrieval < 0) {
+                this.scrollPullHistoryRetrieval = false;
+                self.enableScrollbar();
+            }
+            delete self.loadingShown;
+
+            if (mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
+                var headerText = l[8002];
 
                 if (contactName) {
                     headerText = headerText.replace("%s", "<span>" + htmlentities(contactName) + "</span>");
@@ -1175,12 +1101,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     </div>
                 );
             }
-            delete self.loadingShown;
         }
-        else {
-            delete self.loadingShown;
-        }
-
 
         var lastTimeMarker;
         var lastMessageFrom = null;
@@ -1203,15 +1124,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 }
 
                 var timestamp = v.delay;
-                var curTimeMarker;
-                var iso = (new Date(timestamp * 1000).toISOString());
-                if (todayOrYesterday(iso)) {
-                    // if in last 2 days, use the time2lastSeparator
-                    curTimeMarker = time2lastSeparator(iso);
-                } else {
-                    // if not in the last 2 days, use 1st June [Year]
-                    curTimeMarker = acc_time2date(timestamp, true);
-                }
+                var curTimeMarker = getTimeMarker(timestamp);
                 var currentState = v.getState ? v.getState() : null;
 
                 if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
@@ -1360,9 +1273,9 @@ export class ConversationPanel extends MegaRenderMixin {
 
                                 if (messageContents === false || messageContents === currentContents) {
                                     self.messagesListScrollable.scrollToBottom(true);
-                                    self.lastScrollPositionPerc = 1;
-                                } else if (messageContents) {
-                                    $(room).trigger('onMessageUpdating', v);
+                                }
+                                else if (messageContents) {
+                                    room.trigger('onMessageUpdating', v);
                                     room.megaChat.plugins.chatdIntegration.updateMessage(
                                         room,
                                         v.internalId ? v.internalId : v.orderValue,
@@ -1390,7 +1303,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                         }
 
 
-                                        $(v).trigger(
+                                        v.trigger(
                                             'onChange',
                                             [
                                                 v,
@@ -1404,7 +1317,6 @@ export class ConversationPanel extends MegaRenderMixin {
                                     }
 
                                     self.messagesListScrollable.scrollToBottom(true);
-                                    self.lastScrollPositionPerc = 1;
                                 } else if (messageContents.length === 0) {
 
                                     self.setState({
@@ -1659,7 +1571,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         msg.messageHtml = "";
                         msg.deleted = true;
 
-                        $(msg).trigger(
+                        msg.trigger(
                             'onChange',
                             [
                                 msg,
@@ -1945,7 +1857,7 @@ export class ConversationPanel extends MegaRenderMixin {
         var startCallDisabled = isStartCallDisabled(room);
         var startCallButtonClass = startCallDisabled ? " disabled" : "";
         return (
-            <div className={conversationPanelClasses} onMouseMove={self.onMouseMove.bind(self)}
+            <div className={conversationPanelClasses} onMouseMove={() => self.onMouseMove()}
                  data-room-id={self.props.chatRoom.chatId}>
                 <div className={"chat-content-block " + (!room.megaChat.chatUIFlags['convPanelCollapse'] ?
                     "with-pane" : "no-pane")}>
@@ -2031,6 +1943,9 @@ export class ConversationPanel extends MegaRenderMixin {
                                 onMessagesToggle={function(isActive) {
                                     self.setState({
                                         'messagesToggledInCall': isActive
+                                    }, function() {
+                                        $('.js-messages-scroll-area', self.findDOMNode())
+                                            .trigger('forceResize', [true]);
                                     });
                                 }}
                             /> : null
@@ -2205,47 +2120,33 @@ export class ConversationPanel extends MegaRenderMixin {
                                 disabled={room.isReadOnly()}
                                 persist={true}
                                 onUpEditPressed={() => {
-                                    var foundMessage = false;
-                                    clone(room.messagesBuff.messages.keys()).reverse().some(function(k) {
-                                        if(!foundMessage) {
-                                            var message = room.messagesBuff.messages[k];
+                                    const time = unixtime();
+                                    const keys = room.messagesBuff.messages.keys();
+                                    for (var i = keys.length; i--;) {
+                                        var message = room.messagesBuff.messages[keys[i]];
 
-                                            var contact;
-                                            if (message.userId) {
-                                                if (!M.u[message.userId]) {
-                                                    // data is still loading!
-                                                    return;
-                                                }
-                                                contact = M.u[message.userId];
-                                            }
-                                            else {
-                                                // contact not found
-                                                return;
-                                            }
-
-                                            if (
-                                                    contact && contact.u === u_handle &&
-                                                    (unixtime() - message.delay) < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                                                    !message.requiresManualRetry &&
-                                                    !message.deleted &&
-                                                    (!message.type ||
-                                                         message instanceof Message) &&
-                                                    (!message.isManagement || !message.isManagement())
-                                                ) {
-                                                    foundMessage = message;
-                                                    return foundMessage;
-                                            }
+                                        var contact = M.u[message.userId];
+                                        if (!contact) {
+                                            // data is still loading!
+                                            continue;
                                         }
-                                    });
 
-                                    if (!foundMessage) {
-                                        return false;
+                                        if (
+                                            contact.u === u_handle &&
+                                            time - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT &&
+                                            !message.requiresManualRetry &&
+                                            !message.deleted &&
+                                            (!message.type ||
+                                                message instanceof Message) &&
+                                            (!message.isManagement || !message.isManagement())
+                                        ) {
+                                            self.setState({'editing': message.messageId});
+                                            self.props.chatRoom.scrolledToBottom = false;
+                                            return true;
+                                        }
                                     }
-                                    else {
-                                        self.setState({'editing': foundMessage.messageId});
-                                        self.props.chatRoom.scrolledToBottom = false;
-                                        return true;
-                                    }
+
+                                    return false;
                                 }}
                                 onResized={() => {
                                     self.handleWindowResize();
@@ -2261,7 +2162,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             // start of the chat, the event continues to be received event that the
                                             // scrollTop is now 0..and if in that time the user sends a message
                                             // the event triggers a weird "scroll up" animation out of nowhere...
-                                            $(self.props.chatRoom).rebind('onMessagesBuffAppend.pull', function() {
+                                            self.props.chatRoom.rebind('onMessagesBuffAppend.pull', function() {
                                                 if (self.messagesListScrollable) {
                                                     self.messagesListScrollable.scrollToBottom(false);
                                                     setTimeout(function() {
@@ -2333,60 +2234,11 @@ export class ConversationPanel extends MegaRenderMixin {
 export class ConversationPanels extends MegaRenderMixin {
     render() {
         var self = this;
-
+        var now = Date.now();
         var conversations = [];
 
-        var hadLoaded = anonymouschat || (
-            ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
-            ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
-            Object.keys(ChatdIntegration._loadingChats).length === 0
-        );
-
-        if (hadLoaded && getSitePath() === "/fm/chat") {
-            // do we need to "activate" an conversation?
-            var activeFound = false;
-           if (megaChat.currentlyOpenedChat && megaChat[megaChat.currentlyOpenedChat]) {
-               activeFound = true;
-           }
-
-            if (megaChat.chats.length > 0 && !activeFound) {
-                megaChat.showLastActive();
-            }
-        }
-
-        if (!hadLoaded && !self._waitLoadingChats) {
-            self._waitLoadingChats = true;
-            megaChat.plugins.chatdIntegration.chatd.rebind('onMessagesHistoryDone.convUImain', function() {
-                if (anonymouschat || (
-                    ChatdIntegration.allChatsHadLoaded.state() !== 'pending' &&
-                    ChatdIntegration.mcfHasFinishedPromise.state() !== 'pending' &&
-                    Object.keys(ChatdIntegration._loadingChats).length === 0
-                )) {
-                    megaChat.plugins.chatdIntegration.chatd.unbind('onMessagesHistoryDone.convUImain');
-                    Soon(function() {
-                        self.safeForceUpdate();
-                        if (M.currentdirid === "chat") {
-                            megaChat.showLastActive();
-                        }
-                    });
-                }
-            });
-            // also update immediately after chats had loaded, since there may be no history/chats to pull
-            var finishedLoadingInitial = function() {
-                if (megaChat.chats.length === 0) {
-                    Soon(function () {
-                        self.safeForceUpdate();
-                    });
-                }
-            };
-
-            ChatdIntegration.allChatsHadLoaded.always(finishedLoadingInitial);
-            ChatdIntegration.mcfHasFinishedPromise.always(finishedLoadingInitial);
-        }
-
-        var now = Date.now();
-
-        hadLoaded && megaChat.chats.forEach(function(chatRoom) {
+        // eslint-disable-next-line local-rules/misc-warnings
+        megaChat.chats.forEach(function(chatRoom) {
             if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
                 conversations.push(
                     <ConversationPanel
@@ -2402,79 +2254,67 @@ export class ConversationPanels extends MegaRenderMixin {
             }
         });
 
+        if (self._MuChangeListener) {
+            console.assert(M.u.removeChangeListener(self._MuChangeListener));
+            delete self._MuChangeListener;
+        }
+
         if (megaChat.chats.length === 0) {
-            if (!self._MuChangeListener) {
-                self._MuChangeListener = M.u.addChangeListener(function() {
-                    self.safeForceUpdate();
-                });
-            }
+            self._MuChangeListener = M.u.addChangeListener(() => self.safeForceUpdate());
             var contactsList = [];
             var contactsListOffline = [];
 
-            if (hadLoaded) {
-                var lim = Math.min(10, M.u.length);
-                var userHandles = M.u.keys();
-                for (var i = 0; i < lim; i++) {
-                    var contact = M.u[userHandles[i]];
-                    if(contact.u !== u_handle && contact.c === 1) {
-                        var pres = megaChat.userPresenceToCssClass(contact.presence);
+            var lim = Math.min(10, M.u.length);
+            var userHandles = M.u.keys();
+            for (var i = 0; i < lim; i++) {
+                var contact = M.u[userHandles[i]];
+                if (contact.u !== u_handle && contact.c === 1) {
+                    var pres = megaChat.userPresenceToCssClass(contact.presence);
 
-                        (pres === "offline" ? contactsListOffline : contactsList).push(
-                            <ContactCard contact={contact} key={contact.u} chatRoom={false} />
-                        );
-                    }
+                    (pres === "offline" ? contactsListOffline : contactsList).push(
+                        <ContactCard contact={contact} key={contact.u} chatRoom={false}/>
+                    );
                 }
             }
-            var emptyMessage = hadLoaded ?
-                l[8008] :
-                l[7006];
+            let emptyMessage = escapeHTML(l[8008]).replace("[P]", "<span>").replace("[/P]", "</span>");
+            let button = <div className="big-red-button new-chat-link"
+                onClick={() => $(document.body).trigger('startNewChatLink')}>{l[20638]}</div>;
+
+            if (anonymouschat) {
+                button = null;
+                emptyMessage = '';
+            }
 
             return (
                 <div>
-                    {hadLoaded ? <div className="chat-right-area">
+                    <div className="chat-right-area">
                         <div className="chat-right-area contacts-list-scroll">
                             <div className="chat-right-pad">
                                 {contactsList}
                                 {contactsListOffline}
                             </div>
                         </div>
-                    </div> : null}
+                    </div>
                     <div className="empty-block">
                         <div className="empty-pad conversations">
-                            <div className="fm-empty-conversations-bg"></div>
-                            <div className="fm-empty-cloud-txt small" dangerouslySetInnerHTML={{
-                                __html: __(anonymouschat ? "" : emptyMessage)
-                                    .replace("[P]", "<span>")
-                                    .replace("[/P]", "</span>")
-                            }}></div>
-                            {hadLoaded && !anonymouschat ? <div className="big-red-button new-chat-link"
-                                onClick={function(e) {
-                                    $(document.body).trigger('startNewChatLink');
-                                }}>{l[20638]}</div> : null}
+                            <div className="fm-empty-conversations-bg"/>
+                            <div className="fm-empty-cloud-txt small"
+                                dangerouslySetInnerHTML={{__html: emptyMessage}}>
+                            </div>
+                            {button}
                         </div>
                     </div>
                 </div>
             );
         }
-        else {
-            if (self._MuChangeListener) {
-                M.u.removeChangeListener(self._MuChangeListener);
-                delete self._MuChangeListener;
-            }
-            if (M.currentdirid === "chat" && conversations.length === 0 && megaChat.chats.length !== 0 && hadLoaded) {
-                // initial load on /fm/chat. focring to show a room.
-                onIdle(function() {
-                    megaChat.showLastActive();
-                });
-            }
-            return (
-                <div className={"conversation-panels " + self.props.className}>
-                    {conversations}
-                </div>
-            );
-        }
+
+        return (
+            <div className={"conversation-panels " + self.props.className}>
+                {conversations}
+            </div>
+        );
     }
-};
+}
 
 function isStartCallDisabled(room) {
     if (Object.keys(room.members).length > 20) {

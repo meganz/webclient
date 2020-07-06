@@ -16,31 +16,15 @@ var ChatNotifications = function(megaChat, options) {
 
     self.notifications = new MegaNotifications(options);
 
-    megaChat.rebind("onInit.chatNotifications", function(e) {
-        self.attachToChat(megaChat);
-    });
-
-    return this;
-};
-
-/**
- * Entry point, for attaching to a specific `Chat` instance
- *
- * @param megaChat {Chat}
- */
-ChatNotifications.prototype.attachToChat = function(megaChat) {
-    var self = this;
-
     megaChat
         .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
+            var cnSel = '.conversation-panel[data-room-id="' + megaRoom.chatId + '"]';
             var resetChatNotificationCounters = function() {
                 if (megaRoom.isCurrentlyActive) {
-                    var uiElement = $('.conversation-panel[data-room-id="' + megaRoom.chatId + '"]');
+                    var uiElement = document.querySelector(cnSel);
 
-                    if (
-                        uiElement.find(".call-block").length > 0 &&
-                        uiElement.find(".call-block.small-block").length === 0
-                    ) {
+                    if (!uiElement || uiElement.querySelector(".call-block") &&
+                        !uiElement.querySelector(".call-block.small-block")) {
                         return;
                     }
 
@@ -94,7 +78,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
 
                         var unreadFlag = (
                             message.getState() === Message.STATE.NOT_SEEN &&
-                            !AppActivityHandler.getGlobalAppActivityHandler().isActive
+                            !mega.active
                         );
 
                         if (message.source === Message.SOURCE.CHATD) {
@@ -171,11 +155,11 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                         });
                     }
                 })
-                .rebind('onChatShown.chatNotifications', function(e) {
-                    resetChatNotificationCounters();
+                .rebind('onChatShown.chatNotifications', function() {
+                    onIdle(resetChatNotificationCounters);
                 })
-                .rebind('onChatIsFocused.chatNotifications', function(e) {
-                    resetChatNotificationCounters();
+                .rebind('onChatIsFocused.chatNotifications', function() {
+                    onIdle(resetChatNotificationCounters);
                 })
                 .rebind('onCallRequestSent.chatNotifications', function(e, callManagerCall, mediaOptions) {
                     var sid = callManagerCall.id;
@@ -239,7 +223,7 @@ ChatNotifications.prototype.attachToChat = function(megaChat) {
                                 'from': title
                             }
                         },
-                        !AppActivityHandler.getGlobalAppActivityHandler().isActive
+                        !mega.active
                     );
 
                     n.on('onClick', function() {

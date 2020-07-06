@@ -10,6 +10,7 @@ const path = require('path');
 
 var webpackConfigs = {
     dev: {
+        mode: 'development',
         cache: false,
         entry: {
             app: [
@@ -63,13 +64,18 @@ var webpackConfigs = {
         plugins: [
             new webpack.BannerPlugin({
                 raw: true,
-                banner: "React.makeElement = React['createElement'];"
+                banner: "/** @file automatically generated, do not edit it. */"
             })
         ]
     },
     dist: {
+        mode: 'production',
         entry: {
             app: entryPoints
+        },
+        performance: {
+            maxAssetSize: 899000,
+            maxEntrypointSize: 899000
         },
         output: {
             path: __dirname + "/",
@@ -79,17 +85,38 @@ var webpackConfigs = {
         module: {
             rules: [
                 {test: /\.less$/, loader: "style!css!less"},
-                // {test: /\.jsx$/, loaders: ['babel-loader', 'stripcomment-loader'], exclude: 'node_modules'},
                 {
                     test: /\.(js|jsx)$/,
                     exclude: /(node_modules|bower_components)/,
                     use: [
-                        // 'react-hot-loader/webpack',
                         {
                             loader: 'babel-loader',
                             options: {
-                                presets: ['@babel/preset-react', '@babel/preset-env'],
-                                // plugins: ['react-hot-loader/babel'],
+                                plugins: [
+                                    '@babel/plugin-transform-runtime',
+                                    'babel-plugin-minify-constant-folding',
+                                    'babel-plugin-minify-guarded-expressions',
+                                    ['babel-plugin-minify-dead-code-elimination',
+                                        {
+                                            'keepFnName': true
+                                        }
+                                    ],
+                                    ['babel-plugin-transform-react-remove-prop-types',
+                                        {
+                                            'classNameMatchers': ['Contact', 'Avatar', 'Mega']
+                                        }
+                                    ]
+                                ],
+                                presets: [
+                                    ['@babel/preset-env',
+                                        {
+                                            "loose": true,
+                                            "exclude": ["@babel/plugin-transform-typeof-symbol"]
+                                        }
+                                    ],
+                                    '@babel/preset-react'
+                                ],
+                                comments: false
                             }
                         }
                     ]
@@ -107,8 +134,11 @@ var webpackConfigs = {
             "react-dom": "ReactDOM",
         },
         plugins: [
+            new webpack.IgnorePlugin({
+                resourceRegExp: /prop-types/
+            }),
             new webpack.BannerPlugin({
-                "banner": "React.makeElement = React['createElement'];",
+                "banner": "/** @file automatically generated, do not edit it. */",
                 "raw": true
             }),
             new webpack.DefinePlugin({

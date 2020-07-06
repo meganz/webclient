@@ -19,12 +19,15 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
 
 /**
  * highlight
- * @description Wraps given text within `strong` element based on passed strings to be matched.
+ * @description Wraps given text within `strong` element based on passed strings to be matched; performs the highlight
+ * while taking into account the presence of DOM tags and/or Emoji content.
+ *
  * @param {string} text The text to be highlighted
  * @param {Object[]} matches Array of objects specifying the matches
+ * @param {boolean} dontEscape flag indicating whether to perform escaping
  * @param {string} matches[].str The match term to check against
  * @param {number} matches[].idx Number identifier for the match term
- * @returns {string}
+ * @returns {string|void}
  *
  * @example
  * highlight('Example MEGA string as input.', [{ idx: 0, str: 'MEGA' }, { idx: 1, str: 'input' }]);
@@ -37,12 +40,23 @@ const highlight = (text, matches, dontEscape) => {
     }
     text = dontEscape ? text : escapeHTML(text);
     if (matches) {
-        let highlighted = text;
-        for (let i = matches.length; i--;) {
-            const match = matches[i].str;
-            highlighted = highlighted.replace(new RegExp(match, 'gi'), word => `<strong>${word}</strong>`);
+        // extract HTML tags
+        var tags = [];
+        text = text.replace(/<[^>]+>/g, match => {
+            return "@@!" + (tags.push(match) - 1) + "!@@";
+        });
+        var regexes = [];
+        var cb = word => `<strong>${word}</strong>`;
+        for (var i = 0; i < matches.length; i++){
+            regexes.push(RegExpEscape(matches[i].str));
         }
-        return highlighted;
+        regexes = regexes.join('|');
+        text = text.replace(new RegExp(regexes, 'g'), cb);
+
+        // add back the HTML tags
+        text = text.replace(/\@\@\!\d+\!\@\@/, match => {
+            return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
+        });
     }
     return text;
 };
@@ -79,7 +93,6 @@ const openResult = (room, messageId, index) => {
 
 //
 // MessageRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MessageRow extends MegaRenderMixin {
@@ -122,7 +135,6 @@ class MessageRow extends MegaRenderMixin {
 
 //
 // ChatRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class ChatRow extends MegaRenderMixin {
@@ -155,7 +167,6 @@ class ChatRow extends MegaRenderMixin {
 
 //
 // MemberRow
-// TODO: add documentation
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MemberRow extends MegaRenderMixin {
@@ -231,10 +242,22 @@ class MemberRow extends MegaRenderMixin {
     }
 }
 
-const NilRow = () => (
+const NilRow = ({ onSearchMessages, isFirstQuery }) => (
     <div className={SEARCH_ROW_CLASS}>
-        <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
-        <span>{LABEL.NO_RESULTS}</span>
+        <div className="nil-container">
+            <img src={`${staticpath}images/temp/search-icon.png`} alt={LABEL.NO_RESULTS} />
+            <span>{LABEL.NO_RESULTS}</span>
+            {isFirstQuery && (
+                <div
+                    className="search-messages"
+                    onClick={onSearchMessages}
+                    dangerouslySetInnerHTML={{
+                        /* `Click <a>here</a> to search for messages.` */
+                        __html: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+                    }}>
+                </div>
+            )}
+        </div>
     </div>
 );
 
@@ -246,7 +269,7 @@ export default class ResultRow extends MegaRenderMixin {
     }
 
     render() {
-        const { type, result, children } = this.props;
+        const { type, result, children, onSearchMessages, isFirstQuery } = this.props;
 
         switch (type) {
             case TYPE.MESSAGE:
@@ -268,7 +291,7 @@ export default class ResultRow extends MegaRenderMixin {
                         contact={M.u[result.data]} />
                 );
             case TYPE.NIL:
-                return <NilRow />;
+                return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery} />;
             default:
                 return (
                     <div className={SEARCH_ROW_CLASS}>

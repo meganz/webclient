@@ -52,8 +52,10 @@
  *     activity.
  */
 
-Object.defineProperty(this, 'MEGA_USER_STRUCT', {
-    value: Object.freeze({
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    var struct = {
         "u": undefined,
         "b": undefined,
         "c": undefined,
@@ -63,9 +65,8 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "h": undefined,
         "t": undefined,
         "p": undefined,
-        "presence": undefined,
+        "presence": 'unavailable',
         "presenceMtime": undefined,
-        "displayColor": NaN,
         "shortName": "",
         "firstName": "",
         "lastName": "",
@@ -75,7 +76,9 @@ Object.defineProperty(this, 'MEGA_USER_STRUCT', {
         "rTimeStamp": undefined,
         "avatar": undefined,
         "lastGreen": undefined
-    })
+    };
+
+    Object.defineProperty(window, 'MEGA_USER_STRUCT', {value: Object.freeze(Object.setPrototypeOf(struct, null))});
 });
 
 

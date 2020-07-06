@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import {MegaRenderMixin} from "../stores/mixins.js";
+import {MegaRenderMixin, schedule, SoonFcWrap} from "../stores/mixins.js";
 
 /**
  * jScrollPane helper
@@ -290,30 +290,12 @@ export class EmojiFormattedContent extends React.Component {
 
         return <span dangerouslySetInnerHTML={{__html: this._formattedContent}}></span>;
     }
-};
-
-function SoonFcWrap( milliseconds ) {
-    return function( target, propertyKey, descriptor) {
-        const originalMethod = descriptor.value;
-        var _timerId = 0;
-        descriptor.value = function () {
-            if (_timerId) {
-                clearTimeout(_timerId);
-            }
-            var self = this;
-            var args = arguments;
-            // Like SoonFc, but with context fix.
-            _timerId = setTimeout(function() {
-                originalMethod.apply(self, args);
-            }, milliseconds);
-        };
-        return descriptor;
-    }
-};
+}
 
 export default {
     JScrollPane,
     RenderTo,
     EmojiFormattedContent,
+    schedule,
     SoonFcWrap
 };

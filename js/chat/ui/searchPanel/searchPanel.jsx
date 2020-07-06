@@ -17,6 +17,7 @@ export default class SearchPanel extends MegaRenderMixin {
         value: '',
         searching: false,
         status: undefined,
+        isFirstQuery: true,
         recents: [],
         results: []
     };
@@ -64,7 +65,7 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clicked on search result
             .rebind('chatSearchResultOpen.searchPanel', () => this.toggleMinimize())
             // Clicked outside the search panel component
-            .rebind('click.searchPanel', ev => {
+            .rebind('mousedown.searchPanel', ev => {
                 if (this.clickedOutsideComponent(ev) && !this.props.minimized) {
                     this.toggleMinimize();
                 }
@@ -85,7 +86,8 @@ export default class SearchPanel extends MegaRenderMixin {
             'div.fm-main',
             'div.fm-left-panel',
             'i.tiny-reset',
-            'div.small-icon.thin-search-icon'
+            'div.small-icon.thin-search-icon',
+            'div.search-messages, div.search-messages a'
         ];
 
         return (
@@ -106,21 +108,14 @@ export default class SearchPanel extends MegaRenderMixin {
         this.props.onToggle();
     };
 
-    doSearch = s => {
-        const self = this;
+    doSearch = (s, searchMessages) => {
         return ChatSearch.doSearch(
             s,
-            function(room, result, results) {
-                self.setState({ results });
-            })
-            .catch(function(ex) {
-                if (d) {
-                    console.log("Search failed (or was reset)", ex);
-                }
-            })
-            .always(function() {
-                self.setState({ status: STATUS.COMPLETED });
-            });
+            (room, result, results) => this.setState({ results }),
+            searchMessages
+        )
+            .catch(ex => d && console.error('Search failed (or was reset)', ex))
+            .always(() => this.setState({ status: STATUS.COMPLETED }));
     };
 
     doToggle = action /* pause || resume */ => {
@@ -154,13 +149,16 @@ export default class SearchPanel extends MegaRenderMixin {
             searching,
             // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
             // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
-            // because `pause search` will not be available yet.
-            status: value.length > 2 ? STATUS.IN_PROGRESS : undefined,
+            // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
+            // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
+            // `MESSAGES`. Hence, we do status reset to `undefined`.
+            status: undefined,
+            isFirstQuery: true,
             results: []
         }, () =>
-            searching && delay('chat-search', () => this.doSearch(value), 1600)
+            searching && delay('chat-search', () => this.doSearch(value, false), 1600)
         );
-    };
+    }
 
     handleToggle = () => {
         const inProgress = this.state.status === STATUS.IN_PROGRESS;
@@ -185,8 +183,17 @@ export default class SearchPanel extends MegaRenderMixin {
         );
     };
 
+    handleSearchMessages = () =>
+        SearchField.hasValue() && (
+            this.setState({ status: STATUS.IN_PROGRESS, isFirstQuery: false }, () => {
+                this.doSearch(this.state.value, true);
+                SearchField.focus();
+                SearchField.select();
+            })
+        );
+
     render() {
-        const { value, searching, status, recents, results } = this.state;
+        const { value, searching, status, isFirstQuery, recents, results } = this.state;
 
         //
         // `SearchPanel`
@@ -219,7 +226,11 @@ export default class SearchPanel extends MegaRenderMixin {
                         )}
 
                         {searching && (
-                            <ResultContainer status={status} results={results} />
+                            <ResultContainer
+                                status={status}
+                                results={results}
+                                isFirstQuery={isFirstQuery}
+                                onSearchMessages={this.handleSearchMessages} />
                         )}
                     </PerfectScrollbar>
                 </div>

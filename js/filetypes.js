@@ -32,7 +32,7 @@ var extensions = {
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
-    'text': [['txt', 'rtf', 'ans', 'ascii', 'log', 'wpd'], 'Text', 'pages'],
+    'text': [['txt', 'rtf', 'ans', 'ascii', 'log', 'wpd', 'json'], 'Text', 'pages'],
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
     'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],

@@ -134,6 +134,8 @@ RichpreviewsFilter._RFC_REGEXP = new RegExp(
 RichpreviewsFilter.retrievePreview = function(url) {
     "use strict";
 
+    url = String(url).split("#")[0];
+
     if (!RichpreviewsFilter._requests[url]) {
 
         RichpreviewsFilter._requests[url] = asyncApiReq({"a":"erlsd", "url": url});

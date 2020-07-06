@@ -24,6 +24,11 @@ GeoLocationLinks.gmapsConfirmation = -1;
 GeoLocationLinks.syncFromAttribute = function() {
     "use strict";
 
+    if (anonymouschat) {
+        GeoLocationLinks.gmapsConfirmation = -1;
+        return;
+    }
+
     mega.attr.get(u_handle, "geo", false, true)
         .done(function(r) {
             if (r.v === "1") {
@@ -49,7 +54,10 @@ GeoLocationLinks.confirmationDoConfirm = function() {
     "use strict";
 
     GeoLocationLinks.gmapsConfirmation = true;
-    mega.attr.set("geo", {v: "1"}, false, true);
+
+    if (!anonymouschat) {
+        mega.attr.set("geo", {v: "1"}, false, true);
+    }
 };
 
 /**
@@ -60,7 +68,10 @@ GeoLocationLinks.confirmationDoNever = function() {
     "use strict";
 
     GeoLocationLinks.gmapsConfirmation = false;
-    mega.attr.set("geo", {v: "0"}, false, true);
+
+    if (!anonymouschat) {
+        mega.attr.set("geo", {v: "0"}, false, true);
+    }
 };
 
 

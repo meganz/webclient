@@ -802,6 +802,10 @@ ul, li {
 .mobile.error-txt span, .mobile.application-txt span {
     color: #FF4C52;
 }
+.mobile.error-txt span.asterisk-msg {
+    color: #999999;
+    font-size: 10px;
+}
 .mobile.download-app {
     display: block;
     width: 178px;
@@ -2833,7 +2837,7 @@ div.radioOn::after {
 div.radioOn.small, div.radioOff.small {
     width: 16px;
     height: 16px;
-} 
+}
 input.radioOn, input.radioOff {
     width: 100%;
     height: 100%;
@@ -11316,6 +11320,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
         line-height: 18px;
         letter-spacing: 0;
         padding: 4px;
+    }
+    .mobile.error-txt span.asterisk-msg {
+        color: #999999;
+        font-size: 10px;
     }
     .wrong-file .mobile.content-row.second {
         height: 54.5%;

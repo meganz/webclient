@@ -50,7 +50,7 @@ const highlight = (text, matches, dontEscape) => {
         let regexes = [];
         const cb = word => `<strong>${word}</strong>`;
         for (let i = 0; i < matches.length; i++) {
-            regexes = [...regexes, RegExpEscape(matches[i].str)];
+            regexes.push(RegExpEscape(matches[i].str));
         }
         regexes = regexes.join('|');
         text = text.replace(new RegExp(regexes, 'g'), cb);

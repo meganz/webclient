@@ -14986,7 +14986,7 @@ var highlight = function highlight(text, matches, dontEscape) {
     var regexes = [];
 
     for (var i = 0; i < matches.length; i++) {
-      regexes = [].concat(regexes, [RegExpEscape(matches[i].str)]);
+      regexes.push(RegExpEscape(matches[i].str));
     }
 
     regexes = regexes.join('|');

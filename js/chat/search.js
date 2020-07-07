@@ -326,7 +326,7 @@ function ChatSearch(megaChat, chatId, searchExpr, handler, searchMessages) {
             throw new Error("Could not find a room for chatid " + chatId);
         }
     }
-    else if (this.originalSearchString.length > 2) { // search all chatrooms
+    else { // search all chatrooms
         for (var roomId2 in self.allChats) {
             if (self.allChats.hasOwnProperty(roomId2)) {
                 var room2 = self.allChats[roomId2];

@@ -2,7 +2,7 @@ import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
 import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../../stores/mixins';
-import { EmojiFormattedContent } from './../../../ui/utils.jsx';
+import { EmojiFormattedContent } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 
 const SEARCH_ROW_CLASS = `result-table-row`;
@@ -38,16 +38,18 @@ const highlight = (text, matches, dontEscape) => {
     if (!text) {
         return;
     }
+
     text = dontEscape ? text : escapeHTML(text);
+
     if (matches) {
         // extract HTML tags
-        var tags = [];
+        let tags = [];
         text = text.replace(/<[^>]+>/g, match => {
             return "@@!" + (tags.push(match) - 1) + "!@@";
         });
-        var regexes = [];
-        var cb = word => `<strong>${word}</strong>`;
-        for (var i = 0; i < matches.length; i++){
+        let regexes = [];
+        const cb = word => `<strong>${word}</strong>`;
+        for (let i = 0; i < matches.length; i++) {
             regexes.push(RegExpEscape(matches[i].str));
         }
         regexes = regexes.join('|');
@@ -58,13 +60,14 @@ const highlight = (text, matches, dontEscape) => {
             return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
         });
     }
+
     return text;
 };
 
 /**
  * openResult
- * @description Invoked on result click, opens the respective chat room; triggers the `resultOpen` event to notify
- * the root component for the interaction and do minimize.
+ * @description Invoked on result click, opens the respective chat room; instantiates new chat room if none is already
+ * available. The root component is notified for the interaction via the `chatSearchResultOpen` event trigger.
  * @see SearchPanel.bindEvents()
  * @param {ChatRoom|String} room room or userId
  * @param {String} [messageId]
@@ -73,14 +76,19 @@ const highlight = (text, matches, dontEscape) => {
 
 const openResult = (room, messageId, index) => {
     $(document).trigger('chatSearchResultOpen');
+
     if (isString(room)) {
         loadSubPage('fm/chat/p/' + room);
     }
     else if (room && room.chatId && !messageId) {
-        // contact matches
-        var chatRoom = megaChat.getChatById(room.chatId);
+        // Chat room matched -> open chat room
+        const chatRoom = megaChat.getChatById(room.chatId);
         if (chatRoom) {
             loadSubPage(chatRoom.getRoomUrl());
+        }
+        else {
+            // No chat room -> instantiate new chat room
+            megaChat.openChat([u_handle, room.chatId], 'private', undefined, undefined, undefined, true);
         }
     }
     else {

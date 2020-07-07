@@ -14985,16 +14985,14 @@ var highlight = function highlight(text, matches, dontEscape) {
     });
     var regexes = [];
 
-    var cb = function cb(word) {
-      return "<strong>" + word + "</strong>";
-    };
-
     for (var i = 0; i < matches.length; i++) {
-      regexes.push(RegExpEscape(matches[i].str));
+      regexes = [].concat(regexes, [RegExpEscape(matches[i].str)]);
     }
 
     regexes = regexes.join('|');
-    text = text.replace(new RegExp(regexes, 'g'), cb);
+    text = text.replace(new RegExp(regexes, 'g'), function cb(word) {
+      return "<strong>" + word + "</strong>";
+    });
     text = text.replace(/\@\@\!\d+\!\@\@/, function (match) {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
@@ -15013,6 +15011,8 @@ var openResult = function openResult(room, messageId, index) {
 
     if (chatRoom) {
       loadSubPage(chatRoom.getRoomUrl());
+    } else {
+      megaChat.openChat([u_handle, room.chatId], 'private', undefined, undefined, undefined, true);
     }
   } else {
     loadSubPage(room.getRoomUrl());

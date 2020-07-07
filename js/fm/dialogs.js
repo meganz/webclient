@@ -643,9 +643,14 @@
                     if (chatRoom.isArchived()) {
                         continue;
                     }
+                    if (chatRoom.isReadOnly()) {
+                        continue;
+                    }
                     var isValidGroupOrPubChat = false;
                     if (chatRoom.type === 'group') {
-                        isValidGroupOrPubChat = true;
+                        if (chatRoom.members.length > 1) {
+                            isValidGroupOrPubChat = true;
+                        }
                     }
                     else if (
                         chatRoom.type === "public" &&

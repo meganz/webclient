@@ -190,29 +190,7 @@
         if (page === "chat" || page.indexOf('/chat/') > -1) {
             return true;
         }
-        if (useMegaSync === -1) {
-            e.preventDefault();
-            e.stopPropagation();
-            megasync.isInstalled(function (err, is) {
-                if (!err || is) {
-                    if (megasync.currUser === u_handle) {
-                        useMegaSync = 2;
-                    }
-                    else {
-                        useMegaSync = 3;
-                    }
-                }
-                else {
-                    useMegaSync = 3;
-                }
-            });
-            return false;
-        }
-        else if (useMegaSync === 3) {
-            useMegaSync = -1
-            return true;
-        }
-        else if (useMegaSync === 2) {
+        if (window.useMegaSync === 2) {
             e.preventDefault();
             e.stopPropagation();
             var target;
@@ -232,7 +210,7 @@
 
             var uploadCmdIsFine = function _uploadCmdIsFine(error, response) {
                 if (error) {
-                    useMegaSync = 3;
+                    window.useMegaSync = 3;
                 }
             };
 
@@ -249,40 +227,10 @@
             return false;
         }
         else {
-            if (localStorage.dd && localStorage.jj && localStorage.d) {
-                console.warn('Strange value of UseMegaSync found = ' + useMegaSync);
-            }
             return true;
         }
     }
-    scope.FileSelectHandlerMegaSyncMouse = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (useMegaSync === -1) {
-            megasync.isInstalled(function (err, is) {
-                if (!err || is) {
-                    if (megasync.currUser === u_handle) {
-                        useMegaSync = 2;
-                    }
-                    else {
-                        useMegaSync = 3;
-                    }
-                }
-                else {
-                    useMegaSync = 3;
-                }
-            });
-            return false;
-        }
-        else if (useMegaSync === 2 && ++usageMegaSync > 3) {
-            useMegaSync = -1;
-            usageMegaSync = 0;
-            return false;
-        }
-        else {
-            return false;
-        }
-    }
+
     function FileDragLeave(e) {
         if (d) {
             console.log('DragLeave');
@@ -520,7 +468,6 @@
                 o.addEventListener("change", FileSelectHandler, false);
                 if (!is_mobile && i) {
                     o.addEventListener("click", FileSelectHandlerMegaSyncClick, true);
-                    o.addEventListener("mouseover", FileSelectHandlerMegaSyncMouse, true);
                 }
             }
         }

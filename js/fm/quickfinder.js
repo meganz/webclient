@@ -77,7 +77,6 @@ var QuickFinder = function(searchable_elements, containers) {
             charTyped = charTyped.toLowerCase();
 
             var nodesList = M.v;
-            var isSharedPanel = false;
             if ($.dialog && allowedDialogs[$.dialog]) {
                 // Assign different nodes list depending on different dialogs
                 var activePanel = $('.dialog-content-block').closest('.fm-picker-dialog-tree-panel.active');
@@ -85,7 +84,6 @@ var QuickFinder = function(searchable_elements, containers) {
                     nodesList = Object.values(M.tree[M.RootID]);
                 }
                 else if (activePanel.hasClass('shared-with-me')) {
-                    isSharedPanel = true;
                     nodesList = Object.values(M.tree.shares);
                 }
                 else {
@@ -125,19 +123,20 @@ var QuickFinder = function(searchable_elements, containers) {
                 if (foundIds.length > 0) {
                     // Fetch the first node after quick finding
                     var dialogQuickIndex = 0;
+                    var $dialogQuickFindNode;
 
-                    if (isSharedPanel) {
-                        // Acquire the first node with the write permission if it's the share-with-me panel
-                        for (var i = 0; i < foundIds.length; i++) {
-                            if (M.d[foundIds[i].h] && M.d[foundIds[i].h].r > 0) {
-                                dialogQuickIndex = i;
-                                break;
-                            }
+                    for (var i = 0; i < foundIds.length; i++) {
+                        $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
+                        if (!$dialogQuickFindNode.hasClass('disabled')) {
+                            // cloud-drive panel: Acquire the first node except for $.selected itself
+                            // share-with-me panel: Acquire the first node with the write permission
+                            break;
                         }
+                        $dialogQuickFindNode = null;
+                        dialogQuickIndex++;
                     }
 
-                    var $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
-                    if (!$dialogQuickFindNode.hasClass('selected')) {
+                    if ($dialogQuickFindNode && !$dialogQuickFindNode.hasClass('selected')) {
                         $dialogQuickFindNode.trigger('click');
                     }
                 }

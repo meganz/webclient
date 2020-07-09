@@ -504,6 +504,7 @@ var extmime = {
 
     // RAW Images
     "3fr": "image/x-hasselblad-3fr",
+    "ari": "image/z-arrialexa-ari",
     "arw": "image/x-sony-arw",
     "arq": "image/x-sony-arq",
     "bay": "image/x-casio-bay",

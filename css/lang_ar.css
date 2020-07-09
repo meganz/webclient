@@ -91,7 +91,14 @@ body.rtl .button.download.big-button.to-clouddrive.transition,
 body.rtl .download.transfer-wrapper .download.checkbox-txt,
 body.rtl .about.top-info,
 body.rtl .subuser-sec-profile-container,
-body.rtl .rtl-block-if-rtl {
+body.rtl .rtl-block-if-rtl,
+body.rtl h1.step-main-question,
+body.rtl .recover-account-body-text,
+body.rtl .col-3.inline-block,
+body.rtl .app-instruction-block option,
+body.rtl .improved-recovery-steps .button-container,
+body.rtl .improved-recovery-steps .info-container,
+body.rtl .fm-dialog.reset-success {
     direction: rtl;
 }
 body.rtl .bottom-page.blue-block.top-pad.bott-pad.mcmd-pg-p,
@@ -114,7 +121,8 @@ body.rtl .big-bott-pad.sync-2 .bottom-page.business-header,
 body.rtl .big-bott-pad.sync-2 .bottom-page.business-text,
 body.rtl .big-bott-pad.sync-4 .bottom-page.vertical-centered-cell.left-cell,
 body.rtl .inline-block.col-2.cmd-pad .bottom-page.dark-txt,
-body.rtl .align-right-if-rtl {
+body.rtl .align-right-if-rtl,
+body.rtl .improved-recovery-steps .park-account-checkbox label {
     text-align: right;
     text-align: justify;
 }
@@ -158,7 +166,10 @@ body.rtl .mobile .membership-st2-info .membership-st2-head,
 body.rtl .mobile .membership-st2-info .payment-method .provider-name,
 body.rtl .mobile .membership-st2-info .membership-radio-label,
 body.rtl .mobile .main-mid-pad.third-section .payment-instructions,
-body.rtl .mobile .main-top-info-block .main-top-info-text {
+body.rtl .mobile .main-top-info-block .main-top-info-text,
+body.rtl .info-block.recovery-key,
+body.rtl .info-block.recovery-key .main-italic-header,
+body.rtl .info-block.recovery-warning .main-italic-header {
     direction: rtl;
     text-align: unset;
 }
@@ -269,4 +280,46 @@ body.ar .wu-stat .wu-total-speed {
 }
 body.ar .wu-stat .wu-total-perc {
     width: 15%;
+}
+body.ar .improved-recovery-steps .recover-button.yes::before {
+    background-position: -133px -720px;
+}
+
+body.ar .improved-recovery-steps .recover-button.no::before {
+    background-position: -133px -740px;
+}
+body.ar .improved-recovery-steps .recover-button.yes::before,
+body.ar .improved-recovery-steps .recover-button.no::before {
+    content: '';
+    background-image: url(../images/mega/recover-account-sprite_v1.png);
+    background-repeat: no-repeat;
+    background-size: 344px auto;
+    display: inline-block;
+    width: 20px;
+    height: 11px;
+    margin-left: 8px;
+}
+body.ar .improved-recovery-steps .recover-button.yes::after,
+body.ar .improved-recovery-steps .recover-button.no::after {
+    content: none;
+}
+body.ar .improved-recovery-steps .recover-button.yes.default-grey-button::before,
+body.ar .improved-recovery-steps .recover-button.yes.red-button::before {
+    content: none;
+}
+
+body.ar .improved-recovery-steps .checkbox-container .settings-row {
+    overflow-y: hidden;
+}
+
+body.ar .fm-dialog.reset-success .reset-description-txt a {
+    font-weight: bold;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
+    body.ar .improved-recovery-steps .recover-button.yes::before,
+    body.ar .improved-recovery-steps .recover-button.no::before {
+        background-image: url(../images/mega/recover-account-sprite_v1@2x.png);
+        background-size: 344px auto;
+    }
 }

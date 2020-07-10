@@ -2064,12 +2064,12 @@ function init_page() {
     }
     else if (page.substr(0, 2) == 'fm' && !u_type) {
         if (loggedout || (u_type === false && page !== 'fm/refer')) {
-            loadSubPage('start');
+            loadSubPage('start', 'override');
             return false;
         }
         login_next = page;
         login_txt = l[1298];
-        loadSubPage('login');
+        loadSubPage('login', 'override');
     }
     else if (typeof init_start === 'function') {
         page = 'start';
@@ -3127,7 +3127,7 @@ function loadSubPage(tpage, event) {
     if (hashLogic || isPublicLink(page)) {
         document.location.hash = '#' + page;
     }
-    else if (event && event.type === 'popstate') {
+    else if (event && event.type === 'popstate' || event === 'override') {
         // In case we navigated to a location.hash, clean it up replacing the current history entry.
         history.replaceState({subpage: page}, "", '/' + page);
     }

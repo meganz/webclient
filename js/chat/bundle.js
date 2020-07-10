@@ -15527,6 +15527,7 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
   function SearchPanel(props) {
     var _this = _MegaRenderMixin.call(this, props) || this;
 
+    _this.wrapperRef = null;
     _this.state = {
       value: '',
       searching: false,
@@ -15634,6 +15635,8 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
           return _this.doSearch(value, false);
         }, 1600);
       });
+
+      _this.wrapperRef.scrollToY(0);
     };
 
     _this.handleToggle = function () {
@@ -15656,6 +15659,8 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
         status: undefined,
         results: []
       }, function () {
+        _this.wrapperRef.scrollToY(0);
+
         onIdle(function () {
           return searchField_SearchField.focus();
         });
@@ -15709,6 +15714,8 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
   };
 
   _proto.render = function render() {
+    var _this2 = this;
+
     var _this$state = this.state,
         value = _this$state.value,
         searching = _this$state.searching,
@@ -15728,6 +15735,9 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
     }), external_React_default.a.createElement("div", {
       className: "search-results-wrapper"
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
+      ref: function ref(wrapper) {
+        _this2.wrapperRef = wrapper;
+      },
       options: {
         'suppressScrollX': true
       }

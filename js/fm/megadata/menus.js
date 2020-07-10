@@ -117,27 +117,26 @@ MegaData.prototype.menuItems = function menuItems() {
     var checkMegaSync = function _checkMegaSync(preparedItems) {
         $('.dropdown-item.download-item').addClass('contains-submenu');
         $('.dropdown-item.download-item').removeClass('msync-found');
-        megasync.isInstalled(function (err, is) {
-            if (!err || is) {
-                $('.dropdown-item.download-item').removeClass('contains-submenu');
-                $('.dropdown-item.download-item').addClass('msync-found');
-                if (megasync.currUser === u_handle && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
-                    var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
-                        if (!error && response === 0) {
-                            preparedItems['.syncmegasync-item'] = 1;
-                        }
-                        promise.resolve(preparedItems);
-                    };
-                    megasync.syncPossible($.selected[0], addItemAndResolvePromise);
-                }
-                else {
+
+        if (window.useMegaSync === 2 || window.useMegaSync === 3) {
+            $('.dropdown-item.download-item').removeClass('contains-submenu');
+            $('.dropdown-item.download-item').addClass('msync-found');
+            if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
+                var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
+                    if (!error && response === 0) {
+                        preparedItems['.syncmegasync-item'] = 1;
+                    }
                     promise.resolve(preparedItems);
-                }
+                };
+                megasync.syncPossible($.selected[0], addItemAndResolvePromise);
             }
             else {
                 promise.resolve(preparedItems);
             }
-        });
+        }
+        else {
+            promise.resolve(preparedItems);
+        }
     }
 
     if (nodes.length) {

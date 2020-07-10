@@ -855,25 +855,9 @@ FileManager.prototype.initFileManagerUI = function() {
             isMegaSyncTransfer = false;
         }
         if (clickedClass.indexOf('transfers') > -1) {
-            if (isMegaSyncTransfer) {
-                // if we need to check megaSync - true defualt
-                megasync.isInstalled(function (err, is) {
-                    if (!err || is) {
-                        if (megasync.currUser === u_handle) {
-                            megasync.transferManager();
-                            return;
-                        }
-                        else {
-                            isMegaSyncTransfer = false;
-                        }
-                    }
-                    else {
-                        isMegaSyncTransfer = false;
-                    }
-                    $mySelf.click();
-
-                });
-                return false;
+            if (isMegaSyncTransfer && window.useMegaSync === 2) {
+                megasync.transferManager();
+                return;
             }
             else {
                 // reset - to ckeck again next time

@@ -494,22 +494,26 @@ var megasync = (function() {
         if (lastCheckStatus && lastCheckTime) {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
 
-            msgDialog('confirmation', 'MEGASync is not responding',
+            msgDialog(
+                'confirmation',
+                'MEGASync is not responding',
                 l[17795],
                 // 'MEGASync stopped responding, it could be closed or too busy',
                 l[17796],
                 // 'Do you want to re-initialize connection with MEGASync, ' +
                 // 'and turn it off if MEGASync did not respond?',
-                function (disableMsync) {
+                function(disableMsync) {
                     if (disableMsync) {
                         lastCheckStatus = null;
                         lastCheckTime = null;
+                        ns.periodicCheck();
                         if (nextIfYes && typeof nextIfYes === 'function') {
                             nextIfYes();
                         }
                     }
 
-                });
+                }
+            );
         }
         else {
             showDownloadDialog();
@@ -957,6 +961,31 @@ var megasync = (function() {
     ns.megaSyncRequest = megaSyncRequest;
     ns.megaSyncIsNotResponding = megaSyncIsNotResponding;
 
+    var periodicCheckTimeout;
+
+    ns.periodicCheck = function() {
+        if (periodicCheckTimeout) {
+            clearTimeout(periodicCheckTimeout);
+        }
+        ns.isInstalled(function(err, is) {
+            if (!err || is) {
+                if (megasync.currUser === u_handle) {
+                    window.useMegaSync = 2;
+                    periodicCheckTimeout = setTimeout(ns.periodicCheck, defaultStatusThreshold);
+                }
+                else {
+                    window.useMegaSync = 3;
+                    periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
+                }
+            }
+            else {
+                window.useMegaSync = 4;
+                periodicCheckTimeout = setTimeout(ns.periodicCheck, statusThresholdWhenDifferentUsr);
+            }
+        });
+    };
+
+    mBroadcaster.once('fm:initialized', ns.periodicCheck);
 
     return ns;
 })();

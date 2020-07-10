@@ -1001,6 +1001,31 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+
+    if (ua.details.os === "Apple") {
+
+        $(window).rebind('blur.ps-unfocus', function() {
+
+            $(document).rebind('ps-scroll-y.ps-unfocus', function(e) {
+
+                $(e.target).addClass('ps-outfocused-scrolling');
+
+                delay('ps-out-focused-' + $(e.target).data('ps-id'), function __psOutFocused() {
+                    $(e.target).removeClass('ps-outfocused-scrolling');
+                }, 1000);
+            });
+        });
+
+        if (!document.hasFocus()) {
+            $(window).trigger('blur.ps-unfocus');
+        }
+
+        $(window).rebind('focus.ps-unfocus', function() {
+
+            $(document).off('ps-scroll-y.ps-unfocus');
+        });
+    }
+
     if (d) {
         console.timeEnd('initUI');
     }

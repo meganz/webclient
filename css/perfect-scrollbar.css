@@ -47,7 +47,7 @@
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.ps-container:hover > .ps-scrollbar-x-rail .ps-scrollbar-x {
+.ps-container:hover > .ps-scrollbar-x-rail .ps-scrollbar-x, .ps-outfocused-scrolling > .ps-scrollbar-x-rail .ps-scrollbar-x {
     opacity: 0.2;
 }
 .ps-container > .ps-scrollbar-x-rail:hover .ps-scrollbar-x, .ps-in-scrolling > .ps-scrollbar-x-rail .ps-scrollbar-x {
@@ -73,7 +73,7 @@
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.ps-container:hover > .ps-scrollbar-y-rail .ps-scrollbar-y {
+.ps-container:hover > .ps-scrollbar-y-rail .ps-scrollbar-y, .ps-outfocused-scrolling > .ps-scrollbar-y-rail .ps-scrollbar-y {
     opacity: 0.2;
 }
 .ps-container > .ps-scrollbar-y-rail:hover .ps-scrollbar-y, .ps-in-scrolling > .ps-scrollbar-y-rail .ps-scrollbar-y {

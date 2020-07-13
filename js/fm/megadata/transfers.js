@@ -479,11 +479,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, entries[0].entry, zipsize);
     }
     else {
-        // unfortunately, we iterate again in reversed order...  2*O(n)
-        // for (var r = entries.length - 1; r >= 0; r--) {
-        //    mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, entries[r].entry);
-        // }
-        mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, tempEntry);
+        if (!preview) {
+            mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, tempEntry);
+        }
         tempEntry = null;
     }
 
@@ -576,11 +574,6 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         st = dl_queue[dl_queue_num].st;
     }
 
-    // var failed = parseInt($('#' + id).data('failed') || "0");
-    // failed not long ago
-
-    // if (failed+30000 > NOW()) return;
-    mega.tpw.updateDownloadUpload(mega.tpw.DOWNLOAD, original_id, perc, bl, bt, kbps, dl_queue_num, st);
     if (!bl) {
         return false;
     }
@@ -591,6 +584,9 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
         if (!force && (perc != 100 || $.transferprogress[id])) {
             return false;
         }
+    }
+    if (!dl_queue[dl_queue_num].preview) {
+        mega.tpw.updateDownloadUpload(mega.tpw.DOWNLOAD, original_id, perc, bl, bt, kbps, dl_queue_num, st);
     }
 
     var $tr = $('.transfer-table #' + id);

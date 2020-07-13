@@ -81,7 +81,7 @@ export default class SearchField extends MegaRenderMixin {
 
         return (
             <div className="search-field">
-                <i className="small-icon thin-search-icon"></i>
+                <i className="small-icon thin-search-icon" />
 
                 <input
                     type="text"

@@ -13,6 +13,8 @@ export const STATUS = {
 const SEARCH_PANEL_CLASS = `search-panel`;
 
 export default class SearchPanel extends MegaRenderMixin {
+    wrapperRef = null;
+
     state = {
         value: '',
         searching: false,
@@ -158,6 +160,8 @@ export default class SearchPanel extends MegaRenderMixin {
         }, () =>
             searching && delay('chat-search', () => this.doSearch(value, false), 1600)
         );
+
+        this.wrapperRef.scrollToY(0);
     }
 
     handleToggle = () => {
@@ -176,6 +180,7 @@ export default class SearchPanel extends MegaRenderMixin {
             // Clear the text on the first reset; minimize on the second
             SearchField.hasValue() ?
                 this.setState({ value: '', searching: false, status: undefined, results: [] }, () => {
+                    this.wrapperRef.scrollToY(0);
                     onIdle(() => SearchField.focus());
                     this.doDestroy();
                 }) :
@@ -220,7 +225,11 @@ export default class SearchPanel extends MegaRenderMixin {
                     onReset={this.handleReset} />
 
                 <div className="search-results-wrapper">
-                    <PerfectScrollbar options={{ 'suppressScrollX': true }}>
+                    <PerfectScrollbar
+                        ref={wrapper => {
+                            this.wrapperRef = wrapper;
+                        }}
+                        options={{ 'suppressScrollX': true }}>
                         {!!recents.length && !searching && (
                             <ResultContainer recents={recents} />
                         )}

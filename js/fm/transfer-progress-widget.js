@@ -816,7 +816,7 @@ mega.tpw = new function TransferProgressWidget() {
 
             $row.removeClass('complete error progress paused').addClass('inqueue');
             $row.find('.transfer-filetype-icon').attr('class', 'transfer-filetype-icon')
-                .addClass(filetype(fName).toLowerCase());
+                .addClass(filetype(fName, true)[0].toLowerCase());
 
             if (entriesArray[r].zipid) {
                 $row.attr('zippo', 'y');

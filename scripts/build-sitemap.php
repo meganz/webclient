@@ -30,13 +30,16 @@ try {
     exit(1);
 }
 
+// Commented out: Languages supported must be explicitly mentioned in config.
 // Prepare array of languages which are supported.
+/*
 foreach (glob($langDir . '/*.json') as $langFile) {
     $lang = str_replace('_prod', '', basename($langFile, '.json'));
     if (strlen($lang) === 2 && !in_array($lang, $languages)) {
         $languages[] = $lang;
     }
 }
+*/
 sort($languages);
 echo "Languages: " . implode(', ', $languages) . PHP_EOL;
 

@@ -2812,10 +2812,10 @@ else if (!browserUpdate) {
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
-        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
-        'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
-        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
+        'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
+        'pdfviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdfviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j:0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j:0 },
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
@@ -3404,6 +3404,8 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
+        var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
+        var j4tr = "url('" + staticpath + "images/pdfV/$1')";
 
         xhr_stack = false;
         for (var i in jsl)
@@ -3447,25 +3449,12 @@ else if (!browserUpdate) {
             }
             else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
                 if (!window[jsl[i].n]) {
-                    var scriptText = jsl[i].text;
                     var blobLink;
                     if ((jsl[i].n || '').indexOf('css') > -1) {
-                        scriptText = scriptText.replace(/\.\.\//g, staticpath).replace(new RegExp("\\/en\\/", "g"), '/' + lang + '/');
-                        blobLink = mObjectURL([scriptText], 'text/css');
+                        blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
                     else {
-                        if (jsl[i].n === 'pdforiginalviewerjs') {
-                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
-                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
-                            }
-                            else {
-                                scriptText = modifyPdfViewerScript(scriptText);
-                                blobLink = mObjectURL([scriptText], 'text/javascript');
-                            }
-                        }
-                        else {
-                            blobLink = mObjectURL([scriptText], 'text/javascript');
-                        }
+                        blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
                 }

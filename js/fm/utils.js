@@ -1982,8 +1982,7 @@ MegaUtils.prototype.onPersistentDB.fallback = promisify(function(resolve, reject
 });
 
 // Get FileSystem storage ignoring polyfills.
-Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
-    get: function() {
+lazy(MegaUtils.prototype, 'requestFileSystem', function() {
         'use strict';
 
         if (!is_chrome_firefox) {
@@ -1993,7 +1992,6 @@ Object.defineProperty(MegaUtils.prototype, 'requestFileSystem', {
                 return requestFileSystem.bind(window);
             }
         }
-    }
 });
 
 /**

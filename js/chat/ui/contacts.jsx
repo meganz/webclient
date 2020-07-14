@@ -968,6 +968,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             self.props.onSelected([contactHash]);
                         }
                         self.props.onSelectDone([contactHash]);
+                        $(document).trigger('closeDropdowns');
                         return;
                     }
                     else {

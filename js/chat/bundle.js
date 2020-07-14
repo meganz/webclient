@@ -2090,6 +2090,7 @@ var ContactPickerWidget = function (_MegaRenderMixin4) {
           }
 
           self.props.onSelectDone([contactHash]);
+          $(document).trigger('closeDropdowns');
           return;
         } else {
           var selected = clone(self.state.selected || []);

@@ -73,7 +73,6 @@ function dashboardUI() {
         avatarDialog();
     });
 
-    $('.data-float-bl .icon-button').rebind('mouseover.dashboardPlus', FileSelectHandlerMegaSyncMouse);
 
     // Data plus, upload file
     $('.data-float-bl .icon-button').rebind('click', function() {

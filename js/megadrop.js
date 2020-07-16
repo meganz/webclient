@@ -1030,7 +1030,7 @@ mega.megadrop = (function() {
                 if (state === 2) { // Active PUP
 
                     if (item.u) {
-                        pupAddAndUpdate();
+                        pupAddAndUpdate(item);
                     }
                     else {
                         // If this is create or delete, waiting for puh to be processed

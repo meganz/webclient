@@ -10342,18 +10342,22 @@ var generic_GenericConversationMessage = function (_ConversationMessageM) {
           if (this.props.grouped) {
             additionalClasses += " grouped";
           } else {
-            avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
-              contact: message.authorContact,
-              className: "message avatar-wrapper small-rounded-avatar",
-              chatRoom: self.props.chatRoom
-            });
-            displayName = M.getNameByHandle(message.authorContact.u);
-            name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
-              contact: contact,
-              className: "message",
-              label: displayName,
-              chatRoom: self.props.chatRoom
-            });
+            var authorContact = message.authorContact || Message.getContactForMessage(message);
+
+            if (authorContact) {
+              avatar = external_React_default.a.createElement(ui_contacts["Avatar"], {
+                contact: authorContact,
+                className: "message avatar-wrapper small-rounded-avatar",
+                chatRoom: self.props.chatRoom
+              });
+              displayName = M.getNameByHandle(authorContact.u);
+              name = external_React_default.a.createElement(ui_contacts["ContactButton"], {
+                contact: authorContact,
+                className: "message",
+                label: displayName,
+                chatRoom: self.props.chatRoom
+              });
+            }
           }
         }
 

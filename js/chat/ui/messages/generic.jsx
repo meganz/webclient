@@ -1397,16 +1397,19 @@ class GenericConversationMessage extends ConversationMessageMixin {
                     additionalClasses += " grouped";
                 }
                 else {
-                    avatar = <Avatar contact={message.authorContact}
-                        className="message avatar-wrapper small-rounded-avatar"
-                        chatRoom={self.props.chatRoom} />;
-                    displayName = M.getNameByHandle(message.authorContact.u);
-                    name = <ContactButton
-                        contact={contact}
-                        className="message"
-                        label={displayName}
-                        chatRoom={self.props.chatRoom}
-                    />;
+                    var authorContact = message.authorContact || Message.getContactForMessage(message);
+                    if (authorContact) {
+                        avatar = <Avatar contact={authorContact}
+                                         className="message avatar-wrapper small-rounded-avatar"
+                                         chatRoom={self.props.chatRoom}/>;
+                        displayName = M.getNameByHandle(authorContact.u);
+                        name = <ContactButton
+                            contact={authorContact}
+                            className="message"
+                            label={displayName}
+                            chatRoom={self.props.chatRoom}
+                        />;
+                    }
                 }
             }
 

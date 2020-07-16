@@ -598,6 +598,7 @@ var redeem = {
 
             if (window.bCreatedVoucher) {
                 delete window.bCreatedVoucher;
+                mega.voucher.redeemSuccess = true;
                 $('.payment-result-button, .payment-close', redeem.$successOverlay).addClass('hidden');
             }
         }

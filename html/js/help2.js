@@ -392,8 +392,8 @@ var Help = (function() {
         $searchHeader.fadeIn();
         $cloneHeader.fadeOut();
 
-        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', SoonFc(function() {
-            var topPos = $(this).scrollTop();
+        $('.bottom-pages .fmholder').rebind('scroll.helpmenu', function() {
+
             var $current = $($('.updateSelected.current')[0]);
 
             if ($current.length === 0) {
@@ -413,9 +413,11 @@ var Help = (function() {
                 }
             }
 
-            if (topPos > 195) {
-                if (topPos + $sideBar.outerHeight() + 115 <= $('.main-mid-pad').outerHeight()) {
-                    $sideBar.css('top', topPos + 30 + 'px').addClass('fixed');
+            var topPos = $(this).scrollTop();
+
+            if (topPos > 246) {
+                if (topPos + $sideBar.outerHeight() + 115 <= $container.outerHeight()) {
+                    $sideBar.addClass('fixed');
                 }
                 else {
                     $sideBar.removeClass('fixed');
@@ -424,7 +426,7 @@ var Help = (function() {
             else {
                 $sideBar.removeAttr('style').removeClass('fixed');
             }
-        }));
+        });
     }
 
 

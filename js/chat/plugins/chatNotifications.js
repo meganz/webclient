@@ -18,9 +18,9 @@ var ChatNotifications = function(megaChat, options) {
 
     megaChat
         .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
-            var cnSel = '.conversation-panel[data-room-id="' + megaRoom.chatId + '"]';
             var resetChatNotificationCounters = function() {
                 if (megaRoom.isCurrentlyActive) {
+                    var cnSel = '.conversation-panel[data-room-id="' + megaRoom.chatId + '"]';
                     var uiElement = document.querySelector(cnSel);
 
                     if (!uiElement || uiElement.querySelector(".call-block") &&

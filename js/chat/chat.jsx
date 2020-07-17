@@ -708,6 +708,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         }
     });
 
+
     unreadCount = unreadCount > 9 ? "9+" : unreadCount;
 
     var haveContents = false;
@@ -2200,6 +2201,17 @@ Chat.prototype.haveAnyActiveCall = function() {
    var chatIds = self.chats.keys();
    for (var i = 0; i < chatIds.length; i++) {
        if (self.chats[chatIds[i]].haveActiveCall()) {
+           return true;
+       }
+   }
+   return false;
+};
+
+Chat.prototype.haveAnyOnHoldCall = function() {
+   var self = this;
+   var chatIds = self.chats.keys();
+   for (var i = 0; i < chatIds.length; i++) {
+       if (self.chats[chatIds[i]].haveActiveOnHoldCall()) {
            return true;
        }
    }

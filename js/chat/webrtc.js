@@ -392,15 +392,13 @@ RtcModule.prototype.onKickedFromChatroom = function(chat) {
 };
 
 RtcModule.prototype.putAllActiveCallsOnHold = function() {
-    var promises = [];
     var calls =  this.calls;
     for (var chatid in calls) {
         var call = calls[chatid];
         if (call.isActive()) {
-            promises.push(call.putOnHold());
+            call.putOnHold();
         }
     }
-    return Promise.all(promises);
 };
 
 // There can only be one actve call at any moment
@@ -892,10 +890,6 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
         return null;
     }
     var existing = self.calls[chatid];
-    if (!existing && Object.keys(self.calls).length) {
-        self.logger.warn("Not starting a call - there is already a call in another chatroom");
-        return null;
-    }
     if (existing) {
         assert(!recovery);
         if (isGroup) {
@@ -910,6 +904,8 @@ RtcModule.prototype._startOrJoinCall = function(chatid, av, handler, isJoin, rec
                 return null;
             }
         }
+    } else {
+        self.putAllActiveCallsOnHold();
     }
     var callid;
     var chat = self.chatd.chatIdMessages[chatid];
@@ -1348,7 +1344,8 @@ Call.prototype._bcastCallData = function(type, uiTermCode) {
         // slot
         state = (self._onHoldRestoreAv != null)
             ? (self._onHoldRestoreAv | Av.OnHold)
-            : self.localAv();
+            : self.localAv(); // this includes the Av.OnHold flag, but returns the current gLocalStream av
+
         if (self.isRingingOut) {
             state |= CallDataFlag.kRinging;
         }
@@ -1869,8 +1866,7 @@ CallRecovery.prototype.putOnHold = function() {
         return;
     }
     self._onHoldRestoreAv = Av.fromStream(self.gLocalStream);
-    Av.enableAudio(self.gLocalStream, false);
-    return self.disableVideo(); // can't fail
+    Av.enableAllTracks(self.gLocalStream, false);
 };
 
 CallRecovery.prototype.releaseOnHold = function() {
@@ -2280,7 +2276,7 @@ Call.prototype.rejoinPeer = function(userid, clientid) {
     return true;
 };
 
-/* == Replace .answer() with this implementation when on-hold feature is enabled
+
 Call.prototype.answer = function(av) {
     var self = this;
     assert(self.isJoiner);
@@ -2289,48 +2285,8 @@ Call.prototype.answer = function(av) {
             "), nothing to answer");
         return false;
     }
-    return self.manager.putAllActiveCallsOnHold()
-    .then(function() {
-        if (self.manager.hasActiveCall()) {
-            self.logger.warn("Another call became active while putting on hold the currently active call");
-            self.hangup(Term.kBusy);
-            return;
-        }
-        return self._startOrJoin(av);
-    });
-};
-*/
-Call.prototype.answer = function(av) {
-    var self = this;
-    assert(self.isJoiner);
-    if (self.state !== CallState.kRingIn) {
-        var errMsg = "Not in kRingIn state, (but in " + constStateToText(CallState, self.state) +
-            "), nothing to answer";
-        self.logger.error(errMsg);
-        return Promise.reject(errMsg);
-    }
-    var calls = self.manager.calls;
-    if (Object.keys(calls).length <= 1) {
-        return self._startOrJoin(av);
-    }
-    // There is another ongoing call, terminate it first
-    var promises = [];
-    for (var k in calls) {
-        var call = calls[k];
-        if (call !== self) {
-            promises.push(call.hangup());
-        }
-    }
-    if (!promises.length) {
-        return self._startOrJoin(av);
-    }
-    self.logger.log("answer: Waiting for other call(s) to terminate first...");
-    return Promise.all(promises).then(function() {
-        // The async resolution of native promises guarantees that any messages resulted
-        // from the hangup() operation will be processed before this .then() handler is invoked
-        self.logger.log("answer: Other call(s) terminated, answering");
-        return self._startOrJoin(av);
-    });
+    self.manager.putAllActiveCallsOnHold();
+    return self._startOrJoin(av);
 };
 
 Call.prototype.hangup = function(reason) {
@@ -2857,26 +2813,25 @@ Call.prototype.isOnHold = function() {
 Call.prototype.putOnHold = function() {
     var self = this;
     if (self._onHoldRestoreAv != null) {
-        self.logger.warn("putOnHold: Call already on hold");
-        return null;
+        var msg = "putOnHold: Call already on hold";
+        self.logger.warn(msg);
+        return;
     }
     var av = self._onHoldRestoreAv = self.localAv();
-    if (av & Av.Audio) {
-        self.enableAudio(false);
+    if (self.gLocalStream) {
+        Av.enableAllTracks(self.gLocalStream, false);
+        var sessions = self.sessions;
+        for (var sid in sessions) {
+            var rtcConn = sessions[sid].rtcConn;
+            if (rtcConn) {
+                Av.enableAllTracks(rtcConn.outputStream, false);
+            }
+        }
     }
-    var pms = (av & Av.Video) ? self.disableVideo() : Promise.resolve();
-    return pms
-    .then(function() {
-        // TODO: Uncomment in production
-        // self._muteUnmuteRemoteStreams(true);
-        self._bcastLocalAvChange();
-    })
-    .catch(function(err) { // should not normally happen
-        self.logger.error("putOnHold: Error: " + err);
-        delete self._onHoldRestoreAv;
-        // self._muteUnmuteRemoteStreams(false);
-        self._bcastLocalAvChange();
-    });
+    self._muteUnmuteRemoteStreams(true);
+    self._bcastLocalAvChange();
+    // Force GUI update
+    self._fire('onLocalMuteComplete');
 };
 
 Call.prototype._muteUnmuteRemoteStreams = function(mute) {
@@ -2890,33 +2845,41 @@ Call.prototype._muteUnmuteRemoteStreams = function(mute) {
 Call.prototype.releaseOnHold = function() {
     var self = this;
     if (!self.isOnHold()) {
-        self.logger.warn("releaseOnHold: Call is not on hold");
-        return null;
+        var msg = "releaseOnHold: Call is not on hold";
+        self.logger.warn(msg);
+        return;
     }
+
     // It's possible that while we are putting the other call on hold and enabling video,
     // another call becomes active, so that we end up with more than one active call. Therefore, having
     // only one active call at any time is not guaranteed
-    self.manager.putAllActiveCallsOnHold()
-    .then(function() {
-        var restoreAv = self._onHoldRestoreAv;
+    self.manager.putAllActiveCallsOnHold();
+
+    var restoreAv = self._onHoldRestoreAv;
+    delete self._onHoldRestoreAv;
+
+    if (self.gLocalStream) {
         if (restoreAv & Av.Audio) {
-            self.enableAudio(true);
+            Av.enableAudio(self.gLocalStream, true);
         }
         if (restoreAv & Av.Video) {
-            return (restoreAv & Av.Screen)
-                ? self.enableScreenCapture()
-                : self.enableCamera();
+            Av.enableVideo(self.gLocalStream, true);
         }
-        return Promise.resolve();
-    })
-    .catch(function(err) {
-        self.logger.warn("releaseOnHold: Error while enabling tracks: " + err);
-    })
-    .then(function() {
-        self._muteUnmuteRemoteStreams(false);
-        delete self._onHoldRestoreAv;
-        self._bcastLocalAvChange();
-    });
+    }
+    var sessions = self.sessions;
+    for (var sid in sessions) {
+        var rtcConn = sessions[sid].rtcConn;
+        if (restoreAv & Av.Audio) {
+            Av.enableAudio(rtcConn.outputStream, true);
+        }
+        if (restoreAv & Av.Video) {
+            Av.enableVideo(rtcConn.outputStream, true);
+        }
+    }
+    // trigger DOM update
+    self._fire('onLocalMuteComplete');
+    self._muteUnmuteRemoteStreams(false);
+    self._bcastLocalAvChange();
 };
 
 /** Protocol flow:
@@ -4517,7 +4480,7 @@ Session.prototype.calcNetworkQualityFirefox = function(sample) {
 // jshint -W003
 // Only if the Video flag is set, the Screen flag may be also set to denote that the video is
 // a screen capture stream
-var Av = { Audio: 1, Video: 2, Screen: 8, OnHold: 16, Mask: 27 }; // 4 is occupied by CallDataFlag.kRinging
+var Av = { Audio: 1, Video: 2, AudioVideoMask: 3, Screen: 8, OnHold: 16, Mask: 27 }; // 4 is occupied by CallDataFlag.kRinging
 Av.fromStream = function(stream) {
     if (!stream) {
         return 0;
@@ -4585,19 +4548,21 @@ Av.enableTracks = function(tracks, enable) {
 };
 
 Av.enableAudio = function(stream, enable) {
-    var ret = stream ? Av.enableTracks(stream.getAudioTracks(), enable) : false;
-    if (ret) {
-        return true;
+    if (!stream) {
+        // disable on null stream is considered successful
+        return !enable;
     }
-    return !enable; // disable on null stream is considered successful
+    var ret = Av.enableTracks(stream.getAudioTracks(), enable);
+    return enable ? ret : true;
 };
 
 Av.enableVideo = function(stream, enable) {
-    var ret = stream ? Av.enableTracks(stream.getVideoTracks(), enable) : false;
-    if (ret) {
-        return true;
+    if (!stream) {
+        // disable on null stream is considered successful
+        return !enable;
     }
-    return !enable; // disable on null stream is considered successful
+    var ret = Av.enableTracks(stream.getVideoTracks(), enable);
+    return enable ? ret : true;
 };
 
 Av.enableAllTracks = function(stream, enable) {

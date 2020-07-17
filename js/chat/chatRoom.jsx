@@ -1862,6 +1862,10 @@ ChatRoom.prototype.haveActiveCall = function() {
     return this.callManagerCall && this.callManagerCall.isActive() === true;
 };
 
+ChatRoom.prototype.haveActiveOnHoldCall = function() {
+    return this.callManagerCall && this.callManagerCall.rtcCall.isOnHold();
+};
+
 ChatRoom.prototype.havePendingGroupCall = function() {
     var self = this;
     var haveCallParticipants = self.getCallParticipants().length > 0;

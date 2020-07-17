@@ -21,9 +21,7 @@
     position:relative;
 }
 .chat-content-block.no-pane .call-block.small-block {
-    width: -webkit-calc(100%);
-    width: -moz-calc(100%);
-    width: calc(100%);
+    width: 100%;
     height: 50%;
     position:relative;
 }
@@ -54,16 +52,17 @@
 .private-chat .call.user-audio {
     bottom: 8px;
     right: 8px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     position: absolute !important;
     z-index: 10;
     height: 184px;
     overflow: hidden;
-    -webkit-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
     box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.3);
+}
+.call.local-video,
+.call.local-audio {
+    webkit-transition: margin-bottom 400ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+    transition: margin-bottom 400ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
 }
 .call.local-audio {
     width: 184px;
@@ -76,18 +75,26 @@ video.localViewport {
 }
 
 .is-screen video.localViewport {
-    transform: none;
     -webkit-transform: none;
     -moz-transform: none;
+    transform: none;
 }
 .call.local-video {
     min-height: 184px;
     max-height: 184px;
 }
 .call.local-video.minimized, .call.local-audio.minimized {
-    width: 44px;
-    height: 25px;
+    width: 34px;
+    height: 24px;
     min-height: 24px;
+    box-shadow: none;
+}
+.call.local-video .center-avatar-wrapper, .call.local-audio .center-avatar-wrapper {
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+}
+.call.local-video.minimized .center-avatar-wrapper, .call.local-audio.minimized .center-avatar-wrapper {
+    opacity: 0;
 }
 .call.video-wrapper {
     display: block;
@@ -97,18 +104,12 @@ video.localViewport {
     z-index: 9;
     position: relative;
     webkit-transition: opacity 200ms ease-in-out;
-    -moz-transition: opacity 200ms ease-in-out;
-    -o-transition: opacity 200ms ease-in-out;
-    -ms-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
 .call.local-video img, .call.local-video video {
     height: 100%;
 }
 .minimized .call.video-wrapper, .call.local-audio.minimized img {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
     opacity: 0;
 }
 .call.video.local-viewport {
@@ -122,16 +123,9 @@ video.localViewport {
     height: 72px;
     bottom: -72px;
     z-index: 10;
-    background-color: rgba(0,0,0,0.9);
-    webkit-transition: all 400ms ease-in-out;
-    -moz-transition: all 400ms ease-in-out;
-    -o-transition: all 400ms ease-in-out;
-    -ms-transition: all 400ms ease-in-out;
-    transition: all 400ms ease-in-out;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
+    background-color: #06151C;
+    webkit-transition: opacity 200ms ease-in-out, bottom 400ms ease-in-out;
+    transition: opacity 200ms ease-in-out, bottom 400ms ease-in-out;
 }
 .small-block .call.bottom-panel, .small-block.call.bottom-panel {
     height: 48px;
@@ -141,15 +135,13 @@ video.localViewport {
     height: 48px;
     top: -48px;
     bottom: auto;
+    opacity: 0;
 }
-.call.bottom-panel.visible-panel, .call.top-panel.visible-panel {
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
+.visible-panel .call.bottom-panel, .call.top-panel.visible-panel {
     opacity: 1;
     bottom: 0;
 }
-.call.top-panel.visible-panel {
+.conversation-panel:not(.group-chat) .call.top-panel.visible-panel {
     top: 0;
     bottom: auto;
 }
@@ -181,10 +173,10 @@ video.localViewport {
     margin-right: 12px;
 }
 .small-block .call.button.left {
-    margin-left: 24px;
+    margin-left: 14px;
 }
 .small-block .call.button.right {
-    margin-right: 15px;
+    margin-right: 14px;
 }
 .full-sized-block  .call.button.left {
     display: none;
@@ -240,40 +232,11 @@ video.localViewport {
     left: 32px;
     margin: -3px 0 0 0;
 }
-
-.call.local-video,
-.call.local-audio {
-    webkit-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
-    -moz-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
-    -o-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
-    -ms-transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
-    transition: margin-bottom 200ms ease-in-out, width 200ms ease-in-out, height 200ms ease-in-out;
+.call-block.visible-panel .call.bottom-aligned {
+    margin-bottom: 72px;
 }
-.call.bottom-aligned {
-    margin-bottom: 0;
-}
-
-.call-block .call.bottom-aligned.visible-panel {
-    margin-bottom: 78px;
-}
-.call-block .call.bottom-aligned.visible-panel.minimized {
-    margin-bottom: 70px;
-}
-
-.call-block.small-block .call.bottom-aligned.visible-panel {
-    margin-bottom: 52px;
-}
-.call-block.small-block .call.bottom-aligned.visible-panel.minimized {
-    margin-bottom: 46px;
-}
-
-.call.local-video.minimized,
-.call.local-audio.minimized {
-    webkit-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
-    -moz-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
-    -o-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
-    -ms-transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
-    transition: bottom 200ms ease-in-out, right 200ms ease-in-out;
+.call-block.small-block.visible-panel .call.bottom-aligned {
+    margin-bottom: 48px;
 }
 
 /* Groups call UI */
@@ -292,33 +255,38 @@ video.localViewport {
 }
 .group-chat .call-block .participantsWrapper {
     width: 100%;
+    margin-top: 36px;
     height: 100%;
+    height: -webkit-calc(100% - 36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
     display: table;
 }
 .group-chat .call-block .participantsContainer {
     -webkit-transition: margin-top 400ms ease-in-out;
-    -moz-transition: margin-top 400ms ease-in-out;
-    -o-transition: margin-top 400ms ease-in-out;
-    -ms-transition: margin-top 400ms ease-in-out;
     transition: margin-top 400ms ease-in-out;
     display: table-cell;
-/*    font-size: 0; */
     vertical-align: middle;
+}
+.group-chat .callReconnecting, .group-chat .activeStreamWrap {
+    margin-top: 36px;
+    height: 100%;
+    height: -webkit-calc(100% - 36px);
+    height: -moz-calc(100% - 36px);
+    height: calc(100% - 36px);
 }
 
 .group-chat .call-block.carousel .participantsContainer {
     right: 0;
     padding: 3px 0;
     -webkit-transition: bottom 400ms ease-in-out;
-    -moz-transition: bottom 400ms ease-in-out;
-    -o-transition: bottom 400ms ease-in-out;
-    -ms-transition: bottom 400ms ease-in-out;
     transition: bottom 400ms ease-in-out;
+    box-sizing: border-box;
 }
-.group-chat .call-block.carousel .participantsContainer.visible-panel {
-    bottom: 70px;
+.group-chat .call-block.carousel.visible-panel .participantsContainer {
+    bottom: 72px;
 }
-.group-chat .call-block.carousel.small-block .participantsContainer.visible-panel {
+.group-chat .call-block.carousel.small-block.visible-panel .participantsContainer {
     bottom: 48px;
 }
 .call-block .icon-connection-issues {
@@ -358,12 +326,11 @@ video.localViewport {
     z-index: 2;
 }
 .call-block .icon-audio-muted.on-hold {
-    /* TODO: Create a real on-hold icon */
-    background-position: -3px -462px;
+    background-position: -44px -428px;
 }
 .call-header {
     height: 36px;
-    background-color: rgb(6, 21, 28, 0.9);
+    background-color: #06151C;
     color: #FFFFFF;
     text-align: left;
     position: absolute;
@@ -404,7 +371,7 @@ video.localViewport {
 }
 .call-header .call-video-icon, .call-header .call-video-icon-warn {
     margin-right: 8px;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-position: -84px -466px;
     height: 12px;
     width: 20px;
@@ -424,7 +391,7 @@ video.localViewport {
 }
 .call-header .call-switch-view {
     margin-right: 16px;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-position: -160px -464px;
     width: 16px;
     height: 16px;
@@ -453,6 +420,12 @@ video.localViewport {
 .in-call-notif.green {
     background-color: rgba(0, 191, 165, 0.9);
 }
+.in-call-notif.gray {
+    background-color: #666666;
+    color: white;
+    opacity: 0.8;
+}
+
 .in-call-notif.neutral {
     box-sizing: border-box;
     height: 36px;
@@ -548,7 +521,7 @@ video.localViewport {
 /* carousel mode */
 .call-block.carousel .participantsContainer {
     position: absolute;
-    bottom: 4px;
+    bottom: 0;
 }
 
 .call-block.carousel .activeStream video,
@@ -556,9 +529,7 @@ video.localViewport {
 .call-block.carousel .activeStream .user-audio,
 .call-block.carousel .activeStream .user-audio .big-avatar {
     width: 100%;
-    height: calc(100% - 16px);
-    margin-bottom: 32px;
-    margin-top: 32px;
+    height: 100%;
 }
 .call-block.carousel .activeStream .icon-audio-muted, .private-chat .call.user-audio .icon-audio-muted, .call-block.grid .participantsContainer .icon-audio-muted {
     width: 38px;
@@ -568,8 +539,7 @@ video.localViewport {
 }
 .call-block.grid .participantsContainer .icon-audio-muted.on-hold,
 .call-block.carousel .activeStream .icon-audio-muted.on-hold {
-    /* FIXME: create a real onhold icon */
-    background-position: -153px -2741px;
+    background-position: -154px -2922px;
 }
 
 .call-block.carousel .participantsContainer {
@@ -581,36 +551,35 @@ video.localViewport {
 .call-block.carousel .participantsContainer .user-video,
 .call-block.carousel .participantsContainer .user-audio {
     margin-right: 8px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
     border-radius: 4px;
     margin-top: 4px;
+    cursor: pointer;
 }
 .call-block.carousel .participantsContainer .user-video.active,
 .call-block.carousel .participantsContainer .user-audio.active {
-    -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
-    -moz-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
     box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);
+}
+.activeStream, .activeStreamWrap {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
 }
 .call-block.carousel .activeStream .user-audio {
     position: relative;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    left: 20%;
     width: 60%;
     height: 240px;
+    margin: -120px 0 0 0;
 }
 .call-block.carousel .activeStream .user-video {
     position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left:0;
     width: 100%;
     height: 100%;
-    margin-top: 8px;
-}
-.call-block.carousel .activeStream .user-video .icon-audio-muted {
-    top: 24px;
+    margin: 0;
 }
 .call-block.grid .participantsContainer .call.is-avatar .avatar-wrapper {
     position: absolute;
@@ -635,8 +604,6 @@ video.localViewport {
     height: 100%;
 }
 .call-block.grid .local-audio .avatar-wrapper {
-    -moz-border-radius: 0;
-    -webkit-border-radius: 0;
     border-radius: 0;
     width: 100%;
     height: 100%;
@@ -649,8 +616,8 @@ video.localViewport {
     transform: translate(-50%, -50%);
 }
 
-.call-block .local-audio.right-aligned .icon-audio-muted,
-.call-block .local-video.right-aligned .icon-audio-muted {
+.call-block .local-audio .icon-audio-muted,
+.call-block .local-video .icon-audio-muted {
     right: auto;
     left: 6px;
     top: 6px;
@@ -658,10 +625,6 @@ video.localViewport {
 .call-block .local-video.minimized .icon-audio-muted,
 .call-block .local-audio.minimized .icon-audio-muted {
     display: none;
-}
-
-.group-chat .call-block.grid .participantsContainer {
-    padding-top: 36px;
 }
 
 /** carousel mode **/
@@ -686,13 +649,9 @@ video.localViewport {
     left: 0;
     top: 0;
     border-radius: inherit;
-    -webkit-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
-    -moz-box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
     box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.2);
 }
 .call-block .avatar-wrapper.avatar-letter::before {
-    -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,0.2);
-    -moz-box-shadow: 0px 0px 0px 2px rgba(255,255,255,0.2);
     box-shadow: 0px 0px 0px 2px rgba(255,255,255,0.2);
 }
 .call-block.carousel .activeStream .avatar-wrapper img {
@@ -747,7 +706,7 @@ video.localViewport {
 }
 /* sizing, depending on participants count */
 .group-chat .call-block.grid.participants-less-4 .participantsContainer .avatar-wrapper {
-    font-size: 35px;
+    font-size: 40px;
 }
 .group-chat .call-block.grid.participants-less-8 .participantsContainer .avatar-wrapper {
     font-size: 30px;
@@ -769,9 +728,6 @@ video.localViewport {
 }
 .call-block.grid .avatar-wrapper, .call-block.carousel .avatar-wrapper {
     webkit-transition: box-shadow 200ms cubic-bezier(.12, .53, .56, .28), width 200ms ease-in-out, height 200ms ease-in-out, font-size 200ms ease-in-out;
-    -moz-transition: box-shadow 200ms cubic-bezier(.12, .53, .56, .28), width 200ms ease-in-out, height 200ms ease-in-out, font-size 200ms ease-in-out;
-    -o-transition: box-shadow 200ms cubic-bezier(.12, .53, .56, .28), width 200ms ease-in-out, height 200ms ease-in-out, font-size 200ms ease-in-out;
-    -ms-transition: box-shadow 200ms cubic-bezier(.12, .53, .56, .28), width 200ms ease-in-out, height 200ms ease-in-out, font-size 200ms ease-in-out;
     transition: box-shadow 200ms cubic-bezier(.12, .53, .56, .28), width 200ms ease-in-out, height 200ms ease-in-out, font-size 200ms ease-in-out;
 }
 .group-chat .call-block.carousel.participants-less-4 .participantsContainer .avatar-wrapper {
@@ -810,6 +766,8 @@ video.localViewport {
 .group-chat .call-block.carousel .activeStream .call.user-audio {
     background-color: #06151C;
     height: 100%;
+    top: 0;
+    margin: 0;
 }
 
 .bottom-panel .button.call.disabled .big-icon, .bottom-panel .button.call.disabled:hover .big-icon {
@@ -846,11 +804,56 @@ video.localViewport {
     z-index: 10;
     opacity: 0.9;
 }
+.callReconnecting.dark {
+    background-color: rgba(0,0,0,0.6);
+}
 .callReconnecting i {
     position: absolute;
     top: 50%;
     left: 50%;
     margin: -35px 0 0 -35px;
+}
+.call-on-hold.body {
+    position: absolute;
+    width: 194px;
+    text-align: center;
+    left: 50%;
+    top: 50%;
+    margin: -32px 0 0 -97px;
+    z-index: 10;
+}
+.call-on-hold.icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    position: relative;
+}
+.call-on-hold.icon.white-bg {
+    border-radius: 100%;
+    background: #ffffff;
+    background: -moz-linear-gradient(top, #ffffff 0%, #e6e6e6 100%);
+    background: -webkit-linear-gradient(top, #ffffff 0%,#e6e6e6 100%);
+    background: linear-gradient(to bottom, #ffffff 0%,#e6e6e6 100%);
+    -webkit-transition: opacity 200ms ease-in-out;
+    transition: opacity 200ms ease-in-out;
+    opacity: 0.7;
+    cursor: pointer;
+}
+.call-on-hold.icon.white-bg:hover {
+    opacity: 1;
+}
+.call-on-hold.body i {
+    margin: -32px 0 0 -32px;
+}
+.call-on-hold.txt {
+    font-size: 20px;
+    line-height: 24px;
+    color: white;
+    font-family: 'LatoWebLight', 'LatoWeb', Arial;
+    padding: 20px 0 0 0;
+}
+.dropdown.call-actions {
+    margin-bottom: 8px;
 }
 .rtc-stats {
     position: absolute; /* Sit on top of the page content */
@@ -864,11 +867,19 @@ video.localViewport {
     z-index: 9; /* Buttons panel has z-index 10, and we need to have it on top of us */
 }
 .audio-level {
-    position: relative;
+    position: absolute;
     background-color: aquamarine;
     height: 1px;
     width: 0%;
     z-index: 9;
     top: 10px;
-    left: 2px;
+    left: 0;
+}
+
+.call.local-video .small-icon.icon-audio-muted.on-hold,
+.private-chat .call-is-on-hold .participantsWrapper .center-avatar-wrapper .small-icon.icon-audio-muted.on-hold,
+.group-chat .call-is-on-hold .activeStreamWrap .center-avatar-wrapper .small-icon.icon-audio-muted.on-hold,
+.call-is-on-hold .participantsWrapper .small-icon.icon-audio-muted.on-hold,
+.group-chat .call-is-on-hold .participantsContainer .center-avatar-wrapper .small-icon.icon-audio-muted.on-hold {
+    display: none;
 }

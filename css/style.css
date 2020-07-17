@@ -5940,6 +5940,10 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     height: -moz-calc(100% - 73px);
     height: calc(100% - 73px);
 }
+.shared-details-block .shared-folder-content .grid-table-header-container-sc {
+    z-index: 2;
+    position: relative;
+}
 .file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling, .out-shared-blocks-scrolling {
     height: 100%;
     padding-right: 14px;

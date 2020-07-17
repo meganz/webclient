@@ -1751,6 +1751,10 @@ function init_page() {
      */
     else if (page.substr(0, 7) === 'voucher') {
 
+        if (mega.voucher && mega.voucher.redeemSuccess) {
+            return loadSubPage('pro');
+        }
+
         // Get the voucher code from the URL.
         var voucherCode = page.substr(7);
 
@@ -1786,7 +1790,7 @@ function init_page() {
         }
         else {
             // Show the voucher info to the user before proceeding to redeem.
-            if (typeof redeem !== 'undefined' && mega.voucher.businessmonths) {
+            if (typeof redeem !== 'undefined' && mega.voucher && mega.voucher.businessmonths) {
                 return redeem.showVoucherInfoDialog();
             }
             // Otherwise go to the Redeem page which will detect the voucher code and show a dialog

@@ -1059,7 +1059,7 @@ var react2 = __webpack_require__.n(react2__);
 var _stores_mixins_js4__ = __webpack_require__(2);
 var _ui_utils_jsx5__ = __webpack_require__(5);
 var _ui_perfectScrollbar_jsx6__ = __webpack_require__(12);
-var _ui_buttons_jsx7__ = __webpack_require__(10);
+var _ui_buttons_jsx7__ = __webpack_require__(9);
 var _ui_dropdowns_jsx8__ = __webpack_require__(7);
 
 
@@ -3253,6 +3253,231 @@ module.exports = _applyDecoratedDescriptor;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+__webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
+var _assertThisInitialized0__ = __webpack_require__(3);
+var _assertThisInitialized0 = __webpack_require__.n(_assertThisInitialized0__);
+var _inheritsLoose1__ = __webpack_require__(1);
+var _inheritsLoose1 = __webpack_require__.n(_inheritsLoose1__);
+var _stores_mixins_js2__ = __webpack_require__(2);
+
+
+
+var React = __webpack_require__(0);
+
+var ReactDOM = __webpack_require__(6);
+
+var utils = __webpack_require__(5);
+
+
+var _buttonGroups = {};
+var Button = function (_MegaRenderMixin) {
+  inherits(Button, _MegaRenderMixin);
+
+  function Button(props) {
+    var _this = _MegaRenderMixin.call(this, props) || this;
+
+    _this.state = {
+      'focused': false
+    };
+    _this.onClick = _this.onClick.bind((_this));
+    _this.onBlur = _this.onBlur.bind((_this));
+    return _this;
+  }
+
+  var _proto = Button.prototype;
+
+  _proto.componentWillUpdate = function componentWillUpdate(nextProps, nextState) {
+    var self = this;
+
+    if (nextProps.disabled === true && nextState.focused === true) {
+      nextState.focused = false;
+    }
+
+    if (this.state.focused != nextState.focused && nextState.focused === true) {
+      $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
+      $(document).rebind('keyup.button' + self.getUniqueId(), function (e) {
+        if (self.state.focused === true) {
+          if (e.keyCode == 27) {
+            self.onBlur();
+          }
+        }
+      });
+
+      if (self._pageChangeListener) {
+        mBroadcaster.removeListener(self._pageChangeListener);
+      }
+
+      this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
+        if (self.state.focused === true) {
+          self.onBlur();
+        }
+      });
+      $(document).rebind('closeDropdowns.' + self.getUniqueId(), function () {
+        self.onBlur();
+      });
+
+      if (this.props.group) {
+        if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
+          _buttonGroups[this.props.group].setState({
+            focused: false
+          });
+
+          _buttonGroups[this.props.group].unbindEvents();
+        }
+
+        _buttonGroups[this.props.group] = this;
+      }
+    }
+
+    if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] == this) {
+      _buttonGroups[this.props.group] = null;
+    }
+  };
+
+  _proto.componentWillUnmount = function componentWillUnmount() {
+    _MegaRenderMixin.prototype.componentWillUnmount.call(this);
+
+    this.unbindEvents();
+  };
+
+  _proto.renderChildren = function renderChildren() {
+    var self = this;
+    return React.Children.map(this.props.children, function (child) {
+      return React.cloneElement(child, {
+        active: self.state.focused,
+        closeDropdown: function closeDropdown() {
+          self.setState({
+            'focused': false
+          });
+          self.unbindEvents();
+        },
+        onActiveChange: function onActiveChange(newVal) {
+          var $element = $(self.findDOMNode());
+          var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
+
+          if ($scrollables.length > 0) {
+            if (newVal === true) {
+              $scrollables.attr('data-scroll-disabled', true);
+              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
+                Ps.disable(element);
+              });
+            } else {
+              $scrollables.removeAttr('data-scroll-disabled');
+              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
+                Ps.enable(element);
+              });
+            }
+          }
+
+          if (child.props.onActiveChange) {
+            child.props.onActiveChange.call(this, newVal);
+          }
+        }
+      });
+    }.bind(this));
+  };
+
+  _proto.onBlur = function onBlur(e) {
+    if (!this.isMounted()) {
+      return;
+    }
+
+    var $element = $(ReactDOM.findDOMNode(this));
+
+    if (!e || !$(e.target).closest(".button").is($element)) {
+      this.setState({
+        focused: false
+      });
+      this.unbindEvents();
+      this.forceUpdate();
+    }
+  };
+
+  _proto.unbindEvents = function unbindEvents() {
+    var self = this;
+    $(document).off('keyup.button' + self.getUniqueId());
+    $(document).off('closeDropdowns.' + self.getUniqueId());
+    $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+
+    if (self._pageChangeListener) {
+      mBroadcaster.removeListener(self._pageChangeListener);
+    }
+  };
+
+  _proto.onClick = function onClick(e) {
+    var $element = $(ReactDOM.findDOMNode(this));
+
+    if (this.props.disabled === true) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    if ($(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    if ($(e.target).is("input,textarea,select")) {
+      return;
+    }
+
+    if (this.state.focused === false) {
+      if (this.props.onClick) {
+        this.props.onClick(this);
+      } else if (React.Children.count(this.props.children) > 0) {
+        this.setState({
+          'focused': true
+        });
+      }
+    } else if (this.state.focused === true) {
+      this.setState({
+        focused: false
+      });
+      this.unbindEvents();
+    }
+  };
+
+  _proto.render = function render() {
+    var classes = this.props.className ? "button " + this.props.className : "button";
+
+    if (this.props.disabled == true || this.props.disabled == "true") {
+      classes += " disabled";
+    } else if (this.state.focused) {
+      classes += " active";
+    }
+
+    var label;
+
+    if (this.props.label) {
+      label = this.props.label;
+    }
+
+    var icon;
+
+    if (this.props.icon) {
+      icon = React.createElement("i", {
+        className: "small-icon " + this.props.icon
+      });
+    }
+
+    return React.createElement("div", {
+      className: classes,
+      onClick: this.onClick,
+      style: this.props.style ? this.props.style : null
+    }, icon, React.createElement("span", null, label), this.renderChildren());
+  };
+
+  return Button;
+}(_stores_mixins_js2__["MegaRenderMixin"]);
+
+/***/ }),
+
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 
 var _assertThisInitialized0__ = __webpack_require__(3);
 var _assertThisInitialized0 = __webpack_require__.n(_assertThisInitialized0__);
@@ -3662,231 +3887,6 @@ __webpack_exports__["a"] = ({
   SelectContactDialog: SelectContactDialog,
   ConfirmDialog: ConfirmDialog
 });
-
-/***/ }),
-
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-__webpack_require__.d(__webpack_exports__, "Button", function() { return Button; });
-var _assertThisInitialized0__ = __webpack_require__(3);
-var _assertThisInitialized0 = __webpack_require__.n(_assertThisInitialized0__);
-var _inheritsLoose1__ = __webpack_require__(1);
-var _inheritsLoose1 = __webpack_require__.n(_inheritsLoose1__);
-var _stores_mixins_js2__ = __webpack_require__(2);
-
-
-
-var React = __webpack_require__(0);
-
-var ReactDOM = __webpack_require__(6);
-
-var utils = __webpack_require__(5);
-
-
-var _buttonGroups = {};
-var Button = function (_MegaRenderMixin) {
-  inherits(Button, _MegaRenderMixin);
-
-  function Button(props) {
-    var _this = _MegaRenderMixin.call(this, props) || this;
-
-    _this.state = {
-      'focused': false
-    };
-    _this.onClick = _this.onClick.bind((_this));
-    _this.onBlur = _this.onBlur.bind((_this));
-    return _this;
-  }
-
-  var _proto = Button.prototype;
-
-  _proto.componentWillUpdate = function componentWillUpdate(nextProps, nextState) {
-    var self = this;
-
-    if (nextProps.disabled === true && nextState.focused === true) {
-      nextState.focused = false;
-    }
-
-    if (this.state.focused != nextState.focused && nextState.focused === true) {
-      $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
-      $(document).rebind('keyup.button' + self.getUniqueId(), function (e) {
-        if (self.state.focused === true) {
-          if (e.keyCode == 27) {
-            self.onBlur();
-          }
-        }
-      });
-
-      if (self._pageChangeListener) {
-        mBroadcaster.removeListener(self._pageChangeListener);
-      }
-
-      this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
-        if (self.state.focused === true) {
-          self.onBlur();
-        }
-      });
-      $(document).rebind('closeDropdowns.' + self.getUniqueId(), function () {
-        self.onBlur();
-      });
-
-      if (this.props.group) {
-        if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
-          _buttonGroups[this.props.group].setState({
-            focused: false
-          });
-
-          _buttonGroups[this.props.group].unbindEvents();
-        }
-
-        _buttonGroups[this.props.group] = this;
-      }
-    }
-
-    if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] == this) {
-      _buttonGroups[this.props.group] = null;
-    }
-  };
-
-  _proto.componentWillUnmount = function componentWillUnmount() {
-    _MegaRenderMixin.prototype.componentWillUnmount.call(this);
-
-    this.unbindEvents();
-  };
-
-  _proto.renderChildren = function renderChildren() {
-    var self = this;
-    return React.Children.map(this.props.children, function (child) {
-      return React.cloneElement(child, {
-        active: self.state.focused,
-        closeDropdown: function closeDropdown() {
-          self.setState({
-            'focused': false
-          });
-          self.unbindEvents();
-        },
-        onActiveChange: function onActiveChange(newVal) {
-          var $element = $(self.findDOMNode());
-          var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
-
-          if ($scrollables.length > 0) {
-            if (newVal === true) {
-              $scrollables.attr('data-scroll-disabled', true);
-              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
-                Ps.disable(element);
-              });
-            } else {
-              $scrollables.removeAttr('data-scroll-disabled');
-              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
-                Ps.enable(element);
-              });
-            }
-          }
-
-          if (child.props.onActiveChange) {
-            child.props.onActiveChange.call(this, newVal);
-          }
-        }
-      });
-    }.bind(this));
-  };
-
-  _proto.onBlur = function onBlur(e) {
-    if (!this.isMounted()) {
-      return;
-    }
-
-    var $element = $(ReactDOM.findDOMNode(this));
-
-    if (!e || !$(e.target).closest(".button").is($element)) {
-      this.setState({
-        focused: false
-      });
-      this.unbindEvents();
-      this.forceUpdate();
-    }
-  };
-
-  _proto.unbindEvents = function unbindEvents() {
-    var self = this;
-    $(document).off('keyup.button' + self.getUniqueId());
-    $(document).off('closeDropdowns.' + self.getUniqueId());
-    $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
-
-    if (self._pageChangeListener) {
-      mBroadcaster.removeListener(self._pageChangeListener);
-    }
-  };
-
-  _proto.onClick = function onClick(e) {
-    var $element = $(ReactDOM.findDOMNode(this));
-
-    if (this.props.disabled === true) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    if ($(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    if ($(e.target).is("input,textarea,select")) {
-      return;
-    }
-
-    if (this.state.focused === false) {
-      if (this.props.onClick) {
-        this.props.onClick(this);
-      } else if (React.Children.count(this.props.children) > 0) {
-        this.setState({
-          'focused': true
-        });
-      }
-    } else if (this.state.focused === true) {
-      this.setState({
-        focused: false
-      });
-      this.unbindEvents();
-    }
-  };
-
-  _proto.render = function render() {
-    var classes = this.props.className ? "button " + this.props.className : "button";
-
-    if (this.props.disabled == true || this.props.disabled == "true") {
-      classes += " disabled";
-    } else if (this.state.focused) {
-      classes += " active";
-    }
-
-    var label;
-
-    if (this.props.label) {
-      label = this.props.label;
-    }
-
-    var icon;
-
-    if (this.props.icon) {
-      icon = React.createElement("i", {
-        className: "small-icon " + this.props.icon
-      });
-    }
-
-    return React.createElement("div", {
-      className: classes,
-      onClick: this.onClick,
-      style: this.props.style ? this.props.style : null
-    }, icon, React.createElement("span", null, label), this.renderChildren());
-  };
-
-  return Button;
-}(_stores_mixins_js2__["MegaRenderMixin"]);
 
 /***/ }),
 
@@ -4902,10 +4902,10 @@ var utils = __webpack_require__(5);
 var mixins = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var ui_buttons = __webpack_require__(10);
+var ui_buttons = __webpack_require__(9);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(9);
+var modalDialogs = __webpack_require__(10);
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/assertThisInitialized.js
 var assertThisInitialized = __webpack_require__(3);
@@ -6757,7 +6757,7 @@ var ReactDOM = __webpack_require__(6);
 
 
 
-var ButtonsUI = __webpack_require__(10);
+var ButtonsUI = __webpack_require__(9);
 
 var emojiAutocomplete_EmojiAutocomplete = function (_MegaRenderMixin) {
   inherits(EmojiAutocomplete, _MegaRenderMixin);
@@ -9147,7 +9147,7 @@ var messages_geoLocation = (GeoLocation);
 
 var generic_DropdownsUI = __webpack_require__(7);
 
-var generic_ButtonsUI = __webpack_require__(10);
+var generic_ButtonsUI = __webpack_require__(9);
 
 var generic_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
 var CLICKABLE_ATTACHMENT_CLASSES = ".message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium";
@@ -11738,14 +11738,19 @@ var VIEW_MODES = {
   "CAROUSEL": 2
 };
 
-function muteOrHoldIconStyle(opts) {
+function muteOrHoldIconStyle(opts, contact) {
+  var props = {};
+
   if (opts.onHold) {
-    return "small-icon icon-audio-muted";
+    props.className = "small-icon icon-audio-muted on-hold simpletip";
+    props["data-simpletip"] = l[23542].replace("%s", M.getNameByHandle(contact.u));
   } else if (!opts.audio) {
-    return "small-icon icon-audio-muted";
+    props.className = "small-icon icon-audio-muted";
+  } else {
+    props.className = "small-icon hidden";
   }
 
-  return "small-icon hidden";
+  return props;
 }
 
 var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) {
@@ -11765,11 +11770,9 @@ var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) 
     var sess = self.props.sess;
     var sid = sess.stringSid;
     var peerMedia = Av.toMediaOptions(this.props.peerAv);
-    var noVideo = !peerMedia.video || sess.call.isOnHold() || peerMedia.onHold;
-    self.state.noVideo = noVideo;
+    var contact = M.u[base64urlencode(sess.peer)];
 
-    if (noVideo) {
-      var contact = M.u[base64urlencode(sess.peer)];
+    if (!self.props.video) {
       assert(contact);
       return external_React_default.a.createElement("div", {
         className: "call user-audio is-avatar " + (self.props.isActive ? "active" : "") + " stream" + sid,
@@ -11783,10 +11786,11 @@ var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) 
       }, sess.peerNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
         className: "icon-connection-issues"
       }) : null, external_React_default.a.createElement("div", {
-        className: "center-avatar-wrapper"
-      }, external_React_default.a.createElement("div", {
-        className: muteOrHoldIconStyle(peerMedia)
-      }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+        className: "center-avatar-wrapper",
+        style: {
+          left: "auto"
+        }
+      }, external_React_default.a.createElement("div", muteOrHoldIconStyle(peerMedia, contact)), external_React_default.a.createElement(ui_contacts["Avatar"], {
         contact: contact,
         className: "avatar-wrapper",
         simpletip: contact.name,
@@ -11812,9 +11816,7 @@ var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) 
         }
       }, sess.peerNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
         className: "icon-connection-issues"
-      }) : null, external_React_default.a.createElement("div", {
-        className: muteOrHoldIconStyle(peerMedia)
-      }), external_React_default.a.createElement("div", {
+      }) : null, external_React_default.a.createElement("div", muteOrHoldIconStyle(peerMedia, contact)), external_React_default.a.createElement("div", {
         className: "audio-level",
         ref: function ref(_ref2) {
           self.audioLevelDiv = _ref2;
@@ -11864,11 +11866,7 @@ var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) 
     var self = this;
     var player = self.refs.player;
 
-    if (self.state.noVideo) {
-      if (player) {
-        RTC.detachMediaStream(player);
-      }
-    } else {
+    if (self.props.video) {
       assert(player);
       var sess = self.props.sess;
 
@@ -11881,6 +11879,10 @@ var conversationaudiovideopanel_RemoteVideoPlayer = function (_MegaRenderMixin) 
       }
 
       RTC.attachMediaStream(player, sess.remoteStream);
+    } else {
+      if (player) {
+        RTC.detachMediaStream(player);
+      }
     }
   };
 
@@ -12012,7 +12014,8 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
 
     var $container = $(external_ReactDOM_default.a.findDOMNode(self));
     self.visiblePanel = false;
-    $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).removeClass('visible-panel');
+    $container.removeClass('visible-panel');
+    $(document).trigger('closeDropdowns');
   };
 
   _proto2.resizeVideos = function resizeVideos() {
@@ -12050,12 +12053,10 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     var newWidth;
 
     if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
-      $('.participantsContainer', $container).height('auto');
       var activeStreamHeight = $container.outerHeight() - $('.call-header').outerHeight() - $('.participantsContainer', $container).outerHeight();
       var activeSid = this.getActiveSid();
       var mediaOpts = activeSid === "local" ? callManagerCall.getMediaOptions() : callManagerCall.getRemoteMediaOptions(activeSid);
       $('.activeStream', $container).height(activeStreamHeight);
-      $('.activeStream .user-audio .avatar-wrapper', $container).width(activeStreamHeight - 20).height(activeStreamHeight - 20).css('font-size', 100 / 240 * activeStreamHeight + "px");
       $('.user-video, .user-audio, .user-video video', $container).width('').height('');
       var $video;
       var $mutedIcon;
@@ -12074,7 +12075,6 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
 
           $mutedIcon.css({
             'right': 'auto',
-            'top': 32,
             'left': $video.outerWidth() / 2 + actualWidth / 2 - $mutedIcon.outerWidth() - 24
           });
         } else {
@@ -12085,7 +12085,6 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
         }
       }
     } else {
-      $('.participantsContainer', $container).height($container.outerHeight() - $('.call-header', $container).outerHeight());
       newWidth = totalWidth / totalStreams;
     }
 
@@ -12124,7 +12123,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       var $this = $(this);
       clearTimeout(mouseoutThrottling);
       self.visiblePanel = true;
-      $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container).addClass('visible-panel');
+      $container.addClass('visible-panel');
 
       if ($this.hasClass('full-sized-block')) {
         $('.call.top-panel', $container).addClass('visible-panel');
@@ -12133,12 +12132,17 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function () {
       $(this);
       clearTimeout(mouseoutThrottling);
+
+      if ($('.dropdown.call-actions').length > 0) {
+        return;
+      }
+
       mouseoutThrottling = setTimeout(function () {
         self.visiblePanel = false;
 
         self._hideBottomPanel();
 
-        $('.call.top-panel', $container).removeClass('visible-panel');
+        $container.removeClass('visible-panel');
       }, 500);
     });
     var idleMouseTimer;
@@ -12150,7 +12154,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       self._hideBottomPanel();
 
       $container.addClass('no-cursor');
-      $('.call.top-panel', $container).removeClass('visible-panel');
+      $container.removeClass('visible-panel');
       forceMouseHide = true;
       setTimeout(function () {
         forceMouseHide = false;
@@ -12168,14 +12172,14 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
 
       if (!forceMouseHide) {
         self.visiblePanel = true;
-        $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+        $container.addClass('visible-panel');
         $container.removeClass('no-cursor');
 
         if ($this.hasClass('full-sized-block')) {
           $('.call.top-panel', $container).addClass('visible-panel');
         }
 
-        idleMouseTimer = setTimeout(hideBottomPanel, 2000);
+        idleMouseTimer = setTimeout(hideBottomPanel, 20000);
       }
     });
     $('.call.bottom-panel', $container).rebind('mouseenter.chatUI' + self.props.chatRoom.roomId, function () {
@@ -12184,7 +12188,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     });
     $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId, function () {
       self._bottomPanelMouseOver = false;
-      idleMouseTimer = setTimeout(hideBottomPanel, 2000);
+      idleMouseTimer = setTimeout(hideBottomPanel, 20000);
     });
     $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
       if (!$(document).fullScreen() && room.isCurrentlyActive) {
@@ -12209,33 +12213,17 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
           return false;
         }
 
-        var right = Math.max(0, $container.outerWidth() - ui.position.left);
-        var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
-        right = Math.min(right, $container.outerWidth() - 8);
-        bottom = Math.min(bottom, $container.outerHeight() - 8);
-        right -= ui.helper.outerWidth();
-        bottom -= ui.helper.outerHeight();
-        var minBottom = $(this).is(".minimized") ? 48 : 8;
-
-        if (bottom < minBottom) {
-          bottom = minBottom;
-          $(this).addClass('bottom-aligned');
-        } else {
-          $(this).removeClass('bottom-aligned');
-        }
-
-        if (right < 8) {
-          right = 8;
-          $(this).addClass('right-aligned');
-        } else {
-          $(this).removeClass('right-aligned');
-        }
-
+        var right = Math.max(0, $container.outerWidth(true) - ui.position.left);
+        var bottom = Math.max(0, $container.outerHeight(true) - ui.position.top);
+        right = Math.min(right, $container.outerWidth(true) - 8);
+        bottom = Math.min(bottom, $container.outerHeight(true) - 8);
+        right -= ui.helper.outerWidth(true);
+        bottom -= ui.helper.outerHeight(true);
         ui.offset = {
           left: 'auto',
           top: 'auto',
-          right: right,
-          bottom: bottom,
+          right: right < 8 ? 8 : right,
+          bottom: bottom < 8 ? 8 : bottom,
           height: "",
           width: ""
         };
@@ -12248,10 +12236,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     chatGlobalEventManager.addEventListener('resize', 'chatUI_' + room.roomId, function () {
       if ($container.is(":visible")) {
         if (!elementInViewport($localMediaDisplay[0])) {
-          $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
-            'right': 8,
-            'bottom': 8
-          });
+          $localMediaDisplay.removeAttr('style');
         }
       }
 
@@ -12380,12 +12365,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     var $container = $(external_ReactDOM_default.a.findDOMNode(this));
     var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
     var newVal = !this.state.localMediaDisplay;
-    $localMediaDisplay.addClass('right-aligned').addClass('bottom-aligned').css({
-      'width': '',
-      'height': '',
-      'right': 8,
-      'bottom': newVal ? 8 : 8
-    });
+    $localMediaDisplay.removeAttr('style');
     this.setState({
       localMediaDisplay: newVal
     });
@@ -12430,16 +12410,19 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       }
     }
 
-    var visiblePanelClass = this.visiblePanel ? " visible-panel" : "";
+    this.visiblePanel ? " visible-panel" : "";
     var localMedia = Av.toMediaOptions(rtcCall.localAv());
     sids.forEach(function (binSid, i) {
       var sess = sessions[binSid];
       var sid = sess.stringSid;
       var playerIsActive = activeSid === sid;
+      var av = sess.peerAv();
+      var hasVideo = (av & Av.Video) != 0 && !sess.call.isOnHold() && !sess.peerIsOnHold();
       var player = external_React_default.a.createElement(conversationaudiovideopanel_RemoteVideoPlayer, {
         sess: sess,
         key: sid + "_" + i,
-        peerAv: sess.peerAv(),
+        peerAv: av,
+        video: hasVideo,
         isActive: playerIsActive,
         onPlayerClick: onRemotePlayerClick
       });
@@ -12448,7 +12431,8 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
         activePlayer = external_React_default.a.createElement(conversationaudiovideopanel_RemoteVideoPlayer, {
           sess: sess,
           key: "carousel_active",
-          peerAv: sess.peerAv(),
+          peerAv: av,
+          video: hasVideo,
           isCarouselMain: true,
           noAudioLevel: true
         });
@@ -12460,7 +12444,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
     if (this.getViewMode() === VIEW_MODES.GRID) {
       if (!localMedia.video) {
         localPlayerElement = external_React_default.a.createElement("div", {
-          className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass
+          className: "call local-audio right-aligned bottom-aligned is-avatar" + (this.state.localMediaDisplay ? "" : " minimized ")
         }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
           className: "icon-connection-issues"
         }) : null, external_React_default.a.createElement("div", {
@@ -12469,10 +12453,8 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
         }, external_React_default.a.createElement("i", {
           className: "tiny-icon grey-minus-icon"
         })), external_React_default.a.createElement("div", {
-          className: "center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden")
-        }, external_React_default.a.createElement("div", {
-          className: muteOrHoldIconStyle(localMedia)
-        }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+          className: "center-avatar-wrapper"
+        }, external_React_default.a.createElement("div", muteOrHoldIconStyle(localMedia, M.u[u_handle])), external_React_default.a.createElement(ui_contacts["Avatar"], {
           contact: M.u[u_handle],
           chatRoom: this.props.chatRoom,
           className: "call avatar-wrapper is-avatar " + (this.state.localMediaDisplay ? "" : "hidden"),
@@ -12480,7 +12462,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
         })));
       } else {
         localPlayerElement = external_React_default.a.createElement("div", {
-          className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + visiblePanelClass + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : "")
+          className: "call local-video right-aligned is-video bottom-aligned" + (this.state.localMediaDisplay ? "" : " minimized ") + (activeSid === "local" ? " active " : "") + (localMedia.screen ? " is-screen" : "")
         }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
           className: "icon-connection-issues"
         }) : null, external_React_default.a.createElement("div", {
@@ -12488,9 +12470,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
           onClick: this.toggleLocalVideoDisplay.bind(this)
         }, external_React_default.a.createElement("i", {
           className: "tiny-icon grey-minus-icon"
-        })), external_React_default.a.createElement("div", {
-          className: muteOrHoldIconStyle(localMedia)
-        }), external_React_default.a.createElement("video", {
+        })), external_React_default.a.createElement("div", muteOrHoldIconStyle(localMedia, M.u[u_handle])), external_React_default.a.createElement("video", {
           className: "localViewport",
           defaultmuted: "true",
           muted: true,
@@ -12520,9 +12500,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
           className: "icon-connection-issues"
         }) : null, external_React_default.a.createElement("div", {
           className: "center-avatar-wrapper"
-        }, external_React_default.a.createElement("div", {
-          className: muteOrHoldIconStyle(callManagerCall.getMediaOptions())
-        }), external_React_default.a.createElement(ui_contacts["Avatar"], {
+        }, external_React_default.a.createElement("div", muteOrHoldIconStyle(callManagerCall.getMediaOptions(), M.u[u_handle])), external_React_default.a.createElement(ui_contacts["Avatar"], {
           contact: M.u[u_handle],
           className: "call avatar-wrapper",
           chatRoom: this.props.chatRoom,
@@ -12543,9 +12521,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
           }
         }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
           className: "icon-connection-issues"
-        }) : null, external_React_default.a.createElement("div", {
-          className: muteOrHoldIconStyle(localMedia)
-        }), external_React_default.a.createElement("video", (_React$createElement = {
+        }) : null, external_React_default.a.createElement("div", muteOrHoldIconStyle(localMedia, M.u[u_handle])), external_React_default.a.createElement("video", (_React$createElement = {
           ref: "localViewport",
           className: "localViewport smallLocalViewport",
           defaultmuted: "true",
@@ -12564,9 +12540,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
             key: "local-video2"
           }, megaChat.rtc.ownNetworkQuality() === 0 ? external_React_default.a.createElement("div", {
             className: "icon-connection-issues"
-          }) : null, external_React_default.a.createElement("div", {
-            className: muteOrHoldIconStyle(localMedia)
-          }), external_React_default.a.createElement("video", {
+          }) : null, external_React_default.a.createElement("div", muteOrHoldIconStyle(localMedia, M.u[u_handle])), external_React_default.a.createElement("video", {
             className: "localViewport bigLocalViewport",
             defaultmuted: "true",
             muted: true,
@@ -12673,6 +12647,19 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       }, networkQualityMessage);
     }
 
+    var otherPartyIsOnHold = false;
+
+    if (realSids.length === 1 && !rtcCall.isOnHold()) {
+      var session = sessions[realSids[0]];
+      otherPartyIsOnHold = !!session.peerIsOnHold();
+    }
+
+    if (rtcCall.isOnHold() || otherPartyIsOnHold) {
+      networkQualityBar = external_React_default.a.createElement("div", {
+        className: "in-call-notif gray" + (notifBar ? " after-green-notif" : "")
+      }, l[23457]);
+    }
+
     additionalClass += self.getViewMode() === VIEW_MODES.GRID ? " grid" : " carousel";
     var players = null;
 
@@ -12686,6 +12673,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       }, remotePlayerElements), localPlayerElement);
     } else {
       players = external_React_default.a.createElement("div", {
+        className: "activeStreamWrap",
         key: "container"
       }, external_React_default.a.createElement("div", {
         className: "activeStream",
@@ -12730,12 +12718,22 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       }, external_React_default.a.createElement("i", {
         className: "huge-icon crossed-phone"
       }));
-    } else if (rtcCall.isOnHold()) {
+    } else if (rtcCall.isOnHold() || otherPartyIsOnHold) {
       hugeOverlayDiv = external_React_default.a.createElement("div", {
-        className: "callReconnecting"
+        className: "callReconnecting dark"
+      }, external_React_default.a.createElement("div", {
+        className: "call-on-hold body"
+      }, external_React_default.a.createElement("div", {
+        className: "call-on-hold icon " + (otherPartyIsOnHold ? "" : "white-bg"),
+        onClick: otherPartyIsOnHold ? undefined : function () {
+          rtcCall.releaseOnHold();
+        }
       }, external_React_default.a.createElement("i", {
-        className: "huge-icon call-on-hold"
-      }));
+        className: "big-icon " + (otherPartyIsOnHold ? "white-pause" : "grey-play")
+      })), external_React_default.a.createElement("div", {
+        className: "call-on-hold txt"
+      }, otherPartyIsOnHold ? l[23458] : l[23459])));
+      additionalClass += " call-is-on-hold";
     }
 
     var micMuteBtnDisabled = rtcCall.isLocalMuteInProgress() || rtcCall.isRecovery || rtcCall.isOnHold();
@@ -12746,7 +12744,7 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       id: "call-block"
     }, external_React_default.a.createElement("div", {
       className: "av-resize-handler ui-resizable-handle ui-resizable-s " + (this.state.messagesBlockEnabled && !this.state.fullScreenModeEnabled ? "" : "hidden")
-    }), header, notifBar, networkQualityBar, players, hugeOverlayDiv, topPanel, external_React_default.a.createElement("div", {
+    }), header, notifBar, networkQualityBar, null, players, hugeOverlayDiv, topPanel, external_React_default.a.createElement("div", {
       className: "call bottom-panel"
     }, external_React_default.a.createElement("div", {
       className: "button call left" + (unreadDiv ? " unread" : ""),
@@ -12804,7 +12802,29 @@ var conversationaudiovideopanel_ConversationAVPanel = function (_MegaRenderMixin
       className: "big-icon simpletip " + (rtcCall.isScreenCaptureEnabled() ? "screenshare" : "crossed-screenshare"),
       "data-simpletip": rtcCall.isScreenCaptureEnabled() ? l[22890] : l[22889],
       "data-simpletipoffset": "5"
-    })), external_React_default.a.createElement("div", {
+    })), external_React_default.a.createElement(ui_buttons["Button"], {
+      className: "call",
+      disabled: rtcCall.isRecovery && rtcCall.isOnHold(),
+      icon: "big-icon white-dots"
+    }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
+      className: "dark black call-actions",
+      noArrow: true,
+      positionMy: "center top",
+      positionAt: "center bottom",
+      vertOffset: 10
+    }, rtcCall.isOnHold() ? external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+      icon: "white-play",
+      label: l[23459],
+      onClick: function onClick() {
+        rtcCall.releaseOnHold();
+      }
+    }) : external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+      icon: "white-pause",
+      label: l[23460],
+      onClick: function onClick() {
+        rtcCall.putOnHold();
+      }
+    }))), external_React_default.a.createElement("div", {
       className: "button call",
       onClick: function onClick() {
         callManagerCall.endCall();
@@ -14919,7 +14939,7 @@ var utils = __webpack_require__(5);
 var mixins = __webpack_require__(2);
 
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(10);
+var buttons = __webpack_require__(9);
 
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(7);
@@ -15761,7 +15781,7 @@ var searchPanel_SearchPanel = function (_MegaRenderMixin) {
 
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(9);
+var modalDialogs = __webpack_require__(10);
 
 // CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
@@ -18754,6 +18774,19 @@ Chat.prototype.haveAnyActiveCall = function () {
   return false;
 };
 
+Chat.prototype.haveAnyOnHoldCall = function () {
+  var self = this;
+  var chatIds = self.chats.keys();
+
+  for (var i = 0; i < chatIds.length; i++) {
+    if (self.chats[chatIds[i]].haveActiveOnHoldCall()) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
   'use strict';
 
@@ -20517,6 +20550,10 @@ ChatRoom.prototype.haveActiveCall = function () {
   return this.callManagerCall && this.callManagerCall.isActive() === true;
 };
 
+ChatRoom.prototype.haveActiveOnHoldCall = function () {
+  return this.callManagerCall && this.callManagerCall.rtcCall.isOnHold();
+};
+
 ChatRoom.prototype.havePendingGroupCall = function () {
   var self = this;
   var haveCallParticipants = self.getCallParticipants().length > 0;
@@ -20920,7 +20957,7 @@ var miniui = ({
 var ui_contacts = __webpack_require__(4);
 
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs = __webpack_require__(9);
+var modalDialogs = __webpack_require__(10);
 
 // CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 

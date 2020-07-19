@@ -280,7 +280,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
     # Get the HTMLHint output.
     os.chdir(PROJECT_PATH)
     rules = config.HTMLHINT_RULES if not norules else ''
-    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile('dont-deploy'))
+    files_to_test = pick_files_to_test(file_line_mapping, ['htm', 'html'], re.compile(r'dont-deploy|html[\\/]pdf'))
 
     if len(files_to_test) == 0:
         logging.info('HTMLHint: No modified HTML files found.')

@@ -6049,7 +6049,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
     var buttons = [];
 
     if (!folderIsHighlighted || this.props.folderSelectable) {
-      buttons = [].concat(buttons, [{
+      buttons.push({
         "label": this.props.selectLabel,
         "key": "select",
         "className": "default-grey-button " + (this.state.selected.length === 0 || share && share.down ? "disabled" : null),
@@ -6065,15 +6065,15 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
           e.preventDefault();
           e.stopPropagation();
         }
-      }]);
+      });
     }
 
     if (folderIsHighlighted) {
       var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
       var hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
       var highlightedNode = hasHighlightedNode && this.state.highlighted[0];
-      buttons = [].concat(buttons, [this.props.allowAttachFolders ? {
-        "label": "Attach",
+      buttons.push(this.props.allowAttachFolders ? {
+        "label": l[8023],
         "key": "attach",
         className: className,
         onClick: function onClick() {
@@ -6109,10 +6109,10 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
           e.preventDefault();
           e.stopPropagation();
         }
-      }]);
+      });
     }
 
-    buttons = [].concat(buttons, [{
+    buttons.push({
       "label": this.props.cancelLabel,
       "key": "cancel",
       "onClick": function onClick(e) {
@@ -6121,7 +6121,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
         e.preventDefault();
         e.stopPropagation();
       }
-    }]);
+    });
     var gridHeader = [];
 
     if (viewMode === "0") {

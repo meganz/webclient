@@ -1212,7 +1212,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         let buttons = [];
         if (!folderIsHighlighted || this.props.folderSelectable) {
-            buttons = [...buttons, {
+            buttons.push({
                 "label": this.props.selectLabel,
                 "key": "select",
                 "className": "default-grey-button " +
@@ -1228,7 +1228,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     e.preventDefault();
                     e.stopPropagation();
                 }
-            }];
+            });
         }
 
         if (folderIsHighlighted) {
@@ -1236,24 +1236,21 @@ class CloudBrowserDialog extends MegaRenderMixin {
             const hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
             const highlightedNode = hasHighlightedNode && this.state.highlighted[0];
 
-            buttons = [
-                ...buttons,
-                this.props.allowAttachFolders ?
-                    {
-                        "label": "Attach",
-                        "key": "attach",
-                        className,
-                        onClick: () => {
-                            if (hasHighlightedNode) {
-                                M.createPublicLink(highlightedNode)
-                                    .then(({ link }) => {
-                                        this.props.onClose();
-                                        this.props.room.sendMessage(link);
-                                    });
-                            }
+            buttons.push(
+                this.props.allowAttachFolders ? {
+                    "label": l[8023],
+                    "key": "attach",
+                    className,
+                    onClick: () => {
+                        if (hasHighlightedNode) {
+                            M.createPublicLink(highlightedNode)
+                                .then(({ link }) => {
+                                    this.props.onClose();
+                                    this.props.room.sendMessage(link);
+                                });
                         }
-                    } :
-                    null,
+                    }
+                } : null,
                 {
                     "label": this.props.openLabel,
                     "key": "select",
@@ -1267,11 +1264,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
                         e.preventDefault();
                         e.stopPropagation();
                     }
-                }
-            ];
+                });
         }
 
-        buttons = [...buttons, {
+        buttons.push({
             "label": this.props.cancelLabel,
             "key": "cancel",
             "onClick": e => {
@@ -1279,7 +1275,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }];
+        });
 
         var gridHeader = [];
         if (viewMode === "0") {

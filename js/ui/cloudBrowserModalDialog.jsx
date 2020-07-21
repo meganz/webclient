@@ -921,20 +921,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
         e.stopPropagation();
 
         if (nodeId === 'shares') {
-            // [...] TODO: Decide on the correct behavior -- redirect to `Contacts` or stay within the dialog
-
-            // Open `Contacts` and show the shared folders by the owner of the given breadcrumb node
-            // return prevNodeId && M.d[prevNodeId] && M.openFolder(M.d[prevNodeId].h);
-
             // Switch the active tab to `Incoming Shares`
             return this.handleTabChange('shares');
-        }
-
-        if (nodeId === M.InboxID) {
-            // [...] TODO: Which tab should be active when we open search result that is contained within `Inbox` --
-            //  `Cloud Drive`, `Incoming Shares` or else?
-
-            // return this.handleTabChange('inbox');
         }
 
         // Click to open allowed only on folders as breadcrumb nodes
@@ -1215,68 +1203,85 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 });
         }
 
-        self.state.highlighted.forEach(function(nodeId) {
+        this.state.highlighted.forEach(nodeId => {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
                 folderIsHighlighted = true;
             }
-
             share = M.getNodeShare(nodeId);
         });
 
-        var buttons = [];
-
-        if (!folderIsHighlighted || self.props.folderSelectable) {
-            buttons.push({
-                "label": self.props.selectLabel,
+        let buttons = [];
+        if (!folderIsHighlighted || this.props.folderSelectable) {
+            buttons = [...buttons, {
+                "label": this.props.selectLabel,
                 "key": "select",
                 "className": "default-grey-button " +
-                    (self.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.selected.length > 0) {
-                        self.props.onSelected(
-                            self.state.selected.filter(node => !M.getNodeShare(node).down)
+                    (this.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
+                "onClick": e => {
+                    if (this.state.selected.length > 0) {
+                        this.props.onSelected(
+                            this.state.selected.filter(node => !M.getNodeShare(node).down)
                         );
-                        self.props.onAttachClicked();
+                        this.props.onAttachClicked();
                     }
 
                     e.preventDefault();
                     e.stopPropagation();
                 }
-            });
-        }
-        else if (folderIsHighlighted) {
-            buttons.push({
-                "label": self.props.openLabel,
-                "key": "select",
-                "className": "default-grey-button " + (share && share.down ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.highlighted.length > 0) {
-                        self.setState({'currentlyViewedEntry': self.state.highlighted[0]});
-                        self.clearSelectionAndHighlight();
-                        self.browserEntries.setState({
-                            'selected': [],
-                            'searchValue': '',
-                            'highlighted': []
-                        });
-                    }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
+            }];
         }
 
-        buttons.push({
-            "label": self.props.cancelLabel,
+        if (folderIsHighlighted) {
+            const className = `default-grey-button ${share && share.down ? 'disabled' : null}`;
+            const hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
+            const highlightedNode = hasHighlightedNode && this.state.highlighted[0];
+
+            buttons = [
+                ...buttons,
+                this.props.allowAttachFolders ?
+                    {
+                        "label": "Attach",
+                        "key": "attach",
+                        className,
+                        onClick: () => {
+                            if (hasHighlightedNode) {
+                                M.createPublicLink(highlightedNode)
+                                    .then(({ link }) => {
+                                        this.props.onClose();
+                                        this.props.room.sendMessage(link);
+                                    });
+                            }
+                        }
+                    } :
+                    null,
+                {
+                    "label": this.props.openLabel,
+                    "key": "select",
+                    className,
+                    onClick: e => {
+                        if (hasHighlightedNode) {
+                            this.setState({ currentlyViewedEntry: highlightedNode });
+                            this.clearSelectionAndHighlight();
+                            this.browserEntries.setState({ selected: [], searchValue: '', highlighted: [] });
+                        }
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            ];
+        }
+
+        buttons = [...buttons, {
+            "label": this.props.cancelLabel,
             "key": "cancel",
-            "onClick": function(e) {
-                self.props.onClose(self);
+            "onClick": e => {
+                this.props.onClose(this);
                 e.preventDefault();
                 e.stopPropagation();
             }
-        });
+        }];
 
         var gridHeader = [];
-
         if (viewMode === "0") {
             gridHeader.push(
                 <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>

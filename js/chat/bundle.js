@@ -5752,8 +5752,6 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       return this.handleTabChange('shares');
     }
 
-    if (nodeId === M.InboxID) {}
-
     if (M.d[nodeId] && M.d[nodeId].t) {
       this.setState({
         selectedTab: M.d[nodeId].p ? 'shares' : 'clouddrive',
@@ -5973,6 +5971,8 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
   };
 
   _proto2.render = function render() {
+    var _this6 = this;
+
     var self = this;
     var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
     var classes = "add-from-cloud " + self.props.className;
@@ -6039,7 +6039,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       });
     }
 
-    self.state.highlighted.forEach(function (nodeId) {
+    this.state.highlighted.forEach(function (nodeId) {
       if (M.d[nodeId] && M.d[nodeId].t === 1) {
         folderIsHighlighted = true;
       }
@@ -6048,56 +6048,80 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
     });
     var buttons = [];
 
-    if (!folderIsHighlighted || self.props.folderSelectable) {
-      buttons.push({
-        "label": self.props.selectLabel,
+    if (!folderIsHighlighted || this.props.folderSelectable) {
+      buttons = [].concat(buttons, [{
+        "label": this.props.selectLabel,
         "key": "select",
-        "className": "default-grey-button " + (self.state.selected.length === 0 || share && share.down ? "disabled" : null),
+        "className": "default-grey-button " + (this.state.selected.length === 0 || share && share.down ? "disabled" : null),
         "onClick": function onClick(e) {
-          if (self.state.selected.length > 0) {
-            self.props.onSelected(self.state.selected.filter(function (node) {
+          if (_this6.state.selected.length > 0) {
+            _this6.props.onSelected(_this6.state.selected.filter(function (node) {
               return !M.getNodeShare(node).down;
             }));
-            self.props.onAttachClicked();
+
+            _this6.props.onAttachClicked();
           }
 
           e.preventDefault();
           e.stopPropagation();
         }
-      });
-    } else if (folderIsHighlighted) {
-      buttons.push({
-        "label": self.props.openLabel,
-        "key": "select",
-        "className": "default-grey-button " + (share && share.down ? "disabled" : null),
-        "onClick": function onClick(e) {
-          if (self.state.highlighted.length > 0) {
-            self.setState({
-              'currentlyViewedEntry': self.state.highlighted[0]
-            });
-            self.clearSelectionAndHighlight();
-            self.browserEntries.setState({
-              'selected': [],
-              'searchValue': '',
-              'highlighted': []
-            });
-          }
-
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
+      }]);
     }
 
-    buttons.push({
-      "label": self.props.cancelLabel,
+    if (folderIsHighlighted) {
+      var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
+      var hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
+      var highlightedNode = hasHighlightedNode && this.state.highlighted[0];
+      buttons = [].concat(buttons, [this.props.allowAttachFolders ? {
+        "label": "Attach",
+        "key": "attach",
+        className: className,
+        onClick: function onClick() {
+          if (hasHighlightedNode) {
+            M.createPublicLink(highlightedNode).then(function (_ref2) {
+              var link = _ref2.link;
+
+              _this6.props.onClose();
+
+              _this6.props.room.sendMessage(link);
+            });
+          }
+        }
+      } : null, {
+        "label": this.props.openLabel,
+        "key": "select",
+        className: className,
+        onClick: function onClick(e) {
+          if (hasHighlightedNode) {
+            _this6.setState({
+              currentlyViewedEntry: highlightedNode
+            });
+
+            _this6.clearSelectionAndHighlight();
+
+            _this6.browserEntries.setState({
+              selected: [],
+              searchValue: '',
+              highlighted: []
+            });
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }]);
+    }
+
+    buttons = [].concat(buttons, [{
+      "label": this.props.cancelLabel,
       "key": "cancel",
       "onClick": function onClick(e) {
-        self.props.onClose(self);
+        _this6.props.onClose(_this6);
+
         e.preventDefault();
         e.stopPropagation();
       }
-    });
+    }]);
     var gridHeader = [];
 
     if (viewMode === "0") {
@@ -14034,6 +14058,8 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var selected = [];
       attachCloudDialog = external_React_default.a.createElement(cloudBrowserModalDialog.CloudBrowserDialog, {
         folderSelectNotAllowed: true,
+        allowAttachFolders: true,
+        room: room,
         onClose: function onClose() {
           self.setState({
             'attachCloudDialog': false

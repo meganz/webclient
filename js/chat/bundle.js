@@ -18233,7 +18233,8 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
   $('.contacts-grid-view').addClass('hidden');
   $('.fm-chat-block').addClass('hidden');
   $('.fm-contacts-blocks-view').addClass('hidden');
-  $('.fm-right-files-block').removeClass('hidden');
+  $('.fm-right-files-block').addClass('hidden');
+  $('.fm-right-files-block.in-chat').removeClass('hidden');
   $('.nw-conversations-item').removeClass('selected');
   $('.fm-empty-conversations').removeClass('hidden');
   M.onSectionUIOpen('conversations');

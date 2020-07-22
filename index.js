@@ -2886,79 +2886,11 @@ function getTemplate(name) {
 }
 
 function pagemetadata() {
-    var mega_desc = false;
+    'use strict';
+    var metas = mega.metatags.getPageMetaTags(page);
+    var mega_desc = metas.mega_desc || mega.whoami;
+    mega_title = metas.mega_title || 'MEGA';
 
-    if (page === 'refer') {
-        mega_title = 'MEGA Referral Program';
-    }
-    else if (page === 'uwp') {
-        mega_title = 'Windows 10 app - MEGA';
-    }
-    else if (page === 'mobileapp') {
-        mega_title = 'MEGA - Mobile Apps';
-        mega_desc = 'Securely manage your files and collaborate everyone from anywhere.';
-    }
-    else if (page === 'nas') {
-        mega_title = 'MEGA on NAS';
-        mega_desc = 'A command line tool to interact with MEGA from your Network Attached Storage device.';
-    }
-    else if (page == 'sync') {
-        mega_title = 'MEGAsync - Download';
-        mega_desc = 'MEGAsync securely synchronizes data between your computer and your MEGA account. Available for Windows, Mac and Linux.';
-    }
-    else if (page == 'extensions') {
-        mega_title = 'Browser Extensions - MEGA';
-    }
-    else if (page == 'bird') {
-        mega_title = 'MEGAbird - Download';
-    }
-    else if (page == 'cmd') {
-        mega_title = 'MEGAcmd - Download';
-        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
-    }
-    else if (page === 'downloadapp') {
-        mega_title = 'Download our App';
-        mega_desc = 'MEGAcmd is an interactive, text console based, scriptable MEGA client.';
-    }
-    else if (page == 'pro') {
-        mega_title = 'Plans & pricing - MEGA';
-        mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. MEGA provides one the cheapest cloud storage deals on the Internet.';
-    }
-    else if (page == 'register') {
-        mega_title = 'Register - MEGA';
-        mega_desc = 'Create your free MEGA account and get free 50 GB.';
-    }
-    else if (page == 'login') {
-        mega_title = 'Login - MEGA';
-    }
-    else if (page == 'recovery') {
-        mega_title = 'Recovery - MEGA';
-        mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
-    }
-    else if (page == 'terms') {
-        mega_title = 'Terms of Service - MEGA';
-    }
-    else if (page == 'privacy') {
-        mega_title = 'Privacy Policy - MEGA';
-    }
-    else if (page === 'gdpr') {
-        mega_title = l[18421] + ' - MEGA';
-    }
-    else if (page == 'copyright') {
-        mega_title = 'Copyright - MEGA';
-    }
-    else if (page == 'takedown') {
-        mega_title = 'Takedown Guidance - MEGA';
-    }
-    else if (typeof Object(window.dlmanager).isStreaming === 'object') {
-        mega_title = 'MEGA - ' + dlmanager.isStreaming._megaNode.name;
-    }
-    else {
-        mega_title = 'MEGA';
-    }
-    if (!mega_desc) {
-        mega_desc = mega.whoami;
-    }
     $('meta[name=description]').remove();
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
     document.title = mega_title;

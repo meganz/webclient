@@ -297,12 +297,23 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     var promises = [];
     var rooms = Object.keys(Chat.mcf);
     for (var i = rooms.length; i--;) {
-        promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+        if (!this.publicChatKeys[rooms[i]]) {
+            promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+        }
         delete Chat.mcf[rooms[i]];
     }
 
     Promise.allSettled(promises)
         .then(function(res) {
+            const pub = Object.keys(self.publicChatKeys);
+            return Promise.allSettled(
+                [res].concat(pub.map(pch => {
+                    return self.plugins.chatdIntegration.openChat(pch, true);
+                }))
+            );
+        })
+        .then(function(res) {
+            res = res[0].value.concat(res.slice(1));
             self.logger.info('chats settled...', res);
 
             if (res.length === 1 && res[0].reason === ENOENT) {

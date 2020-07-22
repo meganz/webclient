@@ -309,6 +309,10 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                 msgDialog('warninga', l[20641], l[20642], 0, function() {
                     loadSubPage(anonymouschat ? 'start' : 'fm/chat');
                 });
+
+                if (anonymouschat) {
+                    return reject(ETEMPUNAVAIL);
+                }
             }
 
             // eslint-disable-next-line react/no-render-return-value
@@ -1503,6 +1507,9 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
                         console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
                     }
                     M.currentdirid = M.chat = page = false;
+                    if (String(location).startsWith('chat')) {
+                        location = location === 'chat' ? 'fm' : 'chat';
+                    }
                     loadSubPage(location, event);
                     done(EACCESS);
                 });

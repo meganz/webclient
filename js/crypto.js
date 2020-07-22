@@ -1165,9 +1165,11 @@ function getsc(force) {
                 mega.loadReport.scSent = Date.now();
             }
         }
-        else if (d) {
-            console.error('Get WSC is called but without SN, it\'s a bug... please trace');
-            api_req({ a: 'log', e: 99737, m: 'Get WSC is called but without SN' });
+        else {
+            if (d) {
+                console.error('Get WSC is called but without SN, it\'s a bug... please trace');
+            }
+            eventlog(99737);
         }
     }
 }

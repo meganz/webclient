@@ -17280,6 +17280,10 @@ Chat.prototype.init = promisify(function (resolve, reject) {
       msgDialog('warninga', l[20641], l[20642], 0, function () {
         loadSubPage(anonymouschat ? 'start' : 'fm/chat');
       });
+
+      if (anonymouschat) {
+        return reject(ETEMPUNAVAIL);
+      }
     }
 
     self.$conversationsAppInstance = react_dom1.a.render(self.$conversationsApp = react0.a.createElement(_ui_conversations_jsx2__["default"].ConversationsApp, {
@@ -18201,6 +18205,11 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
         }
 
         M.currentdirid = M.chat = page = false;
+
+        if (String(location).startsWith('chat')) {
+          location = location === 'chat' ? 'fm' : 'chat';
+        }
+
         loadSubPage(location, event);
         done(EACCESS);
       });

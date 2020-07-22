@@ -1024,12 +1024,13 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                     location.reload();
                 }
                 else if (is_mobile) {
-
                     // Always go back to the Login page on logout on mobile
                     loadSubPage('login');
-                    location.reload();
+                    return location.reload();
                 }
-                else if (location.href.indexOf('fm/search/') > -1 || location.href.indexOf('fm/chat/') > -1) {
+
+                var sitePath = getSitePath();
+                if (sitePath.indexOf('fm/search/') > -1 || sitePath.indexOf('/chat') > -1) {
                     location.replace(getBaseUrl());
                 }
                 else if (location.href.indexOf('fm/user-management/invdet') > -1) {

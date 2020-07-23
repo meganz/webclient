@@ -421,8 +421,9 @@
                         $('.red-header', $a1).text(l[17093]);
                         $('.red-header', $a2).text(l[16490]);
                         $('.red-header', $a3).text(l[17094]);
-                        $('.light-grey', $a3).text(l[16493]);
                         $('.light-grey', $a1).safeHTML(l[17097]);
+                        $('.light-grey', $a2).text(l[16491]);
+                        $('.light-grey', $a3).text(l[16493]);
                     }
                     break;
                 case 'replace':
@@ -430,6 +431,7 @@
                     $('.red-header', $a2).text(l[16490]);
                     $('.red-header', $a3).text(l[17094]);
                     $('.light-grey', $a1).text(l[17602]);
+                    $('.light-grey', $a2).text(l[16491]);
                     $('.light-grey', $a3).text(l[16493]);
                     break;
                 case 'import':

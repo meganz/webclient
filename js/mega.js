@@ -3316,7 +3316,7 @@ function process_ok(ok, ignoreDB) {
 function processMCF(mcfResponse, ignoreDB) {
     'use strict';
 
-    if (mcfResponse === EEXPIRED) {
+    if (mcfResponse === EEXPIRED || mcfResponse === EINTERNAL) {
         return;
     }
 

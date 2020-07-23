@@ -254,7 +254,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sDeepIndex) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle)) {
+            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle) ||
+                dialog && Object($.openedDialogNodes).hasOwnProperty(curItemHandle)) {
                 if (containsc) {
                     buildnode = true;
                 }

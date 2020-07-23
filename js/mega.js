@@ -2688,8 +2688,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             shareAccessRightsLevel: accessRights
         })
             .always(function (pubKey, result) {
-
-                var sharePromise = new MegaPromise();
+                var sharePromise;
 
                 // parse [api-result, user-data-ctx]
                 var ctx = result[1];

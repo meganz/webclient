@@ -1959,35 +1959,30 @@ ChatRoom.prototype.callParticipantsUpdated = function(
 
 ChatRoom.prototype.onPublicChatRoomInitialized = function() {
     var self = this;
-    var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
-        JSON.parse(localStorage.autoJoinOnLoginChat) : false;
 
-    if (
-        self.type === "public" &&
-        autoLoginChatInfo &&
-        autoLoginChatInfo[0] === self.publicChatHandle
-    ) {
+    if (self.type !== "public" || !localStorage.autoJoinOnLoginChat) {
+        return;
+    }
+
+    var autoLoginChatInfo = tryCatch(JSON.parse.bind(JSON))(localStorage.autoJoinOnLoginChat) || false;
+
+    if (autoLoginChatInfo[0] === self.publicChatHandle) {
+        localStorage.removeItem("autoJoinOnLoginChat");
 
         if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
-            var doJoinEventually = function (state) {
+            var doJoinEventually = function(state) {
                 if (state === ChatRoom.STATE.READY) {
                     self.joinViaPublicHandle();
-                    localStorage.removeItem("autoJoinOnLoginChat");
                     self.unbind('onStateChange.' + self.publicChatHandle);
                 }
             };
 
-            doJoinEventually(self.state);
-
             self.rebind('onStateChange.' + self.publicChatHandle, function (e, oldState, newState) {
                 doJoinEventually(newState);
             });
-        }
-        else {
-            // auto join expired.
-            localStorage.removeItem("autoJoinOnLoginChat");
-        }
 
+            doJoinEventually(self.state);
+        }
     }
 };
 

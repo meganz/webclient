@@ -20990,6 +20990,7 @@ var startGroupChatWizard_StartGroupChatWizard = function (_MegaRenderMixin) {
   function StartGroupChatWizard(props) {
     var _this = _MegaRenderMixin.call(this, props) || this;
 
+    _this.inputRef = startGroupChatWizard_React.createRef();
     var haveContacts = false;
     var keys = M.u.keys();
 
@@ -21049,6 +21050,8 @@ var startGroupChatWizard_StartGroupChatWizard = function (_MegaRenderMixin) {
   };
 
   _proto.render = function render() {
+    var _this2 = this;
+
     var self = this;
     var classes = "new-group-chat contrast small-footer " + self.props.className;
     var contacts = M.u;
@@ -21150,51 +21153,59 @@ var startGroupChatWizard_StartGroupChatWizard = function (_MegaRenderMixin) {
         checkboxClassName = "checkboxOff";
       }
 
-      chatInfoElements = startGroupChatWizard_React.createElement("div", null, startGroupChatWizard_React.createElement("div", {
-        className: "contacts-search-header left-aligned top-pad" + (failedToEnableChatlink ? " failed" : "")
+      chatInfoElements = startGroupChatWizard_React.createElement(startGroupChatWizard_React.Fragment, null, startGroupChatWizard_React.createElement("div", {
+        className: "\n                            contacts-search-header left-aligned top-pad\n                            " + (failedToEnableChatlink ? 'failed' : '') + "\n                        "
       }, startGroupChatWizard_React.createElement("i", {
         className: "small-icon conversations"
       }), startGroupChatWizard_React.createElement("input", {
+        autoFocus: true,
         type: "search",
+        ref: this.inputRef,
         placeholder: l[18509],
-        value: self.state.groupName,
+        value: this.state.groupName,
         maxLength: 30,
         onKeyDown: function onKeyDown(e) {
           var code = e.which || e.keyCode;
 
-          if (allowNext && code === 13) {
-            if (self.state.step === 1) {
-              self.onFinalizeClick();
-            }
+          if (allowNext && code === 13 && self.state.step === 1) {
+            _this2.onFinalizeClick();
           }
         },
         onChange: function onChange(e) {
-          self.setState({
-            'groupName': e.target.value,
-            'failedToEnableChatlink': false
+          return _this2.setState({
+            groupName: e.target.value,
+            failedToEnableChatlink: false
           });
         }
-      })), this.props.flowType !== 2 ? startGroupChatWizard_React.createElement("div", {
+      })), this.props.flowType === 2 ? null : startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog content"
       }, startGroupChatWizard_React.createElement(miniui.ToggleCheckbox, {
         className: "right",
-        checked: self.state.keyRotation,
-        onToggle: function onToggle(v) {
-          self.setState({
-            'keyRotation': v
+        checked: this.state.keyRotation,
+        onToggle: function onToggle(keyRotation) {
+          return _this2.setState({
+            keyRotation: keyRotation
+          }, function () {
+            return _this2.inputRef.current.focus();
           });
         }
       }), startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog header"
-      }, !self.state.keyRotation ? l[20576] : l[20631]), startGroupChatWizard_React.createElement("div", {
+      }, this.state.keyRotation ? l[20631] : l[20576]), startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog description"
       }, l[20484]), startGroupChatWizard_React.createElement("div", {
-        className: "group-chat-dialog checkbox " + (self.state.keyRotation ? "disabled" : "") + (failedToEnableChatlink ? " failed" : ""),
-        onClick: SoonFc(function () {
-          self.setState({
-            'createChatLink': !self.state.createChatLink
-          });
-        }, 75)
+        className: "\n                                    group-chat-dialog checkbox\n                                    " + (this.state.keyRotation ? 'disabled' : '') + "\n                                    " + (failedToEnableChatlink ? 'failed' : '') + "\n                                ",
+        onClick: function onClick() {
+          delay('chatWizard-createChatLink', function () {
+            _this2.setState(function (state) {
+              return {
+                createChatLink: !state.createChatLink
+              };
+            });
+
+            _this2.inputRef.current.focus();
+          }, 100);
+        }
       }, startGroupChatWizard_React.createElement("div", {
         className: "checkdiv " + checkboxClassName
       }, startGroupChatWizard_React.createElement("input", {
@@ -21207,7 +21218,7 @@ var startGroupChatWizard_StartGroupChatWizard = function (_MegaRenderMixin) {
         className: "radio-txt lato mid"
       }, l[20575]), startGroupChatWizard_React.createElement("div", {
         className: "clear"
-      }))) : null, failedToEnableChatlink ? startGroupChatWizard_React.createElement("div", {
+      }))), failedToEnableChatlink ? startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog description chatlinks-intermediate-msg"
       }, l[20573]) : null);
     }

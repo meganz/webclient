@@ -153,8 +153,9 @@ var crypt = (function() {
                     }
                 }
                 else {
-                    logger.error(keyType + ' pub key for ' + userhandle
-                        + ' could not be retrieved: ' + res);
+                    if (d > 1 || is_karma) {
+                        logger.warn(keyType + ' pub key for ' + userhandle + ' could not be retrieved: ' + res);
+                    }
                     masterPromise.reject(res, [res, userData]);
                 }
             };

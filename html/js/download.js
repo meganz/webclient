@@ -790,7 +790,6 @@ function dlPageStartDownload(isDlWithMegaSync) {
     $downloadPage.find('.download.eta-block .light-txt').text(l[1042] + '\u2026');
     $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
     $('.download.warning-block').removeClass('visible');
-    $('.download-state-text').addClass('hidden');
 
     if (isDlWithMegaSync) {
         $('.download .pause-transfer').addClass('hidden');

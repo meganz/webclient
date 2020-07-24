@@ -731,14 +731,12 @@ body:not(.en) .download.top-bar.floating {
 }
 .download-complete .progress-cell .mid-pause {
     cursor: default;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=70);
-    -moz-opacity: 0.7;
-    -khtml-opacity: 0.7;
     opacity: 0.7;
 }
 .download.error-text, .download.state-text {
     padding: 2px 0 0 0;
     font-size: 0;
+    position: relative;
 }
 .bar-table .download.error-text {
     padding: 7px 10px 0 10px;
@@ -762,6 +760,15 @@ body:not(.en) .download.top-bar.floating {
 .download.error-text i, .download.state-text i {
     vertical-align: top;
     margin: 0px 5px 0 -4px;
+}
+.download.state-text.save {
+    margin-bottom: 50px;
+}
+.download.state-text.save i {
+    position: absolute;
+}
+.download.state-text.save span {
+    padding-left: 24px;
 }
 .bar-table .download.error-text span {
     color: #D90007;

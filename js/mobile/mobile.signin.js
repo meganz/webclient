@@ -293,6 +293,10 @@ mobile.signin.old = {
             // If they were on a page and asked to login before accessing
             else if (login_next) {
 
+                if (typeof login_next === 'function') {
+                    return login_next();                    
+                }
+
                 // Store the page temporarily
                 var nextPageAfterLogin = login_next;
 
@@ -401,6 +405,10 @@ mobile.signin.new = {
                 // If they were on a page and asked to login before accessing
                 else if (login_next) {
 
+                    if (typeof login_next === 'function') {
+                        return login_next();                    
+                    }
+                    
                     // Store the page temporarily
                     var nextPageAfterLogin = login_next;
 

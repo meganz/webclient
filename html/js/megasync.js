@@ -29,6 +29,7 @@ var megasync = (function() {
         windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
         mac: 'https://mega.nz/MEGAsyncSetup.dmg'
     };
+    var usemsync = localStorage.usemsync;
 
     var linuxClients;
     var listeners = [];
@@ -895,7 +896,8 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if (!fmconfig.dlThroughMEGAsync && page !== "download") {
+        if ((!fmconfig.dlThroughMEGAsync && page !== "download")
+            || (!is_livesite && !usemsync)) {
             next(true, false); // next with error=true and isworking=false
         }
         else if (!lastCheckStatus || !lastCheckTime) {
@@ -984,8 +986,12 @@ var megasync = (function() {
             }
         });
     };
-
-    mBroadcaster.once('fm:initialized', ns.periodicCheck);
+    if (is_livesite || usemsync) {
+        mBroadcaster.once('fm:initialized', ns.periodicCheck);
+    }
+    else {
+        ns.periodicCheck = function() { };
+    }
 
     return ns;
 })();

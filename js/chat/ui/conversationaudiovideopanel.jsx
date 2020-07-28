@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import {MegaRenderMixin} from './../../stores/mixins.js';
 import {Avatar} from './../ui/contacts.jsx';
 import utils from './../../ui/utils.jsx';
-import PropTypes from 'prop-types';
+
+import { DropdownItem, Dropdown } from './../../ui/dropdowns.jsx';
+import { Button } from './../../ui/buttons.jsx';
 
 // eslint-disable-next-line id-length
 var DEBUG_PARTICIPANTS_MULTIPLICATOR = 1;
@@ -18,14 +20,19 @@ var VIEW_MODES = {
     "CAROUSEL": 2,
 };
 
-function muteOrHoldIconStyle(opts) {
+function muteOrHoldIconStyle(opts, contact) {
+    var props = {};
     if (opts.onHold) {
-        return "small-icon icon-audio-muted"; // on-hold";
+        props.className = "small-icon icon-audio-muted on-hold simpletip";
+        props["data-simpletip"] = l[23542].replace("%s", M.getNameByHandle(contact.u));
     }
     else if (!opts.audio) {
-        return "small-icon icon-audio-muted";
+        props.className = "small-icon icon-audio-muted";
     }
-    return "small-icon hidden";
+    else {
+        props.className = "small-icon hidden";
+    }
+    return props;
 }
 
 class RemoteVideoPlayer extends MegaRenderMixin {
@@ -38,11 +45,10 @@ class RemoteVideoPlayer extends MegaRenderMixin {
         var sess = self.props.sess;
         var sid = sess.stringSid;
         var peerMedia = Av.toMediaOptions(this.props.peerAv);
-        let noVideo = (!peerMedia.video || sess.call.isOnHold() || peerMedia.onHold);
-        self.state.noVideo = noVideo;
-        if (noVideo) {
-            // Show avatar for remote video
-            var contact = M.u[base64urlencode(sess.peer)];
+        // Show avatar for remote video
+        var contact = M.u[base64urlencode(sess.peer)];
+
+        if (!self.props.video) {
             assert(contact);
             return <div
                 className={"call user-audio is-avatar " + (self.props.isActive ? "active" : "") +
@@ -57,8 +63,8 @@ class RemoteVideoPlayer extends MegaRenderMixin {
                     sess.peerNetworkQuality() === 0 ?
                         <div className="icon-connection-issues"></div> : null
                 }
-                <div className="center-avatar-wrapper">
-                    <div className={ muteOrHoldIconStyle(peerMedia) }></div>
+                <div className="center-avatar-wrapper" style={{left: "auto"}}>
+                    <div {...muteOrHoldIconStyle(peerMedia, contact)}></div>
                     <Avatar contact={contact}  className="avatar-wrapper" simpletip={contact.name}
                         simpletipWrapper="#call-block"
                         simpletipOffset={8}
@@ -87,7 +93,7 @@ class RemoteVideoPlayer extends MegaRenderMixin {
                     sess.peerNetworkQuality() === 0 ?
                         <div className="icon-connection-issues"></div> : null
                 }
-                <div className={ muteOrHoldIconStyle(peerMedia) }></div>
+                <div {...muteOrHoldIconStyle(peerMedia, contact)}></div>
                 <div className="audio-level"
                     ref={function(ref) {
                         self.audioLevelDiv = ref;
@@ -128,11 +134,7 @@ class RemoteVideoPlayer extends MegaRenderMixin {
     relinkToStream() {
         var self = this;
         let player = self.refs.player;
-        if (self.state.noVideo) {
-            if (player) {
-                RTC.detachMediaStream(player);
-            }
-        } else {
+        if (self.props.video) {
             assert(player);
             let sess = self.props.sess;
             if (player.srcObject) {
@@ -144,18 +146,15 @@ class RemoteVideoPlayer extends MegaRenderMixin {
                 RTC.detachMediaStream(player);
             }
             RTC.attachMediaStream(player, sess.remoteStream);
+        } else {
+            if (player) {
+                RTC.detachMediaStream(player);
+            }
         }
     }
 };
 
-RemoteVideoPlayer.propTypes = {
-    sess: PropTypes.object.isRequired,
-    isActive: PropTypes.bool, // used only for carousel to flag the active video thumbnail
-    isCarouselMain: PropTypes.bool, // if it's the big window in carousel mode
-    peerAv: PropTypes.number.isRequired,
-    onPlayerClick: PropTypes.func,
-    noAudioLevel: PropTypes.bool
-};
+
 
 class ConversationAVPanel extends MegaRenderMixin {
     constructor(props) {
@@ -252,8 +251,8 @@ class ConversationAVPanel extends MegaRenderMixin {
         var $container = $(ReactDOM.findDOMNode(self));
 
         self.visiblePanel = false;
-        $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container)
-            .removeClass('visible-panel');
+        $container.removeClass('visible-panel');
+        $(document).trigger('closeDropdowns');
     }
     resizeVideos() {
         var self = this;
@@ -288,7 +287,6 @@ class ConversationAVPanel extends MegaRenderMixin {
         var newWidth;
 
         if (self.getViewMode() === VIEW_MODES.CAROUSEL) {
-            $('.participantsContainer', $container).height('auto');
             var activeStreamHeight =
                 $container.outerHeight() - $('.call-header').outerHeight() -
                 $('.participantsContainer', $container).outerHeight()
@@ -303,10 +301,6 @@ class ConversationAVPanel extends MegaRenderMixin {
                 activeStreamHeight
             );
 
-            $('.activeStream .user-audio .avatar-wrapper', $container)
-                .width(activeStreamHeight - 20)
-                .height(activeStreamHeight - 20)
-                .css('font-size', 100 / 240 * activeStreamHeight + "px");
 
             $('.user-video, .user-audio, .user-video video', $container)
                 .width('')
@@ -332,7 +326,6 @@ class ConversationAVPanel extends MegaRenderMixin {
 
                     $mutedIcon.css({
                         'right': 'auto',
-                        'top': 24 + 8,
                         'left':
                             $video.outerWidth() / 2 + actualWidth / 2 - $mutedIcon.outerWidth() - 24
 
@@ -349,10 +342,6 @@ class ConversationAVPanel extends MegaRenderMixin {
 
         }
         else { // grid mode
-            $('.participantsContainer', $container).height(
-                $container.outerHeight() - $('.call-header', $container).outerHeight()
-            );
-
             newWidth = totalWidth / totalStreams;
         }
 
@@ -397,8 +386,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
             self.visiblePanel = true;
-            $('.call.bottom-panel, .call.local-video, .call.local-audio, .participantsContainer', $container)
-                .addClass('visible-panel');
+            $container.addClass('visible-panel');
 
             if ($this.hasClass('full-sized-block')) {
                 $('.call.top-panel', $container).addClass('visible-panel');
@@ -408,10 +396,14 @@ class ConversationAVPanel extends MegaRenderMixin {
         $container.rebind('mouseout.chatUI' + self.props.chatRoom.roomId, function() {
             var $this = $(this);
             clearTimeout(mouseoutThrottling);
+            if ($('.dropdown.call-actions').length > 0) {
+                return;
+            }
+
             mouseoutThrottling = setTimeout(function() {
                 self.visiblePanel = false;
                 self._hideBottomPanel();
-                $('.call.top-panel', $container).removeClass('visible-panel');
+                $container.removeClass('visible-panel');
             }, 500);
         });
 
@@ -425,7 +417,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             self._hideBottomPanel();
 
             $container.addClass('no-cursor');
-            $('.call.top-panel', $container).removeClass('visible-panel');
+            $container.removeClass('visible-panel');
 
             forceMouseHide = true;
             setTimeout(function() {
@@ -441,12 +433,12 @@ class ConversationAVPanel extends MegaRenderMixin {
             clearTimeout(idleMouseTimer);
             if (!forceMouseHide) {
                 self.visiblePanel = true;
-                $('.call.bottom-panel, .call.local-video, .call.local-audio', $container).addClass('visible-panel');
+                $container.addClass('visible-panel');
                 $container.removeClass('no-cursor');
                 if ($this.hasClass('full-sized-block')) {
                     $('.call.top-panel', $container).addClass('visible-panel');
                 }
-                idleMouseTimer = setTimeout(hideBottomPanel, 2000);
+                idleMouseTimer = setTimeout(hideBottomPanel, 20000);
             }
         });
 
@@ -457,7 +449,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         $('.call.bottom-panel', $container).rebind('mouseleave.chatUI' + self.props.chatRoom.roomId,function(ev) {
             self._bottomPanelMouseOver = false;
 
-            idleMouseTimer = setTimeout(hideBottomPanel, 2000);
+            idleMouseTimer = setTimeout(hideBottomPanel, 20000);
         });
 
 
@@ -482,40 +474,22 @@ class ConversationAVPanel extends MegaRenderMixin {
                     return false;
                 }
 
-                var right = Math.max(0, $container.outerWidth() - ui.position.left);
-                var bottom = Math.max(0, $container.outerHeight() - ui.position.top);
+                var right = Math.max(0, $container.outerWidth(true) - ui.position.left);
+                var bottom = Math.max(0, $container.outerHeight(true) - ui.position.top);
 
 
                 // contain in the $container
-                right = Math.min(right, $container.outerWidth() - 8);
-                bottom = Math.min(bottom, $container.outerHeight() - 8);
+                right = Math.min(right, $container.outerWidth(true) - 8);
+                bottom = Math.min(bottom, $container.outerHeight(true) - 8);
 
-                right -= ui.helper.outerWidth();
-                bottom -= ui.helper.outerHeight();
-
-                var minBottom = $(this).is(".minimized") ? 48 : 8;
-
-                if (bottom < minBottom) {
-                    bottom = minBottom;
-                    $(this).addClass('bottom-aligned');
-                }
-                else {
-                    $(this).removeClass('bottom-aligned');
-                }
-
-                if (right < 8) {
-                    right = 8;
-                    $(this).addClass('right-aligned');
-                }
-                else {
-                    $(this).removeClass('right-aligned');
-                }
+                right -= ui.helper.outerWidth(true);
+                bottom -= ui.helper.outerHeight(true);
 
                 ui.offset = {
                     left: 'auto',
                     top: 'auto',
-                    right: right,
-                    bottom: bottom,
+                    right: right < 8 ? 8 : right,
+                    bottom: bottom < 8 ? 8 : bottom,
                     height: "",
                     width: ""
                 };
@@ -532,13 +506,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         chatGlobalEventManager.addEventListener('resize', 'chatUI_' + room.roomId, function() {
             if ($container.is(":visible")) {
                 if (!elementInViewport($localMediaDisplay[0])) {
-                    $localMediaDisplay
-                        .addClass('right-aligned')
-                        .addClass('bottom-aligned')
-                        .css({
-                            'right': 8,
-                            'bottom': 8,
-                        });
+                    $localMediaDisplay.removeAttr('style');
                 }
             }
             self.resizePanes();
@@ -664,15 +632,7 @@ class ConversationAVPanel extends MegaRenderMixin {
         var $container = $(ReactDOM.findDOMNode(this));
         var $localMediaDisplay = $('.call.local-video, .call.local-audio', $container);
         var newVal = !this.state.localMediaDisplay;
-        $localMediaDisplay
-            .addClass('right-aligned')
-            .addClass('bottom-aligned')
-            .css({
-                'width': '',
-                'height': '',
-                'right': 8,
-                'bottom': newVal ? 8 : 8
-            });
+        $localMediaDisplay.removeAttr('style');
 
         this.setState({localMediaDisplay: newVal});
     }
@@ -733,10 +693,14 @@ class ConversationAVPanel extends MegaRenderMixin {
             let sess = sessions[binSid];
             let sid = sess.stringSid;
             let playerIsActive = activeSid === sid;
+            let av = sess.peerAv();
+            let hasVideo = ((av & Av.Video) != 0) && !sess.call.isOnHold() && !sess.peerIsOnHold();
+
             let player = <RemoteVideoPlayer
                 sess = {sess}
                 key = {sid + "_" + i}
-                peerAv = {sess.peerAv()}
+                peerAv = {av}
+                video = {hasVideo}
                 isActive = {playerIsActive}
                 onPlayerClick = { onRemotePlayerClick }
             />;
@@ -744,7 +708,8 @@ class ConversationAVPanel extends MegaRenderMixin {
                 activePlayer = <RemoteVideoPlayer
                     sess = {sess}
                     key = {"carousel_active"}
-                    peerAv = {sess.peerAv()}
+                    peerAv = {av}
+                    video = {hasVideo}
                     isCarouselMain = {true}
                     noAudioLevel = {true}
                 />;
@@ -757,8 +722,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                 // no local video, display our avatar
                 localPlayerElement = <div className={
                     "call local-audio right-aligned bottom-aligned is-avatar" +
-                    (this.state.localMediaDisplay ? "" : " minimized ") +
-                    visiblePanelClass
+                    (this.state.localMediaDisplay ? "" : " minimized ")
                 }>
                     {
                         megaChat.rtc.ownNetworkQuality() === 0 ?
@@ -768,8 +732,8 @@ class ConversationAVPanel extends MegaRenderMixin {
                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
-                    <div className={"center-avatar-wrapper " + (this.state.localMediaDisplay ? "" : "hidden")}>
-                        <div className={ muteOrHoldIconStyle(localMedia) }></div>
+                    <div className="center-avatar-wrapper">
+                        <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                         <Avatar
                             contact={M.u[u_handle]}
                             chatRoom={this.props.chatRoom}
@@ -788,7 +752,6 @@ class ConversationAVPanel extends MegaRenderMixin {
                     className={
                         "call local-video right-aligned is-video bottom-aligned" +
                         (this.state.localMediaDisplay ? "" : " minimized ") +
-                        visiblePanelClass +
                         (activeSid === "local" ? " active " : "") +
                         (localMedia.screen ? " is-screen" : "")
                     }>
@@ -800,7 +763,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                         onClick={this.toggleLocalVideoDisplay.bind(this)}>
                         <i className="tiny-icon grey-minus-icon"/>
                     </div>
-                    <div className={ muteOrHoldIconStyle(localMedia) }></div>
+                    <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                     <video
                         className="localViewport"
                         defaultmuted={"true"}
@@ -835,7 +798,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                             <div className="icon-connection-issues"></div> : null
                     }
                     <div className="center-avatar-wrapper">
-                        <div className={ muteOrHoldIconStyle(callManagerCall.getMediaOptions()) }></div>
+                        <div {...muteOrHoldIconStyle(callManagerCall.getMediaOptions(), M.u[u_handle])}></div>
                         <Avatar
                             contact={M.u[u_handle]} className="call avatar-wrapper"
                             chatRoom={this.props.chatRoom}
@@ -865,7 +828,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                         megaChat.rtc.ownNetworkQuality() === 0 ?
                             <div className="icon-connection-issues"></div> : null
                     }
-                    <div className={ muteOrHoldIconStyle(localMedia) }></div>
+                    <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                     <video
                         ref="localViewport"
                         className="localViewport smallLocalViewport"
@@ -893,7 +856,7 @@ class ConversationAVPanel extends MegaRenderMixin {
                             megaChat.rtc.ownNetworkQuality() === 0 ?
                                 <div className="icon-connection-issues"></div> : null
                         }
-                        <div className={ muteOrHoldIconStyle(localMedia) }></div>
+                        <div {...muteOrHoldIconStyle(localMedia, M.u[u_handle])}></div>
                         <video
                             className="localViewport bigLocalViewport"
                             defaultmuted={"true"}
@@ -1007,12 +970,26 @@ class ConversationAVPanel extends MegaRenderMixin {
             }
         }
         var networkQualityBar = null;
+        var onHoldBar = null;
 
         var netq = megaChat.rtc.ownNetworkQuality();
         if (netq != null && netq <= 1) {
             var networkQualityMessage =  l[23213];
             networkQualityBar = <div className={"in-call-notif yellow" + (notifBar ? " after-green-notif" : "") }>
                 {networkQualityMessage}
+            </div>;
+        }
+
+        var otherPartyIsOnHold = false;
+        if (realSids.length === 1 && !rtcCall.isOnHold()) {
+            /* UI contains only 1 session */
+            var session = sessions[realSids[0]];
+            otherPartyIsOnHold = !!session.peerIsOnHold();
+        }
+
+        if (rtcCall.isOnHold() || otherPartyIsOnHold) {
+            networkQualityBar = <div className={"in-call-notif gray" + (notifBar ? " after-green-notif" : "") }>
+                {l[23457]}
             </div>;
         }
 
@@ -1026,7 +1003,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             </div>;
         }
         else { // carousel
-            players = <div key="container">
+            players = <div className="activeStreamWrap" key="container">
                 <div className="activeStream" key="activeStream">
                     {activePlayer}
                 </div>
@@ -1067,16 +1044,29 @@ class ConversationAVPanel extends MegaRenderMixin {
             additionalClass += " participants-a-lot";
         }
 
+
         var hugeOverlayDiv = null;
         if (chatRoom.callReconnecting) {
             hugeOverlayDiv = <div className="callReconnecting">
                     <i className="huge-icon crossed-phone"></i>
                 </div>;
         }
-        else if (rtcCall.isOnHold()) {
-            hugeOverlayDiv = <div className="callReconnecting">
-                <i className="huge-icon call-on-hold"></i>
+        else if (rtcCall.isOnHold() || otherPartyIsOnHold) {
+            hugeOverlayDiv = <div className="callReconnecting dark">
+                <div className="call-on-hold body">
+                    <div
+                        className={"call-on-hold icon " + (otherPartyIsOnHold ? "" : "white-bg")}
+                        onClick={otherPartyIsOnHold ? undefined : function() {
+                            rtcCall.releaseOnHold();
+                        }}>
+                            <i className={"big-icon " + (otherPartyIsOnHold ? "white-pause" : "grey-play")}></i>
+                    </div>
+                    <div className="call-on-hold txt">
+                        {otherPartyIsOnHold ? l[23458] : l[23459]}
+                    </div>
+                </div>
             </div>;
+            additionalClass += " call-is-on-hold";
         }
         var micMuteBtnDisabled = rtcCall.isLocalMuteInProgress() || rtcCall.isRecovery || rtcCall.isOnHold();
         var camMuteBtnDisabled = micMuteBtnDisabled || (!localMedia.video && videoSendersMaxed);
@@ -1091,6 +1081,7 @@ class ConversationAVPanel extends MegaRenderMixin {
             {header}
             {notifBar}
             {networkQualityBar}
+            {onHoldBar}
             {players}
             {hugeOverlayDiv}
 
@@ -1175,24 +1166,38 @@ class ConversationAVPanel extends MegaRenderMixin {
                     >
                     </i>
                 </div>
-{/*     Put-on-hold button - currently disabled
 
-                <div className={"button call " + ((rtcCall.isRecovery && rtcCall.isOnHold()) ? "disabled" : "")
-                } onClick={function(e) {
-                    if (rtcCall.isOnHold()) {
-                        rtcCall.releaseOnHold();
-                    }
-                    else {
-                        rtcCall.putOnHold();
-                    }
-                    chatRoom.trackDataChange();
-                }
-                }>
-                    <i className={"big-icon " + (
-                        rtcCall.isOnHold() ? "crossed-call-on-hold" : "call-on-hold"
-                    )}></i>
-                </div>
-*/}
+                <Button
+                    className="call"
+                    disabled={rtcCall.isRecovery && rtcCall.isOnHold()}
+                    icon="big-icon white-dots">
+                    <Dropdown
+                        className="dark black call-actions"
+                        noArrow={true}
+                        positionMy="center top"
+                        positionAt="center bottom"
+                        vertOffset={10}
+                    >
+
+                        {rtcCall.isOnHold() ?
+                            <DropdownItem
+                                icon="white-play"
+                                label={l[23459]}
+                                onClick={function() {
+                                    rtcCall.releaseOnHold();
+                                }}
+                            /> :
+                            <DropdownItem
+                                icon="white-pause"
+                                label={l[23460]}
+                                onClick={function() {
+                                    rtcCall.putOnHold();
+                                }}
+                            />}
+
+                    </Dropdown>
+                </Button>
+
                 <div className="button call" onClick={function(e) {
                     callManagerCall.endCall();
                 }}>

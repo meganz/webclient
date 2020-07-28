@@ -94,7 +94,10 @@ var redeem = {
                 // No longer needed.
                 delete localStorage.voucher;
                 delete localStorage[data.code];
-                mega.attr.remove('promocode', -2, true).dump();
+                if (u_attr['^!promocode']) {
+                    mega.attr.remove('promocode', -2, true).dump();
+                }
+
             };
 
             promise.then(addVoucher).catch(redeem.goToCloud.bind(redeem));
@@ -598,6 +601,7 @@ var redeem = {
 
             if (window.bCreatedVoucher) {
                 delete window.bCreatedVoucher;
+                mega.voucher.redeemSuccess = true;
                 $('.payment-result-button, .payment-close', redeem.$successOverlay).addClass('hidden');
             }
         }

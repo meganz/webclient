@@ -249,13 +249,16 @@ WebrtcApi.prototype.peerConnRemoveVideoTrack = function(peerConn) {
     }
 };
 
-WebrtcApi.prototype.peerConnAddClonedTracksFromStream = function(peerConn, stream) {
+WebrtcApi.prototype.peerConnAddClonedTracksFromStream = function(peerConn, stream, disabled) {
     // NOTE: Edge can't add one track to multiple peer connections, so we need to clone the stream
+    var pcStream = peerConn.outputStream;
     var tracks = stream.getTracks();
     var len = tracks.length;
     for (var i = 0; i < len; i++) {
         var track = tracks[i].clone();
-        var pcStream = peerConn.outputStream;
+        if (disabled) {
+            track.enabled = false;
+        }
         pcStream.addTrack(track);
         if (track.kind === 'video') {
             assert(!peerConn.videoSender);

@@ -213,7 +213,7 @@ var watchdog = Object.freeze({
 
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {
-                    location.assign(location.pathname);
+                    location.reload(true);
                 }
                 break;
 

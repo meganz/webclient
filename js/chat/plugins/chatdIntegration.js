@@ -368,6 +368,9 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
 
 
 ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle, chatShard) {
+    if (!isPublic && !chatIdOrHandle) {
+        return Promise.reject(ENOENT);
+    }
     var apiReq = {
         a: isPublic ? 'mcphurl' : 'mcurl',
         v: Chatd.VERSION

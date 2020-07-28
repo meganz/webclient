@@ -3760,6 +3760,10 @@
     "23449": "Extensi\u00f3n de MEGA para Chrome[R\/], Firefox[R\/], Opera[R\/], Edge[R\/]",
     "23450": "ha activado la rotaci\u00f3n de la clave de cifrado",
     "23451": "No hemos detectado ninguna entrada de audio, comprueba tu micr\u00f3fono.",
+    "23457": "Llamada en espera",
+    "23458": "Llamada en espera",
+    "23459": "Reanudar llamada",
+    "23460": "Poner llamada en espera",
     "23462": "Para hacer transferencias y sincronizar con facilidad, instala la aplicaci\u00f3n de escritorio de MEGA.",
     "23491": "Cup\u00f3n de 1 a\u00f1o para cuentas Business",
     "23492": "Cup\u00f3n de 1 mes para cuentas Business",
@@ -3782,11 +3786,12 @@
     "23535": "Comprueba los datos y prueba de nuevo.",
     "23536": "\u00bfNo tienes una direcci\u00f3n de Bitcoin?",
     "23541": "Este no es un cup\u00f3n para cuentas Business. En las cuentas Business solo se pueden canjear cupones para Business.",
-    "23543": "Descifrando resultados ...",
+    "23542": "%s ha puesto la llamada en espera",
+    "23543": "Descifrando resultados...",
     "23544": "Pausar b\u00fasqueda",
     "23545": "Reanudar b\u00fasqueda",
     "23546": "B\u00fasqueda completada",
     "23547": "Buscar mensajes",
     "23548": "Haz clic [A]aqu\u00ed[\/A] para buscar mensajes.",
-    "23608": "Se mostrar\u00e1 una vista previa del enlace en cuando lo env\u00edes al chat. Est\u00e1 funci\u00f3n est\u00e1 desactivada por defecto ya que permite que MEGA pueda ver lo que has mandado, ya que generamos las vistas previas para ti. No mantenemos registro de estas solicitudes de vista previa."
+    "23608": "Se mostrar\u00e1 una vista previa del enlace en cuanto lo env\u00edes al chat. Est\u00e1 funci\u00f3n est\u00e1 desactivada por defecto ya que permite que MEGA pueda ver lo que has mandado dado que que generamos las vistas previas para ti. No mantenemos registro de estas solicitudes de vista previa."
 }

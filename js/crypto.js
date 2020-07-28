@@ -1157,11 +1157,19 @@ function getsc(force) {
         }
 
         api_cancel(apixs[5]);   // retire existing XHR that may still be completing the request
-        api_ready(apixs[5]);
-        api_req('sn=' + currsn, {}, 5);
+        if (currsn) {
+            api_ready(apixs[5]);
+            api_req('sn=' + currsn, {}, 5);
 
-        if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-            mega.loadReport.scSent = Date.now();
+            if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
+                mega.loadReport.scSent = Date.now();
+            }
+        }
+        else {
+            if (d) {
+                console.error('Get WSC is called but without SN, it\'s a bug... please trace');
+            }
+            eventlog(99737);
         }
     }
 }

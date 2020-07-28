@@ -2688,8 +2688,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             shareAccessRightsLevel: accessRights
         })
             .always(function (pubKey, result) {
-
-                var sharePromise = new MegaPromise();
+                var sharePromise;
 
                 // parse [api-result, user-data-ctx]
                 var ctx = result[1];
@@ -3316,7 +3315,7 @@ function process_ok(ok, ignoreDB) {
 function processMCF(mcfResponse, ignoreDB) {
     'use strict';
 
-    if (mcfResponse === EEXPIRED) {
+    if (mcfResponse === EEXPIRED || mcfResponse === EINTERNAL) {
         return;
     }
 

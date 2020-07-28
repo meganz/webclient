@@ -58,6 +58,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
     && typeof ReadableStream === 'function'
@@ -505,12 +506,6 @@ if (!browserUpdate) try
             }
         }
     }
-    else if (location.host === 'mega.io') {
-        // this means we are not in special modes, and we are in MEGA.io
-        document.head.querySelectorAll('meta[property="og:url"]')[0].content = 'https://mega.io/';
-        document.head.querySelectorAll('meta[property="twitter:url"]')[0].content = 'https://mega.io/';
-        document.head.querySelectorAll('link[rel="icon"]')[0].href = 'https://mega.io/favicon.ico?v=3';
-    }
 
     // Override any set static path with the one from localStorage to test standard static server failure
     if (localStorage.getItem('staticpath') !== null) {
@@ -554,6 +549,22 @@ catch(e) {
         );
         browserUpdate = 1;
     }
+}
+
+if (location.host === 'mega.io') {
+    tmp = document.head.querySelector('meta[property="og:url"]');
+    if (tmp) {
+        tmp.content = 'https://mega.io/';
+    }
+    tmp = document.head.querySelector('meta[property="twitter:url"]');
+    if (tmp) {
+        tmp.content = 'https://mega.io/';
+    }
+    tmp = document.head.querySelector('link[rel="icon"]');
+    if (tmp) {
+        tmp.href = 'https://mega.io/favicon.ico?v=3';
+    }
+    tmp = undefined;
 }
 
 var mega = {

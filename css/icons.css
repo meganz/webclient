@@ -1,7 +1,7 @@
 .tiny-icon, .semi-small-icon, .small-icon, .medium-icon, .semi-big-icon, .big-icon, .huge-icon, .icon56 {
     width: 20px;
     height: 20px;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
     background-position: 0px -1447px;
     display: inline-block;
@@ -12,7 +12,7 @@
     height: 184px;
     margin: 21px auto;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
     background-position: center -1838px;
 }
@@ -158,6 +158,12 @@
     background-position: -80px -896px;
 }
 
+.small-icon.white-play {
+    background-position: -3px -1747px;
+}
+.small-icon.white-pause {
+    background-position: -47px -1747px;
+}
 .small-icon.audio-call {
     background-position: -4px -38px;
 }
@@ -290,8 +296,10 @@
     background-position: -65px -3268px;
 }
 .small-icon.grey-call-on-hold {
-    /* FIXME: create a real onhold icon */
-    background-position: -10px -3610px;
+    background-position: -86px -1747px;
+}
+.small-icon.white-call-on-hold, li.active .small-icon.grey-call-on-hold {
+    background-position: -126px -1747px;
 }
 .small-icon.clock-icon {
     background-position: -2px -3200px;
@@ -539,7 +547,7 @@
     width: 32px;
     height: 32px;
     display: block;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
 }
 .call-icon.handset-with-stop {
@@ -663,6 +671,9 @@
 .semi-big-icon.screenshare, .small-block .big-icon.screenshare {
     background-position: -198px -3127px;
 }
+.semi-big-icon.white-dots, .small-block .big-icon.white-dots {
+    background-position: -41px -1786px;
+}
 .semi-big-icon.grey-lock {
     background-position: -3px -3710px;
 }
@@ -701,6 +712,9 @@
 }
 .big-icon.nwse-inset-resize, .button.active .big-icon.nwse-resize {
     background-position: -14px -3537px;
+}
+.big-icon.white-dots {
+    background-position: -159px -1733px;
 }
 .big-104px-icon {
     width: 104px;
@@ -960,24 +974,15 @@
     width: 70px;
     height: 70px;
 }
-.huge-icon.call-on-hold {
-    /* FIXME: create a real onhold icon */
-    background-position: -153px -2741px;
-    width: 40px;
-    height: 40px;
-    zoom: 3.0
+.big-icon.grey-play {
+    background-position: -164px -2589px;
+    width: 64px;
+    height: 64px;
 }
-.big-icon.call-on-hold {
-    /* FIXME: create a real onhold icon */
-    background-position: -150px -2730px;
-    width: 70px;
-    height: 70px;
-}
-.big-icon.crossed-call-on-hold {
-    /* FIXME: create a real onhold icon */
-    background-position: -150px -2800px;
-    width: 70px;
-    height: 70px;
+.big-icon.white-pause {
+    background-position: 0px -2589px;
+    width: 64px;
+    height: 64px;
 }
 .big-icon.group-chat {
     width: 48px;

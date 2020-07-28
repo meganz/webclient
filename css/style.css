@@ -5940,6 +5940,10 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     height: -moz-calc(100% - 73px);
     height: calc(100% - 73px);
 }
+.shared-details-block .shared-folder-content .grid-table-header-container-sc {
+    z-index: 2;
+    position: relative;
+}
 .file-block-scrolling, .contacts-blocks-scrolling, .shared-blocks-scrolling, .out-shared-blocks-scrolling {
     height: 100%;
     padding-right: 14px;
@@ -21245,7 +21249,7 @@ div div.nt-main-date,
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
-    background-image: url(../images/mega/new-chat-sprite_v16.png);
+    background-image: url(../images/mega/new-chat-sprite_v17.png);
     background-repeat: no-repeat;
     background-position: -7px -1353px;
     -webkit-box-shadow: 0px 0px 0px 2px rgba(255,255,255,1);

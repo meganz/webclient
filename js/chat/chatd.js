@@ -518,21 +518,21 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
 
 Chatd.Shard.prototype.retrieveMcurlAndExecOnce = promisify(function(resolve, reject, chatId) {
     'use strict';
-    var isPublic = anonymouschat && pchandle;
+    var publicChatHandle = anonymouschat && pchandle;
     var chatHandleOrId = chatId;
 
-    if (isPublic) {
+    if (publicChatHandle) {
         chatHandleOrId = pchandle;
     }
     else {
         var chatRoom = megaChat.getChatById(chatId);
         if (chatRoom && chatRoom.publicChatHandle) {
-            isPublic = true;
-            chatHandleOrId = chatRoom.publicChatHandle;
+            publicChatHandle = chatRoom.publicChatHandle;
+            chatHandleOrId = chatRoom.chatId;
         }
     }
 
-    megaChat.plugins.chatdIntegration._retrieveShardUrl(isPublic, chatHandleOrId)
+    megaChat.plugins.chatdIntegration._retrieveShardUrl(publicChatHandle, chatHandleOrId)
         .then(function(ret) {
             if (typeof ret === "string") {
                 resolve(ret);

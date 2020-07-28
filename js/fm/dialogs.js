@@ -648,9 +648,10 @@
                     }
                     var isValidGroupOrPubChat = false;
                     if (chatRoom.type === 'group') {
-                        if (chatRoom.members.length > 1) {
-                            isValidGroupOrPubChat = true;
+                        if (!$.len(chatRoom.members)) {
+                            continue;
                         }
+                        isValidGroupOrPubChat = true;
                     }
                     else if (
                         chatRoom.type === "public" &&
@@ -716,6 +717,7 @@
                     }
                 }
             }
+
             myContacts.sort(M.sortObjFn("name", 1));
 
             for (var a = 0; a < myContacts.length; a++) {

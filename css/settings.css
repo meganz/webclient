@@ -1131,14 +1131,16 @@
 .fm-right-account-block .fm-breadcrumbs {
     cursor: pointer;
     max-width: calc(100% - 20px);
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 .fm-right-account-block .fm-breadcrumbs:nth-of-type(2) {
-    cursor: pointer;
     max-width: calc(100% - 74px);
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+.fm-right-account-block .megadrop-row .fm-picker-breadcrumbs .fm-breadcrumbs > span.right-arrow-bg {
+    cursor: pointer;
+    max-width: 100%;
+}
+.fm-right-account-block .megadrop-row .fm-picker-breadcrumbs .fm-breadcrumbs > span.right-arrow-bg span {
+    white-space: nowrap;
 }
 .fm-right-account-block .megadrop-row .fm-breadcrumbs:hover > span {
     text-decoration: underline;

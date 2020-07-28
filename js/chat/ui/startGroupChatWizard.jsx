@@ -10,6 +10,7 @@ import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
 export class StartGroupChatWizard extends MegaRenderMixin {
+    inputRef = React.createRef();
     static clickTime = 0;
     static defaultProps = {
         'selectLabel': __(l[1940]),
@@ -174,59 +175,84 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 checkboxClassName = "checkboxOff";
             }
 
-            chatInfoElements = <div>
-                <div className={"contacts-search-header left-aligned top-pad" +
-                (failedToEnableChatlink ? " failed" : "")}>
-                    <i className="small-icon conversations"></i>
-                    <input type="search"
-                           placeholder={l[18509]} value={self.state.groupName}
-                           maxLength={30}
-                           onKeyDown={function(e) {
-                               var code = e.which || e.keyCode;
-                               if (allowNext && code === 13) {
-                                   if (self.state.step === 1) {
-                                       self.onFinalizeClick();
-                                   }
-                               }
-                           }}
-                           onChange={function(e) {
-                               self.setState({
-                                   'groupName': e.target.value,
-                                   'failedToEnableChatlink': false
-                               });
-                    }} />
-                </div>
-                {this.props.flowType !== 2 ?
-                <div className="group-chat-dialog content">
-                    <MiniUI.ToggleCheckbox className={"right"} checked={self.state.keyRotation} onToggle={function(v) {
-                        self.setState({'keyRotation': v});
-                    }} />
-                    <div className="group-chat-dialog header">
-                        {!self.state.keyRotation ? l[20576] : l[20631]}
+            chatInfoElements = (
+                <>
+                    <div
+                        className={`
+                            contacts-search-header left-aligned top-pad
+                            ${failedToEnableChatlink ? 'failed' : ''}
+                        `}>
+                        <i className="small-icon conversations" />
+                        <input
+                            autoFocus
+                            type="search"
+                            ref={this.inputRef}
+                            placeholder={l[18509]}
+                            value={this.state.groupName}
+                            maxLength={30}
+                            onKeyDown={e => {
+                                const code = e.which || e.keyCode;
+                                if (allowNext && code === 13 && self.state.step === 1) {
+                                    this.onFinalizeClick();
+                                }
+                            }}
+                            onChange={e =>
+                                this.setState({ groupName: e.target.value, failedToEnableChatlink: false })
+                            }
+                        />
                     </div>
-                    <div className="group-chat-dialog description">{l[20484]}</div>
+                    {this.props.flowType === 2 ? null : (
+                        <div className="group-chat-dialog content">
+                            <MiniUI.ToggleCheckbox
+                                className="right"
+                                checked={this.state.keyRotation}
+                                onToggle={keyRotation =>
+                                    this.setState({ keyRotation }, () =>
+                                        this.inputRef.current.focus()
+                                    )
+                                }
+                            />
+                            <div className="group-chat-dialog header">
+                                {this.state.keyRotation ? l[20631] : l[20576]}
+                            </div>
+                            <div className="group-chat-dialog description">
+                                {l[20484]}
+                            </div>
 
-                    <div className={"group-chat-dialog checkbox " + (
-                        self.state.keyRotation ? "disabled" : ""
-                    ) + (failedToEnableChatlink ? " failed" : "")} onClick={SoonFc(function(e) {
-                        // this is somehow called twice if clicked on the label...
-                        self.setState({'createChatLink': !self.state.createChatLink});
-                    }, 75)}>
-                        <div className={"checkdiv " + checkboxClassName}>
-                            <input type="checkbox"
-                                  name="group-encryption"
-                                  id="group-encryption"
-                                  className="checkboxOn hidden" />
+                            <div
+                                className={`
+                                    group-chat-dialog checkbox
+                                    ${this.state.keyRotation ? 'disabled' : ''}
+                                    ${failedToEnableChatlink ? 'failed' : ''}
+                                `}
+                                onClick={() => {
+                                    delay(
+                                        'chatWizard-createChatLink',
+                                        () => {
+                                            this.setState(state => ({ createChatLink: !state.createChatLink }));
+                                            this.inputRef.current.focus();
+                                        },
+                                        100
+                                    );
+                                }}>
+                                <div className={`checkdiv ${checkboxClassName}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="group-encryption"
+                                        id="group-encryption"
+                                        className="checkboxOn hidden"
+                                    />
+                                </div>
+                                <label htmlFor="group-encryption" className="radio-txt lato mid">{l[20575]}</label>
+                                <div className="clear" />
+                            </div>
                         </div>
-                        <label htmlFor="group-encryption" className="radio-txt lato mid">{l[20575]}</label>
-                        <div className="clear"></div>
-                    </div>
-                </div> : null}
-                {failedToEnableChatlink ?
-                    <div className="group-chat-dialog description chatlinks-intermediate-msg">
-                        {l[20573]}
-                    </div> : null}
-            </div>;
+                    )}
+                    {failedToEnableChatlink ? (
+                        <div className="group-chat-dialog description chatlinks-intermediate-msg">{l[20573]}</div>
+                    ) : null}
+                </>
+            );
         }
 
 

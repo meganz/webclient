@@ -3612,23 +3612,25 @@ var ModalDialog = function (_MegaRenderMixin2) {
     if (self.props.buttons) {
       var buttons = [];
       self.props.buttons.forEach(function (v) {
-        buttons.push(React.createElement("a", {
-          className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
-          onClick: function onClick(e) {
-            if ($(e.target).is(".disabled")) {
-              return false;
-            }
+        if (v) {
+          buttons.push(React.createElement("a", {
+            className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
+            onClick: function onClick(e) {
+              if ($(e.target).is(".disabled")) {
+                return false;
+              }
 
-            if (v.onClick) {
-              v.onClick(e, self);
-            }
-          },
-          key: v.key
-        }, v.iconBefore ? React.createElement("i", {
-          className: v.iconBefore
-        }) : null, v.label, v.iconAfter ? React.createElement("i", {
-          className: v.iconAfter
-        }) : null));
+              if (v.onClick) {
+                v.onClick(e, self);
+              }
+            },
+            key: v.key
+          }, v.iconBefore ? React.createElement("i", {
+            className: v.iconBefore
+          }) : null, v.label, v.iconAfter ? React.createElement("i", {
+            className: v.iconAfter
+          }) : null));
+        }
       });
       footer = React.createElement("div", {
         className: "fm-dialog-footer white"
@@ -6069,45 +6071,54 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
     }
 
     if (folderIsHighlighted) {
+      var highlighted = this.state.highlighted;
       var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
-      var hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
-      var highlightedNode = hasHighlightedNode && this.state.highlighted[0];
-      buttons.push(this.props.allowAttachFolders ? {
+      var highlightedNode = highlighted && highlighted.length && highlighted[0];
+      var allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+      buttons.push(allowAttachFolders ? {
         "label": l[8023],
         "key": "attach",
         className: className,
         onClick: function onClick() {
-          if (hasHighlightedNode) {
-            M.createPublicLink(highlightedNode).then(function (_ref2) {
-              var link = _ref2.link;
+          _this6.props.onClose();
 
-              _this6.props.onClose();
+          onIdle(function () {
+            var createPublicLink = function createPublicLink() {
+              M.createPublicLink(highlightedNode).then(function (_ref2) {
+                var link = _ref2.link;
+                return _this6.props.room.sendMessage(link);
+              });
+            };
 
-              _this6.props.room.sendMessage(link);
+            return mega.megadrop.isDropExist(highlightedNode).length ? createPublicLink() : msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], function (e) {
+              if (e) {
+                mega.megadrop.pufRemove([highlightedNode]);
+                mega.megadrop.pufCallbacks[highlightedNode] = {
+                  del: createPublicLink
+                };
+              }
             });
-          }
+          });
         }
       } : null, {
         "label": this.props.openLabel,
         "key": "select",
         className: className,
         onClick: function onClick(e) {
-          if (hasHighlightedNode) {
-            _this6.setState({
-              currentlyViewedEntry: highlightedNode
-            });
-
-            _this6.clearSelectionAndHighlight();
-
-            _this6.browserEntries.setState({
-              selected: [],
-              searchValue: '',
-              highlighted: []
-            });
-          }
-
           e.preventDefault();
           e.stopPropagation();
+
+          _this6.setState({
+            currentlyViewedEntry: highlightedNode
+          });
+
+          _this6.clearSelectionAndHighlight();
+
+          _this6.browserEntries.setState({
+            selected: [],
+            searchValue: '',
+            highlighted: []
+          });
         }
       });
     }

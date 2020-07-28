@@ -1232,23 +1232,47 @@ class CloudBrowserDialog extends MegaRenderMixin {
         }
 
         if (folderIsHighlighted) {
+            const { highlighted } = this.state;
             const className = `default-grey-button ${share && share.down ? 'disabled' : null}`;
-            const hasHighlightedNode = this.state.highlighted && !!this.state.highlighted.length;
-            const highlightedNode = hasHighlightedNode && this.state.highlighted[0];
+            const highlightedNode = highlighted && highlighted.length && highlighted[0];
+            const allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].su === undefined &&
+                M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
 
             buttons.push(
-                this.props.allowAttachFolders ? {
+                allowAttachFolders ? {
                     "label": l[8023],
                     "key": "attach",
                     className,
                     onClick: () => {
-                        if (hasHighlightedNode) {
-                            M.createPublicLink(highlightedNode)
-                                .then(({ link }) => {
-                                    this.props.onClose();
-                                    this.props.room.sendMessage(link);
-                                });
-                        }
+                        this.props.onClose();
+                        onIdle(() => {
+                            const createPublicLink = () => {
+                                M.createPublicLink(highlightedNode)
+                                    .then(({ link }) =>
+                                        this.props.room.sendMessage(link)
+                                    );
+                            };
+
+                            return (
+                                mega.megadrop.isDropExist(highlightedNode).length ?
+                                    createPublicLink() :
+                                    msgDialog(
+                                        'confirmation',
+                                        // `Confirm removal`
+                                        l[1003],
+                                        // `By doing this you will cancel your MEGAdrop setup for the folder named %1`
+                                        l[17403].replace('%1', escapeHTML(highlightedNode.name)),
+                                        // `Do you want to proceed?`
+                                        l[18229],
+                                        (e) => {
+                                            if (e) {
+                                                mega.megadrop.pufRemove([highlightedNode]);
+                                                mega.megadrop.pufCallbacks[highlightedNode] = { del: createPublicLink };
+                                            }
+                                        }
+                                    )
+                            );
+                        });
                     }
                 } : null,
                 {
@@ -1256,13 +1280,12 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     "key": "select",
                     className,
                     onClick: e => {
-                        if (hasHighlightedNode) {
-                            this.setState({ currentlyViewedEntry: highlightedNode });
-                            this.clearSelectionAndHighlight();
-                            this.browserEntries.setState({ selected: [], searchValue: '', highlighted: [] });
-                        }
                         e.preventDefault();
                         e.stopPropagation();
+
+                        this.setState({ currentlyViewedEntry: highlightedNode });
+                        this.clearSelectionAndHighlight();
+                        this.browserEntries.setState({ selected: [], searchValue: '', highlighted: [] });
                     }
                 });
         }

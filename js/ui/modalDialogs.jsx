@@ -116,25 +116,30 @@ class ModalDialog extends MegaRenderMixin {
         }.bind(this));
 
 
-        if(self.props.buttons) {
+        if (self.props.buttons) {
             var buttons = [];
             self.props.buttons.forEach(function(v) {
-                buttons.push(
-                    <a
-                        className={(v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : "")}
-                        onClick={(e) => {
-                            if ($(e.target).is(".disabled")) {
-                                return false;
+                if (v) {
+                    buttons.push(
+                        <a
+                            className={
+                                (v.defaultClassname ? v.defaultClassname : "default-white-button right") +
+                                (v.className ? " " + v.className : "")
                             }
-                            if (v.onClick) {
-                                v.onClick(e, self);
-                            }
-                        }} key={v.key}>
+                            onClick={(e) => {
+                                if ($(e.target).is(".disabled")) {
+                                    return false;
+                                }
+                                if (v.onClick) {
+                                    v.onClick(e, self);
+                                }
+                            }} key={v.key}>
                             {v.iconBefore ? <i className={v.iconBefore} /> : null}
                             {v.label}
                             {v.iconAfter ? <i className={v.iconAfter} /> : null}
                         </a>
-                );
+                    );
+                }
             });
 
             footer = <div className="fm-dialog-footer white">

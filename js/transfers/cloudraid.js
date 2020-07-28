@@ -326,6 +326,9 @@
     // from a working fetch for over 40 seconds (experimentally determined)
     CloudRaidRequest.prototype.FETCH_DATA_TIMEOUT_MS = 115000;
 
+    // Switch source for received http error codes.
+    CloudRaidRequest.prototype.EC_SWITCH_SOURCE = {408: 1, 409: 1, 429: 1, 503: 1};
+
     CloudRaidRequest.prototype.onPartFailure = function(failedPartNum, partStatus) {
         var self = this;
 
@@ -347,7 +350,7 @@
             sumFails += this.part[i].failCount;
         }
 
-        if (sumFails > 2 || (partStatus > 200 && partStatus !== 503)) {
+        if (sumFails > 2 || partStatus > 200 && !this.EC_SWITCH_SOURCE[partStatus | 0]) {
             // three fails across all channels, when any data received would reset the count on that channel
             if (d) {
                 this.logger.error("%s, aborting chunk download and retrying...",

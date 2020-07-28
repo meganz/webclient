@@ -1821,25 +1821,20 @@ function init_page() {
         return false;
     }
     // If they recently tried to join a chat link, forward to the chat link page.
-    else if (
-        localStorage.getItem('autoJoinOnLoginChat') !== null && u_type === 3 &&
-        getSitePath().indexOf("/chat/") !== 0
-    ) {
-        var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
-            JSON.parse(localStorage.autoJoinOnLoginChat) : false;
+    else if (u_type === 3 && localStorage.autoJoinOnLoginChat) {
+        // @todo refactor this!
+        tryCatch(function() {
+            var autoLoginChatInfo = localStorage.autoJoinOnLoginChat;
+            delete localStorage.autoJoinOnLoginChat;
 
-        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
+            page = false;
+            autoLoginChatInfo = JSON.parse(autoLoginChatInfo);
             loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
-            return false;
-        }
-        else {
-            localStorage.removeItem('autoJoinOnLoginChat');
-            // the only way tto not refactor this whole piece of code is to simply do a recurrsion, after the
-            // autoJoin... is removed.
-            return init_page();
-        }
-
-    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+        }, function() {
+            loadSubPage('fm');
+        })();
+    }
+    else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;
         var contactRequestTime = contactRequestInfo.unixTime;
@@ -1929,7 +1924,7 @@ function init_page() {
             }
         }
 
-        if (page.substr(0, 5) === "chat/") {
+        if (page.substr(0, 4) === "chat") {
             id = page;
             page = "chat";
             if (u_type === false) {
@@ -1939,7 +1934,10 @@ function init_page() {
 
                 loadingInitDialog.show();
                 init_chat(0x104DF11E5)
-                    .always(function() {
+                    .always(function(res) {
+                        if (res === ETEMPUNAVAIL) {
+                            throw new Error('chat-link not available.');
+                        }
                         M.chat = true;
                         megaChat.renderListing(id)
                             .always(function() {
@@ -2862,7 +2860,7 @@ function is_fm() {
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
 
-    if (!r && (page.substr(0, 5) === 'chat/' || page === "chat")) {
+    if (!r && page.substr(0, 4) === "chat") {
         r = true;
     }
 

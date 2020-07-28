@@ -58,6 +58,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
     && typeof ReadableStream === 'function'

@@ -60,7 +60,7 @@
         "func-call-spacing": [2, "never"],
         "function-call-argument-newline": [2, "consistent"],
         "guard-for-in": 1,
-        "id-length": [2, {"min": 1, "max": 26}],
+        "id-length": [2, {"min": 1, "max": 29}],
         "keyword-spacing": [2, {}],
         "linebreak-style": 2,
         "max-classes-per-file": [1, 4],

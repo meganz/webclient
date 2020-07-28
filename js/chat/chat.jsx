@@ -297,18 +297,33 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     var promises = [];
     var rooms = Object.keys(Chat.mcf);
     for (var i = rooms.length; i--;) {
-        promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+        if (!this.publicChatKeys[rooms[i]]) {
+            promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+        }
         delete Chat.mcf[rooms[i]];
     }
 
     Promise.allSettled(promises)
         .then(function(res) {
+            const pub = Object.keys(self.publicChatKeys);
+            return Promise.allSettled(
+                [res].concat(pub.map(pch => {
+                    return self.plugins.chatdIntegration.openChat(pch, true);
+                }))
+            );
+        })
+        .then(function(res) {
+            res = res[0].value.concat(res.slice(1));
             self.logger.info('chats settled...', res);
 
             if (res.length === 1 && res[0].reason === ENOENT) {
                 msgDialog('warninga', l[20641], l[20642], 0, function() {
                     loadSubPage(anonymouschat ? 'start' : 'fm/chat');
                 });
+
+                if (anonymouschat) {
+                    return reject(ETEMPUNAVAIL);
+                }
             }
 
             // eslint-disable-next-line react/no-render-return-value
@@ -1503,6 +1518,9 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
                         console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
                     }
                     M.currentdirid = M.chat = page = false;
+                    if (String(location).startsWith('chat')) {
+                        location = location === 'chat' ? 'fm' : 'chat';
+                    }
                     loadSubPage(location, event);
                     done(EACCESS);
                 });
@@ -1544,7 +1562,8 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
     $('.contacts-grid-view').addClass('hidden');
     $('.fm-chat-block').addClass('hidden');
     $('.fm-contacts-blocks-view').addClass('hidden');
-    $('.fm-right-files-block').removeClass('hidden');
+    $('.fm-right-files-block').addClass('hidden');
+    $('.fm-right-files-block.in-chat').removeClass('hidden');
     $('.nw-conversations-item').removeClass('selected');
     $('.fm-empty-conversations').removeClass('hidden');
 

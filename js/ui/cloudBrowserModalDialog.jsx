@@ -1255,7 +1255,6 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
                             return (
                                 mega.megadrop.isDropExist(highlightedNode).length ?
-                                    createPublicLink() :
                                     msgDialog(
                                         'confirmation',
                                         // `Confirm removal`
@@ -1270,7 +1269,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
                                                 mega.megadrop.pufCallbacks[highlightedNode] = { del: createPublicLink };
                                             }
                                         }
-                                    )
+                                    ) :
+                                    createPublicLink()
                             );
                         });
                     }

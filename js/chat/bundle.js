@@ -6090,14 +6090,14 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
               });
             };
 
-            return mega.megadrop.isDropExist(highlightedNode).length ? createPublicLink() : msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], function (e) {
+            return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], function (e) {
               if (e) {
                 mega.megadrop.pufRemove([highlightedNode]);
                 mega.megadrop.pufCallbacks[highlightedNode] = {
                   del: createPublicLink
                 };
               }
-            });
+            }) : createPublicLink();
           });
         }
       } : null, {

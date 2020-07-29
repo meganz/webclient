@@ -294,20 +294,27 @@ ChatdIntegration.prototype.joinChatViaPublicHandle = function(chatRoom) {
     if (chatRoom.protocolHandler && chatRoom.protocolHandler.unifiedKey) {
         var myKey = chatRoom.protocolHandler.packKeyTo([chatRoom.protocolHandler.unifiedKey], u_handle);
 
-        self.chatd._reinitChatIdHistory(chatRoom.chatId, false);
-        chatRoom.messagesBuff.messageOrders = {};
-
+        loadingDialog.show();
         asyncApiReq({
             a: 'mciph',
             ph: chatRoom.publicChatHandle,
             ck: base64urlencode(myKey),
             v: Chatd.VERSION
-        })
-        .done(function(r) {
-        })
-        .fail(function(r) {
-            if (r === EEXPIRED) {
+        }).then(function(res) {
+            loadingDialog.hide();
+            self.logger.info('mciph succeed...', res);
+            self.chatd._reinitChatIdHistory(chatRoom.chatId, false);
+            chatRoom.messagesBuff.messageOrders = {};
+        }).catch(function(ex) {
+            loadingDialog.hide();
+            if (ex === EEXPIRED) {
                 self.requiresUpdate();
+            }
+            else if (ex === ENOENT) {
+                msgDialog('warninga', l[20641], l[20642]);
+            }
+            else {
+                self.logger.warn('Unexpected mciph error...', ex);
             }
         });
     }

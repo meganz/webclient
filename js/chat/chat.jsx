@@ -316,16 +316,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             res = res[0].value.concat(res.slice(1));
             self.logger.info('chats settled...', res);
 
-            if (res.length === 1 && res[0].reason === ENOENT) {
-                msgDialog('warninga', l[20641], l[20642], 0, function() {
-                    loadSubPage(anonymouschat ? 'start' : 'fm/chat');
-                });
-
-                if (anonymouschat) {
-                    return reject(ETEMPUNAVAIL);
-                }
-            }
-
             // eslint-disable-next-line react/no-render-return-value
             self.$conversationsAppInstance = ReactDOM.render(
                 self.$conversationsApp = <ConversationsUI.ConversationsApp megaChat={self}/>,
@@ -1517,11 +1507,19 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
                     if (d && ex !== ENOENT) {
                         console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
                     }
-                    M.currentdirid = M.chat = page = false;
-                    if (String(location).startsWith('chat')) {
-                        location = location === 'chat' ? 'fm' : 'chat';
+
+                    if (ex === ENOENT && this.publicChatKeys[roomId]) {
+                        msgDialog('warninga', l[20641], l[20642], 0, function() {
+                            loadSubPage(anonymouschat ? 'start' : 'fm/chat', event);
+                        });
                     }
-                    loadSubPage(location, event);
+                    else {
+                        if (String(location).startsWith('chat')) {
+                            location = location === 'chat' ? 'fm' : 'chat';
+                        }
+                        M.currentdirid = M.chat = page = false;
+                        loadSubPage(location, event);
+                    }
                     done(EACCESS);
                 });
             resolve = null;
@@ -1539,6 +1537,22 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
     M.currentdirid = String(page = location).replace('fm/', '');
     history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
 });
+
+if (is_mobile) {
+    Chat.prototype.navigate = function(location, event) {
+        if (d) {
+            this.logger.warn('mobile-nop navigate(%s)', location);
+        }
+        if (anonymouschat) {
+            parsepage(pages.mobile);
+            mobile.chatlink.show(pchandle, getSitePath().split('#').pop());
+        }
+        else {
+            loadSubPage('fm', event);
+        }
+        return Promise.resolve();
+    };
+}
 
 /**
  * Called when Conversations tab is opened
@@ -2475,19 +2489,24 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
     assert(chatHandle, 'missing chat handle when calling megaChat.loginOrRegisterBeforeJoining');
 
     var chatKey = "#" + window.location.hash.split("#").pop();
+    var finish = function(stay) {
+        if (!notJoinReq) {
+            localStorage.autoJoinOnLoginChat = JSON.stringify([chatHandle, unixtime(), chatKey]);
+        }
+
+        if (!stay) {
+            window.location.reload();
+        }
+        return stay;
+    };
     var doShowLoginDialog = function() {
         mega.ui.showLoginRequiredDialog({
                 minUserType: 3,
                 skipInitialDialog: 1
             })
-            .done(function () {
+            .done(function() {
                 if (page !== 'login') {
-                    if (!notJoinReq) {
-                        localStorage.autoJoinOnLoginChat = JSON.stringify(
-                            [chatHandle, unixtime(), chatKey]
-                        );
-                    }
-                    window.location.reload();
+                    finish();
                 }
             });
     };
@@ -2509,15 +2528,11 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
             },
 
             onAccountCreated: function(gotLoggedIn, registerData) {
-                if (!notJoinReq) {
-                    localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
-                    localStorage.autoJoinOnLoginChat = JSON.stringify(
-                        [chatHandle, unixtime(), chatKey]
-                    );
+                if (finish(!gotLoggedIn)) {
+                    security.register.cacheRegistrationData(registerData);
+                    mega.ui.sendSignupLinkDialog(registerData);
+                    megaChat.destroy();
                 }
-                // If true this means they do not need to confirm their email before continuing to step 2
-                mega.ui.sendSignupLinkDialog(registerData, false);
-                megaChat.destroy();
             }
         });
     };
@@ -2525,13 +2540,7 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(chatHandle, forceRegister
 
     if (u_handle && u_handle !== "AAAAAAAAAAA") {
         // logged in/confirmed account in another tab!
-        if (!notJoinReq) {
-            localStorage.autoJoinOnLoginChat = JSON.stringify(
-                [chatHandle, unixtime(), chatKey]
-            );
-        }
-        window.location.reload();
-        return;
+        return finish();
     }
     if (forceRegister) {
         return doShowRegisterDialog();

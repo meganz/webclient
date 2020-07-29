@@ -1036,10 +1036,21 @@
 
         var b = $('.content-panel.' + tab).html();
 
+        // Before refresh content remember what is opened.
+        var $openedNodes = $('ul.opened[id^="mctreesub_"]', $dialog);
+        $.openedDialogNodes = {};
+
+        for (var i = $openedNodes.length; i--;) {
+
+            var id = $openedNodes[i].id.replace('mctreesub_', '');
+            $.openedDialogNodes[id] = 1;
+        }
+
         handleDialogTabContent(tab, 'ul', b);
         buildDialogTree();
 
         delete $.cfsection; // safe deleting
+        delete $.openedDialogNodes;
 
         disableFolders($.moveDialog && 'move');
         dialogScroll('.dialog-tree-panel-scroll');

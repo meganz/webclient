@@ -2068,7 +2068,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
             selectLabel: l[1523],
             folderSelectable: true, // Can select folder(s)
             onAttach: function() {
-                closeDialog();
+                doClose(true);
                 $.selected = selected;
                 M.getLinkAction();
             }

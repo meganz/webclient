@@ -3550,6 +3550,10 @@ var ModalDialog = function (_MegaRenderMixin2) {
         self.onBlur();
       }
     });
+    $('.fm-dialog-overlay').rebind('click.modalDialog' + self.getUniqueId(), function () {
+      self.onBlur();
+      return false;
+    });
   };
 
   _proto2.onBlur = function onBlur(e) {
@@ -3568,6 +3572,7 @@ var ModalDialog = function (_MegaRenderMixin2) {
     $(document).off('keyup.modalDialog' + this.getUniqueId());
     $(document.body).removeClass('overlayed');
     $('.fm-dialog-overlay').addClass('hidden');
+    $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
   };
 
   _proto2.onCloseClicked = function onCloseClicked() {

@@ -860,7 +860,9 @@ function closedlpopup()
 
 function importFile() {
     'use strict';
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]);
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]).always(function() {
+        mBroadcaster.sendMessage('fm:importFileLinkDone');
+    });
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)

@@ -661,18 +661,6 @@ function init_page() {
         return false;
     }
 
-    // is chat link?
-    if (is_mobile && page.substr(0, 4) === 'chat') {
-        var chatInfo = window.location.toString().split("chat/");
-        if (chatInfo[1] && chatInfo[1].split) {
-            chatInfo = chatInfo[1].split("#");
-            var chatHandle = chatInfo[0];
-            var chatKey = chatInfo[1];
-            parsepage(pages['mobile']);
-            mobile.chatlink.show(chatHandle, chatKey);
-            return;
-        }
-    }
     if ((pfkey || dlkey) && !location.hash) {
         return location.replace(getAppBaseUrl());
     }
@@ -1821,7 +1809,7 @@ function init_page() {
         return false;
     }
     // If they recently tried to join a chat link, forward to the chat link page.
-    else if (u_type === 3 && localStorage.autoJoinOnLoginChat) {
+    else if (0 && u_type === 3 && localStorage.autoJoinOnLoginChat) {
         // @todo refactor this!
         tryCatch(function() {
             var autoLoginChatInfo = localStorage.autoJoinOnLoginChat;
@@ -1934,10 +1922,7 @@ function init_page() {
 
                 loadingInitDialog.show();
                 init_chat(0x104DF11E5)
-                    .always(function(res) {
-                        if (res === ETEMPUNAVAIL) {
-                            throw new Error('chat-link not available.');
-                        }
+                    .always(function() {
                         M.chat = true;
                         megaChat.renderListing(id)
                             .always(function() {

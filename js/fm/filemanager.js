@@ -2349,12 +2349,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         }
         else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove')) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         }
         else if (

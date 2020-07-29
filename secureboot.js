@@ -45,7 +45,7 @@ var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_msie = ua.indexOf('msie') !== 1 || uv.appVersion.indexOf('trident') > -1;
+var is_msie = ua.indexOf('msie') !== -1 || uv.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';

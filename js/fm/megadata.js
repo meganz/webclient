@@ -232,6 +232,10 @@ function MegaData() {
                                     .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
                             ); // Your account is almost full.
                         }
+                        // When the banner is taped, show pro page.
+                        ab.onTap(function() {
+                            loadSubPage('pro');
+                        });
                     }
                 };
 
@@ -241,11 +245,6 @@ function MegaData() {
                 else {
                     action();
                 }
-
-                // When the banner is taped, show pro page.
-                ab.onTap(function() {
-                    loadSubPage('pro');
-                });
             }
         };
 

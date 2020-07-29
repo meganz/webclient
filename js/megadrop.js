@@ -1396,6 +1396,13 @@ mega.megadrop = (function() {
             if (pupHandle && !$('#pup_' + pupHandle).length) {
                 ui.nodeIcon(nodeHandle, true);
                 drawPupCard(pupHandle);
+                _eventListeners();
+
+                var $emptyGrid = $('.grid-table-empty', settingsOpts.card.wrapperClass);
+
+                if ($emptyGrid.length) {
+                    $emptyGrid.parent('tr').remove();
+                }
             }
         };
 

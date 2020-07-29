@@ -1808,20 +1808,6 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-    // If they recently tried to join a chat link, forward to the chat link page.
-    else if (0 && u_type === 3 && localStorage.autoJoinOnLoginChat) {
-        // @todo refactor this!
-        tryCatch(function() {
-            var autoLoginChatInfo = localStorage.autoJoinOnLoginChat;
-            delete localStorage.autoJoinOnLoginChat;
-
-            page = false;
-            autoLoginChatInfo = JSON.parse(autoLoginChatInfo);
-            loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
-        }, function() {
-            loadSubPage('fm');
-        })();
-    }
     else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;

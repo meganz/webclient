@@ -89,7 +89,7 @@ if (typeof loadingDialog === 'undefined') {
 
         delete $.loadingSubject[subject];
 
-        if (Object.keys($.loadingSubject).length === 0 || subject === 'force') {
+        if (!loadingInitDialog.active && (Object.keys($.loadingSubject).length === 0 || subject === 'force')) {
             $overlay = $('.dark-overlay:not(.mobile)', 'body');
             $spinner = $('.loading-spinner:not(.manual-management)', 'body');
 

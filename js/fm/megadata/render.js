@@ -11,12 +11,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
         console.time('renderMain');
     }
 
-    // Disable aUpdate flag if a new item was added to an empty
-    // folder, so that MegaRender properly uses JSP container..
-    if (aUpdate && this.v.length === 1) {
-        aUpdate = false;
-    }
-
     if (!aUpdate) {
         if (this.megaRender) {
             this.megaRender.destroy();

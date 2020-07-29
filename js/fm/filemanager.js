@@ -1147,9 +1147,10 @@ FileManager.prototype.updFileManagerUI = function() {
             var renderPromise = MegaPromise.resolve();
             if (UImain) {
                 if (UItree || M.v.length) {
+                    var emptyBeforeUpd = M.v.length === 0;
                     M.filterByParent(M.currentCustomView.nodeID || M.currentdirid);
                     M.sort();
-                    M.renderMain(true);
+                    M.renderMain(!emptyBeforeUpd);
                 }
                 else {
                     renderPromise = M.openFolder(M.currentdirid, true);

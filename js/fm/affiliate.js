@@ -2332,9 +2332,18 @@ mBroadcaster.addListener('fm:initialized', function() {
             delete $.noAffGuide;
             M.affiliate.setUA('icon', 1);
         }
+        // else if user is existing user who did not see dialog show it.
         else if (!M.affiliate.icon) {
-            // else if user is existing user who did not see dialog show it.
-            affiliateUI.guideDialog.show();
+
+            // If this is import redirection from download page, lets delay show guide dialog until finished.
+            if (typeof dl_import !== 'undefined' && dl_import) {
+                mBroadcaster.once('fm:importFileLinkDone', function() {
+                    affiliateUI.guideDialog.show();
+                });
+            }
+            else {
+                affiliateUI.guideDialog.show();
+            }
         }
 
         // we reached our goal, stop listening for fminitialized

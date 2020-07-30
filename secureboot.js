@@ -3310,17 +3310,12 @@ else if (!browserUpdate) {
                 }
             }
         };
-        xhr_stack[xhri].onreadystatechange = function()
-        {
-            try
-            {
-                if (this.readyState == 1) this.timeout=0;
+        xhr_stack[xhri].onreadystatechange = tryCatch(function() {
+            if (this.readyState === 2) {
+                xhr_timeout = 0;
+                this.timeout = 0;
             }
-            catch(e)
-            {
-
-            }
-        };
+        }, false);
         xhr_stack[xhri].onerror = xhr_error;
         xhr_stack[xhri].ontimeout = xhr_error;
         if (jsl[jsi].text)
@@ -3335,14 +3330,10 @@ else if (!browserUpdate) {
             xhr_stack[xhri].xhri = xhri;
             if (localStorage.dd) url += '?t=' + Date.now();
             xhr_stack[xhri].open("GET", bootstaticpath + url, true);
-            xhr_stack[xhri].timeout = xhr_timeout;
 
-            // If a response is received (after 50ms or the 1st byte), set the timeout to 0 so that we wait as long as
-            // possible to receive the rest of the files. This means even slow connections (< GPRS) can load the site.
-            xhr_stack[xhri].onprogress = function() {
-                this.timeout = 0;
-                xhr_timeout = 0;
-            };
+            if (xhr_timeout > 0) {
+                xhr_stack[xhri].timeout = xhr_timeout;
+            }
 
             if (is_chrome_firefox || is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
@@ -3926,7 +3917,9 @@ function tryCatch(fn, onerror)
         try {
             return fn.apply(this, arguments);
         } catch (e) {
-            console.error(e);
+            if (onerror !== false) {
+                console.error(e);
+            }
 
             if (typeof onerror === 'function') {
                 onIdle(onerror.bind(null, e));

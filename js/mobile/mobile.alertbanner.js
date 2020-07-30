@@ -146,7 +146,6 @@ mobile.alertBanner = {
         'use strict';
         if (handler instanceof Function) {
             this.$alertBanner.off(event).on(event, function() {
-                mobile.alertBanner.close();
                 handler();
                 return false;
             });

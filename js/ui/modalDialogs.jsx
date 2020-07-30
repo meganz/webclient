@@ -118,7 +118,7 @@ class ModalDialog extends MegaRenderMixin {
 
         if (self.props.buttons) {
             var buttons = [];
-            self.props.buttons.forEach(function(v) {
+            self.props.buttons.forEach(function(v, i) {
                 if (v) {
                     buttons.push(
                         <a
@@ -133,7 +133,7 @@ class ModalDialog extends MegaRenderMixin {
                                 if (v.onClick) {
                                     v.onClick(e, self);
                                 }
-                            }} key={v.key}>
+                            }} key={v.key + i}>
                             {v.iconBefore ? <i className={v.iconBefore} /> : null}
                             {v.label}
                             {v.iconAfter ? <i className={v.iconAfter} /> : null}

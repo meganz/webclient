@@ -3611,7 +3611,7 @@ var ModalDialog = function (_MegaRenderMixin2) {
 
     if (self.props.buttons) {
       var buttons = [];
-      self.props.buttons.forEach(function (v) {
+      self.props.buttons.forEach(function (v, i) {
         if (v) {
           buttons.push(React.createElement("a", {
             className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
@@ -3624,7 +3624,7 @@ var ModalDialog = function (_MegaRenderMixin2) {
                 v.onClick(e, self);
               }
             },
-            key: v.key
+            key: v.key + i
           }, v.iconBefore ? React.createElement("i", {
             className: v.iconBefore
           }) : null, v.label, v.iconAfter ? React.createElement("i", {
@@ -6074,7 +6074,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       var highlighted = this.state.highlighted;
       var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
       var highlightedNode = highlighted && highlighted.length && highlighted[0];
-      var allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+      var allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].u === u_handle && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
       buttons.push(allowAttachFolders ? {
         "label": l[8023],
         "key": "attach",

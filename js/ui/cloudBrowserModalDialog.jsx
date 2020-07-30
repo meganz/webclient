@@ -1235,8 +1235,12 @@ class CloudBrowserDialog extends MegaRenderMixin {
             const { highlighted } = this.state;
             const className = `default-grey-button ${share && share.down ? 'disabled' : null}`;
             const highlightedNode = highlighted && highlighted.length && highlighted[0];
-            const allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].su === undefined &&
-                M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+            const allowAttachFolders = (
+                this.props.allowAttachFolders &&
+                M.d[highlightedNode].u === u_handle &&
+                M.d[highlightedNode].su === undefined &&
+                M.getNodeShareUsers(highlightedNode, 'EXP').length === 0
+            );
 
             buttons.push(
                 allowAttachFolders ? {

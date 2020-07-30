@@ -91,6 +91,11 @@ mega.tpw = new function TransferProgressWidget() {
     };
 
     var removeRow = function($row) {
+
+        if (!$row || !$row.length) {
+            return;
+        }
+
         var timer = $row.data('timer');
         if (timer) {
             clearTimeout(timer);
@@ -1282,7 +1287,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if ($tasks && $tasks.length) {
-            for (var r = 0; r < $tasks.length && r < maximumLength; r++) {
+            for (var r = 0; r < $tasks.length; r++) {
                 removeRow($($tasks[r]));
             }
         }

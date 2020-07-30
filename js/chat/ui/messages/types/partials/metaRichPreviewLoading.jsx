@@ -1,5 +1,5 @@
 var React = require("react");
-var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
+var ConversationMessageMixin = require('../../mixin.jsx').ConversationMessageMixin;
 
 class MetaRichpreviewLoading extends ConversationMessageMixin {
     render() {

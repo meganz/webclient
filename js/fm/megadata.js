@@ -258,6 +258,8 @@ function MegaData() {
             return true;
         };
 
+        this['updFile' + 'ManagerUI'] = mobile.updFileManagerUI;
+
         var tf = [
             "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI",
             "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",

@@ -1075,11 +1075,12 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
  * @returns {MegaPromise}
  */
 FileManager.prototype.updFileManagerUI = function() {
+
     "use strict";
 
     var treebuild = Object.create(null);
-    var UImain = false;
     var UItree = false;
+    var UImain = false;
     var newcontact = false;
     var newpath = false;
     var newshare = false;
@@ -1106,7 +1107,7 @@ FileManager.prototype.updFileManagerUI = function() {
             || newNode.p === this.currentCustomView.nodeID
             || newNode.h === this.currentCustomView.nodeID) {
 
-            UImain = M.v.length || !is_mobile || !mobile.uploadOverlay.uploading;
+            UImain = true;
 
             if ($.onRenderNewSelectNode === newNode.h) {
                 delete $.onRenderNewSelectNode;

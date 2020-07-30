@@ -106,15 +106,18 @@ mobile.cloud = {
     /**
      * After an action packet update to the cloud drive, this function
      * updates the folder and file count for each folder in the current view
+     * @param {String} [nodes] Optional, list of the nodes to be updated
      */
-    countAndUpdateSubFolderTotals: function() {
+    countAndUpdateSubFolderTotals: function(nodes) {
 
         'use strict';
 
-        // Loop through current view
-        for (var i = 0; i < M.v.length; i++) {
+        var list = nodes || M.v;
 
-            var node = M.v[i];
+        // Loop through current view
+        for (var i = 0; i < list.length; i++) {
+
+            var node = list[i];
             var nodeHandle = node.h;
             var nodeType = node.t;
 

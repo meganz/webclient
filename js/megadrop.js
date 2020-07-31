@@ -1283,17 +1283,26 @@ mega.megadrop = (function() {
 
             // Widget expanded copy link
             $('.copy-url', $wrapper).rebind('click', function() {
-                copyToClipboard(settingsOpts.card.url, l[17619]);
+
+                var url = $('.url-link .widget-url', $(this).parents('.url-link')).text();
+
+                copyToClipboard(url, l[17619]);
             });
 
             // Widget expanded copy source code
             $('.copy-code', $wrapper).rebind('click', function() {
-                copyToClipboard(settingsOpts.card.code, l[17620]);
+
+                var code = $('.embed-code .widget-code-wrapper', $(this).parents('.embed-link')).text();
+
+                copyToClipboard(code, l[17620]);
             });
 
             // Widget expanded  Preview upload page
             $('.preview-widget', $wrapper).rebind('click', function () {
-                window.open(settingsOpts.card.url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
+
+                var url = $('.url-link .widget-url', $(this).parents('.widget-card.expanded-widget')).text();
+
+                window.open(url, '_blank', wopts.widgetParams[0].slice(1, -1), true);
             });
         };
 

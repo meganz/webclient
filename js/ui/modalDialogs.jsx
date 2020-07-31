@@ -49,6 +49,11 @@ class ModalDialog extends MegaRenderMixin {
                 self.onBlur();
             }
         });
+
+        $('.fm-dialog-overlay').rebind('click.modalDialog' + self.getUniqueId(), function() {
+            self.onBlur();
+            return false;
+        });
     }
     onBlur(e) {
         var $element = $(ReactDOM.findDOMNode(this));
@@ -66,6 +71,7 @@ class ModalDialog extends MegaRenderMixin {
         $(document).off('keyup.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
+        $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
     }
     onCloseClicked(e) {
         var self = this;

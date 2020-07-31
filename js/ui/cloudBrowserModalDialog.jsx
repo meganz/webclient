@@ -1143,10 +1143,11 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         const classes = `add-from-cloud ${self.props.className}`;
 
-        var folderIsHighlighted = false;
-        var share = false;
+        let folderIsHighlighted = false;
+        let share = false;
+        let isOutgoingShare = false;
 
-        var breadcrumb = [];
+        let breadcrumb = [];
         const entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
         if (entryId !== undefined) {
@@ -1174,6 +1175,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     const prevNodeId = path[k - 1];
                     const nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
                     const nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
+
+                    // Flag that the specific node is part of the `Outgoing Shares` node chain;
+                    // The `Attach` button is not available for IS_OUTGOING_SHARE nodes.
+                    isOutgoingShare = nodeId === 'shares';
 
                     (function(nodeId, k) {
                         breadcrumb.unshift(
@@ -1237,6 +1242,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             const highlightedNode = highlighted && highlighted.length && highlighted[0];
             const allowAttachFolders = (
                 this.props.allowAttachFolders &&
+                !isOutgoingShare &&
                 M.d[highlightedNode].u === u_handle &&
                 M.d[highlightedNode].su === undefined &&
                 M.getNodeShareUsers(highlightedNode, 'EXP').length === 0

@@ -5980,6 +5980,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
     var classes = "add-from-cloud " + self.props.className;
     var folderIsHighlighted = false;
     var share = false;
+    var isOutgoingShare = false;
     var breadcrumb = [];
     var entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
@@ -6008,6 +6009,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
         var prevNodeId = path[k - 1];
         var nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
         var nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
+        isOutgoingShare = nodeId === 'shares';
 
         (function (nodeId, k) {
           breadcrumb.unshift(self.isSearch() ? external_React_default.a.createElement("div", {
@@ -6074,7 +6076,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       var highlighted = this.state.highlighted;
       var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
       var highlightedNode = highlighted && highlighted.length && highlighted[0];
-      var allowAttachFolders = this.props.allowAttachFolders && M.d[highlightedNode].u === u_handle && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+      var allowAttachFolders = this.props.allowAttachFolders && !isOutgoingShare && M.d[highlightedNode].u === u_handle && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
       buttons.push(allowAttachFolders ? {
         "label": l[8023],
         "key": "attach",

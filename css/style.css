@@ -2250,6 +2250,7 @@ a.nt-settings-button:hover span {
     -webkit-transition: opacity 250ms ease-in-out;
     transition: opacity 250ms ease-in-out;
     opacity: 0;
+    min-height: 15px;
 }
 .jspDrag::before {
     position: absolute;

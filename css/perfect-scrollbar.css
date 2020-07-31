@@ -72,6 +72,7 @@
     border-radius: 8px;
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
+    min-height: 15px;
 }
 .ps-container:hover > .ps-scrollbar-y-rail .ps-scrollbar-y, .ps-outfocused-scrolling > .ps-scrollbar-y-rail .ps-scrollbar-y {
     opacity: 0.2;

@@ -1037,9 +1037,10 @@ accountUI.account = {
             var $personalInfoBlock = $('.profile-form');
             var $birthdayBlock = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'],
                 $personalInfoBlock);
-            var $firstNameField = $personalInfoBlock.find('#account-firstname');
+            var $firstNameField = $('#account-firstname', $personalInfoBlock);
+            var $lastNameField = $('#account-lastname', $personalInfoBlock);
             var $saveBlock = $('.fm-account-sections .save-block');
-            var $saveButton = $saveBlock.find('.fm-account-save');
+            var $saveButton = $('.fm-account-save', $saveBlock);
 
             // Avatar
             $('.fm-account-avatar, .settings-sub-section.avatar .avatar', $personalInfoBlock)
@@ -1048,7 +1049,7 @@ accountUI.account = {
                 });
 
             // All profile text inputs
-            $firstNameField.add('#account-lastname', $personalInfoBlock).add('.byear, .bmonth, .bdate', $birthdayBlock)
+            $firstNameField.add($lastNameField).add('.byear, .bmonth, .bdate', $birthdayBlock)
                 .rebind('input.settingsGeneral, change.settingsGeneral', function() {
 
                     var $this = $(this);
@@ -1082,8 +1083,8 @@ accountUI.account = {
                         }
                     }
 
-                    if ($firstNameField.val() && $firstNameField.val().trim().length > 0
-                        && !$personalInfoBlock.find('.errored').length) {
+                    if ($firstNameField.val().trim().length > 0  && $lastNameField.val().trim().length > 0 &&
+                        !$('.errored', $personalInfoBlock).length) {
                         $saveBlock.removeClass('closed');
                     }
                     else {

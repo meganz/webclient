@@ -1,27 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+export default class AudioPlayer extends React.Component {
+    state = {
+        currentTime: null,
+        progressWidth: 0,
+        isBeingPlayed: false,
+        isPaused: false,
+    };
 
-class AudioPlayer extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            currentTime: null,
-            progressWidth: 0,
-            isBeingPlayed: false,
-            isPaused: false,
-        }
-
-        this.handleOnPlaying = this.handleOnPlaying.bind(this);
-        this.handleOnTimeUpdate = this.handleOnTimeUpdate.bind(this);
-        this.handleOnEnded = this.handleOnEnded.bind(this);
-        this.handleOnPause = this.handleOnPause.bind(this);
-        this.handleOnMouseDown = this.handleOnMouseDown.bind(this);
     }
 
-    play(e) {
-        const self = this;
-        const audio = self.audioEl;
+    play = () => {
+        const audio = this.audioEl;
 
         if (audio.paused) {
             const result = audio.play();
@@ -38,65 +31,46 @@ class AudioPlayer extends React.Component {
 
             // Pause all others audio elements
             Array.prototype.filter
-            .call(audios, audioElement => audioElement.id !== self.props.audioId)
-            .forEach(audioElement => {
-                if (!audioElement.paused) {
-                    audioElement.pause();
-                }
-            });
+                .call(audios, audioElement => audioElement.id !== this.props.audioId)
+                .forEach(audioElement => {
+                    if (!audioElement.paused) {
+                        audioElement.pause();
+                    }
+                });
 
-            self.setState({
+            this.setState({
                 isPaused: false
-            })
-        } else {
-            audio.pause();
-            self.setState({
-                isPaused: true
-            })
+            });
         }
-    }
+        else {
+            audio.pause();
+            this.setState({
+                isPaused: true
+            });
+        }
+    };
 
-    handleOnPause(e) {
-        this.setState({
-            isPaused: true
-        })
-    }
+    handleOnPause = () => this.setState({ isPaused: true });
 
-    handleOnPlaying(e) {
-        this.setState((prevState) => {
-            return {
-                isBeingPlayed: true
-            }
-        })
-    }
+    handleOnPlaying = () => this.setState({ isBeingPlayed: true });
 
-    handleOnTimeUpdate(e) {
+    handleOnTimeUpdate = () => {
         const { currentTime, duration } = this.audioEl;
         const percent = (currentTime / duration) * 100;
 
-        this.setState((prevState) => {
-            return {
-                currentTime: secondsToTimeShort(currentTime),
-                progressWidth: percent
-            }
+        this.setState({
+            currentTime: secondsToTimeShort(currentTime),
+            progressWidth: percent
         });
     }
 
-    handleOnEnded(e) {
-        this.setState((prevState) => {
-            return {
-                progressWidth: 0,
-                isBeingPlayed: false,
-                currentTime: 0
-            }
-        });
-    }
+    handleOnEnded = () => this.setState({ progressWidth: 0, isBeingPlayed: false, currentTime: 0 });
 
-    handleOnMouseDown(event) {
+    handleOnMouseDown = event => {
         event.preventDefault();
-        const self = this;
-        const sliderPin = self.sliderPin;
-        const slider = self.slider;
+
+        const sliderPin = this.sliderPin;
+        const slider = this.slider;
         const shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
 
         document.addEventListener('mousemove', onMouseMove);
@@ -117,15 +91,13 @@ class AudioPlayer extends React.Component {
 
             const pinPosition = newLeft / slider.getBoundingClientRect().width;
 
-            const newTime = Math.ceil(self.props.playtime * pinPosition)
+            const newTime = Math.ceil(this.props.playtime * pinPosition);
             const newCurrentTime = secondsToTimeShort(newTime);
-            self.audioEl.currentTime = newTime;
+            this.audioEl.currentTime = newTime;
 
-            self.setState((prevState) => {
-                return {
-                    currentTime: newCurrentTime,
-                    progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
-                }
+            this.setState({
+                currentTime: newCurrentTime,
+                progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
             });
         }
 
@@ -138,20 +110,19 @@ class AudioPlayer extends React.Component {
     }
 
     render() {
-        const self = this;
-        const { source, audioId, loading, playtime } = self.props;
-        const { progressWidth, isBeingPlayed, isPaused, currentTime } = self.state;
+        const { source, audioId, loading, playtime } = this.props;
+        const { progressWidth, isBeingPlayed, isPaused, currentTime } = this.state;
 
         const progressStyles = {
             width: `${progressWidth}%`,
-        }
+        };
 
         let playtimeStyles = null;
 
         if (isBeingPlayed) {
             playtimeStyles = {
                 color: '#EB4444'
-            }
+            };
         }
 
         let btnClass = 'audio-player__pause-btn';
@@ -163,34 +134,33 @@ class AudioPlayer extends React.Component {
             <span
                 className={btnClass}
                 onClick={() => {
-                    self.play();
-                    if (self.props.source === null) {
-                        self.props.getAudioFile()
+                    this.play();
+                    if (this.props.source === null) {
+                        this.props.getAudioFile();
                     }
                 }}>
             </span>
         );
 
         if (loading) {
-            controls = (
-                <div className="small-blue-spinner audio-player__spinner">
-                </div>
-            );
+            controls = <div className="small-blue-spinner audio-player__spinner" />;
         }
 
         return (
             <div className="audio-player">
                 {controls}
-                <div className="slider" ref={(slider) => {this.slider = slider;}}>
-                    <div className="slider__progress" style={progressStyles}>
-                    </div>
+                <div className="slider" ref={(slider) => {
+                    this.slider = slider;
+                }}>
+                    <div className="slider__progress" style={progressStyles} />
                     <div
                         className="slider__progress__pin"
-                        style={{left: `${progressWidth}%`}}
-                        ref={(sliderPin) => {this.sliderPin = sliderPin;}}
+                        style={{ left: `${progressWidth}%` }}
+                        ref={(sliderPin) => {
+                            this.sliderPin = sliderPin;
+                        }}
                         onMouseDown={this.handleOnMouseDown}
-                    >
-                    </div>
+                    />
                 </div>
                 <span className="audio-player__time" style={playtimeStyles}>
                     {currentTime ? currentTime : secondsToTimeShort(playtime)}
@@ -199,11 +169,13 @@ class AudioPlayer extends React.Component {
                     src={source}
                     className="audio-player__player"
                     id={audioId}
-                    ref={(audio) => {this.audioEl = audio;}}
-                    onPlaying={self.handleOnPlaying}
-                    onPause={self.handleOnPause}
-                    onEnded={self.handleOnEnded}
-                    onTimeUpdate={self.handleOnTimeUpdate}
+                    ref={(audio) => {
+                        this.audioEl = audio;
+                    }}
+                    onPlaying={this.handleOnPlaying}
+                    onPause={this.handleOnPause}
+                    onEnded={this.handleOnEnded}
+                    onTimeUpdate={this.handleOnTimeUpdate}
                 >
                 </audio>
             </div>
@@ -218,5 +190,3 @@ AudioPlayer.propTypes = {
     getAudioFile: PropTypes.func.isRequired,
     playtime: PropTypes.number.isRequired
 };
-
-export default AudioPlayer;

@@ -302,9 +302,11 @@ var affiliateprogram = {
             var $this = $(this);
 
             if (is_mobile) {
+
                 var affguide = '/fm/refer/guide';
 
-                if (u_storage.sid) {
+                var openGenerateRefLink = function() {
+
                     loadSubPage(affguide);
 
                     var $affguidepage = $('.affiliate-guide-page');
@@ -312,8 +314,12 @@ var affiliateprogram = {
                     $('.expandable:first', $affguidepage).trigger('tap');
                     $('.generate', $affguidepage).trigger('tap');
                 }
+
+                if (u_storage.sid) {
+                    openGenerateRefLink();
+                }
                 else {
-                    login_next = affguide;
+                    login_next = openGenerateRefLink;
                     loadSubPage('login');
                 }
             }

@@ -661,18 +661,6 @@ function init_page() {
         return false;
     }
 
-    // is chat link?
-    if (is_mobile && page.substr(0, 4) === 'chat') {
-        var chatInfo = window.location.toString().split("chat/");
-        if (chatInfo[1] && chatInfo[1].split) {
-            chatInfo = chatInfo[1].split("#");
-            var chatHandle = chatInfo[0];
-            var chatKey = chatInfo[1];
-            parsepage(pages['mobile']);
-            mobile.chatlink.show(chatHandle, chatKey);
-            return;
-        }
-    }
     if ((pfkey || dlkey) && !location.hash) {
         return location.replace(getAppBaseUrl());
     }
@@ -1820,26 +1808,7 @@ function init_page() {
         loadSubPage('redeem');
         return false;
     }
-    // If they recently tried to join a chat link, forward to the chat link page.
-    else if (
-        localStorage.getItem('autoJoinOnLoginChat') !== null && u_type === 3 &&
-        getSitePath().indexOf("/chat/") !== 0
-    ) {
-        var autoLoginChatInfo = typeof localStorage.autoJoinOnLoginChat !== "undefined" ?
-            JSON.parse(localStorage.autoJoinOnLoginChat) : false;
-
-        if (unixtime() - 2 * 60 * 60 < autoLoginChatInfo[1]) {
-            loadSubPage("/chat/" + autoLoginChatInfo[0] + autoLoginChatInfo[2]);
-            return false;
-        }
-        else {
-            localStorage.removeItem('autoJoinOnLoginChat');
-            // the only way tto not refactor this whole piece of code is to simply do a recurrsion, after the
-            // autoJoin... is removed.
-            return init_page();
-        }
-
-    } else if (localStorage.getItem('addContact') !== null && u_type === 3) {
+    else if (localStorage.getItem('addContact') !== null && u_type === 3) {
         var contactRequestInfo = JSON.parse(localStorage.getItem('addContact'));
         var contactHandle = contactRequestInfo.u;
         var contactRequestTime = contactRequestInfo.unixTime;
@@ -1929,7 +1898,7 @@ function init_page() {
             }
         }
 
-        if (page.substr(0, 5) === "chat/") {
+        if (page.substr(0, 4) === "chat") {
             id = page;
             page = "chat";
             if (u_type === false) {
@@ -2862,7 +2831,7 @@ function is_fm() {
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
     }
 
-    if (!r && (page.substr(0, 5) === 'chat/' || page === "chat")) {
+    if (!r && page.substr(0, 4) === "chat") {
         r = true;
     }
 

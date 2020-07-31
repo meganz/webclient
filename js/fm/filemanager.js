@@ -1147,9 +1147,10 @@ FileManager.prototype.updFileManagerUI = function() {
             var renderPromise = MegaPromise.resolve();
             if (UImain) {
                 if (UItree || M.v.length) {
+                    var emptyBeforeUpd = M.v.length === 0;
                     M.filterByParent(M.currentCustomView.nodeID || M.currentdirid);
                     M.sort();
-                    M.renderMain(true);
+                    M.renderMain(!emptyBeforeUpd);
                 }
                 else {
                     renderPromise = M.openFolder(M.currentdirid, true);
@@ -2067,7 +2068,7 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
             selectLabel: l[1523],
             folderSelectable: true, // Can select folder(s)
             onAttach: function() {
-                closeDialog();
+                doClose(true);
                 $.selected = selected;
                 M.getLinkAction();
             }
@@ -2348,12 +2349,14 @@ FileManager.prototype.initUIKeyEvents = function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         }
         else if ((e.keyCode == 13 && $.msgDialog == 'confirmation') && (e.keyCode == 13 && $.msgDialog == 'remove')) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         }
         else if (

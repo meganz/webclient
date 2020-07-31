@@ -9,6 +9,7 @@ var slideshowid;
     var zoom_mode;
     var origImgWidth;
     var slideshowplay;
+    var slideshowpause;
     var origImgHeight;
     var slideshowTimer;
     var mouseIdleTimer;
@@ -272,7 +273,7 @@ var slideshowid;
     }
 
     function slideshow_timereset() {
-        if (slideshowplay) {
+        if (slideshowplay && !slideshowpause) {
             clearTimeout(slideshowTimer);
             slideshowTimer = setTimeout(slideshow_next, 4000);
         }
@@ -320,11 +321,13 @@ var slideshowid;
             if ($(this).attr('data-state') === 'pause') {
                 $this.attr('data-state', 'play');
                 $this.find('i').removeClass('pause').addClass('play');
+                slideshowpause = true;
             }
             else {
                 $this.attr('data-state', 'pause');
                 $this.find('i').removeClass('play').addClass('pause');
                 slideshowTimer = setTimeout(slideshow_next, 4000);
+                slideshowpause = false;
             }
             return false;
         });

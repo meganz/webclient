@@ -1315,12 +1315,14 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         $('#msgDialog .default-white-button').rebind('click', function() {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
     }
@@ -1336,6 +1338,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         /*!1*/
@@ -1343,6 +1346,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
     }
@@ -1363,6 +1367,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(false);
+                    $.warningCallback = null;
                 }
             });
             /*!2*/
@@ -1370,6 +1375,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
+                    $.warningCallback = null;
                 }
             });
         }
@@ -1384,6 +1390,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
                 closeMsg();
                 if ($.warningCallback) {
                     $.warningCallback(true);
+                    $.warningCallback = null;
                 }
             });
         }
@@ -1420,6 +1427,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
+                $.warningCallback = null;
             }
         });
         /*!3*/
@@ -1427,6 +1435,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(false);
+                $.warningCallback = null;
             }
         });
         $('#msgDialog .icon').addClass('fm-notification-icon');
@@ -1473,6 +1482,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback('register');
+                $.warningCallback = null;
             }
         });
         // Login to complete the import
@@ -1480,6 +1490,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback('login');
+                $.warningCallback = null;
             }
         });
         // Have an ephemeral account to complete the import
@@ -1487,6 +1498,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback('ephemeral');
+                $.warningCallback = null;
             }
         });
     }
@@ -1507,6 +1519,7 @@ function msgDialog(type, title, msg, submsg, callback, checkbox) {
         closeMsg();
         if ($.warningCallback) {
             $.warningCallback(false);
+            $.warningCallback = null;
         }
     });
     $('#msgDialog').removeClass('hidden');
@@ -2644,6 +2657,14 @@ function closeDialog(ev) {
 
         if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
+        }
+
+        if ($.msgDialog) {
+            if ($.warningCallback) {
+                onIdle($.warningCallback.bind(null, null));
+                $.warningCallback = null;
+            }
+            delete $.msgDialog;
         }
     }
     $('.fm-dialog, .overlay.arrange-to-back').removeClass('arrange-to-back');

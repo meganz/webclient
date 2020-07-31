@@ -45,7 +45,7 @@ var is_iframed = is_embed || is_drop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
     document.location.host === 'mega' || document.location.protocol === 'mega:';
-var is_msie = ua.indexOf('msie') !== 1 || uv.appVersion.indexOf('trident') > -1;
+var is_msie = ua.indexOf('msie') !== -1 || uv.indexOf('trident') > -1;
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
@@ -58,6 +58,7 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
 var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder
     && typeof ReadableStream === 'function'
@@ -3178,7 +3179,7 @@ else if (!browserUpdate) {
     // unlimited (0 ms) and let the lower layers handle it (e.g. use the browser default timeout) which can let the
     // site load slowly over 5 minutes if they are on a really bad connection. For the EU static server (which we
     // assume never fails) we set the timeout to unlimited.
-    var xhr_timeout = (staticpath === defaultStaticPath || is_msie) ? 0 : 15000;
+    var xhr_timeout = (staticpath === defaultStaticPath) ? 0 : 15000;
 
     /**
      * Handles the XHR loading error. It tries reloading the file multiple times and switches the static path to the
@@ -3309,17 +3310,12 @@ else if (!browserUpdate) {
                 }
             }
         };
-        xhr_stack[xhri].onreadystatechange = function()
-        {
-            try
-            {
-                if (this.readyState == 1) this.timeout=0;
+        xhr_stack[xhri].onreadystatechange = tryCatch(function() {
+            if (this.readyState === 2) {
+                xhr_timeout = 0;
+                this.timeout = 0;
             }
-            catch(e)
-            {
-
-            }
-        };
+        }, false);
         xhr_stack[xhri].onerror = xhr_error;
         xhr_stack[xhri].ontimeout = xhr_error;
         if (jsl[jsi].text)
@@ -3334,16 +3330,9 @@ else if (!browserUpdate) {
             xhr_stack[xhri].xhri = xhri;
             if (localStorage.dd) url += '?t=' + Date.now();
             xhr_stack[xhri].open("GET", bootstaticpath + url, true);
-            xhr_stack[xhri].timeout = xhr_timeout;
 
-            // If a response is received (after 50ms or the 1st byte), set the timeout to 0 so that we wait as long as
-            // possible to receive the rest of the files. This means even slow connections (< GPRS) can load the site.
-            // excluding IE, since IE doesnt support setting "timeout" after "send"
-            if (!is_msie) {
-                xhr_stack[xhri].onprogress = function() {
-                    this.timeout = 0;
-                    xhr_timeout = 0;
-                };
+            if (xhr_timeout > 0) {
+                xhr_stack[xhri].timeout = xhr_timeout;
             }
 
             if (is_chrome_firefox || is_firefox_web_ext) {
@@ -3928,7 +3917,9 @@ function tryCatch(fn, onerror)
         try {
             return fn.apply(this, arguments);
         } catch (e) {
-            console.error(e);
+            if (onerror !== false) {
+                console.error(e);
+            }
 
             if (typeof onerror === 'function') {
                 onIdle(onerror.bind(null, e));

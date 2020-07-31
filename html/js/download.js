@@ -790,7 +790,6 @@ function dlPageStartDownload(isDlWithMegaSync) {
     $downloadPage.find('.download.eta-block .light-txt').text(l[1042] + '\u2026');
     $('.download.transfer-buttons', $downloadPage).removeClass('hidden');
     $('.download.warning-block').removeClass('visible');
-    $('.download-state-text').addClass('hidden');
 
     if (isDlWithMegaSync) {
         $('.download .pause-transfer').addClass('hidden');
@@ -861,7 +860,9 @@ function closedlpopup()
 
 function importFile() {
     'use strict';
-    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]);
+    M.importFileLink(dl_import[0], dl_import[1], dl_attr, dl_import[2]).always(function() {
+        mBroadcaster.sendMessage('fm:importFileLinkDone');
+    });
 }
 
 function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)

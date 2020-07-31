@@ -855,7 +855,7 @@ accountUI.account = {
                 .attr('max', i);
 
             if (u_attr.birthyear) {
-                $input.val(u_attr.birthyear);
+                $input.val(u_attr.birthyear).trigger('input');
             }
         },
 
@@ -865,7 +865,7 @@ accountUI.account = {
 
             if (u_attr.birthmonth) {
                 var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bmonth');
-                $input.val(u_attr.birthmonth);
+                $input.val(u_attr.birthmonth).trigger('input');
                 this.zerofill($input[0]);
             }
         },
@@ -876,7 +876,7 @@ accountUI.account = {
 
             if (u_attr.birthday) {
                 var $input = $('.mega-input-title-ontop.birth.' + $.dateTimeFormat['structure'] + ' .bdate');
-                $input.val(u_attr.birthday);
+                $input.val(u_attr.birthday).trigger('input');
                 this.zerofill($input[0]);
             }
         },
@@ -1083,8 +1083,16 @@ accountUI.account = {
                         }
                     }
 
-                    if ($firstNameField.val().trim().length > 0  && $lastNameField.val().trim().length > 0 &&
-                        !$('.errored', $personalInfoBlock).length) {
+                    var enteredFirst = $firstNameField.val().trim();
+                    var enteredLast = $lastNameField.val().trim();
+
+                    if (enteredFirst.length > 0 && enteredLast.length > 0 &&
+                        !$('.errored', $personalInfoBlock).length &&
+                        (enteredFirst !== u_attr.firstname ||
+                        enteredLast !== u_attr.lastname ||
+                        ($('.bdate', $birthdayBlock).val() | 0) !== (u_attr.birthday | 0) ||
+                        ($('.bmonth', $birthdayBlock).val() | 0) !== (u_attr.birthmonth | 0) ||
+                        ($('.byear', $birthdayBlock).val() | 0)  !== (u_attr.birthyear | 0))) {
                         $saveBlock.removeClass('closed');
                     }
                     else {

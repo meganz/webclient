@@ -921,20 +921,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
         e.stopPropagation();
 
         if (nodeId === 'shares') {
-            // [...] TODO: Decide on the correct behavior -- redirect to `Contacts` or stay within the dialog
-
-            // Open `Contacts` and show the shared folders by the owner of the given breadcrumb node
-            // return prevNodeId && M.d[prevNodeId] && M.openFolder(M.d[prevNodeId].h);
-
             // Switch the active tab to `Incoming Shares`
             return this.handleTabChange('shares');
-        }
-
-        if (nodeId === M.InboxID) {
-            // [...] TODO: Which tab should be active when we open search result that is contained within `Inbox` --
-            //  `Cloud Drive`, `Incoming Shares` or else?
-
-            // return this.handleTabChange('inbox');
         }
 
         // Click to open allowed only on folders as breadcrumb nodes
@@ -1155,10 +1143,11 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         const classes = `add-from-cloud ${self.props.className}`;
 
-        var folderIsHighlighted = false;
-        var share = false;
+        let folderIsHighlighted = false;
+        let share = false;
+        let isIncomingShare = false;
 
-        var breadcrumb = [];
+        let breadcrumb = [];
         const entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
         if (entryId !== undefined) {
@@ -1186,6 +1175,10 @@ class CloudBrowserDialog extends MegaRenderMixin {
                     const prevNodeId = path[k - 1];
                     const nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
                     const nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
+
+                    // Flag that the specific node is part of the `Incoming Shares` node chain;
+                    // The `Attach` button is not available for isIncomingShare nodes.
+                    isIncomingShare = nodeId === 'shares';
 
                     (function(nodeId, k) {
                         breadcrumb.unshift(
@@ -1215,28 +1208,26 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 });
         }
 
-        self.state.highlighted.forEach(function(nodeId) {
+        this.state.highlighted.forEach(nodeId => {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
                 folderIsHighlighted = true;
             }
-
             share = M.getNodeShare(nodeId);
         });
 
-        var buttons = [];
-
-        if (!folderIsHighlighted || self.props.folderSelectable) {
+        let buttons = [];
+        if (!folderIsHighlighted || this.props.folderSelectable) {
             buttons.push({
-                "label": self.props.selectLabel,
+                "label": this.props.selectLabel,
                 "key": "select",
                 "className": "default-grey-button " +
-                    (self.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.selected.length > 0) {
-                        self.props.onSelected(
-                            self.state.selected.filter(node => !M.getNodeShare(node).down)
+                    (this.state.selected.length === 0 || (share && share.down) ? "disabled" : null),
+                "onClick": e => {
+                    if (this.state.selected.length > 0) {
+                        this.props.onSelected(
+                            this.state.selected.filter(node => !M.getNodeShare(node).down)
                         );
-                        self.props.onAttachClicked();
+                        this.props.onAttachClicked();
                     }
 
                     e.preventDefault();
@@ -1244,39 +1235,82 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 }
             });
         }
-        else if (folderIsHighlighted) {
-            buttons.push({
-                "label": self.props.openLabel,
-                "key": "select",
-                "className": "default-grey-button " + (share && share.down ? "disabled" : null),
-                "onClick": function(e) {
-                    if (self.state.highlighted.length > 0) {
-                        self.setState({'currentlyViewedEntry': self.state.highlighted[0]});
-                        self.clearSelectionAndHighlight();
-                        self.browserEntries.setState({
-                            'selected': [],
-                            'searchValue': '',
-                            'highlighted': []
+
+        if (folderIsHighlighted) {
+            const { highlighted } = this.state;
+            const className = `default-grey-button ${share && share.down ? 'disabled' : null}`;
+            const highlightedNode = highlighted && highlighted.length && highlighted[0];
+            const allowAttachFolders = (
+                this.props.allowAttachFolders &&
+                !isIncomingShare &&
+                M.d[highlightedNode].u === u_handle &&
+                M.d[highlightedNode].su === undefined &&
+                M.getNodeShareUsers(highlightedNode, 'EXP').length === 0
+            );
+
+            buttons.push(
+                allowAttachFolders ? {
+                    "label": l[8023],
+                    "key": "attach",
+                    className,
+                    onClick: () => {
+                        this.props.onClose();
+                        onIdle(() => {
+                            const createPublicLink = () => {
+                                M.createPublicLink(highlightedNode)
+                                    .then(({ link }) =>
+                                        this.props.room.sendMessage(link)
+                                    );
+                            };
+
+                            return (
+                                mega.megadrop.isDropExist(highlightedNode).length ?
+                                    msgDialog(
+                                        'confirmation',
+                                        // `Confirm removal`
+                                        l[1003],
+                                        // `By doing this you will cancel your MEGAdrop setup for the folder named %1`
+                                        l[17403].replace('%1', escapeHTML(highlightedNode.name)),
+                                        // `Do you want to proceed?`
+                                        l[18229],
+                                        (e) => {
+                                            if (e) {
+                                                mega.megadrop.pufRemove([highlightedNode]);
+                                                mega.megadrop.pufCallbacks[highlightedNode] = { del: createPublicLink };
+                                            }
+                                        }
+                                    ) :
+                                    createPublicLink()
+                            );
                         });
                     }
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-            });
+                } : null,
+                {
+                    "label": this.props.openLabel,
+                    "key": "select",
+                    className,
+                    onClick: e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        this.setState({ currentlyViewedEntry: highlightedNode });
+                        this.clearSelectionAndHighlight();
+                        this.browserEntries.setState({ selected: [], searchValue: '', highlighted: [] });
+                    }
+                });
         }
 
         buttons.push({
-            "label": self.props.cancelLabel,
+            "label": this.props.cancelLabel,
             "key": "cancel",
-            "onClick": function(e) {
-                self.props.onClose(self);
+            "onClick": e => {
+                this.props.onClose(this);
                 e.preventDefault();
                 e.stopPropagation();
             }
         });
 
         var gridHeader = [];
-
         if (viewMode === "0") {
             gridHeader.push(
                 <table className="grid-table-header fm-dialog-table" key={"grid-table-header"}>

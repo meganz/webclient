@@ -3304,6 +3304,40 @@ MegaData.prototype.leaveShare = function(h) {
     return promise;
 };
 
+MegaData.prototype.createPublicLink = promisify(function(resolve, reject, handle) {
+    'use strict';
+
+    dbfetch.get(handle).then(function() {
+        return M.getNodeShare(handle).h === handle || !M.d[handle].t || !!u_sharekeys[handle] || M.getNodes(handle, 1);
+    }).then(function(nodes) {
+        return Array.isArray(nodes) ? api_setshare(handle, [{u: 'EXP', r: 0}], nodes) : {r: [0]};
+    }).then(function(res) {
+        return M.d[handle].ph || res.r && res.r[0] === 0 && M.req({a: 'l', i: requesti, n: handle});
+    }).then(function(ph) {
+        if (!ph || typeof ph !== 'string') {
+            return reject(EFAILED);
+        }
+        var n = M.getNodeByHandle(handle);
+        if (n.ph !== ph) {
+            M.nodeShare(handle, {h: handle, r: 0, u: 'EXP', ts: unixtime(), ph: ph});
+            n.ph = ph;
+            M.nodeUpdated(n);
+        }
+        var res = {
+            n: n,
+            ph: ph,
+            key: n.t ? u_sharekeys[n.h][0] : n.k
+        };
+        if (mega.flags.nlfe) {
+            res.link = getBaseUrl() + '/' + (n.t ? 'folder' : 'file') + '/' + res.ph + '#' + a32_to_base64(res.key);
+        }
+        else {
+            res.link = getBaseUrl() + '/#' + (n.t ? 'F' : '') + '!' + res.ph + '!' + a32_to_base64(res.key);
+        }
+        resolve(res);
+    }).catch(reject);
+});
+
 /**
  * Retrieve node share.
  * @param {String|Object} node cloud node or handle

@@ -3616,24 +3616,26 @@ var ModalDialog = function (_MegaRenderMixin2) {
 
     if (self.props.buttons) {
       var buttons = [];
-      self.props.buttons.forEach(function (v) {
-        buttons.push(React.createElement("a", {
-          className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
-          onClick: function onClick(e) {
-            if ($(e.target).is(".disabled")) {
-              return false;
-            }
+      self.props.buttons.forEach(function (v, i) {
+        if (v) {
+          buttons.push(React.createElement("a", {
+            className: (v.defaultClassname ? v.defaultClassname : "default-white-button right") + (v.className ? " " + v.className : ""),
+            onClick: function onClick(e) {
+              if ($(e.target).is(".disabled")) {
+                return false;
+              }
 
-            if (v.onClick) {
-              v.onClick(e, self);
-            }
-          },
-          key: v.key
-        }, v.iconBefore ? React.createElement("i", {
-          className: v.iconBefore
-        }) : null, v.label, v.iconAfter ? React.createElement("i", {
-          className: v.iconAfter
-        }) : null));
+              if (v.onClick) {
+                v.onClick(e, self);
+              }
+            },
+            key: v.key + i
+          }, v.iconBefore ? React.createElement("i", {
+            className: v.iconBefore
+          }) : null, v.label, v.iconAfter ? React.createElement("i", {
+            className: v.iconAfter
+          }) : null));
+        }
       });
       footer = React.createElement("div", {
         className: "fm-dialog-footer white"
@@ -5757,8 +5759,6 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       return this.handleTabChange('shares');
     }
 
-    if (nodeId === M.InboxID) {}
-
     if (M.d[nodeId] && M.d[nodeId].t) {
       this.setState({
         selectedTab: M.d[nodeId].p ? 'shares' : 'clouddrive',
@@ -5978,11 +5978,14 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
   };
 
   _proto2.render = function render() {
+    var _this6 = this;
+
     var self = this;
     var viewMode = localStorage.dialogViewMode ? localStorage.dialogViewMode : "0";
     var classes = "add-from-cloud " + self.props.className;
     var folderIsHighlighted = false;
     var share = false;
+    var isIncomingShare = false;
     var breadcrumb = [];
     var entryId = self.isSearch() ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
 
@@ -6011,6 +6014,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
         var prevNodeId = path[k - 1];
         var nodeName = self.getBreadcrumbNodeText(nodeId, prevNodeId);
         var nodeIcon = self.getBreadcrumbNodeIcon(nodeId);
+        isIncomingShare = nodeId === 'shares';
 
         (function (nodeId, k) {
           breadcrumb.unshift(self.isSearch() ? external_React_default.a.createElement("div", {
@@ -6044,7 +6048,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       });
     }
 
-    self.state.highlighted.forEach(function (nodeId) {
+    this.state.highlighted.forEach(function (nodeId) {
       if (M.d[nodeId] && M.d[nodeId].t === 1) {
         folderIsHighlighted = true;
       }
@@ -6053,39 +6057,18 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
     });
     var buttons = [];
 
-    if (!folderIsHighlighted || self.props.folderSelectable) {
+    if (!folderIsHighlighted || this.props.folderSelectable) {
       buttons.push({
-        "label": self.props.selectLabel,
+        "label": this.props.selectLabel,
         "key": "select",
-        "className": "default-grey-button " + (self.state.selected.length === 0 || share && share.down ? "disabled" : null),
+        "className": "default-grey-button " + (this.state.selected.length === 0 || share && share.down ? "disabled" : null),
         "onClick": function onClick(e) {
-          if (self.state.selected.length > 0) {
-            self.props.onSelected(self.state.selected.filter(function (node) {
+          if (_this6.state.selected.length > 0) {
+            _this6.props.onSelected(_this6.state.selected.filter(function (node) {
               return !M.getNodeShare(node).down;
             }));
-            self.props.onAttachClicked();
-          }
 
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-    } else if (folderIsHighlighted) {
-      buttons.push({
-        "label": self.props.openLabel,
-        "key": "select",
-        "className": "default-grey-button " + (share && share.down ? "disabled" : null),
-        "onClick": function onClick(e) {
-          if (self.state.highlighted.length > 0) {
-            self.setState({
-              'currentlyViewedEntry': self.state.highlighted[0]
-            });
-            self.clearSelectionAndHighlight();
-            self.browserEntries.setState({
-              'selected': [],
-              'searchValue': '',
-              'highlighted': []
-            });
+            _this6.props.onAttachClicked();
           }
 
           e.preventDefault();
@@ -6094,11 +6077,65 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       });
     }
 
+    if (folderIsHighlighted) {
+      var highlighted = this.state.highlighted;
+      var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
+      var highlightedNode = highlighted && highlighted.length && highlighted[0];
+      var allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && M.d[highlightedNode].u === u_handle && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+      buttons.push(allowAttachFolders ? {
+        "label": l[8023],
+        "key": "attach",
+        className: className,
+        onClick: function onClick() {
+          _this6.props.onClose();
+
+          onIdle(function () {
+            var createPublicLink = function createPublicLink() {
+              M.createPublicLink(highlightedNode).then(function (_ref2) {
+                var link = _ref2.link;
+                return _this6.props.room.sendMessage(link);
+              });
+            };
+
+            return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], function (e) {
+              if (e) {
+                mega.megadrop.pufRemove([highlightedNode]);
+                mega.megadrop.pufCallbacks[highlightedNode] = {
+                  del: createPublicLink
+                };
+              }
+            }) : createPublicLink();
+          });
+        }
+      } : null, {
+        "label": this.props.openLabel,
+        "key": "select",
+        className: className,
+        onClick: function onClick(e) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          _this6.setState({
+            currentlyViewedEntry: highlightedNode
+          });
+
+          _this6.clearSelectionAndHighlight();
+
+          _this6.browserEntries.setState({
+            selected: [],
+            searchValue: '',
+            highlighted: []
+          });
+        }
+      });
+    }
+
     buttons.push({
-      "label": self.props.cancelLabel,
+      "label": this.props.cancelLabel,
       "key": "cancel",
       "onClick": function onClick(e) {
-        self.props.onClose(self);
+        _this6.props.onClose(_this6);
+
         e.preventDefault();
         e.stopPropagation();
       }
@@ -14274,6 +14311,8 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       var selected = [];
       attachCloudDialog = external_React_default.a.createElement(cloudBrowserModalDialog.CloudBrowserDialog, {
         folderSelectNotAllowed: true,
+        allowAttachFolders: true,
+        room: room,
         onClose: function onClose() {
           self.setState({
             'attachCloudDialog': false

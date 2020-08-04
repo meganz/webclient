@@ -19,7 +19,7 @@ var aboutus = {
 
     fetchCMS: function() {
         "use strict";
-        M.xhr({url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_" + lang, type: 'json'})
+        M.xhr({url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_en", type: 'json'})
             .then(function(ev, members) {
                 members.sort(function() {
                     return 0.5 - Math.random();

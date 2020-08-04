@@ -99,6 +99,9 @@ var megasync = (function() {
                 return ShttpMegasyncUrl;
             }
         }
+        else if (ua.details.browser === 'Edgium') {
+            return httpMegasyncUrl;
+        }
         else {
             return ShttpMegasyncUrl;
         }

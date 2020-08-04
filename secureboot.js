@@ -56,7 +56,6 @@ var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_android = /android/.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_old_windows_phone = /Windows Phone 8|IEMobile\/9|IEMobile\/10|IEMobile\/11/i.test(ua);
-var is_internet_explorer_11 = Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
 var is_uc_browser = /ucbrowser/.test(ua);
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io' || is_extension;
 self.fetchStreamSupport = (
@@ -299,9 +298,9 @@ if (is_chrome_firefox) {
 
 var myURL = window.URL;
 
-// Check whether we should redirect the user to the browser update.html page (triggered for IE10 and worse browsers)
-browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' ||
-    (window.chrome && !document.exitPointerLock);
+// Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
+browserUpdate = browserUpdate || localStorage.testie11 || window.MSBlobBuilder || !myURL ||
+    typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -859,50 +858,6 @@ else {
 	{
 		console.log('Probably Google Cache?');
 	}
-}
-
-// Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
-    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
-    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
-
-/**
- * Determines whether to show the Site Update page for IE11 users. For IE11 users they are shown the Site Update page
- * once initially with option to continue to the site, then they are shown again after 2 weeks, then 1 week, then 4
- * days, then 2 days, then every day after that.
- * @returns {Boolean} Returns true if it should show the page, false if not
- */
-var showUpdatePage = function() {
-
-    'use strict';
-
-
-    // Always show the site update page for IE11 users except for public links only
-    if (isPublicLink(page)) {
-        return false;
-    }
-
-    var showSiteUpdateAfter = localStorage.getItem('showSiteUpdateAfter');
-
-    // If they've already seen the update page in the past
-    if (showSiteUpdateAfter !== null) {
-
-        // Convert from JSON string
-        var showSiteUpdateAfterObj = JSON.parse(showSiteUpdateAfter);
-
-        // If it is not yet time to show the update page again, don't show it
-        if (showSiteUpdateAfterObj.showAgainDateTime >= Date.now()) {
-            return false;
-        }
-    }
-
-    return true;
-};
-
-// If IE 11 and they are due to see the Site Update page again, set flag to redirect to update page.
-// This won't be shown for the legacy mobile page so that the apps keep working.
-if (!showLegacyMobilePage && (localStorage.testie11 || is_internet_explorer_11) && showUpdatePage()) {
-    browserUpdate = true;
 }
 
 // If they need to update their browser, store the current page before going to the update page
@@ -1777,6 +1732,11 @@ if (is_ios) {
         };
     }
 }
+
+// Determine whether to show the legacy mobile page for these links so that they redirect back to the app
+var showLegacyMobilePage = (m && (page.substr(0, 6) === 'verify' || page.substr(0, 6) === 'fm/ipc' ||
+    page.substr(0, 9) === 'newsignup' || page.substr(0, 7) === 'account' ||
+    (is_old_windows_phone && page.substr(0, 7) === 'confirm')));
 
 /**
  * Some legacy secureboot mobile code that has been refactored to keep just the blog working and also redirect to the

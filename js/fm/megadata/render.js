@@ -453,7 +453,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     }
     else if (folderlink && $('.default-white-button.l-pane-visibility').hasClass('active')) {
         $('.folder-link .right-arrow-bg', $block)
-            .safeHTML('<span>' + M.getNameByHandle(M.RootID) + '</span>');
+            .safeHTML('<span>' + escapeHTML(M.getNameByHandle(M.RootID)) + '</span>');
     }
     else {
         $('.fm-breadcrumbs', $block).addClass('deactivated');

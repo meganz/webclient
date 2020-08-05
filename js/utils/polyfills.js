@@ -197,8 +197,8 @@ mBroadcaster.once('boot_done', function() {
             var fail = function(result) {
                 return {status: 'rejected', reason: result};
             };
-            var map = function(promise) {
-                return promise.then(done).catch(fail);
+            var map = function(value) {
+                return Promise.resolve(value).then(done).catch(fail);
             };
             return Promise.all(promises.map(map));
         };

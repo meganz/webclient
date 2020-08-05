@@ -305,9 +305,10 @@
             return true;
         }
 
-        if (page == 'start') {
-            if ($('#fmholder').html() == '') {
-                $('#fmholder').html(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+        if (page === 'start' && !is_mobile) {
+            console.assert(typeof fm_addhtml === 'function');
+            if (typeof fm_addhtml === 'function') {
+                fm_addhtml();
             }
         }
 

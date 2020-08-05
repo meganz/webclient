@@ -1116,7 +1116,31 @@ function FMShortcuts() {
 
 
 
+function fm_addhtml() {
+    'use strict';
 
+    var elm = document.getElementById('fmholder');
+    if (elm) {
+        if (!elm.textContent) {
+            $(elm).safeHTML(translate(String(pages.fm).replace(/{staticpath}/g, staticpath)));
+        }
+
+        if (!document.getElementById('invoicePdfPrinter')) {
+            elm = document.querySelector('.invoice-container');
+            if (elm && elm.parentNode) {
+                elm.parentNode.insertBefore(mCreateElement('iframe', {
+                    type: 'content',
+                    'class': 'hidden',
+                    src: 'about:blank',
+                    id: 'invoicePdfPrinter'
+                }), elm);
+            }
+        }
+    }
+    else {
+        console.error('fmholder container not found...');
+    }
+}
 
 function fm_hideoverlay() {
     "use strict";

@@ -17548,20 +17548,11 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   var rooms = Object.keys(Chat.mcf);
 
   for (var i = rooms.length; i--;) {
-    if (!this.publicChatKeys[rooms[i]]) {
-      promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
-    }
-
+    promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
     delete Chat.mcf[rooms[i]];
   }
 
   Promise.allSettled(promises).then(function (res) {
-    var pub = Object.keys(self.publicChatKeys);
-    return Promise.allSettled([res].concat(pub.map(function (pch) {
-      return self.plugins.chatdIntegration.openChat(pch, true);
-    })));
-  }).then(function (res) {
-    res = res[0].value.concat(res.slice(1));
     self.logger.info('chats settled...', res);
     self.$conversationsAppInstance = react_dom1.a.render(self.$conversationsApp = react0.a.createElement(_ui_conversations_jsx2__["default"].ConversationsApp, {
       megaChat: self

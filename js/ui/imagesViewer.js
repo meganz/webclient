@@ -294,6 +294,7 @@ var slideshowid;
         if (slideshow_stop) {
             $overlay.removeClass('slideshow').off('mousewheel.imgzoom');
             slideshowplay = false;
+            slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
             $pauseButton.find('i').removeClass('play').addClass('pause');
             clearTimeout(slideshowTimer);

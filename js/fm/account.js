@@ -3130,21 +3130,48 @@ accountUI.transfers = {
 accountUI.contactAndChat = {
 
     init: function(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
-
         'use strict';
-
-        if (!megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.plugins.presencedIntegration) {
-            var presenceInt = megaChat.plugins.presencedIntegration;
-            var delaying = this.delayRender(presenceInt, autoaway);
-
-            if (delaying) {
-                return;
-            }
-
-            this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-            this.status.bindEvents(presenceInt, autoawaytimeout);
-            this.richURL.render();
+        if (window.megaChatIsDisabled) {
+            console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
+            return;
         }
+
+        var self = this;
+
+        if (!megaChatIsReady) {
+            // If chat is not ready waiting for chat_initialized broadcaster.
+            loadingDialog.show();
+            var args = toArray.apply(null, arguments);
+            mBroadcaster.once('chat_initialized', function() {
+                self.init.apply(self, args);
+            });
+            return true;
+        }
+        loadingDialog.hide();
+        $.tresizer();
+
+        var presenceInt = megaChat.plugins.presencedIntegration;
+
+        if (!presenceInt || !presenceInt.userPresence) {
+            setTimeout(function() {
+                throw new Error('presenceInt is not ready...');
+            });
+            return true;
+        }
+
+        presenceInt.rebind('settingsUIUpdated.settings', function() {
+            self.init.apply(self, toArray.apply(null, arguments).slice(1));
+        });
+
+        // Only call this if the call of this function is the first one, made by fm.js -> accountUI
+        if (autoaway === undefined) {
+            presenceInt.userPresence.updateui();
+            return true;
+        }
+
+        this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
+        this.status.bindEvents(presenceInt, autoawaytimeout);
+        this.richURL.render();
     },
 
     status: {
@@ -3275,66 +3302,6 @@ accountUI.contactAndChat = {
                         RichpreviewsFilter.confirmationDoNever();
                     }
                 });
-        }
-    },
-
-    delayRender: function(presenceInt, autoaway) {
-
-        'use strict';
-
-        var self = this;
-
-        if (!megaChatIsReady) {
-            if (megaChatIsDisabled) {
-                console.error('Mega Chat is disabled, cannot proceed to Contact and Chat settings');
-            }
-            else {
-                // If chat is not ready waiting for chat_initialized broadcaster.
-                loadingDialog.show();
-                mBroadcaster.once('chat_initialized', self.delayRender.bind(self, presenceInt, autoaway));
-            }
-            return true;
-        }
-        loadingDialog.hide();
-
-        if (!presenceInt || !presenceInt.userPresence) {
-            setTimeout(function() {
-                throw new Error('presenceInt is not ready...');
-            });
-            return true;
-            // ^ FIXME too..!
-        }
-
-        // Only call this if the call of this function is the first one, made by fm.js -> accountUI
-        if (autoaway === undefined) {
-            presenceInt.rebind('settingsUIUpdated.settings', function(
-                e,
-                autoaway,
-                autoawaylock,
-                autoawaytimeout,
-                persist,
-                persistlock,
-                lastSeen
-            ) {
-                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-            });
-
-            presenceInt.userPresence.updateui();
-            return true;
-        }
-
-        if (typeof (megaChat) !== 'undefined' && typeof(presenceInt) !== 'undefined') {
-            presenceInt.rebind('settingsUIUpdated.settings', function(
-                e,
-                autoaway,
-                autoawaylock,
-                autoawaytimeout,
-                persist,
-                persistlock,
-                lastSeen
-            ) {
-                self.init(autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
-            });
         }
     },
 };

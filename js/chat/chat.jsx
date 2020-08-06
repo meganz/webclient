@@ -322,10 +322,9 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                 .dump('on-chat-history-loaded');
 
             self.is_initialized = true;
-            mBroadcaster.sendMessage('chat_initialized');
-
             self.registerUploadListeners();
             self.trigger("onInit");
+            mBroadcaster.sendMessage('chat_initialized');
 
             return true;
         })

@@ -800,6 +800,17 @@ if (!browserUpdate && is_extension)
 
             if (tmp.version === '109101.103.97') {
                 urlrootfile = 'webclient/index.html';
+
+                if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
+                    chrome.runtime.getPackageDirectoryEntry(function(root) {
+                        'use strict';
+                        root.getDirectory('images', {create: false}, function(dir) {
+                            if (dir && dir.isDirectory && dir.name === 'images') {
+                                staticpath = bootstaticpath;
+                            }
+                        });
+                    });
+                }
             }
         }
 

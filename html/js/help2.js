@@ -107,7 +107,6 @@ var Help = (function() {
         }, 100);
     }
 
-
     function helpScrollTo(selector) {
         var $target = $(selector);
         var $dataTarget = $('*[data-update="' + selector + '"]');
@@ -202,10 +201,12 @@ var Help = (function() {
         $container.find('form').rebind('submit', function(e) {
             e.preventDefault();
 
-            // Log search submitted
-            api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
-
-            loadSubPage(url('search', $(this).find('input[type="text"]').val()));
+            var searchVal = $('input[type="text"]', $(this)).val();
+            if (searchVal !== "") {
+                // Log search submitted
+                api_req({ a: 'log', e: 99619, m: 'Help2 regular search feature used' });
+                loadSubPage(url('search', searchVal));
+            }
         });
 
         $container.find('form input[type=text]').each(function() {
@@ -279,7 +280,6 @@ var Help = (function() {
         });
     }
 
-
     // User Feedback Information section
     function userfeedback() {
 
@@ -337,7 +337,6 @@ var Help = (function() {
             $(this).find('input').prop('checked', true);
         });
     }
-
 
     // Home Page Panel Interaction
     function homepageinteraction() {
@@ -429,10 +428,9 @@ var Help = (function() {
         });
     }
 
-
     var urls = {
         'search': function(args) {
-            var searchTerm = mURIDecode(String(args[1]).replace(/\+/g, ' '));
+            var searchTerm = mURIDecode(String(args[1] ? args[1] : "").replace(/\+/g, ' '));
             var sText = searchTerm.replace(/[+-]/g, ' ');
             var search = sText.replace(/%([\da-f]+)/g, function(all, number) {
                 return String.fromCharCode(parseInt(number, 16));
@@ -451,8 +449,11 @@ var Help = (function() {
 
             parsepage(Data.help_search_tpl.html);
 
-            $('#help2-main .search').val(sText);
+            if (words.length === 0) {
+                articles = [];
+            }
 
+            $('#help2-main .search').val(sText);
             if (articles.length === 0) {
                 $('.search-404-block').show();
                 $('.main-search-pad,.sidebar-menu-container').hide();
@@ -499,7 +500,6 @@ var Help = (function() {
                     .text(tag.text + ' ' + tag.count)
                     .appendTo('.sidebar-tags-container');
             });
-
         },
         'client': function(args) {
             if (args[1] === 'mobile') {

@@ -299,7 +299,7 @@ if (is_chrome_firefox) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || localStorage.testie11 || window.MSBlobBuilder || !myURL ||
+browserUpdate = browserUpdate || window.MSBlobBuilder || !myURL ||
     typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
 
 if (!String.prototype.trim) {

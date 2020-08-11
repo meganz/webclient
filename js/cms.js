@@ -143,6 +143,29 @@
         return false;
     }
 
+    function parse_cms_content(content) {
+        if (content && typeof content !== 'string') {
+            content = ab_to_str(content);
+        }
+
+        return String(content)
+            .replace(/\s+/g, ' ')
+            // eslint-disable-next-line no-use-before-define
+            .replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl())
+            .replace(/<a[^>]+>/g, function(m) {
+                if (m.indexOf('href=&quot;') > 0) {
+                    m = m.replace(/&quot;/g, '"');
+                }
+                if (/href=["']\w+:/.test(m)) {
+                    m = m.replace('>', ' target="_blank" rel="noopener noreferrer">');
+                }
+                if (/href=["'][#/]/.test(m)) {
+                    m = m.replace('>', ' class="clickurl">');
+                }
+                return m;
+            });
+    }
+
     function process_cms_response(bytes, next, as, id) {
         var viewer = new Uint8Array(bytes);
 
@@ -165,7 +188,7 @@
         if (verify_cms_content(content, signature, id)) {
             switch (mime) {
             case 3: // html
-                content = ab_to_str(content).replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+                    content = parse_cms_content(content);
                 next(false, { html: content, mime: mime});
                 return loaded(id);
 
@@ -504,19 +527,21 @@
 
 })(this);
 
-CMS.on('corporate', function()
-{
+CMS.on('corporate', function() {
+    'use strict';
+
     $('.new-left-menu-link').rebind('click', function() {
         loadSubPage('corporate/' + $(this).attr('id'));
-        $('.old .fmholder').animate({ scrollTop: 0 }, 0);
+        $('.old .fmholder').animate({scrollTop: 0}, 0);
     });
-    var ctype = getSitePath().substr(11);
-    if ($('#' + ctype).length === 1) {
+    var ctype = getSitePath().substr(11).replace(/[^\w-]/g, '');
+    if (ctype && document.getElementById(ctype)) {
         $('.new-right-content-block').addClass('hidden');
         $('.new-right-content-block.' + ctype).removeClass('hidden');
         $('.new-left-menu-link').removeClass('active');
         $('#' + ctype).addClass('active');
-    } else {
+    }
+    else {
         $('.new-left-menu-link:first').trigger('click');
     }
 });

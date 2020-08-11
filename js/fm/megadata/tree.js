@@ -805,8 +805,8 @@ MegaData.prototype.treeSortUI = function() {
 MegaData.prototype.treePanelType = function() {
     'use strict';
 
-    var remove = /(?:active|nw-fm-left-icon|ui-droppable|filled|glow|asc|desc)/g;
-    return $.trim($('.nw-fm-left-icon.active').attr('class').replace(remove, ''));
+    var remove = /active|nw-fm-left-icon|ui-droppable|filled|glow|asc|desc/g;
+    return $.trim(String($('.nw-fm-left-icon.active').attr('class') || 'unknown').replace(remove, ''));
 };
 
 /**

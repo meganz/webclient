@@ -87,6 +87,10 @@ mBroadcaster.once('startMega:desktop', function() {
             delete pages[p[i]];
         }
     }
+
+    if ((p = document.querySelector('.viewer-image-bl'))) {
+        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
+    }
 });
 
 function startMega() {
@@ -1932,8 +1936,8 @@ function init_page() {
             if (is_mobile) {
                 $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
-            else if ($('#fmholder').html() === '') {
-                $('#fmholder').safeHTML(translate(pages['fm'].replace(/{staticpath}/g, staticpath)));
+            else {
+                fm_addhtml();
             }
 
             if (!anonymouschat) {

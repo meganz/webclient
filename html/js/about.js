@@ -9,7 +9,7 @@ var aboutus = {
         // Cache selectors
         var $page = $('.bottom-page.scroll-block.about', 'body');
 
-        this.fetchCMS($page);
+        this.fetchCMS();
 
         aboutus.openSubSection($page);
         if (page === 'about/main') {
@@ -19,24 +19,18 @@ var aboutus = {
 
     fetchCMS: function() {
         "use strict";
-        M.xhr({url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_en", type: 'json'})
-            .then(function(ev, members) {
-                members.sort(function() {
-                    return 0.5 - Math.random();
+
+        if (this.members) {
+            this.insMembersInHTML(this.members);
+        }
+        else {
+            var self = this;
+            M.xhr({ url: (localStorage.cms || "https://cms2.mega.nz/") + "unsigned/team_en", type: 'json' })
+                .then(function(ev, members) {
+                    self.members = members;
+                    self.insMembersInHTML(members);
                 });
-                var aboutContent = '';
-                for (var i = members.length; i--;) {
-                    aboutContent +=
-                        '<div class="bottom-page inline-block col-6 fadein">' +
-                            '<img class="shadow" src="' + escapeHTML(members[i].photo)
-                                + '" alt="' + escapeHTML(members[i].name) + '">' +
-                            '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
-                            '<span>' + escapeHTML(members[i].role) + '</span>' +
-                        '</div>';
-                }
-                aboutContent = aboutContent.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
-                $('.members', '.bottom-page').safeHTML(aboutContent);
-            });
+        }
     },
 
     /**
@@ -48,7 +42,6 @@ var aboutus = {
     showSubsectionContent: function($page, subsection) {
         "use strict";
 
-        loadSubPage('/about/' + subsection);
 
         $('.about.main-menu.item.active', $page).removeClass('active');
         $('.about.main-menu.item.about-' + subsection, $page).addClass('active');
@@ -84,7 +77,7 @@ var aboutus = {
 
         // Init main menu click
         $('.about.main-menu.item', $page).rebind('click.about', function() {
-            aboutus.showSubsectionContent($page, $(this).data('page'));
+            loadSubPage('/about/' + $(this).data('page'));
         });
     },
 
@@ -116,5 +109,24 @@ var aboutus = {
                 $('.about-mega-countries .num span', $page).text(mcountries);
             }
         });
+    },
+
+    insMembersInHTML: function(members) {
+        'use strict';
+        members.sort(function() {
+            return 0.5 - Math.random();
+        });
+        var aboutContent = '';
+        for (var i = members.length; i--;) {
+            aboutContent +=
+                '<div class="bottom-page inline-block col-6 fadein">' +
+                '<img class="shadow" src="' + escapeHTML(members[i].photo)
+                + '" alt="' + escapeHTML(members[i].name) + '">' +
+                '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
+                '<span>' + escapeHTML(members[i].role) + '</span>' +
+                '</div>';
+        }
+        aboutContent = aboutContent.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
+        $('.members', '.bottom-page').safeHTML(aboutContent);
     }
 };

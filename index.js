@@ -1503,6 +1503,9 @@ function init_page() {
         }
     }
     else if (page.substr(0, 5) === 'about') {
+        if (page === 'about') {
+            page = 'about/main';
+        }
         parsepage(pages.about);
         aboutus.init();
     }

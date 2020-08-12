@@ -171,7 +171,7 @@
 
                             if (action) {
                                 var name = file.name;
-
+                                var proceed = true;
                                 switch (action) {
                                     case ns.DONTCOPY:
                                         break;
@@ -179,10 +179,15 @@
                                         name = self.findNewName(name, node.p || target);
                                         /* falls through */
                                     case ns.REPLACE:
-                                        save(file, name, action, node);
+                                        proceed = save(file, name, action, node);
                                         break;
                                 }
-                                promptRecursion(a);
+                                if (proceed) {
+                                    promptRecursion(a);
+                                }
+                                else {
+                                    promptPromise.resolve();
+                                }
                             }
                             else {
                                 self.prompt(op, file, node, a.length, node.p || target)

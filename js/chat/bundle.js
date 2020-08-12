@@ -6081,7 +6081,7 @@ var cloudBrowserModalDialog_CloudBrowserDialog = function (_MegaRenderMixin2) {
       var highlighted = this.state.highlighted;
       var className = "default-grey-button " + (share && share.down ? 'disabled' : null);
       var highlightedNode = highlighted && highlighted.length && highlighted[0];
-      var allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && M.d[highlightedNode].u === u_handle && M.d[highlightedNode].su === undefined && M.getNodeShareUsers(highlightedNode, 'EXP').length === 0;
+      var allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare;
       buttons.push(allowAttachFolders ? {
         "label": l[8023],
         "key": "attach",

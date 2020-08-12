@@ -3308,7 +3308,7 @@ MegaData.prototype.createPublicLink = promisify(function(resolve, reject, handle
     'use strict';
 
     dbfetch.get(handle).then(function() {
-        return M.getNodeShare(handle).h === handle || !M.d[handle].t || !!u_sharekeys[handle] || M.getNodes(handle, 1);
+        return M.getNodeShare(handle).h === handle || !M.d[handle].t || M.getNodes(handle, 1);
     }).then(function(nodes) {
         return Array.isArray(nodes) ? api_setshare(handle, [{u: 'EXP', r: 0}], nodes) : {r: [0]};
     }).then(function(res) {

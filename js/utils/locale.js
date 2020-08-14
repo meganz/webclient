@@ -1107,6 +1107,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="/security" class="clickurl green txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
         .replace('[A]', '<a href="/security" class="clickurl red txt-bold" target="_blank">').replace('[/A]', '</a>');
+    l[23748] = escapeHTML(l[23748]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="/security" class="clickurl red txt-bold" target="_blank">').replace('[/A]', '</a>');
     l[22074] = l[22074].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
     l[22077] = l[22077].replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
     l[22247] = l[22247].replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');

@@ -212,7 +212,10 @@ mega.metatags = new function() {
         else if (page === 'businesssignup') {
             mTags.mega_title = 'Business Signup - MEGA';
         }
-        else if (page && page !== 'start' && isPageExcluded(page)) {
+        else if (page === 'start') {
+            mTags.mega_title = 'MEGA';
+        }
+        else if (page && isPageExcluded(page)) {
             mTags.mega_title = page.charAt(0).toUpperCase() + page.slice(1) + ' - MEGA';
         }
         else {
@@ -223,12 +226,11 @@ mega.metatags = new function() {
                 }
                 api_req({ a: 'log', e: 99735, m: 'page without title: ' + page });
             }
-            else {
-                metaRobots = document.createElement('meta');
-                metaRobots.name = 'robots';
-                metaRobots.content = 'noindex';
-                document.head.appendChild(metaRobots);
-            }
+
+            metaRobots = document.createElement('meta');
+            metaRobots.name = 'robots';
+            metaRobots.content = 'noindex';
+            document.head.appendChild(metaRobots);
         }
         if (!mTags.mega_desc) {
             mTags.mega_desc = mega.whoami;

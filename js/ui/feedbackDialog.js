@@ -174,7 +174,7 @@
 
         initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
 
-        $('.stats-button', self.$dialog).rebind('click.feedbackDialog', function() {
+        $('.feedback-question', self.$dialog).rebind('click.feedbackDialog', function() {
             var dialog = self.$dataReportDialog;
             if (!dialog) {
                 dialog = self.$dataReportDialog = new mega.ui.Dialog({

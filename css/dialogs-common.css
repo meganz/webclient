@@ -2,8 +2,10 @@
  * Dialogs CSS for mobile and desktop devices.
  */
 
-.dialog-sprite, i.dialog-sprite {
-    background-image: url(../images/mega/dialog-sprite_v14.png);
+.dialog-sprite, i.dialog-sprite,
+.ui-datepicker-prev, .ui-datepicker-next
+{
+    background-image: url(../images/mega/dialog-sprite_v15.png);
     background-repeat:  no-repeat;
 }
 .fm-dialog.big-radius {
@@ -19,7 +21,6 @@
 }
 .nw-fm-dialog-title, .fm-dialog-title {
     font-size: 20px;
-    color: #333333;
     line-height: 30px;
     color: #666;
     padding: 20px 48px 0 48px;
@@ -60,6 +61,8 @@
 .mobile .fm-dialog-title.medium {
     font-size: 16px;
 }
+
+/* Mobile only */
 .mobile .common-dialogs .fm-dialog {
     max-height: 100%;
     max-height: -webkit-calc(100% - 30px);

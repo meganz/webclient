@@ -817,6 +817,10 @@ if (!browserUpdate && is_extension)
         bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
     }
 
+    if (localStorage.useBootStaticPath) {
+        staticpath = bootstaticpath;
+    }
+
     Object.defineProperty(window, 'eval', {
         value : function evil(code) {
             'use strict';
@@ -2525,6 +2529,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});

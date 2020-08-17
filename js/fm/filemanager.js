@@ -2662,7 +2662,6 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
             $('#fmholder').addClass('transfer-panel-opened');
-            M.addNotificationsUI(1);
             var domScrollingTable = M.getTransferElements().domScrollingTable;
             if (!domScrollingTable.classList.contains('ps-container')) {
                 Ps.initialize(domScrollingTable, {suppressScrollX: true});
@@ -2792,18 +2791,6 @@ FileManager.prototype.addTransferPanelUI = function() {
             }
         }
     });
-};
-
-FileManager.prototype.addNotificationsUI = function(close) {
-    if (close) {
-        $('.fm-main.notifications').addClass('hidden');
-        $('.fm-main.default').removeClass('hidden');
-        return false;
-    }
-    $('.fm-main.notifications').removeClass('hidden');
-    $('.notifications .nw-fm-left-icon').removeClass('active');
-    $('.fm-main.default').addClass('hidden');
-    $.tresizer();
 };
 
 /**

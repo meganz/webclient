@@ -25,10 +25,6 @@
 .dropdown.body.big-radius, .fm-dialog.big-radius {
     border-radius: 24px;
 }
-.big-radius .fm-dialog-close {
-    right: 27px;
-    top: 27px;
-}
 .dropdown.info-txt {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 12px;
@@ -147,7 +143,7 @@
     background-position: 0 -2249px;
 }
 .dropdown-dark-arrow {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -41px -1315px;
     display: none;
@@ -267,7 +263,7 @@
     position: absolute;
     right: 7px;
     top: 9px;
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
     background-position: -106px -254px;
     opacity: 0.73;
@@ -332,7 +328,7 @@
     top: 7px;
     content: '';
     display: block;
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-repeat: no-repeat;
 }
 .colour-sorting-menu .dropdown-item.asc i::after {/* Dark arrow pointing up */
@@ -587,7 +583,7 @@
     transition: all 200ms ease-in-out, right 200ms ease-in-out;
 }
 .labels:not(.disabled) .dropdown-colour-item::after {
-    background-image: url(../images/mega/icons-sprite_v37.png);
+    background-image: url(../images/mega/icons-sprite_v39.png);
     background-position: 2.2px -532.2px;
     opacity: 0;
 }

@@ -1163,6 +1163,7 @@ RecentsRender.prototype._updateState = function(actions) {
 
     var removed = [];
     var added = [];
+    var removedAsExpanded = [];
     var newActionIdMap = {};
     var i;
     var k;
@@ -1193,6 +1194,12 @@ RecentsRender.prototype._updateState = function(actions) {
             delete this._renderCache[action.id];
             delete this._renderFunctions[action.id];
             delete this.actionIdMap[action.id];
+
+            // If this is expaned action and it is about to removed, save states with ts.
+            if (this._expandedStates[action.id]) {
+                removedAsExpanded.push(action.ts);
+            }
+
             this._dynamicList.remove(action.id);
             if (this._actionChildren[action.id]) {
                 for (k = 0; k < this._actionChildren[action.id].length; k++) {
@@ -1207,7 +1214,7 @@ RecentsRender.prototype._updateState = function(actions) {
     }
 
     if (stateChanged) {
-        this._applyStateChange(added, removed);
+        this._applyStateChange(added, removed, removedAsExpanded);
     }
 };
 
@@ -1217,7 +1224,7 @@ RecentsRender.prototype._updateState = function(actions) {
  * @param removed
  * @private
  */
-RecentsRender.prototype._applyStateChange = function(added, removed) {
+RecentsRender.prototype._applyStateChange = function(added, removed, removedAsExpanded) {
     'use strict';
     var action;
     var i;
@@ -1232,6 +1239,14 @@ RecentsRender.prototype._applyStateChange = function(added, removed) {
     // Inject new actions.
     var handled = 0;
     i = 0;
+
+    var currentScrollTop = this._dynamicList.getScrollTop();
+
+    var keepExpanded = function(id) {
+        $('.toggle-expanded-state', '.action-' + id).trigger('click');
+        this._dynamicList.scrollToYPosition(currentScrollTop);
+    };
+
     while (i < actions.length && handled < added.length) {
         action = actions[i];
         if (added[handled].ts > action.ts) {
@@ -1247,6 +1262,11 @@ RecentsRender.prototype._applyStateChange = function(added, removed) {
             actions.splice(pos, 0, added[handled]);
             this._populateNodeActionMap(added[handled]);
             this._dynamicList.insert(after, added[handled].id);
+
+            if (removedAsExpanded.indexOf(added[handled].ts) > -1) {
+                onIdle(keepExpanded.bind(this, added[handled].id));
+            }
+
             handled++;
         }
         i++;

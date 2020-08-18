@@ -77,47 +77,42 @@ var Help = (function() {
         return 'help/' + toArray.apply(null, arguments).join('/').trim().replace(/\s/g, '+');
     }
 
-    function selectMenuItem($element, $elements) {
+    function selectMenuItem($element, $elements, isScroll) {
         $elements = $elements || $('.updateSelected.current');
         $elements.removeClass('current');
         $element.addClass('current');
         var $link = $($element.data('update'))
             .parent().
-                find('.active').removeClass('active').end()
+            find('.active').removeClass('active').end()
             .end()
             .addClass('active');
 
-        delay('help2:selectMenuItem', function() {
+        if (!isScroll) {
             var state = $link.data('state');
-            if (!state && $link.data('to')) {
-                var parts = getUrlParts();
-                // the url normally includes, 'help', 'client', 'webclient', and 'section'/'question'
-                // set the first one as selected by default if it only has 'help', 'client', 'webclient'.
-                if (parts.length > 3) {
-                    parts.pop();
+            if (state) {
+                var splitPlace = state.lastIndexOf('/');
+                state = state.substr(0, splitPlace) + '#' + state.substr(splitPlace + 1);
+                var newpage = getCleanSitePath(state);
+                if (newpage !== page && page.substr(0, 4) === 'help') {
+                    page = newpage;
+                    history.pushState({ subpage: page }, '', (hashLogic ? '#' : '/') + page);
                 }
-                parts.push(String($link.data('to')).replace(/^[/#]+/, ''));
-                state = parts.join('/');
             }
-            var newpage = getCleanSitePath(state);
-            if (newpage !== page && page.substr(0, 4) === 'help') {
-                page = newpage;
-                history.replaceState({subpage: page}, '', (hashLogic ? '#' : '/') + page);
-            }
-        }, 100);
+        }
+
     }
 
     function helpScrollTo(selector) {
         var $target = $(selector);
         var $dataTarget = $('*[data-update="' + selector + '"]');
         if ($target.length) {
-            selectMenuItem($target);
+            selectMenuItem($target, null, true);
             $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $target.position().top - 20
             }, 1000);
         }
         else if ($dataTarget.length) {
-            selectMenuItem($dataTarget);
+            selectMenuItem($dataTarget, null, true);
             $('.bottom-pages .fmholder').stop().animate({
                 scrollTop: $('*[data-update="' + selector + '"]').position().top - 20
             }, 1000);
@@ -167,20 +162,34 @@ var Help = (function() {
     }
 
     function patchLinks() {
-        $('.d-section-items a, .popular-question-items a, .related-articles-list a').each(function(i,el) {
-            var url = $(el).attr('href') || $(el).data('fxhref');
+        var $sectionItems = $('.d-section-items a, .popular-question-items a, .related-articles-list a');
+        for (var k = 0; k < $sectionItems.length; k++) {
+            var $el = $($sectionItems[k]);
+            var url = $el.attr('href') || $el.data('fxhref');
 
-            // If not using hash routing (e.g. not an extension), change the link to use / at the start rather than #
-            if (url && !hashLogic) {
-                $(el).attr('href', String(url).replace('#', '/'));
+            if (url) {
+                if (!hashLogic) {
+                    url = url.replace('#', '/');
+                }
+                var pos = url.lastIndexOf('/');
+                url = url.substring(0, pos) + '#' + url.substring(pos + 1);
+                $el.attr('href', url);
             }
-        });
+        }
+
         $('.d-section-items a, .popular-question-items a, .related-articles-list a').rebind('click', function() {
             var url = $(this).attr('href') || $(this).data('fxhref');
             if (url) {
                 loadSubPage(url);
                 initScrollDownToQuestionId(url);
 
+                return false;
+            }
+        });
+        $('.d-section-title a', '.main-content-pad').rebind('click', function() {
+            var url = $(this).attr('href') || $(this).data('fxhref');
+            if (url) {
+                loadSubPage(url);
                 return false;
             }
         });
@@ -378,6 +387,13 @@ var Help = (function() {
         });
     }
 
+    function clearQuestion(question) {
+        if (question.lastIndexOf('-') !== -1) {
+            question = question.substring(question.lastIndexOf('-') + 1);
+        }
+        return question;
+    }
+
     // Header functions including search and go back buttons
 
     function headerInteraction() {
@@ -396,7 +412,7 @@ var Help = (function() {
             var $current = $($('.updateSelected.current')[0]);
 
             if ($current.length === 0) {
-                selectMenuItem($elements.eq(0), $current);
+                selectMenuItem($elements.eq(0), $current, true);
             }
             else {
                 var pcn = $current.pvisible();
@@ -407,7 +423,7 @@ var Help = (function() {
                     var nevis = $next.pvisible();
                     var $mvto = $prev.pvisible() > nevis ? $prev : nevis ? $next : null;
                     if ($mvto && $mvto.pvisible() > pcn) {
-                        selectMenuItem($mvto, $current);
+                        selectMenuItem($mvto, $current, true);
                     }
                 }
             }
@@ -510,7 +526,11 @@ var Help = (function() {
 
             args.shift();
             var question = '';
-            if (args.length === 3 || args.length === 2) {
+            if (args.length > 3) {
+                return loadSubPage('help');
+            }
+
+            if (args.length === 3) {
                 question = args.pop();
                 if (args.length === 2) {// if this a question.
                     if (question.lastIndexOf('-') !== -1) {
@@ -522,7 +542,14 @@ var Help = (function() {
                         return;
                     }
                 }
-            } else if (args.length !== 1) {
+            }
+            else if (args.length === 2 && location.hash) {
+                var sec = args.pop();
+                sec = sec.substring(0, sec.indexOf('#'));
+                args.push(sec);
+                question = clearQuestion(location.hash);
+            }
+            else if (args.length < 1) {
                 loadSubPage('help');
                 return;
             }
@@ -560,22 +587,29 @@ var Help = (function() {
             });
 
             $('.support-link-icon').rebind('click', function() {
-                var parts = getShortUrl($(this).parents('.support-article').attr('id'));
+                var articleURL = $(this).parents('.support-article').data('update');
+                if (articleURL) {
+                    articleURL = articleURL.replace('#section-', '#');
+                    var sectionURL = getCleanSitePath();
+                    var articlePos = sectionURL.lastIndexOf('#');
+                    if (articlePos > 0) {
+                        sectionURL = sectionURL.substring(0, articlePos);
+                    }
+                    var link = getBaseUrl() + '/' + sectionURL + articleURL;
+                    var $input = $('.share-help').removeClass('hidden');
 
-                var link = 'https://mega.nz/' + parts.join('/');
-                var $input = $('.share-help').removeClass('hidden')
-                    .find('input').val(link)
-                    .trigger("focus")
-                    .trigger('select');
-                $('.fm-dialog-close').rebind('click', function() {
-                    $('.share-help').addClass('hidden');
-                    fm_hideoverlay();
-                });
-                $('.copy-to-clipboard').rebind('click', function() {
-                    copyToClipboard(link, l[7654]);
-                    return false;
-                });
-                fm_showoverlay();
+                    $('input', $input).val(link).trigger("focus").trigger('select');
+
+                    $('.fm-dialog-close').rebind('click', function() {
+                        $('.share-help').addClass('hidden');
+                        fm_hideoverlay();
+                    });
+                    $('.copy-to-clipboard').rebind('click', function() {
+                        copyToClipboard(link, l[7654]);
+                        return false;
+                    });
+                    fm_showoverlay();
+                }
             });
 
             if (question) {
@@ -727,7 +761,14 @@ var Help = (function() {
             titles = blobs.help_search.object.map(function(entry) {
                 entry.label = entry.title;
                 entry.value = entry.title;
-                entry.url   = 'help/client/' + entry.id;
+                var cleanID = entry.id.replace('//', '/');
+                var urlParts = cleanID.split('/');
+                if (urlParts.length === 3) {
+                    var qu = urlParts.pop();
+                    cleanID = urlParts.join('/') + '#' + qu;
+                }
+                entry.url = 'help/client/' + cleanID;
+                entry.id = cleanID;
                 return entry;
             });
 
@@ -814,7 +855,12 @@ var Help = (function() {
 
         $('#help2-main .scrollTo').rebind('click', function() {
             var $this = $(this);
-            var $target = $($(this).data('to'));
+
+            // this is main section
+            if (!$this.data('state')) {
+                return loadSubPage(getCleanSitePath() + '/' + $this.data('to').replace('#', ''));
+            }
+            var $target = $($this.data('to'));
 
             if (!$this.is('.gray-inactive')) {
                 selectMenuItem($target);

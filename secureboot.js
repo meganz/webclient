@@ -118,7 +118,8 @@ function getSitePath() {
         }
     }
 
-    if (isPublickLinkV2(document.location.pathname)) {
+    if (isPublickLinkV2(document.location.pathname)
+        || isHelpLink(document.location.pathname)) {
         return document.location.pathname + document.location.hash;
     }
 
@@ -190,6 +191,11 @@ function isPublickLinkV2(page) {
 
     var types = {'file': 6, 'folder': 8, 'embed': 7};
     return page.length > types[page.split('/')[0]];
+}
+function isHelpLink(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+    return page.indexOf('help/') === 0;
 }
 
 // Check whether the provided `page` points to a chat link
@@ -852,6 +858,10 @@ else if (isPublickLinkV2(document.location.pathname)) {
         page = page.split(/[#/]/);
         page = '!' + page[1] + '!' + page[2];
     }
+}
+else if (isHelpLink(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
 }
 else {
     if (document.location.hash.length > 0) {

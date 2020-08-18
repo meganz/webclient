@@ -451,7 +451,7 @@ MegaData.prototype.renderPath = function(fileHandle) {
     if ($('.fm-breadcrumbs', $block).length > 1) {
         $('.fm-breadcrumbs', $block).removeClass('deactivated');
     }
-    else if (folderlink && $('.default-white-button.l-pane-visibility').hasClass('active')) {
+    else if (folderlink) {
         $('.folder-link .right-arrow-bg', $block)
             .safeHTML('<span>@@</span>', M.getNameByHandle(M.RootID));
     }

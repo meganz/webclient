@@ -11477,7 +11477,7 @@ var closeOpenMode_CloseOpenModeMessage = function (_ConversationMessageM) {
       className: "message user-card-name"
     }, displayName), datetime, closeOpenMode_React.createElement("div", {
       className: "message text-block"
-    }, __(l[23450]))));
+    }, __(l[20569]))));
   };
 
   return CloseOpenModeMessage;

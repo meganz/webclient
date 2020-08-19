@@ -16295,7 +16295,7 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     width: auto;
     max-width: 190px;
 }
-.share-dialog-permissions {
+.share-dialog .share-dialog-permissions {
     float: right;
 }
 .share-dialog .multiple-input i {

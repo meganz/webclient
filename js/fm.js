@@ -2728,13 +2728,15 @@ function closeDialog(ev) {
             delete $.cfpromise;
         }
     }
+    else {
+        delete $.mcImport;
+    }
 
     if ($.dialog === 'selectFolder') {
         delete $.selectFolderCallback;
     }
 
     delete $.dialog;
-    delete $.mcImport;
     treesearch = false;
 
     if ($.registerDialog) {

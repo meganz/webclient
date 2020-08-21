@@ -42,7 +42,7 @@ class TopicChange extends ConversationMessageMixin {
             this._formattedTopic = formattedTopic;
         }
 
-        var text = __(l[9081])
+        var text = l[9081]
             .replace(
                 "%s",
                 '<strong className="dark-grey-txt">"' +

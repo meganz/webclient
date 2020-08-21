@@ -219,7 +219,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                 if (room.iAmOperator() && contactHash !== u_handle) {
                     dropdownRemoveButton.push(
                         <DropdownsUI.DropdownItem className="red"
-                            key="remove" icon="rounded-stop" label={__(l[8867])}
+                            key="remove" icon="rounded-stop" label={l[8867]}
                             onClick={onRemoveClicked.bind(this, contactHash)}/>
                     );
                 }
@@ -228,14 +228,14 @@ class ParticipantsListInner extends MegaRenderMixin {
                     // operator
                     dropdowns.push(
                         <div key="setPermLabel" className="dropdown-items-info">
-                            {__(l[8868])}
+                            {l[8868]}
                         </div>
                     );
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
                             key="privOperator" icon="gentleman"
-                            label={__(l[8875])}
+                            label={l[8875]}
                             className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
                             disabled={contactHash === u_handle}
                             onClick={onSetPrivClicked.bind(this, contactHash, FULL)} />
@@ -246,7 +246,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                             key="privFullAcc" icon="conversation-icon"
                             className={"tick-item " + (room.members[contactHash] === OPERATOR ? "active" : "")}
                             disabled={contactHash === u_handle}
-                            label={__(l[8874])} onClick={onSetPrivClicked.bind(this, contactHash, OPERATOR)} />
+                            label={l[8874]} onClick={onSetPrivClicked.bind(this, contactHash, OPERATOR)} />
                     );
 
                     dropdowns.push(
@@ -254,7 +254,7 @@ class ParticipantsListInner extends MegaRenderMixin {
                             key="privReadOnly" icon="eye-icon"
                             className={"tick-item " + (room.members[contactHash] === READONLY ? "active" : "")}
                             disabled={contactHash === u_handle}
-                            label={__(l[8873])} onClick={onSetPrivClicked.bind(this, contactHash, READONLY)}/>
+                            label={l[8873]} onClick={onSetPrivClicked.bind(this, contactHash, READONLY)}/>
                     );
 
                 }

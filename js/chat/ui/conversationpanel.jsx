@@ -130,7 +130,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     }
                 }}>
                 <i className="small-icon colorized audio-call"></i>
-                <span>{__(l[5896])}</span>
+                <span>{l[5896]}</span>
             </div>;
         }
         if (startVideoCallButton !== null) {
@@ -141,7 +141,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     }
                 }}>
                 <i className="small-icon colorized video-call"></i>
-                <span>{__(l[5897])}</span>
+                <span>{l[5897]}</span>
             </div>;
         }
         var AVseperator = <div className="chat-button-seperator"></div>;
@@ -220,7 +220,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                 <Button
                     className="link-button green light"
                     icon="rounded-plus colorized"
-                    label={__(l[8007])}
+                    label={l[8007]}
                     disabled={
                         /* Disable in case I don't have any more contacts to add ... */
                         !(
@@ -238,9 +238,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                         }
                         multiple={true}
                         className="popup add-participant-selector"
-                        singleSelectedButtonLabel={__(l[8869])}
-                        multipleSelectedButtonLabel={__(l[8869])}
-                        nothingSelectedButtonLabel={__(l[8870])}
+                        singleSelectedButtonLabel={l[8869]}
+                        multipleSelectedButtonLabel={l[8869]}
+                        nothingSelectedButtonLabel={l[8870]}
                         onSelectDone={this.props.onAddParticipantSelected.bind(this)}
                         positionMy="center top"
                         positionAt="left bottom"
@@ -358,7 +358,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                             <Button
                                 className="link-button light dropdown-element"
                                 icon="rounded-grey-up-arrow colorized"
-                                label={__(l[23753])}
+                                label={l[23753]}
                                 disabled={room.isReadOnly()}
                                 >
                                 <Dropdown
@@ -368,19 +368,19 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     onClick={() => {}}
                                 >
                                     <div className="dropdown info-txt">
-                                        {__(l[23753]) ? __(l[23753]) : "Send..."}
+                                        {l[23753] ? l[23753] : "Send..."}
                                     </div>
                                     <DropdownItem
                                         className="link-button light"
                                         icon="grey-cloud colorized"
-                                        label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
+                                        label={l[19794] ? l[19794] : "My Cloud Drive"}
                                         onClick={() => {
                                             self.props.onAttachFromCloudClicked();
                                         }} />
                                     <DropdownItem
                                         className="link-button light"
                                         icon="grey-computer colorized"
-                                        label={__(l[19795]) ? __(l[19795]) : "My computer"}
+                                        label={l[19795] ? l[19795] : "My computer"}
                                         onClick={() => {
                                             self.props.onAttachFromComputerClicked();
                                         }} />
@@ -401,7 +401,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                      }
                                  }}>
                                 <i className="small-icon colorized clear-arrow"></i>
-                                <span>{__(l[8871])}</span>
+                                <span>{l[8871]}</span>
                             </div>
 
                             {
@@ -461,7 +461,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                      }}>
                                     <i className={"small-icon colorized " +  ((room.isArchived()) ?
                                         "unarchive" : "archive")}></i>
-                                    <span>{room.isArchived() ? __(l[19065]) : __(l[16689])}</span>
+                                    <span>{room.isArchived() ? l[19065] : l[16689]}</span>
                                 </div>
                             }
                             {
@@ -1080,22 +1080,22 @@ export class ConversationPanel extends MegaRenderMixin {
                         <div className="header" dangerouslySetInnerHTML={{__html: headerText}}>
                         </div>
                         <div className="info">
-                            {__(l[8080])}
+                            {l[8080]}
                             <p>
-                                <i className="semi-big-icon grey-lock"></i>
+                                <i className="semi-big-icon grey-lock" />
                                 <span dangerouslySetInnerHTML={{
-                                    __html: __(l[8540])
+                                    __html: l[8540]
                                         .replace("[S]", "<strong>")
                                         .replace("[/S]", "</strong>")
-                                }}></span>
+                                }} />
                             </p>
                             <p>
-                                <i className="semi-big-icon grey-tick"></i>
+                                <i className="semi-big-icon grey-tick" />
                                 <span dangerouslySetInnerHTML={{
-                                    __html: __(l[8539])
+                                    __html: l[8539]
                                         .replace("[S]", "<strong>")
                                         .replace("[/S]", "</strong>")
-                                }}></span>
+                                }} />
                             </p>
                         </div>
                     </div>
@@ -1523,7 +1523,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.confirmDeleteDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={__(l[8004])}
+                title={l[8004]}
                 name="delete-message"
                 onClose={() => {
                     self.setState({'confirmDeleteDialog': false});
@@ -1589,7 +1589,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__(l[8879])}
+                        {l[8879]}
                     </div>
 
                     <GenericConversationMessage
@@ -1608,7 +1608,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.pasteImageConfirmDialog) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={__(l[20905])}
+                title={l[20905]}
                 name="paste-image-chat"
                 onClose={() => {
                     self.setState({'pasteImageConfirmDialog': false});
@@ -1642,7 +1642,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__(l[20906])}
+                        {l[20906]}
                     </div>
 
                     <img
@@ -1671,7 +1671,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.truncateDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={__(l[8871])}
+                title={l[8871]}
                 name="truncate-conversation"
                 dontShowAgainCheckbox={false}
                 onClose={() => {
@@ -1690,7 +1690,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__(l[8881])}
+                        {l[8881]}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1699,7 +1699,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.archiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={__(l[19068])}
+                title={l[19068]}
                 name="archive-conversation"
                 onClose={() => {
                     self.setState({'archiveDialog': false});
@@ -1717,7 +1717,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__(l[19069])}
+                        {l[19069]}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1725,7 +1725,7 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.unarchiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={__(l[19063])}
+                title={l[19063]}
                 name="unarchive-conversation"
                 onClose={() => {
                     self.setState({'unarchiveDialog': false});
@@ -1743,7 +1743,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 <div className="fm-dialog-content">
 
                     <div className="dialog secondary-header">
-                        {__(l[19064])}
+                        {l[19064]}
                     </div>
                 </div>
             </ModalDialogsUI.ConfirmDialog>
@@ -1762,7 +1762,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
             confirmDeleteDialog = <ModalDialogsUI.ModalDialog
                 chatRoom={room}
-                title={__(l[9080])}
+                title={l[9080]}
                 name="rename-group"
                 className="chat-rename-dialog"
                 onClose={() => {
@@ -1966,7 +1966,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__(l[8882])}
+                            {l[8882]}
                         </div>
                     </div>
 
@@ -1975,7 +1975,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__(l[8883])}
+                            {l[8883]}
                         </div>
                     </div>
 
@@ -1984,7 +1984,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         <i className="dropdown-white-arrow"></i>
                         <div className="dropdown notification-text">
                             <i className="small-icon conversations"></i>
-                            {__(l[8884])}
+                            {l[8884]}
                         </div>
                     </div>
 
@@ -2196,19 +2196,19 @@ export class ConversationPanel extends MegaRenderMixin {
                                             vertOffset={4}
                                         >
                                             <div className="dropdown info-txt">
-                                                {__(l[23753]) ? __(l[23753]) : "Send..."}
+                                                {l[23753] ? l[23753] : "Send..."}
                                             </div>
                                             <DropdownItem
                                                 className="link-button light"
                                                 icon="grey-cloud colorized"
-                                                label={__(l[19794]) ? __(l[19794]) : "My Cloud Drive"}
+                                                label={l[19794] ? l[19794] : "My Cloud Drive"}
                                                 onClick={(e) => {
                                                     self.setState({'attachCloudDialog': true});
                                             }} />
                                             <DropdownItem
                                                 className="link-button light"
                                                 icon="grey-computer colorized"
-                                                label={__(l[19795]) ? __(l[19795]) : "My computer"}
+                                                label={l[19795] ? l[19795] : "My computer"}
                                                 onClick={(e) => {
                                                     self.uploadFromComputer();
                                             }} />
@@ -2216,7 +2216,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             <DropdownItem
                                                 className="link-button light"
                                                 icon="square-profile colorized"
-                                                label={__(l[8628])}
+                                                label={l[8628]}
                                                 onClick={(e) => {
                                                     self.setState({'sendContactDialog': true});
                                             }} />

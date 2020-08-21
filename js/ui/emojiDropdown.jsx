@@ -486,16 +486,15 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
         return <div>
             <div className="popup-header emoji">
 
-                { preview ? preview : <div className="search-block emoji">
-                        <i className="small-icon search-icon"></i>
-                        <input type="search"
-                               placeholder={__(l[102])}
-                               ref="emojiSearchField"
-                               onChange={this.onSearchChange}
-                               value={this.state.searchValue}/>
-
-                    </div>
-                }
+                {preview ? preview : <div className="search-block emoji">
+                    <i className="small-icon search-icon" />
+                    <input
+                        type="search"
+                        placeholder={l[102]}
+                        ref="emojiSearchField"
+                        onChange={this.onSearchChange}
+                        value={this.state.searchValue}/>
+                </div>}
 
             </div>
 

@@ -13,8 +13,8 @@ export class StartGroupChatWizard extends MegaRenderMixin {
     inputRef = React.createRef();
     static clickTime = 0;
     static defaultProps = {
-        'selectLabel': __(l[1940]),
-        'cancelLabel': __(l[82]),
+        'selectLabel': l[1940],
+        'cancelLabel': l[82],
         'hideable': true,
         'flowType': 1
     };

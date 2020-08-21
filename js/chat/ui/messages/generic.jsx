@@ -239,7 +239,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 <DropdownsUI.DropdownItem
                     icon="context remove-link"
                     key="removeLinkButton"
-                    label={__(l[6821])}
+                    label={l[6821]}
                     onClick={self._removeLink.bind(self, h)}
                 />
             );
@@ -517,7 +517,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                             revokeButton = (
                                                 <DropdownsUI.DropdownItem
                                                     icon="red-cross"
-                                                    label={__(l[83])}
+                                                    label={l[83]}
                                                     className="red"
                                                     onClick={() => {
                                                         chatRoom.megaChat.plugins.chatdIntegration.updateMessage(
@@ -544,7 +544,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                         else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
                                             downloadButton = <DropdownsUI.DropdownItem
                                                 icon="rounded-grey-down-arrow"
-                                                label={__(l[1187])}
+                                                label={l[1187]}
                                                 onClick={self._startDownload.bind(self, v)}/>;
 
                                             if (M.getNodeRoot(v.h) !== M.RubbishID) {
@@ -554,7 +554,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                             firstGroupOfButtons.push(
                                                 <DropdownsUI.DropdownItem
                                                     icon="context info"
-                                                    label={__(l[6859])}
+                                                    label={l[6859]}
                                                     key="infoDialog"
                                                     onClick={() => {
                                                         $.selected = [v.h];
@@ -569,7 +569,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                             linkButtons.push(
                                                 <DropdownsUI.DropdownItem
                                                     icon="small-icon conversations"
-                                                    label={__(l[17764])}
+                                                    label={l[17764]}
                                                     key="sendToChat"
                                                     onClick={() => {
                                                         $.selected = [v.h];
@@ -630,19 +630,19 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     {previewButton && <hr/>}
                                     <DropdownsUI.DropdownItem
                                         icon="rounded-grey-down-arrow"
-                                        label={__(l[1187])}
+                                        label={l[1187]}
                                         onClick={self._startDownload.bind(self, v)}
                                     />
                                     {self._isUserRegistered() &&
                                         <React.Fragment>
                                             <DropdownsUI.DropdownItem
                                                 icon="grey-cloud"
-                                                label={__(l[1988])}
+                                                label={l[1988]}
                                                 onClick={self._addToCloudDrive.bind(self, v, false)}
                                             />
                                             <DropdownsUI.DropdownItem
                                                 icon="conversations"
-                                                label={__(l[17764])}
+                                                label={l[17764]}
                                                 onClick={self._addToCloudDrive.bind(self, v, true)}
                                             />
                                         </React.Fragment>
@@ -703,7 +703,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                             <div className={attachmentClasses} key={'atch-' + v.ch}>
                                 <div className="message shared-info">
                                     <div className="message data-title">
-                                        {__(l[17669])}
+                                        {l[17669]}
                                         <span className="file-name">{v.name}</span>
                                     </div>
                                     <div className="message file-size">
@@ -836,7 +836,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                                     <DropdownsUI.DropdownItem
                                         icon="human-profile"
-                                        label={__(l[5868])}
+                                        label={l[5868]}
                                         onClick={() => {
                                             loadSubPage("fm/" + contact.u);
                                         }}
@@ -844,7 +844,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                     <hr/>
                                     <DropdownsUI.DropdownItem
                                         icon="conversations"
-                                        label={__(l[8632])}
+                                        label={l[8632]}
                                         onClick={() => {
                                             loadSubPage("fm/chat/p/" + contact.u);
                                         }}
@@ -885,7 +885,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
 
                                     <DropdownsUI.DropdownItem
                                         icon="rounded-grey-plus"
-                                        label={__(l[71])}
+                                        label={l[71]}
                                         onClick={() => {
                                             var exists = false;
                                             Object.keys(M.opc).forEach(function(k) {
@@ -1036,7 +1036,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         const deleteButton = (
                             <DropdownsUI.DropdownItem
                                 icon="red-cross"
-                                label={__(l[1730])}
+                                label={l[1730]}
                                 className="red"
                                 onClick={(e) => {
                                     self.doDelete(e, message);
@@ -1282,7 +1282,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                 }
                 else {
                     if (message.updated > 0 && !message.metaType) {
-                        textMessage = textMessage + " <em>" + __(l[8887]) + "</em>";
+                        textMessage = textMessage + " <em>" + l[8887] + "</em>";
                     }
                     if (self.props.initTextScrolling) {
                         messageDisplayBlock =
@@ -1306,7 +1306,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                         var editButton = (message.metaType !== Message.MESSAGE_META_TYPE.GEOLOCATION) ?
                             <DropdownsUI.DropdownItem
                                 icon="icons-sprite writing-pencil"
-                                label={__(l[1342])}
+                                label={l[1342]}
                                 className=""
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -1331,7 +1331,7 @@ class GenericConversationMessage extends ConversationMessageMixin {
                                 {editButton ? <hr/> : null}
                                 <DropdownsUI.DropdownItem
                                     icon="red-cross"
-                                    label={__(l[1730])}
+                                    label={l[1730]}
                                     className="red"
                                     onClick={(e) => {
                                         self.doDelete(e, message);

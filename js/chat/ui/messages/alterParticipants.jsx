@@ -80,8 +80,8 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text = (h === contact.u) ?
-                __('joined the group chat.') :
-                __(l[8907]).replace(
+                'joined the group chat.' :
+                l[8907].replace(
                     "%s",
                     '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
                 );
@@ -118,10 +118,10 @@ class AltPartsConvMessage extends ConversationMessageMixin {
 
             var text;
             if (otherContact.u === contact.u) {
-                text = __(l[8908]);
+                text = l[8908];
             }
             else {
-                text = __(l[8906]).replace(
+                text = l[8906].replace(
                     "%s",
                     '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'
                 );

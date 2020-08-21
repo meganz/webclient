@@ -732,14 +732,14 @@ export class TypingArea extends MegaRenderMixin {
                     className="default-white-button right"
                     icon=""
                     onClick={self.onSaveClicked.bind(self)}
-                    label={__(l[776])} />,
+                    label={l[776]} />,
 
                 <Button
                     key="cancel"
                     className="default-white-button right"
                     icon=""
                     onClick={self.onCancelClicked.bind(self)}
-                    label={__(l[1718])} />
+                    label={l[1718]} />
             ];
         }
 

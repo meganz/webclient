@@ -2389,7 +2389,7 @@ var ContactPickerWidget = function (_MegaRenderMixin4) {
           className: "contacts-search-subsection"
         }, react2.a.createElement("div", {
           className: "contacts-list-header"
-        }, !frequentsLoading && frequentContacts.length === 0 ? !self.props.readOnly ? l[165] : l[16217] : l[165]), react2.a.createElement("div", {
+        }, frequentContacts.length === 0 ? self.props.readOnly ? l[16217] : l[165] : l[165]), react2.a.createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
         }, contacts)) : undefined));

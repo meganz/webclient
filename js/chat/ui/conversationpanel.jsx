@@ -358,7 +358,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                             <Button
                                 className="link-button light dropdown-element"
                                 icon="rounded-grey-up-arrow colorized"
-                                label={__(l[6834] + "...")}
+                                label={__(l[23753])}
                                 disabled={room.isReadOnly()}
                                 >
                                 <Dropdown
@@ -368,7 +368,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     onClick={() => {}}
                                 >
                                     <div className="dropdown info-txt">
-                                        {__(l[19793]) ? __(l[19793]) : "Send files from..."}
+                                        {__(l[23753]) ? __(l[23753]) : "Send..."}
                                     </div>
                                     <DropdownItem
                                         className="link-button light"
@@ -2196,7 +2196,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             vertOffset={4}
                                         >
                                             <div className="dropdown info-txt">
-                                                {__(l[19793]) ? __(l[19793]) : "Send files from..."}
+                                                {__(l[23753]) ? __(l[23753]) : "Send..."}
                                             </div>
                                             <DropdownItem
                                                 className="link-button light"

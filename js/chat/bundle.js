@@ -2389,7 +2389,7 @@ var ContactPickerWidget = function (_MegaRenderMixin4) {
           className: "contacts-search-subsection"
         }, react2.a.createElement("div", {
           className: "contacts-list-header"
-        }, !frequentsLoading && frequentContacts.length === 0 ? !self.props.readOnly ? l[165] : l[16217] : l[165]), react2.a.createElement("div", {
+        }, frequentContacts.length === 0 ? self.props.readOnly ? l[16217] : l[165] : l[165]), react2.a.createElement("div", {
           className: "contacts-search-list",
           style: innerDivStyles
         }, contacts)) : undefined));
@@ -11477,7 +11477,7 @@ var closeOpenMode_CloseOpenModeMessage = function (_ConversationMessageM) {
       className: "message user-card-name"
     }, displayName), datetime, closeOpenMode_React.createElement("div", {
       className: "message text-block"
-    }, __(l[23450]))));
+    }, __(l[20569]))));
   };
 
   return CloseOpenModeMessage;
@@ -13221,7 +13221,7 @@ var conversationpanel_ConversationRightArea = function (_MegaRenderMixin2) {
     }), external_React_default.a.createElement("span", null, l[20597])) : null, external_React_default.a.createElement(ui_buttons["Button"], {
       className: "link-button light dropdown-element",
       icon: "rounded-grey-up-arrow colorized",
-      label: __(l[6834] + "..."),
+      label: __(l[23753]),
       disabled: room.isReadOnly()
     }, external_React_default.a.createElement(ui_dropdowns["Dropdown"], {
       className: "wide-dropdown send-files-selector light",
@@ -13230,7 +13230,7 @@ var conversationpanel_ConversationRightArea = function (_MegaRenderMixin2) {
       onClick: function onClick() {}
     }, external_React_default.a.createElement("div", {
       className: "dropdown info-txt"
-    }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+    }, __(l[23753]) ? __(l[23753]) : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-cloud colorized",
       label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",
@@ -14817,7 +14817,7 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       vertOffset: 4
     }, external_React_default.a.createElement("div", {
       className: "dropdown info-txt"
-    }, __(l[19793]) ? __(l[19793]) : "Send files from..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
+    }, __(l[23753]) ? __(l[23753]) : "Send..."), external_React_default.a.createElement(ui_dropdowns["DropdownItem"], {
       className: "link-button light",
       icon: "grey-cloud colorized",
       label: __(l[19794]) ? __(l[19794]) : "My Cloud Drive",

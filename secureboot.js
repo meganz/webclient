@@ -810,10 +810,12 @@ if (!browserUpdate && is_extension)
                 if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
                     chrome.runtime.getPackageDirectoryEntry(function(root) {
                         'use strict';
-                        root.getDirectory('images', {create: false}, function(dir) {
-                            if (dir && dir.isDirectory && dir.name === 'images') {
-                                staticpath = bootstaticpath;
-                            }
+                        root.getDirectory('webclient', {create: false}, function(dir) {
+                            dir.getDirectory('images', {create: false}, function(dir) {
+                                if (dir && dir.isDirectory && dir.name === 'images') {
+                                    staticpath = bootstaticpath;
+                                }
+                            });
                         });
                     });
                 }

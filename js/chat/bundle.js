@@ -10630,7 +10630,7 @@ var alterParticipants_AltPartsConvMessage = function (_ConversationMessageM) {
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-      var text = h === contact.u ? 'joined the group chat.' : l[8907].replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
+      var text = h === contact.u ? l[23756] : l[8907].replace("%s", '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>');
 
       self._ensureNameIsLoaded(otherContact.u);
 

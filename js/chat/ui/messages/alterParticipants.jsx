@@ -80,7 +80,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
 
             var text = (h === contact.u) ?
-                'joined the group chat.' :
+                l[23756] :
                 l[8907].replace(
                     "%s",
                     '<strong className="dark-grey-txt">' + htmlentities(displayName) + '</strong>'

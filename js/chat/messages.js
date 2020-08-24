@@ -105,7 +105,7 @@ Message._getTextContentsForDialogType = function(message) {
                 otherContact = M.u[message.meta.included[0]];
                 if (contact && otherContact) {
                     textMessage = (contact.u === otherContact.u) ?
-                        'joined the group chat.' :
+                        l[23756] :
                         l[8907].replace("%s", contactName);
                     var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
                     contact = otherContact;

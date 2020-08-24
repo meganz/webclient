@@ -581,6 +581,105 @@ var mobile = {
                 e.preventDefault();
             }
         });
+    },
+
+    updFileManagerUI: function() {
+
+        'use strict';
+
+        var UImain = false;
+
+        if (d) {
+            console.time('rendernew');
+        }
+
+        var countUpdNodes = {};
+        var promises = [];
+        var seenByCountUpd = {};
+
+        var _setCountUpdNode = promisify(function(resolve, reject, node) {
+
+            var promise = MegaPromise.resolve();
+
+            if (!M.d[node.p]) {
+                promise = dbfetch.get(node.p);
+            }
+
+            promise.always(function() {
+
+                var parents = M.getPath(node.h);
+                var pIndex = parents.indexOf(M.currentdirid);
+                var pInCurrentView = parents[--pIndex];
+
+                if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
+                    countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
+                }
+
+                resolve(node.h);
+            });
+        });
+
+        for (var i = newnodes.length; i--;) {
+
+            var newNode = newnodes[i];
+
+            if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
+                UImain = M.v.length || !mobile.uploadOverlay.uploading;
+            }
+
+            if (!seenByCountUpd[newNode.p]) {
+
+                seenByCountUpd[newNode.p] = 1;
+                promises.push(_setCountUpdNode(newNode));
+            }
+        }
+
+        Promise.allSettled(promises).always(function() {
+
+            countUpdNodes = Object.values(countUpdNodes);
+
+            if (countUpdNodes.length) {
+                mobile.cloud.countAndUpdateSubFolderTotals(countUpdNodes);
+            }
+        });
+
+        var masterPromise = new MegaPromise();
+
+        if (d) {
+            console.log('rendernew, dir=%s, root=%s, mode=%d', this.currentdirid, this.currentrootid, this.viewmode);
+            console.log('rendernew.stat', UImain);
+        }
+
+        var renderPromise = MegaPromise.resolve();
+
+        if (UImain) {
+            if (M.v.length) {
+                var emptyBeforeUpd = M.v.length === 0;
+                M.filterByParent(M.currentdirid);
+                M.sort();
+                M.renderMain(!emptyBeforeUpd);
+            }
+            else {
+                renderPromise = M.openFolder(M.currentdirid, true);
+            }
+        }
+
+        renderPromise.always(function() {
+
+            if (UImain) {
+                mBroadcaster.sendMessage('mediainfo:collect');
+                $.tresizer();
+            }
+
+            if (d) {
+                console.timeEnd('rendernew');
+            }
+
+            masterPromise.resolve();
+        });
+
+        newnodes = [];
+        return masterPromise;
     }
 };
 

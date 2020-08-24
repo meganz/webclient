@@ -310,7 +310,7 @@
             </div>
             <div class="fm-dialog-new-folder-input">
                 <div class="fm-dialog-new-folder-pad decryption-password">
-                    <span class="icon"></span>
+                    <i class="small-icon dialog-sprite grey-lock"></i>
                     <input class="password-decrypt-input" type="password" placeholder="[$9073]" value="" autocomplete="new-password" />
                 </div>
             </div>
@@ -605,99 +605,121 @@
     </div>
 </div>
 
-
-<div class="fm-dialog export-links-dialog hidden">
-    <div class="fm-dialog-header">
-        <div class="fm-dialog-title">[$1031]</div>
-        <div class="fm-dialog-close"></div>
-        <div class="clear"></div>
+<!-- Export links dialog  !-->
+<div class="fm-dialog export-links-dialog lato big-radius hidden">
+    <div class="fm-dialog-close"></div>
+    
+    <!-- Or [$8734] for multiple linkls !-->
+    <div class="export-links-dialog header get-link">
+        [$59]
     </div>
 
-    <!-- Share link & Embed Tab link -->
-    <div class="fm-dialog-tab hidden">
-        <div class="fm-tab-wrapper">
-            <div class="fm-tab tab-url-link active">
-                <span>[$5622]</span>
-            </div>
-            <div class="fm-tab tab-embed-link">
-                <span>[$17407]</span>
-            </div>
-        </div>
+    <div class="export-links-dialog header embed">
+        [$17407]
     </div>
 
-    <!-- Please add "expiry-date" class to show new features. Please add "pro-only" class for free accounts !-->
-    <div class="export-content-block">
-        <div class="fm-links-export-options">
-            <div class="fm-link-select-label">[$7649]</div>
-            <div class="fm-links-radio-buttons">
-                <div class="separate-link-and-key">
-                    <div class="link-handle" data-keyoptions="public-handle">
-                        <span class="icon"></span>
-                        <span class="text">[$7947]</span>
-                    </div>
-                    <div class="button-separator"></div>
-                    <div class="link-decryption-key" data-keyoptions="decryption-key">
-                        <span class="icon"></span>
-                        <span class="text">[$7971]</span>
-                    </div>
+    <div class="clear"></div>
+    
+    <div class="export-links-dialog body">
+        <div class="export-links-dialog options">
+            <div class="export-links-dialog key">
+                <div class="checkdiv small-green dialog-sprite checkboxOff">
+                    <input type="checkbox" name="export-keys-opt" id="export-keys-opt">
                 </div>
-                <div class="link-handle-and-key" data-keyoptions="full-link">
-                    <span class="icon"></span>
-                    <span class="text">[$7948]</span>
-                </div>
-            </div>
-        </div>
-        <div class="clear"></div>
-        <div class="extra-options">
-            <div class="fm-expiry-dropdown">
-                <div class="fm-link-select-label">
-                    <span class="set-expiry-text">[$8953]</span><span class="pro-only-feature"> ([$8695])</span>:
-                    <div class="dialog-feature-toggle expiry"><div class="dialog-feature-switch"></div></div>
-                </div>
-                <div class="expiry-date-select-container default-select hidden">
-                    <input type="text" id="link-expiry-datepicker"
-                           class="fm-dialogs-select expiry-date-select"
-                           value="" placeholder="[$17697]-[$17698]-[$17699]" />
-                </div>
-                <div class="disabled-overlay hidden"></div>
-            </div>
-            <div class="fm-password-protect-dropdown">
-                <div class="fm-link-select-label">
-                    <span class="set-password-text">[$9063]</span><span class="pro-only-feature"> ([$8695])</span>: <span class="password-strength"></span>
-                    <div class="dialog-feature-toggle"><div class="dialog-feature-switch"></div></div>
-                </div>
-                <div class="password-entry-container hidden">
-                    <div class="password-protect-inputs">
-                        <div class="password-protect-input-container">
-                            <div class="estimator-loading-icon"></div>
-                            <input class="password-protect-input first" type="password" placeholder="[$9074]">
+                <label for="export-keys-opt" class="radio-txt">
+                    [$23620]
+                </label>
+
+                <div class="rounded-tip-button">
+                    <i class="small-icon dialog-sprite question-mark"></i>
+                    <div class="dropdown body dropdown-arrow down-arrow keys-tip">
+                        <i class="dropdown-white-arrow"></i>
+                        <div class="flying-file dialog-sprite"></div>
+                        <div class="tip-header">
+                            [$1028]
                         </div>
-                        <div class="spacer"></div>
-                        <div class="password-protect-input-container">
-                            <input class="password-protect-input second" type="password" placeholder="[$9075]">
+                        <div class="tip-text">
+                            [$23621]
+                        </div>
+                        <a href="/help/client/webclient/contacts-and-sharing/how-do-i-get-a-decryption-key-for-my-link-576c7cf4886688e6028b458a" target="_blank" class="tip-link clickurl">[$8742]</a>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="export-links-dialog pro">
+                <div class="half-sized-block">
+                    <div class="export-links-dialog sub-header expiry">
+                        <span class="info">[$23622]</span> <span class="pro-only-feature">[$8695]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left expiry">
+                        <span class="label">[$8953]</span>
+                        <input type="text" class="set-date" value="" />
+                        <div class="sub-button hidden">
+                             <i class="small-icon dialog-sprite small-cross"></i>
                         </div>
                     </div>
-                    <div class="password-protect-error"></div>
-                    <div class="default-white-button left fm-dialog-button encrypt-link-button">
-                        <span class="encrypt-text">[$9061]</span>
-                        <i class="small-icon encryption-in-progress hidden"></i>
-                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div class="disabled-overlay hidden"></div>
+                <div class="half-sized-block">
+                    <div class="export-links-dialog sub-header">
+                        [$23623] <span class="pro-only-feature">[$8695]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left password">
+                        <span>[$17454]</span>
+                    </div>
+                    <div class="button default-white-button semi-big gradient left remove hidden">
+                        <span>[$83]</span>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
             </div>
-            <div class="clear"></div>
         </div>
-        <div class="reveal-feature-toggle-container">
-            <div class="reveal-feature-toggle">[$9064]</div><div class="get-pro hidden">[$8696]</div>
+        
+        <div class="dark-direct-tooltip custom-html">
+            <i class="small-icon icons-sprite tooltip-arrow"></i>
+            <div class="content"></div>
         </div>
-        <div id="export-link-body" class="export-link-body"></div>
+        
+        <div class="dropdown body export hidden">
+            <div class="dropdown-item link-button light set-exp-date">
+                <i class="small-icon context-sprite calendar colorized"></i>
+                <span>[$8953]</span>
+            </div>
+            <div class="dropdown-item link-button light set-password">
+                <i class="small-icon context-sprite lock colorized"></i>
+                <span>[$17454]</span>
+            </div>
+            <hr>
+            <div class="dropdown-item link-button light remove-item">
+                <i class="small-icon context-sprite light-red-cross colorized"></i>
+                <span>[$6821]</span>
+            </div>
+        </div>
+
+        <!-- Please use "separately" classname if its availbable to copy keys separately !-->
+        <div class="export-links-dialog links">
+            <div class="export-links-dialog links-scroll"></div>
+            <div class="export-links-dialog links-scroll-overlays"></div>
+            <div class="export-links-dialog bottom">
+                <div class="button default-green-button semi-big gradient right copy keys hidden">
+                    [$23624]
+                </div>
+                <!-- Or [$23625] for "Copy All Links" !-->
+                <div class="button default-green-button semi-big gradient right copy links">
+                    [$20840]
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected -->
+    <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected !-->
     <div class="embed-content-block hidden">
         <div class="wrapper embed-video">
             <div class="video-thumbnail-container">
-                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself -->
+                <!-- Render video thumnail here. Display using 16:9 ratio, if you can't display normally and the video should centre itself !-->
                 <div class="video-thumbnail"><img /></div>
                 <div class="file-information-container">
                     <div class="video-filename">
@@ -761,7 +783,7 @@
                         <div class="checkdiv checkboxOff">
                             <input type="checkbox" id="enable-autoplay" class="checkboxOff" />
                         </div>
-                        <label for="enable-autoplay" class="radio-txt">[$22188]<div class="small-icon info-icon simpletip" data-simpletip-style="{&quot;text-align&quot;:&quot;center&quot;}" data-simpletip="Currently, only the Chrome browser supports autoplay embed video with sound.[BR]To autoplay on other browsers, please mute the video with the option below."></div></label>
+                        <label for="enable-autoplay" class="radio-txt">[$22188]<div class="small-icon info-icon fm-s simpletip" data-simpletip-style="{&quot;text-align&quot;:&quot;center&quot;}" data-simpletip="[$23718]"></div></label>
                     </div>
                 </div>
                 <div class="settings-row">
@@ -774,29 +796,47 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="fm-notifications-bottom">
-        <div class="export-description hidden">
-            [$7682]
+        <div class="bottom">
+            <div class="button default-green-button semi-big gradient right copy links">
+                [$17408]
+            </div>
+            <div class="clear"></div>
         </div>
-        <!-- Preview video should only be visible when the embed video tab is selected -->
-        <div class="default-white-button left preview-embed button hidden">
-            <span>[$1899]</span>
-        </div>
-        <div class="default-green-button right links-button copy-to-clipboard button" id="clipboardbtn1">
-            <span></span>
-        </div>
-        <div class="clear"></div>
     </div>
 </div>
 
-
-<div class="export-links-warning hidden">
-    <div class="export-links-warning-close"></div>
-    <div class="export-warning-content">
-        <p>
-            <span class="orange">[$368]</span> [$7680]
-        </p>
+<!-- Set password dialog  !-->
+<div class="fm-dialog set-password-dialog lato big-radius hidden">
+    <div class="fm-dialog-title">
+        [$17454]
+    </div>
+    <div class="set-password-dialog body">
+        <div  class="set-password-dialog existing-pass hidden">
+            <div  class="set-password-dialog existing-tip">
+                [$23669]
+            </div>
+            <div  class="set-password-dialog existing-input">
+                <div  class="set-password-dialog existing-input-wrap">
+                    <i class="small-icon dialog-sprite grey-eye"></i>
+                    <input type="password" value="" readonly>
+                </div>
+                <div class="button default-green-button semi-big gradient no-hover copy">
+                    [$63]
+                </div>
+            </div>
+        </div>
+        <div class="set-password-dialog pass-wrapper">
+            <input class="titleTop with-icon enter-pass" type="password" placeholder="[$9074]" data-icon="bus-reg-icon pw1" />
+            <div class="set-password-dialog strength"></div>
+            <input class="titleTop with-icon confirm-pass" type="password" placeholder="[$1114]"  data-icon="bus-reg-icon pw2" />
+        </div>
+        <div class="button default-green-button semi-big gradient right confirm">
+            [$870]
+        </div>
+        <div class="button default-white-button semi-big right cancel">
+            [$82]
+        </div>
+        <div class="clear"></div>
     </div>
 </div>
 
@@ -1455,11 +1495,11 @@
         <div class="feedback-dialog-header">[$7238]</div>
         <div class="fm-mega-dialog-pad">
             <div class="rating">
-                <a class="unhappy"></a>
-                <a class="sad"></a>
-                <a class="neutral"></a>
-                <a class="happy"></a>
-                <a class="awesome"></a>
+                <a class="unhappy dialog-sprite"></a>
+                <a class="sad dialog-sprite"></a>
+                <a class="neutral dialog-sprite"></a>
+                <a class="happy dialog-sprite"></a>
+                <a class="awesome dialog-sprite"></a>
                 <div class="clear"></div>
             </div>
             <div class="feedback-dialog-textarea">
@@ -1470,7 +1510,7 @@
             </div>
             <div class="reply">
                 <div class="feedback-label-txt">
-                    <div class="checkdiv checkboxOff">
+                    <div class="checkdiv checkboxOff small-green dialog-sprite">
                         <input type="checkbox" name="contact_me" id="contact_me" />
                     </div>
 
@@ -1483,17 +1523,17 @@
             </div>
             <div class="stats">
                 <div class="feedback-label-txt">
-                    <div class="checkdiv checkboxOff">
+                    <div class="checkdiv checkboxOff small-green dialog-sprite">
                         <input type="checkbox" name="send_stats" id="send_stats" />
                     </div>
 
                     <label for="send_stats" class="radio-txt">
                         [$6945]
                     </label>
-                    <span class="membership-question stats-button">
-                        <span class="membership-notification">
+                    <span class="feedback-question dialog-sprite">
+                        <span class="dropdown body dropdown-arrow down-arrow">
+                            <i class="dropdown-white-arrow"></i>
                             <span>[$17701]</span>
-                            <span class="membership-arrow"></span>
                         </span>
                     </span>
                 </div>
@@ -1509,7 +1549,7 @@
 </div>
 
 
-<div class="fm-dialog fm-mega-dialog collected-data-review-dialog hidden">
+<div class="fm-dialog collected-data-review-dialog hidden">
     <div class="fm-dialog-close"></div>
     <div class="nw-fm-dialog-title"></div>
     <div class="fm-mega-dialog-pad">

@@ -1075,11 +1075,12 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
  * @returns {MegaPromise}
  */
 FileManager.prototype.updFileManagerUI = function() {
+
     "use strict";
 
     var treebuild = Object.create(null);
-    var UImain = false;
     var UItree = false;
+    var UImain = false;
     var newcontact = false;
     var newpath = false;
     var newshare = false;
@@ -1106,7 +1107,7 @@ FileManager.prototype.updFileManagerUI = function() {
             || newNode.p === this.currentCustomView.nodeID
             || newNode.h === this.currentCustomView.nodeID) {
 
-            UImain = M.v.length || !is_mobile || !mobile.uploadOverlay.uploading;
+            UImain = true;
 
             if ($.onRenderNewSelectNode === newNode.h) {
                 delete $.onRenderNewSelectNode;
@@ -2662,7 +2663,6 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.nw-fm-left-icon').removeClass('active');
             $('.nw-fm-left-icon.transfers').addClass('active');
             $('#fmholder').addClass('transfer-panel-opened');
-            M.addNotificationsUI(1);
             var domScrollingTable = M.getTransferElements().domScrollingTable;
             if (!domScrollingTable.classList.contains('ps-container')) {
                 Ps.initialize(domScrollingTable, {suppressScrollX: true});
@@ -2792,18 +2792,6 @@ FileManager.prototype.addTransferPanelUI = function() {
             }
         }
     });
-};
-
-FileManager.prototype.addNotificationsUI = function(close) {
-    if (close) {
-        $('.fm-main.notifications').addClass('hidden');
-        $('.fm-main.default').removeClass('hidden');
-        return false;
-    }
-    $('.fm-main.notifications').removeClass('hidden');
-    $('.notifications .nw-fm-left-icon').removeClass('active');
-    $('.fm-main.default').addClass('hidden');
-    $.tresizer();
 };
 
 /**

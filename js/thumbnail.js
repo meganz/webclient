@@ -505,13 +505,14 @@ mBroadcaster.once('startMega', function() {
     'use strict';
     exifImageRotation.fromImage = getComputedStyle(document.documentElement).imageOrientation === 'from-image';
 
-    if (d && exifImageRotation.fromImage) {
-        console.info('This browser automatically rotates images based on the EXIF metadata.', [ua]);
-    }
+    if (exifImageRotation.fromImage) {
+        if (d) {
+            console.info('This browser automatically rotates images based on the EXIF metadata.', [ua]);
+        }
 
-    if (window.safari) {
-        // TODO / FIXME
-        exifImageRotation.fromImage = false;
+        if (window.safari || ua.details.engine === 'Gecko') {
+            exifImageRotation.fromImage = -1;
+        }
     }
 });
 
@@ -526,7 +527,7 @@ function exifImageRotation(target, buffer, orientation) {
     var blobURI = mObjectURL([buffer], buffer.type || 'image/jpeg');
 
     orientation |= 0;
-    if (orientation < 2) {
+    if (orientation < 2 || exifImageRotation.fromImage < 0) {
         // No rotation needed.
         target.src = blobURI;
     }

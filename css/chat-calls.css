@@ -403,7 +403,6 @@ video.localViewport {
 .in-call-notif {
     color: rgba(255, 255, 255, 1);
     height: 24px;
-    width: 100%;
     position: absolute;
     top: 36px;
     z-index: 12;
@@ -413,6 +412,7 @@ video.localViewport {
     -ms-animation: fadein 2s; /* Internet Explorer */
     -o-animation: fadein 2s; /* Opera < 12.1 */
     animation: fadein 2s;
+    width: 100%;
 }
 .private-chat .in-call-notif {
     top: 0;
@@ -429,11 +429,11 @@ video.localViewport {
 .in-call-notif.neutral {
     box-sizing: border-box;
     height: 36px;
-    width: 291px;
     border: 1px solid rgba(0,0,0,0.05);
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
     left: 50%;
-    margin-left: -145px;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
     top: 12px;
     color: #2BA6DE;
     border-radius: 18px;
@@ -441,6 +441,7 @@ video.localViewport {
     font-size: 14px;
     background-color: white;
     line-height: 33px;
+    width: auto;
 }
 
 .in-call-notif.neutral.join a:hover {
@@ -454,7 +455,7 @@ video.localViewport {
     border: 1px solid white;
     color: white;
     padding: 0px 12px;
-    webkit-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+    -webkit-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -moz-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -o-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -ms-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
@@ -463,13 +464,12 @@ video.localViewport {
     display: inline;
     float: right;
     height: 24px;
-    margin-top: 4px;
     line-height: 22px;
-    margin-right: 4px;
+    margin: 4px 4px auto 24px;
 }
 .in-call-notif.neutral .small-icon {
     margin-top: 7px;
-    margin-left: -22px;
+    margin-left: 10px;
     margin-right: 10px;
 }
 @keyframes fadein {

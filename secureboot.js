@@ -118,7 +118,8 @@ function getSitePath() {
         }
     }
 
-    if (isPublickLinkV2(document.location.pathname)) {
+    if (isPublickLinkV2(document.location.pathname)
+        || isHelpLink(document.location.pathname)) {
         return document.location.pathname + document.location.hash;
     }
 
@@ -190,6 +191,11 @@ function isPublickLinkV2(page) {
 
     var types = {'file': 6, 'folder': 8, 'embed': 7};
     return page.length > types[page.split('/')[0]];
+}
+function isHelpLink(page) {
+    'use strict';
+    page = getCleanSitePath(page);
+    return page.indexOf('help/') === 0;
 }
 
 // Check whether the provided `page` points to a chat link
@@ -804,10 +810,12 @@ if (!browserUpdate && is_extension)
                 if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
                     chrome.runtime.getPackageDirectoryEntry(function(root) {
                         'use strict';
-                        root.getDirectory('images', {create: false}, function(dir) {
-                            if (dir && dir.isDirectory && dir.name === 'images') {
-                                staticpath = bootstaticpath;
-                            }
+                        root.getDirectory('webclient', {create: false}, function(dir) {
+                            dir.getDirectory('images', {create: false}, function(dir) {
+                                if (dir && dir.isDirectory && dir.name === 'images') {
+                                    staticpath = bootstaticpath;
+                                }
+                            });
                         });
                     });
                 }
@@ -815,6 +823,10 @@ if (!browserUpdate && is_extension)
         }
 
         bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
+    }
+
+    if (localStorage.useBootStaticPath) {
+        staticpath = bootstaticpath;
     }
 
     Object.defineProperty(window, 'eval', {
@@ -848,6 +860,10 @@ else if (isPublickLinkV2(document.location.pathname)) {
         page = page.split(/[#/]/);
         page = '!' + page[1] + '!' + page[2];
     }
+}
+else if (isHelpLink(document.location.pathname)) {
+    page = getCleanSitePath();
+    history.replaceState({ subpage: page }, "", '/' + page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -2525,6 +2541,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/account.css', n: 'account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/jq-ui-custom.css', n: 'jq_ui_custom_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});

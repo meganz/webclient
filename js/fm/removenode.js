@@ -98,7 +98,13 @@ function removeUInode(h, parent) {
             if (!hasItems) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tr').remove();
-                $('.fm-empty-cloud').removeClass('hidden');
+
+                if (folderlink) {
+                    $('.fm-empty-folder').removeClass('hidden');
+                }
+                else {
+                    $('.fm-empty-cloud').removeClass('hidden');
+                }
             }
             break;
         default:

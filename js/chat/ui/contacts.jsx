@@ -1276,8 +1276,8 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         {contacts.length > 0 ?
                             <div className="contacts-search-subsection">
                                 <div className="contacts-list-header">
-                                    {!frequentsLoading && frequentContacts.length === 0 ? (
-                                        !self.props.readOnly ? l[165] : l[16217]
+                                    {frequentContacts && frequentContacts.length === 0 ? (
+                                        self.props.readOnly ? l[16217] : l[165]
                                     ) : l[165]}
                                 </div>
 

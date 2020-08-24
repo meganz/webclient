@@ -2526,7 +2526,7 @@ accountUI.security = {
             // If not the current session
             if (!currentSession) {
                 if (activeSession) {
-                    status = '<span class="active-session-txt">' + l[7666] + '</span>';     // Active
+                    status = '<span class="active-session-txt">' + l[23754] + '</span>';     // Logged-in
                 }
                 else {
                     status = '<span class="expired-session-txt">' + l[1664] + '</span>';    // Expired

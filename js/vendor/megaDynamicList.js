@@ -716,5 +716,13 @@
         this._viewChanged(true);
     };
 
+    MegaDynamicList.prototype.scrollToYPosition = function(value) {
+
+        'use strict';
+
+        this.listContainer.scrollTop = value;
+        this._viewChanged(true);
+    }
+
     scope.MegaDynamicList = MegaDynamicList;
 })(window, jQuery);

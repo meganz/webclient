@@ -374,10 +374,6 @@
              */
         }
 
-        if (!is_mobile && (id !== 'notifications') && !$('.fm-main.notifications').hasClass('hidden')) {
-            M.addNotificationsUI(1);
-        }
-
         if (!fminitialized) {
             firstopen = true;
         }
@@ -509,9 +505,6 @@
         }
         else if (id && id.substr(0, 9) === 'refer') {
             M.onFileManagerReady(affiliateUI);
-        }
-        else if (id && id.substr(0, 13) === 'notifications') {
-            M.addNotificationsUI();
         }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;

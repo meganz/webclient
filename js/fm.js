@@ -1668,12 +1668,19 @@ function openContactInfoLink(contactLink) {
  * @returns {null} no returned value
  */
 function openAccessQRDialog() {
+    "use strict";
+
     var $dialog = $('.fm-dialog.qr-dialog');
 
     var QRdialogPrepare = function _QRdialogPrepare() {
+
+        var curAvatar;
+
         $dialog.removeClass('hidden');
         $dialog.removeClass('disabled');
+
         if (M.account.contactLink && M.account.contactLink.length) {
+
             var myHost = getBaseUrl() + '/' + M.account.contactLink;
             var QRoptions = {
                 width: 222,
@@ -1682,107 +1689,117 @@ function openAccessQRDialog() {
                 foreground: '#D90007',
                 text: myHost
             };
-            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
 
+            $('.qr-icon-big', $dialog).text('').qrcode(QRoptions);
             $('.qr-http-link', $dialog).text(myHost);
-            var curAvatar = useravatar.contact(u_handle);
+
+            curAvatar = useravatar.contact(u_handle);
             $('.avatar-container-qr', $dialog).html(curAvatar);
+
             var handleAutoAccept = function _handleAutoAccept(autoAcc) {
+
                 if (autoAcc === '0') {
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').removeClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '2px');
+
+                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).removeClass('toggle-on');
                 }
-                else { // if  it's 1 or not set
-                    $dialog.find('.qr-dialog-label .dialog-feature-toggle').addClass('toggle-on')
-                        .find('.dialog-feature-switch').css('marginLeft', '22px');
+                else {
+
+                    // if  it's 1 or not set
+                    $('.qr-dialog-label .dialog-feature-toggle', $dialog).addClass('toggle-on');
                 }
             };
-            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
 
+            mega.attr.get(u_handle, 'clv', -2, 0).always(handleAutoAccept);
         }
     };
 
-    $dialog.find('.fm-dialog-close')
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    $dialog.find('#qr-dlg-close')
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    $dialog.find('.qr-dialog-label .dialog-feature-toggle').rebind('click', function () {
-        var me = $(this);
-        if (me.hasClass('toggle-on')) {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '2px' }, 150, 'swing', function () {
-                me.removeClass('toggle-on');
-                mega.attr.set('clv', 0, -2, 0);
-            });
+    $('.fm-dialog-close, #qr-dlg-close', $dialog).rebind('click', function() {
+
+        closeDialog();
+        return false;
+    });
+
+    $('.qr-dialog-label .dialog-feature-toggle', $dialog).rebind('click', function() {
+
+        var $this = $(this);
+
+        if ($this.hasClass('toggle-on')) {
+
+            $this.removeClass('toggle-on');
+            mega.attr.set('clv', 0, -2, 0);
         }
         else {
-            me.find('.dialog-feature-switch').animate({ marginLeft: '22px' }, 150, 'swing', function () {
-                me.addClass('toggle-on');
-                mega.attr.set('clv', 1, -2, 0);
-            });
+
+            $this.addClass('toggle-on');
+            mega.attr.set('clv', 1, -2, 0);
         }
     });
-    $dialog.find('.reset-qr-label')
-        .rebind('click', function () {
-            var msgTitle = l[18227]; // 'QR Code Regenerate';
-            var msgMsg = l[18228] + ' '; // 'You are about to generate a new QR code. ' +
-                // 'Your <b>existing</b> QR code and invitation link will no longer work. ';
-            var msgQuestion = l[18229]; // 'Do you want to proceed?';
-            msgDialog('confirmation', msgTitle, msgMsg,
-                msgQuestion,
-                function (regenQR) {
-                    if (regenQR) {
-                        $dialog.addClass('disabled');
-                        var delQR = {
-                            a: 'cld',
-                            cl: M.account.contactLink.substring(2, M.account.contactLink.length)
-                        };
-                        var reGenQR = { a: 'clc' };
 
-                        api_req(delQR, {
-                            callback: function (res, ctx) {
-                                if (res === 0) { // success
-                                    api_req(reGenQR, {
-                                        callback: function (res2, ctx2) {
-                                            if (typeof res2 !== 'string') {
-                                                res2 = '';
-                                            }
-                                            else {
-                                                res2 = 'C!' + res2;
-                                            }
-                                            M.account.contactLink = res2;
-                                            QRdialogPrepare();
-                                        }
-                                    });
+    $('.reset-qr-label', $dialog).rebind('click', function() {
+
+        // QR Code Regenerate
+        var msgTitle = l[18227];
+        // You are about to generate a new QR code.
+        // Your <b>existing</b> QR code and invitation link will no longer work.
+        var msgMsg = l[18228] + ' ';
+        // Do you want to proceed?
+        var msgQuestion = l[18229];
+
+        msgDialog('confirmation', msgTitle, msgMsg, msgQuestion, function(regenQR) {
+
+            if (regenQR) {
+                $dialog.addClass('disabled');
+                var delQR = {
+                    a: 'cld',
+                    cl: M.account.contactLink.substring(2, M.account.contactLink.length)
+                };
+                var reGenQR = { a: 'clc' };
+
+                api_req(delQR, {
+                    callback: function(res) {
+                        // success
+                        if (res === 0) {
+
+                            api_req(reGenQR, {
+                                callback: function(res2) {
+
+                                    if (typeof res2 === 'string') {
+                                        res2 = 'C!' + res2;
+                                    }
+                                    else {
+                                        res2 = '';
+                                    }
+
+                                    M.account.contactLink = res2;
+                                    QRdialogPrepare();
                                 }
-                                else {
-                                    $dialog.removeClass('disabled');
-                                }
-                            }
-                        });
+                            });
+                        }
+                        else {
+                            $dialog.removeClass('disabled');
+                        }
                     }
                 });
-
+            }
         });
+    });
+
     if (is_extension || M.execCommandUsable()) {
-        $('#qr-dlg-cpy-lnk').removeClass('hidden');
-        $('#qr-dlg-cpy-lnk').rebind('click', function () {
+
+        $('#qr-dlg-cpy-lnk').removeClass('hidden').rebind('click', function() {
             var links = $.trim($('.qr-http-link', $dialog).text());
             var toastTxt = l[7654];
+
             copyToClipboard(links, toastTxt);
         });
     }
     else {
         $('#qr-dlg-cpy-lnk').addClass('hidden');
     }
+
     if (ua.details.browser === "Chrome") {
-        $dialog.find('#qr-dlg-sv-img').removeClass('hidden');
-        $dialog.find('#qr-dlg-sv-img').rebind('click', function () {
+
+        $('#qr-dlg-sv-img', $dialog).removeClass('hidden').rebind('click', function() {
             var canvasQR = $('.qr-icon-big canvas', $dialog)[0];
             var genImageURL = canvasQR.toDataURL();
             var link = document.createElement("a");
@@ -1794,10 +1811,12 @@ function openAccessQRDialog() {
         });
     }
     else {
-        $dialog.find('#qr-dlg-sv-img').addClass('hidden');
+
+        $('#qr-dlg-sv-img', $dialog).addClass('hidden');
     }
 
-    M.safeShowDialog('qr-dialog', function () {
+    M.safeShowDialog('qr-dialog', function() {
+
         QRdialogPrepare();
         return $dialog;
     });
@@ -3414,28 +3433,34 @@ function fm_resize_handler(force) {
     }
 
     if (M.currentdirid !== 'transfers') {
+        var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
+        var leftPaneWidth = Math.round($('.nw-fm-left-icons-panel:visible').outerWidth());
+
         if (megaChatIsReady && megaChat.resized) {
             megaChat.resized();
         }
 
         $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
-            'margin-left': ($('.fm-left-panel:visible').width() + $('.nw-fm-left-icons-panel').width()) + "px"
+            'margin-left': (treePaneWidth + leftPaneWidth) + "px"
         });
 
-        $('.popup.transfer-widget').width($('.fm-left-panel:visible').width() - 9);
+        $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 
     if (M.currentrootid === 'shares') {
-        var shared_block_height = $('.shared-details-block').height() - $('.shared-top-details').height();
+        var $sharedDetailsBlock = $('.shared-details-block', '.fm-main');
+        var sharedDetailsHeight = Math.round($sharedDetailsBlock.outerHeight());
+        var sharedHeaderHeight = Math.round($('.shared-top-details').outerHeight());
+        var sharedBlockHeight = sharedDetailsHeight - sharedHeaderHeight;
 
-        if ($('.shared-details-block').parents('.fm-main').hasClass('fm-notification')) {
-            shared_block_height -= 24;
+        if ($sharedDetailsBlock.closest('.fm-main').hasClass('fm-notification')) {
+            sharedBlockHeight -= 24;
         }
 
-        if (shared_block_height > 0) {
-            $('.shared-details-block .files-grid-view, .shared-details-block .fm-blocks-view').css({
-                'height': shared_block_height + "px",
-                'min-height': shared_block_height + "px"
+        if (sharedBlockHeight > 0) {
+            $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
+                'height': sharedBlockHeight + "px",
+                'min-height': sharedBlockHeight + "px"
             });
         }
     }

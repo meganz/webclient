@@ -989,7 +989,7 @@ var megasync = (function() {
             }
         });
     };
-    if (is_livesite || usemsync) {
+    if ((is_livesite && !is_mobile) || usemsync) {
         mBroadcaster.once('fm:initialized', ns.periodicCheck);
     }
     else {

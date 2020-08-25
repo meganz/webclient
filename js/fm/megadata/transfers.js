@@ -1628,6 +1628,12 @@ MegaData.prototype.ulerror = function(ul, error) {
 MegaData.prototype.ulcomplete = function(ul, h, faid) {
     'use strict';
 
+    // If there is no start time, initialise the upload and set percentage to 100, e.g. with deduplicated uploads
+    if (h && typeof ul.starttime === 'undefined') {
+        M.ulstart(ul);
+        M.ulprogress(ul, 100, ul.size, ul.size, 0);
+    }
+
     mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
 
     if (ul.skipfile) {

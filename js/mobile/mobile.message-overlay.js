@@ -39,6 +39,8 @@ mobile.messageOverlay = {
             return false;
         };
 
+        $('input').blur();
+
         if (typeof onSuccess === 'string') {
             icon = onSuccess;
             onSuccess = null;

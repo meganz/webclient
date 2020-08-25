@@ -586,7 +586,7 @@ var mega = {
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
-    whoami: 'We make secure cloud storage simple. Create an account and get 50 GB ' +
+    whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),

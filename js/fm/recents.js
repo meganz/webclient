@@ -725,6 +725,14 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
             if (M.d[node.h]) {
                 M.d[node.h].seen = true;
+
+                if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
+                    $newThumb.addClass('linked');
+                }
+            }
+
+            if (!node.t && node.tvf) {
+                $newThumb.addClass('versioning');
             }
             node.seen = true;
 

@@ -181,6 +181,7 @@
     opacity: 0;
 }
 .account.input-wrapper .select-arrow {
+    z-index: -1;
     left: auto;
     right: 5px;
     -webkit-transition: transform 200ms ease-in-out;

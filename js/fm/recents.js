@@ -466,8 +466,6 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
         $newRow.find(".action-icon.tiny-icon").removeClass("top-arrow").addClass("refresh");
     }
 
-
-
     if (action.type === "media" && action.length > 1) {
         this._renderMedia($newRow, action, actionId);
     } else {
@@ -494,10 +492,29 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     var self = this;
     var isCreated = action.action === "added";
     var isOtherUser = action.user !== u_handle;
+    var $icon = $(".medium-file-icon", $newRow);
+    var iconClass = fileIcon(action[0]);
 
     // handle icon
-    var $icon = $newRow.find(".medium-file-icon");
-    $icon.addClass(fileIcon(action[0]));
+    $icon.addClass(iconClass);
+
+    if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
+        iconClass === 'video' && is_video(action[0]))) {
+
+        $icon.addClass('thumb').safeHTML('<img>');
+
+        if (M.d[action[0].h]) {
+            M.d[action[0].h].seen = true;
+        }
+        action[0].seen = true;
+
+        if (iconClass === 'video') {
+            $icon.safeAppend(
+                '<div class="video-thumb-details">' +
+                    '<i class="small-icon small-play-icon"></i>' +
+                '</div>');
+        }
+    }
 
     // handle filename.
     var $fileName = $newRow.find(".file-name");
@@ -725,6 +742,14 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
             if (M.d[node.h]) {
                 M.d[node.h].seen = true;
+
+                if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
+                    $newThumb.addClass('linked');
+                }
+            }
+
+            if (!node.t && node.tvf) {
+                $newThumb.addClass('versioning');
             }
             node.seen = true;
 

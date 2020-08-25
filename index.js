@@ -1507,9 +1507,6 @@ function init_page() {
         }
     }
     else if (page.substr(0, 5) === 'about') {
-        if (page === 'about') {
-            page = 'about/main';
-        }
         parsepage(pages.about);
         aboutus.init();
     }
@@ -2073,6 +2070,8 @@ function init_page() {
 
     topmenuUI();
 
+    mega.metatags.checkPageMatchesURL();
+
     loggedout = false;
     flhashchange = false;
 
@@ -2554,7 +2553,7 @@ function topmenuUI() {
                     'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                     'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate', 'nas'
                 ];
-                var moveTo = {'account': 'fm/account', 'affiliate': 'refer'};
+                var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
 
                 for (var i = subPages.length; i--;) {
                     if (className.indexOf(subPages[i]) > -1) {

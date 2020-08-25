@@ -26267,6 +26267,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     left: 24px;
     top: 5px;
 }
+.fm-recents .medium-file-icon.thumb {
+    background-image: none;
+}
+.fm-recents .medium-file-icon.thumb img {
+    width: 100%;
+    height: 100%;
+}
+.fm-recents .medium-file-icon.thumb.video .video-thumb-details {
+    display: block;
+    top: 0;
+    text-align: center;
+    padding-top: 9px;
+}
 .fm-recents .medium-file-icon.double {
     left: 21px;
     top: 8px;

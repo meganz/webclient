@@ -4626,11 +4626,6 @@
         width: 82%;
         margin-left: 8%;
     }
-    #help2-main .support-images-gallery img {
-        width: auto;
-        height: 230px !important;
-        max-width: inherit;
-    }
     #help2-main .ui-autocomplete {
         width: 300px;
     }

@@ -12,9 +12,6 @@ var aboutus = {
         this.fetchCMS();
 
         aboutus.openSubSection($page);
-        if (page === 'about/main') {
-            this.dynamicCount($page);
-        }
     },
 
     fetchCMS: function() {
@@ -71,6 +68,7 @@ var aboutus = {
         }
         else {
             subsection = 'main';
+            this.dynamicCount($page);
         }
 
         aboutus.showSubsectionContent($page, subsection);

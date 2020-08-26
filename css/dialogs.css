@@ -3975,7 +3975,7 @@ li.token-input-token-invite .input-close {
 }
 /* Add contact */
 .add-user-popup.fm-dialog {
-    z-index: 1200;
+    z-index: 1100;
     left: 50%;
     top: 50%;
     width: 640px;
@@ -6191,7 +6191,7 @@ a.affiliate-guide.grey-link:hover {
 }
 
 .affiliate-redeem .mega-input-title-ontop input {
-    padding: 0px 12px 0 8px; 
+    padding: 0px 12px 0 8px;
 }
 /* end of Affiliate redemtion dialog */
 
@@ -6280,7 +6280,7 @@ a.affiliate-guide.grey-link:hover {
 /* File folder picker dialog (upload, share etc)*/
 /* Important TODO - Reslice this dialog:
 * - Remove unnecessary inheritances, styles
-* - Remove static background-images 
+* - Remove static background-images
 */
 .fm-dialog.fm-picker-dialog {
     width: 604px;
@@ -7778,7 +7778,7 @@ a.affiliate-guide.grey-link:hover {
 }
 .export-links-dialog.item-size {
     display: inline-block;
-    margin: 3px 0 0 8px; 
+    margin: 3px 0 0 8px;
     color: #666;
     vertical-align: top;
 }

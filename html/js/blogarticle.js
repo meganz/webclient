@@ -7,7 +7,17 @@ function init_blogarticle() {
         blog_bind_search();
     }
 
-    var post = blogposts['post_' + blogid];
+    var post;
+    if (page === 'blogarticle') {
+        post = blogposts['post_' + blogid];
+    }
+    else if (page.substr(0, 5) === 'blog/') {
+        blogid = blogHeaders[page.substr(5)].replace('post_', '');
+        post = blogposts['post_' + blogid];
+    }
+    else {
+        console.error('unknown blog ' + page);
+    }
     if (!post) {
         handleInvalidBlogID();
     }
@@ -29,22 +39,22 @@ function render_blogarticle() {
         var $blogPrev = $('#blog_prev');
         var $blogNext = $('#blog_next');
         if (blogposts['post_' + (parseInt(blogid) - 1)]) {
-            $blogPrev.attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) - 1)].id);
+            $blogPrev.attr('href', '/blog/' + blogposts['post_' + (parseInt(blogid) - 1)].th);
             $blogPrev.fadeTo(0, 1);
             $blogPrev.addClass('active');
         }
         else {
-            $blogPrev.attr('href', '/blog_' + blogid);
+            $blogPrev.attr('href', '/blog/' + blogposts['post_' + blogid].th);
             $blogPrev.fadeTo(0, 0.4);
             $blogPrev.removeClass('active');
         }
         if (blogposts['post_' + (parseInt(blogid) + 1)]) {
-            $blogNext.attr('href', '/blog_' + blogposts['post_' + (parseInt(blogid) + 1)].id);
+            $blogNext.attr('href', '/blog/' + blogposts['post_' + (parseInt(blogid) + 1)].th);
             $blogNext.fadeTo(0, 1);
             $blogNext.addClass('active');
         }
         else {
-            $blogNext.attr('href', '/blog_' + blogid);
+            $blogNext.attr('href', '/blog/' + blogposts['post_' + blogid].th);
             $blogNext.fadeTo(0, 0.4);
             $blogNext.removeClass('active');
         }

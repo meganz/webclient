@@ -35,6 +35,8 @@ var QuickFinder = function(searchable_elements, containers) {
         if (self.is_active()) {
             self.deactivate();
         }
+        // Clear the repeat key press setting if change the page
+        last_key = null;
     });
 
     $(window).rebind('keypress.quickFinder', function(e) {

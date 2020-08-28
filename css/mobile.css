@@ -3379,6 +3379,11 @@ input.radioOn, input.radioOff {
     padding-left: 18px;
     margin: 24px 0;
 }
+
+.mobile.remember-billing-info-wrapper .radio-txt {
+    padding-top: 0px;
+}
+
 .payment-options .pro-gray-block, .payment-options .third-section {
     position: relative;
 }

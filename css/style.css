@@ -6225,6 +6225,17 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;
 }
+
+@media only screen and (max-width: 1368px) and (min-width: 320px)  {
+    .grid-table.shared-with-me td:nth-child(2) {
+        width: 150px !important;
+    }
+
+    .grid-table.out-shares td:nth-child(2) {
+        width: 150px !important;
+    }    
+}
+
 table {
     border-spacing: transparent;
 }

@@ -166,15 +166,13 @@ mega.textEditorUI = new function TextEditorUI() {
                         l[22750],
                         l[22751],
                         function() {
-                            // eslint-disable-next-line no-unused-expressions
-                            !hashLogic && history.back();
+                            history.back();
                             mega.textEditorUI.doClose();
                         }
                     );
                 }
                 else {
-                    // eslint-disable-next-line no-unused-expressions
-                    !hashLogic && history.back();
+                    history.back();
                     mega.textEditorUI.doClose();
                 }
                 return false;
@@ -376,8 +374,8 @@ mega.textEditorUI = new function TextEditorUI() {
     this.setupEditor = function(fName, txt, handle, isReadonly) {
         M.require('codemirror_js', 'codemirrorscroll_js').done(function() {
             init();
+            pushHistoryState();
             $containerDialog.removeClass('hidden');
-            addingFakeHistoryState();
             window.textEditorVisible = true;
             $myTextarea = $('#txtar', $editorContianer);
             if (!editor) {

@@ -576,24 +576,6 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
-    /** Adding the current page to history if needed to preserve navigation correctness
-     * @returns {Void}      No return value should be expected
-     */
-    global.addingFakeHistoryState = function() {
-        // then pushing fake states of history/hash
-        if (!hashLogic) {
-            var isSearch = page.indexOf('fm/search/');
-            if (isSearch >= 0) {
-                var searchString = page.substring(isSearch + 10);
-                var tempPage = page.substring(0, isSearch + 10);
-                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
-            }
-            else {
-                history.pushState({ subpage: page }, '', '/' + page);
-            }
-        }
-    };
-
     // Viewer Init
     function slideshow(id, close, hideCounter) {
         if (!close && M.isInvalidUserStatus()) {
@@ -662,8 +644,9 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            addingFakeHistoryState();
-
+            if (!history.state || history.state.view !== id) {
+                pushHistoryState();
+            }
             _hideCounter = hideCounter;
         }
 
@@ -677,6 +660,7 @@ var slideshowid;
         }
         mBroadcaster.sendMessage('slideshow:open', n);
         sessionStorage.setItem('previewNode', id);
+        pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -708,14 +692,7 @@ var slideshowid;
                     }
                 }
                 else if (e.keyCode === 8 || e.key === 'Backspace') {
-                    // since Backspace event is processed with keydown at document level for cloudBrowser.
-                    // i prefered that to process it here, instead of unbind the previous handler.
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 }
             });
@@ -723,12 +700,7 @@ var slideshowid;
             // Close icon
             $overlay.find('.viewer-button.close,.viewer-error-close')
                 .rebind('click', function () {
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 });
 

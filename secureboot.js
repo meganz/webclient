@@ -305,8 +305,10 @@ if (is_chrome_firefox) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || window.MSBlobBuilder || !myURL ||
-    typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
+    || typeof history !== 'object' || typeof history.replaceState !== 'function'
+    || window.chrome && !document.exitPointerLock
+;
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -3870,12 +3872,29 @@ function pushHistoryState(page, state) {
     'use strict';
 
     try {
-        if (typeof page !== 'object') {
-            page = {subpage: page};
+        var method = 'pushState';
+        if (page === true) {
+            method = 'replaceState';
+            page = state;
+            state = undefined;
         }
-        state = Object.assign(page, state);
+
+        if (typeof page !== 'object') {
+            page = page ? {subpage: page} : history.state || {subpage: getCleanSitePath()};
+        }
+        state = Object.assign({}, page, state);
         page = state.subpage || state.fmpage || location.hash;
-        history.pushState(state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+
+        if (page.substr(0, 9) === 'fm/search') {
+            state.searchString = page.substr(9) || state.searchString;
+            page = state.subpage = 'fm/search';
+        }
+
+        if (d > 1 && method === 'pushState' && JSON.stringify(history.state) === JSON.stringify(state)) {
+            console.warn('duplicate push state attempt.');
+        }
+
+        history[method](state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
     }
     catch (ex) {
         console.warn(ex);

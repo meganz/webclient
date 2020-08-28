@@ -3387,29 +3387,11 @@ BusinessAccountUI.prototype.sortSubusers = function(subusers, field) {
  */
 BusinessAccountUI.prototype.URLchanger = function (subLocation) {
     "use strict";
-    try {
-
-        if (hashLogic) {
-            var newHash = '#fm/user-management' + (subLocation ? '/' + subLocation : '');
-            if (document.location.hash !== newHash) {
-                window.skipHashChange = true;
-                document.location.hash = newHash;
-                page = newHash;
-                M.currentdirid = page;
-            }
-        }
-        else {
-            var newSubPage = (subLocation) ? ('fm/user-management/' + subLocation)
-                : 'fm/user-management';
-            if (page !== newSubPage) {
-                history.pushState({ subpage: newSubPage }, "", "/" + newSubPage);
-                page = newSubPage;
-                M.currentdirid = page;
-            }
-        }
-    }
-    catch (ex) {
-        console.error(ex);
+    var newSubPage = subLocation ? 'fm/user-management/' + subLocation : 'fm/user-management';
+    if (page !== newSubPage) {
+        pushHistoryState(newSubPage);
+        page = newSubPage;
+        M.currentdirid = page;
     }
 };
 

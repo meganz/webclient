@@ -1,36 +1,34 @@
 import React from 'react';
-import AudioPlayer from './AudioPlayer.jsx';
+import AudioPlayer from './audioPlayer.jsx';
 import PropTypes from 'prop-types';
 
-class AudioContainer extends React.Component {
+export default class AudioContainer extends React.Component {
+    state = {
+        audioBlobUrl: null,
+        loading: false
+    };
+
     constructor(props) {
         super(props);
-        this.state = {
-            audioBlobUrl: null,
-            loading: false
-        }
-
-        this.getAudioFile = this.getAudioFile.bind(this);
     }
 
-    getAudioFile() {
-        const self = this;
-        const {mime, h} = this.props;
+    getAudioFile= () => {
+        const { mime, h } = this.props;
 
-        self.setState({
+        this.setState({
             loading: true
         });
 
         if (mime !== 'audio/mp4') {
             if (d) {
-                console.warn('cannot play this file type (%s)', mime, h, [self]);
+                console.warn('cannot play this file type (%s)', mime, h, [this]);
             }
             return false;
         }
 
         M.gfsfetch(h, 0, -1)
-            .then(({buffer}) => {
-                self.setState(() => {
+            .then(({ buffer }) => {
+                this.setState(() => {
                     return {
                         audioBlobUrl: mObjectURL([buffer], 'audio/mp4'),
                         loading: false
@@ -49,18 +47,17 @@ class AudioContainer extends React.Component {
     }
 
     render() {
-        const self = this;
-        const { audioBlobUrl, loading } = self.state;
-        const { playtime, mime} = self.props;
+        const { audioBlobUrl, loading } = this.state;
+        const { playtime, mime, audioId } = this.props;
 
         return (
             <div className="audio-container">
                 <AudioPlayer
                     source={(audioBlobUrl ? audioBlobUrl : null)}
-                    audioId={self.props.audioId}
+                    audioId={audioId}
                     loading={loading}
                     mime={mime}
-                    getAudioFile={self.getAudioFile}
+                    getAudioFile={this.getAudioFile}
                     playtime={playtime}
                 />
             </div>
@@ -71,11 +68,9 @@ class AudioContainer extends React.Component {
 AudioContainer.propTypes = {
     h: PropTypes.string.isRequired,
     mime: PropTypes.string.isRequired,
-}
+};
 
 AudioContainer.defaultProps = {
     h: null,
     mime: null,
-}
-
-export default AudioContainer;
+};

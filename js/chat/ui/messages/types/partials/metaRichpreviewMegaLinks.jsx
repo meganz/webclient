@@ -1,8 +1,8 @@
 import React from 'react';
-import utils from './../../../ui/utils.jsx';
-import { ConversationMessageMixin } from './mixin.jsx';
+import utils from '../../../../../ui/utils.jsx';
+import { ConversationMessageMixin } from '../../mixin.jsx';
 import { MetaRichpreviewLoading } from './metaRichPreviewLoading.jsx';
-import {ContactVerified, ContactPresence, Avatar} from "./../contacts.jsx";
+import {ContactVerified, ContactPresence, Avatar} from "../../../contacts.jsx";
 
 class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
     render() {

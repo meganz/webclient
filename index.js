@@ -2059,7 +2059,9 @@ function init_page() {
 
     topmenuUI();
 
-    mega.metatags.checkPageMatchesURL();
+    if (!window.is_karma && mega.metatags) {
+        mega.metatags.checkPageMatchesURL();
+    }
 
     loggedout = false;
     flhashchange = false;
@@ -2845,6 +2847,9 @@ function getTemplate(name) {
 
 function pagemetadata() {
     'use strict';
+    if (window.is_karma) {
+        return;
+    }
     var metas = mega.metatags.getPageMetaTags(page);
     var mega_desc = metas.mega_desc || mega.whoami;
     mega_title = metas.mega_title || 'MEGA';

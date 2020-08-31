@@ -1139,12 +1139,12 @@ MegaData.prototype.addTreeUI = function() {
 /**
  * Invokes debounced tree panel initialization.
  */
-MegaData.prototype.addTreeUIDelayed = function() {
+MegaData.prototype.addTreeUIDelayed = function(ms) {
     'use strict';
 
     delay('treeUI', function() {
         M.addTreeUI();
-    }, 30);
+    }, ms || 30);
 };
 
 /**

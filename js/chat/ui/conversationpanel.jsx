@@ -964,21 +964,17 @@ export class ConversationPanel extends MegaRenderMixin {
                 msgAppended++;
             });
 
+            // wait for all msgs to be rendered.
             chatRoom.off('onHistoryDecrypted.pull');
             chatRoom.one('onHistoryDecrypted.pull', function() {
                 chatRoom.off('onMessagesBuffAppend.pull');
 
-                // wait for all msgs to be rendered.
-                chatRoom.messagesBuff.addChangeListener(function() {
-                    if (msgAppended > 0) {
-                        self._reposOnUpdate = scrYOffset;
-                    }
+                if (msgAppended > 0) {
+                    self._reposOnUpdate = scrYOffset;
+                }
 
-                    self.scrollPullHistoryRetrieval = -1;
-                    // self.eventuallyUpdate();
-
-                    return 0xDEAD;
-                });
+                self.scrollPullHistoryRetrieval = -1;
+                // self.eventuallyUpdate();
             });
 
             mb.retrieveChatHistory();

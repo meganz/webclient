@@ -43,6 +43,17 @@ body * {
     user-select: none;
 }
 
+.wait-cursor, .loading-cursor, .progress-cursor {
+    cursor: progress !important;
+}
+
+.fmdb-working #topmenu .membership-status,
+.wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg {
+    background-image: url("../images/mega/ajax-loader-tiny.gif") !important;
+    background-position: center !important;
+    background-size: auto !important;
+}
+
 /* Developer dark mode */
 html.dark-mode {
     filter: invert(1);

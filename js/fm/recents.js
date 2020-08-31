@@ -87,22 +87,7 @@ function RecentsRender() {
     var self = this;
 
     // Init Dependencies
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-
-    if (!window.selectionManager) {
-        window.selectionManager = new SelectionManager(
-            this.$container,
-            $.selected && $.selected.length > 0
-        );
-
-        if ($.selected) {
-            $.selected.forEach(function(h) {
-                selectionManager.add_to_selection(h);
-            });
-        }
-    }
+    M.initShortcutsAndSelection(this.$container);
 
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
@@ -121,6 +106,10 @@ function RecentsRender() {
 RecentsRender.prototype.render = function(limit, until, forceInit) {
     'use strict';
     var self = this;
+
+    if (M.currentdirid !== "recents") {
+        return;
+    }
 
     // Switch to recents panel.
     M.onSectionUIOpen('recents');

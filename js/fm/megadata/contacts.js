@@ -914,16 +914,7 @@ MegaData.prototype.syncContactEmail = function(userHash, promise) {
 
             if (fmdb && !ignoreDB && !pfkey) {
                 // convert MegaDataObjects -> JS
-                var cleanedUpUserData = clone(u.toJS ? u.toJS() : u);
-                delete cleanedUpUserData.presence;
-                delete cleanedUpUserData.presenceMtime;
-                delete cleanedUpUserData.shortName;
-                delete cleanedUpUserData.firstName;
-                delete cleanedUpUserData.lastName;
-                delete cleanedUpUserData.name;
-                delete cleanedUpUserData.avatar;
-                delete cleanedUpUserData.ats;
-                fmdb.add('u', {u: u.u, d: cleanedUpUserData});
+                fmdb.add('u', {u: u.u, d: clone(u instanceof MegaDataMap ? u.toJS() : u)});
                 user.firstName = '';
                 user.lastName = '';
                 attribCache.removeItem(user.u + "_firstname");

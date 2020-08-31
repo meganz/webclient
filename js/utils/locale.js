@@ -156,7 +156,7 @@ function setDateTimeFormat(locales, format) {
  *       13: January (Only month short version)
  */
 function time2date(unixTime, format) {
-
+    'use strict';
     var date = new Date(unixTime * 1000 || 0);
     var result;
     var dateFunc;

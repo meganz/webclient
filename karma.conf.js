@@ -34,7 +34,6 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
-        'js/vendor/dexie.js',
         // For notifications.
         'js/vendor/notification.js',
         'js/vendor/moment.js',
@@ -50,6 +49,7 @@ module.exports = function(config) {
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
         'js/vendor/es6-shim.js',
+        'js/vendor/dexie.js',
 
         // == Our code ==
         'secureboot.js',

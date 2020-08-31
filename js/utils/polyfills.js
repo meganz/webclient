@@ -176,6 +176,17 @@ mBroadcaster.once('boot_done', function() {
     }
 });
 
+mBroadcaster.once('boot_done', function() {
+    'use strict';
+
+    if (typeof window.queueMicrotask !== "function") {
+        var tbsp = Promise.resolve();
+
+        window.queueMicrotask = function(callback) {
+            tbsp.then(callback);
+        };
+    }
+});
 
 mBroadcaster.once('boot_done', function() {
     'use strict';

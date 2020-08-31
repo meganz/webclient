@@ -591,7 +591,7 @@ var mega = {
     whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
-    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 6),
 
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
@@ -713,6 +713,9 @@ Object.defineProperty(mega, 'active', {
         };
     })()
 });
+
+// nb: can overflow..
+Object.defineProperty(window, 'mIncID', {value: 0, writable: true});
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
@@ -1346,11 +1349,31 @@ function mObjectURL(data, type)
             }
         },
 
-        notify: function crossTab_notify(msg, data) {
-            data = { origin: this.ctID, data: data, sid: Math.random()};
+        drain: function() {
+            'use strict';
+            if (typeof delay === 'function') {
+                var tag = this.eTag;
+                delay('crosstab:drain', function() {
+                    var entries = Object.keys(localStorage)
+                        .filter(function(k) {
+                            return k.startsWith(tag);
+                        });
+                    console.debug('Removing crossTab entries...', entries);
+
+                    for (var i = entries.length; i--;) {
+                        delete localStorage[entries[i]];
+                    }
+                }, 8e3);
+            }
+        },
+
+        notify: tryCatch(function crossTab_notify(msg, data) {
+            'use strict';
+            this.drain();
+            data = { origin: this.ctID, data: data, sid: ++mIncID };
             localStorage.setItem(this.eTag + msg, JSON.stringify(data));
             if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        },
+        }),
 
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
@@ -2338,6 +2361,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
 
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
@@ -2357,7 +2381,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:5,w:5});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
@@ -3470,20 +3493,6 @@ else if (!browserUpdate) {
                     window[jsl[i].n] = blobLink;
                 }
             }
-            else if (jsl[i].j === 5) {
-                // a type of resources that we want to modify before loading.
-                if (jsl[i].n.indexOf('dexie_js') > -1) {
-                    var replaceString =
-                        'return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();';
-
-                    var replaceByString = 'throw new Error();';
-
-                    jsl[i].text = jsl[i].text.replace(replaceString, replaceByString);
-
-                    jsar.push(jsl[i].text + '\n\n');
-
-                }
-            }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
                 try {
                     var templates = JSON.parse(jsl[i].text);
@@ -3938,22 +3947,6 @@ function tryCatch(fn, onerror)
     return fn.foo;
 }
 
-// setImmediate polyfill for Dexie...
-if (!window.setImmediate && window.requestIdleCallback) {
-    window.setImmediate = function _setImmediate(callback) {
-        'use strict';
-
-        // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback, {timeout: 20});
-    };
-
-    window.clearImmediate = function _clearImmediate(pid) {
-        'use strict';
-
-        window.cancelIdleCallback(pid);
-    };
-}
-
 var onIdle = function(handler) {
         var startTime = Date.now();
 
@@ -4033,7 +4026,14 @@ function promisify(fc) {
     'use strict';
     var a$yncMethod = function() {
         var self = this;
-        var args = toArray.apply(null, arguments);
+        var args = [];
+        if (arguments.length) {
+            var len = arguments.length;
+            args = Array(len);
+            while (len--) {
+                args[len] = arguments[len];
+            }
+        }
         return new Promise(function(resolve, reject) {
             a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
         });
@@ -4046,9 +4046,18 @@ function promisify(fc) {
 
 function mutex(name, handler) {
     'use strict';
+    if (typeof name === 'function') {
+        handler = name;
+        name = null;
+    }
     var mMutexMethod = function() {
         var self = this;
-        var args = toArray.apply(null, arguments);
+        var args = arguments.length ? toArray.apply(null, arguments) : [];
+        name = name || this.__mutex_lock_name_$;
+        if (!name) {
+            name = (this.constructor.name || '$') + makeUUID().slice(-13);
+            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
+        }
         return new Promise(function(resolve, reject) {
             mutex.lock(name).then(function(unlock) {
                 var res = function(a0) {

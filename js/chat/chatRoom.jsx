@@ -376,7 +376,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     self.rebind('onMarkAsJoinRequested.initHist', () => {
         timer = setTimeout(function() {
             if (d) {
-                console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+                self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
             _historyIsAvailable(false);
         }, 3e5);

@@ -530,11 +530,30 @@
 CMS.on('corporate', function() {
     'use strict';
 
+    CMS.pagesMap = CMS.pagesMap || { 'page-1': 'investors', 'page-2': 'media', 'page-3': 'shareholder-reports' };
+    CMS.reversedMap = CMS.reversedMap || (function() {
+        var temp = Object.create(null);
+        for (var k in CMS.pagesMap) {
+            if (CMS.pagesMap.hasOwnProperty(k)) {
+                temp[CMS.pagesMap[k]] = k;
+            }
+        }
+        return temp;
+    })();
+
     $('.new-left-menu-link').rebind('click', function() {
-        loadSubPage('corporate/' + $(this).attr('id'));
+        var pageName = $(this).attr('id');
+
+        // check if CMS is updated to return correct URLs
+        pageName = CMS.pagesMap[pageName] || pageName;
+        loadSubPage('corporate/' + pageName);
         $('.old .fmholder').animate({scrollTop: 0}, 0);
     });
-    var ctype = getSitePath().substr(11).replace(/[^\w-]/g, '');
+    var ctype = getCleanSitePath().substr(10).replace(/[^\w-]/g, '');
+
+    // support prior and after CMS data change.
+    ctype = document.getElementById(ctype) ? ctype : CMS.reversedMap[ctype] || CMS.reversedMap.investors;
+
     if (ctype && document.getElementById(ctype)) {
         $('.new-right-content-block').addClass('hidden');
         $('.new-right-content-block.' + ctype).removeClass('hidden');

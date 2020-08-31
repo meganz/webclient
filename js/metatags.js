@@ -266,6 +266,23 @@ mega.metatags = new function() {
             mTags.mega_title = 'Business Account - MEGA';
             mTags.mega_desc = 'Create Business Account';
         }
+        else if (page === 'corporate') {
+            mTags.mega_title = 'Investors - MEGA';
+            mTags.mega_desc = 'MEGA investor relations';
+            addCanonical(getBaseUrl() + '/corporate/investors');
+        }
+        else if (page === 'corporate/investors') {
+            mTags.mega_title = 'Investors - MEGA';
+            mTags.mega_desc = 'MEGA investor relations';
+        }
+        else if (page === 'corporate/media') {
+            mTags.mega_title = 'Media - MEGA';
+            mTags.mega_desc = 'MEGA corporate media';
+        }
+        else if (page === 'corporate/shareholder-reports') {
+            mTags.mega_title = 'Shareholder Reports - MEGA';
+            mTags.mega_desc = 'MEGA shareholder reports';
+        }
         else if (typeof Object(window.dlmanager).isStreaming === 'object') {
             mTags.mega_title = dlmanager.isStreaming._megaNode.name + ' - MEGA';
         }

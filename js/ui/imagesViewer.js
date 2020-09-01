@@ -625,11 +625,9 @@ var slideshowid;
                 _pdfSeen = false;
 
                 tryCatch(function() {
-                    var doc = document.getElementById('pdfpreviewdiv1');
-                    if (doc && (doc = doc.contentWindow.document)) {
-                        doc.open();
-                        doc.close();
-                    }
+                    var ev = document.createEvent("HTMLEvents");
+                    ev.initEvent("pdfjs-cleanup.meganz", true);
+                    document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
                 })();
             }
 
@@ -1182,12 +1180,30 @@ var slideshowid;
 
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
-    function prepareAndViewPdfViewer() {
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function() {
+    function prepareAndViewPdfViewer(data) {
+        if (_pdfSeen) {
+            var success = false;
+            tryCatch(function() {
+                var elm = document.getElementById('pdfpreviewdiv1');
+                elm.classList.remove('hidden');
+
+                var ev = document.createEvent("HTMLEvents");
+                ev.initEvent("pdfjs-openfile.meganz", true);
+                ev.data = data.buffer || data.src;
+                elm.contentDocument.body.dispatchEvent(ev);
+                success = true;
+            })();
+
+            if (success) {
+                return;
+            }
+        }
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').done(function() {
             var myPage = pages['pdfviewer'];
-            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
-            myPage = myPage.replace('^$#^3', window['pdfjs2']);
-            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            myPage = myPage.replace('viewer.css', window.pdfviewercss);
+            myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
+            myPage = myPage.replace('viewer.js', window.pdfviewerjs);
+            localStorage.setItem('currPdfPrev2', JSON.stringify(data.src));
             // remove then re-add iframe to avoid History changes [push]
             var pdfIframe = document.getElementById('pdfpreviewdiv1');
             var newPdfIframe = document.createElement('iframe');
@@ -1229,9 +1245,7 @@ var slideshowid;
             $imgBlock.find('.img-wrap').addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
-            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-            localStorage.setItem('pdfPrevTitle', $overlay.find('.viewer-filename').text());
-            prepareAndViewPdfViewer();
+            prepareAndViewPdfViewer(previews[id]);
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
@@ -1464,7 +1478,7 @@ var slideshowid;
                     delete p.prev;
                 }
 
-                if (p.type.startsWith('image')) {
+                if (p.type.startsWith('image') || p.type === 'application/pdf') {
                     URL.revokeObjectURL(p.src);
                     if (previews[k] === p) {
                         previews[k] = false;

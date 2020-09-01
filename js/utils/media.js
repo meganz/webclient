@@ -410,15 +410,13 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
     M.require('pdfjs').then(function() {
         if (!PDFThumbHandler.q) {
             PDFThumbHandler.q = function PDFThumbQueueHandler(task, done) {
-                var canvas;
-                var pdfTask;
                 var buffer = task[0];
                 var callback = task[1];
                 var tag = 'pdf-thumber.' + makeUUID();
                 var logger = PDFThumbHandler.q.logger;
                 var finish = function(buf) {
                     if (done) {
-                        pdfTask.destroy().then(done).catch(done);
+                        onIdle(done);
                         done = null;
                     }
 
@@ -433,34 +431,10 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
                     console.time(tag);
                 }
 
-                pdfTask = PDFJS.getDocument(buffer);
-                buffer = null;
-
-                pdfTask.then(function(pdf) {
-                    return pdf.getPage(1);
-                }).then(function(page) {
-                    var scale = 2.5;
-                    var viewport = page.getViewport(scale);
-
-                    // Prepare canvas using PDF page dimensions
-                    canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-
-                    // Render PDF page into canvas context
-                    var renderContext = {
-                        viewport: viewport,
-                        canvasContext: context
-                    };
-
-                    return page.render(renderContext);
-                }).then(function() {
-                    var buffer = dataURLToAB(canvas.toDataURL('image/png'));
+                pdfjsLib.getPreviewImage(buffer).then(function(buffer) {
 
                     if (d) {
-                        logger.log('[%s] pdf2img %sx%s (%s bytes)',
-                            tag, canvas.width, canvas.height, buffer.byteLength);
+                        logger.log('[%s] %sx%s (%s bytes)', tag, buffer.width, buffer.height, buffer.byteLength);
                     }
 
                     finish(buffer);
@@ -475,12 +449,8 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
             PDFThumbHandler.q = new MegaQueue(PDFThumbHandler.q, mega.maxWorkers, 'pdf-thumber');
 
             if (d) {
-                console.info('Using pdf.js %s (%s)', PDFJS.version, PDFJS.build);
+                console.info('Using pdf.js %s (%s)', pdfjsLib.version, pdfjsLib.build);
             }
-
-            PDFJS.verbosity = d ? 10 : 0;
-            PDFJS.isEvalSupported = false;
-            PDFJS.workerSrc = (is_extension ? '' : '/') + 'pdf.worker.js';
         }
         var q = PDFThumbHandler.q;
 
@@ -521,6 +491,9 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     delete mThumbHandler.sup.SVG;
 }
 
+if (!window.fetchStreamSupport) {
+    delete mThumbHandler.sup.PDF;
+}
 
 mBroadcaster.once('startMega', function() {
     'use strict';

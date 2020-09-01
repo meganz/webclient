@@ -142,12 +142,9 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [pdf.js]: PDF Reader in JavaScript.
 
-> This is released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+> Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
----
-[pdf.viewer.js]: PDF Reader Viewer in JavaScript.
-
-> This is released under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+> **This is a fork**, [Compare the changes](https://github.com/mozilla/pdf.js/compare/master...meganz:master)
 
 ---
 [codemirror.js]: Text editor in JavaScript Ver. 5.49.2
@@ -258,8 +255,7 @@ characters were removed from the files
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
 [notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
-[pdf.js]: <https://github.com/mozilla/pdfjs-dist/tree/v1.9.638>
-[pdf.viewer.js]: <https://github.com/mozilla/pdf.js/releases/download/v1.8.188/pdfjs-1.8.188-dist.zip>
+[pdf.js]: <https://github.com/mega.nz/pdf.js>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/releases/tag/v16.8.6
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>

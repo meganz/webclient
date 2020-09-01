@@ -62,17 +62,6 @@ mBroadcaster.once('startMega', function() {
         $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
         delete pages['dialogs-common'];
     }
-
-    if (!hashLogic) {
-        $(window).rebind('popstate.mega', function(event) {
-            var state = event.originalEvent.state || {};
-            var add = '';
-            if (state.searchString) {
-                add = state.searchString;
-            }
-            loadSubPage((state.subpage || state.fmpage || getCleanSitePath() || location.hash) + add, event);
-        });
-    }
 });
 
 mBroadcaster.once('startMega:desktop', function() {
@@ -1507,9 +1496,6 @@ function init_page() {
         }
     }
     else if (page.substr(0, 5) === 'about') {
-        if (page === 'about') {
-            page = 'about/main';
-        }
         parsepage(pages.about);
         aboutus.init();
     }
@@ -2073,6 +2059,10 @@ function init_page() {
 
     topmenuUI();
 
+    if (!window.is_karma && mega.metatags) {
+        mega.metatags.checkPageMatchesURL();
+    }
+
     loggedout = false;
     flhashchange = false;
 
@@ -2554,7 +2544,7 @@ function topmenuUI() {
                     'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
                     'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate', 'nas'
                 ];
-                var moveTo = {'account': 'fm/account', 'affiliate': 'refer'};
+                var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
 
                 for (var i = subPages.length; i--;) {
                     if (className.indexOf(subPages[i]) > -1) {
@@ -2857,6 +2847,9 @@ function getTemplate(name) {
 
 function pagemetadata() {
     'use strict';
+    if (window.is_karma) {
+        return;
+    }
     var metas = mega.metatags.getPageMetaTags(page);
     var mega_desc = metas.mega_desc || mega.whoami;
     mega_title = metas.mega_title || 'MEGA';
@@ -2933,7 +2926,7 @@ function parsetopmenu() {
 function loadSubPage(tpage, event) {
     'use strict';
 
-    pagemetadata();
+    onIdle(pagemetadata);
     tpage = getCleanSitePath(tpage);
 
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
@@ -2955,6 +2948,13 @@ function loadSubPage(tpage, event) {
 
     if (window.versiondialogid) {
         fileversioning.closeFileVersioningDialog(window.versiondialogid);
+    }
+
+    if (event && Object(event.state).view) {
+        onIdle(function() {
+            slideshow(event.state.view);
+        });
+        return false;
     }
 
     if (folderlink) {
@@ -3030,23 +3030,12 @@ function loadSubPage(tpage, event) {
         }
     }
 
-    if (hashLogic || isPublicLink(page)) {
-        document.location.hash = '#' + page;
-    }
-    else if (event && event.type === 'popstate' || event === 'override') {
+    if (event && event.type === 'popstate' || event === 'override') {
         // In case we navigated to a location.hash, clean it up replacing the current history entry.
-        history.replaceState({subpage: page}, "", '/' + page);
+        pushHistoryState(true, page);
     }
     else {
-        var isSearch = page.indexOf('fm/search/');
-        if (isSearch >= 0) {
-            var searchString = page.substring(isSearch + 10);
-            var tempPage = page.substring(0, isSearch + 10);
-            history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
-        }
-        else {
-            history.pushState({ subpage: page }, "", "/" + page);
-        }
+        pushHistoryState(page);
     }
 
     // since hash changing above will fire popstate event, which in its turn will call
@@ -3068,19 +3057,16 @@ function loadSubPage(tpage, event) {
     mBroadcaster.sendMessage('pagechange', tpage);
 }
 
+window.addEventListener('popstate', function(event) {
+    'use strict';
 
-window.onhashchange = function () {
-    if (window.skipHashChange) {
-        delete window.skipHashChange;
-        return false;
-    }
-    if (hashLogic) {
-        hash = getCleanSitePath(location.hash);
-        if (hash !== page) {
-            loadSubPage(hash);
-        }
-    }
-};
+    var state = event.state || {};
+    var add = state.searchString || '';
+    loadSubPage((state.subpage || state.fmpage || getCleanSitePath() || location.hash) + add, event);
+}, {
+    capture: true,
+    passive: true,
+});
 
 window.onbeforeunload = function () {
     'use strict';
@@ -3122,6 +3108,6 @@ mBroadcaster.once('mega:openfolder', function() {
     if (sessionStorage && sessionStorage.previewNode) {
         var previewNode = sessionStorage.previewNode;
         sessionStorage.removeItem('previewNode');
-        (is_mobile ? mobile.slideshow.init : slideshow)(previewNode);
+        slideshow(previewNode);
     }
 });

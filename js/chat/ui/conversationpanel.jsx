@@ -13,7 +13,7 @@ import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
 import { Accordion } from './../../ui/accordion.jsx';
 import { AccordionPanel } from './../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
-import { GenericConversationMessage } from './messages/generic.jsx';
+import GenericConversationMessage  from './messages/generic.jsx';
 import { AltPartsConvMessage }  from './messages/alterParticipants.jsx';
 import { TruncatedMessage } from './messages/truncated.jsx';
 import { PrivilegeChange } from './messages/privilegeChange.jsx';

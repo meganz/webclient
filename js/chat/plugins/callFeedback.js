@@ -35,7 +35,7 @@ var CallFeedback = function(megaChat, options) {
                                         'text': l[1403],
                                         'callback': function () {
                                             var feedbackDialog = mega.ui.FeedbackDialog.singleton(
-                                                $(this),
+                                                undefined,
                                                 undefined,
                                                 "call-ended"
                                             );

@@ -259,6 +259,7 @@ function dashboardUI() {
                         var expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
                         var currentTime = new Date();
                         var remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
+                        remainingDays = remainingDays < 0 ? 0 : remainingDays;
                         var daysLeft = l[16284].replace('%1', remainingDays);
                         $('.suba-days-left', $businessLeft).removeClass('hidden').text(daysLeft);
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');

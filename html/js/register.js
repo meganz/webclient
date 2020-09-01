@@ -442,6 +442,7 @@ function init_register() {
         $lastName.addClass('hidden');
         $firstName.addClass('hidden');
         $regInfoContainer.addClass('businessSubAc');
+        $('.checkbox-block.pw-remind .radio-txt', $formWrapper).safeHTML(l[23748]);
     }
 
     // Init inputs events

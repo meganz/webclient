@@ -559,7 +559,8 @@
 .call-icon.crossed-handset {
     background-position: -58px -2368px;
 }
-.call-icon.diagonal-handset {
+.call-icon.diagonal-handset,
+.call-icon.call-started {
     background-position: -58px -2418px;
 }
 .call-icon.handset-with-down-arrow {

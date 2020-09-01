@@ -166,15 +166,13 @@ mega.textEditorUI = new function TextEditorUI() {
                         l[22750],
                         l[22751],
                         function() {
-                            // eslint-disable-next-line no-unused-expressions
-                            !hashLogic && history.back();
+                            history.back();
                             mega.textEditorUI.doClose();
                         }
                     );
                 }
                 else {
-                    // eslint-disable-next-line no-unused-expressions
-                    !hashLogic && history.back();
+                    history.back();
                     mega.textEditorUI.doClose();
                 }
                 return false;
@@ -376,8 +374,8 @@ mega.textEditorUI = new function TextEditorUI() {
     this.setupEditor = function(fName, txt, handle, isReadonly) {
         M.require('codemirror_js', 'codemirrorscroll_js').done(function() {
             init();
+            pushHistoryState();
             $containerDialog.removeClass('hidden');
-            addingFakeHistoryState();
             window.textEditorVisible = true;
             $myTextarea = $('#txtar', $editorContianer);
             if (!editor) {
@@ -390,7 +388,7 @@ mega.textEditorUI = new function TextEditorUI() {
             // Without parentheses && will be applied first,
             // I want JS to start from left and go in with first match
             // eslint-disable-next-line no-extra-parens
-            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 2)) {
+            if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1)) {
                 editor.options.readOnly = true;
                 $('.txt-editor-menu', $editorContianer).addClass('disabled');
                 $('.txt-editor-btn.save-btn', $editorContianer).addClass('hidden');

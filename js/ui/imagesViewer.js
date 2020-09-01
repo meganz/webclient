@@ -576,24 +576,6 @@ var slideshowid;
         $percLabel.attr('data-perc', w_perc).text(Math.round(w_perc) + '%');
     }
 
-    /** Adding the current page to history if needed to preserve navigation correctness
-     * @returns {Void}      No return value should be expected
-     */
-    global.addingFakeHistoryState = function() {
-        // then pushing fake states of history/hash
-        if (!hashLogic) {
-            var isSearch = page.indexOf('fm/search/');
-            if (isSearch >= 0) {
-                var searchString = page.substring(isSearch + 10);
-                var tempPage = page.substring(0, isSearch + 10);
-                history.pushState({ subpage: tempPage, searchString: searchString }, "", "/" + tempPage);
-            }
-            else {
-                history.pushState({ subpage: page }, '', '/' + page);
-            }
-        }
-    };
-
     // Viewer Init
     function slideshow(id, close, hideCounter) {
         if (!close && M.isInvalidUserStatus()) {
@@ -643,11 +625,9 @@ var slideshowid;
                 _pdfSeen = false;
 
                 tryCatch(function() {
-                    var doc = document.getElementById('pdfpreviewdiv1');
-                    if (doc && (doc = doc.contentWindow.document)) {
-                        doc.open();
-                        doc.close();
-                    }
+                    var ev = document.createEvent("HTMLEvents");
+                    ev.initEvent("pdfjs-cleanup.meganz", true);
+                    document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
                 })();
             }
 
@@ -662,8 +642,9 @@ var slideshowid;
         // Checking if this the first preview (not a preview navigation)
         if (!slideshowid) {
             // then pushing fake states of history/hash
-            addingFakeHistoryState();
-
+            if (!history.state || history.state.view !== id) {
+                pushHistoryState();
+            }
             _hideCounter = hideCounter;
         }
 
@@ -677,6 +658,7 @@ var slideshowid;
         }
         mBroadcaster.sendMessage('slideshow:open', n);
         sessionStorage.setItem('previewNode', id);
+        pushHistoryState(true, Object.assign({subpage: page}, history.state, {view: slideshowid}));
 
         // Turn off pick and pan mode
         slideshow_pickpan($overlay, 1);
@@ -708,14 +690,7 @@ var slideshowid;
                     }
                 }
                 else if (e.keyCode === 8 || e.key === 'Backspace') {
-                    // since Backspace event is processed with keydown at document level for cloudBrowser.
-                    // i prefered that to process it here, instead of unbind the previous handler.
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 }
             });
@@ -723,12 +698,7 @@ var slideshowid;
             // Close icon
             $overlay.find('.viewer-button.close,.viewer-error-close')
                 .rebind('click', function () {
-                    if (hashLogic || location.hash) {
-                        slideshow(0, 1);
-                    }
-                    else {
-                        history.back();
-                    }
+                    history.back();
                     return false;
                 });
 
@@ -1210,12 +1180,30 @@ var slideshowid;
 
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
-    function prepareAndViewPdfViewer() {
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdforiginalviewerjs').done(function() {
+    function prepareAndViewPdfViewer(data) {
+        if (_pdfSeen) {
+            var success = false;
+            tryCatch(function() {
+                var elm = document.getElementById('pdfpreviewdiv1');
+                elm.classList.remove('hidden');
+
+                var ev = document.createEvent("HTMLEvents");
+                ev.initEvent("pdfjs-openfile.meganz", true);
+                ev.data = data.buffer || data.src;
+                elm.contentDocument.body.dispatchEvent(ev);
+                success = true;
+            })();
+
+            if (success) {
+                return;
+            }
+        }
+        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').done(function() {
             var myPage = pages['pdfviewer'];
-            myPage = myPage.replace('^$#^1', window['pdfviewercss']);
-            myPage = myPage.replace('^$#^3', window['pdfjs2']);
-            myPage = myPage.replace('^$#^4', window['pdforiginalviewerjs']);
+            myPage = myPage.replace('viewer.css', window.pdfviewercss);
+            myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
+            myPage = myPage.replace('viewer.js', window.pdfviewerjs);
+            localStorage.setItem('currPdfPrev2', JSON.stringify(data.src));
             // remove then re-add iframe to avoid History changes [push]
             var pdfIframe = document.getElementById('pdfpreviewdiv1');
             var newPdfIframe = document.createElement('iframe');
@@ -1257,9 +1245,7 @@ var slideshowid;
             $imgBlock.find('.img-wrap').addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
-            localStorage.setItem('currPdfPrev2', JSON.stringify(src));
-            localStorage.setItem('pdfPrevTitle', $overlay.find('.viewer-filename').text());
-            prepareAndViewPdfViewer();
+            prepareAndViewPdfViewer(previews[id]);
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
@@ -1492,7 +1478,7 @@ var slideshowid;
                     delete p.prev;
                 }
 
-                if (p.type.startsWith('image')) {
+                if (p.type.startsWith('image') || p.type === 'application/pdf') {
                     URL.revokeObjectURL(p.src);
                     if (previews[k] === p) {
                         previews[k] = false;

@@ -725,7 +725,7 @@ function api_proc(q) {
                         if (typeof ctx.callback === 'function') {
                             var res = t[i];
 
-                            if (res.err < 0) {
+                            if (res && res.err < 0) {
                                 // eslint-disable-next-line max-depth
                                 if (d) {
                                     logger.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);

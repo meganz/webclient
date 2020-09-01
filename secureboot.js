@@ -305,8 +305,10 @@ if (is_chrome_firefox) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || window.MSBlobBuilder || !myURL ||
-    typeof DataView === 'undefined' || (window.chrome && !document.exitPointerLock);
+browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
+    || typeof history !== 'object' || typeof history.replaceState !== 'function'
+    || window.chrome && !document.exitPointerLock
+;
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -586,7 +588,7 @@ var mega = {
     browserBrand: [
         0, 'Torch', 'Epic'
     ],
-    whoami: 'We make secure cloud storage simple. Create an account and get 50 GB ' +
+    whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
     maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
@@ -2810,10 +2812,10 @@ else if (!browserUpdate) {
         'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'uwp': {f:'html/uwp.html', n: 'uwp', j:0},
-        'pdfviewer': {f:'html/pdfViewer.html', n: 'pdfviewer', j:0 },
-        'pdfviewercss': {f:'css/pdfViewer.css', n: 'pdfviewercss', j:4 },
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
-        'pdforiginalviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdforiginalviewerjs', j:4 },
+        'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
+        'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
+        'pdfviewerjs': {f:'js/vendor/pdf.viewer.js', n: 'pdfviewerjs', j:4 },
         'megadrop': {f:'html/megadrop.html', n: 'megadrop', j:0 },
         'nomegadrop': {f:'html/nomegadrop.html', n: 'nomegadrop', j:0 },
         'megadrop_js': {f:'js/megadrop.js', n: 'megadrop_js', j:1 },
@@ -3402,6 +3404,8 @@ else if (!browserUpdate) {
         var jsar = [];
         var cssar = [];
         var nodedec = {};
+        var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
+        var j4tr = "url('" + staticpath + "images/pdfV/$1')";
 
         xhr_stack = false;
         for (var i in jsl)
@@ -3445,25 +3449,12 @@ else if (!browserUpdate) {
             }
             else if (jsl[i].j === 4) { // new type to distinguish files to be used on iframes
                 if (!window[jsl[i].n]) {
-                    var scriptText = jsl[i].text;
                     var blobLink;
                     if ((jsl[i].n || '').indexOf('css') > -1) {
-                        scriptText = scriptText.replace(/\.\.\//g, staticpath).replace(new RegExp("\\/en\\/", "g"), '/' + lang + '/');
-                        blobLink = mObjectURL([scriptText], 'text/css');
+                        blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
                     else {
-                        if (jsl[i].n === 'pdforiginalviewerjs') {
-                            if (localStorage.d === '1' && localStorage.dd === '1' && localStorage.jj === '1') {
-                                blobLink = staticpath + 'dont-deploy/pdf.viewer.debug.js';
-                            }
-                            else {
-                                scriptText = modifyPdfViewerScript(scriptText);
-                                blobLink = mObjectURL([scriptText], 'text/javascript');
-                            }
-                        }
-                        else {
-                            blobLink = mObjectURL([scriptText], 'text/javascript');
-                        }
+                        blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
                 }
@@ -3870,12 +3861,29 @@ function pushHistoryState(page, state) {
     'use strict';
 
     try {
-        if (typeof page !== 'object') {
-            page = {subpage: page};
+        var method = 'pushState';
+        if (page === true) {
+            method = 'replaceState';
+            page = state;
+            state = undefined;
         }
-        state = Object.assign(page, state);
+
+        if (typeof page !== 'object') {
+            page = page ? {subpage: page} : history.state || {subpage: getCleanSitePath()};
+        }
+        state = Object.assign({}, page, state);
         page = state.subpage || state.fmpage || location.hash;
-        history.pushState(state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+
+        if (page.substr(0, 9) === 'fm/search') {
+            state.searchString = page.substr(9) || state.searchString;
+            page = state.subpage = 'fm/search';
+        }
+
+        if (d > 1 && method === 'pushState' && JSON.stringify(history.state) === JSON.stringify(state)) {
+            console.warn('duplicate push state attempt.');
+        }
+
+        history[method](state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
     }
     catch (ex) {
         console.warn(ex);

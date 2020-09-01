@@ -269,8 +269,6 @@
             });
         }
 
-        var isLinkV2 = false;
-
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
@@ -285,8 +283,7 @@
                         target = '/folder/' + selectedNode.p;
                     }
                 }
-                newHashLocation = '/folder/' + pfid + '#' + pfkey + target;
-                isLinkV2 = true;
+                newHashLocation = 'folder/' + pfid + '#' + pfkey + target;
             }
             else {
                 if (this.currentdirid !== this.RootID) {
@@ -300,26 +297,9 @@
             newHashLocation = 'fm/' + this.currentdirid;
         }
 
-        tryCatch(function() {
-
-            if (hashLogic) {
-                document.location.hash = '#' + newHashLocation;
-            }
-            else if (isLinkV2) {
-                // this is new link.
-                var currURL = getSitePath();
-                if (currURL !== newHashLocation) {
-                    loadSubPage(newHashLocation);
-                }
-            }
-            else if (window.location.pathname !== "/" + newHashLocation && !pfid && !M.chat) {
-                loadSubPage(newHashLocation);
-            }
-            else if (pfid && document.location.hash !== '#' + newHashLocation) {
-                history.pushState({fmpage: newHashLocation}, "", "#" + newHashLocation);
-                page = newHashLocation;
-            }
-        })();
+        if (getSitePath() !== '/' + newHashLocation && !this.chat) {
+            loadSubPage(newHashLocation);
+        }
 
         this.currentTreeType = this.currentCustomView.type || M.treePanelType();
 

@@ -6225,6 +6225,17 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 .grid-table.shared-with-me td, .grid-table.out-shares td, .grid-table.contacts td, .contact-requests-grid td, .sent-requests-grid td {
     vertical-align: middle;
 }
+
+@media only screen and (max-width: 1368px) and (min-width: 320px)  {
+    .grid-table.shared-with-me td:nth-child(2) {
+        width: 150px !important;
+    }
+
+    .grid-table.out-shares td:nth-child(2) {
+        width: 150px !important;
+    }    
+}
+
 table {
     border-spacing: transparent;
 }
@@ -8735,7 +8746,7 @@ body:not(.en) .warning-dialog-a.wide {
     width: 27px;
     margin: 2px 0 0 0;
 }
-.fm-blocks-view .versioning .versioning-indicator, .ver-col-container .versioning .versioning-indicator {
+.fm-blocks-view .versioning .versioning-indicator, .ver-col-container .versioning .versioning-indicator, .fm-recents .versioning .versioning-indicator {
     display: block;
 }
 .taken-down .dialog.versioning-indicator {
@@ -15818,7 +15829,6 @@ ul.token-input-list-mega {
     font-size: 14px;
     line-height: 18px;
     margin-top: 6px;
-    text-transform: uppercase;
     border-radius: 2px;
     box-sizing: border-box;
     z-index: 100;
@@ -26266,6 +26276,19 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     position: absolute;
     left: 24px;
     top: 5px;
+}
+.fm-recents .medium-file-icon.thumb {
+    background-image: none;
+}
+.fm-recents .medium-file-icon.thumb img {
+    width: 100%;
+    height: 100%;
+}
+.fm-recents .medium-file-icon.thumb.video .video-thumb-details {
+    display: block;
+    top: 0;
+    text-align: center;
+    padding-top: 9px;
 }
 .fm-recents .medium-file-icon.double {
     left: 21px;

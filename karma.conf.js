@@ -124,6 +124,7 @@ module.exports = function(config) {
         'js/vendor/int64.js',
         'js/cms.js',
         'js/keepAlive.js',
+        'js/metatags.js',
 
         // Transfers
         'js/transfers/meths/filesystem.js',

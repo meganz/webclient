@@ -1045,3 +1045,13 @@ function validateUserAction(hideContext) {
     }
     return true;
 }
+
+// eslint-disable-next-line no-useless-concat
+window['slide' + 'show'] = function(h, close) {
+    if (close) {
+        mobile.slideshow.close();
+    }
+    else {
+        mobile.slideshow.init(h);
+    }
+};

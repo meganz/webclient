@@ -818,7 +818,12 @@ function init_page() {
         doRenderCorpPage();
         bottompage.init();
     }
-    else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
+    else if (page.substr(0, 5) === 'blog/') {
+        // eslint-disable-next-line dot-notation
+        parsepage(pages['blogarticle']);
+        init_blogarticle();
+    }
+    else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
         blogid = page.substr(5, page.length - 2);
         page = 'blogarticle';
         parsepage(pages['blogarticle']);
@@ -2038,7 +2043,9 @@ function init_page() {
 
     topmenuUI();
 
-    mega.metatags.checkPageMatchesURL();
+    if (!window.is_karma && mega.metatags) {
+        mega.metatags.checkPageMatchesURL();
+    }
 
     loggedout = false;
     flhashchange = false;
@@ -2824,6 +2831,9 @@ function getTemplate(name) {
 
 function pagemetadata() {
     'use strict';
+    if (window.is_karma) {
+        return;
+    }
     var metas = mega.metatags.getPageMetaTags(page);
     var mega_desc = metas.mega_desc || mega.whoami;
     mega_title = metas.mega_title || 'MEGA';

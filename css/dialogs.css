@@ -2211,18 +2211,19 @@ li.token-input-token-invite .input-close {
     -khtml-opacity: 1;
     opacity: 1;
 }
+
 .create-folder-input-bl input, .add-user-popup-input-bl input, .fm-account-input input, .rename-input-bl input {
     width: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     background-color: white;
-    line-height: 35px;
+    line-height: 18px;
     margin-top: 0;
     font-size: 13px;
-    height: 35px;
+    height: 28px;
     color: #333333;
-    padding: 0 10px 0 42px;
+    padding: 9px 10px 0 42px;
     margin: 0;
     background-repeat: no-repeat;
     background-color: transparent;

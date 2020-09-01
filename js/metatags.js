@@ -20,8 +20,8 @@ mega.metatags = new function() {
         return false;
     };
 
-    var stopBots = function(metaRobots) {
-        if (!isPageExcluded(page) && !is_fm() && !is_extension) {
+    var stopBots = function(metaRobots, noReporting) {
+        if (!noReporting && !isPageExcluded(page) && !is_fm() && !is_extension) {
             if (d) {
                 console.error('A page without title. Please handle. Page: ' + page);
             }
@@ -325,6 +325,40 @@ mega.metatags = new function() {
         else if (page === 'businesssignup') {
             mTags.mega_title = 'Business Signup - MEGA';
             stopBots(metaRobots);
+        }
+        else if (page === 'blog') {
+            mTags.mega_title = 'Blog - MEGA';
+            mTags.mega_desc = 'MEGA\'s Blog';
+            if (blogmonth || blogsearch) {
+                stopBots(metaRobots, true);
+            }
+        }
+        else if (page.substr(0, 10) === 'blogsearch') {
+            mTags.mega_title = 'Blog search - MEGA';
+            mTags.mega_desc = 'MEGA\'s Blog';
+            stopBots(metaRobots, true);
+        }
+        else if (page === 'blogarticle') {
+            mTags.mega_title = 'Blog article - MEGA';
+            mTags.mega_desc = 'Blog article from MEGA';
+            stopBots(metaRobots, true);
+        }
+        else if (page.substr(0, 5) === 'blog/') {
+            var notSet = true;
+            if (blogHeaders && blogposts) {
+                var bHeader = page.substr(page.lastIndexOf('/') + 1);
+                if (blogHeaders[bHeader]) {
+                    var post = blogposts[blogHeaders[bHeader]];
+                    mTags.mega_title = post.h + ' - MEGA';
+                    mTags.mega_desc = post.introtxt;
+                    notSet = false;
+                }
+            }
+            if (notSet) {
+                mTags.mega_title = 'Blog article - MEGA';
+                mTags.mega_desc = 'Blog article from MEGA';
+                stopBots(metaRobots, true);
+            }
         }
         else if (page === 'help') {
             mTags.mega_title = 'Help - MEGA';

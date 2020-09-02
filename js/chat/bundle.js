@@ -9518,7 +9518,7 @@ audioContainer_AudioContainer.defaultProps = {
 
 
 
-MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
+var voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
 
 var voiceClip_VoiceClip = function (_AbstractGenericMessa) {
   inherits(VoiceClip, _AbstractGenericMessa);
@@ -9535,7 +9535,7 @@ var voiceClip_VoiceClip = function (_AbstractGenericMessa) {
     var message = this.props.message;
     var contact = this.getContact();
     var iAmSender = contact && contact.u === u_handle;
-    var stillEditable = unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT;
+    var stillEditable = unixtime() - message.delay < voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT;
     var isBeingEdited = this.props.isBeingEdited() === true;
     var chatIsReadOnly = this.props.chatRoom.isReadOnly() === true;
 

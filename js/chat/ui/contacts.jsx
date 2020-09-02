@@ -292,33 +292,29 @@ export class ContactButton extends ContactAwareComponent {
             vertOffset = 25;
             horizOffset = 0;
         }
+
         if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
-            label = <em className="contact-name-loading"></em>;
+            label = <em className="contact-name-loading" />;
         }
 
-
-        var buttonComponent = null;
-        if (!self.props.noContextMenu) {
-
-
-            buttonComponent = <Button
-                className={classes}
-                icon={icon}
-                disabled={self.props.dropdownDisabled}
-                label={label}
-            >
-                <Dropdown className="contact-card-dropdown"
-                    positionMy={dropdownPosition}
-                    positionAt={dropdownPosition}
-                    vertOffset={vertOffset}
-                    horizOffset={horizOffset}
-                    dropdownItemGenerator={self.dropdownItemGenerator.bind(this)}
-                    noArrow={true}
-                />
-            </Button>;
-        }
-
-        return buttonComponent;
+        return (
+            this.props.noContextMenu ?
+                <div className="user-card-name light">{label}</div> :
+                <Button
+                    className={classes}
+                    icon={icon}
+                    disabled={self.props.dropdownDisabled}
+                    label={label}>
+                    <Dropdown
+                        className="contact-card-dropdown"
+                        positionMy={dropdownPosition}
+                        positionAt={dropdownPosition}
+                        vertOffset={vertOffset}
+                        horizOffset={horizOffset}
+                        dropdownItemGenerator={self.dropdownItemGenerator.bind(this)}
+                        noArrow={true}/>
+                </Button>
+        );
     }
 };
 
@@ -793,8 +789,12 @@ export class ContactItem extends ContactAwareComponent {
             <Avatar contact={contact} className="avatar-wrapper small-rounded-avatar" hideVerifiedBadge={true}
                 chatRoom={this.props.chatRoom} />
             <div className="user-card-data">
-                <ContactButton contact={contact} className="light"
-                    label={username} chatRoom={this.props.chatRoom} />
+                <ContactButton
+                    noContextMenu={this.props.noContextMenu}
+                    contact={contact}
+                    className="light"
+                    label={username}
+                    chatRoom={this.props.chatRoom} />
             </div>
         </div>;
     }
@@ -1114,11 +1114,14 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 var sel2 = self.state.selected || [];
                 for (var i2 = 0; i2 < sel2.length; i2++) {
                     var v2 = sel2[i2];
-                    contactsSelected.push(<ContactItem contact={M.u[v2]}
-                        onClick={onContactSelectDoneCb}
-                        chatRoom={self.props.chatRoom || false}
-                        key={v2}
-                    />);
+                    contactsSelected.push(
+                        <ContactItem
+                            noContextMenu={true}
+                            contact={M.u[v2]}
+                            onClick={onContactSelectDoneCb}
+                            chatRoom={self.props.chatRoom || false}
+                            key={v2} />
+                    );
                 }
 
                 multipleContacts =

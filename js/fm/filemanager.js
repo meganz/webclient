@@ -3044,16 +3044,6 @@ FileManager.prototype.addGridUI = function(refresh) {
                 M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 400);
             }
 
-            var _swapCalcToPx = function($header) {
-
-                var sizeAsPx = $header.outerWidth();
-                var megatype = $header.attr('megatype');
-
-                $header.outerWidth(sizeAsPx);
-                M.columnsWidth.cloud[megatype].curr = sizeAsPx;
-                $('.grid-table.fm td[megatype="' + megatype + '"]').css('width', sizeAsPx);
-            };
-
             for (var col in M.columnsWidth.cloud) {
                 var $header = $('.files-grid-view.fm .grid-table-header th[megatype="' + col + '"]');
                 if (!$header) {
@@ -3072,9 +3062,6 @@ FileManager.prototype.addGridUI = function(refresh) {
                             if ($header.outerWidth() < M.columnsWidth.cloud[col].min) {
                                 $header.outerWidth(M.columnsWidth.cloud[col].min);
                             }
-
-                            // To prevent table sizing bug, change calc to px later.
-                            onIdle(_swapCalcToPx.bind(null, $header));
                         }
                     }
 

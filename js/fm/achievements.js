@@ -796,6 +796,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
             if (!error) {
                 $('.fm-dialog.invite-dialog').addClass('success');
                 $('.fm-dialog.invite-dialog button.back').removeClass('hidden');
+                $('.fm-dialog.invite-dialog .share-added-contact.token-input-token-invite').remove();
             }
             else {
                 console.warn('Unable to send invitation(s), no account access.');

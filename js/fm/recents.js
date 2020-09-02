@@ -368,9 +368,10 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     var self = this;
     var user = M.getUserByHandle(action.user);
     var $userNameContainer = $newRow.find(".file-name .action-user-name");
+
     $userNameContainer
         .removeClass("hidden")
-        .text(user.name)
+        .text(M.getNameByHandle(action.user))
         .attr('id', user.h)
         .rebind("contextmenu", function(e) {
             self.markSelected($userNameContainer, $newRow);
@@ -387,7 +388,9 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
             return false;
         })
         .rebind("dblclick", function() {
-            M.openFolder(user.h);
+            if (user.h) {
+                M.openFolder(user.h);
+            }
             return false;
         });
 };

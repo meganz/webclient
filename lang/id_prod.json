@@ -16,7 +16,7 @@
     "56": "Dapat Dibaca & Ditulis",
     "57": "Akses penuh",
     "58": "Unduh",
-    "59": "Dapatkan pranala",
+    "59": "Dapatkan Tautan",
     "60": "Berbagi",
     "61": "Ubah nama",
     "62": "Pindahkan",
@@ -3773,8 +3773,8 @@
     "23669": "Anda telah menetapkan kata sandi untuk tautan ini.",
     "23674": "Beberapa tanggal ditetapkan",
     "23686": "per TB\/bulan",
-    "23718": "Currently, only the Google Chrome browser supports autoplaying embedded video with sound.[BR] To autoplay using other browsers, please mute the video using the option below.",
-    "23748": "I understand that [B]if I lose my password, I won\u2019t be able to access my account, unless my administrator resets my password[\/B]. Read more about [A]MEGA\u2019s end-to-end encryption[\/A].",
-    "23753": "Send...",
-    "23754": "Logged-in"
+    "23718": "Saat ini, hanya browser Google Chrome yang mendukung pemutaran otomatis video tersemat dengan suara.[BR] Untuk memutar otomatis menggunakan browser lain, nonaktifkan video menggunakan opsi di bawah.",
+    "23748": "Saya memahami bahwa [B]jika saya kehilangan sandi, saya tidak akan dapat mengakses akun saya, kecuali administrator saya menyetel ulang sandi saya[\/B]. Baca selengkapnya tentang [A]MEGA\u2019s end-to-end encryption[\/A].",
+    "23753": "Kirim...",
+    "23754": "Sudah masuk"
 }

@@ -1077,7 +1077,7 @@
     "8005": "Add to Cloud Drive",
     "8006": "Attachment added to your Cloud Drive.",
     "8007": "Add Participant\u2026",
-    "8008": "You have no [P]Conversations[\/P]",
+    "8008": "You have no [P]conversations[\/P]",
     "8010": "Search contacts",
     "8011": "Add from my Cloud Drive",
     "8016": "PEOPLE",
@@ -3100,7 +3100,7 @@
     "20559": "You can exchange messages, share your files and have audio\/video calls with MEGA\u2019s end-to-end encrypted chat.",
     "20560": "The Secure Solution for Your Business",
     "20561": "Take the security of your company\u2019s data and communication to the next level with MEGA\u2019s end-to-end encrypted business solution.",
-    "20569": "switched off chat public mode.",
+    "20569": "disabled public chat mode.",
     "20570": "created a chat link.",
     "20571": "removed the chat link.",
     "20572": "Easy automated synchronization between your computer and your MEGA cloud. Available for Windows, Mac and Linux.",
@@ -3775,6 +3775,6 @@
     "23686": "per TB\/month",
     "23718": "Currently, only the Google Chrome browser supports autoplaying embedded video with sound.[BR] To autoplay using other browsers, please mute the video using the option below.",
     "23748": "I understand that [B]if I lose my password, I won\u2019t be able to access my account, unless my administrator resets my password[\/B]. Read more about [A]MEGA\u2019s end-to-end encryption[\/A].",
-    "23753": "Send...",
+    "23753": "Send\u2026",
     "23754": "Logged-in"
 }

@@ -603,11 +603,11 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
     var contacts = M.getContactsEMails();
     var errorTimer = null;
 
-    $dialog.position({
-        'my': 'center center',
-        'at': 'center center',
-        'of': $(window)
-    });
+    // $dialog.position({
+    //     'my': 'center center',
+    //     'at': 'center center',
+    //     'of': $(window)
+    // });
 
     $this.tokenInput(contacts, {
         theme: "invite",

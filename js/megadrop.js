@@ -361,7 +361,7 @@ mega.megadrop = (function() {
                 }
                 else {
                     add(puh).done(function () {
-                        mBroadcaster.sendMessageAfterReady('MEGAdrop:puhProcessed');
+                        mBroadcaster.sendMessageAfterReady('MEGAdrop:puhProcessed_' + puh.ph);
                     });
                 }
             }
@@ -1034,7 +1034,7 @@ mega.megadrop = (function() {
                     }
                     else {
                         // If this is create or delete, waiting for puh to be processed
-                        mBroadcaster.onceAfterReady('MEGAdrop:puhProcessed', afterPuh.bind(this, item));
+                        mBroadcaster.onceAfterReady('MEGAdrop:puhProcessed_' + pufHandle, afterPuh.bind(this, item));
                     }
                 }
                 else { // Inactive PUP

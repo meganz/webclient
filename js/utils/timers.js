@@ -15,7 +15,7 @@ function later(callback) {
  */
 function Soon(callback) {
     'use strict';
-    delay.tbsp.then(callback);
+    queueMicrotask(callback);
 }
 
 /**
@@ -122,7 +122,7 @@ function delay(aProcID, aFunction, aTimeout) {
 
             var rem = q.tde - (performance.now() - q.tik);
             if (rem < 20) {
-                delay.tbsp.then(q.tsk);
+                queueMicrotask(q.tsk);
             }
             else {
                 delay(q.pun, q.tsk, rem);
@@ -150,9 +150,3 @@ delay.cancel = function(aProcID) {
     }
     return false;
 };
-
-/** @property delay.tbsp */
-lazy(delay, 'tbsp', function() {
-    'use strict';
-    return Promise.resolve();
-});

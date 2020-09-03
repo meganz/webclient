@@ -202,7 +202,6 @@ var scheduler = function scheduler(func, name, debug) {
   var dbug = debug !== false && DEBUG_THIS;
   var idnt = null;
   var task = null;
-  var tbsp = Promise.resolve();
 
   var fire = function fire() {
     if (dbug) {
@@ -210,7 +209,7 @@ var scheduler = function scheduler(func, name, debug) {
     }
 
     if (task) {
-      tbsp.then(task);
+      queueMicrotask(task);
       task = null;
     }
   };
@@ -227,7 +226,7 @@ var scheduler = function scheduler(func, name, debug) {
     }
 
     if (!task) {
-      tbsp.then(fire);
+      queueMicrotask(fire);
     }
 
     var idx = arguments.length;
@@ -1248,7 +1247,7 @@ var Dropdown = function (_MegaRenderMixin) {
 
     if (!child && !this.props.forceShowWhenEmpty) {
       if (this.props.active !== false) {
-        (window.setImmediate || window.setTimeout)(function () {
+        queueMicrotask(function () {
           self.onActiveChange(false);
         });
       }
@@ -1820,26 +1819,22 @@ var ContactButton = function (_ContactAwareComponen2) {
       });
     }
 
-    var buttonComponent = null;
-
-    if (!self.props.noContextMenu) {
-      buttonComponent = react2.a.createElement(_ui_buttons_jsx7__["Button"], {
-        className: classes,
-        icon: icon,
-        disabled: self.props.dropdownDisabled,
-        label: label
-      }, react2.a.createElement(_ui_dropdowns_jsx8__["Dropdown"], {
-        className: "contact-card-dropdown",
-        positionMy: dropdownPosition,
-        positionAt: dropdownPosition,
-        vertOffset: vertOffset,
-        horizOffset: horizOffset,
-        dropdownItemGenerator: self.dropdownItemGenerator.bind(this),
-        noArrow: true
-      }));
-    }
-
-    return buttonComponent;
+    return this.props.noContextMenu ? react2.a.createElement("div", {
+      className: "user-card-name light"
+    }, label) : react2.a.createElement(_ui_buttons_jsx7__["Button"], {
+      className: classes,
+      icon: icon,
+      disabled: self.props.dropdownDisabled,
+      label: label
+    }, react2.a.createElement(_ui_dropdowns_jsx8__["Dropdown"], {
+      className: "contact-card-dropdown",
+      positionMy: dropdownPosition,
+      positionAt: dropdownPosition,
+      vertOffset: vertOffset,
+      horizOffset: horizOffset,
+      dropdownItemGenerator: self.dropdownItemGenerator.bind(this),
+      noArrow: true
+    }));
   };
 
   return ContactButton;
@@ -2371,6 +2366,7 @@ var ContactItem = function (_ContactAwareComponen8) {
     }), react2.a.createElement("div", {
       className: "user-card-data"
     }, react2.a.createElement(ContactButton, {
+      noContextMenu: this.props.noContextMenu,
       contact: contact,
       className: "light",
       label: username,
@@ -2682,6 +2678,7 @@ var ContactPickerWidget = function (_MegaRenderMixin4) {
         for (var i2 = 0; i2 < sel2.length; i2++) {
           var v2 = sel2[i2];
           contactsSelected.push(react2.a.createElement(ContactItem, {
+            noContextMenu: true,
             contact: M.u[v2],
             onClick: onContactSelectDoneCb,
             chatRoom: self.props.chatRoom || false,
@@ -3224,15 +3221,11 @@ var _assertThisInitialized0__ = __webpack_require__(4);
 var _assertThisInitialized0 = __webpack_require__.n(_assertThisInitialized0__);
 var _inheritsLoose1__ = __webpack_require__(1);
 var _inheritsLoose1 = __webpack_require__.n(_inheritsLoose1__);
-var _stores_mixins_js2__ = __webpack_require__(2);
+var react2__ = __webpack_require__(0);
+var react2 = __webpack_require__.n(react2__);
+var _stores_mixins_js3__ = __webpack_require__(2);
 
 
-
-var React = __webpack_require__(0);
-
-var ReactDOM = __webpack_require__(7);
-
-var utils = __webpack_require__(6);
 
 
 var _buttonGroups = {};
@@ -3242,48 +3235,96 @@ var Button = function (_MegaRenderMixin) {
   function Button(props) {
     var _this = _MegaRenderMixin.call(this, props) || this;
 
+    _this.buttonClass = ".button";
     _this.state = {
-      'focused': false
+      focused: false
     };
-    _this.onClick = _this.onClick.bind((_this));
-    _this.onBlur = _this.onBlur.bind((_this));
+
+    _this.onBlur = function (e) {
+      if (!_this.isMounted()) {
+        return;
+      }
+
+      if (!e || !$(e.target).closest(_this.buttonClass).is(_this.findDOMNode())) {
+        _this.setState({
+          focused: false
+        }, function () {
+          _this.unbindEvents();
+
+          _this.forceUpdate();
+        });
+      }
+    };
+
+    _this.onClick = function (e) {
+      if (_this.props.disabled === true) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if ($(e.target).closest('.popup').closest(_this.buttonClass).is(_this.findDOMNode()) && _this.state.focused === true) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      if ($(e.target).is('input, textarea, select')) {
+        return;
+      }
+
+      if (_this.state.focused === false) {
+        if (_this.props.onClick) {
+          _this.props.onClick((_this));
+        } else if (react2.a.Children.count(_this.props.children) > 0) {
+          _this.setState({
+            focused: true
+          });
+        }
+      } else if (_this.state.focused === true) {
+        _this.setState({
+          focused: false
+        });
+
+        _this.unbindEvents();
+      }
+    };
+
     return _this;
   }
 
   var _proto = Button.prototype;
 
   _proto.componentWillUpdate = function componentWillUpdate(nextProps, nextState) {
-    var self = this;
+    var _this2 = this;
 
     if (nextProps.disabled === true && nextState.focused === true) {
       nextState.focused = false;
     }
 
-    if (this.state.focused != nextState.focused && nextState.focused === true) {
-      $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
-      $(document).rebind('keyup.button' + self.getUniqueId(), function (e) {
-        if (self.state.focused === true) {
-          if (e.keyCode == 27) {
-            self.onBlur();
+    if (this.state.focused !== nextState.focused && nextState.focused === true) {
+      $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
+      $(document).rebind('keyup.button' + this.getUniqueId(), function (e) {
+        if (_this2.state.focused === true && e.keyCode === 27) {
+            _this2.onBlur();
           }
-        }
       });
 
-      if (self._pageChangeListener) {
-        mBroadcaster.removeListener(self._pageChangeListener);
+      if (this._pageChangeListener) {
+        mBroadcaster.removeListener(this._pageChangeListener);
       }
 
       this._pageChangeListener = mBroadcaster.addListener('pagechange', function () {
-        if (self.state.focused === true) {
-          self.onBlur();
+        if (_this2.state.focused === true) {
+          _this2.onBlur();
         }
       });
-      $(document).rebind('closeDropdowns.' + self.getUniqueId(), function () {
-        self.onBlur();
+      $(document).rebind('closeDropdowns.' + this.getUniqueId(), function () {
+        return _this2.onBlur();
       });
 
       if (this.props.group) {
-        if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
+        if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] !== this) {
           _buttonGroups[this.props.group].setState({
             focused: false
           });
@@ -3295,7 +3336,7 @@ var Button = function (_MegaRenderMixin) {
       }
     }
 
-    if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] == this) {
+    if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] === this) {
       _buttonGroups[this.props.group] = null;
     }
   };
@@ -3308,8 +3349,8 @@ var Button = function (_MegaRenderMixin) {
 
   _proto.renderChildren = function renderChildren() {
     var self = this;
-    return React.Children.map(this.props.children, function (child) {
-      return React.cloneElement(child, {
+    return react2.a.Children.map(this.props.children, function (child) {
+      return react2.a.cloneElement(child, {
         active: self.state.focused,
         closeDropdown: function closeDropdown() {
           self.setState({
@@ -3343,100 +3384,34 @@ var Button = function (_MegaRenderMixin) {
     }.bind(this));
   };
 
-  _proto.onBlur = function onBlur(e) {
-    if (!this.isMounted()) {
-      return;
-    }
-
-    var $element = $(ReactDOM.findDOMNode(this));
-
-    if (!e || !$(e.target).closest(".button").is($element)) {
-      this.setState({
-        focused: false
-      });
-      this.unbindEvents();
-      this.forceUpdate();
-    }
-  };
-
   _proto.unbindEvents = function unbindEvents() {
-    var self = this;
-    $(document).off('keyup.button' + self.getUniqueId());
-    $(document).off('closeDropdowns.' + self.getUniqueId());
-    $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+    $(document).off('keyup.button' + this.getUniqueId());
+    $(document).off('closeDropdowns.' + this.getUniqueId());
+    $('.conversationsApp').unbind('mousedown.button' + this.getUniqueId());
 
-    if (self._pageChangeListener) {
-      mBroadcaster.removeListener(self._pageChangeListener);
-    }
-  };
-
-  _proto.onClick = function onClick(e) {
-    var $element = $(ReactDOM.findDOMNode(this));
-
-    if (this.props.disabled === true) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    if ($(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    if ($(e.target).is("input,textarea,select")) {
-      return;
-    }
-
-    if (this.state.focused === false) {
-      if (this.props.onClick) {
-        this.props.onClick(this);
-      } else if (React.Children.count(this.props.children) > 0) {
-        this.setState({
-          'focused': true
-        });
-      }
-    } else if (this.state.focused === true) {
-      this.setState({
-        focused: false
-      });
-      this.unbindEvents();
+    if (this._pageChangeListener) {
+      mBroadcaster.removeListener(this._pageChangeListener);
     }
   };
 
   _proto.render = function render() {
-    var classes = this.props.className ? "button " + this.props.className : "button";
-
-    if (this.props.disabled == true || this.props.disabled == "true") {
-      classes += " disabled";
-    } else if (this.state.focused) {
-      classes += " active";
-    }
-
-    var label;
-
-    if (this.props.label) {
-      label = this.props.label;
-    }
-
-    var icon;
-
-    if (this.props.icon) {
-      icon = React.createElement("i", {
-        className: "small-icon " + this.props.icon
-      });
-    }
-
-    return React.createElement("div", {
-      className: classes,
-      onClick: this.onClick,
-      style: this.props.style ? this.props.style : null
-    }, icon, React.createElement("span", null, label), this.renderChildren());
+    var _this$props = this.props,
+        className = _this$props.className,
+        disabled = _this$props.disabled,
+        style = _this$props.style,
+        icon = _this$props.icon,
+        label = _this$props.label;
+    return react2.a.createElement("div", {
+      className: "\n                    button\n                    " + (className ? className : '') + "\n                    " + (disabled ? 'disabled' : '') + "\n                    " + (this.state.focused ? 'active' : '') + "\n                ",
+      style: style,
+      onClick: this.onClick
+    }, icon && react2.a.createElement("i", {
+      className: "small-icon " + icon
+    }), label && react2.a.createElement("span", null, label), this.renderChildren());
   };
 
   return Button;
-}(_stores_mixins_js2__["MegaRenderMixin"]);
+}(_stores_mixins_js3__["MegaRenderMixin"]);
 
 /***/ }),
 
@@ -9542,7 +9517,7 @@ audioContainer_AudioContainer.defaultProps = {
 
 
 
-MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
+var voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 3600;
 
 var voiceClip_VoiceClip = function (_AbstractGenericMessa) {
   inherits(VoiceClip, _AbstractGenericMessa);
@@ -9559,7 +9534,7 @@ var voiceClip_VoiceClip = function (_AbstractGenericMessa) {
     var message = this.props.message;
     var contact = this.getContact();
     var iAmSender = contact && contact.u === u_handle;
-    var stillEditable = unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT;
+    var stillEditable = unixtime() - message.delay < voiceClip_MESSAGE_NOT_EDITABLE_TIMEOUT;
     var isBeingEdited = this.props.isBeingEdited() === true;
     var chatIsReadOnly = this.props.chatRoom.isReadOnly() === true;
 
@@ -13985,14 +13960,12 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       chatRoom.off('onHistoryDecrypted.pull');
       chatRoom.one('onHistoryDecrypted.pull', function () {
         chatRoom.off('onMessagesBuffAppend.pull');
-        chatRoom.messagesBuff.addChangeListener(function () {
-          if (msgAppended > 0) {
-            self._reposOnUpdate = scrYOffset;
-          }
 
-          self.scrollPullHistoryRetrieval = -1;
-          return 0xDEAD;
-        });
+        if (msgAppended > 0) {
+          self._reposOnUpdate = scrYOffset;
+        }
+
+        self.scrollPullHistoryRetrieval = -1;
       });
       mb.retrieveChatHistory();
     }
@@ -17955,6 +17928,20 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     $('.new-messages-indicator').removeClass('hidden');
   }
 }, 100);
+Chat.prototype.destroyDatabases = promisify(function (resolve, reject) {
+  var chatd = this.plugins.chatdIntegration.chatd || false;
+  var promises = [];
+
+  if (chatd.chatdPersist) {
+    promises.push(chatd.chatdPersist.drop());
+  }
+
+  if (chatd.messagesQueueKvStorage) {
+    promises.push(chatd.messagesQueueKvStorage.clear());
+  }
+
+  Promise.allSettled(promises).then(resolve).catch(reject);
+});
 
 Chat.prototype.destroy = function (isLogout) {
   var self = this;
@@ -19730,7 +19717,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   self.rebind('onMarkAsJoinRequested.initHist', function () {
     timer = setTimeout(function () {
       if (d) {
-        console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+        self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
       }
 
       _historyIsAvailable(false);

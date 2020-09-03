@@ -637,7 +637,7 @@ function api_proc(q) {
                             catch (e) {}
                         }
 
-                        if (evt.loaded > 0 && bytes) {
+                        if (evt.loaded > 0 && bytes > 2) {
                             this.q.ctxsBuffer[0].progress(evt.loaded / bytes * 100);
                         }
                     }

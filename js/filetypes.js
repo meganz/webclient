@@ -600,13 +600,14 @@ function filemime(n, def) {
  * Get file type
  * @param {MegaNode|String} n       ufs-node, or file-name
  * @param {Boolean} [getFullType]   Return full detailed array of the type
+ * @param {Boolean} [ik]            {@link fileext}
  * @returns {String|Array}          Extension Desc, or full type info
  */
-function filetype(n, getFullType) {
+function filetype(n, getFullType, ik) {
     "use strict";
     var name = String(n && (n.name || n.n) || n || '');
     var node = typeof n === 'object' ? n : {name: name};
-    var fext = fileext(name);
+    var fext = fileext(name, 0, ik);
 
     if (!ext[fext]) {
         var t = is_video(node);

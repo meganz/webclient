@@ -769,6 +769,25 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 }, 100);
 
 /**
+ * Destroy all MegaChat databases.
+ * @returns {Promise}
+ */
+Chat.prototype.destroyDatabases = promisify(function(resolve, reject) {
+    const chatd = this.plugins.chatdIntegration.chatd || false;
+    const promises = [];
+
+    if (chatd.chatdPersist) {
+        promises.push(chatd.chatdPersist.drop());
+    }
+
+    if (chatd.messagesQueueKvStorage) {
+        promises.push(chatd.messagesQueueKvStorage.clear());
+    }
+
+    Promise.allSettled(promises).then(resolve).catch(reject);
+});
+
+/**
  * Destroy this MegaChat instance (leave all rooms then disconnect)
  *
  * @returns {*}
@@ -802,7 +821,6 @@ Chat.prototype.destroy = function(isLogout) {
     catch (e) {
         console.error("Failed do destroy chat dom:", e);
     }
-
 
 
     self.chats.forEach( function(room, roomJid) {

@@ -2333,9 +2333,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 db.version(1).stores({kv: '&k'});
                 db.open().then(read).catch(console.warn.bind(console, dbname));
                 timer = setTimeout(apiReq, 1400);
-
-                // save the db name for our getDatabaseNames polyfill
-                localStorage['_$mdb$' + dbname] = 1;
             }
             else {
                 apiReq();

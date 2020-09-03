@@ -248,6 +248,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
 
             M.colourLabelcmUpdate(selNode);
+
+            if (items['.edit-file-item']) {
+                $('.dropdown-item.edit-file-item span').text(l[865]);
+            }
+        }
+        else if (items['.edit-file-item']) {
+            $('.dropdown-item.edit-file-item span').text(l[16797]);
         }
     }
 

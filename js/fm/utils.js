@@ -391,6 +391,32 @@ MegaUtils.prototype.getStack = function megaUtilsGetStack() {
 };
 
 /**
+ * Get function caller.
+ * @returns {String} caller
+ */
+MegaUtils.prototype.getCaller = function megaUtilsGetCaller() {
+    'use strict';
+    var stackIdx = 2;
+    var stack = M.getStack().split('\n');
+
+    for (var i = stack.length; i--;) {
+        if (stack[i].indexOf('getCaller') > 0) {
+            stackIdx = i;
+            break;
+        }
+    }
+
+    stack = String(stack.splice(++stackIdx + (stack[0] === 'Error')));
+
+    var m = stack.match(/at\s(\S+)/);
+    if (m) {
+        return String(m[1]).split(/[\s:]/)[0];
+    }
+
+    return '<unknown>';
+};
+
+/**
  *  Check whether there are pending transfers.
  *
  *  @return {Boolean}
@@ -615,36 +641,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                         M.clearFileSystemStorage()
                     ];
 
-                    if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        megaChat.plugins.chatdIntegration.chatd.chatdPersist
-                    ) {
-                        waitingPromises.push(
-                            megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
-                        );
-                    }
-                    else if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
-                        typeof(ChatdPersist) !== 'undefined'
-                    ) {
-                        // chatdPersist was disabled, potential crash, try to delete the db manually
-                        waitingPromises.push(
-                            ChatdPersist.forceDrop()
-                        );
-                    }
-
-                    if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage
-                    ) {
-                        // clear messagesQueueKvStorage
-                        waitingPromises.push(
-                            megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage.clear()
-                        );
+                    if (window.megaChatIsReady) {
+                        waitingPromises.push(megaChat.destroyDatabases());
                     }
 
                     MegaPromise.allDone(waitingPromises).then(function(r) {
@@ -1224,7 +1222,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                             if (r.length) {
                                 ts = add(r);
 
-                                if (--max && r.length === options.limit) {
+                                if (--max && r.length >= options.limit) {
                                     return onIdle(_);
                                 }
                             }
@@ -1379,6 +1377,27 @@ MegaUtils.prototype.checkForDuplication = function(id) {
         return resultObject;
     }
 };
+
+mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
+    'use strict';
+
+    var dups = M.checkForDuplication(id);
+    if (dups && (dups.files || dups.folders)) {
+        var $bar = $('.duplicated-items-found').removeClass('hidden');
+
+        $('.files-grid-view.fm').addClass('duplication-found');
+        $('.fm-blocks-view.fm').addClass('duplication-found');
+        $('.fix-me-btn', $bar).rebind('click.df', function() {
+            fileconflict.resolveExistedDuplication(dups, id);
+        });
+        $('.fix-me-close', $bar).rebind('click.df', function() {
+            $('.files-grid-view.fm').removeClass('duplication-found');
+            $('.fm-blocks-view.fm').removeClass('duplication-found');
+            $('.duplicated-items-found').addClass('hidden');
+        });
+    }
+}));
+
 
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page

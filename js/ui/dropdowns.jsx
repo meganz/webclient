@@ -220,7 +220,7 @@ export class Dropdown extends MegaRenderMixin {
 
         if (!child && !this.props.forceShowWhenEmpty) {
             if (this.props.active !== false) {
-                (window.setImmediate || window.setTimeout)(function() {
+                queueMicrotask(function() {
                     self.onActiveChange(false);
                 });
             }

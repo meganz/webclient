@@ -87,22 +87,7 @@ function RecentsRender() {
     var self = this;
 
     // Init Dependencies
-    if (!window.fmShortcuts) {
-        window.fmShortcuts = new FMShortcuts();
-    }
-
-    if (!window.selectionManager) {
-        window.selectionManager = new SelectionManager(
-            this.$container,
-            $.selected && $.selected.length > 0
-        );
-
-        if ($.selected) {
-            $.selected.forEach(function(h) {
-                selectionManager.add_to_selection(h);
-            });
-        }
-    }
+    M.initShortcutsAndSelection(this.$container);
 
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
@@ -121,6 +106,10 @@ function RecentsRender() {
 RecentsRender.prototype.render = function(limit, until, forceInit) {
     'use strict';
     var self = this;
+
+    if (M.currentdirid !== "recents") {
+        return;
+    }
 
     // Switch to recents panel.
     M.onSectionUIOpen('recents');
@@ -368,9 +357,10 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     var self = this;
     var user = M.getUserByHandle(action.user);
     var $userNameContainer = $newRow.find(".file-name .action-user-name");
+
     $userNameContainer
         .removeClass("hidden")
-        .text(user.name)
+        .text(M.getNameByHandle(action.user))
         .attr('id', user.h)
         .rebind("contextmenu", function(e) {
             self.markSelected($userNameContainer, $newRow);
@@ -387,7 +377,9 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
             return false;
         })
         .rebind("dblclick", function() {
-            M.openFolder(user.h);
+            if (user.h) {
+                M.openFolder(user.h);
+            }
             return false;
         });
 };

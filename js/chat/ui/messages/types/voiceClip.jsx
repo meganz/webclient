@@ -6,7 +6,7 @@ import AudioContainer from './partials/audioContainer.jsx';
 
 // 1h as confirmed by Mathias
 // eslint-disable-next-line id-length
-MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
+const MESSAGE_NOT_EDITABLE_TIMEOUT = window.MESSAGE_NOT_EDITABLE_TIMEOUT = 60 * 60;
 
 export default class VoiceClip extends AbstractGenericMessage {
     constructor(props) {

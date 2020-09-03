@@ -23,6 +23,14 @@ var SelectionManager = function($selectable, resume) {
 
     var debugMode = !!localStorage.selectionManagerDebug;
 
+    var idMapper = String;
+
+    if (M.currentdirid === "ipc" || M.currentdirid === "opc") {
+        idMapper = function(n) {
+            return n.p ? M.currentdirid + "_" + n.p : n.h;
+        };
+    }
+
     /**
      * Store all selected items in an _ordered_ array.
      *
@@ -48,7 +56,7 @@ var SelectionManager = function($selectable, resume) {
         if (
             !targetScope ||
             !targetScope.parentNode ||
-            $(targetScope).is(".hidden") ||
+            targetScope.classList.contains("hidden") ||
             !$(targetScope).is(":visible")
         ) {
             // because MegaRender is providing a DOM node, which later on is being removed, we can't cache
@@ -128,18 +136,17 @@ var SelectionManager = function($selectable, resume) {
 
     this.clear_selection = function() {
         $selectable = this._ensure_selectable_is_available();
-
-        this.selected_list.forEach(function(nodeId) {
-            var node = $('#' + nodeId, $selectable);
-            if (node && node.length > 0) {
-                node.removeClass('ui-selected');
-            }
-        });
+        $('.ui-selected', $selectable).removeClass('ui-selected');
 
         this.selected_list = $.selected = [];
-        this.hideSelectionBar();
-
         this.clear_last_selected();
+
+        var self = this;
+        onIdle(function() {
+            if (!self.selected_list.length) {
+                self.hideSelectionBar();
+            }
+        });
     };
 
     /**
@@ -165,20 +172,19 @@ var SelectionManager = function($selectable, resume) {
         self.clear_last_selected();
         quickFinder.disable_if_active();
 
+        if (typeof nodeId !== 'string') {
+            nodeId = nodeId && nodeId[nodeId.length - 1] || false;
+        }
 
         if (this.selected_list.indexOf(nodeId) === -1) {
-            this.add_to_selection(nodeId, scrollTo);
+            if (nodeId) {
+                this.add_to_selection(nodeId, scrollTo);
+            }
             return;
         }
+        this.last_selected = nodeId;
 
-        if ($.isArray(nodeId)) {
-            this.last_selected = nodeId[nodeId.length - 1];
-        }
-        else {
-            this.last_selected = nodeId;
-        }
-
-        if (scrollTo && !$.isArray(nodeId)) {
+        if (scrollTo) {
             $selectable = this._ensure_selectable_is_available();
             var $element = $('#' + this.last_selected, $selectable);
             $element.addClass("currently-selected");
@@ -198,7 +204,7 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
-        if (!isString(nodeId)) {
+        if (typeof nodeId !== 'string') {
             if (nodeId && nodeId.h) {
                 nodeId = nodeId.h;
             }
@@ -210,33 +216,49 @@ var SelectionManager = function($selectable, resume) {
 
         if (this.selected_list.indexOf(nodeId) === -1) {
             this.selected_list.push(nodeId);
-            $selectable = this._ensure_selectable_is_available();
-            $('#' + nodeId, $selectable).addClass('ui-selected');
-            this.set_currently_selected(nodeId, scrollTo);
 
-            if (!alreadySorted) {
-                // shift + up/down requires the selected_list to be in the same order as in M.v (e.g. render order)
-                var currentViewOrderMap = {};
-                M.v.forEach(function (v, k) {
-                    currentViewOrderMap[SelectionManager.dynamicNodeIdRetriever(v)] = k;
-                });
+            var self = this;
+            delay('selectionManager:add:' + M.currentdirid, function() {
+                var selectionSize = 0;
 
-                // sort this.selected_list as in M.v
-                this.selected_list.sort(function (a, b) {
-                    var aa = currentViewOrderMap[a];
-                    var bb = currentViewOrderMap[b];
-                    if (aa < bb) {
-                        return -1;
+                for (var i = self.selected_list.length; i--;) {
+                    var n = self.selected_list[i];
+                    var e = document.getElementById(n);
+                    if (e) {
+                        e.classList.add('ui-selected');
                     }
-                    if (aa > bb) {
-                        return 1;
+                    if ((n = M.d[n])) {
+                        selectionSize += n.t ? n.tb : n.s;
+                    }
+                }
+                self.set_currently_selected(nodeId, scrollTo);
+
+                if (!alreadySorted) {
+                    // shift + up/down requires the selected_list to be in the same order as in M.v (e.g. render order)
+                    var currentViewOrderMap = {};
+                    for (var j = 0; j < M.v.length; ++j) {
+                        currentViewOrderMap[idMapper(M.v[j])] = j;
                     }
 
-                    return 0;
-                });
-            }
+                    // sort this.selected_list as in M.v
+                    self.selected_list.sort(function(a, b) {
+                        var aa = currentViewOrderMap[a];
+                        var bb = currentViewOrderMap[b];
+                        if (aa < bb) {
+                            return -1;
+                        }
+                        if (aa > bb) {
+                            return 1;
+                        }
 
-            this.selectionNotification(nodeId, true);
+                        return 0;
+                    });
+                }
+
+                if (selectionSize) {
+                    self.selectionNotification(selectionSize);
+                }
+            }, -1);
         }
         $.selected = this.selected_list;
         if (debugMode) {
@@ -274,13 +296,17 @@ var SelectionManager = function($selectable, resume) {
      * Simple helper func, for selecting all elements in the current view.
      */
     this.select_all = function() {
-        var self = this;
+        $.selected = this.selected_list = M.v.map(idMapper);
 
-        self.clear_selection();
+        var container = this._ensure_selectable_is_available().get(0);
+        var nodeList = container.querySelectorAll('.megaListItem');
 
-        M.v.forEach(function(v) {
-            self.add_to_selection(SelectionManager.dynamicNodeIdRetriever(v), false, true);
-        });
+        for (var i = nodeList.length; i--;) {
+            nodeList[i].classList.add('ui-selected');
+        }
+        this.set_currently_selected(nodeList.length && nodeList[0].id);
+
+        this.selectionNotification(M.d[M.currentdirid].tb);
     };
 
     this.select_next = function(shiftKey, scrollTo) {
@@ -513,7 +539,7 @@ var SelectionManager = function($selectable, resume) {
      */
     this.selectionNotification = function (nodeId, isAddToSelection) {
 
-        if (M.chat || !M.d[nodeId]) {
+        if (M.chat || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
 
@@ -526,9 +552,13 @@ var SelectionManager = function($selectable, resume) {
             var itemsTotalSize = "";
             var notificationText = "";
 
-            if (isAddToSelection) {
+            if (typeof nodeId === 'number') {
+                this.selected_totalSize = nodeId;
+            }
+            else if (isAddToSelection) {
                 this.selected_totalSize += M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
-            } else {
+            }
+            else {
                 this.selected_totalSize -= M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
             }
             itemsTotalSize = bytesToSize(this.selected_totalSize);
@@ -558,6 +588,8 @@ var SelectionManager = function($selectable, resume) {
         $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
         $selectionBar.addClass('visible');
         $selectionBar.parent('div').addClass('select');
+
+        this.vSelectionBar = $('b', $selectionBar).get(0);
 
         if (this.selected_list.length === 1 && M.currentdirid.startsWith("search/")){
             $selectionBar.css("opacity", 0);
@@ -598,41 +630,27 @@ var SelectionManager = function($selectable, resume) {
         this.selected_totalSize = 0;
         $('.selection-status-bar').removeClass('visible');
         $('.selection-status-bar').parent('div').removeClass('select');
+        this.vSelectionBar = null;
     };
 
-    if (!resume) {
-        this.clear_selection(); // remove ANY old .currently-selected values.
-    }
-    else {
-        if (debugMode) {
-            console.error('resuming:', JSON.stringify($.selected));
+    this.reinitialize = function() {
+        var nodeList = $.selected = $.selected || [];
+
+        if (nodeList.length) {
+            if (nodeList.length === M.v.length) {
+                this.select_all();
+            }
+            else {
+                // trick: add once so that delay() is invoked, then replace the internal list
+                this.add_to_selection(nodeList[0], true);
+                $.selected = this.selected_list = nodeList;
+            }
         }
-        this.selected_list = [];
-        this.hideSelectionBar();
-
-        $.selected.forEach(function(entry) {
-            self.selected_list.push(entry);
-            self.selectionNotification(entry, true);
-        });
-
-        // ensure the current 'resume' selection list is matching the current M.v
-        $.selected.forEach(function(nodeId) {
-            if (M.currentCustomView && M.previousdirid === M.currentdirid) {
-                if ((M.currentdirid === 'public-links' && !M.getNodeShare(nodeId, 'EXP')) ||
-                    (M.currentdirid === 'out-shares' && !M.getSharingUsers(nodeId).length)) {
-                    self.remove_from_selection(nodeId);
-                }
-            }
-            else if (M.previousdirid !== M.currentdirid) {
-                self.remove_from_selection(nodeId);
-            }
-            else if (!M.c[M.currentdirid] || !M.c[M.currentdirid][nodeId]) {
-                self.remove_from_selection(nodeId);
-            }
-        });
-
-        this.clear_last_selected();
-    }
+        else {
+            this.clear_selection(); // remove ANY old .currently-selected values.
+        }
+    };
+    this.reinitialize();
 
     var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
 

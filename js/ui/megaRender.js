@@ -305,6 +305,13 @@
         return parseHTML(versionsTemplate).firstChild;
     };
 
+    var classListMultiple = false;
+    tryCatch(function() {
+        var te = document.createElement("test");
+        te.classList.add("foo", "bar");
+        classListMultiple = te.classList.contains("bar");
+    }, false);
+
     mBroadcaster.once('startMega', function() {
         logger = MegaLogger.getLogger('MegaRender');
 
@@ -447,12 +454,10 @@
                 console.time('MegaRender.cleanupLayout');
             }
 
-            var lSel = aListSelector;
-
-            M.hideEmptyGrids();
-            $.tresizer();
-
             if (!aUpdate) {
+                M.hideEmptyGrids();
+                $.tresizer();
+
                 sharedFolderUI();
                 deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
                 deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
@@ -469,7 +474,8 @@
                 $('.out-shared-blocks-scrolling a').remove();
                 $('.contacts-blocks-scrolling .content a').remove();
 
-                $(lSel).show().parent().children('table').show();
+                // eslint-disable-next-line local-rules/jquery-replacements
+                $(aListSelector).show().parent().children('table').show();
             }
 
             // Draw empty grid if no contents.
@@ -538,8 +544,9 @@
                 else if (M.currentrootid === 'shares') {
                     if (M.currentdirid === 'shares') {
                         $('.fm-empty-incoming').removeClass('hidden');
-                    } else {
-                        M.emptySharefolderUI(lSel);
+                    }
+                    else {
+                        M.emptySharefolderUI(aListSelector);
                     }
                 }
                 else if (M.currentrootid === 'contacts') {
@@ -640,8 +647,8 @@
                 }
             }
 
-            for (var idx in aNodeList) {
-                if (aNodeList.hasOwnProperty(idx)) {
+            if (!DYNLIST_ENABLED || this.section !== 'cloud-drive') {
+                for (var idx = aNodeList.length; idx--;) {
                     var node = this.nodeList[idx];
 
                     if (node && node.h) {
@@ -672,7 +679,6 @@
             else {
                 return aNodeList.length;
             }
-
         },
 
         setDOMColumnsWidth: function(nodeDOM) {
@@ -730,8 +736,6 @@
                 this.nodeMap[aHandle] = this.buildDOMNode(aNode, properties, template);
             }
 
-            this.setDOMColumnsWidth(this.nodeMap[aHandle]);
-
             return this.nodeMap[aHandle];
         },
 
@@ -745,29 +749,14 @@
         },
 
         /**
-
-        /**
          * Add classes to DOM node
          * @param {Object} aDOMNode    DOM node to set class over
          * @param {Array}  aClassNames An array of classes
          */
-        addClasses: function(aDOMNode, aClassNames) {
-            var len;
-
-            // TODO: find what is causing the issue and remove then all this
-            if (d) {
-                len = aClassNames.length;
-
-                while (len--) {
-                    if (!aClassNames[len] || typeof aClassNames[len] !== 'string') {
-                        console.warn('Invalid classList', len, aClassNames[len], aClassNames[len - 1], aClassNames);
-                        break;
-                    }
-                }
-            }
-            aClassNames = aClassNames.filter(String);
-
-            len = aClassNames.length;
+        addClasses: classListMultiple ? function(aDOMNode, aClassNames) {
+            aDOMNode.classList.add.apply(aDOMNode.classList, aClassNames);
+        } : function(aDOMNode, aClassNames) {
+            var len = aClassNames.length;
             while (len--) {
                 // XXX: classList.add does support an array, but not in all browsers
                 aDOMNode.classList.add(aClassNames[len]);
@@ -779,7 +768,9 @@
          * @param {Object} aDOMNode    DOM node to set class over
          * @param {Array}  aClassNames An array of classes
          */
-        removeClasses: function(aDOMNode, aClassNames) {
+        removeClasses: classListMultiple ? function(aDOMNode, aClassNames) {
+            aDOMNode.classList.remove.apply(aDOMNode.classList, aClassNames);
+        } : function(aDOMNode, aClassNames) {
             // XXX: classList.add does support an array, but not in all browsers
             var len = aClassNames.length;
             while (len--) {
@@ -877,8 +868,8 @@
                 }
                 else {
                     props.classNames.push('file');
-                    props.type = filetype(aNode);
                     props.size = bytesToSize(aNode.s);
+                    props.type = filetype(aNode, 0, 1);
 
                     if (aNode.fa && aNode.fa.indexOf(':8*') > 0) {
                         Object.assign(props, MediaAttribute(aNode).data);
@@ -1408,7 +1399,6 @@
                 return null;
             },
             'cloud-drive': function(aUpdate, aNodeList) {
-                var self = this;
                 var result = this.initializers['*'].apply(this, arguments);
 
                 if (DYNLIST_ENABLED) {
@@ -1421,7 +1411,7 @@
                             'batchPages': 0,
                             'appendOnly': false,
                             'onContentUpdated': function () {
-                                M.rmSetupUIDelayed();
+                                M.rmSetupUI(false, true);
                             },
                             'perfectScrollOptions': {
                                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
@@ -1454,8 +1444,6 @@
                         }
 
                         var newNodes = [];
-                        var nodeIndex = [];
-
                         var objMap = newnodes
                             .map(function(n) {
                                 return n.h;
@@ -1465,17 +1453,15 @@
                                 return obj;
                             }, {});
 
-                        for (var idx in aNodeList) {
-                            if (aNodeList.hasOwnProperty(idx)) {
-                                if (objMap[aNodeList[idx].h]) {
-                                    newNodes[idx] = aNodeList[idx];
-                                }
-                                nodeIndex[aNodeList[idx].h] = idx;
+                        for (var idx = aNodeList.length; idx--;) {
+                            if (objMap[aNodeList[idx].h]) {
+                                newNodes[idx] = aNodeList[idx];
                             }
                         }
 
                         if (newNodes.length) {
                             result.newNodeList = newNodes;
+                            result.curNodeList = aNodeList;
                         }
                     }
                 }
@@ -1530,35 +1516,11 @@
                             this.removeClasses(container.parentNode.parentNode, ["hidden"]);
                         }
 
-
-                        var ids = [];
-                        aNodeList.forEach(function(v) {
-                            ids.push(v.h);
-                        });
-
-                        this.megaList.batchAdd(ids);
+                        this.megaList.batchReplace(aNodeList.map(String));
                         this.megaList.initialRender();
                     }
                     else if (aUserData && aUserData.newNodeList && aUserData.newNodeList.length > 0) {
-                        var sortedNodeList = {};
-                        var foundNodesForAdding = false;
-                        aNodeList.forEach(function(v, k) {
-                            // newnodes, and update may be triggered by an move op (because of the newly modified
-                            // lack of 'i' property), so the newnodes may contain unrelated nodes (to the current
-                            // view)
-                            if (v.p === M.currentdirid || v.p === M.currentCustomView.nodeID) {
-                                foundNodesForAdding = true;
-                                sortedNodeList[k] = v.h;
-                                if (!M.v[k] || M.v[k].h !== v.h) {
-                                    console.error("This should never happen, e.g. !M.v[k] || M.v[k].h !== v.h", v);
-                                }
-                            }
-
-                        });
-
-                        if (foundNodesForAdding) {
-                            this.megaList.batchAddFromMap(sortedNodeList);
-                        }
+                        this.megaList.batchReplace(aUserData.curNodeList.map(String));
                     }
                 }
             }

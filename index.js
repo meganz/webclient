@@ -3100,10 +3100,36 @@ window.onunload = function () {
     }
 };
 
-mBroadcaster.once('boot_done', function () {
+mBroadcaster.once('boot_done', function() {
+    'use strict';
     M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
-    attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    if (d) {
+        if (!window.crossOriginIsolated) {
+            if (window.crossOriginIsolated === false) {
+                console.warn('cross-origin isolation is not enabled...');
+            }
+            return;
+        }
+
+        (function memoryMeasurement() {
+            var performMeasurement = tryCatch(function() {
+                performance.measureMemory()
+                    .then(function(result) {
+                        onIdle(memoryMeasurement);
+                        console.info('Memory usage:', result);
+                    });
+            });
+
+            if (!performance.measureMemory) {
+                console.debug('performance.measureMemory() is not available.');
+                return;
+            }
+            var interval = -Math.log(Math.random()) * 2e4;
+            console.info('Scheduling memory measurement in %d seconds.', Math.round(interval / 1e3));
+            setTimeout(performMeasurement, interval);
+        })();
+    }
 });
 
 // After open folder call, check if we should restore any previously opened preview node.

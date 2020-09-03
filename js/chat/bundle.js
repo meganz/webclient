@@ -202,7 +202,6 @@ var scheduler = function scheduler(func, name, debug) {
   var dbug = debug !== false && DEBUG_THIS;
   var idnt = null;
   var task = null;
-  var tbsp = Promise.resolve();
 
   var fire = function fire() {
     if (dbug) {
@@ -210,7 +209,7 @@ var scheduler = function scheduler(func, name, debug) {
     }
 
     if (task) {
-      tbsp.then(task);
+      queueMicrotask(task);
       task = null;
     }
   };
@@ -227,7 +226,7 @@ var scheduler = function scheduler(func, name, debug) {
     }
 
     if (!task) {
-      tbsp.then(fire);
+      queueMicrotask(fire);
     }
 
     var idx = arguments.length;
@@ -1248,7 +1247,7 @@ var Dropdown = function (_MegaRenderMixin) {
 
     if (!child && !this.props.forceShowWhenEmpty) {
       if (this.props.active !== false) {
-        (window.setImmediate || window.setTimeout)(function () {
+        queueMicrotask(function () {
           self.onActiveChange(false);
         });
       }
@@ -13961,14 +13960,12 @@ var conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       chatRoom.off('onHistoryDecrypted.pull');
       chatRoom.one('onHistoryDecrypted.pull', function () {
         chatRoom.off('onMessagesBuffAppend.pull');
-        chatRoom.messagesBuff.addChangeListener(function () {
-          if (msgAppended > 0) {
-            self._reposOnUpdate = scrYOffset;
-          }
 
-          self.scrollPullHistoryRetrieval = -1;
-          return 0xDEAD;
-        });
+        if (msgAppended > 0) {
+          self._reposOnUpdate = scrYOffset;
+        }
+
+        self.scrollPullHistoryRetrieval = -1;
       });
       mb.retrieveChatHistory();
     }
@@ -17931,6 +17928,20 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     $('.new-messages-indicator').removeClass('hidden');
   }
 }, 100);
+Chat.prototype.destroyDatabases = promisify(function (resolve, reject) {
+  var chatd = this.plugins.chatdIntegration.chatd || false;
+  var promises = [];
+
+  if (chatd.chatdPersist) {
+    promises.push(chatd.chatdPersist.drop());
+  }
+
+  if (chatd.messagesQueueKvStorage) {
+    promises.push(chatd.messagesQueueKvStorage.clear());
+  }
+
+  Promise.allSettled(promises).then(resolve).catch(reject);
+});
 
 Chat.prototype.destroy = function (isLogout) {
   var self = this;
@@ -19706,7 +19717,7 @@ var ChatRoom = function ChatRoom(megaChat, roomId, type, users, ctime, lastActiv
   self.rebind('onMarkAsJoinRequested.initHist', function () {
     timer = setTimeout(function () {
       if (d) {
-        console.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
+        self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
       }
 
       _historyIsAvailable(false);

@@ -95,14 +95,11 @@ MegaData.prototype.filterByParent = function(id) {
                 }
                 return true;
             });
-
-        return M.checkForDuplication(id);
     }
     else {
         this.filterBy(function(node) {
             return (node.p === id);
         });
-        return M.checkForDuplication(id);
     }
 };
 

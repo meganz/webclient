@@ -3315,6 +3315,9 @@ function fm_resize_handler(force) {
         return;
     }
     if (d) {
+        if (d > 1) {
+            console.warn('fm_resize_handler');
+        }
         console.time('fm_resize_handler');
     }
 

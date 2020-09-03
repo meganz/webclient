@@ -1960,13 +1960,8 @@ function emplacenode(node, noc) {
         if (node.hash) {
             if (!M.h[node.hash]) {
                 M.h[node.hash] = Object.create(null);
-                M.h[node.hash][node.h] = true;
             }
-            else {
-                if (!M.h[node.hash][node.h]) {
-                    M.h[node.hash][node.h] = true;
-                }
-            }
+            M.h[node.hash][node.h] = 1;
         }
     }
     else if (node.t > 1 && node.t < 5) {
@@ -2155,10 +2150,9 @@ function worker_procmsg(ev) {
                 }
             }
 
-            setTimeout(function() {
-                loadfm_callback(residualfm);
-                residualfm = false;
-            }, 350);
+            window.loadingInitDialog.step3();
+            setTimeout(loadfm_callback, 300, residualfm);
+            residualfm = false;
         }
     }
     else {
@@ -2255,7 +2249,7 @@ function fetchfm(sn) {
     }
     else {
         // activate/prefetch attribute cache at this early stage
-        promise = attribCache.prefillMemCache(fmdb);
+        promise = attribCache.load();
     }
 
     promise.always(function() {
@@ -2289,144 +2283,147 @@ function fetchfm(sn) {
 
 function dbfetchfm() {
     "use strict";
-
-    var i;
+    var tables = {
+        tree: function(r) {
+            for (var i = r.length; i--;) {
+                ufsc.addTreeNode(r[i], true);
+            }
+            if (d) {
+                console.debug('processed %d tree nodes.', r.length);
+            }
+        },
+        opc: processOPC,
+        ipc: processIPC,
+        ps: function(r) {
+            processPS(r, true);
+            r = r.map(function(n) {
+                return n.h;
+            });
+            return dbfetch.geta(r).catch(dump.bind(null, 'ps.fail'));
+        },
+        puf: function _(r) {
+            mega.megadrop.pufProcessDb(r);
+            r = r.map(function(n) {
+                return n.h;
+            });
+            return dbfetch.geta(r).catch(dump.bind(null, 'puf.fail'));
+        },
+        suba: process_suba,
+        pup: mega.megadrop.pupProcessDb,
+        mcf: 1
+    };
+    var tableProc = function(t) {
+        return function(r) {
+            if (tables[t] === 1) {
+                if (r.length > 0) {
+                    // only set chatmcf is there is anything returned
+                    // if not, this would force the chat to do a 'mcf' call
+                    loadfm.chatmcf = r;
+                }
+                else {
+                    loadfm.chatmcf = -1;
+                }
+            }
+            else {
+                return tables[t](r, true);
+            }
+        };
+    };
+    var checkSettled = function(r) {
+        for (var i = r.length; i--;) {
+            if (r[i].status !== 'fulfilled') {
+                throw new Error(r[i].reason);
+            }
+        }
+    };
 
     loadingInitDialog.step2();
 
-    fmdb.get('ok').always(function get_ok(r) {
-        process_ok(r, true);
+    if (d) {
+        console.time('dbfetchfm');
+    }
 
-        var promise;
-        if (mBroadcaster.crossTab.master && !localStorage.fmall) {
-            promise = dbfetch.root();
-
-            mega.fcv_db = 1;
-        }
-        else {
-            // fetch the whole cloud on slave tabs..
-            promise = dbfetch.chunked(0);
-
-            mega.fcv_db = 2;
-        }
-
-        promise.always(function get_f(folders) {
-            loadfm.onDemandFolders = folders;
+    Promise.allSettled([fmdb.get('ok'), dbfetch.init()])
+        .then(function(r) {
+            checkSettled(r);
+            process_ok(r[0].value, true);
 
             mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
             mega.loadReport.stepTimeStamp = Date.now();
 
-            fmdb.get('mk').always(function get_mk(r) {
-                crypto_missingkeysfromdb(r);
+            return Promise.allSettled([fmdb.get('mk'), fmdb.get('u'), fmdb.get('s')]);
+        })
+        .then(function(r) {
+            var promises = [];
 
-                mega.loadReport.pn1 = Date.now() - mega.loadReport.stepTimeStamp;
+            checkSettled(r);
+            crypto_missingkeysfromdb(r[0].value);
+            mega.loadReport.pn1 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                fmdb.get('u').always(function get_u(r) {
-                    process_u(r, true);
+            process_u(r[1].value, true);
+            mega.loadReport.pn2 = Date.now() - mega.loadReport.stepTimeStamp;
+            // @todo deprecate those pn1-pn5 ...
+            mega.loadReport.pn3 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                    mega.loadReport.pn2 = Date.now() - mega.loadReport.stepTimeStamp;
+            r = r[2].value;
+            for (var i = r.length; i--;) {
+                if (r[i].su) {
+                    // this is an inbound share
+                    M.c.shares[r[i].t] = r[i];
 
-                    fmdb.get('s').always(function get_s(r) {
-                        var promises = [];
+                    if (r[i].sk) {
+                        crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
+                    }
+                }
+                else {
+                    // this is an outbound share
+                    promises.push(M.nodeShare(r[i].h, r[i], true));
+                }
+            }
+            mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        mega.loadReport.pn3 = Date.now() - mega.loadReport.stepTimeStamp;
+            for (var j = 0, it = Object.keys(tables); j < it.length; ++j) {
+                var t = it[j];
+                promises.push(fmdb.get(t).then(tableProc(t)).catch(dump));
+            }
+            mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
 
-                        for (i = r.length; i--;) {
-                            if (r[i].su) {
-                                // this is an inbound share
-                                M.c.shares[r[i].t] = r[i];
-                                if (r[i].sk) {
-                                    crypto_setsharekey(r[i].t, base64_to_a32(r[i].sk), true);
-                                }
-                            }
-                            else {
-                                // this is an outbound share
-                                promises.push(M.nodeShare(r[i].h, r[i], true));
-                            }
-                        }
+            return Promise.allSettled(promises);
+        })
+        .then(function(r) {
+            checkSettled(r);
 
-                        mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
+            if (d) {
+                console.info('All settled, %d operations completed to load from DB.', r.length);
+                console.timeEnd('dbfetchfm');
+            }
 
-                        var tables = {
-                            opc: processOPC,
-                            ipc: processIPC,
-                            ps: function _(r) {
-                                processPS(r, true);
-                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
-                            },
-                            suba: process_suba,
-                            puf: function _(r) {
-                                mega.megadrop.pufProcessDb(r);
-                                _.promise.linkDoneAndFailTo(dbfetch.geta(r.map(function(n) { return n.h; })));
-                            },
-                            pup: mega.megadrop.pupProcessDb,
-                            tree: function(r) {
-                                for (var i = r.length; i--;) {
-                                    ufsc.addTreeNode(r[i], true);
-                                }
-                            },
-                            mcf: 1
-                        };
-                        tables.ps.promise = new MegaPromise();
-                        tables.puf.promise = new MegaPromise();
+            mega.loadReport.mode = 1;
+            mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
+            mega.loadReport.procNodes = Date.now() - mega.loadReport.stepTimeStamp;
+            mega.loadReport.stepTimeStamp = Date.now();
 
-                        Object.keys(tables).forEach(function(t) {
-                            promise = fmdb.get(t);
-                            promise.always(function(r) {
-                                if (tables[t] === 1) {
-                                    if (r.length > 0) {
-                                        // only set chatmcf is there is anything returned
-                                        // if not, this would force the chat to do a 'mcf' call
-                                        loadfm.chatmcf = r;
-                                    }
-                                    else {
-                                        loadfm.chatmcf = -1;
-                                    }
-                                }
-                                else {
-                                    tables[t](r, true);
-                                }
-                            });
-                            promises.push(promise);
+            if (!mBroadcaster.crossTab.master && window.fmdb) {
+                // on a secondary tab, prevent writing to DB once we have read its contents
+                fmdb.crashed = 666;
+            }
+            console.assert(window.fmdb, 'check what is going on here...');
 
-                            if (tables[t].promise) {
-                                promises.push(tables[t].promise);
-                            }
-                        });
-                        mega.loadReport.pn5 = Date.now() - mega.loadReport.stepTimeStamp;
+            if (ufsc) {
+                if (d && $.len(ufsc.cache || {})) {
+                    console.warn('found non-flushed ufs-cache entries...', [ufsc.cache], ufsc);
+                }
+                delete ufsc.cache;
+            }
 
-                        MegaPromise.allDone(promises).always(function dbfetchfm_done() {
-
-                            mega.loadReport.mode = 1;
-                            mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
-                            mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
-                            mega.loadReport.stepTimeStamp = Date.now();
-
-                            if (!mBroadcaster.crossTab.master) {
-                                // on a secondary tab, prevent writing to DB once we have read its contents
-                                // XXX: TypeError: Cannot create property 'crashed' on boolean 'false'
-                                // ^^^ how does `fmdb` get set to `false` here ?! :-/
-                                if (fmdb) {
-                                    fmdb.crashed = 666;
-                                }
-                            }
-
-                            if (ufsc) {
-                                if (d && $.len(ufsc.cache || {})) {
-                                    console.warn('found non-flushed ufs-cache entries...', [ufsc.cache], ufsc);
-                                }
-                                delete ufsc.cache;
-                            }
-
-                            // fetch & process new actionpackets
-                            loadingInitDialog.step3();
-                            getsc(true);
-                        });
-                    });
-                });
-            });
+            // fetch & process new actionpackets
+            window.loadingInitDialog.step3();
+            getsc(true);
+        })
+        .catch(function(ex) {
+            console.error(ex);
+            siteLoadError(ex, 'dbfetchfm');
         });
-    });
 }
 
 // returns tree type h is in
@@ -3465,8 +3462,6 @@ function loadfm_callback(res) {
         return;
     }
 
-    loadingInitDialog.step3();
-
     mega.loadReport.recvNodes     = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
 
@@ -3615,6 +3610,17 @@ function loadfm_callback(res) {
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
         console.assert(ufsc, 'check this...');
         if (ufsc) {
+            if (localStorage.ufsis) {
+                ufsc.saveInitialState()
+                    .then(function() {
+                        setsn(res.sn);
+                        currsn = res.sn;
+                        getsc(true);
+                    })
+                    .catch(dump);
+                return;
+            }
+
             ufsc.save();
         }
 

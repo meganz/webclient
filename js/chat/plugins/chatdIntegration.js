@@ -1010,10 +1010,6 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
     if (!chatRoom.messagesBuff) {
         chatRoom.pubCu25519KeyIsMissing = false;
 
-        var waitingForPromises = [];
-
-        chatRoom.notDecryptedBuffer = {};
-
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
         chatRoom.messagesBuff.rebind('onHistoryFinished.chatd', function() {
             var containerBatchFromHist;
@@ -1030,117 +1026,85 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 containerMessages = chatRoom.messagesBuff.messages;
             }
 
+            var hist = [];
+            var invitors = [];
             containerBatchFromHist.forEach(function(v, k) {
                 if (v.userId && !v.requiresManualRetry) {
                     if (!v.textContents && v.message && !v.deleted) {
                         var msg = v.message;
 
-                        chatRoom.notDecryptedBuffer[k] = {
+                        hist.push({
                             'message': msg,
                             'userId': v.userId,
                             'keyid': v.keyid,
                             'ts': v.delay,
                             'k': k
-                        };
+                        });
+
+                        if (v.userId === strongvelope.COMMANDER) {
+                            var parsedMessage = strongvelope._parseMessageContent(msg);
+                            if (parsedMessage && invitors.indexOf(parsedMessage.invitor) < 0) {
+                                invitors.push(parsedMessage.invitor);
+                            }
+                        }
                     }
                 }
             });
 
-            var hist = [];
-            var invitors = [];
-            Object.keys(chatRoom.notDecryptedBuffer).forEach(function(k) {
-                var v = chatRoom.notDecryptedBuffer[k];
+            if (!hist.length) {
+                return chatRoom.trigger('onHistoryDecrypted');
+            }
 
-                if (v) {
-                    hist.push(v);
-                }
-                if (v.userId === strongvelope.COMMANDER) {
-                    var parsedMessage = strongvelope._parseMessageContent(v.message);
-                    if (parsedMessage) {
-                        invitors.push(parsedMessage.invitor);
-                    }
-                }
-            });
+            var mIdx = -1;
+            var parseMessage = tryCatch(function(msg) {
+                var messageId = hist[mIdx].k;
+                var msgInstance = containerBatchFromHist[messageId]
+                    || containerMessages[messageId] || chatRoom.messagesBuff.getMessageById(messageId);
 
-            if (hist.length > 0) {
-                var _decryptSuccessCb = function(decryptedMsgs) {
-                    for (var i = decryptedMsgs.length - 1; i >= 0; i--) {
-                        var v = decryptedMsgs[i];
-                        if (!v) {
-                            // message failed to decrypt and decryption returned undefined.
-                            continue;
-                        }
-                        var failedToDecrypt = false;
-                        var messageId = hist[i]['k'];
-
-                        var msgInstance = containerBatchFromHist[messageId] || containerMessages[messageId];
-
-                        if (!msgInstance) {
-                            msgInstance = chatRoom.messagesBuff.getMessageById(messageId);
-                        }
-
-                        var succeeded = self._processDecryptedMessage(chatRoom, msgInstance, v, isSharedFileMessage);
-                        if (!succeeded) {
-                            failedToDecrypt = true;
-                            self.logger.error("Could not decrypt: ", v, msgInstance);
-                        }
-
-                        delete chatRoom.notDecryptedBuffer[messageId];
-
-                        // if (!failedToDecrypt) {
-                        self._parseMessage(chatRoom, msgInstance);
-                        containerMessages.push(msgInstance);
-                        containerBatchFromHist.remove(messageId);
-                        // }
+                if (msgInstance) {
+                    var succeeded = self._processDecryptedMessage(chatRoom, msgInstance, msg, isSharedFileMessage);
+                    if (!succeeded) {
+                        chatRoom.logger.error('Could not decrypt message "%s"', messageId, msg, msgInstance);
                     }
 
-                    chatRoom.trigger('onHistoryDecrypted');
-                };
-
-                var decryptMessages = function() {
-                    try {
-                        // .seed result is not used in here, since it returns false, even when some messages can be
-                        // decrypted which in the current case (of tons of cached non encrypted txt msgs in chatd) is
-                        // bad
-                        chatRoom.protocolHandler.seed(hist).always(function() {
-                            chatRoom.protocolHandler.batchDecrypt(hist, true)
-                                .done(_decryptSuccessCb)
-                                .fail(function(e) {
-                                    self.logger.error("Failed to decrypt stuff via strongvelope, error: ", e);
-                                });
-                        });
-                    } catch (e) {
-                        self.logger.error("Failed to decrypt stuff via strongvelope, uncaught exception: ", e);
-                    }
-                };
-
-
-
-                var proceed = function() {
-                    if (chatRoom.protocolHandler) {
-                        invitors = array.unique(invitors);
-                        ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle)
-                            .always(decryptMessages);
-                    }
-                    else if (chatRoom.strongvelopeSetupPromises) {
-                        chatRoom.strongvelopeSetupPromises.always(function() {
-                            ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle)
-                                .always(decryptMessages);
-                        });
-                    }
-                };
-
-                if (chatRoom._keysAreSeeding) {
-                    chatRoom._keysAreSeeding.always(proceed);
+                    self._parseMessage(chatRoom, msgInstance);
+                    containerMessages.push(msgInstance);
+                    containerBatchFromHist.remove(messageId);
                 }
                 else {
-                    proceed();
+                    chatRoom.logger.critical('Message "%s" not found.', messageId, hist[mIdx]);
                 }
-            }
-            else {
-                // no new messages retrieved (from chatd!)
-                chatRoom.trigger('onHistoryDecrypted');
-            }
+            }, function(ex) {
+                chatRoom.logger.error('Failed to parse message.', hist[mIdx], ex);
+            });
+
+            (chatRoom._keysAreSeeding || Promise.resolve())
+                .then(function() {
+                    return chatRoom.strongvelopeSetupPromises;
+                })
+                .then(function() {
+                    return ChatdIntegration._ensureKeysAreLoaded(hist, invitors, chatRoom.publicChatHandle);
+                })
+                .then(function() {
+                    // .seed result is not used in here, since it returns false, even when some messages can be
+                    // decrypted which in the current case (of tons of cached non encrypted msgs in chatd) is bad
+                    return chatRoom.protocolHandler.seed(hist);
+                })
+                .then(function() {
+                    return chatRoom.protocolHandler.batchDecrypt(hist, true);
+                })
+                .then(function(decryptedMsgs) {
+                    for (mIdx = decryptedMsgs.length; mIdx--;) {
+                        // message may failed to decrypt and decryption returned undefined.
+                        if (decryptedMsgs[mIdx]) {
+                            parseMessage(decryptedMsgs[mIdx]);
+                        }
+                    }
+                    chatRoom.trigger('onHistoryDecrypted');
+                })
+                .catch(function(ex) {
+                    chatRoom.logger.error("Failed to decrypt message(s) via strongvelope", ex);
+                });
         });
 
         chatRoom.rebind('onLeaveChatRequested.chatdInt', function() {
@@ -1286,9 +1250,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
             }
         });
 
-        waitingForPromises.push(
-            self._retrieveChatdIdIfRequired(chatRoom)
-        );
+        var waitingForPromises = [self._retrieveChatdIdIfRequired(chatRoom)];
         if ((chatRoom.type === "public" || chatRoom.type === "group") && chatRoom.ck) {
             // group chats with a ck (e.g. now "private group chats"), may have topics/messages that require
             // preloading of keys. Since we don't know just yet, we need to preload them just-in-case.
@@ -1509,7 +1471,7 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
             }
 
             if (self.chatd.chatdPersist) {
-                self.chatd.chatdPersist.persistTruncate(chatRoom.chatId, msgInstance.orderValue);
+                self.chatd.chatdPersist.persistTruncate(chatRoom.chatId, msgInstance.orderValue).always(nop);
             }
         }
 
@@ -1723,7 +1685,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
         msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
         if (!msg && self.chatd.chatdPersist) {
             self.chatd.chatdPersist.getMessageByOrderValue(chatRoom.chatId, msgnum)
-                .done(function(r) {
+                .then(function(r) {
                     if (!r) {
                         console.error(
                             "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
@@ -1734,7 +1696,7 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
                     var msg = r[0];
 
                     self.chatd.chatdPersist.retrieveAndLoadKeysFor(chatRoom.chatId, msg.userId, msg.keyId)
-                        .done(function() {
+                        .then(function() {
 
                             chatMessages.buf[msgnum] = [
                                 // Chatd.MsgField.MSGID,
@@ -1756,13 +1718,13 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
 
                             self.updateMessage(chatRoom, msgnum, newMessage);
                         })
-                        .fail(function(e) {
-                            self.logger.error("Failed to retrieve key for MSGUPD, ", msgnum, msg.keyId, e);
+                        .catch(function(ex) {
+                            self.logger.error("Failed to retrieve key for MSGUPD, ", msgnum, msg.keyId, ex);
                         });
 
 
                 })
-                .fail(function() {
+                .catch(function() {
                     console.error(
                         "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
                         msgnum

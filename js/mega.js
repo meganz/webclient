@@ -2974,6 +2974,10 @@ function processPH(publicHandles) {
         if (is_mobile) {
             mobile.cloud.updateLinkStatus(nodeId);
         }
+
+        if (fminitialized && M.recentsRender) {
+            M.recentsRender.nodeChanged(nodeId);
+        }
     }
 }
 

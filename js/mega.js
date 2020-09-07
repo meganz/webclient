@@ -1577,6 +1577,8 @@ scparser.$finalize = function() {
                         M.openFolder(M.currentdirid, true);
                     }
                 });
+
+                scpubliclinksuiupd = false;
             }
 
             if (scContactsSharesUIUpdate === M.currentdirid) {

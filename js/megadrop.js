@@ -1200,7 +1200,7 @@ mega.megadrop = (function() {
 
                 // Waiting for css animation to be finished
                 setTimeout(function() {
-                    initAccountScroll(1);
+                    initAccountScroll();
                 }, 301);
             });
 

@@ -6,6 +6,9 @@ function init_start() {
     var carouselInterval;
     var sliderInterval;
     var swipeInterval = 5000;
+    var dropboxPrice = 4.9;
+    var megaPrice = 1.56;
+    var gdrivePrice = 4.9;
     var $page = $('.bottom-page.scroll-block.startpage', '.fmholder');
 
     if (u_type > 0) {
@@ -67,6 +70,21 @@ function init_start() {
         $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
         $('.mid-green-link.refer', $page).removeClass('hidden');
     }
+
+    $('span', '.dropbox').text(
+        getCountryAndLocales().locales ?
+            dropboxPrice.toLocaleString(getCountryAndLocales().locales) : dropboxPrice
+    );
+
+    $('span', '.mega').text(
+        getCountryAndLocales().locales ?
+            megaPrice.toLocaleString(getCountryAndLocales().locales) : megaPrice
+    );
+
+    $('span', '.gdrive').text(
+        getCountryAndLocales().locales ?
+            gdrivePrice.toLocaleString(getCountryAndLocales().locales) : gdrivePrice
+    );
 
     /**
      * detectSwipe

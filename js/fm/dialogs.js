@@ -182,7 +182,7 @@
             var chats = getSelectedChats();
             if (chats.length > 1) {
                 path = [u_handle, 'contacts'];
-                names[u_handle] = l[1025];
+                names[u_handle] = l[23755];
             }
             else {
                 aTarget = chats[0] || String(aTarget || '').split('/').pop();

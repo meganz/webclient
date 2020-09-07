@@ -217,8 +217,8 @@ function topMenuScroll() {
 function scrollMenu() {
     "use strict";
 
-    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function () {
-        if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
+        if (page === 'doc' || page.substr(0, 9) === 'corporate' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
             if (topPos > 0) {
@@ -792,10 +792,10 @@ function init_page() {
         parsepage(pages['change_email']);
         emailchange.main();
     }
-    else if (page.substr(0, 9) == 'corporate') {
+    else if (page.substr(0, 9) === 'corporate') {
         function doRenderCorpPage() {
-            if (window.corpTemplate) {
-                parsepage(window.corpTemplate);
+            if (window.corpTemplate && (new Date() - window.corpTemplate.ts < 72e5)) {
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
@@ -803,41 +803,20 @@ function init_page() {
             }
 
             loadingDialog.show();
-            CMS.watch('corporate', function () {
-                window.corpTemplate = null;
-                doRenderCorpPage();
-            });
-            CMS.get('corporate', function (err, content) {
-                parsepage(window.corpTemplate = content.html);
+
+            CMS.get('corporate', function(err, content) {
+                window.corpTemplate = {
+                    template: content.html,
+                    ts: new Date()
+                };
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
             });
         }
 
         doRenderCorpPage();
-        page = 'cpage';
         bottompage.init();
-    }
-    else if (page.substr(0, 5) == 'page_') {
-        var cpage = decodeURIComponent(page.substr(5, page.length - 2));
-
-        function doRenderCMSPage() {
-            loadingDialog.show();
-            CMS.watch(cpage, function () {
-                doRenderCMSPage();
-            });
-
-            CMS.get(cpage, function (err, content) {
-                parsepage(content.html);
-                topmenuUI();
-                loadingDialog.hide();
-            });
-        }
-
-        doRenderCMSPage();
-        page = 'cpage';
-        bottompage.init();
-        return;
     }
     else if (page.substr(0, 5) === 'blog/') {
         // eslint-disable-next-line dot-notation

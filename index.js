@@ -2910,7 +2910,6 @@ function parsetopmenu() {
 function loadSubPage(tpage, event) {
     'use strict';
 
-    onIdle(pagemetadata);
     tpage = getCleanSitePath(tpage);
 
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {

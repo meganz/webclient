@@ -803,6 +803,9 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
 
         var avatar = useravatar.contact(contact.u, '', 'div');
 
+        // Show the nickname if it's set for this contact
+        var userName = contact.nickname === '' ? contact.name : contact.nickname;
+
         // callOptions, can be == {} in the cases then the user does not have/have not provided access
         // to the cam & mic
         var showVideoButton = true;
@@ -823,7 +826,7 @@ CallManagerCall.prototype.onWaitingResponseIncoming = function (e, eventData) {
 
 
         self.getCallManager().incomingCallDialog.show(
-            contact.name,
+            userName,
             avatar,
             self.id,
             showVideoButton,

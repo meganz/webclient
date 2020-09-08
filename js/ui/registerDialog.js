@@ -362,12 +362,16 @@
         });
 
         $button.rebind('click.proRegister', function(e) {
+
+            if ($(this).hasClass('disabled')) {
+                return false;
+            }
             doProRegister($dialog);
             return false;
         });
 
         $button.rebind('keydown.proRegister', function (e) {
-            if (e.keyCode === 13) {
+            if (e.keyCode === 13  && !$(this).hasClass('disabled')) {
                 doProRegister($dialog);
                 return false;
             }

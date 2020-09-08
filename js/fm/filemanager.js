@@ -824,7 +824,26 @@ FileManager.prototype.initFileManagerUI = function() {
         e.stopPropagation();
     });
 
-    var fmTabState;
+    var self = this;
+
+    if (!this.fmTabState || this.fmTabState['cloud-drive'].root !== M.RootID) {
+        this.fmTabState = {
+            'cloud-drive':     {root: M.RootID,    prev: null},
+            'folder-link':     {root: M.RootID,    prev: null},
+            'shared-with-me':  {root: 'shares',    prev: null},
+            'conversations':   {root: 'chat',      prev: null},
+            'contacts':        {root: 'contacts',  prev: null},
+            'transfers':       {root: 'transfers', prev: null},
+            'account':         {root: 'account',   prev: null},
+            'dashboard':       {root: 'dashboard', prev: null},
+            'recents':         {root: 'recents',   prev: null},
+            'inbox':           {root: M.InboxID,   prev: null},
+            'rubbish-bin':     {root: M.RubbishID, prev: null},
+            'user-management': {root: 'user-management', prev: null},
+            'affiliate':       {root: 'affiliate', prev: null}
+        };
+    }
+
     var isMegaSyncTransfer = true;
     $('.nw-fm-left-icon').rebind('click', function(e) {
         treesearch = false;
@@ -834,23 +853,7 @@ FileManager.prototype.initFileManagerUI = function() {
         if (!clickedClass) {
             return;
         }
-        if (!fmTabState || fmTabState['cloud-drive'].root !== M.RootID) {
-            fmTabState = {
-                'cloud-drive':     {root: M.RootID,    prev: null},
-                'folder-link':     {root: M.RootID,    prev: null},
-                'shared-with-me':  {root: 'shares',    prev: null},
-                'conversations':   {root: 'chat',      prev: null},
-                'contacts':        {root: 'contacts',  prev: null},
-                'transfers':       {root: 'transfers', prev: null},
-                'account':         {root: 'account',   prev: null},
-                'dashboard':       {root: 'dashboard', prev: null},
-                'recents':         {root: 'recents',   prev: null},
-                'inbox':           {root: M.InboxID,   prev: null},
-                'rubbish-bin':     {root: M.RubbishID, prev: null},
-                'user-management': {root: 'user-management', prev: null},
-                'affiliate':       {root: 'affiliate', prev: null}
-            };
-        }
+
         if ((ul_queue && ul_queue.length) || (dl_queue && dl_queue.length)) {
             isMegaSyncTransfer = false;
         }
@@ -879,7 +882,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         var activeClass = ('' + $('.nw-fm-left-icon.active:visible')
             .attr('class')).split(" ").filter(function(c) {
-            return !!fmTabState[c];
+            return !!self.fmTabState[c];
         })[0];
 
         if ($mySelf.hasClass('contacts') && !$('.contacts-indicator', $mySelf).is('.hidden')) {
@@ -887,7 +890,7 @@ FileManager.prototype.initFileManagerUI = function() {
              return false;
         }
 
-        var activeTab = fmTabState[activeClass];
+        var activeTab = self.fmTabState[activeClass];
 
         if (activeTab) {
             if (activeTab.root === M.currentrootid || activeTab.root === 'chat' ||
@@ -928,9 +931,9 @@ FileManager.prototype.initFileManagerUI = function() {
         //     loadSubPage('fm/recents');
         // }
 
-        for (var tab in fmTabState) {
+        for (var tab in self.fmTabState) {
             if (~clickedClass.indexOf(tab)) {
-                tab = fmTabState[tab];
+                tab = self.fmTabState[tab];
 
                 var targetFolder = null;
 
@@ -1777,6 +1780,13 @@ FileManager.prototype.initContextUI = function() {
             target = M.currentrootid + '/' + target;
         }
         M.openFolder(target);
+    });
+
+    $(c + '.open-cloud-item').rebind('click', function() {
+
+        M.fmTabState['shared-with-me'].prev = M.currentdirid;
+        M.lastActiveTab = M.fmTabState['shared-with-me'].prev;
+        M.openFolder($.selected[0]);
     });
 
     $(c + '.preview-item').rebind('click', function() {

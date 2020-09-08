@@ -2840,11 +2840,14 @@ function odqPaywallDialogTexts(user_attr, accountData) {
     }
 
     var filesText = l[23253]; // 0 files
-    if (accountData.stats[M.RootID].files === 1) {
+    var totalFiles = accountData.stats[M.RootID].files +
+        (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
+        (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
+    if (totalFiles === 1) {
         filesText = l[835];
     }
-    else if (accountData.stats[M.RootID].files > 1) {
-        filesText = l[833].replace('[X]', accountData.stats[M.RootID].files);
+    else if (totalFiles > 1) {
+        filesText = l[833].replace('[X]', totalFiles);
     }
 
     dialogText = dialogText.replace('%1', user_attr.email || ' ');

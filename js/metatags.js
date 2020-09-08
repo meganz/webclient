@@ -72,6 +72,110 @@ mega.metatags = new function() {
     };
 
     /* eslint-disable complexity */
+    this.addStrucuturedData = function(type, data) {
+
+        if (!type || !data) {
+            return;
+        }
+
+        var supportedTypes = ['Product', 'SoftwareApplication', 'FAQPage', 'NewsArticle', 'Organization'];
+        if (supportedTypes.indexOf(type) === -1) {
+            return;
+        }
+
+        if (
+            !(type === 'Product' && data.offers && data.description && data.name) &&
+            !(type === 'SoftwareApplication' && data.offers && data.operatingSystem && data.name) &&
+            !(type === 'FAQPage' && data.mainEntity && Object.keys(data.mainEntity).length) &&
+            !(type === 'NewsArticle' && data.headline && data.image && data.datePublished && data.dateModified) &&
+            !(type === 'Organization' && data.url && data.logo)
+        ) {
+            return;
+        }
+
+        var prepareMetaStruct = function() {
+            var structData = document.head.querySelector('script[type="application/ld+json"]');
+            if (!structData) {
+                structData = document.createElement('script');
+                structData.setAttribute('type', 'application/ld+json');
+                document.head.appendChild(structData);
+            }
+            return structData;
+        };
+
+        var metaStruct = prepareMetaStruct();
+        if (!metaStruct) {
+            return;
+        }
+
+        var structContent = Object.create(null);
+        structContent['@context'] = 'https://schema.org/';
+        structContent['@type'] = type;
+
+        if (type === 'Product') {
+            structContent['name'] = data.name;
+            structContent['image'] = [data.image || 'https://cms2.mega.nz/b41537c0eae056cfe5ab05902fca322b.png'];
+            structContent['description'] = data.description;
+            structContent['brand'] = { '@type': 'Brand', 'name': 'MEGA' };
+            structContent['offers'] = {
+                '@type': 'Offer',
+                'url': data.offers.url || '',
+                'priceCurrency': 'EUR',
+                'price': data.offers.price
+            };
+
+        }
+        else if (type === 'SoftwareApplication') {
+            structContent['name'] = data.name;
+            structContent['operatingSystem'] = data.operatingSystem;
+            if (data.applicationCategory) {
+                structContent['applicationCategory'] = data.applicationCategory;
+            }
+            structContent['offers'] = {
+                '@type': 'Offer',
+                'priceCurrency': 'EUR',
+                'price': data.offers.price
+            };
+        }
+        else if (type === 'FAQPage') {
+            var mainE = [];
+            for (var entity in data.mainEntity) {
+                if (data.mainEntity[entity]) {
+                    var temp = {
+                        '@type': 'Question',
+                        'name': entity,
+                        'acceptedAnswer': {
+                            '@type': 'Answer',
+                            'text': data.mainEntity[entity]
+                        }
+                    };
+                    mainE.push(temp);
+                }
+            }
+            if (mainE.length) {
+                structContent['mainEntity'] = mainE;
+            }
+            else {
+                document.head.removeChild(metaStruct);
+                return;
+            }
+        }
+        else if (type === 'NewsArticle') {
+            structContent['headline'] = data.headline;
+            structContent['image'] = [data.image];
+            structContent['datePublished'] = data.datePublished;
+            structContent['dateModified'] = data.dateModified;
+        }
+        else if (type === 'Organization') {
+            structContent['url'] = data.url;
+            structContent['logo'] = data.logo;
+        }
+        else {
+            return;
+        }
+        metaStruct.textContent = JSON.stringify(structContent, null, 3);
+    };
+
     /**
      * Get Page meta tags.
      * @param {String} page     Page name
@@ -86,6 +190,10 @@ mega.metatags = new function() {
         var metaCanonical = document.head.querySelector('link[rel="canonical"]');
         if (metaCanonical) {
             document.head.removeChild(metaCanonical);
+        }
+        var metaStruct = document.head.querySelector('script[type="application/ld+json"]');
+        if (metaStruct) {
+            document.head.removeChild(metaStruct);
         }
         var image;
 
@@ -102,6 +210,15 @@ mega.metatags = new function() {
             if (page === 'uwp') {
                 addCanonical(getBaseUrl() + '/wp');
             }
+            this.addStrucuturedData('Product', {
+                name: 'MEGA App for Windows 10',
+                image: image,
+                description: mTags.mega_desc,
+                offers: {
+                    url: getBaseUrl() + '/wp',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'mobileapp' || page === 'mobile' || page === 'android' || page === 'ios') {
             mTags.mega_title = 'MEGA Mobile Apps - MEGA';
@@ -109,29 +226,79 @@ mega.metatags = new function() {
             if (page !== 'mobile') {
                 addCanonical(getBaseUrl() + '/mobile');
             }
+            this.addStrucuturedData('Product', {
+                name: 'MEGA Mobile Apps',
+                description: mTags.mega_desc,
+                offers: {
+                    url: getBaseUrl() + '/mobile',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'nas') {
             mTags.mega_title = 'MEGA on NAS - MEGA';
             mTags.mega_desc = 'A command line tool to interact with MEGA from your Network Attached Storage device.';
+            this.addStrucuturedData('Product', {
+                name: 'MEGA on NAS',
+                description: mTags.mega_desc,
+                offers: {
+                    url: getBaseUrl() + '/nas',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'sync') {
             mTags.mega_title = 'MEGA Desktop App - MEGA';
             mTags.mega_desc = 'Easy automated synchronisation between your computer and your MEGA cloud';
             image = 'https://cms2.mega.nz/0723d3ca8f856c90f39480c66b4f2646.png';
+            this.addStrucuturedData('Product', {
+                name: 'MEGA Desktop App',
+                description: mTags.mega_desc,
+                image: image,
+                offers: {
+                    url: getBaseUrl() + '/sync',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'extensions') {
             mTags.mega_title = 'Browser Extensions - MEGA';
             mTags.mega_desc = 'Reduce loading times, improve download performance, strengthen security';
             image = 'https://cms2.mega.nz/b9a5ee1bd8935e2eb8659b1b7b87f0ae.png';
+            this.addStrucuturedData('Product', {
+                name: 'MEGA Browser Extensions',
+                description: mTags.mega_desc,
+                image: image,
+                offers: {
+                    url: getBaseUrl() + '/extensions',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'bird') {
             mTags.mega_title = 'MEGAbird - MEGA';
             mTags.mega_desc = 'Send large files by email through MEGA';
+            this.addStrucuturedData('Product', {
+                name: 'MEGAbird',
+                description: mTags.mega_desc,
+                offers: {
+                    url: getBaseUrl() + '/bird',
+                    price: '0.0'
+                }
+            });
         }
         else if (page === 'cmd') {
             mTags.mega_title = 'MEGAcmd - MEGA';
             mTags.mega_desc = 'A command line tool to work with your MEGA account and files.';
             image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
+            this.addStrucuturedData('Product', {
+                name: 'MEGAcmd',
+                description: mTags.mega_desc,
+                offers: {
+                    url: getBaseUrl() + '/cmd',
+                    price: '0.0'
+                }
+            });
         }
         // else if (page === 'downloadapp') {
         //    mTags.mega_title = 'Download the MEGA App - MEGA';
@@ -230,6 +397,10 @@ mega.metatags = new function() {
             if (page === 'about') {
                 addCanonical(getBaseUrl() + '/about/main');
             }
+            this.addStrucuturedData('Organization', {
+                url: getBaseUrl(),
+                logo: 'https://cms2.mega.nz/b41537c0eae056cfe5ab05902fca322b.png',
+            });
         }
         else if (page === 'about/jobs') {
             mTags.mega_title = 'Jobs - MEGA';
@@ -261,10 +432,37 @@ mega.metatags = new function() {
             mTags.mega_title = 'Business - MEGA';
             mTags.mega_desc = 'The secure solution for your business';
             image = 'https://cms2.mega.nz/730b119f030d91dacb5dc349726e6c17.png';
+            this.addStrucuturedData('Product', {
+                name: 'MEGA for Business',
+                description: 'The secure solution for your business. '
+                    + 'With our end-to-end encryption, your data has never been safer.',
+                image: image,
+                offers: {
+                    url: getBaseUrl() + '/business',
+                    price: '10.0'
+                }
+            });
         }
         else if (page === 'registerb') {
             mTags.mega_title = 'Business Account - MEGA';
             mTags.mega_desc = 'Create Business Account';
+        }
+        else if (page === 'corporate') {
+            mTags.mega_title = 'Investors - MEGA';
+            mTags.mega_desc = 'MEGA investor relations';
+            addCanonical(getBaseUrl() + '/corporate/investors');
+        }
+        else if (page === 'corporate/investors') {
+            mTags.mega_title = 'Investors - MEGA';
+            mTags.mega_desc = 'MEGA investor relations';
+        }
+        else if (page === 'corporate/media') {
+            mTags.mega_title = 'Media - MEGA';
+            mTags.mega_desc = 'MEGA corporate media';
+        }
+        else if (page === 'corporate/shareholder-reports') {
+            mTags.mega_title = 'Shareholder Reports - MEGA';
+            mTags.mega_desc = 'MEGA shareholder reports';
         }
         else if (typeof Object(window.dlmanager).isStreaming === 'object') {
             mTags.mega_title = dlmanager.isStreaming._megaNode.name + ' - MEGA';

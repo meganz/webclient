@@ -491,7 +491,7 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     $icon.addClass(iconClass);
 
     if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
-        iconClass === 'video' && is_video(action[0]))) {
+        iconClass === 'video' && is_video(action[0]) || iconClass === 'pdf')) {
 
         $icon.addClass('thumb').safeHTML('<img>');
 
@@ -703,6 +703,8 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var mediaCounts = self._countMedia(action);
     var videos = mediaCounts.videos;
     var images = mediaCounts.images;
+    var pdfs = mediaCounts.pdfs;
+
     // Create & append new image container, fire async method to collect thumbnail.
     var renderThumb = function(i) {
         return new Promise(function (resolve) {
@@ -752,6 +754,9 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                 if (node && node.data && node.data.playtime) {
                     $newThumb.find('.video-thumb-details span').text(secondsToTimeShort(node.data.playtime));
                 }
+            }
+            else if (filetype(node) === 'PDF') {
+                $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
             }
 
             var $contextMenuHandle = $newThumb.find(".file-settings-icon");
@@ -834,41 +839,61 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var $title = $newRow.find(".file-name");
     var $titleString;
 
-    var makeTitle = function (selfString, createdByString, modifiedByString) {
+    // Ternary key based title string set. Can be extended by adding more type
+    var titleStrings = {
+        "222": [l[23871], l[23872], l[23873]],
+        "221": [l[23874], l[23875], l[23876]],
+        "220": [l[19947], l[19945], l[19946]],
+        "212": [l[23877], l[23878], l[23879]],
+        "211": [l[23882], l[23881], l[23880]],
+        "210": [l[19948], l[19949], l[19950]],
+        "202": [l[23883], l[23884], l[23885]],
+        "201": [l[23886], l[23887], l[23888]],
+        "200": [l[19960], l[19961], l[19962]],
+        "122": [l[23889], l[23891], l[23891]],
+        "121": [l[23892], l[23893], l[23894]],
+        "120": [l[19951], l[19952], l[19953]],
+        "112": [l[23895], l[23896], l[23897]],
+        "111": [l[23898], l[23899], l[23900]],
+        "110": [l[19954], l[19955], l[19956]],
+        "102": [l[23901], l[23902], l[23903]],
+        "101": [l[23904], l[23905], l[23906]],
+        "022": [l[23907], l[23908], l[23909]],
+        "021": [l[23910], l[23911], l[23912]],
+        "020": [l[19957], l[19958], l[19959]],
+        "012": [l[23913], l[23914], l[23915]],
+        "011": [l[23916], l[23917], l[23918]],
+        "002": [l[23919], l[23920], l[23921]],
+
+        // Below set should be arrived on this point.
+        // "100": [],
+        // "010": [],
+        // "001": [],
+        // "000": [],
+    };
+
+    var makeTitle = function() {
+
+        var titleTernary = '' + Math.min(images, 2) + Math.min(videos, 2) + Math.min(pdfs, 2);
+        var currentStringSet = titleStrings[titleTernary];
+
         if (isOtherUser) {
             if (isCreated) {
-                $titleString = createdByString;
+                $titleString = currentStringSet[1];
             } else {
-                $titleString = modifiedByString;
+                $titleString = currentStringSet[2];
             }
             $titleString = $titleString
                 .replace("%3", '<span class="link action-user-name"></span>')
                 .replace("[A]", '<span class="link title">')
                 .replace("[/A]", '</span>');
         } else {
-            $titleString = '<span class="link title">' + selfString + '</span>';
+            $titleString = '<span class="link title">' + currentStringSet[0] + '</span>';
         }
-        return $titleString.replace("%1", images).replace("%2", videos);
+        return $titleString.replace("%1", images).replace("%2", videos).replace('%4', pdfs);
     };
 
-    if (images > 1 && videos > 1) {
-        $titleString = makeTitle(l[19947], l[19945], l[19946]);
-    }
-    else if (images > 1 && videos === 1) {
-        $titleString = makeTitle(l[19948], l[19949], l[19950]);
-    }
-    else if (images === 1 && videos > 1) {
-        $titleString = makeTitle(l[19951], l[19952], l[19953]);
-    }
-    else if (images === 1 && videos === 1) {
-        $titleString = makeTitle(l[19954], l[19955], l[19956]);
-    }
-    else if (images > 0) {
-        $titleString = makeTitle(l[19960], l[19961], l[19962]);
-    }
-    else if (videos > 0) {
-        $titleString = makeTitle(l[19957], l[19958], l[19959]);
-    }
+    $titleString = makeTitle();
     $title.safeHTML($titleString);
 
     // Attach title click to open folder.
@@ -886,8 +911,19 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     if (images === 0) {
         $frontIcon.removeClass("image").addClass("video");
     }
-    if (videos > 0) {
+
+    if (videos === 0) {
+        $frontIcon.removeClass('video').addClass('pdf');
+    }
+    else {
         $rearIcon.removeClass("image").addClass("video");
+    }
+
+    if (pdfs === 0) {
+        $frontIcon.removeClass('pdf').addClass('image');
+    }
+    else {
+        $rearIcon.removeClass("image").addClass("pdf");
     }
 
     // Attach resize listener to the image block.
@@ -965,7 +1001,8 @@ RecentsRender.prototype._countMedia = function(action) {
     'use strict';
     var counts = {
         images: 0,
-        videos: 0
+        videos: 0,
+        pdfs: 0
     };
 
     for (var idx = action.length; idx--;) {
@@ -975,7 +1012,10 @@ RecentsRender.prototype._countMedia = function(action) {
             counts.videos++;
         }
         else if (is_image3(n)) {
-            counts.images += 1;
+            counts.images++;
+        }
+        else if (filetype(n) === 'PDF') {
+            counts.pdfs++;
         }
         else if (d) {
             console.warn('What is this?...', n);

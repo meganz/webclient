@@ -9,6 +9,7 @@ var Help = (function() {
     var focus;
     var allTags = [];
     var titles = [];
+    var structIdx = [];
     var $window = $(window);
     var $currentQuestion = null;
 
@@ -618,6 +619,9 @@ var Help = (function() {
                     helpScrollTo($currentQuestion);
                 }, 400);
             }
+            if (args.length === 2) {
+                mega.metatags.addStrucuturedData('FAQPage', { mainEntity: structIdx[args[0]][args[1]] });
+            }
         },
         'welcome': function welcome() {
             parsepage(Data.help_index.html);
@@ -745,6 +749,14 @@ var Help = (function() {
 
     ns.loadfromCMS = function(callback)
     {
+        var addToStructIndex = function(client, section, question, body) {
+            structIdx[client] = structIdx[client] || Object.create(null);
+            structIdx[client][section] = structIdx[client][section] || Object.create(null);
+            if (!structIdx[client][section][question]) {
+                structIdx[client][section][question] = body;
+            }
+        };
+
         CMS.index('help_' + lang, function(err, blobs)
         {
             if (err) {
@@ -766,6 +778,7 @@ var Help = (function() {
                 if (urlParts.length === 3) {
                     var qu = urlParts.pop();
                     cleanID = urlParts.join('/') + '#' + qu;
+                    addToStructIndex(urlParts[0], urlParts[1], entry.title, entry.body);
                 }
                 entry.url = 'help/client/' + cleanID;
                 entry.id = cleanID;

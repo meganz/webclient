@@ -18,7 +18,7 @@ var accountinputs = {
         var $loginForm = $formWrapper.find('form');
         var $inputs = $('input',  $formWrapper);
         var $checkbox = $('.account.checkbox-block input, .pw-remind.checkbox-block input', $loginForm);
-        var $button = $loginForm.find('.button');
+        var $button = $('.button', $loginForm).addClass('disabled');
         var $tooltip  = $loginForm.find('.account.input-tooltip');
 
         var megaInputs = new mega.ui.MegaInputs($inputs);
@@ -73,6 +73,7 @@ var accountinputs = {
         });
 
         $('.radio-txt, .checkbox', $formWrapper).rebind('click.commonevent', function(e) {
+
             var $wrapper = $(this).parent().find('.checkbox');
 
             $wrapper.parent().removeClass('focused');
@@ -82,6 +83,13 @@ var accountinputs = {
             }
             else {
                 $wrapper .addClass('checkboxOn').removeClass('checkboxOff');
+            }
+
+            if ($('.checkboxOn', $formWrapper).length === $checkbox.length) {
+                $button.removeClass('disabled');
+            }
+            else {
+                $button.addClass('disabled');
             }
         });
 

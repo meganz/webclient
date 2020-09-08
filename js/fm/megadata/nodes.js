@@ -2883,7 +2883,7 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
             for (var i = 0; i < nodes.length; i++) {
                 var n = new MegaNode(nodes[i]);
                 var actionType = n.tvf ? "updated" : "added";
-                var blockType = (is_image3(n) || is_video(n) === 1) ? 'media' : 'files';
+                var blockType = is_image2(n) || is_video(n) === 1 ? 'media' : 'files';
                 index[n.u] = index[n.u] || Object.create(null);
                 index[n.u][n.p] = index[n.u][n.p] || Object.create(null);
                 index[n.u][n.p][actionType] = index[n.u][n.p][actionType] || Object.create(null);

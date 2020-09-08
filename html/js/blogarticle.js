@@ -99,6 +99,17 @@ function render_blogarticle() {
     if (!m && !is_mobile) {
         blog_archive();
     }
+    var pubDate = blogposts[i].t ? new Date(blogposts[i].t * 1000) : new Date();
+    mega.metatags.addStrucuturedData(
+        'NewsArticle',
+        {
+            headline: btitle,
+            image: blogposts[i].attaches.bimg ? CMS.img3(blogposts[i].attaches.bimg) :
+                'https://cms2.mega.nz/b41537c0eae056cfe5ab05902fca322b.png',
+            datePublished: pubDate,
+            dateModified: pubDate
+        }
+    );
 
     api_req({ a: 'log', e: 99801, m: blogid});
 }

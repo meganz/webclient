@@ -71,11 +71,13 @@ mobile.register = {
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
         var $registerButton = this.$registerScreen.find('.register-button');
+        var $tncBlock = $('.confirm-terms', this.$registerScreen);
+        var $tncCheckbox = $('input', $tncBlock);
         var $allFields = $firstNameField.add($lastNameField).add($emailField)
                             .add($passwordField).add($confirmPasswordField);
 
         // Add keyup event to the input fields
-        $allFields.rebind('keyup.registerbuttoncheck', function(event) {
+        var registerButtonCheck = function(event) {
 
             var firstName = $firstNameField.val();
             var lastName = $lastNameField.val();
@@ -90,7 +92,7 @@ mobile.register = {
 
             // Change the button to red to enable it if they have entered something in all the fields
             if (firstName.length > 0 && lastName.length > 0 && email.length > 0 &&
-                    password.length > 0 && confirmPassword.length > 0 &&
+                    password.length > 0 && confirmPassword.length > 0 && $tncCheckbox[0].checked === true &&
                     !$emailField.parent().hasClass('incorrect')) {
 
                 // Activate the register button
@@ -105,7 +107,10 @@ mobile.register = {
                 // Grey it out if they have not completed one of the fields
                 $registerButton.removeClass('active');
             }
-        });
+        };
+
+        $allFields.rebind('keyup.registerbuttoncheck', registerButtonCheck);
+        $tncBlock.rebind('tap.registerbuttoncheck', registerButtonCheck);
     },
 
     /**
@@ -152,6 +157,7 @@ mobile.register = {
         var $passwordField = this.$registerScreen.find('.password input');
         var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
         var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
+        var $tncCheckbox = $('.confirm-terms input', this.$registerScreen);
         var $registerButton = this.$registerScreen.find('.register-button');
         var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
         var registerInfo = this.registerInfo;
@@ -168,7 +174,7 @@ mobile.register = {
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
-                    password.length < 1 || confirmPassword.length < 1) {
+                    password.length < 1 || confirmPassword.length < 1 || $tncCheckbox[0].checked === false) {
 
                 return false;
             }

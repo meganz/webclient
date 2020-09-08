@@ -2854,15 +2854,35 @@ function odqPaywallDialogTexts(user_attr, accountData) {
     dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used))
         .replace('%5', filesText);
 
+    // In here, it's guaranteed that we have pro.membershipPlans,
+    // but we will check for error free logic in case of changes
+    var minPlanId = -1;
     var neededPro = 4;
-    if (user_attr.p) {
-        neededPro = user_attr.p + 1;
-        if (neededPro === 3) {
-            neededPro = 100;
+    if (pro.membershipPlans && pro.membershipPlans.length) {
+        var spaceUsedGB = accountData.space_used / 1073741824; // = 1024*1024*1024
+        var minPlan = 9000000;
+        for (var h = 0; h < pro.membershipPlans.length; h++) {
+            if (pro.membershipPlans[h][4] === 1 && pro.membershipPlans[h][2] > spaceUsedGB &&
+                pro.membershipPlans[h][2] < minPlan) {
+                minPlan = pro.membershipPlans[h][2];
+                minPlanId = pro.membershipPlans[h][1];
+            }
         }
-        else if (neededPro === 5) {
-            neededPro = 1;
+    }
+    if (minPlanId === -1) {
+        // weirdly, we dont have plans loaded, or no plan matched the storage.
+        if (user_attr.p) {
+            neededPro = user_attr.p + 1;
+            if (neededPro === 3) {
+                neededPro = 100;
+            }
+            else if (neededPro === 5) {
+                neededPro = 1;
+            }
         }
+    }
+    else {
+        neededPro = minPlanId;
     }
 
     dialogText = dialogText.replace('%7', pro.getProPlanName(neededPro));

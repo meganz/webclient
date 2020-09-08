@@ -419,6 +419,9 @@
         img2: function insecureImageLoading(id) {
             return this.getUrl() + "/unsigned/" + id;
         },
+        img3: function insecureImageLoading(id) {
+            return this.getUrlShort() + "/unsigned/" + id;
+        },
 
         img: function(id) {
             if (!assets[id]) {
@@ -494,6 +497,9 @@
 
         getUrl: function() {
             return localStorage.cms || "https://cms2.mega.nz/";
+        },
+        getUrlShort: function() {
+            return localStorage.cms || "https://cms2.mega.nz";
         },
 
         on: function(id, callback)

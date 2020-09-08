@@ -3633,7 +3633,7 @@
         font-size: 16px;
     }
     #help2-main .support-article-info li strong, #help2-main .support-article-info p strong {
-        font-size: 16px;
+        font-size: 13px;
         line-height: 26px;
         font-family: 'source_sans_prosemibold';
     }
@@ -3946,7 +3946,7 @@
         margin-bottom: 20px;
     }
     #help2-main .support-article-info li strong {
-        font-size: 16px;
+        font-size: 13px;
         color: #444;
         line-height: 26px;
         margin-bottom: 18px;

@@ -402,11 +402,15 @@ function init_register() {
     });
 
     $button.rebind('click.initregister', function() {
+
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
         pageregister();
     });
 
     $button.rebind('keydown.initregister', function (e) {
-        if (e.keyCode === 13) {
+        if (e.keyCode === 13 && !$(this).hasClass('disabled')) {
             pageregister();
         }
     });

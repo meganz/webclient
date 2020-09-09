@@ -287,7 +287,7 @@ const SoonFcWrap = (milliseconds, local) => {
   };
 };
 const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
-let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = logcall(), _dec4 = SoonFcWrap(80, true), _dec5 = SoonFcWrap(350, true), (_class = class extends react2.a.Component {
+let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = logcall(), _dec4 = SoonFcWrap(80, true), _dec5 = SoonFcWrap(350, true), (_class = class MegaRenderMixin extends react2.a.Component {
   constructor(props) {
     super(props);
     lazy(this, '__internalReactID', function () {
@@ -3768,7 +3768,7 @@ var _dec, _dec2, _class, _class2, _temp;
 var React = __webpack_require__(0);
 
 
-let PerfectScrollbar = (_dec = Object(_stores_mixins_js1__["SoonFcWrap"])(30, true), _dec2 = Object(_stores_mixins_js1__["SoonFcWrap"])(30, true), (_class = (_temp = _class2 = class extends _stores_mixins_js1__["MegaRenderMixin"] {
+let PerfectScrollbar = (_dec = Object(_stores_mixins_js1__["SoonFcWrap"])(30, true), _dec2 = Object(_stores_mixins_js1__["SoonFcWrap"])(30, true), (_class = (_temp = _class2 = class PerfectScrollbar extends _stores_mixins_js1__["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.isUserScroll = true;
@@ -4455,7 +4455,7 @@ __webpack_require__.r(__webpack_exports__);
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, "JoinCallNotification", function() { return conversationpanel_JoinCallNotification; });
 __webpack_require__.d(__webpack_exports__, "ConversationRightArea", function() { return conversationpanel_ConversationRightArea; });
-__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return ConversationPanel; });
+__webpack_require__.d(__webpack_exports__, "ConversationPanel", function() { return conversationpanel_ConversationPanel; });
 __webpack_require__.d(__webpack_exports__, "ConversationPanels", function() { return conversationpanel_ConversationPanels; });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/applyDecoratedDescriptor.js
@@ -6564,7 +6564,7 @@ var typingArea_ReactDOM = __webpack_require__(5);
 
 
 
-let TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Object(mixins["SoonFcWrap"])(54, true), (_class = (_temp = _class2 = class extends mixins["MegaRenderMixin"] {
+let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Object(mixins["SoonFcWrap"])(54, true), (_class = (_temp = _class2 = class TypingArea extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     var initialText = this.props.initialText;
@@ -9483,7 +9483,7 @@ class text_Text extends abstractGenericMessage_AbstractGenericMessage {
     if (isBeingEdited() === true) {
       let msgContents = message.textContents;
       msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
-      messageDisplayBlock = external_React_default.a.createElement(TypingArea, {
+      messageDisplayBlock = external_React_default.a.createElement(typingArea_TypingArea, {
         iconClass: "small-icon writing-pen textarea-icon",
         initialText: msgContents,
         chatRoom: chatRoom,
@@ -10411,7 +10411,7 @@ class sharedFilesAccordionPanel_SharedFileItem extends mixins["MegaRenderMixin"]
 
 }
 
-let SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = class extends mixins["MegaRenderMixin"] {
+let sharedFilesAccordionPanel_SharedFilesAccordionPanel = (sharedFilesAccordionPanel_dec = utils["default"].SoonFcWrap(350), (sharedFilesAccordionPanel_class = class SharedFilesAccordionPanel extends mixins["MegaRenderMixin"] {
   eventuallyRenderThumbnails() {
     if (this.allShownNodes) {
       var pending = [];
@@ -12610,7 +12610,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
       }
     }, external_React_default.a.createElement("i", {
       className: "small-icon rounded-stop colorized"
-    }), external_React_default.a.createElement("span", null, l[148])) : null)), external_React_default.a.createElement(SharedFilesAccordionPanel, {
+    }), external_React_default.a.createElement("span", null, l[148])) : null)), external_React_default.a.createElement(sharedFilesAccordionPanel_SharedFilesAccordionPanel, {
       key: "sharedFiles",
       title: l[19796] ? l[19796] : "Shared Files",
       chatRoom: room,
@@ -12626,7 +12626,7 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class extends mixins["MegaRenderMixin"] {
+let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.state = {
@@ -14028,7 +14028,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       className: "chat-textarea-block"
     }, external_React_default.a.createElement(whosTyping_WhosTyping, {
       chatRoom: room
-    }), external_React_default.a.createElement(TypingArea, {
+    }), external_React_default.a.createElement(typingArea_TypingArea, {
       chatRoom: self.props.chatRoom,
       className: "main-typing-area",
       disabled: room.isReadOnly(),
@@ -14131,7 +14131,7 @@ class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
     var conversations = [];
     megaChat.chats.forEach(function (chatRoom) {
       if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 900000) {
-        conversations.push(external_React_default.a.createElement(ConversationPanel, {
+        conversations.push(external_React_default.a.createElement(conversationpanel_ConversationPanel, {
           chatUIFlags: self.props.chatUIFlags,
           isExpanded: chatRoom.megaChat.chatUIFlags['convPanelCollapse'],
           chatRoom: chatRoom,
@@ -14986,7 +14986,7 @@ var getRoomName = function (chatRoom) {
   return chatRoom.getRoomTitle();
 };
 
-let ConversationsListItem = (_dec = utils["default"].SoonFcWrap(40, true), _dec2 = Object(mixins["timing"])(0.7, 8), (_class = class extends mixins["MegaRenderMixin"] {
+let conversations_ConversationsListItem = (_dec = utils["default"].SoonFcWrap(40, true), _dec2 = Object(mixins["timing"])(0.7, 8), (_class = class ConversationsListItem extends mixins["MegaRenderMixin"] {
   isLoading() {
     const mb = this.props.chatRoom.messagesBuff;
 
@@ -15490,7 +15490,7 @@ class conversations_ConversationsList extends mixins["MegaRenderMixin"] {
         }
       }
 
-      currConvsList.push(React.createElement(ConversationsListItem, {
+      currConvsList.push(React.createElement(conversations_ConversationsListItem, {
         key: chatRoom.roomId,
         chatRoom: chatRoom,
         contact: contact,
@@ -15713,7 +15713,7 @@ class conversations_ArchivedConversationsList extends mixins["MegaRenderMixin"] 
 
 }
 
-let ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class2 = class extends mixins["MegaRenderMixin"] {
+let conversations_ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class2 = class ConversationsApp extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
     this.state = {
@@ -16132,7 +16132,7 @@ if (false) {}
 var conversations = __webpack_exports__["default"] = ({
   ConversationsList: conversations_ConversationsList,
   ArchivedConversationsList: conversations_ArchivedConversationsList,
-  ConversationsApp: ConversationsApp
+  ConversationsApp: conversations_ConversationsApp
 });
 
 /***/ }),

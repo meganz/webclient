@@ -2299,7 +2299,7 @@ MegaDexie.create = function(name, binary) {
 };
 
 // Remove obsolete databases.
-mBroadcaster.once('startMega', function _removeObsoleteDatabases() {
+mBroadcaster.once('startMega', tryCatch(function _removeObsoleteDatabases() {
     'use strict';
 
     if (Date.now() > 163e10) {
@@ -2328,7 +2328,7 @@ mBroadcaster.once('startMega', function _removeObsoleteDatabases() {
     for (var i = entries.length; i--;) {
         delete localStorage[entries[i]];
     }
-});
+}, false));
 
 // --------------------------------------------------------------------------
 // --------------------------------------------------------------------------

@@ -5,7 +5,8 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     var reuseData = (account.lastupdate > Date.now() - 10000) && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
-        if (d) {
+        // @todo we probably want to fix this properly, not filing bogus data in `stats` when invoked outside the fm
+        if (d > !!M.account.stats.undefined) {
             console.error('Track down how we get here...', M.RootID, account.stats && Object.keys(account.stats));
         }
         reuseData = false;

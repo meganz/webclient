@@ -219,7 +219,7 @@ var SelectionManager = function($selectable, resume) {
 
             var self = this;
             delay('selectionManager:add:' + M.currentdirid, function() {
-                var selectionSize = 0;
+                var selectionSize = false;
 
                 for (var i = self.selected_list.length; i--;) {
                     var n = self.selected_list[i];
@@ -255,7 +255,7 @@ var SelectionManager = function($selectable, resume) {
                     });
                 }
 
-                if (selectionSize) {
+                if (selectionSize !== false) {
                     self.selectionNotification(selectionSize);
                 }
             }, -1);

@@ -361,6 +361,12 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     $userNameContainer
         .removeClass("hidden")
         .text(M.getNameByHandle(action.user))
+
+    if (!user.h) {
+        // unknown/deleted contact, no business here...
+        return;
+    }
+    $userNameContainer
         .attr('id', user.h)
         .rebind("contextmenu", function(e) {
             self.markSelected($userNameContainer, $newRow);

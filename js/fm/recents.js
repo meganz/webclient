@@ -761,7 +761,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
                     $newThumb.find('.video-thumb-details span').text(secondsToTimeShort(node.data.playtime));
                 }
             }
-            else if (filetype(node) === 'PDF') {
+            else if (fileIcon(node) === 'pdf') {
                 $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
             }
 
@@ -1020,7 +1020,7 @@ RecentsRender.prototype._countMedia = function(action) {
         else if (is_image3(n)) {
             counts.images++;
         }
-        else if (filetype(n) === 'PDF') {
+        else if (fileIcon(n) === 'pdf') {
             counts.pdfs++;
         }
         else if (d) {

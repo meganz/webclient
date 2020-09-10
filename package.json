@@ -29,12 +29,11 @@
     "encryption"
   ],
   "browserslist": [
-    "Chrome > 44",
-    "Firefox > 28",
-    "Safari > 10",
-    "Opera > 47",
-    "Edge > 12",
-    "IE 11"
+    "Chrome > 57",
+    "Firefox > 53",
+    "Safari > 10.1",
+    "Opera > 54",
+    "Edge > 78"
   ],
   "author": "Mega Limited",
   "license": "proprietary",

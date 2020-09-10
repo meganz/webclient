@@ -7,6 +7,29 @@ var entryPoints = [
 
 const path = require('path');
 
+var BABEL_LOADER_OPTIONS = {
+    plugins: [
+        '@babel/plugin-transform-runtime',
+        'babel-plugin-minify-constant-folding',
+        'babel-plugin-minify-guarded-expressions',
+        ['babel-plugin-minify-dead-code-elimination', {
+            'keepFnName': true,
+            'keepClassName': true
+        }],
+        ['babel-plugin-transform-react-remove-prop-types', {
+            'classNameMatchers': ['Contact', 'Avatar', 'Mega']
+        }]
+    ],
+    presets: [
+        ['@babel/preset-env',  {
+            "loose": true,
+            "exclude": ["@babel/plugin-transform-typeof-symbol"]
+        }],
+        '@babel/preset-react'
+    ],
+    comments: false
+};
+
 
 var webpackConfigs = {
     dev: {
@@ -51,10 +74,7 @@ var webpackConfigs = {
                         'react-hot-loader/webpack',
                         {
                             loader: 'babel-loader',
-                            options: {
-                                presets: ['@babel/preset-react', '@babel/preset-env'],
-                                // plugins: ['react-hot-loader/babel'],
-                            }
+                            options: BABEL_LOADER_OPTIONS
                         }
                     ]
                 },
@@ -91,33 +111,7 @@ var webpackConfigs = {
                     use: [
                         {
                             loader: 'babel-loader',
-                            options: {
-                                plugins: [
-                                    '@babel/plugin-transform-runtime',
-                                    'babel-plugin-minify-constant-folding',
-                                    'babel-plugin-minify-guarded-expressions',
-                                    ['babel-plugin-minify-dead-code-elimination',
-                                        {
-                                            'keepFnName': true
-                                        }
-                                    ],
-                                    ['babel-plugin-transform-react-remove-prop-types',
-                                        {
-                                            'classNameMatchers': ['Contact', 'Avatar', 'Mega']
-                                        }
-                                    ]
-                                ],
-                                presets: [
-                                    ['@babel/preset-env',
-                                        {
-                                            "loose": true,
-                                            "exclude": ["@babel/plugin-transform-typeof-symbol"]
-                                        }
-                                    ],
-                                    '@babel/preset-react'
-                                ],
-                                comments: false
-                            }
+                            options: BABEL_LOADER_OPTIONS
                         }
                     ]
                 },

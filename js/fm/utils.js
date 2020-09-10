@@ -1303,6 +1303,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
     if (M.currentrootid === M.RubbishID
+        || String(id).indexOf('search/') > -1
         || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
         return;
     }

@@ -313,6 +313,8 @@ pro.proplan = {
         var zeroPrice;
         var classType = 1;
         var $countryLocale = getCountryAndLocales();
+        var decimalSeparator = 1.1.toLocaleString($countryLocale.locales).substring(1, 2);
+
 
         var setPriceFont = function _setPriceFunction(_pageType,
                                                       _monthlyBasePriceDollars,
@@ -436,7 +438,7 @@ pro.proplan = {
                 }
 
                 // Calculate the monthly base price
-                var monthlyBasePriceParts = monthlyBasePrice.split('.');
+                var monthlyBasePriceParts = monthlyBasePrice.split(decimalSeparator);
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
 
@@ -480,7 +482,7 @@ pro.proplan = {
                 }
                 else {
                     $priceDollars.text(monthlyBasePriceDollars);
-                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                    $priceCents.text(decimalSeparator + monthlyBasePriceCents + ' ' +
                         monthlyBasePriceCurrencySign);
                 }
 

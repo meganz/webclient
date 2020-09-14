@@ -2301,14 +2301,14 @@ function dbfetchfm() {
             r = r.map(function(n) {
                 return n.h;
             });
-            return dbfetch.geta(r).catch(dump.bind(null, 'ps.fail'));
+            return dbfetch.geta(r);
         },
         puf: function _(r) {
             mega.megadrop.pufProcessDb(r);
             r = r.map(function(n) {
                 return n.h;
             });
-            return dbfetch.geta(r).catch(dump.bind(null, 'puf.fail'));
+            return dbfetch.geta(r);
         },
         suba: process_suba,
         pup: mega.megadrop.pupProcessDb,
@@ -2383,6 +2383,12 @@ function dbfetchfm() {
                 }
             }
             mega.loadReport.pn4 = Date.now() - mega.loadReport.stepTimeStamp;
+
+            if (promises.length) {
+                // handle all outbound shares through a single promise.
+                // if an ENOENT happens, this won't halt the process...
+                promises = [MegaPromise.allDone(promises)];
+            }
 
             for (var j = 0, it = Object.keys(tables); j < it.length; ++j) {
                 var t = it[j];
@@ -2973,6 +2979,10 @@ function processPH(publicHandles) {
         // Update the public link icon for mobile
         if (is_mobile) {
             mobile.cloud.updateLinkStatus(nodeId);
+        }
+
+        if (fminitialized && M.recentsRender) {
+            M.recentsRender.nodeChanged(nodeId);
         }
     }
 }

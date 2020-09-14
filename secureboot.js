@@ -5,8 +5,6 @@ var m;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
-var maintenance = false;
-var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
 var storageQuotaError = false;
@@ -935,6 +933,20 @@ var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){
 function addScript(data) {
     "use strict";
     return mCreateElement('script', {type: 'text/javascript'}, 'head', data);
+}
+
+function scriptTest(data, callback) {
+    'use strict';
+    var feat = addScript([data]);
+    var load = feat.onload;
+    feat.onload = function() {
+        if (load) {
+            setTimeout(load);
+        }
+        callback(false);
+        this.parentNode.removeChild(this);
+    };
+    feat.onerror = callback;
 }
 
 function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
@@ -1960,6 +1972,11 @@ else if (!browserUpdate) {
                     .trim();
             }
             if (__cdumps.length > 3) return false;
+
+            if (url && ln < 2) {
+                console.debug([errobj || msg]);
+                return;
+            }
 
             var expectedSourceOrigin = url || ln > 10;
             if (url === '@srvlog') {
@@ -3374,9 +3391,19 @@ else if (!browserUpdate) {
             mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
         });
 
-        if (!maintenance && !androidsplash && !is_karma) {
-            jsl_start();
-        }
+        scriptTest(
+            'const f=async ()=>{}; es6s =' +
+            ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
+            ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
+            ' && f[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
+            function(error) {
+                if (error || !window.es6s) {
+                    document.location = (is_extension ? '' : '/') + 'update.html';
+                    return;
+                }
+                jsl_start();
+            });
     };
     function jsl_load(xhri)
     {

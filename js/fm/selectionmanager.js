@@ -30,6 +30,11 @@ var SelectionManager = function($selectable, resume) {
             return n.p ? M.currentdirid + "_" + n.p : n.h;
         };
     }
+    else if (M.currentdirid === "contacts") {
+        idMapper = function(u) {
+            return u.u;
+        };
+    }
 
     /**
      * Store all selected items in an _ordered_ array.
@@ -209,7 +214,7 @@ var SelectionManager = function($selectable, resume) {
                 nodeId = nodeId.h;
             }
             else if (d) {
-                console.error(".add_to_selection received a non-string as nodeId");
+                console.error(".add_to_selection received a non-string as nodeId", nodeId);
                 return;
             }
         }
@@ -219,7 +224,7 @@ var SelectionManager = function($selectable, resume) {
 
             var self = this;
             delay('selectionManager:add:' + M.currentdirid, function() {
-                var selectionSize = 0;
+                var selectionSize = false;
 
                 for (var i = self.selected_list.length; i--;) {
                     var n = self.selected_list[i];
@@ -255,7 +260,7 @@ var SelectionManager = function($selectable, resume) {
                     });
                 }
 
-                if (selectionSize) {
+                if (selectionSize !== false) {
                     self.selectionNotification(selectionSize);
                 }
             }, -1);
@@ -299,14 +304,22 @@ var SelectionManager = function($selectable, resume) {
         $.selected = this.selected_list = M.v.map(idMapper);
 
         var container = this._ensure_selectable_is_available().get(0);
-        var nodeList = container.querySelectorAll('.megaListItem');
+        var nodeList = container && container.querySelectorAll('.megaListItem') || false;
 
-        for (var i = nodeList.length; i--;) {
-            nodeList[i].classList.add('ui-selected');
+        if (nodeList.length) {
+            for (var i = nodeList.length; i--;) {
+                nodeList[i].classList.add('ui-selected');
+            }
+            this.set_currently_selected(nodeList.length && nodeList[0].id);
         }
-        this.set_currently_selected(nodeList.length && nodeList[0].id);
+        else if (this.selected_list.length) {
+            // Not under a MegaList-powered view
+            self.add_to_selection(this.selected_list.pop(), false, true);
+        }
 
-        this.selectionNotification(M.d[M.currentdirid].tb);
+        if (M.d[M.currentdirid]) {
+            this.selectionNotification(M.d[M.currentdirid].tb);
+        }
     };
 
     this.select_next = function(shiftKey, scrollTo) {

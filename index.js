@@ -130,7 +130,10 @@ function topMenu(close) {
         $topMenuIcon.addClass('active');
         $topMenu.removeClass('hidden');
 
-        topMenuDataUpdate();
+        if (u_type) {
+            $('.top-menu-logged .loader', $topMenu).addClass('loading');
+            M.getStorageQuota().then(topMenuDataUpdate).catch(dump);
+        }
 
         if (!is_mobile) {
             topMenuScroll();
@@ -156,32 +159,13 @@ function topMenu(close) {
 }
 
 /* Update used storage info*/
-function topMenuDataUpdate() {
+function topMenuDataUpdate(data) {
     'use strict';
-
-    if (!u_type) {
-        return false;
-    }
-
-    var $storageBlock = $('.top-menu-logged', '.top-menu-popup');
     var storageHtml;
-    var space_used;
-    var space;
-    var perc;
-
-    if (typeof M.account.space_used === 'undefined') {
-        $('.loader', $storageBlock).addClass('loading');
-
-        M.accountData(function() {
-            topMenuDataUpdate();
-        });
-        return false;
-    }
-
-    space_used = bytesToSize(M.account.space_used);
-    space = bytesToSize(M.account.space);
-    perc = Math.round(M.account.space_used / M.account.space * 100);
-    $storageBlock.removeClass('going-out exceeded');
+    var $storageBlock = $('.top-menu-logged', '.top-menu-popup').removeClass('going-out exceeded');
+    var space_used = bytesToSize(data.used);
+    var space = bytesToSize(data.max);
+    var perc = data.percent;
 
     if (perc >= 100) {
         $storageBlock.addClass('exceeded');

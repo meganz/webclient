@@ -312,9 +312,12 @@ pro.proplan = {
         var oneLocalPriceFound = false;
         var zeroPrice;
         var classType = 1;
-        var $countryLocale = getCountryAndLocales();
-        var decimalSeparator = 1.1.toLocaleString($countryLocale.locales).substring(1, 2);
-
+        var intl = typeof Intl !== 'undefined'
+            && Intl.NumberFormat
+            && new Intl.NumberFormat(
+                getCountryAndLocales().locales,
+                {minimumFractionDigits: 2}
+            );
 
         var setPriceFont = function _setPriceFunction(_pageType,
                                                       _monthlyBasePriceDollars,
@@ -403,11 +406,8 @@ pro.proplan = {
                     $euroPrice.removeClass('hidden');
                     $currncyAbbrev.removeClass('hidden');
                     $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-                    $euroPrice.text(
-                        $countryLocale.locales ?
-                            parseFloat(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE])
-                                .toLocaleString($countryLocale.locales) + ' ' + euroSign :
-                            currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] + ' ' + euroSign
+                    $euroPrice.text(intl.format(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE])  +
+                        ' ' + euroSign
                     );
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE].toString();
@@ -425,10 +425,7 @@ pro.proplan = {
                     $euroPrice.addClass('hidden');
                     $currncyAbbrev.addClass('hidden');
                     // Calculate the monthly base price
-                    monthlyBasePrice = $countryLocale.locales ?
-                        parseFloat(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE])
-                            .toLocaleString($countryLocale.locales)
-                        : currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE];
+                    monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE].toString();
                     monthlyBasePriceCurrencySign = euroSign;
 
                     if (pageType === "D") {
@@ -438,7 +435,8 @@ pro.proplan = {
                 }
 
                 // Calculate the monthly base price
-                var monthlyBasePriceParts = monthlyBasePrice.split(decimalSeparator);
+                var decimalSeparator = intl.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
+                var monthlyBasePriceParts = intl.format(monthlyBasePrice).split(decimalSeparator);
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
 

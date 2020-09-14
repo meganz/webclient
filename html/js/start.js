@@ -6,7 +6,7 @@ function init_start() {
     var carouselInterval;
     var sliderInterval;
     var swipeInterval = 5000;
-    var $countryLocale = getCountryAndLocales();
+    var intl = mega.intlNumberFormat;
     var dropboxPrice = 4.9;
     var megaPrice = 1.56;
     var gdrivePrice = 4.9;
@@ -72,20 +72,11 @@ function init_start() {
         $('.mid-green-link.refer', $page).removeClass('hidden');
     }
 
-    $('.dropbox span', $page).text(
-        $countryLocale.locales ?
-            dropboxPrice.toLocaleString($countryLocale.locales) : dropboxPrice
-    );
+    $('.dropbox span', $page).text(intl.format(dropboxPrice));
 
-    $('.mega span', $page).text(
-        $countryLocale.locales ?
-            megaPrice.toLocaleString($countryLocale.locales) : megaPrice
-    );
+    $('.mega span', $page).text(intl.format(megaPrice));
 
-    $('.gdrive span', $page).text(
-        $countryLocale.locales ?
-            gdrivePrice.toLocaleString($countryLocale.locales) : gdrivePrice
-    );
+    $('.gdrive span', $page).text(intl.format(gdrivePrice));
 
     /**
      * detectSwipe

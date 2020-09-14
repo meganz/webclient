@@ -210,15 +210,6 @@ mega.metatags = new function() {
             if (page === 'uwp') {
                 addCanonical(getBaseUrl() + '/wp');
             }
-            this.addStrucuturedData('Product', {
-                name: 'MEGA App for Windows 10',
-                image: image,
-                description: mTags.mega_desc,
-                offers: {
-                    url: getBaseUrl() + '/wp',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'mobileapp' || page === 'mobile' || page === 'android' || page === 'ios') {
             mTags.mega_title = 'MEGA Mobile Apps - MEGA';
@@ -226,84 +217,30 @@ mega.metatags = new function() {
             if (page !== 'mobile') {
                 addCanonical(getBaseUrl() + '/mobile');
             }
-            this.addStrucuturedData('Product', {
-                name: 'MEGA Mobile Apps',
-                description: mTags.mega_desc,
-                offers: {
-                    url: getBaseUrl() + '/mobile',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'nas') {
             mTags.mega_title = 'MEGA on NAS - MEGA';
             mTags.mega_desc = 'A command line tool to interact with MEGA from your Network Attached Storage device.';
-            this.addStrucuturedData('Product', {
-                name: 'MEGA on NAS',
-                description: mTags.mega_desc,
-                offers: {
-                    url: getBaseUrl() + '/nas',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'sync') {
             mTags.mega_title = 'MEGA Desktop App - MEGA';
             mTags.mega_desc = 'Easy automated synchronisation between your computer and your MEGA cloud';
             image = 'https://cms2.mega.nz/0723d3ca8f856c90f39480c66b4f2646.png';
-            this.addStrucuturedData('Product', {
-                name: 'MEGA Desktop App',
-                description: mTags.mega_desc,
-                image: image,
-                offers: {
-                    url: getBaseUrl() + '/sync',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'extensions') {
             mTags.mega_title = 'Browser Extensions - MEGA';
             mTags.mega_desc = 'Reduce loading times, improve download performance, strengthen security';
             image = 'https://cms2.mega.nz/b9a5ee1bd8935e2eb8659b1b7b87f0ae.png';
-            this.addStrucuturedData('Product', {
-                name: 'MEGA Browser Extensions',
-                description: mTags.mega_desc,
-                image: image,
-                offers: {
-                    url: getBaseUrl() + '/extensions',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'bird') {
             mTags.mega_title = 'MEGAbird - MEGA';
             mTags.mega_desc = 'Send large files by email through MEGA';
-            this.addStrucuturedData('Product', {
-                name: 'MEGAbird',
-                description: mTags.mega_desc,
-                offers: {
-                    url: getBaseUrl() + '/bird',
-                    price: '0.0'
-                }
-            });
         }
         else if (page === 'cmd') {
             mTags.mega_title = 'MEGAcmd - MEGA';
             mTags.mega_desc = 'A command line tool to work with your MEGA account and files.';
             image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
-            this.addStrucuturedData('Product', {
-                name: 'MEGAcmd',
-                description: mTags.mega_desc,
-                offers: {
-                    url: getBaseUrl() + '/cmd',
-                    price: '0.0'
-                }
-            });
         }
-        // else if (page === 'downloadapp') {
-        //    mTags.mega_title = 'Download the MEGA App - MEGA';
-        //    mTags.mega_desc = 'You\'re nearly there, download our desktop app to get started!';
-        // }
         else if (page === 'pro') {
             mTags.mega_title = 'Plans & pricing - MEGA';
             mTags.mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
@@ -432,16 +369,6 @@ mega.metatags = new function() {
             mTags.mega_title = 'Business - MEGA';
             mTags.mega_desc = 'The secure solution for your business';
             image = 'https://cms2.mega.nz/730b119f030d91dacb5dc349726e6c17.png';
-            this.addStrucuturedData('Product', {
-                name: 'MEGA for Business',
-                description: 'The secure solution for your business. '
-                    + 'With our end-to-end encryption, your data has never been safer.',
-                image: image,
-                offers: {
-                    url: getBaseUrl() + '/business',
-                    price: '10.0'
-                }
-            });
         }
         else if (page === 'registerb') {
             mTags.mega_title = 'Business Account - MEGA';

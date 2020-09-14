@@ -13085,13 +13085,11 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     chatRoom.rebind('onHistoryDecrypted.cp', function () {
       self.eventuallyUpdate();
     });
-    this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(function () {
-      Soon(function () {
-        if (self.isComponentEventuallyVisible()) {
-          $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
-        }
-      });
-    });
+    this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(SoonFc(function () {
+      if (self.isComponentEventuallyVisible()) {
+        $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+      }
+    }));
   }
 
   componentWillUnmount() {

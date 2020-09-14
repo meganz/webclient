@@ -312,12 +312,7 @@ pro.proplan = {
         var oneLocalPriceFound = false;
         var zeroPrice;
         var classType = 1;
-        var intl = typeof Intl !== 'undefined'
-            && Intl.NumberFormat
-            && new Intl.NumberFormat(
-                getCountryAndLocales().locales,
-                {minimumFractionDigits: 2}
-            );
+        var intl = mega.intlNumberFormat;
 
         var setPriceFont = function _setPriceFunction(_pageType,
                                                       _monthlyBasePriceDollars,

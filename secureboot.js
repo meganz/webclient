@@ -2241,7 +2241,7 @@ else if (!browserUpdate) {
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_bot && locationSearchParams !== '') {
+        if ((is_bot || sessionStorage.botSim ) && locationSearchParams !== '') {
             userLangs = locationSearchParams.replace('?', '');
         }
         else {

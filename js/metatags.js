@@ -198,13 +198,14 @@ mega.metatags = new function() {
         var image;
 
         if (page === 'refer') {
-            mTags.mega_title = 'MEGA Referral Program - MEGA';
-            mTags.mega_desc = 'Earn 20% of the revenue from each purchase made by a user you have referred to MEGA';
+            mTags.mega_title = l[23963] || 'MEGA Referral Program - MEGA';
+            mTags.mega_desc = l[22712] ||
+                'Earn 20% of the revenue from each purchase made by a user you have referred to MEGA';
             image = 'https://cms2.mega.nz/07834c8d2b3b05bc352966fe02fe597b.png';
         }
         else if (page === 'uwp' || page === 'wp') {
-            mTags.mega_title = 'MEGA App for Windows 10 - MEGA';
-            mTags.mega_desc = 'Your files, wherever you are, whenever you need them - '
+            mTags.mega_title = l[23964] || 'MEGA App for Windows 10 - MEGA';
+            mTags.mega_desc = l[19663] || 'Your files, wherever you are, whenever you need them - '
                 + 'across all your Windows 10 devices';
             image = 'https://cms2.mega.nz/3f16d936a620162a88f5442b3742f5e0.png';
             if (page === 'uwp') {
@@ -212,124 +213,125 @@ mega.metatags = new function() {
             }
         }
         else if (page === 'mobileapp' || page === 'mobile' || page === 'android' || page === 'ios') {
-            mTags.mega_title = 'MEGA Mobile Apps - MEGA';
-            mTags.mega_desc = 'Securely manage your files and collaborate with everyone from anywhere.';
+            mTags.mega_title = l[23965] || 'MEGA Mobile Apps - MEGA';
+            mTags.mega_desc = l[19683] || 'Securely manage your files and collaborate with everyone from anywhere.';
             if (page !== 'mobile') {
                 addCanonical(getBaseUrl() + '/mobile');
             }
         }
         else if (page === 'nas') {
-            mTags.mega_title = 'MEGA on NAS - MEGA';
-            mTags.mega_desc = 'A command line tool to interact with MEGA from your Network Attached Storage device.';
+            mTags.mega_title = l[23966] || 'MEGA on NAS - MEGA';
+            mTags.mega_desc = l[23331] ||
+                'A command line tool to interact with MEGA from your Network Attached Storage device.';
         }
         else if (page === 'sync') {
-            mTags.mega_title = 'MEGA Desktop App - MEGA';
-            mTags.mega_desc = 'Easy automated synchronisation between your computer and your MEGA cloud';
+            mTags.mega_title = l[23967] || 'MEGA Desktop App - MEGA';
+            mTags.mega_desc = l[16580] || 'Easy automated synchronisation between your computer and your MEGA cloud';
             image = 'https://cms2.mega.nz/0723d3ca8f856c90f39480c66b4f2646.png';
         }
         else if (page === 'extensions') {
-            mTags.mega_title = 'Browser Extensions - MEGA';
-            mTags.mega_desc = 'Reduce loading times, improve download performance, strengthen security';
+            mTags.mega_title = l[23968] || 'Browser Extensions - MEGA';
+            mTags.mega_desc = l[20921] || 'Reduce loading times, improve download performance, strengthen security';
             image = 'https://cms2.mega.nz/b9a5ee1bd8935e2eb8659b1b7b87f0ae.png';
         }
         else if (page === 'bird') {
-            mTags.mega_title = 'MEGAbird - MEGA';
-            mTags.mega_desc = 'Send large files by email through MEGA';
+            mTags.mega_title = l[23969] || 'MEGAbird - MEGA';
+            mTags.mega_desc = l[20931] || 'Send large files by email through MEGA';
         }
         else if (page === 'cmd') {
-            mTags.mega_title = 'MEGAcmd - MEGA';
-            mTags.mega_desc = 'A command line tool to work with your MEGA account and files.';
+            mTags.mega_title = l[23970] || 'MEGAcmd - MEGA';
+            mTags.mega_desc = l[18775] || 'A command line tool to work with your MEGA account and files.';
             image = 'https://cms2.mega.nz/75bc1e26149f8962b723a42205434feb.png';
         }
         else if (page === 'pro') {
-            mTags.mega_title = 'Plans & pricing - MEGA';
-            mTags.mega_desc = 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
+            mTags.mega_title = l[23971] || 'Plans & pricing - MEGA';
+            mTags.mega_desc = l[23972] || 'Upgrade to a MEGA PRO account for additional storage and transfer quota. '
                 + 'MEGA provides one of the cheapest cloud storage deals on the Internet.';
             image = 'https://cms2.mega.nz/559d084a50ad7283acb6f1c433136952.png';
         }
         else if (page === 'register') {
-            mTags.mega_title = 'Register - MEGA';
-            mTags.mega_desc = 'Create your MEGA account and get up to 50 GB free!';
+            mTags.mega_title = l[23973] || 'Register - MEGA';
+            mTags.mega_desc = l[23974] || 'Create your MEGA account and get up to 50 GB free!';
         }
         else if (page === 'login') {
-            mTags.mega_title = 'Login - MEGA';
-            mTags.mega_desc = 'Login to your MEGA account.';
+            mTags.mega_title = l[23975] || 'Login - MEGA';
+            mTags.mega_desc = [1768] || 'Login to your MEGA account';
         }
         else if (page === 'recovery') {
-            mTags.mega_title = 'Recovery - MEGA';
-            mTags.mega_desc = 'Forgot your MEGA password? Start your recovery process here.';
+            mTags.mega_title = l[23976] || 'Recovery - MEGA';
+            mTags.mega_desc = l[23977] || 'Forgot your MEGA password? Start your recovery process here.';
         }
         else if (page === 'terms') {
-            mTags.mega_title = 'Terms of Service - MEGA';
-            mTags.mega_desc = 'MEGA LIMITED TERMS OF SERVICE ("TERMS")';
+            mTags.mega_title = l[23978] || 'Terms of Service - MEGA';
+            mTags.mega_desc = l[23979] || 'MEGA LIMITED TERMS OF SERVICE ("TERMS")';
         }
         else if (page === 'privacy') {
-            mTags.mega_title = 'Privacy Policy - MEGA';
-            mTags.mega_desc = 'Mega Limited Privacy and Data Policy';
+            mTags.mega_title = l[23980] || 'Privacy Policy - MEGA';
+            mTags.mega_desc = l[23981] || 'Mega Limited Privacy and Data Policy';
         }
         else if (page === 'gdpr') {
-            mTags.mega_title = 'GDPR - MEGA';
-            mTags.mega_desc = 'General Data Protection Regulation Disclosure';
+            mTags.mega_title = l[23982] || 'GDPR - MEGA';
+            mTags.mega_desc = l[18421] || 'General Data Protection Regulation Disclosure';
         }
         else if (page === 'copyright') {
-            mTags.mega_title = 'Copyright - MEGA';
-            mTags.mega_desc = 'Copyright. Notice of Alleged Infringement "Notice"';
+            mTags.mega_title = l[23983] || 'Copyright - MEGA';
+            mTags.mega_desc = l[23984] || 'Copyright. Notice of Alleged Infringement "Notice"';
         }
         else if (page === 'copyrightnotice') {
-            mTags.mega_title = 'Copyright Notice - MEGA';
-            mTags.mega_desc = 'Copyright. Notice of Alleged Infringement "Notice"';
+            mTags.mega_title = l[23985] || 'Copyright Notice - MEGA';
+            mTags.mega_desc = l[23986] || 'Copyright. Notice of Alleged Infringement "Notice" submit';
         }
         else if (page === 'disputenotice') {
-            mTags.mega_title = 'Copyright Counter-Notification - MEGA';
-            mTags.mega_desc = 'Copyright Counter-Notification';
+            mTags.mega_title = l[23987] || 'Copyright Counter-Notification - MEGA';
+            mTags.mega_desc = l[8789] || 'Copyright Counter-Notification';
         }
         else if (page === 'takedown') {
-            mTags.mega_title = 'Takedown Guidance - MEGA';
-            mTags.mega_desc = 'Guidance on Requesting User Information or "Takedown" of User Data';
+            mTags.mega_title = l[23988] || 'Takedown Guidance - MEGA';
+            mTags.mega_desc = l[23989] || 'Guidance on Requesting User Information or "Takedown" of User Data';
         }
         else if (page === 'contact') {
-            mTags.mega_title = 'Contact Us - MEGA';
-            mTags.mega_desc = 'Contact MEGA';
+            mTags.mega_title = l[23990] || 'Contact Us - MEGA';
+            mTags.mega_desc = l[23991] || 'Contact MEGA';
         }
         else if (page === 'resellers') {
-            mTags.mega_title = 'Resellers - MEGA';
-            mTags.mega_desc = 'You can conveniently purchase your MEGA PRO membership from one of our '
+            mTags.mega_title = l[23992] || 'Resellers - MEGA';
+            mTags.mega_desc = l[23993] || 'You can conveniently purchase your MEGA PRO membership from one of our '
                 + 'authorized resellers.';
         }
         else if (page === 'security') {
-            mTags.mega_title = 'Security - MEGA';
-            mTags.mega_desc = 'Security and why it matters';
+            mTags.mega_title = l[23994] || 'Security - MEGA';
+            mTags.mega_desc = l[20004] || 'Security and why it matters';
             image = 'https://cms2.mega.nz/c964ddb7dd27f1acd727747862787486.png';
         }
         else if (page === 'privacycompany') {
-            mTags.mega_title = 'Privacy Company - MEGA';
-            mTags.mega_desc = 'MEGA is Cloud Storage with Powerful Always-On Privacy.';
+            mTags.mega_title = l[23995] || 'Privacy Company - MEGA';
+            mTags.mega_desc = l[676] || 'MEGA is Cloud Storage with Powerful Always-On Privacy.';
         }
         else if (page === 'dev' || page === 'developers') {
-            mTags.mega_title = 'MEGA Software Development Kit - MEGA';
-            mTags.mega_desc = 'Developers - MEGA Software Development Kit';
+            mTags.mega_title = l[23996] || 'MEGA Software Development Kit - MEGA';
+            mTags.mega_desc = l[23997] || 'Developers - MEGA Software Development Kit';
             if (page === 'developers') {
                 addCanonical(getBaseUrl() + '/dev');
             }
         }
         else if (page === 'doc') {
-            mTags.mega_title = 'Documentation - MEGA';
-            mTags.mega_desc = 'Developers - Documentation';
+            mTags.mega_title = l[23998] || 'Documentation - MEGA';
+            mTags.mega_desc = l[23999] || 'Developers - Documentation';
         }
         else if (page === 'sdk') {
-            mTags.mega_title = 'SDK - MEGA';
-            mTags.mega_desc = 'MEGA SDK for C++, providing essential abstraction to your application\'s '
+            mTags.mega_title = l[24000] || 'SDK - MEGA';
+            mTags.mega_desc = l[24001] || 'MEGA SDK for C++, providing essential abstraction to your application\'s '
                 + 'secure cloud storage access.';
         }
         else if (page === 'sdkterms') {
-            mTags.mega_title = 'SDK Terms of Service - MEGA';
-            mTags.mega_desc = 'In addition to MEGA\'s Terms of Service and Privacy Policy, which are '
+            mTags.mega_title = l[24002] || 'SDK Terms of Service - MEGA';
+            mTags.mega_desc = l[24003] || 'In addition to MEGA\'s Terms of Service and Privacy Policy, which are '
                 + 'incorporated by reference into these terms, these terms apply to applications to '
                 + 'use, and all subsequent use of, MEGA\'s API and SDK.';
         }
         else if (page === 'about/main' || page === 'about') {
-            mTags.mega_title = 'About - MEGA';
-            mTags.mega_desc = 'MEGA - The Privacy Company';
+            mTags.mega_title = l[24004] || 'About - MEGA';
+            mTags.mega_desc = l[23065] || 'MEGA - The Privacy Company';
             image = 'https://cms2.mega.nz/0fcca13fc3baaf74cd6bdc51850c19c3.png';
             if (page === 'about') {
                 addCanonical(getBaseUrl() + '/about/main');
@@ -340,56 +342,56 @@ mega.metatags = new function() {
             });
         }
         else if (page === 'about/jobs') {
-            mTags.mega_title = 'Jobs - MEGA';
-            mTags.mega_desc = 'MEGA career opportunities start right here!';
+            mTags.mega_title = l[24005] || 'Jobs - MEGA';
+            mTags.mega_desc = l[23082] || 'MEGA career opportunities start right here!';
             image = 'https://cms2.mega.nz/659cd40a308f29a025c2d3b42944a0c9.png';
         }
         else if (page === 'about/privacy') {
-            mTags.mega_title = 'Privacy - MEGA';
-            mTags.mega_desc = 'MEGA is the Privacy Company';
+            mTags.mega_title = l[24006] || 'Privacy - MEGA';
+            mTags.mega_desc = l[23115] || 'MEGA is the Privacy Company';
             image = 'https://cms2.mega.nz/753f59a51ed56feda0644a1be74c1671.png';
         }
         else if (page === 'about/reliability') {
-            mTags.mega_title = 'Reliability - MEGA';
-            mTags.mega_desc = 'MEGA\'s mission is not limited to just keeping your valuable data private: '
-                + 'safeguarding it is equally important to us.';
+            mTags.mega_title = l[24007] || 'Reliability - MEGA';
+            mTags.mega_desc = l[23122] || 'MEGA\'s mission is not limited to just keeping your valuable data private:'
+                + ' safeguarding it is equally important to us.';
             image = 'https://cms2.mega.nz/f1d60e5822b4d755de9be2d0441b9a3b.png';
         }
         else if (page === 'sourcecode') {
-            mTags.mega_title = 'Source Code - MEGA';
-            mTags.mega_desc = 'Source Code Transparency';
+            mTags.mega_title = l[24008] || 'Source Code - MEGA';
+            mTags.mega_desc = l[8438] || 'Source Code Transparency';
             image = 'https://cms2.mega.nz/147ddec6fa35a6084030513d1ccd2eed.png';
         }
         else if (page === 'credits') {
-            mTags.mega_title = 'Credits - MEGA';
-            mTags.mega_desc = 'MEGA would like to thank the authors of the following open source components '
-                + 'that contributed essential functionality to our site.';
+            mTags.mega_title = l[24009] || 'Credits - MEGA';
+            mTags.mega_desc = l[24010] || 'MEGA would like to thank the authors of the following open source '
+                + 'components that contributed essential functionality to our site.';
         }
         else if (page === 'business') {
-            mTags.mega_title = 'Business - MEGA';
-            mTags.mega_desc = 'The secure solution for your business';
+            mTags.mega_title = l[24011] || 'Business - MEGA';
+            mTags.mega_desc = l[19531] || 'The secure solution for your business';
             image = 'https://cms2.mega.nz/730b119f030d91dacb5dc349726e6c17.png';
         }
         else if (page === 'registerb') {
-            mTags.mega_title = 'Business Account - MEGA';
-            mTags.mega_desc = 'Create Business Account';
+            mTags.mega_title = l[24012] || 'Business Account - MEGA';
+            mTags.mega_desc = l[19517] || 'Create Business Account';
         }
         else if (page === 'corporate') {
-            mTags.mega_title = 'Investors - MEGA';
-            mTags.mega_desc = 'MEGA investor relations';
+            mTags.mega_title = l[24013] || 'Investors - MEGA';
+            mTags.mega_desc = l[24014] || 'MEGA investor relations';
             addCanonical(getBaseUrl() + '/corporate/investors');
         }
         else if (page === 'corporate/investors') {
-            mTags.mega_title = 'Investors - MEGA';
-            mTags.mega_desc = 'MEGA investor relations';
+            mTags.mega_title = l[24013] || 'Investors - MEGA';
+            mTags.mega_desc = l[24014] || 'MEGA investor relations';
         }
         else if (page === 'corporate/media') {
-            mTags.mega_title = 'Media - MEGA';
-            mTags.mega_desc = 'MEGA corporate media';
+            mTags.mega_title = l[24015] || 'Media - MEGA';
+            mTags.mega_desc = l[24016] || 'MEGA corporate media';
         }
         else if (page === 'corporate/shareholder-reports') {
-            mTags.mega_title = 'Shareholder Reports - MEGA';
-            mTags.mega_desc = 'MEGA shareholder reports';
+            mTags.mega_title = l[24017] || 'Shareholder Reports - MEGA';
+            mTags.mega_desc = l[24018] || 'MEGA shareholder reports';
         }
         else if (typeof Object(window.dlmanager).isStreaming === 'object') {
             mTags.mega_title = dlmanager.isStreaming._megaNode.name + ' - MEGA';
@@ -435,8 +437,8 @@ mega.metatags = new function() {
             stopBots(metaRobots);
         }
         else if (page === 'blog') {
-            mTags.mega_title = 'Blog - MEGA';
-            mTags.mega_desc = 'MEGA\'s Blog';
+            mTags.mega_title = l[24019] || 'Blog - MEGA';
+            mTags.mega_desc = l[24020] || 'MEGA\'s Blog';
             if (blogmonth || blogsearch) {
                 stopBots(metaRobots, true);
             }
@@ -469,8 +471,8 @@ mega.metatags = new function() {
             }
         }
         else if (page === 'help') {
-            mTags.mega_title = 'Help - MEGA';
-            mTags.mega_desc = 'MEGA\'s Help Centre';
+            mTags.mega_title = l[24021] || 'Help - MEGA';
+            mTags.mega_desc = l[24022] || 'MEGA\'s Help Centre';
         }
         else if (page.indexOf('help/') > -1 && page.length > 5) {
             var linkParts = page.split('/');
@@ -479,8 +481,10 @@ mega.metatags = new function() {
             }
             else if (linkParts.length === 3) {
                 var sectionTitle = (linkParts[2].charAt(0).toUpperCase() + linkParts[2].slice(1)).replace(/-/g, ' ');
-                mTags.mega_title = sectionTitle + ' Help - MEGA';
-                mTags.mega_desc = 'MEGA\'s ' + sectionTitle + ' Help Centre';
+                mTags.mega_title = (l[24027] ? l[24027].replace('$1', sectionTitle) : '') ||
+                    sectionTitle + ' Help - MEGA';
+                mTags.mega_desc = (l[24028] ? l[24028].replace('$1', sectionTitle) : '') ||
+                    'MEGA\'s ' + sectionTitle + ' Help Centre';
             }
             else if (linkParts.length === 4) {
                 var secTitle = (linkParts[2].charAt(0).toUpperCase() + linkParts[2].slice(1)).replace(/-/g, ' ');
@@ -490,8 +494,10 @@ mega.metatags = new function() {
                     articleTitle = articleTitle.substring(0, hashPos);
                 }
                 articleTitle = articleTitle.replace(/-/g, ' ');
-                mTags.mega_title = articleTitle + ' - ' + secTitle + ' Help - MEGA';
-                mTags.mega_desc = 'MEGA\'s ' + secTitle + ' - Help Centre - ' + articleTitle;
+                mTags.mega_title = (l[24033] ? l[24033].replace('$1', articleTitle).replace('$2', secTitle) : '') ||
+                    articleTitle + ' - ' + secTitle + ' Help - MEGA';
+                mTags.mega_desc = (l[24034] ? l[24034].replace('$1', secTitle).replace('$2', articleTitle) : '') ||
+                    'MEGA\'s ' + secTitle + ' - Help Centre - ' + articleTitle;
             }
             else {
                 stopBots(metaRobots);
@@ -512,7 +518,7 @@ mega.metatags = new function() {
             stopBots(metaRobots);
         }
         if (!mTags.mega_desc) {
-            mTags.mega_desc = mega.whoami;
+            mTags.mega_desc = l[24023] || mega.whoami;
             if (!isPageExcluded(page) && !is_fm() && !is_extension) {
                 if (d) {
                     console.error('A page without Description. Please handle. Page: ' + page);

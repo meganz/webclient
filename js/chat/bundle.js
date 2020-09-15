@@ -18004,12 +18004,39 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
 
   return new MegaPromise(function (resolve, reject) {
     var promises = [];
+    var folderNodes = [];
+    var fileNodes = [];
 
     var attachNodes = function (roomId) {
       return new MegaPromise(function (resolve, reject) {
         self.smartOpenChat(roomId).then(function (room) {
-          room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
+          room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
         }).catch(function (ex) {
+          if (d) {
+            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+          }
+
+          reject(ex);
+        });
+      });
+    };
+
+    var attachFolders = roomId => {
+      return new MegaPromise((resolve, reject) => {
+        var createPublicLink = (nodeId, room) => {
+          M.createPublicLink(nodeId).then(({
+            link
+          }) => {
+            room.sendMessage(link);
+            resolve(room);
+          }).catch(reject);
+        };
+
+        self.smartOpenChat(roomId).then(room => {
+          for (var i = folderNodes.length; i--;) {
+            createPublicLink(folderNodes[i], room);
+          }
+        }).catch(ex => {
           if (d) {
             self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
           }
@@ -18023,36 +18050,58 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
       targets = [targets];
     }
 
-    for (var i = targets.length; i--;) {
-      promises.push(attachNodes(targets[i]));
+    for (var i = nodes.length; i--;) {
+      if (M.d[nodes[i]].t) {
+        folderNodes.push(nodes[i]);
+      } else {
+        fileNodes.push(nodes[i]);
+      }
     }
 
-    MegaPromise.allDone(promises).unpack(function (result) {
-      var room;
+    var _afterMDcheck = () => {
+      for (var i = targets.length; i--;) {
+        if (fileNodes.length > 0) {
+          promises.push(attachNodes(targets[i]));
+        }
 
-      for (var i = result.length; i--;) {
-        if (result[i] instanceof ChatRoom) {
-          room = result[i];
-          break;
+        if (folderNodes.length > 0) {
+          promises.push(attachFolders(targets[i]));
         }
       }
 
-      if (room) {
-        showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-        var roomUrl = room.getRoomUrl().replace("fm/", "");
-        M.openFolder(roomUrl).always(resolve);
-      } else {
+      MegaPromise.allDone(promises).unpack(function (result) {
+        var room;
+
+        for (var i = result.length; i--;) {
+          if (result[i] instanceof ChatRoom) {
+            room = result[i];
+            break;
+          }
+        }
+
+        if (room) {
+          showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+          var roomUrl = room.getRoomUrl().replace("fm/", "");
+          M.openFolder(roomUrl).always(resolve);
+        } else {
+          if (d) {
+            self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+          }
+
+          reject(result);
+        }
+
         if (d) {
-          self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+          console.groupEnd();
         }
+      });
+    };
 
-        reject(result);
-      }
-
-      if (d) {
-        console.groupEnd();
-      }
-    });
+    if (mega.megadrop.isDropExist(folderNodes).length) {
+      mega.megadrop.showRemoveWarning(folderNodes).then(_afterMDcheck);
+    } else {
+      _afterMDcheck();
+    }
   });
 };
 

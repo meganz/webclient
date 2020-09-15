@@ -1776,29 +1776,14 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            attribCache.getItem(contactHandle + "_uge")
-            .done(function(email) {
-                addContact(u_attr.email, email);
-            })
-            .fail(function() {
-                asyncApiReq({
-                    'a': 'uge',
-                    'u': contactHandle
+            M.syncContactEmail(contactHandle, new MegaPromise())
+                .then(function(email) {
+                    addContact(u_attr.email, email);
                 })
-                .done(function(email) {
-                    if (isValidEmail(email) && isString(email)) {
-                        attribCache.setItem(contactHandle + "_uge", email);
-                        addContact(u_attr.email, email);
-                    }
-                    else {
-                        localStorage.removeItem('addContact');
-                    }
-                })
-                .fail(function(e) {
-                    console.error(e);
+                .catch(function(ex) {
+                    console.error(ex);
                     localStorage.removeItem('addContact');
                 });
-            });
         }
     } else if (is_fm()) {
         var id = false;

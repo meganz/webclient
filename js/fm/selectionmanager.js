@@ -223,7 +223,7 @@ var SelectionManager = function($selectable, resume) {
             this.selected_list.push(nodeId);
 
             var self = this;
-            delay('selectionManager:add:' + M.currentdirid, function() {
+            var dlps = function() {
                 var selectionSize = false;
 
                 for (var i = self.selected_list.length; i--;) {
@@ -263,7 +263,15 @@ var SelectionManager = function($selectable, resume) {
                 if (selectionSize !== false) {
                     self.selectionNotification(selectionSize);
                 }
-            }, -1);
+            };
+
+            if (scrollTo === EROLLEDBACK) {
+                scrollTo = true;
+                delay('selectionManager:add:' + M.currentdirid, dlps, -1);
+            }
+            else {
+                dlps();
+            }
         }
         $.selected = this.selected_list;
         if (debugMode) {
@@ -655,7 +663,7 @@ var SelectionManager = function($selectable, resume) {
             }
             else {
                 // trick: add once so that delay() is invoked, then replace the internal list
-                this.add_to_selection(nodeList[0], true);
+                this.add_to_selection(nodeList[0], EROLLEDBACK);
                 $.selected = this.selected_list = nodeList;
             }
         }

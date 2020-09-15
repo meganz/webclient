@@ -82,10 +82,6 @@ function mouseMoveEntropy(e) {
             asmCrypto.random.seed(bioSeed);
             saveRandSeed();
         }
-
-        if (typeof arkanoid_entropy !== 'undefined') {
-            arkanoid_entropy();
-        }
     }
 
     if (!mouseApiRetryT || mouseApiRetryT < lastactive) {
@@ -124,6 +120,7 @@ function eventsEnd() {
 // Start collection of entropy.
 
 function eventsCollect() {
+    'use strict';
     if (!d) {
         asmCrypto.random.skipSystemRNGWarning = true;
     }
@@ -133,6 +130,13 @@ function eventsCollect() {
             console.log("Initially seeding PRNG with a stored seed");
         }
         asmCrypto.random.seed(asmCrypto.string_to_bytes(base64urldecode(localStorage.randseed)));
+    }
+
+    if (mega.getRandomValues.strong) {
+        if (d > 1) {
+            console.log("Initially seeding PRNG with strong random values");
+        }
+        asmCrypto.random.seed(mega.getRandomValues(384));
     }
 
     if ((document.implementation.hasFeature("Events", "2.0"))

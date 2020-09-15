@@ -217,8 +217,8 @@ function rand(n) {
  * @param {Function} callBack   optional callback function to be called.
  *                              if not specified the standard set_RSA will be called
  */
-function crypto_rsagenkey(callBack) {
-    var $promise = new MegaPromise();
+var crypto_rsagenkey = promisify(function _crypto_rsagenkey(resolve, reject, aSetRSA) {
+    'use strict';
     var logger = MegaLogger.getLogger('crypt');
 
     var startTime = new Date();
@@ -239,15 +239,14 @@ function crypto_rsagenkey(callBack) {
         };
     }
     else {
-        var w = new Worker('keygen.js');
+        var w = new Worker((is_extension ? '' : '/') + 'keygen.js');
 
         w.onmessage = function (e) {
             w.terminate();
             _done(e.data);
         };
 
-        var workerSeed = new Uint8Array(256);
-        asmCrypto.getRandomValues(workerSeed);
+        var workerSeed = mega.getRandomValues(256);
 
         w.postMessage([2048, 257, workerSeed]);
     }
@@ -258,20 +257,14 @@ function crypto_rsagenkey(callBack) {
                      + (endTime.getTime() - startTime.getTime()) / 1000.0
             + " seconds!");
 
-        if (callBack && typeof callBack === 'function') {
-            callBack(k);
-            $promise.resolve(); // release the promise
+        if (aSetRSA === false) {
+            resolve(k);
         }
         else {
-            u_setrsa(k)
-                .done(function () {
-                    $promise.resolve(k);
-                });
+            u_setrsa(k).then(resolve).catch(dump);
         }
     }
-
-    return $promise;
-}
+});
 
 function ApiQueue() { // double storage
     'use strict';

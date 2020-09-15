@@ -621,7 +621,7 @@ BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, pass
         }
         return null;
     }
-    
+
 };
 
 /**
@@ -1029,7 +1029,7 @@ BusinessAccount.prototype.getInvoiceDetails = function (invoiceID, forceUpdate) 
                 mega.buinsessAccount.invoicesDetailsList = mega.buinsessAccount.invoicesDetailsList
                     || Object.create(null);
                 res.timestamp = currTime;
-                
+
                 mega.buinsessAccount.invoicesDetailsList[invoiceID] = res;
                 operationPromise.resolve(1, res); // invoice detail
             }
@@ -1258,8 +1258,8 @@ BusinessAccount.prototype.setMasterUserAttributes =
         }
         else {
             var businessKey = mySelf.creatBusinessAccountMasterKey();
-            var generateRSA = crypto_rsagenkey(
-                function(businessRSA) {
+            crypto_rsagenkey(false)
+                .then(function(businessRSA) {
 
                     request_upb.k = a32_to_base64(encrypt_key(u_k_aes, businessKey));
                     request_upb.pubk = base64urlencode(crypto_encodepubkey(businessRSA));

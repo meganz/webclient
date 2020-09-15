@@ -80,6 +80,33 @@ if (!String.prototype.endsWith) {
     };
 }
 
+mBroadcaster.once('startMega', tryCatch(function() {
+    'use strict';
+
+    // FIXME: this is a silly polyfill for our exact needs atm..
+    if (window.Intl && !Intl.NumberFormat.prototype.formatToParts) {
+        Intl.NumberFormat.prototype.formatToParts = function(n) {
+            var result;
+
+            tryCatch(function() {
+                result = Number(n).toLocaleString(getCountryAndLocales().locales).match(/(\d+)(\D)(\d+)/);
+            }, function() {
+                result = Number(n).toLocaleString().match(/(\d+)(\D)(\d+)/);
+            })();
+
+            if (!result || result.length !== 4) {
+                result = [NaN, NaN, '.', NaN];
+            }
+
+            return [
+                {type: "integer", value: result[1]},
+                {type: "decimal", value: result[2]},
+                {type: "fraction", value: result[3]}
+            ];
+        };
+    }
+}, false));
+
 mBroadcaster.once('startMega', function() {
     "use strict";
 

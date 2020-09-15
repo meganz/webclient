@@ -312,6 +312,7 @@ pro.proplan = {
         var oneLocalPriceFound = false;
         var zeroPrice;
         var classType = 1;
+        var intl = mega.intlNumberFormat;
 
         var setPriceFont = function _setPriceFunction(_pageType,
                                                       _monthlyBasePriceDollars,
@@ -400,8 +401,9 @@ pro.proplan = {
                     $euroPrice.removeClass('hidden');
                     $currncyAbbrev.removeClass('hidden');
                     $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-                    $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] +
-                        ' ' + euroSign);
+                    $euroPrice.text(intl.format(currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE])  +
+                        ' ' + euroSign
+                    );
                     // Calculate the monthly base price in local currency
                     monthlyBasePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE].toString();
 
@@ -428,7 +430,8 @@ pro.proplan = {
                 }
 
                 // Calculate the monthly base price
-                var monthlyBasePriceParts = monthlyBasePrice.split('.');
+                var decimalSeparator = intl.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
+                var monthlyBasePriceParts = intl.format(monthlyBasePrice).split(decimalSeparator);
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
 
@@ -472,7 +475,7 @@ pro.proplan = {
                 }
                 else {
                     $priceDollars.text(monthlyBasePriceDollars);
-                    $priceCents.text('.' + monthlyBasePriceCents + ' ' +
+                    $priceCents.text(decimalSeparator + monthlyBasePriceCents + ' ' +
                         monthlyBasePriceCurrencySign);
                 }
 
@@ -689,7 +692,7 @@ pro.proplan = {
 
                 // Store next plan
                 pro.proplan.nextPlan = data.nextplan;
-                
+
                 var $nextPlan = $plansBlock.find('[data-payment="' + pro.proplan.nextPlan.p + '"]');
 
                 $nextPlan.addClass('next').find('.plan-time').text(time2date(pro.proplan.nextPlan.t, 2));

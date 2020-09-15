@@ -1058,7 +1058,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue))
                 .forEach(function(n) {
                     // skip contacts and invalid data.
-                    if (!n.h || n.h.length === 11) {
+                    if (!n.h || n.h.length === 11 || n.fv) {
                         return;
                     }
                     if (self.props.customFilterFn && !self.props.customFilterFn(n)) {

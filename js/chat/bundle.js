@@ -5433,7 +5433,7 @@ class cloudBrowserModalDialog_CloudBrowserDialog extends mixins["MegaRenderMixin
 
     if (self.state.currentlyViewedEntry === "search" && self.state.searchValue && self.state.searchValue.length >= 3) {
       M.getFilterBy(M.getFilterBySearchFn(self.state.searchValue)).forEach(function (n) {
-        if (!n.h || n.h.length === 11) {
+        if (!n.h || n.h.length === 11 || n.fv) {
           return;
         }
 

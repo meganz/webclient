@@ -5,8 +5,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     var reuseData = (account.lastupdate > Date.now() - 10000) && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
-        // @todo we probably want to fix this properly, not filing bogus data in `stats` when invoked outside the fm
-        if (d > !!M.account.stats.undefined) {
+        if (d) {
             console.error('Track down how we get here...', M.RootID, account.stats && Object.keys(account.stats));
         }
         reuseData = false;
@@ -19,6 +18,11 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         var uqres = false;
         var pstatus = Object(window.u_attr).p;
         var mRootID = M.RootID;
+
+        if (!window.fminitialized) {
+            console.warn('You should not use this function outside the fm...');
+        }
+        console.assert(mRootID, 'I told you...');
 
         if (blockui) {
             loadingDialog.show();

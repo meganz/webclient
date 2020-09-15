@@ -16,6 +16,7 @@
     "plugins": [
         "compat",
         "dollar-sign",
+        "es",
         "jquery",
         "local-rules",
         "no-unsanitized",
@@ -162,10 +163,10 @@
         "es/no-trailing-function-commas": 2,
         // es2020
         "es/no-dynamic-import": 2,
-        "es/no-export-ns-from": 2,
+        //"es/no-export-ns-from": 2,
         "es/no-global-this": 2,
-        "es/no-import-meta": 2,
-        "es/no-nullish-coalescing-operators": 2,
+        //"es/no-import-meta": 2,
+        //"es/no-nullish-coalescing-operators": 2,
 
         "jquery/no-ajax": 2,
         "jquery/no-deferred": 2,

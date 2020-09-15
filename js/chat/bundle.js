@@ -16164,6 +16164,11 @@ __webpack_require__(21);
 
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
+const LOAD_ORIGINALS = {
+  'image/gif': 2e6,
+  'image/png': 2e5,
+  'image/webp': 2e5
+};
 var megaChatInstanceId = 0;
 var CHATUIFLAGS_MAPPING = {
   'convPanelCollapse': 'cPC'
@@ -17526,6 +17531,7 @@ Chat.prototype._doLoadImages = function () {
   "use strict";
 
   var self = this;
+  var originals = Object.create(null);
   var imagesToBeLoaded = self._imagesToBeLoaded;
   self._imagesToBeLoaded = Object.create(null);
 
@@ -17542,12 +17548,54 @@ Chat.prototype._doLoadImages = function () {
     self._doneLoadingImage(h);
   };
 
-  api_getfileattr(imagesToBeLoaded, 1, function (ctx, origNodeHandle, data) {
+  for (var k in imagesToBeLoaded) {
+    var node = imagesToBeLoaded[k];
+    var mime = filemime(node);
+
+    if (node.s < LOAD_ORIGINALS[mime]) {
+      originals[node.h] = node;
+      delete imagesToBeLoaded[k];
+    }
+  }
+
+  var onSuccess = function (ctx, origNodeHandle, data) {
     chatImageParser(origNodeHandle, data);
-  }, function (origNodeHandle) {
+  };
+
+  var onError = function (origNodeHandle) {
     chatImageParser(origNodeHandle, 0xDEAD);
-  });
-  [imagesToBeLoaded].forEach(function (obj) {
+  };
+
+  var loadOriginal = function (n) {
+    M.gfsfetch(n.h, 0, -1).then(function (data) {
+      var handler = is_image(n);
+
+      if (typeof handler === 'function') {
+        handler(data, chatImageParser.bind(this, n.h));
+      } else {
+        chatImageParser(n.h, data);
+      }
+    }).catch(function (ex) {
+      var type = String(n.fa).indexOf(':1*') > 0 ? 1 : 0;
+
+      if (d) {
+        console.debug('Failed to load original image on chat.', n.h, n, ex);
+      }
+
+      imagesToBeLoaded[n.h] = originals[n.h];
+      delete originals[n.h];
+      delay('ChatRoom[' + self.roomId + ']:origFallback' + type, function () {
+        api_getfileattr(imagesToBeLoaded, type, onSuccess, onError);
+      });
+    });
+  };
+
+  if ($.len(originals)) {
+    Object.values(originals).map(loadOriginal);
+  }
+
+  api_getfileattr(imagesToBeLoaded, 1, onSuccess, onError);
+  [imagesToBeLoaded, originals].forEach(function (obj) {
     Object.keys(obj).forEach(function (handle) {
       self._startedLoadingImage(handle);
     });

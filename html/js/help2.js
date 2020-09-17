@@ -753,7 +753,7 @@ var Help = (function() {
             structIdx[client] = structIdx[client] || Object.create(null);
             structIdx[client][section] = structIdx[client][section] || Object.create(null);
             if (!structIdx[client][section][question]) {
-                structIdx[client][section][question] = body;
+                structIdx[client][section][question] = (typeof body === 'string' ? body.trim() : '');
             }
         };
 

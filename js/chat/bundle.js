@@ -8182,8 +8182,6 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
     this._handleAddContact = contactEmail => {
       let exists = false;
       Object.keys(M.opc).forEach(function (k) {
-        console.error('each ->', M.opc[k]);
-
         if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
           exists = true;
           return false;
@@ -8651,6 +8649,7 @@ class audioPlayer_AudioPlayer extends external_React_default.a.Component {
 
     this.handleOnMouseDown = event => {
       event.preventDefault();
+      const self = this;
       const sliderPin = this.sliderPin;
       const slider = this.slider;
       const shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
@@ -8672,10 +8671,10 @@ class audioPlayer_AudioPlayer extends external_React_default.a.Component {
 
         sliderPin.style.left = newLeft + "px";
         const pinPosition = newLeft / slider.getBoundingClientRect().width;
-        const newTime = Math.ceil(this.props.playtime * pinPosition);
+        const newTime = Math.ceil(self.props.playtime * pinPosition);
         const newCurrentTime = secondsToTimeShort(newTime);
-        this.audioEl.currentTime = newTime;
-        this.setState({
+        self.audioEl.currentTime = newTime;
+        self.setState({
           currentTime: newCurrentTime,
           progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
         });

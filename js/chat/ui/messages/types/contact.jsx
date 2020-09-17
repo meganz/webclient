@@ -13,7 +13,6 @@ export default class Contact extends AbstractGenericMessage {
         let exists = false;
 
         Object.keys(M.opc).forEach(function(k) {
-            console.error('each ->', M.opc[k]);
             if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
                 exists = true;
                 return false;

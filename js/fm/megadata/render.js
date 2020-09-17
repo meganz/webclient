@@ -666,7 +666,11 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
     megaRender.numInsertedDOMNodes++;
 
     var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
-    if (!node.__hasMegaColumnsWidth) {
+    var fnameWidth = $('td[megatype="fname"]', node).outerWidth();
+
+    if (!node.__hasMegaColumnsWidth ||
+        fnameWidth !== M.columnsWidth.cloud.fname.curr ||
+        fnameWidth !== M.columnsWidth.cloud.fname.currpx) {
         node.__hasMegaColumnsWidth = true;
         megaRender.setDOMColumnsWidth(node);
     }

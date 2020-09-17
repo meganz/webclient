@@ -695,6 +695,9 @@
                         if (typeof M.columnsWidth[sectionName][knownColumnsWidths[col]].curr === 'number') {
                             tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr + 'px';
                         }
+                        else if (M.columnsWidth[sectionName][knownColumnsWidths[col]].currpx) {
+                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].currpx + 'px';
+                        }
                         else {
                             tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr || '';
                         }

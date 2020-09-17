@@ -3081,6 +3081,7 @@ FileManager.prototype.addGridUI = function(refresh) {
                         }
                         else {
                             $header.outerWidth(M.columnsWidth.cloud[col].curr);
+                            M.columnsWidth.cloud[col].currpx = $header.outerWidth();
                             if ($header.outerWidth() < M.columnsWidth.cloud[col].min) {
                                 $header.outerWidth(M.columnsWidth.cloud[col].min);
                             }

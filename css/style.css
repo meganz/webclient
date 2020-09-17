@@ -253,7 +253,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .loading .top-head {
     z-index: 1111;
 }
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after,  .fm-right-header-user-management::after {
+.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, div:not(.grid-table-header-container-sc) > .grid-table-header::after, .grid-table-header-container-sc::after, .files-grid-view::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after,  .fm-right-header-user-management::after {
     content: '';
     width: 100%;
     height: 1px;
@@ -4037,6 +4037,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -moz-border-radius: 100%;
     -webkit-border-radius: 100%;
     border-radius: 100%;
+}
+.files-grid-view .grid-table-header-container-sc {
+    position: relative;
+    background-color: white;
+    
 }
 .files-grid-view .nw-contact-status, .fm-blocks-view .nw-contact-status, .shared-grid-view .nw-contact-status, .shared-blocks-view .nw-contact-status {
     border: 0;

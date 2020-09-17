@@ -780,11 +780,6 @@ export class TypingArea extends MegaRenderMixin {
 
                         self.prefillMode = true;
 
-                        // console.error("prefilling", [pre, emojiAlias, post], self.state.emojiStartPos,
-                        // self.state.emojiStartPos + emojiAlias.length, (
-                        //     post ? (post.substr(0, 1) !== " " ? 1 : 0) : 1
-                        // ));
-
                         // in case of concat'ed emojis like:
                         // :smile::smile:
 

@@ -184,16 +184,6 @@ export class ConversationRightArea extends MegaRenderMixin {
             dontShowTruncateButton = true;
         }
 
-
-        // console.error(
-        //     self.findDOMNode(),
-        //     excludedParticipants,
-        //         self.allContactsInChat(excludedParticipants),
-        //         room.isReadOnly(),
-        //         room.iAmOperator(),
-        //     myPresence === 'offline'
-        // );
-
         var renameButtonClass = "link-button light " + (
             room.isReadOnly() || !room.iAmOperator() ?
                 "disabled" : ""
@@ -935,8 +925,6 @@ export class ConversationPanel extends MegaRenderMixin {
             self.props.chatRoom.scrolledToBottom = true;
             return;
         }
-
-        // console.error(self.getUniqueId(), "is user scroll!");
 
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {

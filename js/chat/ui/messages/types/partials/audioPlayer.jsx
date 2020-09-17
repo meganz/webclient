@@ -69,6 +69,7 @@ export default class AudioPlayer extends React.Component {
     handleOnMouseDown = event => {
         event.preventDefault();
 
+        const self = this;
         const sliderPin = this.sliderPin;
         const slider = this.slider;
         const shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
@@ -91,11 +92,11 @@ export default class AudioPlayer extends React.Component {
 
             const pinPosition = newLeft / slider.getBoundingClientRect().width;
 
-            const newTime = Math.ceil(this.props.playtime * pinPosition);
+            const newTime = Math.ceil(self.props.playtime * pinPosition);
             const newCurrentTime = secondsToTimeShort(newTime);
-            this.audioEl.currentTime = newTime;
+            self.audioEl.currentTime = newTime;
 
-            this.setState({
+            self.setState({
                 currentTime: newCurrentTime,
                 progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
             });

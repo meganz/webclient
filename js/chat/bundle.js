@@ -8182,8 +8182,6 @@ class contact_Contact extends abstractGenericMessage_AbstractGenericMessage {
     this._handleAddContact = contactEmail => {
       let exists = false;
       Object.keys(M.opc).forEach(function (k) {
-        console.error('each ->', M.opc[k]);
-
         if (!exists && M.opc[k].m === contactEmail && !M.opc[k].hasOwnProperty('dts')) {
           exists = true;
           return false;

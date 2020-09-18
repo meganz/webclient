@@ -620,6 +620,13 @@ var mega = {
         return 0;
     },
 
+    /** get cryptographically strong random values. */
+    getRandomValues: function(len) {
+        'use strict';
+        var seed = new Uint8Array(len || 128);
+        return asmCrypto.getRandomValues(seed);
+    },
+
     /** Load performance report */
     initLoadReport: function() {
         var r = {startTime: Date.now(), stepTimeStamp: Date.now(), EAGAINs: 0, e500s: 0, errs: 0, mode: 1};
@@ -723,6 +730,17 @@ Object.defineProperty(mega, 'active', {
         };
     })()
 });
+
+if (window.crypto && typeof crypto.getRandomValues === 'function') {
+    (function(crypto, rand) {
+        'use strict';
+        mega.getRandomValues = function(len) {
+            var seed = new Uint8Array(len || 128);
+            return rand.call(crypto, seed);
+        };
+        mega.getRandomValues.strong = true;
+    })(crypto, crypto.getRandomValues);
+}
 
 // nb: can overflow..
 Object.defineProperty(window, 'mIncID', {value: 0, writable: true});

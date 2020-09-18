@@ -408,6 +408,7 @@ pro.propay = {
         var currentPlan = pro.membershipPlans[planIndex];
         var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
         var monthOrYearWording = (numOfMonths !== 12) ? l[931] : l[932];
+        var intl = mega.intlNumberFormat;
 
         // Get the current plan price
         var price = currentPlan[pro.UTQA_RES_INDEX_PRICE].split('.');
@@ -419,7 +420,7 @@ pro.propay = {
 
         var dollars = price[0];
         var cents = price[1];
-
+        var decimal = intl.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
         // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
         var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
         var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
@@ -460,7 +461,7 @@ pro.propay = {
             $euroPrice.removeClass('hidden');
             $currncyAbbrev.removeClass('hidden');
             $currncyAbbrev.text(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
-            $euroPrice.text(currentPlan[pro.UTQA_RES_INDEX_PRICE] +
+            $euroPrice.text(intl.format(currentPlan[pro.UTQA_RES_INDEX_PRICE]) +
                 ' ' + euroSign);
             localPrice = '' + currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
             $('.reg-st3-txt-localcurrencyprogram').removeClass('hidden');
@@ -518,12 +519,12 @@ pro.propay = {
         }
         else {
             $priceDollars.text(dollars);
-            $priceCents.text('.' + cents + ' ' + euroSign);    // EUR symbol
+            $priceCents.text(decimal + cents + ' ' + euroSign);    // EUR symbol
         }
         $pricePeriod.text('/' + monthOrYearWording);
 
         // Update the charge information for question 3
-        $chargeAmount.text(dollars + '.' + cents);
+        $chargeAmount.text(dollars + decimal + cents);
 
         // Update storage
         $storageAmount.text(storageSizeRounded);

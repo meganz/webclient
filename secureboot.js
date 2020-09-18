@@ -700,7 +700,7 @@ lazy(mega, 'intlNumberFormat', function() {
     var intl;
 
     tryCatch(function() {
-        intl = new Intl.NumberFormat(getCountryAndLocales().locales, {minimumFractionDigits: 2});
+        intl = new Intl.NumberFormat(getCountryAndLocales().locales.replace('ar', 'en'), {minimumFractionDigits: 2});
     }, false)();
 
     return intl || new Intl.NumberFormat();

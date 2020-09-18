@@ -263,8 +263,8 @@ accountUI.general = {
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
             $bandwidthChart.find('.chart.data .size-txt').text(usedB);
-            $bandwidthChart.find('.chart.data .pecents-txt').text((b2[0]));
-            $bandwidthChart.find('.chart.data .gb-txt').text((b2[1]));
+            $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
+            $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
             $bandwidthChart.find('.chart.data .content-txt').text('/');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
                 if (this.perc_c_b > 0) {
@@ -1893,7 +1893,10 @@ accountUI.plan = {
 
             "use strict";
 
-            $('.account.plan-info.balance span').safeHTML('&euro; @@', account.balance[0][0]);
+            $('.account.plan-info.balance span').safeHTML(
+                '&euro; @@',
+                mega.intlNumberFormat.format(account.balance[0][0])
+            );
         },
 
         bindEvents: function() {
@@ -2007,6 +2010,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[476] +
                 '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
             if (account.purchases.length) {
+                var intl = mega.intlNumberFormat;
                 // Render every purchase made into Purchase History on Account page
                 $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -2035,7 +2039,7 @@ accountUI.plan = {
                         + '</span>'
                         + '<span class="fm-member-icon-txt"> ' + item + '</span>'
                         + '</td>'
-                        + '<td>&euro;' + htmlentities(price) + '</td>'
+                        + '<td>&euro;' + intl.format(htmlentities(price)) + '</td>'
                         + '<td>' + paymentMethod + '</td>'
                         + '</tr>';
                 });
@@ -2073,6 +2077,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
                 '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
             if (account.transactions.length) {
+                var intl = mega.intlNumberFormat;
                 $(account.transactions).each(function(i, el) {
 
                     if (i === $.transactionlimit) {
@@ -2083,10 +2088,10 @@ accountUI.plan = {
                     var debit = '';
 
                     if (el[2] > 0) {
-                        credit = '<span class="green">&euro;' + htmlentities(el[2]) + '</span>';
+                        credit = '<span class="green">&euro;' + intl.format(htmlentities(el[2])) + '</span>';
                     }
                     else {
-                        debit = '<span class="red">&euro;' + htmlentities(el[2]) + '</span>';
+                        debit = '<span class="red">&euro;' + intl.format(htmlentities(el[2])) + '</span>';
                     }
                     html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
                         + credit + '</td><td>' + debit + '</td></tr>';

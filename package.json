@@ -58,7 +58,7 @@
     "grunt-htmljson": "0.1.1",
     "prop-types": "15.7.2",
     "react-hot-loader": "4.12.21",
-    "webpack": "4.44.1",
+    "webpack": "4.44.2",
     "webpack-cli": "3.3.12"
   },
   "devDependencies": {

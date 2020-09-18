@@ -104,7 +104,7 @@ function render_blogarticle() {
         'NewsArticle',
         {
             headline: btitle,
-            image: blogposts[i].attaches.bimg ? CMS.img3(blogposts[i].attaches.bimg) :
+            image: blogposts[i].attaches.bimg ? CMS.img2(blogposts[i].attaches.bimg) :
                 'https://cms2.mega.nz/b41537c0eae056cfe5ab05902fca322b.png',
             datePublished: pubDate,
             dateModified: pubDate

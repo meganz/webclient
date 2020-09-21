@@ -319,7 +319,7 @@
             delete fetching[id];
             cmsBackoff = 0; /* reset backoff */
         };
-        var url = CMS.getUrl() + id;
+        var url = CMS.getUrl() + '/' + id;
         q.open("GET", url);
         q.responseType = 'arraybuffer';
         q.send();
@@ -419,9 +419,6 @@
         img2: function insecureImageLoading(id) {
             return this.getUrl() + "/unsigned/" + id;
         },
-        img3: function insecureImageLoading(id) {
-            return this.getUrlShort() + "/unsigned/" + id;
-        },
 
         img: function(id) {
             if (!assets[id]) {
@@ -496,9 +493,6 @@
         },
 
         getUrl: function() {
-            return localStorage.cms || "https://cms2.mega.nz/";
-        },
-        getUrlShort: function() {
             return localStorage.cms || "https://cms2.mega.nz";
         },
 

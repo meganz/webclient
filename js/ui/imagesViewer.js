@@ -834,7 +834,13 @@ var slideshowid;
         if (previews[n.h]) {
             if (previews[n.h].fromChat) {
                 previews[n.h].fromChat = null;
-                fetchsrc(n);
+
+                if (previews[n.h].full) {
+                    previewimg(n.h, previews[n.h].buffer);
+                }
+                else {
+                    fetchsrc(n);
+                }
             }
             else {
                 previewsrc(n.h);
@@ -1403,7 +1409,7 @@ var slideshowid;
 
         if (previews[id]) {
             if (previews[id].full) {
-                if (d) {
+                if (d && previews[id].fromChat !== null) {
                     console.warn('Not overwriting a full preview...', id);
                 }
                 if (id === slideshow_handle()) {

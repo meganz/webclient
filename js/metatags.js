@@ -176,6 +176,16 @@ mega.metatags = new function() {
         metaStruct.textContent = JSON.stringify(structContent, null, 3);
     };
 
+    this.disableBots = function() {
+        var metaRobots = document.head.querySelector('meta[name="robots"]');
+        if (!metaRobots) {
+            metaRobots = document.createElement('meta');
+            document.head.appendChild(metaRobots);
+        }
+        metaRobots.name = 'robots';
+        metaRobots.content = 'noindex';
+    };
+
     /**
      * Get Page meta tags.
      * @param {String} page     Page name

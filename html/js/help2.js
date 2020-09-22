@@ -528,7 +528,9 @@ var Help = (function() {
             args.shift();
             var question = '';
             if (args.length > 3) {
-                return loadSubPage('help');
+                loadSubPage('help');
+                mega.metatags.disableBots();
+                return;
             }
 
             if (args.length === 3) {
@@ -540,6 +542,7 @@ var Help = (function() {
                     else {
                         // Reload the short url of the help article when title is missing in original url
                         loadSubPage('help/s/' + question);
+                        mega.metatags.disableBots();
                         return;
                     }
                 }
@@ -549,6 +552,10 @@ var Help = (function() {
                 sec = sec.substring(0, sec.indexOf('#'));
                 args.push(sec);
                 question = clearQuestion(location.hash);
+            }
+            else if (args.length === 2 && !location.hash && args[1].length > 20) {
+                // old buggos short urls
+                return loadSubPage('help/s/' + args.pop());
             }
             else if (args.length < 1) {
                 loadSubPage('help');
@@ -576,19 +583,7 @@ var Help = (function() {
 
             parsepage(data.html);
 
-            $('.support-email-icon').rebind('click', function() {
-                var parts = getUrlParts($(this).parents('.support-article').attr('id'));
-                window.helpOrigin = 'https://mega.nz/' + parts.join('/');
-                var newpage = 'support';
-                if (!u_type) {
-                    login_next = newpage;
-                    newpage = 'login';
-                }
-                loadSubPage(newpage);
-            });
-
-            $('.support-link-icon').rebind('click', function() {
-                var articleURL = $(this).parents('.support-article').data('update');
+            var getArticleURL = function(articleURL) {
                 if (articleURL) {
                     articleURL = articleURL.replace('#section-', '#');
                     var sectionURL = getCleanSitePath();
@@ -596,7 +591,34 @@ var Help = (function() {
                     if (articlePos > 0) {
                         sectionURL = sectionURL.substring(0, articlePos);
                     }
-                    var link = getBaseUrl() + '/' + sectionURL + articleURL;
+                    return getBaseUrl() + '/' + sectionURL + articleURL;
+                }
+            };
+
+            $('.support-email-icon').rebind('click', function() {
+                var parts = $(this).parents('.support-article').data('update');
+                if (parts) {
+                    window.helpOrigin = getArticleURL(parts);
+                    if (!window.helpOrigin) {
+                        delete window.helpOrigin;
+                        return;
+                    }
+                    var newpage = 'support';
+                    if (!u_type) {
+                        login_next = newpage;
+                        newpage = 'login';
+                    }
+                    loadSubPage(newpage);
+                }
+            });
+
+            $('.support-link-icon').rebind('click', function() {
+                var articleURL = $(this).parents('.support-article').data('update');
+                if (articleURL) {
+                    var link = getArticleURL(articleURL);
+                    if (!link) {
+                        return;
+                    }
                     var $input = $('.share-help').removeClass('hidden');
 
                     $('input', $input).val(link).trigger("focus").trigger('select');
@@ -639,6 +661,7 @@ var Help = (function() {
 
             var redirect = article[0] ? article[0].url : 'help';
             loadSubPage(redirect);
+            mega.metatags.disableBots();
         }
     };
 

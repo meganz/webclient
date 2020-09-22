@@ -3234,7 +3234,7 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
   }
 
   onBlur(e) {
-    var $element = $(ReactDOM.findDOMNode(this));
+    var $element = $(this.findDOMNode());
 
     if (!e || !$(e.target).closest(".fm-dialog").is($element)) {
       document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
@@ -3246,6 +3246,7 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
     super.componentWillUnmount();
     document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
     $(document).off('keyup.modalDialog' + this.getUniqueId());
+    $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
     $(document.body).removeClass('overlayed');
     $('.fm-dialog-overlay').addClass('hidden');
     $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
@@ -3261,6 +3262,7 @@ class ModalDialog extends _stores_mixins_js1__["MegaRenderMixin"] {
 
   onPopupDidMount(elem) {
     this.domNode = elem;
+    $(elem).rebind('dialog-closed.modalDialog' + this.getUniqueId(), () => this.onCloseClicked());
 
     if (this.props.popupDidMount) {
       this.props.popupDidMount(elem);

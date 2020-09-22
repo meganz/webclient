@@ -798,30 +798,50 @@ MegaData.prototype.syncContactEmail = function(userHash, promise) {
         return promise ? promise.resolve(user.m) : user.m;
     }
 
-    attribCache.getItem(userHash + "_uge")
-        .done(function(r) {
-            M.u[userHash].m = r;
-            if (promise) {
-                promise.resolve(r);
+    var cache = false;
+    var resolve = promise ? function(email) {
+        promise[email ? 'resolve' : 'reject'](email);
+    } : nop;
+    var validate = function(data) {
+        if (typeof data === 'string' && data[0] === '[') {
+            data = JSON.parse(data);
+        }
+        if (!Array.isArray(data)) {
+            data = [data, Infinity];
+        }
+        var email = data[0];
+        var expiry = data[1];
+
+        console.assert(typeof email !== 'string' || email.indexOf('@') > 0);
+        if (typeof email !== 'string' || email.indexOf('@') < 0) {
+            console.assert(email === ENOENT);
+            email = ENOENT;
+        }
+
+        if (cache === true) {
+            attribCache.setItem(userHash + "_uge+", JSON.stringify([email, Date.now() + 7e6]));
+        }
+
+        if (email === ENOENT) {
+            if (Date.now() > expiry) {
+                console.assert(!cache);
+                throw EEXPIRED;
             }
-        })
-        .fail(function() {
-            asyncApiReq({a: 'uge', u: userHash})
-                .done(function(r) {
-                    if (r && isString(r) && M.u[userHash]) {
-                        M.u[userHash].m = r;
-                        attribCache.setItem(userHash + "_uge", r);
 
-                        if (promise) {
-                            promise.resolve(r);
-                        }
-                        return;
-                    }
+            email = undefined;
+        }
+        else if (M.u[userHash].m !== email) {
+            M.u[userHash].m = email;
+        }
 
-                    if (promise) {
-                        promise.reject();
-                    }
-                });
+        resolve(email);
+    };
+
+    attribCache.getItem(userHash + "_uge+")
+        .then(validate)
+        .catch(function() {
+            cache = true;
+            asyncApiReq({a: 'uge', u: userHash}).always(validate);
         });
 
     return promise || true;

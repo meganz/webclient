@@ -155,6 +155,17 @@ var SelectionManager = function($selectable, resume) {
     };
 
     /**
+     * Clear the current selection and select only the pointed item instead
+     * @param {Array|String|MegaNode} item Either a MegaNode, and array of them, or its handle.
+     * @param {Boolean} [scrollTo] Whether the item shall be scrolled into view.
+     * @returns {String} The node handle
+     */
+    this.resetTo = function(item, scrollTo) {
+        this.clear_selection();
+        return this.set_currently_selected(item, scrollTo);
+    };
+
+    /**
      * The idea of this method is to _validate_ and return the .currently-selected element.
      *
      * @returns {String|Boolean} node id
@@ -169,6 +180,23 @@ var SelectionManager = function($selectable, resume) {
     };
 
     /**
+     * Get safe list item..
+     * @param {Array|String|MegaNode} item Either a MegaNode, and array of them, or its handle.
+     * @returns {String|Boolean} Either the node handle as an string or false if unable to determine.
+     * @private
+     */
+    this._getSafeListItem = function(item) {
+        if (typeof item !== 'string') {
+            item = item && item[item.length - 1] || false;
+
+            if (item && typeof item !== 'string') {
+                item = idMapper(item) || false;
+            }
+        }
+        return item;
+    };
+
+    /**
      * Used from the shortcut keys code.
      *
      * @param nodeId
@@ -177,15 +205,12 @@ var SelectionManager = function($selectable, resume) {
         self.clear_last_selected();
         quickFinder.disable_if_active();
 
-        if (typeof nodeId !== 'string') {
-            nodeId = nodeId && nodeId[nodeId.length - 1] || false;
-        }
-
-        if (this.selected_list.indexOf(nodeId) === -1) {
+        nodeId = this._getSafeListItem(nodeId);
+        if (!nodeId || this.selected_list.indexOf(nodeId) === -1) {
             if (nodeId) {
                 this.add_to_selection(nodeId, scrollTo);
             }
-            return;
+            return nodeId;
         }
         this.last_selected = nodeId;
 
@@ -206,71 +231,58 @@ var SelectionManager = function($selectable, resume) {
                 }
             }
         }
+
+        return nodeId;
     };
 
     this.add_to_selection = function(nodeId, scrollTo, alreadySorted) {
-        if (typeof nodeId !== 'string') {
-            if (nodeId && nodeId.h) {
-                nodeId = nodeId.h;
-            }
-            else if (d) {
-                console.error(".add_to_selection received a non-string as nodeId", nodeId);
-                return;
-            }
+        var tmp = this._getSafeListItem(nodeId);
+        if (!tmp) {
+            console.error("Unable to determine item type...", nodeId);
+            return;
         }
+        nodeId = tmp;
 
         if (this.selected_list.indexOf(nodeId) === -1) {
             this.selected_list.push(nodeId);
 
-            var self = this;
-            var dlps = function() {
-                var selectionSize = false;
-
-                for (var i = self.selected_list.length; i--;) {
-                    var n = self.selected_list[i];
-                    var e = document.getElementById(n);
-                    if (e) {
-                        e.classList.add('ui-selected');
-                    }
-                    if ((n = M.d[n])) {
-                        selectionSize += n.t ? n.tb : n.s;
-                    }
+            var selectionSize = false;
+            for (var i = this.selected_list.length; i--;) {
+                var n = this.selected_list[i];
+                var e = document.getElementById(n);
+                if (e) {
+                    e.classList.add('ui-selected');
                 }
-                self.set_currently_selected(nodeId, scrollTo);
-
-                if (!alreadySorted) {
-                    // shift + up/down requires the selected_list to be in the same order as in M.v (e.g. render order)
-                    var currentViewOrderMap = {};
-                    for (var j = 0; j < M.v.length; ++j) {
-                        currentViewOrderMap[idMapper(M.v[j])] = j;
-                    }
-
-                    // sort this.selected_list as in M.v
-                    self.selected_list.sort(function(a, b) {
-                        var aa = currentViewOrderMap[a];
-                        var bb = currentViewOrderMap[b];
-                        if (aa < bb) {
-                            return -1;
-                        }
-                        if (aa > bb) {
-                            return 1;
-                        }
-
-                        return 0;
-                    });
+                if ((n = M.d[n])) {
+                    selectionSize += n.t ? n.tb : n.s;
                 }
-
-                if (selectionSize !== false) {
-                    self.selectionNotification(selectionSize);
-                }
-            };
-
-            if (scrollTo === EROLLEDBACK) {
-                scrollTo = true;
-                delay('selectionManager:add:' + M.currentdirid, dlps, -1);
             }
-            else {
-                dlps();
+            this.set_currently_selected(nodeId, scrollTo);
+
+            if (!alreadySorted) {
+                // shift + up/down requires the selected_list to be in the same order as in M.v (e.g. render order)
+                var currentViewOrderMap = {};
+                for (var j = 0; j < M.v.length; ++j) {
+                    currentViewOrderMap[idMapper(M.v[j])] = j;
+                }
+
+                // sort this.selected_list as in M.v
+                this.selected_list.sort(function(a, b) {
+                    var aa = currentViewOrderMap[a];
+                    var bb = currentViewOrderMap[b];
+                    if (aa < bb) {
+                        return -1;
+                    }
+                    if (aa > bb) {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+            }
+
+            if (selectionSize !== false) {
+                this.selectionNotification(selectionSize);
             }
         }
         $.selected = this.selected_list;
@@ -318,7 +330,7 @@ var SelectionManager = function($selectable, resume) {
             for (var i = nodeList.length; i--;) {
                 nodeList[i].classList.add('ui-selected');
             }
-            this.set_currently_selected(nodeList.length && nodeList[0].id);
+            this.set_currently_selected(nodeList[0].id);
         }
         else if (this.selected_list.length) {
             // Not under a MegaList-powered view
@@ -339,12 +351,8 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this._select_pointer = function(ptr, shiftKey, scrollTo) {
-        var currentViewIds = [];
-        M.v.forEach(function(v) {
-            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
-        });
-
-
+        var nextId = null;
+        var currentViewIds = M.v.map(idMapper);
         var current = this.get_currently_selected();
         var nextIndex = currentViewIds.indexOf(current);
 
@@ -356,12 +364,11 @@ var SelectionManager = function($selectable, resume) {
             nextIndex = nextIndex <= 0 ? currentViewIds.length - Math.max(nextIndex, 0) : nextIndex;
 
             if (nextIndex > -1 && nextIndex - 1 >= 0) {
-                var nextId = currentViewIds[nextIndex - 1];
+                nextId = currentViewIds[nextIndex - 1];
 
                 // clear old selection if no shiftKey
                 if (!shiftKey) {
-                    this.clear_selection();
-                    this.set_currently_selected(nextId, scrollTo);
+                    this.resetTo(nextId, scrollTo);
                 }
                 else if (nextIndex < currentViewIds.length) {
                     // shift key selection logic
@@ -373,8 +380,7 @@ var SelectionManager = function($selectable, resume) {
                         var firstItemId = this.selected_list[0];
 
                         // modify selection
-                        this.clear_selection();
-                        this.set_currently_selected(firstItemId, false);
+                        this.resetTo(firstItemId, false);
                         this.shift_select_to(nextId, scrollTo, false, false);
                     }
                     else {
@@ -392,12 +398,11 @@ var SelectionManager = function($selectable, resume) {
             );
 
             if (nextIndex + 1 < currentViewIds.length) {
-                var nextId = currentViewIds[nextIndex + 1];
+                nextId = currentViewIds[nextIndex + 1];
 
                 // clear old selection if no shiftKey
                 if (!shiftKey) {
-                    this.clear_selection();
-                    this.set_currently_selected(nextId, scrollTo);
+                    this.resetTo(nextId, scrollTo);
                 }
                 else if (nextIndex > -1) {
                     // shift key selection logic
@@ -412,8 +417,7 @@ var SelectionManager = function($selectable, resume) {
 
 
                         // modify selection
-                        this.clear_selection();
-                        this.set_currently_selected(fromFirstItemId, false);
+                        this.resetTo(fromFirstItemId, false);
                         this.shift_select_to(lastItemId, scrollTo, false, false);
                         this.last_selected = fromFirstItemId;
                     }
@@ -432,14 +436,11 @@ var SelectionManager = function($selectable, resume) {
         }
 
         if (this.selected_list.length === 0) {
-            this.set_currently_selected(SelectionManager.dynamicNodeIdRetriever(M.v[0]), scrollTo);
+            this.set_currently_selected(idMapper(M.v[0]), scrollTo);
             return;
         }
 
-        var currentViewIds = [];
-        M.v.forEach(function(v) {
-            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
-        });
+        var currentViewIds = M.v.map(idMapper);
 
 
         var items_per_row = Math.floor(
@@ -501,11 +502,7 @@ var SelectionManager = function($selectable, resume) {
     this.shift_select_to = function(lastId, scrollTo, isMouseClick, clear) {
         assert(lastId, 'missing lastId for selectionManager.shift_select_to');
 
-        var currentViewIds = [];
-        M.v.forEach(function(v) {
-            currentViewIds.push(SelectionManager.dynamicNodeIdRetriever(v));
-        });
-
+        var currentViewIds = M.v.map(idMapper);
         var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
         var last_idx = currentViewIds.indexOf(lastId);
@@ -655,16 +652,14 @@ var SelectionManager = function($selectable, resume) {
     };
 
     this.reinitialize = function() {
-        var nodeList = $.selected = $.selected || [];
+        var nodeList = this.selected_list = $.selected = $.selected || [];
 
         if (nodeList.length) {
             if (nodeList.length === M.v.length) {
                 this.select_all();
             }
             else {
-                // trick: add once so that delay() is invoked, then replace the internal list
-                this.add_to_selection(nodeList[0], EROLLEDBACK);
-                $.selected = this.selected_list = nodeList;
+                this.add_to_selection(nodeList.shift(), true);
             }
         }
         else {
@@ -700,21 +695,6 @@ var SelectionManager = function($selectable, resume) {
     }
 
     return this;
-};
-
-
-/**
- * Helper function that would retrieve the DOM Node ID from `n` and convert it to DOM node ID
- *
- * @param n
- */
-SelectionManager.dynamicNodeIdRetriever = function(n) {
-    if ((M.currentdirid === "ipc" || M.currentdirid === "opc") && n.p) {
-        return M.currentdirid + "_" + n.p;
-    }
-    else {
-        return n.h;
-    }
 };
 
 var selectionManager;

@@ -650,8 +650,7 @@ var slideshowid;
 
         slideshowid = n.ch || n.h;
         if (window.selectionManager) {
-            selectionManager.clear_selection();
-            selectionManager.set_currently_selected(n.h);
+            selectionManager.resetTo(n.h);
         }
         else {
             $.selected = [n.h];

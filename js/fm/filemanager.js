@@ -494,9 +494,8 @@ FileManager.prototype.initFileManagerUI = function() {
                                     $ddelm.remove();
                                 }
                             });
-                        if (selectionManager) {
-                            selectionManager.clear_selection();
-                            selectionManager.set_currently_selected($.movet);
+                        if (window.selectionManager) {
+                            selectionManager.resetTo($.movet);
                         }
                     }
                 }, 50);
@@ -3516,8 +3515,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $.gridDragging = true;
             $('body').addClass('dragging');
             if (!$(this).hasClass('ui-selected')) {
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected($(this).attr('id'));
+                selectionManager.resetTo($(this).attr('id'));
             }
             var max = ($(window).height() - 96) / 24;
             var html = [];
@@ -3607,12 +3605,13 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             selectionManager.add_to_selection($(this).attr('id'));
         }
         else {
-            if (selectionManager.selected_list.indexOf($(this).attr('id')) === -1) {
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected($(this).attr('id'));
+            var id = $(this).attr('id');
+
+            if (selectionManager.selected_list.indexOf(id) === -1) {
+                selectionManager.resetTo(id);
             }
             else {
-                selectionManager.add_to_selection($(this).attr('id'));
+                selectionManager.add_to_selection(id);
             }
 
             // Show sort menu for FM, block view only

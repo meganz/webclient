@@ -424,9 +424,10 @@ mega.metatags = new function() {
             mTags.mega_title = 'Two Factor - MEGA';
             stopBots(metaRobots);
         }
-        else if (page === 'emailverify') {
+        else if (page.substr(0, 11) === 'emailverify') {
             mTags.mega_title = 'Email Verify - MEGA';
-            stopBots(metaRobots);
+            mTags.mega_desc = 'Email verification';
+            stopBots(metaRobots, true);
         }
         else if (page === 'businessinvite') {
             mTags.mega_title = 'Business Invite - MEGA';

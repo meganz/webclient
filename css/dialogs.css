@@ -4866,7 +4866,7 @@ body.ru .voucher-logo .plan-info .size-head {
     box-shadow: -2px 2px 20px 0 rgba(0,0,0,0.1);
     z-index: 11;
     right: 0;
-    top: 128px;
+    top: 118px;
     height: 0;
     overflow: hidden;
     visibility: hidden;
@@ -4876,23 +4876,11 @@ body.ru .voucher-logo .plan-info .size-head {
     text-align: center;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     min-height: 100%;
-    min-height: -webkit-calc(100% - 128px);
-    min-height: -moz-calc(100% - 128px);
-    min-height: calc(100% - 128px);
-}
-body.en .register-side-pane.container {
-    top: 118px;
     min-height: -webkit-calc(100% - 118px);
     min-height: -moz-calc(100% - 118px);
     min-height: calc(100% - 118px);
 }
-.hidden-bar + .register-side-pane.container {
-    top: 118px;
-    min-height: -webkit-calc(100% - 118px);
-    min-height: -moz-calc(100% - 118px);
-    min-height: calc(100% - 118px);
-}
-body.en .hidden-bar + .register-side-pane.container {
+body .hidden-bar + .register-side-pane.container {
     top: 106px;
     min-height: -webkit-calc(100% - 106px);
     min-height: -moz-calc(100% - 106px);
@@ -4934,17 +4922,21 @@ body.en .hidden-bar + .register-side-pane.container {
 }
 .register-side-pane.top-bg-txt {
     color: white;
-    font-size: 11px;
-    line-height: 14px;
+    font-size: 10px;
+    line-height: 10px;
     letter-spacing: -0.4px;
     text-align: center;
     position: absolute;
-    width: 78px;
-    height: 40px;
-    right: 6px;
+    width: 82px;
+    height: 36px;
+    right: 4px;
     top: 55px;
     display: table;
     table-layout: fixed;
+}
+.en .register-side-pane.top-bg-txt {
+    font-size: 11px;
+    line-height: 14px;
 }
 .register-side-pane.top-bg-txt span {
     display: table-cell;
@@ -4953,10 +4945,13 @@ body.en .hidden-bar + .register-side-pane.container {
 .register-side-pane.top-bg-txt strong {
     font-family: 'LatoWebBlack', 'source_sans_probold', Arial;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 16px;
     font-weight: normal;
     display: inline-block;
     width: 100%;
+}
+.en.register-side-pane.top-bg-txt strong {
+    line-height: 18px;
 }
 .register-side-pane.header {
     font-size: 20px;
@@ -4969,6 +4964,9 @@ body.en .hidden-bar + .register-side-pane.container {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     min-width: 100%;
+}
+.de .register-side-pane.header {
+    font-size: 16px;
 }
 .fm-dialog .register-side-pane.header {
     min-width: 330px;

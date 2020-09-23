@@ -130,7 +130,6 @@ body:not(.mobile) .about.top-info a:hover {
     color: #373737;
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;
     padding: 98px 0 10px 0;
-    text-transform: capitalize;
 }
 .about.leaders-block {
     font-size: 0;
@@ -438,7 +437,7 @@ body:not(.mobile) .about.white-button:hover {
 }
 .about.top-info.top-pad {
     padding: 44px 0 0 0;
-} 
+}
 .about.data-header {
     display: inline-block;
     margin: 76px 20px 65px 20px;

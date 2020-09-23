@@ -503,7 +503,13 @@
             }
 
             if (fetchshares) {
-                dbfetch.geta(Object.keys(M.c.shares || {}))
+                var handles = Object.keys(M.c.shares || {});
+                for (var i = handles.length; i--;) {
+                    if (M.d[handles[i]]) {
+                        handles.splice(i, 1);
+                    }
+                }
+                dbfetch.geta(handles)
                     .always(function() {
                         if (!$.inSharesRebuild) {
                             $.inSharesRebuild = Date.now();

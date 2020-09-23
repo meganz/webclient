@@ -1386,6 +1386,7 @@ FMDB.prototype.getbykey = promisify(function fmdb_getbykey(resolve, reject, tabl
         var matches = Object.create(null);
         var pendingch = fmdb.pending[ch];
         var tids = Object.keys(pendingch);
+        var dbRecords = r.length;
 
         if (bulk) {
             for (i = r.length; i--;) {
@@ -1418,8 +1419,11 @@ FMDB.prototype.getbykey = promisify(function fmdb_getbykey(resolve, reject, tabl
 
                                 if (typeof matches[f] == 'undefined') {
                                     // boolean false means "record deleted"
-                                    matches[f] = false;
-                                    match = true;
+                                    if (dbRecords) {
+                                        // no need to record a deletion unless we got db entries
+                                        matches[f] = false;
+                                        match = true;
+                                    }
                                 }
                             }
                         }
@@ -1444,8 +1448,11 @@ FMDB.prototype.getbykey = promisify(function fmdb_getbykey(resolve, reject, tabl
 
                                         // mismatch detected - record it as a deletion
                                         if (k >= 0) {
-                                            match = true;
-                                            matches[f] = false;
+                                            // no need to record a deletion unless we got db entries
+                                            if (dbRecords) {
+                                                match = true;
+                                                matches[f] = false;
+                                            }
                                             continue;
                                         }
                                     }
@@ -1469,8 +1476,11 @@ FMDB.prototype.getbykey = promisify(function fmdb_getbykey(resolve, reject, tabl
 
                                         // no match detected - record it as a deletion
                                         if (k < 0) {
-                                            match = true;
-                                            matches[f] = false;
+                                            // no need to record a deletion unless we got db entries
+                                            if (dbRecords) {
+                                                match = true;
+                                                matches[f] = false;
+                                            }
                                             continue;
                                         }
                                     }

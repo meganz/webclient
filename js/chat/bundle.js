@@ -7952,7 +7952,7 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
 
     this._roomIsGroup = () => this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
 
-    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + M.getNameByHandle(handle) + "]]");
+    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + escapeHTML(M.getNameByHandle(handle)) + "]]");
 
     this._getExtraInfo = message => {
       const participantNames = this._getParticipantNames(message);

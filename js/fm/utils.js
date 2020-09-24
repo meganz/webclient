@@ -1298,11 +1298,9 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
     if (M.currentrootid === M.RubbishID
+        || id === 'shares'
         || String(id).indexOf('search/') > -1
-        || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
-        return;
-    }
-    if (folderlink) {
+        || M.getNodeRights(id) < 2) {
         return;
     }
 

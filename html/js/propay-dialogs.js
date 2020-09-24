@@ -552,7 +552,7 @@ var voucherDialog = {
         var oldStorage = oldPlan ? (oldPlan[2] * Math.pow(1024, 3)) : 0;
         var newStorage = Math.max(pro.propay.selectedProPackage[2] * Math.pow(1024, 3), oldStorage);
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
-        var intl = mega.intlNumberFormat;
+        var intl = mega.intl.number;
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
@@ -1267,7 +1267,7 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.payment-plan-price .price').text(mega.intlNumberFormat.format(proPrice));
+        this.$dialog.find('.payment-plan-price .price').text(mega.intl.number.format(proPrice));
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -2440,7 +2440,7 @@ var bitcoinDialog = {
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
         $bitcoinDialog.find('.plan-name').text(planName);
         $bitcoinDialog.find('.plan-duration').text(planMonths);
-        $('.plan-price-euros .value', $bitcoinDialog).text(mega.intlNumberFormat.format(priceEuros));
+        $('.plan-price-euros .value', $bitcoinDialog).text(mega.intl.number.format(priceEuros));
         $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
 
         // Set countdown to price expiry

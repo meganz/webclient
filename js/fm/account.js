@@ -1217,6 +1217,11 @@ accountUI.account = {
                     });
                 }
 
+                // Reset current Internationalization API usage upon save.
+                onIdle(function() {
+                    mega.intl.reset();
+                });
+
                 $saveBlock.addClass('closed');
                 $saveButton.removeClass('disabled');
             });
@@ -1895,7 +1900,7 @@ accountUI.plan = {
 
             $('.account.plan-info.balance span').safeHTML(
                 '&euro; @@',
-                mega.intlNumberFormat.format(account.balance[0][0])
+                mega.intl.number.format(account.balance[0][0])
             );
         },
 
@@ -2010,7 +2015,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[476] +
                 '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
             if (account.purchases.length) {
-                var intl = mega.intlNumberFormat;
+                var intl = mega.intl.number;
                 // Render every purchase made into Purchase History on Account page
                 $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -2039,7 +2044,7 @@ accountUI.plan = {
                         + '</span>'
                         + '<span class="fm-member-icon-txt"> ' + item + '</span>'
                         + '</td>'
-                        + '<td>&euro;' + intl.format(htmlentities(price)) + '</td>'
+                        + '<td>&euro;' + escapeHTML(intl.format(price)) + '</td>'
                         + '<td>' + paymentMethod + '</td>'
                         + '</tr>';
                 });
@@ -2077,7 +2082,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
                 '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
             if (account.transactions.length) {
-                var intl = mega.intlNumberFormat;
+                var intl = mega.intl.number;
                 $(account.transactions).each(function(i, el) {
 
                     if (i === $.transactionlimit) {
@@ -2088,10 +2093,10 @@ accountUI.plan = {
                     var debit = '';
 
                     if (el[2] > 0) {
-                        credit = '<span class="green">&euro;' + intl.format(htmlentities(el[2])) + '</span>';
+                        credit = '<span class="green">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     else {
-                        debit = '<span class="red">&euro;' + intl.format(htmlentities(el[2])) + '</span>';
+                        debit = '<span class="red">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
                     }
                     html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
                         + credit + '</td><td>' + debit + '</td></tr>';

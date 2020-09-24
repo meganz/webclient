@@ -312,7 +312,7 @@ pro.proplan = {
         var oneLocalPriceFound = false;
         var zeroPrice;
         var classType = 1;
-        var intl = mega.intlNumberFormat;
+        var intl = mega.intl.number;
 
         var setPriceFont = function _setPriceFunction(_pageType,
                                                       _monthlyBasePriceDollars,
@@ -430,7 +430,7 @@ pro.proplan = {
                 }
 
                 // Calculate the monthly base price
-                var decimalSeparator = intl.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
+                var decimalSeparator = intl.decimalSeparator;
                 var monthlyBasePriceParts = intl.format(monthlyBasePrice).split(decimalSeparator);
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';

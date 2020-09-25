@@ -561,6 +561,25 @@ export class ConversationPanel extends MegaRenderMixin {
         }
     }
 
+    onKeyboardScroll = ({ keyCode }) => {
+        const scrollbar = this.messagesListScrollable;
+        const scrollPositionY = scrollbar.getScrollPositionY();
+        const offset = parseInt(scrollbar.domNode.style.height);
+        const PAGE = { UP: 33, DOWN: 34 };
+
+        switch (keyCode) {
+            case PAGE.UP:
+                scrollbar.scrollToY(scrollPositionY - offset, true);
+                this.onMessagesScrollUserScroll(scrollbar, 100);
+                break;
+            case PAGE.DOWN:
+                if (!scrollbar.isAtBottom()) {
+                    scrollbar.scrollToY(scrollPositionY + offset, true);
+                }
+                break;
+        }
+    }
+
     componentDidMount() {
         super.componentDidMount();
         var self = this;
@@ -570,6 +589,9 @@ export class ConversationPanel extends MegaRenderMixin {
         self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
             self.callJustEnded = true;
         });
+
+        // [...] TODO: reinitialise;
+        $(document).rebind('keydown.keyboardScroll', this.onKeyboardScroll);
 
         self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
             self.props.chatRoom.scrolledToBottom = true;
@@ -729,6 +751,7 @@ export class ConversationPanel extends MegaRenderMixin {
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
+        $(document).off('keydown.keyboardScroll');
     }
     componentDidUpdate(prevProps, prevState) {
         var self = this;
@@ -913,7 +936,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
     }
 
-    onMessagesScrollUserScroll(ps) {
+    onMessagesScrollUserScroll(ps, offset = 5) {
         var self = this;
 
         var scrollPositionY = ps.getScrollPositionY();
@@ -938,7 +961,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory
-            && (isAtTop || scrollPositionY < 5 && ps.getScrollHeight() > 500)
+            && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500)
             && mb.haveMoreHistory()) {
 
             ps.disable();

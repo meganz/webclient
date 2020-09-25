@@ -1024,6 +1024,13 @@ function init_page() {
             init_login();
         }
     }
+    else if (is_mobile && isEphemeral() && is_fm()) {
+        // Log out and redirect to start page it's the ephemeral session on mobile web
+        u_logout(true);
+        page = '';
+        loadSubPage('start');
+        return false;
+    }
     else if (is_mobile && u_type && page === 'fm/dashboard') {
         loadSubPage('fm');
         return false;

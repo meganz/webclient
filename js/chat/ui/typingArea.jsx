@@ -744,8 +744,7 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         var textareaStyles = {
-            height: self.state.textareaHeight,
-            paddingRight: 14
+            height: self.state.textareaHeight
         };
 
         var textareaScrollBlockStyles = {};

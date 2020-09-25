@@ -974,7 +974,9 @@ function scriptTest(data, callback) {
             setTimeout(load);
         }
         callback(false);
+        this.onload = this.onerror = null;
         this.parentNode.removeChild(this);
+        URL.revokeObjectURL(this.src);
     };
     feat.onerror = callback;
 }
@@ -3422,10 +3424,10 @@ else if (!browserUpdate) {
         });
 
         scriptTest(
-            'const f=async ()=>{}; es6s =' +
+            'es6s =' +
             ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
             ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
-            ' && f[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
                 if (error || !window.es6s) {
@@ -3433,6 +3435,7 @@ else if (!browserUpdate) {
                     return;
                 }
                 jsl_start();
+                delete window.es6s;
             });
     };
     function jsl_load(xhri)

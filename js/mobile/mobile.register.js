@@ -719,7 +719,12 @@ mobile.register.new = {
 
         // Show an error if the email is already in use
         else if (result === EEXIST) {
-            mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
+            mobile.messageOverlay.show(l[9000], '', function() {
+                if (isEphemeral()) {
+                    // Prevent the ephemeral session in mobile web if the email has been registered
+                    u_logout(true);
+                }
+            });    // Error. This email address is already in use.
         }
         else {
             // Show an error

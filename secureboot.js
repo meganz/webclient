@@ -2818,6 +2818,7 @@ else if (!browserUpdate) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
         'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},

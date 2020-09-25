@@ -39,118 +39,162 @@
     background-color: #cacfd4;
 }
 
-/* Style for datepicker dialog (override existing jQuery UI ones) */
-.ui-datepicker {
-    width: 252px;
-    padding: 7px;
-    display: none;
+/* Datepicker */
+.datepickers-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1201;
+}
+@media print {
+    .datepickers-container {
+        display: none;
+    }
+}
+.datepicker {
+    min-width: 252px;
     background: #FFF;
     color: #111;
     font-family: 'LatoWeb', Arial;
     border-radius: 24px;
     box-shadow: 0 4px 16px 0 rgba(0,0,0,0.1);
     margin: 0;
-}
-.ui-datepicker .ui-datepicker-header {
-    font-family: 'LatoWebSemiBold', Arial;
-    font-size: 15px;
-    line-height: 20px;
-    height: 20px;
-    margin-bottom: 15px;
-    margin-top: 7px;
-    text-align: center;
-    position: relative;
-}
-.ui-datepicker .ui-datepicker-title {
-    opacity: 0;
     position: absolute;
-    width: 100%;
+    left: -100000px;
+    opacity: 0;
+    -webkit-transition: opacity 200ms ease-in-out 0s;
+    transition: opacity 200ms ease-in-out 0s;
+    z-index: 100;
 }
-.ui-datepicker select, .ui-datepicker .clone span {
-    font-family: 'LatoWebSemiBold', Arial;
-    font-size: 15px;
-    line-height: 20px;
-    border: 0;
-    margin: 0 2px;
-    padding: 0;
-    width: auto;
+.datepicker.active {
+    opacity: 1;
+}
+.datepicker--content {
+    padding: 7px;
+}
+.datepicker--body {
+    display: none;
+}
+.datepicker--body.active {
+    display: block;
+}
+
+/* -------------------------------------------------
+    Datepicker cells
+   ------------------------------------------------- */
+.datepicker--cell {
     box-sizing: border-box;
     cursor: pointer;
-    outline: none;
-    background: none;
-    vertical-align: top;
     display: inline-block;
-}
-.ui-datepicker .clone + .clone {
-    display: none;
-}
-.ui-datepicker select:focus {
-    box-shadow: none;
-    color: #222; 
-    outline: none;
-}
-.ui-datepicker select::-ms-expand {
-    display: none;
-}
-/* dialog-sprite is used as background image, Set in dialogs-common.css */
-.ui-datepicker-prev, .ui-datepicker-next {
-    position: absolute;
-    right: 7px;
-    top: -2px;
-    width: 24px;
-    height: 24px;
-    font-size: 0;
-    background-position: -138px -7010px;
-    z-index: 1;
-}
-.ui-datepicker-prev {
-    left: 7px;
-    right: auto;
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transform: rotate(180deg);
-}
-.ui-datepicker table {
-    width: 100%;
-    font-size: 14px;
-    color: #333;
-}
-.ui-state-disabled.ui-datepicker-prev, .ui-state-disabled.ui-datepicker-next {
-    display: none;
-}
-.ui-datepicker th, .ui-datepicker td {
-    padding: 1px;
-}
-.ui-datepicker th span, .ui-datepicker th a, .ui-datepicker td span, .ui-datepicker td a {
-    padding: 0;
+    position: relative;
     text-align: center;
     width: 32px;
     height: 32px;
     line-height: 32px;
-    border-radius: 100%;
-    display: block;
-    text-decoration: none;
-    color: #333;
+    color: rgb(51, 51, 51);
     font-size: 14px;
-    -webkit-transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
-    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+    margin: 1px;
+    border-radius: 100%;
+    -webkit-transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
+    transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
+    z-index: 1;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
-.ui-datepicker th span, .ui-datepicker th a {
+.datepicker--cell-month, .datepicker--cell-year {
+    width: 55px;
+    width: calc(25% - 4px);
+    height: 48px;
+    line-height: 48px;
+    border-radius: 16px;
+    margin: 2px;
+}
+.ar .datepicker--cells-months {
+    width: 300px;
+}
+.datepicker--cell.-focus- {
+    background: #F2F2F2;
+}
+.datepicker--cell.-current- {
+    color: #FF5C5E;
+    background: transparent;
+}
+.datepicker--cell.-disabled- {
+    cursor: default;
+    color: #999;
+    background: transparent;
+}
+.datepicker--cell.-selected- {
+    color: #fff;
+    background: #FF5C5E;
+}
+.datepicker--cell:empty {
+    cursor: default;
+}
+.datepicker--days-names {
+    font-size: 0;
+}
+.datepicker--day-name {
+    display: inline-block;
+    text-align: center;
+    text-transform: uppercase;
     font-size: 10px;
     font-family: 'LatoWebSemiBold', Arial;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    color: rgb(51, 51, 51);
+    margin: 1px;
 }
-.ui-datepicker td a.ui-state-default.ui-state-hover {
-    background: #D8D8D8;
+
+/* Navigation */
+.datepicker--nav {
+    font-size: 0;
+    margin-bottom: 2px;
+    margin: 7px  0 2px 0;
+    text-align: center;
+    position: relative;
 }
-.ui-datepicker td a.ui-state-default.ui-state-active {
-    background: #FF5C5E;
-    color: white;
+.datepicker--nav-title {
+    border-radius: 16px;
+    padding: 0 12px;
+    position: relative;
+    display: inline-block;
+    font-family: 'LatoWebSemiBold', Arial;
+    font-size: 15px;
+    line-height: 32px;
+    cursor: pointer;
+    -webkit-transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
+    transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
 }
-.ui-datepicker td.ui-state-disabled span, .ui-datepicker td.ui-state-disabled a {
-    color: #999;
+.datepicker--nav-title i {
+    font-style: normal;
 }
-.ui-datepicker .ui-widget-header .close-icon, .ui-datepicker-buttonpane {
+.datepicker--nav-title:hover {
+    background: #F2F2F2;
+}
+.datepicker--nav-title.-disabled- {
+    cursor: default;
+    background: none;
+}
+.datepicker--nav-action {
+    position: absolute;
+    right: 10px;
+    top: 3px;
+    width: 28px;
+    height: 28px;
+    font-size: 0px;
+    z-index: 1;
+    background-position: -138px -7010px;
+    cursor: pointer;
+}
+.datepicker--nav-action:first-child {
+    left: 10px;
+    right: auto;
+    transform: rotate(180deg);
+}
+.datepicker--nav-action.-disabled- {
     display: none;
 }

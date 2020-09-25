@@ -2209,4 +2209,6 @@ i.account-icon.menu {
 .small-icon.dialog-sprite.grey-lock {
     background-position: -37px -4385px;
 }
-
+.medium-icon.dialog-sprite.right-arrow {
+    background-position: -136px -7008px;
+}

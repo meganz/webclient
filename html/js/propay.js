@@ -420,7 +420,7 @@ pro.propay = {
 
         var dollars = price[0];
         var cents = price[1];
-        var decimal = intl.decimalSeparator;
+        var decimal = mega.intl.decimalSeparator;
         // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
         var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
         var storageBytes = storageGigabytes * 1024 * 1024 * 1024;

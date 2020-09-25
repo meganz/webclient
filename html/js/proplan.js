@@ -430,8 +430,7 @@ pro.proplan = {
                 }
 
                 // Calculate the monthly base price
-                var decimalSeparator = intl.decimalSeparator;
-                var monthlyBasePriceParts = intl.format(monthlyBasePrice).split(decimalSeparator);
+                var monthlyBasePriceParts = monthlyBasePrice.split('.');
                 var monthlyBasePriceDollars = monthlyBasePriceParts[0];
                 var monthlyBasePriceCents = monthlyBasePriceParts[1] || '00';
 
@@ -475,7 +474,7 @@ pro.proplan = {
                 }
                 else {
                     $priceDollars.text(monthlyBasePriceDollars);
-                    $priceCents.text(decimalSeparator + monthlyBasePriceCents + ' ' +
+                    $priceCents.text(mega.intl.decimalSeparator + monthlyBasePriceCents + ' ' +
                         monthlyBasePriceCurrencySign);
                 }
 

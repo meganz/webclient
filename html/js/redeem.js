@@ -400,7 +400,9 @@ var redeem = {
         var storage = vd.storage;
         var bandwidth = vd.bandwidth;
         var numOfMonths = vd.months;
-        var planPrice = vd.price.split('.');
+        var intl = mega.intl.decimal;
+        var decimalSeparator = mega.intl.decimalSeparator;
+        var planPrice = vd.price.split(decimalSeparator);
         var proName = pro.getProPlanName(proNum);
 
         // Get dollars and cents
@@ -418,28 +420,28 @@ var redeem = {
 
         // "Your MEGA voucher for 4.99 &euro; was redeemed successfully"
         var titleText = redeem.$dialog.find('.title-text').html();
-        titleText = titleText.replace('%1', vd.value);
+        titleText = titleText.replace('%1', intl.format(vd.value));
 
         // "Your balance is now 18.00 &euro;."
         var balanceText = redeem.$dialog.find('.balance-text').html();
-            balanceText = balanceText.replace('%1', balance2dp);
+        balanceText = balanceText.replace('%1', intl.format(balance2dp));
 
         // "We suggest the PRO Lite plan based on your account balance."
         // "Click COMPLETE UPGRADE and enjoy your new PRO Lite plan."
         var upgradeText = redeem.$dialog.find('.complete-upgrade-text').html();
-            upgradeText = upgradeText.replace(/%1/g, proName);
-            upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
+        upgradeText = upgradeText.replace(/%1/g, proName);
+        upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
 
         // Update information
         redeem.$dialog.find('.reg-st3-membership-bl').removeClass('pro1 pro2 pro3 pro4');
         redeem.$dialog.find('.reg-st3-membership-bl').addClass('pro' + proNum);
         redeem.$dialog.find('.plan-name').html(proName);
-        redeem.$dialog.find('.price .dollars').text(planPriceDollars);
-        redeem.$dialog.find('.price .cents').text('.' + planPriceCents);
+        redeem.$dialog.find('.price .dollars').text(intl.format(planPriceDollars));
+        redeem.$dialog.find('.price .cents').text(decimalSeparator + intl.format(planPriceCents));
         redeem.$dialog.find('.price .period').text('/' + monthOrYearText);
-        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(storageAmount);
+        redeem.$dialog.find('.reg-st3-storage .quota-amount').text(intl.format(storageAmount));
         redeem.$dialog.find('.reg-st3-storage .quota-unit').text(storageUnit);
-        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(bandwidthAmount);
+        redeem.$dialog.find('.reg-st3-bandwidth .quota-amount').text(intl.format(bandwidthAmount));
         redeem.$dialog.find('.reg-st3-bandwidth .quota-unit').text(bandwidthUnit);
         redeem.$dialog.find('.title-text').html(titleText);
         redeem.$dialog.find('.balance-text').html(balanceText);

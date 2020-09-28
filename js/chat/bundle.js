@@ -12634,25 +12634,29 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       keyCode
     }) => {
       const scrollbar = this.messagesListScrollable;
-      const scrollPositionY = scrollbar.getScrollPositionY();
-      const offset = parseInt(scrollbar.domNode.style.height);
-      const PAGE = {
-        UP: 33,
-        DOWN: 34
-      };
+      const domNode = scrollbar.domNode;
 
-      switch (keyCode) {
-        case PAGE.UP:
-          scrollbar.scrollToY(scrollPositionY - offset, true);
-          this.onMessagesScrollUserScroll(scrollbar, 100);
-          break;
+      if (domNode && domNode.offsetParent && !this.state.attachCloudDialog) {
+        const scrollPositionY = scrollbar.getScrollPositionY();
+        const offset = parseInt(domNode.style.height);
+        const PAGE = {
+          UP: 33,
+          DOWN: 34
+        };
 
-        case PAGE.DOWN:
-          if (!scrollbar.isAtBottom()) {
-            scrollbar.scrollToY(scrollPositionY + offset, true);
-          }
+        switch (keyCode) {
+          case PAGE.UP:
+            scrollbar.scrollToY(scrollPositionY - offset, true);
+            this.onMessagesScrollUserScroll(scrollbar, 100);
+            break;
 
-          break;
+          case PAGE.DOWN:
+            if (!scrollbar.isAtBottom()) {
+              scrollbar.scrollToY(scrollPositionY + offset, true);
+            }
+
+            break;
+        }
       }
     };
 
@@ -12716,7 +12720,6 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function () {
       self.callJustEnded = true;
     });
-    $(document).rebind('keydown.keyboardScroll', this.onKeyboardScroll);
     self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function () {
       self.props.chatRoom.scrolledToBottom = true;
 
@@ -14006,18 +14009,21 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
       onFirstInit: ps => {
         ps.scrollToBottom(true);
-        self.props.chatRoom.scrolledToBottom = 1;
+        this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: self.onMessagesScrollReinitialise.bind(this),
-      onUserScroll: self.onMessagesScrollUserScroll.bind(this),
+      onReinitialise: this.onMessagesScrollReinitialise.bind(this),
+      onUserScroll: this.onMessagesScrollUserScroll.bind(this),
       className: "js-messages-scroll-area perfectScrollbarContainer",
-      messagesToggledInCall: self.state.messagesToggledInCall,
-      ref: ref => self.messagesListScrollable = ref,
-      chatRoom: self.props.chatRoom,
-      messagesBuff: self.props.chatRoom.messagesBuff,
-      editDomElement: self.state.editDomElement,
-      editingMessageId: self.state.editing,
-      confirmDeleteDialog: self.state.confirmDeleteDialog,
+      messagesToggledInCall: this.state.messagesToggledInCall,
+      ref: ref => {
+        this.messagesListScrollable = ref;
+        $(document).rebind('keydown.keyboardScroll', this.onKeyboardScroll);
+      },
+      chatRoom: this.props.chatRoom,
+      messagesBuff: this.props.chatRoom.messagesBuff,
+      editDomElement: this.state.editDomElement,
+      editingMessageId: this.state.editing,
+      confirmDeleteDialog: this.state.confirmDeleteDialog,
       renderedMessagesCount: messagesList.length,
       isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
       options: {
@@ -14028,11 +14034,11 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("div", {
       className: "messages content-area"
     }, external_React_default.a.createElement("div", {
-      className: "loading-spinner js-messages-loading light manual-management" + (!self.loadingShown ? " hidden" : ""),
       key: "loadingSpinner",
       style: {
         top: "50%"
-      }
+      },
+      className: "\n                                                loading-spinner js-messages-loading light manual-management\n                                                " + (this.loadingShown ? '' : 'hidden') + "\n                                            "
     }, external_React_default.a.createElement("div", {
       className: "main-loader",
       style: {

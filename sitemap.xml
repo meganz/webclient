@@ -2,6 +2,7 @@
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd     http://www.w3.org/1999/xhtml http://www.w3.org/2002/08/xhtml/xhtml1-strict.xsd">
   <url>
     <loc>https://mega.nz/</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/?cn"/>
@@ -35,6 +36,7 @@
   </url>
   <url>
     <loc>https://mega.nz/start</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/start?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/start?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/start?cn"/>
@@ -68,6 +70,7 @@
   </url>
   <url>
     <loc>https://mega.nz/business</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/business?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/business?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/business?cn"/>
@@ -101,6 +104,7 @@
   </url>
   <url>
     <loc>https://mega.nz/mobile</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/mobile?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/mobile?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/mobile?cn"/>
@@ -194,6 +198,7 @@
   </url>
   <url>
     <loc>https://mega.nz/sync</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/sync?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/sync?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/sync?cn"/>
@@ -227,6 +232,7 @@
   </url>
   <url>
     <loc>https://mega.nz/cmd</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/cmd?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/cmd?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/cmd?cn"/>
@@ -260,6 +266,7 @@
   </url>
   <url>
     <loc>https://mega.nz/extensions</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/extensions?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/extensions?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/extensions?cn"/>
@@ -383,6 +390,7 @@
   </url>
   <url>
     <loc>https://mega.nz/bird</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/bird?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/bird?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/bird?cn"/>
@@ -416,6 +424,7 @@
   </url>
     <url>
     <loc>https://mega.nz/nas</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/nas?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/nas?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/nas?cn"/>
@@ -449,6 +458,7 @@
   </url>
   <url>
     <loc>https://mega.nz/help</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/help?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/help?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/help?cn"/>
@@ -482,6 +492,7 @@
   </url>
   <url>
     <loc>https://mega.nz/about/main</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/about/main?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/about/main?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/about/main?cn"/>
@@ -515,6 +526,7 @@
   </url>
   <url>
     <loc>https://mega.nz/uwp</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/uwp?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/uwp?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/uwp?cn"/>
@@ -548,6 +560,7 @@
   </url>
   <url>
     <loc>https://mega.nz/about</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/about?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/about?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/about?cn"/>
@@ -581,6 +594,7 @@
   </url>
   <url>
     <loc>https://mega.nz/pro</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/pro?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/pro?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/pro?cn"/>
@@ -614,6 +628,7 @@
   </url>
   <url>
     <loc>https://mega.nz/resellers</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/resellers?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/resellers?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/resellers?cn"/>
@@ -647,6 +662,7 @@
   </url>
   <url>
     <loc>https://mega.nz/corporate/investors</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/corporate/investors?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/corporate/investors?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/corporate/investors?cn"/>
@@ -680,6 +696,7 @@
   </url>
   <url>
     <loc>https://mega.nz/corporate/media</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/corporate/media?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/corporate/media?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/corporate/media?cn"/>
@@ -713,6 +730,7 @@
   </url>
   <url>
     <loc>https://mega.nz/corporate/shareholder-reports</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/corporate/shareholder-reports?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/corporate/shareholder-reports?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/corporate/shareholder-reports?cn"/>
@@ -746,6 +764,7 @@
   </url>
   <url>
     <loc>https://mega.nz/contact</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/contact?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/contact?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/contact?cn"/>
@@ -779,6 +798,7 @@
   </url>
   <url>
     <loc>https://mega.nz/blog</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/blog?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/blog?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/blog?cn"/>
@@ -812,6 +832,7 @@
   </url>
   <url>
     <loc>https://mega.nz/security</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/security?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/security?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/security?cn"/>
@@ -845,6 +866,7 @@
   </url>
   <url>
     <loc>https://mega.nz/credits</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/credits?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/credits?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/credits?cn"/>
@@ -878,6 +900,7 @@
   </url>
   <url>
     <loc>https://mega.nz/terms</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/terms?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/terms?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/terms?cn"/>
@@ -911,6 +934,7 @@
   </url>
   <url>
     <loc>https://mega.nz/privacy</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/privacy?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/privacy?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/privacy?cn"/>
@@ -944,6 +968,7 @@
   </url>
   <url>
     <loc>https://mega.nz/copyright</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/copyright?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/copyright?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/copyright?cn"/>
@@ -977,6 +1002,7 @@
   </url>
   <url>
     <loc>https://mega.nz/takedown</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/takedown?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/takedown?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/takedown?cn"/>
@@ -1010,6 +1036,7 @@
   </url>
   <url>
     <loc>https://mega.nz/gdpr</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/gdpr?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/gdpr?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/gdpr?cn"/>
@@ -1043,6 +1070,7 @@
   </url>
   <url>
     <loc>https://mega.nz/sourcecode</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/sourcecode?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/sourcecode?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/sourcecode?cn"/>
@@ -1076,6 +1104,7 @@
   </url>
   <url>
     <loc>https://mega.nz/sdk</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/sdk?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/sdk?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/sdk?cn"/>
@@ -1109,6 +1138,7 @@
   </url>
   <url>
     <loc>https://mega.nz/doc</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/doc?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/doc?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/doc?cn"/>
@@ -1142,6 +1172,7 @@
   </url>
   <url>
     <loc>https://mega.nz/refer</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/refer?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/refer?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/refer?cn"/>
@@ -1175,6 +1206,7 @@
   </url>
   <url>
     <loc>https://mega.nz/about/reliability</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/about/reliability?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/about/reliability?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/about/reliability?cn"/>
@@ -1208,6 +1240,7 @@
   </url>
   <url>
     <loc>https://mega.nz/about/privacy</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/about/privacy?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/about/privacy?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/about/privacy?cn"/>
@@ -1241,6 +1274,7 @@
   </url>  
   <url>
     <loc>https://mega.nz/about/jobs</loc>
+    <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/about/jobs?ar"/>
     <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/about/jobs?br"/>
     <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/about/jobs?cn"/>

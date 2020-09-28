@@ -8,6 +8,7 @@ function BusinessAccountUI() {
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
         mBroadcaster.addListener('business:subuserUpdate', this.UIEventsHandler.bind(this));
+        Ps.initialize(document.querySelector('.user-management-account-settings .content-wrapper'));
         this.initialized = false;
     }
     else {

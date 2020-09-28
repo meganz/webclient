@@ -7218,8 +7218,7 @@ let typingArea_TypingArea = (_dec = Object(mixins["SoonFcWrap"])(60), _dec2 = Ob
     }
 
     var textareaStyles = {
-      height: self.state.textareaHeight,
-      paddingRight: 14
+      height: self.state.textareaHeight
     };
     var textareaScrollBlockStyles = {};
     var newHeight = Math.min(self.state.textareaHeight, self.getTextareaMaxHeight());

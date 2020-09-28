@@ -63,7 +63,7 @@ function translate(html) {
         //      are used before startMega() have finished. Also, injecting them in the
         //      DOM to manipulate it later is something we should avoid doing as well.
         // FIXME: we will for now whitelist onboarding strings doing so though...
-        if (d && /\[\w+]/.test(l[localeNum]) && (localeNum < 17566 || localeNum > 17577) && localeNum !== 23718) {
+        if (d && /\[\w+]/.test(l[localeNum]) && (localeNum < 17566 || localeNum > 17577)) {
             console.warn('locale string %s does contain raw entity tags', localeNum, [l[localeNum]]);
         }
 

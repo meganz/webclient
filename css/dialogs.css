@@ -7674,7 +7674,7 @@ a.affiliate-guide.grey-link:hover {
     font-family: 'LatoWeb', Arial;
     font-size: 14px;
     line-height: 0;
-    height: 0;
+    height: 100%;
     color: #333333;
     position: absolute;
     opacity: 0;

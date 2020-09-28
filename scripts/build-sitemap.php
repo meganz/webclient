@@ -77,6 +77,7 @@ $addURL = function($uris = []) use ($languages, $root, $pages, $map, $encode) {
             echo "Adding URL: " . $url . PHP_EOL;
             if ($index === 0) {
                 $urlNode->addChild('loc', $encode($url));
+                $urlNode->addChild('lastmod', '2020-09-28');
             }
             foreach ($languages as $lang) {
                 $langNode = $urlNode->addChild('xhtml:xhtml:link');

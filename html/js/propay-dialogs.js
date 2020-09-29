@@ -1369,6 +1369,7 @@ var addressDialog = {
         var $statesSelect = this.$dialog.find('.states');
         var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
         var $postcodeInput = this.$dialog.find(".postcode");
+        var $taxcode = $('input.taxcode', this.$dialog).attr('placeholder', 'VAT ' + l[7347]);
 
         // On dropdown option change
         $countriesSelect.selectmenu({
@@ -1427,6 +1428,8 @@ var addressDialog = {
                 } else {
                     $statesSelect.selectmenu('disable');
                 }
+                var taxName = getTaxName(selectedCountryCode);
+                $taxcode.attr('placeholder', taxName + ' ' + l[7347]);
 
                 // Refresh the selectmenu to show/hide disabled options
                 $statesSelect.selectmenu('refresh');
@@ -1491,6 +1494,10 @@ var addressDialog = {
 
             if (billingInfo.hasOwnProperty('postcode')) {
                 this.$dialog.find(".postcode").val(billingInfo.postcode);
+            }
+
+            if (billingInfo.hasOwnProperty('taxCode')) {
+                $('.taxcode', this.$dialog).val(billingInfo.taxCode);
             }
         }
     },
@@ -1661,6 +1668,7 @@ var addressDialog = {
         var $countrySelectmenuButton = this.$dialog.find('#address-dialog-countries-button');
         var state = $stateSelect.val();
         var country = $countrySelect.val();
+        var taxCode = $('input.taxcode', this.$dialog).val();
 
         // Selectors for error handling
         var $errorMessage = this.$dialog.find('.error-message');
@@ -1715,6 +1723,7 @@ var addressDialog = {
             saveAttribute('city', fieldValues['city']);
             saveAttribute('country', country);
             saveAttribute('state', state);
+            saveAttribute('taxCode', taxCode);
         } else {
             // Forget Attribute.
             mega.attr.remove('billinginfo', false, true);
@@ -1722,7 +1731,7 @@ var addressDialog = {
 
 
         // Send to the API
-        this.proceedToPay(fieldValues, state, country);
+        this.proceedToPay(fieldValues, state, country, taxCode);
     },
 
     /**
@@ -1731,8 +1740,8 @@ var addressDialog = {
      * @param {type} state The value of the state dropdown
      * @param {type} country The value of the country dropdown
      */
-    proceedToPay: function(fieldValues, state, country) {
-
+    proceedToPay: function(fieldValues, state, country, taxCode) {
+        'use strict';
         // Set details for the UTC call
         this.extraDetails.first_name = fieldValues['first-name'];
         this.extraDetails.last_name = fieldValues['last-name'];
@@ -1742,6 +1751,7 @@ var addressDialog = {
         this.extraDetails.zip_code = fieldValues['postcode'];
         this.extraDetails.country = country;
         this.extraDetails.recurring = false;
+        this.extraDetails.taxCode = taxCode;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {

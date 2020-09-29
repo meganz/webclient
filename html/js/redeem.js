@@ -874,13 +874,26 @@ var redeem = {
         return new MegaPromise(function(resolve, reject) {
             var parse = function(v) {
                 var b = v.promotional ? v.value : (v.balance + v.value);
-                var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
-                v.planId = p[0];
-                v.proNum = p[1];
-                v.storage = p[2];
-                v.bandwidth = p[3];
-                v.months = p[4];
-                v.price = p[5];
+
+                var validPlanItem = v.item && v.item.al && v.item.s && v.item.t && v.item.m && v.item.p;
+
+                if (v.promotional && validPlanItem) {
+                    v.planId = v.item.id;
+                    v.proNum = v.item.al;
+                    v.storage = v.item.s;
+                    v.bandwidth = v.item.t;
+                    v.months = v.item.m;
+                    v.price = v.item.p;
+                }
+                else {
+                    var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
+                    v.planId = p[0];
+                    v.proNum = p[1];
+                    v.storage = p[2];
+                    v.bandwidth = p[3];
+                    v.months = p[4];
+                    v.price = p[5];
+                }
 
                 if (v.available && v.proNum) {
                     return resolve(v);

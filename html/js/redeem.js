@@ -402,7 +402,7 @@ var redeem = {
         var numOfMonths = vd.months;
         var intl = mega.intl.decimal;
         var decimalSeparator = mega.intl.decimalSeparator;
-        var planPrice = vd.price.split(decimalSeparator);
+        var planPrice = vd.price.split('.');
         var proName = pro.getProPlanName(proNum);
 
         // Get dollars and cents

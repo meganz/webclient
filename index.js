@@ -2818,7 +2818,17 @@ function pagemetadata() {
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
     document.title = mega_title;
     megatitle();
+
+    if (pagemetadata.last === page) {
+        console.error('Re-invoking pagemetadata() for the same page...', page);
+    }
+    else {
+        mBroadcaster.sendMessage('pagemetadata', metas);
+    }
+    pagemetadata.last = page;
 }
+
+pagemetadata.last = null;
 
 
 function parsepage(pagehtml) {

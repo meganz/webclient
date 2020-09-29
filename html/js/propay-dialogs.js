@@ -919,7 +919,8 @@ var wireTransferDialog = {
 
             // Update plan price in the dialog
             if (proPrice) {
-                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr').removeClass('hidden');
+                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
+                    .removeClass('hidden');
             }
             else {
                 this.$dialog.find('.amount').closest('tr').addClass('hidden');

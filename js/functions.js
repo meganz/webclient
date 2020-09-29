@@ -385,6 +385,11 @@ function bytesToSize(bytes, precision, format) {
         resultUnit = s_b;
     }
 
+    if (window.lang !== 'en') {
+        // @todo measure the performance degradation by invoking this here now..
+        resultSize = mega.intl.decimal.format(resultSize);
+    }
+
     // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
     if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';

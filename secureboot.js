@@ -694,18 +694,6 @@ var mega = {
     }
 };
 
-/** @property mega.intlNumberFormat */
-lazy(mega, 'intlNumberFormat', function() {
-    'use strict';
-    var intl;
-
-    tryCatch(function() {
-        intl = new Intl.NumberFormat(getCountryAndLocales().locales, {minimumFractionDigits: 2});
-    }, false)();
-
-    return intl || new Intl.NumberFormat();
-});
-
 Object.defineProperty(mega, 'flags', {
     get: function() {
         'use strict';

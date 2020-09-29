@@ -552,18 +552,19 @@ var voucherDialog = {
         var oldStorage = oldPlan ? (oldPlan[2] * Math.pow(1024, 3)) : 0;
         var newStorage = Math.max(pro.propay.selectedProPackage[2] * Math.pow(1024, 3), oldStorage);
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
+        var intl = mega.intl.number;
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.voucher-plan-price .price').text(proPrice);
+        this.$dialog.find('.voucher-plan-price .price').text(intl.format(proPrice));
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
 
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
-        $balanceAmount.text(balance);
+        $balanceAmount.text(intl.format(balance));
 
         // Mobile specific dialog enhancements
         if (is_mobile) {
@@ -918,7 +919,8 @@ var wireTransferDialog = {
 
             // Update plan price in the dialog
             if (proPrice) {
-                this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
+                    .removeClass('hidden');
             }
             else {
                 this.$dialog.find('.amount').closest('tr').addClass('hidden');
@@ -1266,7 +1268,7 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.payment-plan-price .price').text(proPrice);
+        this.$dialog.find('.payment-plan-price .price').text(mega.intl.number.format(proPrice));
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -2449,7 +2451,7 @@ var bitcoinDialog = {
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
         $bitcoinDialog.find('.plan-name').text(planName);
         $bitcoinDialog.find('.plan-duration').text(planMonths);
-        $bitcoinDialog.find('.plan-price-euros .value').text(priceEuros);
+        $('.plan-price-euros .value', $bitcoinDialog).text(mega.intl.number.format(priceEuros));
         $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
 
         // Set countdown to price expiry

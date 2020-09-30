@@ -163,12 +163,18 @@ function getCleanSitePath(path) {
                 localStorage.afftype = 1;
             }
         }
+        if (path.mt) {
+            window.uTagMT = path.mt;
+        }
     }
     else if (path[0].indexOf('aff=') === 0) {
         localStorage.affid = String(path[0]).replace('aff=', '');
         localStorage.affts = Date.now();
         localStorage.afftype = 1;
         path = [''];
+    }
+    else if (path[0].indexOf('mt=') === 0) {
+        window.uTagMT = String(path[0]).replace('mt=', '');
     }
 
     return path[0];
@@ -4181,5 +4187,14 @@ mBroadcaster.once('startMega', function() {
 
         checkPage(page);
         mBroadcaster.addListener('pagechange', checkPage);
+    }
+
+    if (window.uTagMT) {
+        var mt = window.uTagMT;
+        delete window.uTagMT;
+
+        setTimeout(function() {
+            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
     }
 });

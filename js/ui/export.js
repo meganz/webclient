@@ -1730,7 +1730,7 @@ var exportExpiry = {
         var $calendarIcons;
         var $lockIcons;
         var $cogIcons;
-        var $datepickerInput = $('.set-date', $linksDialog);
+        var $datepickerInputs = $('.set-date', $linksDialog);
         var html = '';
         var $scroll = $('.export-links-dialog.links-scroll', $linksTab);
         var links;
@@ -1750,11 +1750,16 @@ var exportExpiry = {
             affiliateUI.registeredDialog.show();
 
             // Remove Datepicker dialogs
-            if ($datepickerInput.datepicker()) {
+            for (var i = $datepickerInputs.length; i--;) {
 
-                $datepickerInput.datepicker().data('datepicker').destroy();
-                $('.datepicker', '.datepickers-container').remove();
+                var $datepicker = $($datepickerInputs[i]).data('datepicker');
+
+                if ($datepicker && $datepicker.inited) {
+                    $datepicker.destroy();
+                }
             }
+
+            $('.datepicker', '.datepickers-container').remove();
 
             return true;
         }

@@ -12636,7 +12636,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       const scrollbar = this.messagesListScrollable;
       const domNode = scrollbar.domNode;
 
-      if (domNode && domNode.offsetParent && !this.state.attachCloudDialog) {
+      if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
         const scrollPositionY = scrollbar.getScrollPositionY();
         const offset = parseInt(domNode.style.height);
         const PAGE = {
@@ -12863,7 +12863,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     window.removeEventListener('resize', self.handleWindowResize);
     window.removeEventListener('keydown', self.handleKeyDown);
     $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
-    $(document).off('keydown.keyboardScroll');
+    $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -13977,7 +13977,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       messagesToggledInCall: this.state.messagesToggledInCall,
       ref: ref => {
         this.messagesListScrollable = ref;
-        $(document).rebind('keydown.keyboardScroll', this.onKeyboardScroll);
+        $(document).rebind('keydown.keyboardScroll_' + this.props.chatRoom.roomId, this.onKeyboardScroll);
       },
       chatRoom: this.props.chatRoom,
       messagesBuff: this.props.chatRoom.messagesBuff,

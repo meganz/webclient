@@ -1231,8 +1231,11 @@ var exportExpiry = {
 
         // If they are a pro user, enable expiry date
         if (u_attr.p) {
-            exportExpiry.initExpiryDatePicker();
-            exportExpiry.prepopulateExpiryDates();
+
+            M.require('datepicker_js').done(function() {
+                exportExpiry.initExpiryDatePicker();
+                exportExpiry.prepopulateExpiryDates();
+            });
         }
     },
 
@@ -1243,78 +1246,71 @@ var exportExpiry = {
 
         "use strict";
 
-        var $setDateInput = $('.set-date', this.$dialog);
-        var $dateBtnLabel = $('.label', this.$datepickerBtn);
-        var $removeDateBtn = $('.sub-button', this.$datepickerBtn);
+        var self = this;
+        var $setDateInput = $('.set-date', self.$dialog);
+        var $removeDateBtn = $('.sub-button', self.$datepickerBtn);
         var $scroll = $('.links-scroll', this.$dialog);
+        var minDate = new Date();
+        var maxDate = new Date(2060, 11, 31);
+        var datepicker;
 
-        // Change Month Select width based on the current selection
-        var changeMonthWidth = function() {
-
-            var $datepicker;
-            var $pickerTitle;
-            var clonedSelect;
-            var selectedMonth;
-            var selectedYear;
-
-            Soon(function() {
-
-                $datepicker = $('.ui-datepicker', 'body');
-                $pickerTitle = $('.ui-datepicker-title', $datepicker);
-                selectedMonth = $('.ui-datepicker-month option:selected', $pickerTitle).text();
-                selectedYear = $('.ui-datepicker-year option:selected', $pickerTitle).text();
-                clonedSelect = '<div class="clone"><span class="month">'
-                    + selectedMonth + '</span><span class="year">' + selectedYear + '</span></div>';
-
-                // Append cloned Select box to get realy width of current selection
-                $('.ui-datepicker-header', $datepicker).safeAppend(clonedSelect);
-
-                $('.ui-datepicker-month', $pickerTitle)
-                    .outerWidth($('.clone .month', $datepicker).outerWidth());
-                $('.ui-datepicker-year', $pickerTitle)
-                    .outerWidth($('.clone .year', $datepicker).outerWidth());
-            });
-        };
+        // Set Minimum date at least 1 day in the future
+        minDate.setDate(minDate.getDate() + 1);
 
         // Initialise expiry date picker
-        $setDateInput.datepicker({
+        datepicker = $setDateInput.datepicker({
 
-            // Unix timestamp
+            // Date format, @ - Unix timestamp
             dateFormat: '@',
-            // Sun - Sat
-            dayNamesMin: [
-                l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]
-            ],
-            // At least 1 day in the future
-            minDate: '+1D',
-            monthNames: [
-                l[408], l[409], l[410], l[411], l[412], l[413],     // January - June
-                l[414], l[415], l[416], l[417], l[418], l[419]      // July - December
-            ],
-            monthNamesShort: [
-                l[408], l[409], l[410], l[411], l[412], l[413],     // January - June
-                l[414], l[415], l[416], l[417], l[418], l[419]      // July - December
-            ],
-            // Allows to select year in header
-            changeYear: true,
-            // Allows to select month in header
-            changeMonth: true,
-            // Fade in on Show
-            showAnim: 'fadeIn',
-            // Automatically resize the input field with selected date
-            autoSize: true,
-            // Show for the close button
-            showButtonPanel: true,
-            // Use an icon instead of text
-            closeText: '',
-            // Change Month select box width on Show
-            beforeShow: function(input,inst) {
+            // Minimum date that can be selected
+            minDate: minDate,
+            // Maximum date that can be selected
+            maxDate: maxDate,
+            // Start date that should be displayed when datepiccker is shown
+            startDate: minDate,
+            // Content of Previous button
+            prevHtml: '<i class="medium-icon dialog-sprite right-arrow"></i>',
+            // Content of Next button
+            nextHtml: '<i class="medium-icon dialog-sprite right-arrow"></i>',
+            // First day in the week. 0 - Sun
+            firstDay: 0,
+            // Auto close daticker is date is selected
+            autoClose: true,
+            // If true, then clicking on selected cell will remove selection
+            toggleSelected: false,
+            // Cursom localization
+            language: {
+                // Sun - Sat
+                daysMin: [l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]],
+                months: [
+                    l[408], l[409], l[410], l[411], l[412], l[413],     // January - June
+                    l[414], l[415], l[416], l[417], l[418], l[419]      // July - December
+                ],
+                monthsShort: [
+                    l[24035], l[24037], l[24036], l[24038], l[24047], l[24039],     // January - June
+                    l[24040], l[24041], l[24042], l[24043], l[24044], l[24045]      // July - December
+                ]
+            },
 
-                var $inputClicked = $(input);
-                var $datepicker = $(inst.dpDiv);
+            // Change Month select box width on Show
+            onShow: function(inst) {
+
+                var $inputClicked = inst.$el;
+                var $datepicker = inst.$datepicker;
+
+                // Show previously selected date or min date as default
+                if (inst.selectedDates[0]) {
+                    inst.date = inst.selectedDates[0];
+                }
+                else {
+                    inst.date = minDate;
+                }
+
+                // Update datepicker data
+                inst.update();
 
                 // Change datepicker position related to clicked element
-                var datepickerReposition = function() {
+                inst.setPosition = function() {
 
                     $datepicker.position({
                         of: $inputClicked,
@@ -1325,55 +1321,50 @@ var exportExpiry = {
                 };
 
                 // Change datepicker position
-                Soon(datepickerReposition);
+                Soon(inst.setPosition);
+
+                // Change position on resize
+                $(window).rebind('resize.setDatepickerPosition', function() {
+                    inst.setPosition();
+                });
 
                 // Disable scrolling
                 delay('disableExportScroll', function() {
                     Ps.disable($scroll[0]);
                 }, 100);
 
-                $(window).rebind('resize.setDatepickerPosition', function() {
-                    datepickerReposition();
-                });
-
                 // Close export dropdown
-                $('.dropdown.export', this.$dialog).addClass('hidden');
+                $('.dropdown.export', self.$dialog).addClass('hidden');
 
                 // Close set password dialog
                 exportPassword.encrypt.hideSetPasswordDialog();
-
-                // Change Month select box width on Month change
-                changeMonthWidth();
             },
-            // Change Month select box width on Month change
-            onChangeMonthYear: function() {
 
-                changeMonthWidth();
-            },
-            onSelect: function(dateText) {
+            onSelect: function(dateText, date, inst) {
+
+                var $inputClicked = inst.$el;
 
                 // Select link item
-                $('.item.selected', this.$dialog).removeClass('selected');
-                $(this).closest('.item').addClass('selected');
+                $('.item.selected', self.$dialog).removeClass('selected');
+                $inputClicked.closest('.item').addClass('selected');
 
                 // Update the link with the new expiry timestamp
                 exportExpiry.updateLinks(dateText / 1000);
             },
-            onClose: function() {
+
+            onHide: function() {
 
                 // Enable scroll
                 Ps.enable($scroll[0]);
 
-                // Remove focus from component input
-                $(this).trigger('blur');
-
                 // Unbind dialog positioning
                 $(window).unbind('resize.setDatepickerPosition');
             }
-        });
+
+        }).data('datepicker');
 
         // Clear active dates
-        $setDateInput.datepicker('setDate', null);
+        datepicker.selectedDates = [];
 
         // Press Enter key if datepicker dropdown is opened
         $setDateInput.rebind('keydown.date', function(event) {
@@ -1389,12 +1380,6 @@ var exportExpiry = {
             }
         });
 
-        // Show common datepicker
-        $dateBtnLabel.rebind('click.showDatepicker', function() {
-
-            $('input', $(this).parent()).datepicker('show');
-        });
-
         // Remove date button
         $removeDateBtn.rebind('click.clearExpiry', function() {
 
@@ -1402,7 +1387,7 @@ var exportExpiry = {
             $('.item.selected', this.$dialog).removeClass('selected');
 
             // Remove selected date from all items
-            $setDateInput.datepicker('setDate', null);
+            datepicker.clear();
 
             // Update common Set Expiry Date button
             exportExpiry.updateExpiryButtons();
@@ -1422,9 +1407,13 @@ var exportExpiry = {
         var $expiryLinks = $('.links-scroll .item.dateSet', this.$dialog);
         var $setDateBtn = this.$datepickerBtn;
         var $setDateInput = $('.set-date', $setDateBtn);
+        var datepicker = $setDateInput.datepicker().data('datepicker');
         var $btnLabel = $('.label', $setDateBtn);
         var $removeDateBtn = $('.sub-button', $setDateBtn);
         var buttonLabel;
+
+        // Clear active dates
+        datepicker.selectedDates = [];
 
         // If there is at least one expiry date set
         if ($expiryLinks.length) {
@@ -1454,13 +1443,10 @@ var exportExpiry = {
             if (Number(buttonLabel)) {
 
                 // Set active date in datepicker component
-                $setDateInput.datepicker('setDate', new Date(buttonLabel * 1000));
-                buttonLabel = time2date(buttonLabel, 5);
-            }
-            else {
+                datepicker.selectedDates = [new Date(buttonLabel * 1000)];
 
-                // Remove active date
-                $setDateInput.datepicker('setDate', null);
+                // Change "Set  expiry date" button label
+                buttonLabel = time2date(buttonLabel, 5);
             }
 
             // Set expiry date button label
@@ -1471,10 +1457,6 @@ var exportExpiry = {
             // Clear the date of any old entries and set "Set  expiry date" button label
             $btnLabel.text(l[8953]);
             $removeDateBtn.addClass('hidden');
-
-            if ($setDateInput.is('.hasDatepicker')) {
-                $setDateInput.datepicker('setDate', null);
-            }
         }
     },
 
@@ -1586,7 +1568,11 @@ var exportExpiry = {
         var $linkItem = $('.export-links-dialog.item[data-node-handle="' + nodeHandle + '"]', this.$dialog);
         var $expiryIcon = $('.small-icon.calendar', $linkItem);
         var $setDateInput = $('input', $expiryIcon);
+        var datepicker = $setDateInput.datepicker().data('datepicker');
         var expiryString = '';
+
+        // Clear active dates
+        datepicker.selectedDates = [];
 
         // If the expiry timestamp is set
         if (expiryTimestamp) {
@@ -1596,14 +1582,11 @@ var exportExpiry = {
 
                 // Use 'Expired' string
                 expiryTimestamp = l[1664];
-
-                // Remove active date
-                $setDateInput.datepicker('setDate', null);
             }
             else {
 
                 // Set active date in datepicker component
-                $setDateInput.datepicker('setDate',  new Date(expiryTimestamp * 1000));
+                datepicker.selectedDates = [new Date(expiryTimestamp * 1000)];
             }
 
             // Set special Expiry classname
@@ -1613,9 +1596,6 @@ var exportExpiry = {
             $expiryIcon.removeClass('hidden');
         }
         else {
-
-            // Remove active date
-            $setDateInput.datepicker('setDate', null);
 
             // Set special Expiry classname
             $linkItem.removeClass('dateSet');
@@ -1750,6 +1730,7 @@ var exportExpiry = {
         var $calendarIcons;
         var $lockIcons;
         var $cogIcons;
+        var $datepickerInputs = $('.set-date', $linksDialog);
         var html = '';
         var $scroll = $('.export-links-dialog.links-scroll', $linksTab);
         var links;
@@ -1767,6 +1748,18 @@ var exportExpiry = {
             }
 
             affiliateUI.registeredDialog.show();
+
+            // Remove Datepicker dialogs
+            for (var i = $datepickerInputs.length; i--;) {
+
+                var $datepicker = $($datepickerInputs[i]).data('datepicker');
+
+                if ($datepicker && $datepicker.inited) {
+                    $datepicker.destroy();
+                }
+            }
+
+            $('.datepicker', '.datepickers-container').remove();
 
             return true;
         }
@@ -2214,9 +2207,10 @@ var exportExpiry = {
             $setExpiryItem.rebind('click.setDate', function() {
 
                 var $selectedLink = $('.item.selected', $linksTab);
+                var datepicker = $('.set-date', $selectedLink).datepicker().data('datepicker');
 
                 // Show datepicker
-                $('.set-date', $selectedLink).datepicker('show');
+                datepicker.show();
             });
 
             // Add click event to Set password dropdown item

@@ -25193,15 +25193,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
     height:100%;
 }
 
-.user-management-account-settings .content-wrapper {
-    position: relative;
-    height: calc(100% - 48px);
-}
-
-.user-management-account-settings .content-wrapper .profile {
-    margin-bottom: 16px;
-}
-
 .user-management-account-settings .invoice {
     height:calc(100% - 48px);
 }

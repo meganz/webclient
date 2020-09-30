@@ -163,12 +163,18 @@ function getCleanSitePath(path) {
                 localStorage.afftype = 1;
             }
         }
+        if (path.mt) {
+            window.uTagMT = path.mt;
+        }
     }
     else if (path[0].indexOf('aff=') === 0) {
         localStorage.affid = String(path[0]).replace('aff=', '');
         localStorage.affts = Date.now();
         localStorage.afftype = 1;
         path = [''];
+    }
+    else if (path[0].indexOf('mt=') === 0) {
+        window.uTagMT = String(path[0]).replace('mt=', '');
     }
 
     return path[0];
@@ -693,18 +699,6 @@ var mega = {
         return this._urlParams;
     }
 };
-
-/** @property mega.intlNumberFormat */
-lazy(mega, 'intlNumberFormat', function() {
-    'use strict';
-    var intl;
-
-    tryCatch(function() {
-        intl = new Intl.NumberFormat(getCountryAndLocales().locales, {minimumFractionDigits: 2});
-    }, false)();
-
-    return intl || new Intl.NumberFormat();
-});
 
 Object.defineProperty(mega, 'flags', {
     get: function() {
@@ -2820,6 +2814,7 @@ else if (!browserUpdate) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
         'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
@@ -4192,5 +4187,14 @@ mBroadcaster.once('startMega', function() {
 
         checkPage(page);
         mBroadcaster.addListener('pagechange', checkPage);
+    }
+
+    if (window.uTagMT) {
+        var mt = window.uTagMT;
+        delete window.uTagMT;
+
+        setTimeout(function() {
+            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
     }
 });

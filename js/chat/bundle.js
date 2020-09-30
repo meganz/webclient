@@ -13459,75 +13459,35 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       });
     }
 
-    var privateChatDialog;
+    let privateChatDialog;
 
     if (self.state.privateChatDialog === true) {
-      if (!$.dialog || $.dialog === "create-private-chat") {
-        $.dialog = "create-private-chat";
-        privateChatDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
-          title: l[20594],
-          className: "fm-dialog create-private-chat",
-          chatRoom: room,
-          onClose: () => {
-            self.setState({
-              'privateChatDialog': false
-            });
+      const onClose = () => this.setState({
+        privateChatDialog: false
+      });
 
-            if ($.dialog === "create-private-chat") {
-              closeDialog();
-            }
-          }
-        }, external_React_default.a.createElement("div", {
-          className: "create-private-chat-content-block fm-dialog-body"
-        }, external_React_default.a.createElement("i", {
-          className: "huge-icon lock"
-        }), external_React_default.a.createElement("div", {
-          className: "dialog-body-text"
-        }, external_React_default.a.createElement("div", {
-          className: ""
-        }, external_React_default.a.createElement("b", null, l[20590]), external_React_default.a.createElement("br", null), l[20591])), external_React_default.a.createElement("div", {
-          className: "clear"
-        }), external_React_default.a.createElement("div", {
-          className: "big-red-button",
-          id: "make-chat-private",
-          onClick: function () {
-            self.props.chatRoom.switchOffPublicMode();
-            self.setState({
-              'privateChatDialog': false
-            });
-
-            if ($.dialog === "create-private-chat") {
-              closeDialog();
-            }
-          }
-        }, external_React_default.a.createElement("div", {
-          className: "big-btn-txt"
-        }, l[20593]))));
-        $('.create-private-chat .fm-dialog-close').rebind('click', function () {
-          $('.create-private-chat').addClass('hidden');
-          $('.fm-dialog-overlay').addClass('hidden');
-        });
-        $('.create-private-chat .default-red-button').rebind('click', function () {
-          var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
-          var promises = [];
-          promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
-
-          var _runSwitchOffPublicMode = function () {
-            var topic = null;
-
-            if (self.props.chatRoom.topic) {
-              topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo(self.props.chatRoom.topic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, true, self.props.chatRoom.type === "public");
-              topic = base64urlencode(topic);
-            }
-
-            self.props.onSwitchOffPublicMode(topic);
-          };
-
-          MegaPromise.allDone(promises).done(function () {
-            _runSwitchOffPublicMode();
-          });
-        });
-      }
+      privateChatDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
+        title: l[20594],
+        className: "fm-dialog create-private-chat",
+        chatRoom: room,
+        onClose: onClose
+      }, external_React_default.a.createElement("div", {
+        className: "create-private-chat-content-block fm-dialog-body"
+      }, external_React_default.a.createElement("i", {
+        className: "huge-icon lock"
+      }), external_React_default.a.createElement("div", {
+        className: "dialog-body-text"
+      }, external_React_default.a.createElement("strong", null, l[20590]), external_React_default.a.createElement("br", null), external_React_default.a.createElement("span", null, l[20591])), external_React_default.a.createElement("div", {
+        className: "clear"
+      }), external_React_default.a.createElement("div", {
+        className: "big-red-button",
+        onClick: () => {
+          this.props.chatRoom.switchOffPublicMode();
+          onClose();
+        }
+      }, external_React_default.a.createElement("div", {
+        className: "big-btn-txt"
+      }, l[20593]))));
     }
 
     var sendContactDialog = null;

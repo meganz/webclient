@@ -357,8 +357,7 @@
     var reRendered = {};
 
     var CMS = {
-        watch: function(type, callback)
-        {
+        watch: function(type, callback) {
             curType = type;
             curCallback = callback;
         },
@@ -519,6 +518,55 @@
                 html = html.replace(IMAGE_PLACEHOLDER + "' data-img='loading_" + id, assets[id], 'g');
             }
             return html;
+        },
+
+        fillStats: function($page, muser, dactive, bfiles, mcountries) {
+            // Locale of million and biliion will comes
+            $('.register-count .num', $page).text(muser + 'M+');
+            $('.daily-active .num', $page).text(dactive + 'M+');
+            $('.files-count .num', $page).text(bfiles + 'B+');
+            $('.mega-countries .num', $page).text(mcountries + '+');
+        },
+
+        dynamicStatsCount: function($page) {
+            if (this.statsCache && new Date() - this.statsCache.statsTime < 36e5) {
+                this.fillStats(
+                    $page,
+                    this.statsCache.muser,
+                    this.statsCache.dactive,
+                    this.statsCache.bfiles,
+                    this.statsCache.mcountries
+                );
+            }
+            else {
+                loadingDialog.show();
+
+                api_req({a: "dailystats"}, {
+                    callback: function(res) {
+
+                        loadingDialog.hide();
+
+                        var muser = 175;
+                        var dactive = 10;
+                        var bfiles = 75;
+                        var mcountries = 200;
+
+                        if (typeof res === 'object') {
+                            muser = res.confirmedusers.total / 1000000 | 0;
+                            bfiles = res.files.total / 1000000000 | 0;
+                        }
+
+                        CMS.fillStats($page, muser, dactive, bfiles, mcountries);
+                        CMS.statsCache = {
+                            muser: muser,
+                            dactive: dactive,
+                            bfiles: bfiles,
+                            mcountries: mcountries,
+                            statsTime: new Date()
+                        };
+                    }
+                });
+            }
         }
     };
 
@@ -526,41 +574,3 @@
     window.CMS = CMS;
 
 })(this);
-
-CMS.on('corporate', function() {
-    'use strict';
-
-    CMS.pagesMap = CMS.pagesMap || { 'page-1': 'investors', 'page-2': 'media', 'page-3': 'shareholder-reports' };
-    CMS.reversedMap = CMS.reversedMap || (function() {
-        var temp = Object.create(null);
-        for (var k in CMS.pagesMap) {
-            if (CMS.pagesMap.hasOwnProperty(k)) {
-                temp[CMS.pagesMap[k]] = k;
-            }
-        }
-        return temp;
-    })();
-
-    $('.new-left-menu-link').rebind('click', function() {
-        var pageName = $(this).attr('id');
-
-        // check if CMS is updated to return correct URLs
-        pageName = CMS.pagesMap[pageName] || pageName;
-        loadSubPage('corporate/' + pageName);
-        $('.old .fmholder').animate({scrollTop: 0}, 0);
-    });
-    var ctype = getCleanSitePath().substr(10).replace(/[^\w-]/g, '');
-
-    // support prior and after CMS data change.
-    ctype = document.getElementById(ctype) ? ctype : CMS.reversedMap[ctype] || CMS.reversedMap.investors;
-
-    if (ctype && document.getElementById(ctype)) {
-        $('.new-right-content-block').addClass('hidden');
-        $('.new-right-content-block.' + ctype).removeClass('hidden');
-        $('.new-left-menu-link').removeClass('active');
-        $('#' + ctype).addClass('active');
-    }
-    else {
-        $('.new-left-menu-link:first').trigger('click');
-    }
-});

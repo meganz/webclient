@@ -2450,6 +2450,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'html/start.html', n: 'start', j:0});
     jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
@@ -2818,6 +2819,8 @@ else if (!browserUpdate) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'corporate': {f:'html/corporate.html', n: 'corporate', j:0},
+        'corporate_js': {f:'html/js/corporate.js', n: 'corporate_js', j:1},
         'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
@@ -2968,6 +2971,7 @@ else if (!browserUpdate) {
     var subpages =
     {
         'about': ['about', 'about_js'],
+        'corporate': ['corporate', 'corporate_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
         'credits': ['credits', 'creditscss'],

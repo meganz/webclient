@@ -703,30 +703,8 @@ function init_page() {
         emailchange.main();
     }
     else if (page.substr(0, 9) === 'corporate') {
-        function doRenderCorpPage() {
-            if (window.corpTemplate && (new Date() - window.corpTemplate.ts < 72e5)) {
-                parsepage(window.corpTemplate.template);
-                topmenuUI();
-                loadingDialog.hide();
-                CMS.loaded('corporate');
-                return;
-            }
-
-            loadingDialog.show();
-
-            CMS.get('corporate', function(err, content) {
-                window.corpTemplate = {
-                    template: content.html,
-                    ts: new Date()
-                };
-                parsepage(window.corpTemplate.template);
-                topmenuUI();
-                loadingDialog.hide();
-            });
-        }
-
-        doRenderCorpPage();
-        bottompage.init();
+        parsepage(pages.corporate);
+        corporate.init();
     }
     else if (page.substr(0, 5) === 'blog/') {
         // eslint-disable-next-line dot-notation
@@ -2450,7 +2428,12 @@ function topmenuUI() {
                     'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
                     'nas', 'pro'
                 ];
-                var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
+                var moveTo = {
+                    'account': 'fm/account',
+                    'affiliate': 'refer',
+                    'about': 'about/main',
+                    'corporate': 'corporate/media'
+                };
 
                 for (var i = subPages.length; i--;) {
                     if (className.indexOf(subPages[i]) > -1) {

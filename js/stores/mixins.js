@@ -105,13 +105,12 @@ const scheduler = (func, name, debug) => {
     let dbug = debug !== false && DEBUG_THIS;
     let idnt = null;
     let task = null;
-    let tbsp = Promise.resolve();
     let fire = () => {
         if (dbug) {
             console.warn('Dispatching scheduled task for %s.%s...', idnt, name);
         }
         if (task) {
-            tbsp.then(task);
+            queueMicrotask(task);
             task = null;
         }
     };
@@ -123,7 +122,7 @@ const scheduler = (func, name, debug) => {
             console.warn('Scheduling task from %s.%s...', idnt, name, [this], !!task);
         }
         if (!task) {
-            tbsp.then(fire);
+            queueMicrotask(fire);
         }
         let idx = arguments.length;
         const args = new Array(idx);

@@ -1302,6 +1302,10 @@
 .small-icon.context.open-folder {
     background-position: -2px -1071px;
 }
+.small-icon.context.cloud-folder {
+    background-position: -124px -2261px;
+    opacity: 0.6;
+}
 .small-icon.context.info {
     background-position: -202px -71px;
 }
@@ -1532,6 +1536,9 @@
 }
 .dropdown-item:hover .small-icon.context.open-folder {
     background-position: -42px -1071px;
+}
+.dropdown-item:hover .small-icon.context.cloud-folder {
+    background-position: -163px -2261px;
 }
 .dropdown-item:hover .small-icon.context.info {
     background-position: -242px -71px;
@@ -2202,4 +2209,6 @@ i.account-icon.menu {
 .small-icon.dialog-sprite.grey-lock {
     background-position: -37px -4385px;
 }
-
+.medium-icon.dialog-sprite.right-arrow {
+    background-position: -136px -7008px;
+}

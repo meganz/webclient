@@ -552,18 +552,19 @@ var voucherDialog = {
         var oldStorage = oldPlan ? (oldPlan[2] * Math.pow(1024, 3)) : 0;
         var newStorage = Math.max(pro.propay.selectedProPackage[2] * Math.pow(1024, 3), oldStorage);
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
+        var intl = mega.intl.number;
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.voucher-plan-price .price').text(proPrice);
+        this.$dialog.find('.voucher-plan-price .price').text(intl.format(proPrice));
         this.$dialog.find('#voucher-code-input input').val('');
         this.changeColourIfSufficientBalance();
 
         var $voucherAccountBalance = this.$dialog.find('.voucher-account-balance');
         var $balanceAmount = $voucherAccountBalance.find('.balance-amount');
-        $balanceAmount.text(balance);
+        $balanceAmount.text(intl.format(balance));
 
         // Mobile specific dialog enhancements
         if (is_mobile) {
@@ -918,7 +919,8 @@ var wireTransferDialog = {
 
             // Update plan price in the dialog
             if (proPrice) {
-                this.$dialog.find('.amount').text(proPrice).closest('tr').removeClass('hidden');
+                this.$dialog.find('.amount').text(mega.intl.number.format(proPrice)).closest('tr')
+                    .removeClass('hidden');
             }
             else {
                 this.$dialog.find('.amount').closest('tr').addClass('hidden');
@@ -1266,7 +1268,7 @@ var addressDialog = {
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.$dialog.find('.payment-plan-price .price').text(proPrice);
+        this.$dialog.find('.payment-plan-price .price').text(mega.intl.number.format(proPrice));
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -1369,6 +1371,7 @@ var addressDialog = {
         var $statesSelect = this.$dialog.find('.states');
         var $stateSelectmenuButton = this.$dialog.find('#address-dialog-states-button');
         var $postcodeInput = this.$dialog.find(".postcode");
+        var $taxcode = $('input.taxcode', this.$dialog).attr('placeholder', 'VAT ' + l[7347]);
 
         // On dropdown option change
         $countriesSelect.selectmenu({
@@ -1427,6 +1430,8 @@ var addressDialog = {
                 } else {
                     $statesSelect.selectmenu('disable');
                 }
+                var taxName = getTaxName(selectedCountryCode);
+                $taxcode.attr('placeholder', taxName + ' ' + l[7347]);
 
                 // Refresh the selectmenu to show/hide disabled options
                 $statesSelect.selectmenu('refresh');
@@ -1491,6 +1496,10 @@ var addressDialog = {
 
             if (billingInfo.hasOwnProperty('postcode')) {
                 this.$dialog.find(".postcode").val(billingInfo.postcode);
+            }
+
+            if (billingInfo.hasOwnProperty('taxCode')) {
+                $('.taxcode', this.$dialog).val(billingInfo.taxCode);
             }
         }
     },
@@ -1661,6 +1670,7 @@ var addressDialog = {
         var $countrySelectmenuButton = this.$dialog.find('#address-dialog-countries-button');
         var state = $stateSelect.val();
         var country = $countrySelect.val();
+        var taxCode = $('input.taxcode', this.$dialog).val();
 
         // Selectors for error handling
         var $errorMessage = this.$dialog.find('.error-message');
@@ -1715,6 +1725,7 @@ var addressDialog = {
             saveAttribute('city', fieldValues['city']);
             saveAttribute('country', country);
             saveAttribute('state', state);
+            saveAttribute('taxCode', taxCode);
         } else {
             // Forget Attribute.
             mega.attr.remove('billinginfo', false, true);
@@ -1722,7 +1733,7 @@ var addressDialog = {
 
 
         // Send to the API
-        this.proceedToPay(fieldValues, state, country);
+        this.proceedToPay(fieldValues, state, country, taxCode);
     },
 
     /**
@@ -1731,8 +1742,8 @@ var addressDialog = {
      * @param {type} state The value of the state dropdown
      * @param {type} country The value of the country dropdown
      */
-    proceedToPay: function(fieldValues, state, country) {
-
+    proceedToPay: function(fieldValues, state, country, taxCode) {
+        'use strict';
         // Set details for the UTC call
         this.extraDetails.first_name = fieldValues['first-name'];
         this.extraDetails.last_name = fieldValues['last-name'];
@@ -1742,6 +1753,7 @@ var addressDialog = {
         this.extraDetails.zip_code = fieldValues['postcode'];
         this.extraDetails.country = country;
         this.extraDetails.recurring = false;
+        this.extraDetails.taxCode = taxCode;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
@@ -2439,7 +2451,7 @@ var bitcoinDialog = {
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
         $bitcoinDialog.find('.plan-name').text(planName);
         $bitcoinDialog.find('.plan-duration').text(planMonths);
-        $bitcoinDialog.find('.plan-price-euros .value').text(priceEuros);
+        $('.plan-price-euros .value', $bitcoinDialog).text(mega.intl.number.format(priceEuros));
         $bitcoinDialog.find('.plan-price-bitcoins').text(priceBitcoins);
 
         // Set countdown to price expiry

@@ -391,6 +391,32 @@ MegaUtils.prototype.getStack = function megaUtilsGetStack() {
 };
 
 /**
+ * Get function caller.
+ * @returns {String} caller
+ */
+MegaUtils.prototype.getCaller = function megaUtilsGetCaller() {
+    'use strict';
+    var stackIdx = 2;
+    var stack = M.getStack().split('\n');
+
+    for (var i = stack.length; i--;) {
+        if (stack[i].indexOf('getCaller') > 0) {
+            stackIdx = i;
+            break;
+        }
+    }
+
+    stack = String(stack.splice(++stackIdx + (stack[0] === 'Error')));
+
+    var m = stack.match(/at\s(\S+)/);
+    if (m) {
+        return String(m[1]).split(/[\s:]/)[0];
+    }
+
+    return '<unknown>';
+};
+
+/**
  *  Check whether there are pending transfers.
  *
  *  @return {Boolean}
@@ -615,36 +641,8 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                         M.clearFileSystemStorage()
                     ];
 
-                    if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        megaChat.plugins.chatdIntegration.chatd.chatdPersist
-                    ) {
-                        waitingPromises.push(
-                            megaChat.plugins.chatdIntegration.chatd.chatdPersist.drop()
-                        );
-                    }
-                    else if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        !megaChat.plugins.chatdIntegration.chatd.chatdPersist &&
-                        typeof(ChatdPersist) !== 'undefined'
-                    ) {
-                        // chatdPersist was disabled, potential crash, try to delete the db manually
-                        waitingPromises.push(
-                            ChatdPersist.forceDrop()
-                        );
-                    }
-
-                    if (
-                        typeof(megaChat) !== 'undefined' &&
-                        megaChat.plugins.chatdIntegration &&
-                        megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage
-                    ) {
-                        // clear messagesQueueKvStorage
-                        waitingPromises.push(
-                            megaChat.plugins.chatdIntegration.chatd.messagesQueueKvStorage.clear()
-                        );
+                    if (window.megaChatIsReady) {
+                        waitingPromises.push(megaChat.destroyDatabases());
                     }
 
                     MegaPromise.allDone(waitingPromises).then(function(r) {
@@ -1045,36 +1043,31 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
 
         loadingDialog.show();
         mega.config.flush().always(finishLogout);
+        var promises = [];
 
         if (fmdb && fmconfig.dbDropOnLogout) {
-            step++;
-            var promises = [];
             promises.push(fmdb.drop());
-            if (
-                typeof(megaChat) !== 'undefined' &&
-                megaChat.plugins.chatdIntegration &&
-                megaChat.plugins.chatdIntegration.chatd
-            ) {
-                var chatd = megaChat.plugins.chatdIntegration.chatd;
-                if (chatd.chatdPersist) {
-                    promises.push(
-                        chatd.chatdPersist.drop()
-                    );
-                }
-                if (chatd.messagesQueueKvStorage) {
-                    promises.push(
-                        chatd.messagesQueueKvStorage.clear()
-                    );
-                }
-            }
-
-            MegaPromise.allDone(promises).always(finishLogout);
         }
-        if (!megaChatIsDisabled) {
-            if (typeof(megaChat) !== 'undefined' && typeof(megaChat.userPresence) !== 'undefined') {
+
+        if (window.megaChatIsReady) {
+            if (megaChat.userPresence) {
                 megaChat.userPresence.disconnect();
             }
+
+            if (fmconfig.dbDropOnLogout) {
+                promises.push(megaChat.destroyDatabases());
+            }
         }
+
+        if (window.is_eplusplus) {
+            promises.push(M.delPersistentData('e++ck'));
+        }
+
+        if (promises.length) {
+            ++step;
+            Promise.allSettled(promises).always(finishLogout);
+        }
+
         if (u_privk && !loadfm.loading) {
             // Use the 'Session Management Logout' API call to kill the current session
             api_req({'a': 'sml'}, {callback: finishLogout});
@@ -1224,7 +1217,7 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
                             if (r.length) {
                                 ts = add(r);
 
-                                if (--max && r.length === options.limit) {
+                                if (--max && r.length >= options.limit) {
                                     return onIdle(_);
                                 }
                             }
@@ -1305,10 +1298,9 @@ MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
 MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
     if (M.currentrootid === M.RubbishID
-        || (M.currentrootid === 'shares' && M.getNodeRights(id) < 2)) {
-        return;
-    }
-    if (folderlink) {
+        || id === 'shares'
+        || String(id).indexOf('search/') > -1
+        || M.getNodeRights(id) < 2) {
         return;
     }
 
@@ -1379,6 +1371,27 @@ MegaUtils.prototype.checkForDuplication = function(id) {
         return resultObject;
     }
 };
+
+mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
+    'use strict';
+
+    var dups = M.checkForDuplication(id);
+    if (dups && (dups.files || dups.folders)) {
+        var $bar = $('.duplicated-items-found').removeClass('hidden');
+
+        $('.files-grid-view.fm').addClass('duplication-found');
+        $('.fm-blocks-view.fm').addClass('duplication-found');
+        $('.fix-me-btn', $bar).rebind('click.df', function() {
+            fileconflict.resolveExistedDuplication(dups, id);
+        });
+        $('.fix-me-close', $bar).rebind('click.df', function() {
+            $('.files-grid-view.fm').removeClass('duplication-found');
+            $('.fm-blocks-view.fm').removeClass('duplication-found');
+            $('.duplicated-items-found').addClass('hidden');
+        });
+    }
+}));
+
 
 /**
  * Handle a redirect from the mega.co.nz/#pro page to mega.nz/#pro page
@@ -1705,47 +1718,48 @@ MegaUtils.prototype.isTypedArray = function(obj) {
     return obj && obj.BYTES_PER_ELEMENT > 0;
 };
 
+/** @property MegaUtils.mTextEncoder */
+lazy(MegaUtils.prototype, 'mTextEncoder', function() {
+    'use strict';
+    return new TextEncoder();
+});
 
 /**
  * Convert data to ArrayBuffer
  * @param {*} data the data to convert
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-MegaUtils.prototype.toArrayBuffer = function(data) {
+MegaUtils.prototype.toArrayBuffer = promisify(function(resolve, reject, data) {
     'use strict';
-
-    var promise = new MegaPromise();
 
     if (typeof data === 'string' && data.substr(0, 5) === 'data:') {
         data = dataURLToAB(data);
     }
 
     if (data instanceof Blob) {
-        promise = this.readBlob(data);
+        this.readBlob(data).then(resolve).catch(reject);
     }
     else if (typeof data === 'string' && data.substr(0, 5) === 'blob:') {
         M.xhr({url: data, type: 'arraybuffer'})
             .then(function(ev, data) {
-                promise.resolve(data);
+                resolve(data);
             })
             .catch(function(ex, detail) {
-                promise.reject(detail);
+                reject(detail || ex);
             });
     }
     else if (this.isTypedArray(data)) {
         if (data.byteLength !== data.buffer.byteLength) {
-            promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+            resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
         }
         else {
-            promise.resolve(data.buffer);
+            resolve(data.buffer);
         }
     }
     else if (data instanceof ArrayBuffer) {
-        promise.resolve(data);
+        resolve(data);
     }
     else {
-        var ab;
-
         if (typeof data !== 'string') {
             try {
                 data = JSON.stringify(data);
@@ -1753,27 +1767,10 @@ MegaUtils.prototype.toArrayBuffer = function(data) {
             catch (_) {
             }
         }
-        data = String(data);
 
-        if (typeof TextEncoder !== 'undefined') {
-            ab = new TextEncoder().encode(data).buffer;
-        }
-        else {
-            data = to8(data);
-
-            ab = new ArrayBuffer(data.length);
-            var u8 = new Uint8Array(ab);
-
-            for (var i = data.length; i--;) {
-                u8[i] = data.charCodeAt(i);
-            }
-        }
-
-        promise.resolve(ab);
+        resolve(this.mTextEncoder.encode('' + data).buffer);
     }
-
-    return promise;
-};
+});
 
 /**
  * Save files locally
@@ -1812,9 +1809,10 @@ MegaUtils.prototype.saveAs = function(data, filename) {
     }
     else {
         this.toArrayBuffer(data)
-            .tryCatch(function(ab) {
+            .then(function(ab) {
                 saveToDisk(new Uint8Array(ab));
-            }, function() {
+            })
+            .catch(function() {
                 promise.reject.apply(promise, arguments);
             });
     }
@@ -1826,47 +1824,38 @@ MegaUtils.prototype.saveAs = function(data, filename) {
  * Read a Blob
  * @param {Blob|File} blob The blob to read
  * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaUtils.prototype.readBlob = function(blob, meth) {
     'use strict';
-
-    var reader = new FileReader();
-    var promise = new MegaPromise();
-
-    reader.onload = function() {
-        promise.resolve(this.result);
-    };
-    reader.onerror = function() {
-        promise.reject.apply(promise, arguments);
-    };
-    reader[meth || 'readAsArrayBuffer'](blob);
-
-    return promise;
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function() {
+            resolve(this.result);
+        };
+        reader.onerror = reject;
+        reader[meth || 'readAsArrayBuffer'](blob);
+    });
 };
 
 /**
  * Read a FileSystem's FileEntry
  * @param {FileEntry} entry the.file.entry
  * @param {String} [meth] The FileReader method to use, defaults to readAsArrayBuffer
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaUtils.prototype.readFileEntry = function(entry, meth) {
     'use strict';
-
-    var promise = new MegaPromise();
-    var reject = promise.reject.bind(promise);
-
-    if (String(entry) === '[object FileEntry]') {
-        entry.file(function(file) {
-            promise.linkDoneAndFailTo(M.readBlob(file, meth));
-        }, reject);
-    }
-    else {
-        reject(EACCESS);
-    }
-
-    return promise;
+    return new Promise(function(resolve, reject) {
+        if (String(entry) === '[object FileEntry]') {
+            entry.file(function(file) {
+                M.readBlob(file, meth).then(resolve).catch(reject);
+            }, reject);
+        }
+        else {
+            reject(EARGS);
+        }
+    });
 };
 
 /**
@@ -2167,19 +2156,9 @@ MegaUtils.prototype.getPersistentData = promisify(function(resolve, reject, k) {
         var tmpPromise = this.getFileSystemEntry(k);
 
         tmpPromise.then(function(entry) {
-            tmpPromise = self.readFileEntry(entry, 'readAsText');
-
-            tmpPromise.then(function(data) {
-                try {
-                    return resolve(JSON.parse(data));
-                }
-                catch (_) {
-                }
-
-                resolve(data);
-            });
-
-            tmpPromise.catch(reject);
+            return self.readFileEntry(entry, 'readAsText');
+        }).then(function(data) {
+            resolve(JSON.parse(data));
         }).catch(function(ex) {
             if (ex && ex.name === 'SecurityError') {
                 // Running on Incognito mode?
@@ -2222,10 +2201,7 @@ MegaUtils.prototype.setPersistentData = promisify(function(resolve, reject, k, v
                         resolve();
                     };
 
-                    tmpPromise = M.toArrayBuffer(v)
-                        .tryCatch(function(ab) {
-                            writer.write(new Blob([ab]));
-                        }, writer.onerror.bind(writer));
+                    writer.write(new Blob([tryCatch(JSON.stringify.bind(JSON))(v) || '{}']));
                 };
 
                 writer.onerror = function(e) {
@@ -2331,29 +2307,27 @@ MegaUtils.prototype.getPersistentDataEntries = promisify(function(resolve, rejec
                     return resolve(entries);
                 }
 
-                (function _readEntries(idx) {
-                    var next = function() {
-                        onIdle(_readEntries.bind(this, ++idx));
-                    };
+                var promises = [];
+                for (var i = 0; i < entries.length; ++i) {
+                    promises.push(M.readFileEntry(result[entries[i]], 'readAsText'));
+                }
 
-                    if (idx === entries.length) {
+                Promise.allSettled(promises)
+                    .then(function(r) {
+                        var parse = tryCatch(JSON.parse.bind(JSON), false);
+
+                        for (var i = 0; i < r.length; ++i) {
+                            if (r[i].status === 'fulfilled') {
+                                result[entries[i]] = parse(r[i].value);
+                            }
+                            else {
+                                console.warn('Failed to read filesystem entry...', entries[i], r[i].reason);
+                                result[entries[i]] = false;
+                            }
+                        }
                         resolve(result);
-                    }
-                    else {
-                        M.readFileEntry(result[entries[idx]], 'readAsText')
-                            .fail(next)
-                            .done(function(data) {
-                                try {
-                                    result[entries[idx]] = JSON.parse(data);
-                                }
-                                catch (_) {
-                                    result[entries[idx]] = data;
-                                }
-
-                                next();
-                            });
-                    }
-                })(0);
+                    })
+                    .catch(reject);
             }).catch(function(ex) {
                 if (Object(ex).name === "SecurityError") {
                     // Running on Incognito mode?

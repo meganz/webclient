@@ -3315,6 +3315,9 @@ function fm_resize_handler(force) {
         return;
     }
     if (d) {
+        if (d > 1) {
+            console.warn('fm_resize_handler');
+        }
         console.time('fm_resize_handler');
     }
 
@@ -3336,6 +3339,20 @@ function fm_resize_handler(force) {
             .css({
                 'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() - 46 /* margins of icons */
             });
+
+        // Lets make manually matching width of the header table with the contents table, due to width mismatching bug.
+        var $fNameTh = $('.files-grid-view .grid-table-header:visible th[megatype="fname"]');
+        var fNameThStyle = $fNameTh.length && $fNameTh.attr('style') || '';
+
+        if (fNameThStyle.indexOf('calc(100% -') === -1) {
+            delete M.columnsWidth.cloud.fname.currpx;
+        }
+        else {
+            var fNameThWidth = $fNameTh.outerWidth();
+
+            $('.files-grid-view .grid-table:visible td[megatype="fname"]').css('width', fNameThWidth);
+            M.columnsWidth.cloud.fname.currpx = fNameThWidth;
+        }
 
         initTreeScroll();
     }

@@ -196,15 +196,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         if (!users) {
             users = mySelf.minUsers; // minimum val
         }
+        var intl = mega.intl.number;
         var $gadget = $('.bus-reg-plan', $pageContainer);
-        $gadget.find('.business-plan-price span.big').text(mySelf.planPrice.toFixed(2) + ' \u20ac');
-        $gadget.find('.business-base-plan span.right')
-            .text((mySelf.planPrice * mySelf.minUsers).toFixed(2) + ' \u20ac'); // minimum
-        $gadget.find('.business-users-plan span.right')
-            .text((mySelf.planPrice * (users - mySelf.minUsers)).toFixed(2) + ' \u20ac');
-        $gadget.find('.business-plan-total span.right').text((mySelf.planPrice * users).toFixed(2) + ' \u20ac');
+        $('.business-plan-price span.big', $gadget).text(intl.format(mySelf.planPrice) + ' \u20ac');
+        $('.business-base-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * mySelf.minUsers) + ' \u20ac'); // minimum
+        $('.business-users-plan span.right', $gadget)
+            .text(intl.format(mySelf.planPrice * (users - mySelf.minUsers)) + ' \u20ac');
+        $('.business-plan-total span.right', $gadget).text(intl.format(mySelf.planPrice * users) + ' \u20ac');
 
-        $gadget.find('.business-users-plan .left').text(l[19504].replace('{0}', users - mySelf.minUsers));
+        $('.business-users-plan .left', $gadget).text(l[19504].replace('{0}', users - mySelf.minUsers));
     };
 
     // event handler for clicking on terms anchor

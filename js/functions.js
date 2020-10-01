@@ -385,6 +385,11 @@ function bytesToSize(bytes, precision, format) {
         resultUnit = s_b;
     }
 
+    if (window.lang !== 'en') {
+        // @todo measure the performance degradation by invoking this here now..
+        resultSize = mega.intl.decimal.format(resultSize);
+    }
+
     // XXX: If ever adding more HTML here, make sure it's safe and/or sanitize it.
     if (format === 2) {
         return resultSize + '<span>' + resultUnit + '</span>';
@@ -2840,26 +2845,49 @@ function odqPaywallDialogTexts(user_attr, accountData) {
     }
 
     var filesText = l[23253]; // 0 files
-    if (accountData.stats[M.RootID].files === 1) {
+    var totalFiles = accountData.stats[M.RootID].files +
+        (accountData.stats[M.RubbishID] ? accountData.stats[M.RubbishID].files : 0) +
+        (accountData.stats[M.InboxID] ? accountData.stats[M.InboxID].files : 0);
+    if (totalFiles === 1) {
         filesText = l[835];
     }
-    else if (accountData.stats[M.RootID].files > 1) {
-        filesText = l[833].replace('[X]', accountData.stats[M.RootID].files);
+    else if (totalFiles > 1) {
+        filesText = l[833].replace('[X]', totalFiles);
     }
 
     dialogText = dialogText.replace('%1', user_attr.email || ' ');
     dialogText = dialogText.replace('%6', bytesToSize(accountData.space_used))
         .replace('%5', filesText);
 
+    // In here, it's guaranteed that we have pro.membershipPlans,
+    // but we will check for error free logic in case of changes
+    var minPlanId = -1;
     var neededPro = 4;
-    if (user_attr.p) {
-        neededPro = user_attr.p + 1;
-        if (neededPro === 3) {
-            neededPro = 100;
+    if (pro.membershipPlans && pro.membershipPlans.length) {
+        var spaceUsedGB = accountData.space_used / 1073741824; // = 1024*1024*1024
+        var minPlan = 9000000;
+        for (var h = 0; h < pro.membershipPlans.length; h++) {
+            if (pro.membershipPlans[h][4] === 1 && pro.membershipPlans[h][2] > spaceUsedGB &&
+                pro.membershipPlans[h][2] < minPlan) {
+                minPlan = pro.membershipPlans[h][2];
+                minPlanId = pro.membershipPlans[h][1];
+            }
         }
-        else if (neededPro === 5) {
-            neededPro = 1;
+    }
+    if (minPlanId === -1) {
+        // weirdly, we dont have plans loaded, or no plan matched the storage.
+        if (user_attr.p) {
+            neededPro = user_attr.p + 1;
+            if (neededPro === 3) {
+                neededPro = 100;
+            }
+            else if (neededPro === 5) {
+                neededPro = 1;
+            }
         }
+    }
+    else {
+        neededPro = minPlanId;
     }
 
     dialogText = dialogText.replace('%7', pro.getProPlanName(neededPro));
@@ -2869,6 +2897,84 @@ function odqPaywallDialogTexts(user_attr, accountData) {
         dlgFooterText: dlgFooterText,
         fmBannerText: fmBannerText
     };
+}
+
+
+function getTaxName(countryCode) {
+    'use strict';
+    switch (countryCode) {
+        case "AT": return "USt";
+        case "BE": return "TVA";
+        case "HR": return "PDV";
+        case "CZ": return "DPH";
+        case "DK": return "moms";
+        case "EE": return "km";
+        case "FI": return "ALV";
+        case "FR": return "TVA";
+        case "DE": return "USt";
+        case "HU": return "AFA";
+        case "IT": return "IVA";
+        case "LV": return "PVN";
+        case "LT": return "PVM";
+        case "LU": return "TVA";
+        case "NL": return "BTW";
+        case "PL": return "PTU";
+        case "PT": return "IVA";
+        case "RO": return "TVA";
+        case "SK": return "DPH";
+        case "SI": return "DDV";
+        case "SE": return "MOMS";
+        case "AL": return "TVSH";
+        case "AD": return "IGI";
+        case "AR": return "IVA";
+        case "AM": return "AAH";
+        case "AU": return "GST";
+        case "BO": return "IVA";
+        case "BA": return "PDV";
+        case "BR": return "ICMS";
+        case "CA": return "GST";
+        case "CL": return "IVA";
+        case "CO": return "IVA";
+        case "DO": return "ITBIS";
+        case "EC": return "IVA";
+        case "SV": return "IVA";
+        case "FO": return "MVG";
+        case "GT": return "IVA";
+        case "IS": return "VSK";
+        case "ID": return "PPN";
+        case "JE": return "GST";
+        case "JO": return "GST";
+        case "LB": return "TVA";
+        case "LI": return "MWST";
+        case "MK": return "DDV";
+        case "MY": return "GST";
+        case "MV": return "GST";
+        case "MX": return "IVA";
+        case "MD": return "TVA";
+        case "MC": return "TVA";
+        case "ME": return "PDV";
+        case "MA": return "GST";
+        case "NZ": return "GST";
+        case "NO": return "MVA";
+        case "PK": return "GST";
+        case "PA": return "ITBMS";
+        case "PY": return "IVA";
+        case "PE": return "IGV";
+        case "PH": return "RVAT";
+        case "RU": return "NDS";
+        case "SG": return "GST";
+        case "CH": return "MWST";
+        case "TN": return "TVA";
+        case "TR": return "KDV";
+        case "UA": return "PDV";
+        case "UY": return "IVA";
+        case "UZ": return "QQS";
+        case "VN": return "GTGT";
+        case "VE": return "IVA";
+        case "ES": return "NIF";
+
+        default: return "VAT";
+    }
 }
 /* eslint-enable complexity */
 

@@ -5,8 +5,6 @@ var m;
 var browserUpdate = 0;
 var apipath;
 var pageLoadTime;
-var maintenance = false;
-var androidsplash = false;
 var silent_loading = false;
 var cookiesDisabled = false;
 var storageQuotaError = false;
@@ -165,12 +163,18 @@ function getCleanSitePath(path) {
                 localStorage.afftype = 1;
             }
         }
+        if (path.mt) {
+            window.uTagMT = path.mt;
+        }
     }
     else if (path[0].indexOf('aff=') === 0) {
         localStorage.affid = String(path[0]).replace('aff=', '');
         localStorage.affts = Date.now();
         localStorage.afftype = 1;
         path = [''];
+    }
+    else if (path[0].indexOf('mt=') === 0) {
+        window.uTagMT = String(path[0]).replace('mt=', '');
     }
 
     return path[0];
@@ -591,7 +595,7 @@ var mega = {
     whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
-    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 12),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 6),
 
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
@@ -620,6 +624,13 @@ var mega = {
         }
 
         return 0;
+    },
+
+    /** get cryptographically strong random values. */
+    getRandomValues: function(len) {
+        'use strict';
+        var seed = new Uint8Array(len || 128);
+        return asmCrypto.getRandomValues(seed);
     },
 
     /** Load performance report */
@@ -713,6 +724,20 @@ Object.defineProperty(mega, 'active', {
         };
     })()
 });
+
+if (window.crypto && typeof crypto.getRandomValues === 'function') {
+    (function(crypto, rand) {
+        'use strict';
+        mega.getRandomValues = function(len) {
+            var seed = new Uint8Array(len || 128);
+            return rand.call(crypto, seed);
+        };
+        mega.getRandomValues.strong = true;
+    })(crypto, crypto.getRandomValues);
+}
+
+// nb: can overflow..
+Object.defineProperty(window, 'mIncID', {value: 0, writable: true});
 
 var hashLogic = false;
 if (localStorage.hashLogic) hashLogic=true;
@@ -932,6 +957,22 @@ var asmCryptoSha256Js = '!function(exports,global){function IllegalStateError(){
 function addScript(data) {
     "use strict";
     return mCreateElement('script', {type: 'text/javascript'}, 'head', data);
+}
+
+function scriptTest(data, callback) {
+    'use strict';
+    var feat = addScript([data]);
+    var load = feat.onload;
+    feat.onload = function() {
+        if (load) {
+            setTimeout(load);
+        }
+        callback(false);
+        this.onload = this.onerror = null;
+        this.parentNode.removeChild(this);
+        URL.revokeObjectURL(this.src);
+    };
+    feat.onerror = callback;
 }
 
 function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
@@ -1346,11 +1387,31 @@ function mObjectURL(data, type)
             }
         },
 
-        notify: function crossTab_notify(msg, data) {
-            data = { origin: this.ctID, data: data, sid: Math.random()};
+        drain: function() {
+            'use strict';
+            if (typeof delay === 'function') {
+                var tag = this.eTag;
+                delay('crosstab:drain', function() {
+                    var entries = Object.keys(localStorage)
+                        .filter(function(k) {
+                            return k.startsWith(tag);
+                        });
+                    console.debug('Removing crossTab entries...', entries);
+
+                    for (var i = entries.length; i--;) {
+                        delete localStorage[entries[i]];
+                    }
+                }, 8e3);
+            }
+        },
+
+        notify: tryCatch(function crossTab_notify(msg, data) {
+            'use strict';
+            this.drain();
+            data = { origin: this.ctID, data: data, sid: ++mIncID };
             localStorage.setItem(this.eTag + msg, JSON.stringify(data));
             if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        },
+        }),
 
         setMaster: function crossTab_setMaster() {
             this.master = (Math.random() * Date.now()).toString(36);
@@ -1938,6 +1999,11 @@ else if (!browserUpdate) {
             }
             if (__cdumps.length > 3) return false;
 
+            if (url && ln < 2) {
+                console.debug([errobj || msg]);
+                return;
+            }
+
             var expectedSourceOrigin = url || ln > 10;
             if (url === '@srvlog') {
                 url = '';
@@ -2201,7 +2267,7 @@ else if (!browserUpdate) {
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
         // If a search bot, they may set the URL as e.g. mega.nz/pro?es so get the language from that
-        if (is_bot && locationSearchParams !== '') {
+        if ((is_bot || sessionStorage.botSim ) && locationSearchParams !== '') {
             userLangs = locationSearchParams.replace('?', '');
         }
         else {
@@ -2338,6 +2404,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
 
+    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/crypto.js', n: 'crypto_js', j:1,w:5});
     jsl.push({f:'js/account.js', n: 'user_js', j:1});
@@ -2357,7 +2424,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
     jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
-    jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:5,w:5});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
@@ -2748,6 +2814,7 @@ else if (!browserUpdate) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
         'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
@@ -2781,6 +2848,7 @@ else if (!browserUpdate) {
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'credits': {f:'html/credits.html', n: 'credits', j:0},
+        'creditscss': {f:'css/credits.css', n: 'creditscss', j:2},
         'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
@@ -2893,7 +2961,7 @@ else if (!browserUpdate) {
         'about': ['about', 'about_js'],
         'sourcecode': ['sourcecode'],
         'terms': ['terms'],
-        'credits': ['credits'],
+        'credits': ['credits', 'creditscss'],
         'backup': ['backup', 'backup_js', 'filesaver'],
         'recovery': ['recovery', 'recovery_js'],
         'reset': ['reset', 'reset_js'],
@@ -3350,9 +3418,20 @@ else if (!browserUpdate) {
             mega.ipcc = (String(document.cookie).match(/geoip\s*=\s*([A-Z]{2})/) || [])[1];
         });
 
-        if (!maintenance && !androidsplash && !is_karma) {
-            jsl_start();
-        }
+        scriptTest(
+            'es6s =' +
+            ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
+            ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
+            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
+            function(error) {
+                if (error || !window.es6s) {
+                    document.location = (is_extension ? '' : '/') + 'update.html';
+                    return;
+                }
+                jsl_start();
+                delete window.es6s;
+            });
     };
     function jsl_load(xhri)
     {
@@ -3457,20 +3536,6 @@ else if (!browserUpdate) {
                         blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
-                }
-            }
-            else if (jsl[i].j === 5) {
-                // a type of resources that we want to modify before loading.
-                if (jsl[i].n.indexOf('dexie_js') > -1) {
-                    var replaceString =
-                        'return new Function("let F=async ()=>{},p=F();return [p,Object.getPrototypeOf(p),Promise.resolve(),F.constructor];")();';
-
-                    var replaceByString = 'throw new Error();';
-
-                    jsl[i].text = jsl[i].text.replace(replaceString, replaceByString);
-
-                    jsar.push(jsl[i].text + '\n\n');
-
                 }
             }
             else if (jsl[i].j === 0 && jsl[i].f.match(/\.json$/)) {
@@ -3927,22 +3992,6 @@ function tryCatch(fn, onerror)
     return fn.foo;
 }
 
-// setImmediate polyfill for Dexie...
-if (!window.setImmediate && window.requestIdleCallback) {
-    window.setImmediate = function _setImmediate(callback) {
-        'use strict';
-
-        // XXX: nothing from the code depends on the args
-        return window.requestIdleCallback(callback, {timeout: 20});
-    };
-
-    window.clearImmediate = function _clearImmediate(pid) {
-        'use strict';
-
-        window.cancelIdleCallback(pid);
-    };
-}
-
 var onIdle = function(handler) {
         var startTime = Date.now();
 
@@ -4022,7 +4071,14 @@ function promisify(fc) {
     'use strict';
     var a$yncMethod = function() {
         var self = this;
-        var args = toArray.apply(null, arguments);
+        var args = [];
+        if (arguments.length) {
+            var len = arguments.length;
+            args = Array(len);
+            while (len--) {
+                args[len] = arguments[len];
+            }
+        }
         return new Promise(function(resolve, reject) {
             a$yncMethod.__function__.apply(self, [resolve, reject].concat(args));
         });
@@ -4035,9 +4091,18 @@ function promisify(fc) {
 
 function mutex(name, handler) {
     'use strict';
+    if (typeof name === 'function') {
+        handler = name;
+        name = null;
+    }
     var mMutexMethod = function() {
         var self = this;
-        var args = toArray.apply(null, arguments);
+        var args = arguments.length ? toArray.apply(null, arguments) : [];
+        name = name || this.__mutex_lock_name_$;
+        if (!name) {
+            name = (this.constructor.name || '$') + makeUUID().slice(-13);
+            Object.defineProperty(this, '__mutex_lock_name_$', {value: name});
+        }
         return new Promise(function(resolve, reject) {
             mutex.lock(name).then(function(unlock) {
                 var res = function(a0) {
@@ -4122,5 +4187,14 @@ mBroadcaster.once('startMega', function() {
 
         checkPage(page);
         mBroadcaster.addListener('pagechange', checkPage);
+    }
+
+    if (window.uTagMT) {
+        var mt = window.uTagMT;
+        delete window.uTagMT;
+
+        setTimeout(function() {
+            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
     }
 });

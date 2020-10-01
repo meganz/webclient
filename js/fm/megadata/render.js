@@ -55,7 +55,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
                 $.rmInitJSP = this.fsViewSel;
             }
         }
-        this.rmSetupUI(aUpdate);
+        this.rmSetupUI(aUpdate, aUpdate ? !!$.dbOpenHandle : false);
     }
 
     this.initShortcutsAndSelection(container, aUpdate);
@@ -666,6 +666,14 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
     megaRender.numInsertedDOMNodes++;
 
     var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
+    var fnameWidth = $('td[megatype="fname"]', node).outerWidth();
+
+    if (!node.__hasMegaColumnsWidth ||
+        fnameWidth !== M.columnsWidth.cloud.fname.curr ||
+        fnameWidth !== M.columnsWidth.cloud.fname.currpx) {
+        node.__hasMegaColumnsWidth = true;
+        megaRender.setDOMColumnsWidth(node);
+    }
 
     var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
 

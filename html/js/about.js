@@ -83,30 +83,51 @@ var aboutus = {
 
         "use strict";
 
-        loadingDialog.show();
+        var fillStats = function(muser, dactive, bfiles, mcountries) {
+            // Locale of million and biliion will comes
+            $('.about-register-count .num span', $page).text(muser);
+            $('.about-daily-active .num span', $page).text(dactive);
+            $('.about-files-count .num span', $page).text(bfiles);
+            $('.about-mega-countries .num span', $page).text(mcountries);
+        };
+        var self = this;
 
-        api_req({a: "dailystats"}, {
-            callback: function(res) {
+        if (this.aboutStats && (new Date() - this.aboutStats.aboutStatsTime < 36e5)) {
+            fillStats(
+                this.aboutStats.muser,
+                this.aboutStats.dactive,
+                this.aboutStats.bfiles,
+                this.aboutStats.mcountries);
+        }
+        else {
+            loadingDialog.show();
 
-                loadingDialog.hide();
+            api_req({ a: "dailystats" }, {
+                callback: function(res) {
 
-                var muser = 175;
-                var dactive = 10;
-                var bfiles = 75;
-                var mcountries = 200;
+                    loadingDialog.hide();
 
-                if (typeof res === 'object') {
-                    muser = res.confirmedusers.total / 1000000 | 0;
-                    bfiles = res.files.total / 1000000000 | 0;
+                    var muser = 175;
+                    var dactive = 10;
+                    var bfiles = 75;
+                    var mcountries = 200;
+
+                    if (typeof res === 'object') {
+                        muser = res.confirmedusers.total / 1000000 | 0;
+                        bfiles = res.files.total / 1000000000 | 0;
+                    }
+
+                    fillStats(muser, dactive, bfiles, mcountries);
+                    self.aboutStats = {
+                        muser: muser,
+                        dactive: dactive,
+                        bfiles: bfiles,
+                        mcountries: mcountries,
+                        aboutStatsTime: new Date()
+                    };
                 }
-
-                // Locale of million and biliion will comes
-                $('.about-register-count .num span', $page).text(muser);
-                $('.about-daily-active .num span', $page).text(dactive);
-                $('.about-files-count .num span', $page).text(bfiles);
-                $('.about-mega-countries .num span', $page).text(mcountries);
-            }
-        });
+            });
+        }
     },
 
     insMembersInHTML: function(members) {
@@ -115,16 +136,18 @@ var aboutus = {
             return 0.5 - Math.random();
         });
         var aboutContent = '';
+        var memPhoto;
+        var cmsUrl = CMS.getUrl();
         for (var i = members.length; i--;) {
+            memPhoto = (members[i].photo || '').replace(/(?:{|%7B)cmspath(?:%7D|})/, cmsUrl);
             aboutContent +=
                 '<div class="bottom-page inline-block col-6 fadein">' +
-                '<img class="shadow" src="' + escapeHTML(members[i].photo)
+                '<img class="shadow" src="' + escapeHTML(memPhoto)
                 + '" alt="' + escapeHTML(members[i].name) + '">' +
                 '<span class="bold">' + escapeHTML(members[i].name) + '</span>' +
                 '<span>' + escapeHTML(members[i].role) + '</span>' +
                 '</div>';
         }
-        aboutContent = aboutContent.replace(/(?:{|%7B)cmspath(?:%7D|})/g, CMS.getUrl());
         $('.members', '.bottom-page').safeHTML(aboutContent);
     }
 };

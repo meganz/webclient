@@ -2751,7 +2751,7 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
         until = until || Math.round((Date.now() - 7776e6) / 1e3);
 
         resolve = (function(resolve) {
-            return function(nodes, limit) {
+            return function(nodes) {
                 var sort = M.getSortByDateTimeFn();
                 nodes = nodes.filter(function(n) {
                     return !n.fv;
@@ -2765,13 +2765,22 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
 
         if (fmdb) {
             rubTree = rubTree.map(function(h) {
-                return ab_to_base64(fmdb.strcrypt(h));
+                return fmdb.toStore(h);
             });
+            var binRubFilter = function(n) {
+                for (var i = rubTree.length; i--;) {
+                    if (!indexedDB.cmp(rubTree[i], n.p)) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            var dbRubFilter = FMDB.$useBinaryKeys ? binRubFilter : rubFilter;
             var options = {
                 limit: limit,
 
                 query: function(db) {
-                    return db.orderBy('t').reverse().filter(rubFilter)
+                    return db.orderBy('t').reverse().filter(dbRubFilter)
                         .until(function(row) {
                             return until > row.t;
                         });
@@ -2874,7 +2883,7 @@ MegaData.prototype.getRecentActionsList = function(limit, until) {
             for (var i = 0; i < nodes.length; i++) {
                 var n = new MegaNode(nodes[i]);
                 var actionType = n.tvf ? "updated" : "added";
-                var blockType = (is_image3(n) || is_video(n) === 1) ? 'media' : 'files';
+                var blockType = is_image2(n) || is_video(n) === 1 ? 'media' : 'files';
                 index[n.u] = index[n.u] || Object.create(null);
                 index[n.u][n.p] = index[n.u][n.p] || Object.create(null);
                 index[n.u][n.p][actionType] = index[n.u][n.p][actionType] || Object.create(null);
@@ -3711,7 +3720,7 @@ MegaData.prototype.getNameByHandle = function(handle) {
         var node = this.getNodeByHandle(handle);
 
         if (node) {
-            result = node.name;
+            result = node.name || '';
         }
     }
 
@@ -4123,18 +4132,20 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             _import($.onImportCopyNodes);
         }
         else {
-            var kv = StorageDB(u_handle);
+            var kv = MegaDexie.create(u_handle);
             var key = 'import.' + localStorage.folderLinkImport;
 
             kv.get(key)
-                .done(function(data) {
+                .then(function(data) {
                     _import(data);
-                    kv.rem(key);
+                    kv.remove(key, true).dump(key);
                 })
-                .fail(function(e) {
+                .catch(function(ex) {
                     if (d) {
-                        console.error(e);
+                        console.error(ex);
                     }
+                    loadingDialog.hide('import');
+                    kv.remove(key, true).dump(key);
                     msgDialog('warninga', l[135], l[47]);
                 });
         }
@@ -4166,15 +4177,14 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                         fallback();
                     }
                     else {
-                        StorageDB(u_handle)
+                        MegaDexie.create(u_handle)
                             .set('import.' + FLRootID, data)
-                            .done(function() {
-
+                            .then(function() {
                                 loadSubPage('fm');
                             })
-                            .fail(function(e) {
+                            .catch(function(ex) {
                                 if (d) {
-                                    console.warn('Cannot import using indexedDB...', e);
+                                    console.warn('Cannot import using indexedDB...', ex);
                                 }
                                 fallback();
                             });

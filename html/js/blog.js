@@ -16,6 +16,7 @@ if (!m) {
 
 
 var blogposts = null;
+var blogHeaders = Object.create(null);
 
 function unsigned_blogposts(ready) {
     var xhr = getxhr();
@@ -60,7 +61,7 @@ function blog_bind_search() {
 
 function init_blog_callback() {
     blog_bind_search();
-    if (page === 'blogarticle') {
+    if (page === 'blogarticle' || page.substr(0, 5) === 'blog/') {
         init_blogarticle();
     }
     else if (is_mobile) {
@@ -97,6 +98,20 @@ function init_blog() {
         }
 
         blogposts = data.object;
+        for (var b in blogposts) {
+            if (blogposts.hasOwnProperty(b)) {
+                var bHeader = blogposts[b].h.substr(0, 50).trim().toLowerCase()
+                    .replace(/( )+/g, '-')
+                    .replace(/[^\dA-Za-z-]/g, '')
+                    .replace(/(-)+/g, '-');
+                blogHeaders[bHeader] = b;
+                blogposts[b].th = bHeader;
+            }
+        }
+        if (page.substr(0, 5) === 'blog/') {
+            // we arrived here to load all blogs, with a specific requested blog
+            pagemetadata();
+        }
         loadingDialog.hide();
         init_blog_callback();
     });
@@ -120,7 +135,7 @@ function blog_load() {
                     if (blogposts[i].by) {
                         by = blogposts[i].by;
                     }
-                    blogcontent += '<div class="blog-new-item" data-blogid="' + escapeHTML(blogposts[i].id) + '">';
+                    blogcontent += '<div class="blog-new-item" data-blogid="blog/' + escapeHTML(blogposts[i].th) + '">';
                     blogcontent += '<h2>' + escapeHTML(blogposts[i].h) + '</h2>';
                     blogcontent += '<div class="blog-new-small">' + acc_time2date(blogposts[i].t) + '</div>';
                     blogcontent += '<div class="blog-new-date-div"></div>';
@@ -150,7 +165,7 @@ function blog_load() {
         blogcontent += blog_pager();
         $('.blog-new-left').safeHTML(blogcontent);
         $('.blog-new-read-more, .blog-new-item img, .blog-new-item h2').rebind('click', function() {
-            loadSubPage('blog_' + $(this).parents('.blog-new-item').data('blogid'));
+            loadSubPage($(this).parents('.blog-new-item').data('blogid'));
         });
         $('.blog-pagination-button').rebind('click', function() {
             var c = $(this).attr('class');
@@ -311,7 +326,7 @@ function handleInvalidBlogID() {
         });
 
         if (ids.length > 0) {
-            newPage = 'blog_' + ids[0];
+            newPage = 'blog/' + blogposts['post_' + ids[0]].th;
         }
     }
     else {

@@ -56,7 +56,7 @@ class ModalDialog extends MegaRenderMixin {
         });
     }
     onBlur(e) {
-        var $element = $(ReactDOM.findDOMNode(this));
+        var $element = $(this.findDOMNode());
 
         if (
             (!e || !$(e.target).closest(".fm-dialog").is($element))
@@ -69,11 +69,12 @@ class ModalDialog extends MegaRenderMixin {
         super.componentWillUnmount();
         document.querySelector('.conversationsApp').removeEventListener('click', this.onBlur);
         $(document).off('keyup.modalDialog' + this.getUniqueId());
+        $(this.domNode).off('dialog-closed.modalDialog' + this.getUniqueId());
         $(document.body).removeClass('overlayed');
         $('.fm-dialog-overlay').addClass('hidden');
         $('.fm-dialog-overlay').off('click.modalDialog' + this.getUniqueId());
     }
-    onCloseClicked(e) {
+    onCloseClicked() {
         var self = this;
 
         if (self.props.onClose) {
@@ -82,6 +83,8 @@ class ModalDialog extends MegaRenderMixin {
     }
     onPopupDidMount(elem) {
         this.domNode = elem;
+
+        $(elem).rebind('dialog-closed.modalDialog' + this.getUniqueId(), () => this.onCloseClicked());
 
         if (this.props.popupDidMount) {
             // bubble up...

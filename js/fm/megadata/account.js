@@ -19,6 +19,11 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         var pstatus = Object(window.u_attr).p;
         var mRootID = M.RootID;
 
+        if (!window.fminitialized) {
+            console.warn('You should not use this function outside the fm...');
+        }
+        console.assert(mRootID, 'I told you...');
+
         if (blockui) {
             loadingDialog.show();
         }

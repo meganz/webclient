@@ -179,6 +179,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.open-item'] = 1;
             }
 
+            if (M.currentCustomView) {
+                items['.open-cloud-item'] = 1;
+            }
+
             if (sourceRoot === M.RootID && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
             }
@@ -248,6 +252,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
 
             M.colourLabelcmUpdate(selNode);
+
+            if (items['.edit-file-item']) {
+                $('.dropdown-item.edit-file-item span').text(l[865]);
+            }
+        }
+        else if (items['.edit-file-item']) {
+            $('.dropdown-item.edit-file-item span').text(l[16797]);
         }
     }
 

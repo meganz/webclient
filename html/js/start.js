@@ -6,6 +6,10 @@ function init_start() {
     var carouselInterval;
     var sliderInterval;
     var swipeInterval = 5000;
+    var intl = mega.intl.number;
+    var dropboxPrice = 4.9;
+    var megaPrice = 1.56;
+    var gdrivePrice = 4.9;
     var $page = $('.bottom-page.scroll-block.startpage', '.fmholder');
 
     if (u_type > 0) {
@@ -67,6 +71,12 @@ function init_start() {
         $('.bottom-page.banner-control', $page).removeClass('hidden').rebind('click.top-banner', doSlide);
         $('.mid-green-link.refer', $page).removeClass('hidden');
     }
+
+    $('.dropbox span', $page).text(intl.format(dropboxPrice));
+
+    $('.mega span', $page).text(intl.format(megaPrice));
+
+    $('.gdrive span', $page).text(intl.format(gdrivePrice));
 
     /**
      * detectSwipe

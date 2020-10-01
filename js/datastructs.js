@@ -321,16 +321,15 @@ lazy(MegaDataMap.prototype, '__ident_0', function() {
 lazy(MegaDataMap.prototype, '_schedule', function() {
     var task = null;
     var self = this;
-    var tbsp = Promise.resolve();
     var callTask = function _callTask() {
         if (task) {
-            tbsp.then(task);
+            queueMicrotask(task);
             task = null;
         }
     };
     return function _scheduler(callback) {
         if (!task) {
-            tbsp.then(callTask);
+            queueMicrotask(callTask);
         }
         task = function _task() {
             callback.call(self);
@@ -427,7 +426,7 @@ MegaDataMap.prototype.removeChangeListener = function(cb) {
                 _defineValue(listeners[i], '__mdmChangeListenerID', 'nop');
                 listeners.splice(i, 1);
 
-                if (d) {
+                if (d > 1) {
                     while (--i > 0) {
                         console.assert(listeners[i].__mdmChangeListenerID !== cId);
                     }
@@ -455,7 +454,7 @@ MegaDataMap.prototype._dispatchChangeListeners = function(args) {
         if (typeof listener === 'function') {
             result = listener.apply(this, args);
         }
-        else {
+        else if (listener) {
             result = listener.handleChangeEvent.apply(listener, args);
         }
 

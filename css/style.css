@@ -43,6 +43,17 @@ body * {
     user-select: none;
 }
 
+.wait-cursor, .loading-cursor, .progress-cursor {
+    cursor: progress !important;
+}
+
+.fmdb-working #topmenu .membership-status,
+.wait-cursor .fm-breadcrumbs:first-child:not(.public-links) .right-arrow-bg {
+    background-image: url("../images/mega/ajax-loader-tiny.gif") !important;
+    background-position: center !important;
+    background-size: auto !important;
+}
+
 /* Developer dark mode */
 html.dark-mode {
     filter: invert(1);
@@ -242,7 +253,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .loading .top-head {
     z-index: 1111;
 }
-.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, .grid-table-header::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after,  .fm-right-header-user-management::after {
+.top-head::after, .fm-right-header::after, .new-notification-top::after, .fm-transfers-header::after, div:not(.grid-table-header-container-sc) > .grid-table-header::after, .grid-table-header-container-sc::after, .files-grid-view::after, .shared-top-details::after, .transfer-table-header::after, .contact-top-details::after, .fm-account-history-head::after, .fm-account-widget-head::after, .fm-account-history .grey-bar::after, .fm-account-widget .grey-bar::after, .fm-account-history hr::after, .fm-account-widget hr::after, .fm-account-reseller hr::after,  .fm-right-header-user-management::after {
     content: '';
     width: 100%;
     height: 1px;
@@ -4027,6 +4038,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -webkit-border-radius: 100%;
     border-radius: 100%;
 }
+.files-grid-view .grid-table-header-container-sc {
+    position: relative;
+    background-color: white;
+
+}
 .files-grid-view .nw-contact-status, .fm-blocks-view .nw-contact-status, .shared-grid-view .nw-contact-status, .shared-blocks-view .nw-contact-status {
     border: 0;
     margin: 21px 2px 0 12px;
@@ -6233,7 +6249,7 @@ tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
 
     .grid-table.out-shares td:nth-child(2) {
         width: 150px !important;
-    }    
+    }
 }
 
 table {
@@ -9080,6 +9096,9 @@ body:not(.en) .warning-dialog-a.wide {
     text-align: left;
     background-color: white;
     z-index: 2000;
+}
+.megaapp-linux .megaapp-dropdown-list.default-select-dropdown {
+    z-index: 10;
 }
 .default-select-dropdown .jspDrag {
     width: 6px;
@@ -12616,81 +12635,6 @@ span.browsers-update {
     width: 940px;
     left: 50%;
     margin-left: -470px;
-}
-.new-bottom-pages.credits {
-    overflow: hidden;
-}
-.credits-main-pad {
-    margin: -3px -47px -3px -3px;
-}
-.credits-block {
-    margin: 50px 47px 3px 3px;
-    width: 280px;
-    min-height: 200px;
-    -webkit-box-shadow: 0px 0px 0px 2px #d9d9d9;
-    -moz-box-shadow: 0px 0px 0px 2px #d9d9d9;
-    box-shadow: 0px 0px 0px 2px #d9d9d9;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    border-radius: 5px;
-    padding: 20px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    display: block;
-    float: left;
-    -webkit-transition: box-shadow 200ms ease-in-out;
-    -moz-transition: box-shadow 200ms ease-in-out;
-    -o-transition: box-shadow 200ms ease-in-out;
-    -ms-transition: box-shadow 200ms ease-in-out;
-    transition: box-shadow 200ms ease-in-out;
-}
-.credits-block:hover {
-    -webkit-box-shadow: 0px 0px 0px 5px #d42400;
-    -moz-box-shadow: 0px 0px 0px 5px #d42400;
-    box-shadow: 0px 0px 0px 5px #d42400;
-}
-.credits-logo-block {
-    height: 83px;
-    display: block;
-}
-.credits-logo-block img {
-    width: 235px;
-}
-.credits-description {
-    font-size: 14px;
-    line-height: 26px;
-    color: #333333;
-    display: block;
-}
-.credits-title {
-    display: block;
-    font-size: 20px;
-    line-height: 31px;
-    letter-spacing: -0.1px;
-    color: #666666;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 5px 0 0 0;
-}
-.credits-info {
-    display: block;
-    font-size: 13px;
-    line-height: 24px;
-    letter-spacing: -0.1px;
-    color: #D82D00;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding-top: 2px;
-}
-.nihilogics.credits-logo-block img {
-    margin: -10px 0 0 0;
-}
-.nihilogics.credits-logo-block .credits-info {
-    margin: -20px 0 0 0;
-}
-.standford img {
-    float: left;
-    margin: -3px -180px 0 0;
-
 }
 .account-warning-icon {
     width: 19px;

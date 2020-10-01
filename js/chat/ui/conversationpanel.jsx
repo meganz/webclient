@@ -184,16 +184,6 @@ export class ConversationRightArea extends MegaRenderMixin {
             dontShowTruncateButton = true;
         }
 
-
-        // console.error(
-        //     self.findDOMNode(),
-        //     excludedParticipants,
-        //         self.allContactsInChat(excludedParticipants),
-        //         room.isReadOnly(),
-        //         room.iAmOperator(),
-        //     myPresence === 'offline'
-        // );
-
         var renameButtonClass = "link-button light " + (
             room.isReadOnly() || !room.iAmOperator() ?
                 "disabled" : ""
@@ -936,8 +926,6 @@ export class ConversationPanel extends MegaRenderMixin {
             return;
         }
 
-        // console.error(self.getUniqueId(), "is user scroll!");
-
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
             if (!self.props.chatRoom.scrolledToBottom) {
@@ -964,21 +952,17 @@ export class ConversationPanel extends MegaRenderMixin {
                 msgAppended++;
             });
 
+            // wait for all msgs to be rendered.
             chatRoom.off('onHistoryDecrypted.pull');
             chatRoom.one('onHistoryDecrypted.pull', function() {
                 chatRoom.off('onMessagesBuffAppend.pull');
 
-                // wait for all msgs to be rendered.
-                chatRoom.messagesBuff.addChangeListener(function() {
-                    if (msgAppended > 0) {
-                        self._reposOnUpdate = scrYOffset;
-                    }
+                if (msgAppended > 0) {
+                    self._reposOnUpdate = scrYOffset;
+                }
 
-                    self.scrollPullHistoryRetrieval = -1;
-                    // self.eventuallyUpdate();
-
-                    return 0xDEAD;
-                });
+                self.scrollPullHistoryRetrieval = -1;
+                // self.eventuallyUpdate();
             });
 
             mb.retrieveChatHistory();
@@ -1418,76 +1402,34 @@ export class ConversationPanel extends MegaRenderMixin {
             />
         }
 
-        var privateChatDialog;
-
+        let privateChatDialog;
         if (self.state.privateChatDialog === true) {
-            if (!$.dialog || $.dialog === "create-private-chat") {
-                $.dialog = "create-private-chat";
-
-                privateChatDialog = <ModalDialogsUI.ModalDialog
+            const onClose = () => this.setState({ privateChatDialog: false });
+            privateChatDialog = (
+                <ModalDialogsUI.ModalDialog
                     title={l[20594]}
-                    className={"fm-dialog create-private-chat"}
+                    className="fm-dialog create-private-chat"
                     chatRoom={room}
-                    onClose={() => {
-                        self.setState({'privateChatDialog': false});
-                        if ($.dialog === "create-private-chat") {
-                            closeDialog();
-                        }
-                    }}
-                >
+                    onClose={onClose}>
                     <div className="create-private-chat-content-block fm-dialog-body">
-                        <i className="huge-icon lock"></i>
+                        <i className="huge-icon lock" />
                         <div className="dialog-body-text">
-                            <div className="">
-                                <b>{l[20590]}</b><br/>
-                                {l[20591]}
-                            </div>
+                            <strong>{l[20590]}</strong>
+                            <br />
+                            <span>{l[20591]}</span>
                         </div>
-                        <div className="clear"></div>
-                        <div className="big-red-button" id="make-chat-private" onClick={function() {
-                            self.props.chatRoom.switchOffPublicMode();
-                            self.setState({'privateChatDialog': false});
-                            if ($.dialog === "create-private-chat") {
-                                closeDialog();
-                            }
-                        }}>
+                        <div className="clear" />
+                        <div
+                            className="big-red-button"
+                            onClick={() => {
+                                this.props.chatRoom.switchOffPublicMode();
+                                onClose();
+                            }}>
                             <div className="big-btn-txt">{l[20593]}</div>
                         </div>
                     </div>
-                </ModalDialogsUI.ModalDialog>;
-
-                $('.create-private-chat .fm-dialog-close').rebind('click', function() {
-                    $('.create-private-chat').addClass('hidden');
-                    $('.fm-dialog-overlay').addClass('hidden');
-                });
-                $('.create-private-chat .default-red-button').rebind('click', function() {
-                    var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
-                    var promises = [];
-                    promises.push(
-                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-                    );
-                    var _runSwitchOffPublicMode = function() {
-                        // self.state.value
-                        var topic = null;
-                        if (self.props.chatRoom.topic) {
-                            topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo(
-                                self.props.chatRoom.topic,
-                                strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
-                                participants,
-                                true,
-                                self.props.chatRoom.type === "public"
-                            );
-                            topic = base64urlencode(topic);
-                        }
-                        self.props.onSwitchOffPublicMode(topic);
-                    };
-                    MegaPromise.allDone(promises).done(
-                        function () {
-                            _runSwitchOffPublicMode();
-                        }
-                    );
-                });
-            }
+                </ModalDialogsUI.ModalDialog>
+            );
         }
 
         var sendContactDialog = null;

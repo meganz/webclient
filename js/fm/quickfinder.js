@@ -162,9 +162,7 @@ var QuickFinder = function(searchable_elements, containers) {
             }
             last_key = charTyped;
             if (foundIds[next_idx]) {
-                var nextId = SelectionManager.dynamicNodeIdRetriever(foundIds[next_idx]);
-                selectionManager.clear_selection();
-                selectionManager.set_currently_selected(nextId, true);
+                var nextId = selectionManager.resetTo(foundIds[next_idx], true);
 
                 if (!M.megaRender.megaList) {
                     $(searchable_elements).parents(".ui-selectee, .ui-draggable").removeClass('ui-selected');

@@ -47,9 +47,9 @@
         ["about"],
         ["pro"],
         ["resellers"],
-        ["corporate/page-1"],
-        ["corporate/page-2"],
-        ["corporate/page-3"],
+        ["corporate/investors"],
+        ["corporate/media"],
+        ["corporate/shareholder-reports"],
         ["contact"],
         ["blog"],
         ["security"],
@@ -65,7 +65,6 @@
         ["refer"],
         ["about/reliability"],
         ["about/privacy"],
-        ["about/jobs"],
-        ["Mega_Transparency_Report_201909.pdf"]
+        ["about/jobs"]
     ]
 }

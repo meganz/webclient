@@ -1,52 +1,48 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require("./utils.jsx");
-import {MegaRenderMixin} from "../stores/mixins.js";
+import React from 'react';
+import { MegaRenderMixin } from "../stores/mixins.js";
 
-
-var _buttonGroups = {};
+let _buttonGroups = {};
 
 export class Button extends MegaRenderMixin {
+    buttonClass = `.button`;
+
+    state = {
+        focused: false
+    };
+
     constructor(props) {
         super(props);
-        this.state = {'focused': false};
-        this.onClick = this.onClick.bind(this);
-        this.onBlur = this.onBlur.bind(this);
     }
-    componentWillUpdate(nextProps, nextState) {
-        var self = this;
 
+    componentWillUpdate(nextProps, nextState) {
         if (nextProps.disabled === true && nextState.focused === true) {
             nextState.focused = false;
         }
 
-        if (this.state.focused != nextState.focused && nextState.focused === true) {
-            $('.conversationsApp').rebind('mousedown.button' + self.getUniqueId(), this.onBlur);
+        if (this.state.focused !== nextState.focused && nextState.focused === true) {
+            $('.conversationsApp').rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
 
-            $(document).rebind('keyup.button' + self.getUniqueId(), function(e) {
-                if (self.state.focused === true) {
-                    if (e.keyCode == 27) { // escape key maps to keycode `27`
-                        self.onBlur();
-                    }
+            $(document).rebind('keyup.button' + this.getUniqueId(), e => {
+                if (this.state.focused === true && e.keyCode === 27 /* `ESC` */) {
+                    this.onBlur();
                 }
             });
 
-            if (self._pageChangeListener) {
-                mBroadcaster.removeListener(self._pageChangeListener);
+            if (this._pageChangeListener) {
+                mBroadcaster.removeListener(this._pageChangeListener);
             }
-            this._pageChangeListener = mBroadcaster.addListener('pagechange', function() {
-                if (self.state.focused === true) {
-                    self.onBlur();
+
+            this._pageChangeListener = mBroadcaster.addListener('pagechange', () => {
+                if (this.state.focused === true) {
+                    this.onBlur();
                 }
             });
 
-            $(document).rebind('closeDropdowns.' + self.getUniqueId(), function(e) {
-                self.onBlur();
-            });
+            $(document).rebind('closeDropdowns.' + this.getUniqueId(), () => this.onBlur());
 
             // change the focused state to any other buttons in this group
             if (this.props.group) {
-                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] != this) {
+                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] !== this) {
                     _buttonGroups[this.props.group].setState({focused: false});
                     _buttonGroups[this.props.group].unbindEvents();
                 }
@@ -55,14 +51,16 @@ export class Button extends MegaRenderMixin {
         }
 
         // deactivate group if focused => false and i'm the currently "focused" in the group
-        if (this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] == this) {
+        if (this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] === this) {
             _buttonGroups[this.props.group] = null;
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         this.unbindEvents();
     }
+
     renderChildren() {
         var self = this;
 
@@ -99,98 +97,81 @@ export class Button extends MegaRenderMixin {
             });
         }.bind(this));
     }
-    onBlur(e) {
+
+    onBlur = e => {
         if (!this.isMounted()) {
             return;
         }
-        var $element = $(ReactDOM.findDOMNode(this));
 
-        if(
-            (!e || (
-                    !$(e.target).closest(".button").is($element)
-                )
-            )
-        ) {
-            this.setState({focused: false});
-            this.unbindEvents();
-            this.forceUpdate();
+        if (!e || !$(e.target).closest(this.buttonClass).is(this.findDOMNode())) {
+            this.setState({ focused: false }, () => {
+                this.unbindEvents();
+                this.forceUpdate();
+            });
         }
     }
+
     unbindEvents() {
-        var self = this;
-        $(document).off('keyup.button' + self.getUniqueId());
-        $(document).off('closeDropdowns.' + self.getUniqueId());
-        $('.conversationsApp').unbind('mousedown.button' + self.getUniqueId());
+        $(document).off('keyup.button' + this.getUniqueId());
+        $(document).off('closeDropdowns.' + this.getUniqueId());
+        $('.conversationsApp').unbind('mousedown.button' + this.getUniqueId());
 
-        if (self._pageChangeListener) {
-            mBroadcaster.removeListener(self._pageChangeListener);
+        if (this._pageChangeListener) {
+            mBroadcaster.removeListener(this._pageChangeListener);
         }
     }
-    onClick(e) {
-        var $element = $(ReactDOM.findDOMNode(this));
 
+    onClick = e => {
         if (this.props.disabled === true) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        if(
-            $(e.target).closest(".popup").closest('.button').is($element) && this.state.focused === true
+        if (
+            $(e.target).closest('.popup').closest(this.buttonClass).is(this.findDOMNode()) &&
+            this.state.focused === true
         ) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        if ($(e.target).is("input,textarea,select")) {
+        if ($(e.target).is('input, textarea, select')) {
             return;
         }
-
 
         if (this.state.focused === false) {
             if (this.props.onClick) {
                 this.props.onClick(this);
             }
             else if (React.Children.count(this.props.children) > 0) { // does it contain some kind of a popup/container?
-                this.setState({'focused': true});
+                this.setState({ focused: true });
             }
         }
         else if (this.state.focused === true) {
-            this.setState({focused: false});
+            this.setState({ focused: false });
             this.unbindEvents();
         }
     }
+
     render() {
-        var classes = this.props.className ? `button ${this.props.className}` : "button";
-
-        if (this.props.disabled == true || this.props.disabled == "true") {
-            classes += " disabled";
-        }
-        else if (this.state.focused) {
-            classes += " active";
-        }
-
-        var label;
-        if (this.props.label) {
-            label = this.props.label;
-        }
-
-        var icon;
-        if (this.props.icon) {
-            icon = <i className={"small-icon " + this.props.icon}></i>
-        }
+        const { className, disabled, style, icon, label } = this.props;
 
         return (
             <div
-                className={classes}
-                onClick={this.onClick}
-                style={this.props.style ? this.props.style : null}
-            >
-                {icon}
-                <span>{label}</span>
+                className={`
+                    button
+                    ${className ? className : ''}
+                    ${disabled ? 'disabled' : ''}
+                    ${this.state.focused ? 'active' : ''}
+                `}
+                style={style}
+                onClick={this.onClick}>
+                {icon && <i className={`small-icon ${icon}`} />}
+                {label && <span>{label}</span>}
                 {this.renderChildren()}
             </div>
         );
     }
-};
+}

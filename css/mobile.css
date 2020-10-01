@@ -2013,12 +2013,19 @@ ul, li {
     color: #CCCCCC;
     font-family: 'source_sans_proregular', sans-serif;
 }
+.landscape .mobile.empty-folder-block {
+    top: 20%;
+    margin-top: 15px;
+}
 .mobile.empty-icon {
     width: 145px;
     height: 109px;
     margin: 0 auto 20px auto;
     background-image: url(../images/mobile/mobile-sprite_v39.png);
     background-repeat: no-repeat;
+}
+.landscape .mobile.empty-icon {
+    margin-bottom: 2px;
 }
 .mobile.empty-cloud .empty-icon {
     background-position: -3px -1442px;

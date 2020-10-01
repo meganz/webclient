@@ -130,7 +130,10 @@ function topMenu(close) {
         $topMenuIcon.addClass('active');
         $topMenu.removeClass('hidden');
 
-        topMenuDataUpdate();
+        if (u_type) {
+            $('.top-menu-logged .loader', $topMenu).addClass('loading');
+            M.getStorageQuota().then(topMenuDataUpdate).catch(dump);
+        }
 
         if (!is_mobile) {
             topMenuScroll();
@@ -156,32 +159,13 @@ function topMenu(close) {
 }
 
 /* Update used storage info*/
-function topMenuDataUpdate() {
+function topMenuDataUpdate(data) {
     'use strict';
-
-    if (!u_type) {
-        return false;
-    }
-
-    var $storageBlock = $('.top-menu-logged', '.top-menu-popup');
     var storageHtml;
-    var space_used;
-    var space;
-    var perc;
-
-    if (typeof M.account.space_used === 'undefined') {
-        $('.loader', $storageBlock).addClass('loading');
-
-        M.accountData(function() {
-            topMenuDataUpdate();
-        });
-        return false;
-    }
-
-    space_used = bytesToSize(M.account.space_used);
-    space = bytesToSize(M.account.space);
-    perc = Math.round(M.account.space_used / M.account.space * 100);
-    $storageBlock.removeClass('going-out exceeded');
+    var $storageBlock = $('.top-menu-logged', '.top-menu-popup').removeClass('going-out exceeded');
+    var space_used = bytesToSize(data.used);
+    var space = bytesToSize(data.max);
+    var perc = data.percent;
 
     if (perc >= 100) {
         $storageBlock.addClass('exceeded');
@@ -217,8 +201,8 @@ function topMenuScroll() {
 function scrollMenu() {
     "use strict";
 
-    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function () {
-        if (page === 'doc' || page === 'cpage' || page === 'sdk' || page === 'dev') {
+    $('.bottom-pages .fmholder').rebind('scroll.devmenu', function() {
+        if (page === 'doc' || page.substr(0, 9) === 'corporate' || page === 'sdk' || page === 'dev') {
             var $menu = $('.new-left-menu-block');
             var topPos = $(this).scrollTop();
             if (topPos > 0) {
@@ -792,10 +776,10 @@ function init_page() {
         parsepage(pages['change_email']);
         emailchange.main();
     }
-    else if (page.substr(0, 9) == 'corporate') {
+    else if (page.substr(0, 9) === 'corporate') {
         function doRenderCorpPage() {
-            if (window.corpTemplate) {
-                parsepage(window.corpTemplate);
+            if (window.corpTemplate && (new Date() - window.corpTemplate.ts < 72e5)) {
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
                 CMS.loaded('corporate');
@@ -803,43 +787,27 @@ function init_page() {
             }
 
             loadingDialog.show();
-            CMS.watch('corporate', function () {
-                window.corpTemplate = null;
-                doRenderCorpPage();
-            });
-            CMS.get('corporate', function (err, content) {
-                parsepage(window.corpTemplate = content.html);
+
+            CMS.get('corporate', function(err, content) {
+                window.corpTemplate = {
+                    template: content.html,
+                    ts: new Date()
+                };
+                parsepage(window.corpTemplate.template);
                 topmenuUI();
                 loadingDialog.hide();
             });
         }
 
         doRenderCorpPage();
-        page = 'cpage';
         bottompage.init();
     }
-    else if (page.substr(0, 5) == 'page_') {
-        var cpage = decodeURIComponent(page.substr(5, page.length - 2));
-
-        function doRenderCMSPage() {
-            loadingDialog.show();
-            CMS.watch(cpage, function () {
-                doRenderCMSPage();
-            });
-
-            CMS.get(cpage, function (err, content) {
-                parsepage(content.html);
-                topmenuUI();
-                loadingDialog.hide();
-            });
-        }
-
-        doRenderCMSPage();
-        page = 'cpage';
-        bottompage.init();
-        return;
+    else if (page.substr(0, 5) === 'blog/') {
+        // eslint-disable-next-line dot-notation
+        parsepage(pages['blogarticle']);
+        init_blogarticle();
     }
-    else if (page.substr(0, 4) == 'blog' && page.length > 4 && page.length < 10) {
+    else if (page.substr(0, 5) === 'blog_' && page.length > 4 && page.length < 10) {
         blogid = page.substr(5, page.length - 2);
         page = 'blogarticle';
         parsepage(pages['blogarticle']);
@@ -1055,6 +1023,13 @@ function init_page() {
             parsepage(pages['login']);
             init_login();
         }
+    }
+    else if (is_mobile && isEphemeral() && is_fm()) {
+        // Log out and redirect to start page it's the ephemeral session on mobile web
+        u_logout(true);
+        page = '';
+        loadSubPage('start');
+        return false;
     }
     else if (is_mobile && u_type && page === 'fm/dashboard') {
         loadSubPage('fm');
@@ -1808,29 +1783,14 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            attribCache.getItem(contactHandle + "_uge")
-            .done(function(email) {
-                addContact(u_attr.email, email);
-            })
-            .fail(function() {
-                asyncApiReq({
-                    'a': 'uge',
-                    'u': contactHandle
+            M.syncContactEmail(contactHandle, new MegaPromise())
+                .then(function(email) {
+                    addContact(u_attr.email, email);
                 })
-                .done(function(email) {
-                    if (isValidEmail(email) && isString(email)) {
-                        attribCache.setItem(contactHandle + "_uge", email);
-                        addContact(u_attr.email, email);
-                    }
-                    else {
-                        localStorage.removeItem('addContact');
-                    }
-                })
-                .fail(function(e) {
-                    console.error(e);
+                .catch(function(ex) {
+                    console.error(ex);
                     localStorage.removeItem('addContact');
                 });
-            });
         }
     } else if (is_fm()) {
         var id = false;
@@ -2858,7 +2818,17 @@ function pagemetadata() {
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
     document.title = mega_title;
     megatitle();
+
+    if (pagemetadata.last === page) {
+        console.error('Re-invoking pagemetadata() for the same page...', page);
+    }
+    else {
+        mBroadcaster.sendMessage('pagemetadata', metas);
+    }
+    pagemetadata.last = page;
 }
+
+pagemetadata.last = null;
 
 
 function parsepage(pagehtml) {
@@ -2926,7 +2896,6 @@ function parsetopmenu() {
 function loadSubPage(tpage, event) {
     'use strict';
 
-    onIdle(pagemetadata);
     tpage = getCleanSitePath(tpage);
 
     if (typeof dlPageCleanup === 'function' && tpage[0] !== '!') {
@@ -3095,10 +3064,36 @@ window.onunload = function () {
     }
 };
 
-mBroadcaster.once('boot_done', function () {
+mBroadcaster.once('boot_done', function() {
+    'use strict';
     M = new MegaData();
-    attribCache = new IndexedDBKVStorage('ua', { murSeed: 0x800F0002 });
-    attribCache.bitMapsManager = new MegaDataBitMapManager();
+
+    if (d) {
+        if (!window.crossOriginIsolated) {
+            if (window.crossOriginIsolated === false) {
+                console.warn('cross-origin isolation is not enabled...');
+            }
+            return;
+        }
+
+        (function memoryMeasurement() {
+            var performMeasurement = tryCatch(function() {
+                performance.measureMemory()
+                    .then(function(result) {
+                        onIdle(memoryMeasurement);
+                        console.info('Memory usage:', result);
+                    });
+            });
+
+            if (!performance.measureMemory) {
+                console.debug('performance.measureMemory() is not available.');
+                return;
+            }
+            var interval = -Math.log(Math.random()) * 2e4;
+            console.info('Scheduling memory measurement in %d seconds.', Math.round(interval / 1e3));
+            setTimeout(performMeasurement, interval);
+        })();
+    }
 });
 
 // After open folder call, check if we should restore any previously opened preview node.

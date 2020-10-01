@@ -63,7 +63,7 @@ function translate(html) {
         //      are used before startMega() have finished. Also, injecting them in the
         //      DOM to manipulate it later is something we should avoid doing as well.
         // FIXME: we will for now whitelist onboarding strings doing so though...
-        if (d && /\[\w+]/.test(l[localeNum]) && (localeNum < 17566 || localeNum > 17577)) {
+        if (d && /\[\w+]/.test(l[localeNum]) && (localeNum < 17566 || localeNum > 17577) && localeNum != 23718) {
             console.warn('locale string %s does contain raw entity tags', localeNum, [l[localeNum]]);
         }
 
@@ -156,7 +156,7 @@ function setDateTimeFormat(locales, format) {
  *       13: January (Only month short version)
  */
 function time2date(unixTime, format) {
-
+    'use strict';
     var date = new Date(unixTime * 1000 || 0);
     var result;
     var dateFunc;
@@ -1261,4 +1261,68 @@ mBroadcaster.once('boot_done', function populate_l() {
     if (remappedLangLocales.hasOwnProperty(locale)) {
         locale = remappedLangLocales[locale];
     }
+});
+
+/** @property mega.intl */
+lazy(mega, 'intl', function _() {
+    'use strict';
+    const ns = Object.create(null);
+
+    /** @property mega.intl.number */
+    lazy(ns, 'number', function() {
+        return this.get('NumberFormat', {minimumFractionDigits: 2});
+    });
+
+    /** @property mega.intl.collator */
+    lazy(ns, 'collator', function() {
+        return this.get('Collator');
+    });
+
+    /** @property mega.intl.decimal */
+    lazy(ns, 'decimal', function() {
+        return this.get('NumberFormat');
+    });
+
+    /** @property mega.intl.decimalSeparator */
+    lazy(ns, 'decimalSeparator', function() {
+        return this.number.formatToParts(1.1).find(obj => obj.type === 'decimal').value;
+    });
+
+    /** @property mega.intl.locale */
+    lazy(ns, 'locale', function() {
+        const locale = window.locale || window.lang;
+        const country = window.u_attr && (u_attr.country || u_attr.ipcc) || mega.ipcc;
+
+        // @todo Polyfill Intl.Locale() and return an instance of it instead?
+        return this.test(locale + '-' + country) || this.test(locale) || 'en';
+    });
+
+    /** @function mega.intl.get */
+    ns.get = function(type, options) {
+        let intl;
+
+        tryCatch(() => {
+            intl = new Intl[type](this.locale.replace('ar', 'en'), options);
+        }, false)();
+
+        return intl || new Intl[type]();
+    };
+
+    /** @function mega.intl.compare */
+    ns.compare = function(a, b) {
+        // compares two strings according to the sort order of the current locale.
+        return this.collator.compare(a, b);
+    };
+
+    /** @function mega.intl.reset */
+    ns.reset = function() {
+        delete mega.intl;
+        lazy(mega, 'intl', _);
+    };
+
+    /** @function mega.intl.test */
+    ns.test = locale => tryCatch(() => Intl.NumberFormat.supportedLocalesOf(locale)[0], false)();
+    // @todo ^ does this return the canonical even in browsers not supporting Intl.getCanonicalLocales() ?
+
+    return ns;
 });

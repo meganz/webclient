@@ -1,12 +1,14 @@
 {
     "env": {
         "browser": true,
+        "es6": true,
         "jquery": true,
         "mocha": true,
         "phantomjs": true,
         "worker": true
     },
     "parserOptions": {
+        "ecmaVersion": 2017,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -14,6 +16,7 @@
     "plugins": [
         "compat",
         "dollar-sign",
+        "es",
         "jquery",
         "local-rules",
         "no-unsanitized",
@@ -23,6 +26,8 @@
         "unicorn"
     ],
     "extends": [
+        "plugin:es/no-2019",
+        "plugin:es/no-2018",
         "eslint:recommended",
         "plugin:no-unsanitized/DOM",
         "plugin:react/recommended",
@@ -151,6 +156,18 @@
         "compat/compat": 1,
         "dollar-sign/dollar-sign": 2,
 
+        // es2017
+        "es/no-atomics": 2,
+        "es/no-exponential-operators": 2,
+        "es/no-generators": 2,
+        "es/no-trailing-function-commas": 2,
+        // es2020
+        "es/no-dynamic-import": 2,
+        //"es/no-export-ns-from": 2,
+        "es/no-global-this": 2,
+        //"es/no-import-meta": 2,
+        //"es/no-nullish-coalescing-operators": 2,
+
         "jquery/no-ajax": 2,
         "jquery/no-deferred": 2,
         "jquery/no-each": 2,
@@ -189,6 +206,7 @@
 
         "react/no-find-dom-node": "off",
         "react/prop-types": "off",
+        "react/no-is-mounted": "off",
         "react/jsx-indent": ["error", 4]
     },
 
@@ -202,7 +220,8 @@
                 "sourceType": "module"
             },
             "rules": {
-                "complexity": [2, 28]
+                "complexity": [2, 28],
+                "no-negated-condition": "off"
             }
         }
     ]

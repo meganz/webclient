@@ -1603,7 +1603,7 @@ MessagesBuff.prototype.initChatdPersistEvents = function() {
             var r = self.chatRoom;
             var cp = r.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
             if (self.chatRoom.type === "public") {
-                cp.deleteAllMessages(r.chatId);
+                cp.deleteAllMessages(r.chatId).always(dump);
             }
         }
     });
@@ -1681,7 +1681,7 @@ MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd, force) {
         }
         if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
             var chatdPersist = self.chatdInt.chatd.chatdPersist;
-            chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId);
+            chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId).always(nop);
         }
 
         // check if last recv needs to be updated
@@ -1956,7 +1956,7 @@ MessagesBuff.prototype.removeMessageById = function(messageId) {
 
     var self = this;
     var msg = self.getMessageById(messageId);
-    if (msg.deleted) {
+    if (!msg || msg.deleted) {
         return;
     }
 

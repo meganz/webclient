@@ -5,6 +5,7 @@ var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 export class DropdownEmojiSelector extends MegaRenderMixin {
+    emojiSearchField = React.createRef();
 
     static defaultProps = {
         'requiresUpdateOnResize': true,
@@ -451,73 +452,69 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             }
         }
 
-        self.customCategoriesOrder.forEach(function (categoryName) {
-            var activeClass = activeCategoryName === categoryName ? " active" : "";
-
+        self.customCategoriesOrder.forEach(categoryName => {
             categoryButtons.push(
                 <div
-                    visiblecategories={self.state.visibleCategories}
-                    className={"button square-button emoji" + (activeClass)}
+                    visiblecategories={this.state.visibleCategories}
+                    className={`
+                        button square-button emoji
+                        ${activeCategoryName === categoryName ? 'active' : ''}
+                    `}
                     key={categoryIcons[categoryName]}
                     onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
 
-                        self.setState({browsingCategory: categoryName, searchValue: ''});
-                        self._cachedNodes = {};
+                        this.setState({ browsingCategory: categoryName, searchValue: '' });
+                        this._cachedNodes = {};
 
+                        const categoryPosition =
+                            this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
+                        this.scrollableArea.scrollToY(categoryPosition);
+                        this._onScrollChanged(categoryPosition);
 
-                        var categoryPosition = self.data_categoryPositions[
-                                self.data_categories.indexOf(categoryName)
-                            ] + 10;
-
-                        self.scrollableArea.scrollToY(
-                            categoryPosition
-                        );
-
-                        self._onScrollChanged(categoryPosition)
-                    }}
-                >
-                    <i className={"small-icon " + categoryIcons[categoryName]}></i>
+                        this.emojiSearchField?.current.focus();
+                    }}>
+                    <i className={`small-icon ${categoryIcons[categoryName]}`} />
                 </div>
             );
         });
 
-        return <div>
-            <div className="popup-header emoji">
-
-                {preview ? preview : <div className="search-block emoji">
-                    <i className="small-icon search-icon" />
-                    <input
-                        type="search"
-                        placeholder={l[102]}
-                        ref="emojiSearchField"
-                        onChange={this.onSearchChange}
-                        value={this.state.searchValue}/>
-                </div>}
-
-            </div>
-
-
-
-            <PerfectScrollbar
-                className="popup-scroll-area emoji perfectScrollbarContainer"
-                searchValue={this.state.searchValue}
-                onUserScroll={this.onUserScroll}
-                visibleCategories={this.state.visibleCategories}
-                ref={(ref) => {
-                    self.scrollableArea = ref;
-                }}
-            >
-                <div className="popup-scroll-content emoji">
-                    <div style={{height: self.state.totalScrollHeight}}>
-                        {self._emojiReactElements}
-                    </div>
+        return (
+            <>
+                <div className="popup-header emoji">
+                    {preview || (
+                        <div className="search-block emoji">
+                            <i className="small-icon search-icon" />
+                            <input
+                                ref={this.emojiSearchField}
+                                type="search"
+                                placeholder={l[102]}
+                                onChange={this.onSearchChange}
+                                autoFocus={true}
+                                value={this.state.searchValue} />
+                        </div>
+                    )}
                 </div>
-            </PerfectScrollbar>
 
-            <div className="popup-footer emoji">{categoryButtons}</div>
-        </div>;
+                <PerfectScrollbar
+                    className="popup-scroll-area emoji perfectScrollbarContainer"
+                    searchValue={this.state.searchValue}
+                    onUserScroll={this.onUserScroll}
+                    visibleCategories={this.state.visibleCategories}
+                    ref={ref => {
+                        this.scrollableArea = ref;
+                    }}>
+                    <div className="popup-scroll-content emoji">
+                        <div style={{ height: this.state.totalScrollHeight }}>
+                            {this._emojiReactElements}
+                        </div>
+                    </div>
+                </PerfectScrollbar>
+
+                <div className="popup-footer emoji">{categoryButtons}</div>
+            </>
+        );
     }
     render() {
         var self = this;

@@ -360,7 +360,7 @@ var dlmanager = {
             delete dlmanager.resumeInfoCache[resumeInfo.tag];
 
             M.readFileEntry(resumeInfo.entry)
-                .done(function(ab) {
+                .then(function(ab) {
                     if (ab instanceof ArrayBuffer && ab.byteLength === dl.byteOffset) {
                         dl.pzBufferStateChange = ab;
                     }
@@ -368,7 +368,7 @@ var dlmanager = {
                         console.warn('Invalid pzBufferStateChange...', ab, dl.byteOffset);
                     }
                 })
-                .finally(function() {
+                .always(function() {
                     onIdle(startDownload);
                     resumeInfo.entry.remove(function() {});
                     delete resumeInfo.entry;

@@ -182,7 +182,7 @@
             var chats = getSelectedChats();
             if (chats.length > 1) {
                 path = [u_handle, 'contacts'];
-                names[u_handle] = l[1025];
+                names[u_handle] = l[23755];
             }
             else {
                 aTarget = chats[0] || String(aTarget || '').split('/').pop();
@@ -932,7 +932,8 @@
         $dialog.off('click.hidePermissionsMenu');
 
         // If copying from contacts tab (Ie, sharing)
-        if (section === 'cloud-drive' && (M.currentrootid === 'contacts' || M.currentrootid === 'chat')) {
+        if (!$.saveToDialog && section === 'cloud-drive'
+            && (M.currentrootid === 'contacts' || M.currentrootid === 'chat')) {
             $('.fm-picker-dialog-title', $dialog).text(l[1344]);
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
             $('.share-dialog-permissions', $dialog).removeClass('hidden')

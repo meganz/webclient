@@ -211,13 +211,6 @@ RoomSearch.prototype.pause = function() {
 
 RoomSearch.prototype._setState = function(newState) {
     "use strict";
-    // console.error(
-    //     this.room.chatId,
-    //     this.parentSearch.searchRegExps,
-    //     "setState",
-    //     constStateToText(SearchState, this.state), constStateToText(SearchState, newState)
-    // );
-
     // todo: validate state transitions
     this.state = newState;
 };
@@ -408,7 +401,6 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
                 }
             }
 
-            // console.error(room, resultMeta);
             if (typeof onResult === 'function') {
                 onResult(room.chatId, resultMeta, results);
             }
@@ -433,7 +425,6 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
 
 
     ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler, searchMessages);
-    // console.error('search > doSearch() -> cs:', ChatSearch.doSearch.cs);
 
     results.dump = function() {
         for (var r in results) {
@@ -546,11 +537,9 @@ ChatSearch.prototype.onRoomSearchComplete = function() {
     var len = searches.length;
     for (var i = 0; i < len; i++) {
         if (searches[i].state < SearchState.kComplete) {
-            // console.error(searches[i].state);
             return;
         }
     }
-    // console.error('onComplete');
     this.handler.onComplete();
 };
 

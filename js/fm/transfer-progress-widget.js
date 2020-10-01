@@ -748,10 +748,12 @@ mega.tpw = new function TransferProgressWidget() {
         var addAsHidden = $widgetHeadAndBody.find('.complete-list').hasClass('hidden');
 
         if (addAsHidden && $widgetHeadAndBody.find('.process-list').hasClass('hidden')) {
-            // all done
+            // all done or all not done
             addAsHidden = false;
-            $widgetHeadAndBody.find('.complete-list').removeClass('hidden');
-            $rowsContainer.find('.transfer-task-row').addClass('hidden');
+            if ($('.transfer-task-row.complete', $rowsContainer).length) {
+                $('.complete-list', $widgetHeadAndBody).removeClass('hidden');
+                $('.transfer-task-row.complete', $rowsContainer).addClass('hidden');
+            }
         }
 
         for (var r = 0; r < entriesArray.length; r++) {

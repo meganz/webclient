@@ -45,11 +45,9 @@ var Chatd = function(userId, megaChat, options) {
         self.msgTransactionId += String.fromCharCode(Math.random() * 256);
     }
 
-    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
-
     self.logger = new MegaLogger("chatd", {
         minLogLevel: function() {
-            return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+            return Chatd.LOGGER_LEVEL;
         }
     });
 
@@ -224,6 +222,10 @@ var MESSAGE_EXPIRY = Chatd.MESSAGE_EXPIRY;
 Chatd.MESSAGE_HISTORY_LOAD_COUNT = 32;
 Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL = 3;
 
+Chatd.LOGGER_ENABLED = !!localStorage.chatdLogger;
+Chatd.LOGGER_LEVEL =
+    Chatd.LOGGER_ENABLED ? MegaLogger.LEVELS.DEBUG : d > 1 ? MegaLogger.LEVELS.WARN : MegaLogger.LEVELS.ERROR;
+
 Chatd.VERSION = 1;
 // The per-chat state of the join/login sequence. It can also be null if we are no longer
 // part of that chatroom (i.e. -1 privilege)
@@ -328,17 +330,15 @@ Chatd.Shard = function(chatd, shard) {
     self.cmdq = '';
     self.histRequests = {};
 
-    var loggerIsEnabled = localStorage['chatdLogger'] === '1';
-
     self.logger = new MegaLogger(
         "shard-" + shard, {
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+                return Chatd.LOGGER_LEVEL;
             }
         },
         chatd.logger
     );
-    self.loggerIsEnabled = loggerIsEnabled;
+    self.loggerIsEnabled = Chatd.LOGGER_ENABLED;
 
     /**
      * Will initialise/reset a timer that would force reconnect the shard connection IN case that the keep alive is not
@@ -1133,7 +1133,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
             base64urlencode(chatId),
             count * -1
         )
-            .done(function(result) {
+            .then(function(result) {
                 chatRoom = megaChat.getChatById(base64urlencode(chatId));
                 var messages = result[0];
                 var keys = result[1];
@@ -1241,7 +1241,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                             })
                             .catch(function(ex) {
                                 if (ex && d) {
-                                    console.warn(ex);
+                                    self.logger.warn(ex);
                                 }
                                 // in case low/high fails, proceed w/ joining anyway so that further commands would not
                                 // get stuck w/ no response from chatd.
@@ -1288,7 +1288,7 @@ Chatd.Shard.prototype.hist = function(chatId, count, isInitial) {
                     }
                 }
             })
-            .fail(function() {
+            .catch(function() {
                 if (isInitial) {
                     self.markAsJoinRequested(chatId);
                     self.cmd(Chatd.Opcode.JOIN, chatId + self.chatd.userId + String.fromCharCode(Chatd.Priv.NOCHANGE));
@@ -2620,7 +2620,6 @@ Chatd.prototype.setRtcHandler = function(handler) {
     }
 };
 
-
 Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var self = this;
     var chatIdBin = base64urldecode(chatId);
@@ -2628,9 +2627,12 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
     var oldChatIdMessages = self.chatIdMessages[chatIdBin];
     var chatRoom = self.megaChat.getChatById(base64urlencode(chatIdBin));
     var cdr = self.chatIdMessages[chatIdBin] = new Chatd.Messages(self, self.chatIdShard[chatIdBin], chatIdBin, oldChatIdMessages);
+
+    self.logger.warn('re-init chat history for "%s"', chatId, chatRoom);
+
     chatRoom.messagesBuff.messageOrders = {};
     chatRoom.messagesBuff.sharedFilesMessageOrders = {};
-    chatRoom.notDecryptedBuffer = {};
+
     if (chatRoom.messagesBuff.messagesBatchFromHistory && chatRoom.messagesBuff.messagesBatchFromHistory.length > 0) {
         chatRoom.messagesBuff.messagesBatchFromHistory.clear();
     }
@@ -2658,8 +2660,8 @@ Chatd.prototype._reinitChatIdHistory = function(chatId, resetNums) {
             cdr[k] = oldChatIdMessages[k];
         });
     }
-
 };
+
 Chatd.prototype.onJoinRangeHistReject = function(chatIdBin, shardId) {
     var self = this;
 
@@ -2854,7 +2856,7 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
             var self = this;
 
             this.chatd.chatdPersist.getMessageByMessageId(encChatId, base64urlencode(msgid))
-                .done(function(r) {
+                .then(function(r) {
                     if (!r) {
                         console.error(
                             "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
@@ -2889,15 +2891,13 @@ Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid,
 
                     if (msgObj.keyId !== 0) {
                         self.chatd.chatdPersist.retrieveAndLoadKeysFor(encChatId, msgObj.userId, msgObj.keyId)
-                            .done(function() {
-                                done();
-                            });
+                            .always(done);
                     }
                     else {
                         done();
                     }
                 })
-                .fail(function() {
+                .catch(function() {
                     if (d) {
                         console.warn(
                             "msgmodify failed, can't find", base64urlencode(msgid), " in chatdPersist, maybe the " +

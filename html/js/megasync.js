@@ -375,7 +375,9 @@ var megasync = (function() {
         if (overlayHeight < (listHeight + listPosition)) {
             $arrow.removeClass('hidden');
             $downArrow.removeClass('inactive');
-            $pane.height(overlayHeight - listPosition - 72);
+            var paneHeight = overlayHeight - listPosition - 72;
+            paneHeight = paneHeight < 120 ? 120 : paneHeight;
+            $pane.height(paneHeight);
             $pane.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 8, animateScroll: true});
 
             var jspAPI = $pane.data('jsp');

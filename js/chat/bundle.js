@@ -5832,6 +5832,7 @@ var PerfectScrollbar = __webpack_require__(11).PerfectScrollbar;
 class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.emojiSearchField = React.createRef();
     this.data_categories = null;
     this.data_emojis = null;
     this.data_emojiByCategory = null;
@@ -6196,40 +6197,44 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       }
     }
 
-    self.customCategoriesOrder.forEach(function (categoryName) {
-      var activeClass = activeCategoryName === categoryName ? " active" : "";
+    self.customCategoriesOrder.forEach(categoryName => {
       categoryButtons.push(React.createElement("div", {
-        visiblecategories: self.state.visibleCategories,
-        className: "button square-button emoji" + activeClass,
+        visiblecategories: this.state.visibleCategories,
+        className: "\n                        button square-button emoji\n                        " + (activeCategoryName === categoryName ? 'active' : '') + "\n                    ",
         key: categoryIcons[categoryName],
         onClick: e => {
+          var _this$emojiSearchFiel;
+
           e.stopPropagation();
           e.preventDefault();
-          self.setState({
+          this.setState({
             browsingCategory: categoryName,
             searchValue: ''
           });
-          self._cachedNodes = {};
-          var categoryPosition = self.data_categoryPositions[self.data_categories.indexOf(categoryName)] + 10;
-          self.scrollableArea.scrollToY(categoryPosition);
+          this._cachedNodes = {};
+          const categoryPosition = this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
+          this.scrollableArea.scrollToY(categoryPosition);
 
-          self._onScrollChanged(categoryPosition);
+          this._onScrollChanged(categoryPosition);
+
+          (_this$emojiSearchFiel = this.emojiSearchField) == null ? void 0 : _this$emojiSearchFiel.current.focus();
         }
       }, React.createElement("i", {
         className: "small-icon " + categoryIcons[categoryName]
       })));
     });
-    return React.createElement("div", null, React.createElement("div", {
+    return React.createElement(React.Fragment, null, React.createElement("div", {
       className: "popup-header emoji"
-    }, preview ? preview : React.createElement("div", {
+    }, preview || React.createElement("div", {
       className: "search-block emoji"
     }, React.createElement("i", {
       className: "small-icon search-icon"
     }), React.createElement("input", {
+      ref: this.emojiSearchField,
       type: "search",
       placeholder: __(l[102]),
-      ref: "emojiSearchField",
       onChange: this.onSearchChange,
+      autoFocus: true,
       value: this.state.searchValue
     }))), React.createElement(PerfectScrollbar, {
       className: "popup-scroll-area emoji perfectScrollbarContainer",
@@ -6237,15 +6242,15 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       onUserScroll: this.onUserScroll,
       visibleCategories: this.state.visibleCategories,
       ref: ref => {
-        self.scrollableArea = ref;
+        this.scrollableArea = ref;
       }
     }, React.createElement("div", {
       className: "popup-scroll-content emoji"
     }, React.createElement("div", {
       style: {
-        height: self.state.totalScrollHeight
+        height: this.state.totalScrollHeight
       }
-    }, self._emojiReactElements))), React.createElement("div", {
+    }, this._emojiReactElements))), React.createElement("div", {
       className: "popup-footer emoji"
     }, categoryButtons));
   }
@@ -16160,7 +16165,7 @@ __webpack_require__(21);
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
-  'image/gif': 2e6,
+  'image/gif': 4e6,
   'image/png': 2e5,
   'image/webp': 2e5
 };

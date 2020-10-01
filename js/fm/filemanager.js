@@ -1040,6 +1040,8 @@ FileManager.prototype.initFileManagerUI = function() {
  * @param aUpdate
  */
 FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) {
+    'use strict';
+
     if (!window.fmShortcuts) {
         window.fmShortcuts = new FMShortcuts();
     }
@@ -1047,7 +1049,6 @@ FileManager.prototype.initShortcutsAndSelection = function (container, aUpdate) 
     if (!aUpdate) {
         if (window.selectionManager) {
             window.selectionManager.destroy();
-            Object.freeze(window.selectionManager);
         }
 
         if (M.previousdirid !== M.currentdirid) {
@@ -1232,7 +1233,7 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
                 delay('rendernew:mediainfo:collect', function() {
                     mBroadcaster.sendMessage('mediainfo:collect');
                     $.tresizer();
-                }, 7200);
+                }, 3200);
             }
         }, 2000);
 

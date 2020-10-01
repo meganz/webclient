@@ -12634,7 +12634,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       keyCode
     }) => {
       const scrollbar = this.messagesListScrollable;
-      const domNode = scrollbar.domNode;
+      const domNode = scrollbar == null ? void 0 : scrollbar.domNode;
 
       if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
         const scrollPositionY = scrollbar.getScrollPositionY();

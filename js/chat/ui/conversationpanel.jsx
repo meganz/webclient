@@ -563,7 +563,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
     onKeyboardScroll = ({ keyCode }) => {
         const scrollbar = this.messagesListScrollable;
-        const domNode = scrollbar.domNode;
+        const domNode = scrollbar?.domNode;
 
         if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
             const scrollPositionY = scrollbar.getScrollPositionY();

@@ -5832,6 +5832,7 @@ var PerfectScrollbar = __webpack_require__(11).PerfectScrollbar;
 class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.emojiSearchField = React.createRef();
     this.data_categories = null;
     this.data_emojis = null;
     this.data_emojiByCategory = null;
@@ -6196,40 +6197,44 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       }
     }
 
-    self.customCategoriesOrder.forEach(function (categoryName) {
-      var activeClass = activeCategoryName === categoryName ? " active" : "";
+    self.customCategoriesOrder.forEach(categoryName => {
       categoryButtons.push(React.createElement("div", {
-        visiblecategories: self.state.visibleCategories,
-        className: "button square-button emoji" + activeClass,
+        visiblecategories: this.state.visibleCategories,
+        className: "\n                        button square-button emoji\n                        " + (activeCategoryName === categoryName ? 'active' : '') + "\n                    ",
         key: categoryIcons[categoryName],
         onClick: e => {
+          var _this$emojiSearchFiel;
+
           e.stopPropagation();
           e.preventDefault();
-          self.setState({
+          this.setState({
             browsingCategory: categoryName,
             searchValue: ''
           });
-          self._cachedNodes = {};
-          var categoryPosition = self.data_categoryPositions[self.data_categories.indexOf(categoryName)] + 10;
-          self.scrollableArea.scrollToY(categoryPosition);
+          this._cachedNodes = {};
+          const categoryPosition = this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
+          this.scrollableArea.scrollToY(categoryPosition);
 
-          self._onScrollChanged(categoryPosition);
+          this._onScrollChanged(categoryPosition);
+
+          (_this$emojiSearchFiel = this.emojiSearchField) == null ? void 0 : _this$emojiSearchFiel.current.focus();
         }
       }, React.createElement("i", {
         className: "small-icon " + categoryIcons[categoryName]
       })));
     });
-    return React.createElement("div", null, React.createElement("div", {
+    return React.createElement(React.Fragment, null, React.createElement("div", {
       className: "popup-header emoji"
-    }, preview ? preview : React.createElement("div", {
+    }, preview || React.createElement("div", {
       className: "search-block emoji"
     }, React.createElement("i", {
       className: "small-icon search-icon"
     }), React.createElement("input", {
+      ref: this.emojiSearchField,
       type: "search",
       placeholder: __(l[102]),
-      ref: "emojiSearchField",
       onChange: this.onSearchChange,
+      autoFocus: true,
       value: this.state.searchValue
     }))), React.createElement(PerfectScrollbar, {
       className: "popup-scroll-area emoji perfectScrollbarContainer",
@@ -6237,15 +6242,15 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       onUserScroll: this.onUserScroll,
       visibleCategories: this.state.visibleCategories,
       ref: ref => {
-        self.scrollableArea = ref;
+        this.scrollableArea = ref;
       }
     }, React.createElement("div", {
       className: "popup-scroll-content emoji"
     }, React.createElement("div", {
       style: {
-        height: self.state.totalScrollHeight
+        height: this.state.totalScrollHeight
       }
-    }, self._emojiReactElements))), React.createElement("div", {
+    }, this._emojiReactElements))), React.createElement("div", {
       className: "popup-footer emoji"
     }, categoryButtons));
   }
@@ -13427,75 +13432,35 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       });
     }
 
-    var privateChatDialog;
+    let privateChatDialog;
 
     if (self.state.privateChatDialog === true) {
-      if (!$.dialog || $.dialog === "create-private-chat") {
-        $.dialog = "create-private-chat";
-        privateChatDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
-          title: l[20594],
-          className: "fm-dialog create-private-chat",
-          chatRoom: room,
-          onClose: () => {
-            self.setState({
-              'privateChatDialog': false
-            });
+      const onClose = () => this.setState({
+        privateChatDialog: false
+      });
 
-            if ($.dialog === "create-private-chat") {
-              closeDialog();
-            }
-          }
-        }, external_React_default.a.createElement("div", {
-          className: "create-private-chat-content-block fm-dialog-body"
-        }, external_React_default.a.createElement("i", {
-          className: "huge-icon lock"
-        }), external_React_default.a.createElement("div", {
-          className: "dialog-body-text"
-        }, external_React_default.a.createElement("div", {
-          className: ""
-        }, external_React_default.a.createElement("b", null, l[20590]), external_React_default.a.createElement("br", null), l[20591])), external_React_default.a.createElement("div", {
-          className: "clear"
-        }), external_React_default.a.createElement("div", {
-          className: "big-red-button",
-          id: "make-chat-private",
-          onClick: function () {
-            self.props.chatRoom.switchOffPublicMode();
-            self.setState({
-              'privateChatDialog': false
-            });
-
-            if ($.dialog === "create-private-chat") {
-              closeDialog();
-            }
-          }
-        }, external_React_default.a.createElement("div", {
-          className: "big-btn-txt"
-        }, l[20593]))));
-        $('.create-private-chat .fm-dialog-close').rebind('click', function () {
-          $('.create-private-chat').addClass('hidden');
-          $('.fm-dialog-overlay').addClass('hidden');
-        });
-        $('.create-private-chat .default-red-button').rebind('click', function () {
-          var participants = self.props.chatRoom.protocolHandler.getTrackedParticipants();
-          var promises = [];
-          promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
-
-          var _runSwitchOffPublicMode = function () {
-            var topic = null;
-
-            if (self.props.chatRoom.topic) {
-              topic = self.props.chatRoom.protocolHandler.embeddedEncryptTo(self.props.chatRoom.topic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, true, self.props.chatRoom.type === "public");
-              topic = base64urlencode(topic);
-            }
-
-            self.props.onSwitchOffPublicMode(topic);
-          };
-
-          MegaPromise.allDone(promises).done(function () {
-            _runSwitchOffPublicMode();
-          });
-        });
-      }
+      privateChatDialog = external_React_default.a.createElement(modalDialogs["a" ].ModalDialog, {
+        title: l[20594],
+        className: "fm-dialog create-private-chat",
+        chatRoom: room,
+        onClose: onClose
+      }, external_React_default.a.createElement("div", {
+        className: "create-private-chat-content-block fm-dialog-body"
+      }, external_React_default.a.createElement("i", {
+        className: "huge-icon lock"
+      }), external_React_default.a.createElement("div", {
+        className: "dialog-body-text"
+      }, external_React_default.a.createElement("strong", null, l[20590]), external_React_default.a.createElement("br", null), external_React_default.a.createElement("span", null, l[20591])), external_React_default.a.createElement("div", {
+        className: "clear"
+      }), external_React_default.a.createElement("div", {
+        className: "big-red-button",
+        onClick: () => {
+          this.props.chatRoom.switchOffPublicMode();
+          onClose();
+        }
+      }, external_React_default.a.createElement("div", {
+        className: "big-btn-txt"
+      }, l[20593]))));
     }
 
     var sendContactDialog = null;
@@ -16165,7 +16130,7 @@ __webpack_require__(21);
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
-  'image/gif': 2e6,
+  'image/gif': 4e6,
   'image/png': 2e5,
   'image/webp': 2e5
 };

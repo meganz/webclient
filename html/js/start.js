@@ -6,7 +6,7 @@ function init_start() {
     var carouselInterval;
     var sliderInterval;
     var swipeInterval = 5000;
-    var intl = mega.intlNumberFormat;
+    var intl = mega.intl.number;
     var dropboxPrice = 4.9;
     var megaPrice = 1.56;
     var gdrivePrice = 4.9;

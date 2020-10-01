@@ -36,6 +36,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
 
 ---
+[datepicker.js]: A Lightweight customizable cross-browser jQuery datepicker
+
+> **This is a fork**, [See the changes](https://github.com/t1m0n/air-datepicker/compare/master...meganz:master)
+
+---
 [dexie.js]: A Minimalistic Wrapper for IndexedDB
 
 > Released under the [Apache License Version 2.0](http://www.apache.org/licenses/).
@@ -232,6 +237,7 @@ characters were removed from the files
 [autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
 [bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
+[datepicker.js]: <https://github.com/meganz/air-datepicker>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>

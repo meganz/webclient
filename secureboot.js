@@ -163,12 +163,18 @@ function getCleanSitePath(path) {
                 localStorage.afftype = 1;
             }
         }
+        if (path.mt) {
+            window.uTagMT = path.mt;
+        }
     }
     else if (path[0].indexOf('aff=') === 0) {
         localStorage.affid = String(path[0]).replace('aff=', '');
         localStorage.affts = Date.now();
         localStorage.afftype = 1;
         path = [''];
+    }
+    else if (path[0].indexOf('mt=') === 0) {
+        window.uTagMT = String(path[0]).replace('mt=', '');
     }
 
     return path[0];
@@ -694,18 +700,6 @@ var mega = {
     }
 };
 
-/** @property mega.intlNumberFormat */
-lazy(mega, 'intlNumberFormat', function() {
-    'use strict';
-    var intl;
-
-    tryCatch(function() {
-        intl = new Intl.NumberFormat(getCountryAndLocales().locales, {minimumFractionDigits: 2});
-    }, false)();
-
-    return intl || new Intl.NumberFormat();
-});
-
 Object.defineProperty(mega, 'flags', {
     get: function() {
         'use strict';
@@ -974,7 +968,9 @@ function scriptTest(data, callback) {
             setTimeout(load);
         }
         callback(false);
+        this.onload = this.onerror = null;
         this.parentNode.removeChild(this);
+        URL.revokeObjectURL(this.src);
     };
     feat.onerror = callback;
 }
@@ -2818,6 +2814,7 @@ else if (!browserUpdate) {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
         'about': {f:'html/about.html', n: 'about', j:0},
         'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
+        'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
         'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
@@ -3422,10 +3419,10 @@ else if (!browserUpdate) {
         });
 
         scriptTest(
-            'const f=async ()=>{}; es6s =' +
+            'es6s =' +
             ' Number.isNaN(Date.UTC()) === true' + // C1 E12 F54 O3 S1
             ' && /-/[Symbol.split]("0-0").join("") === "00"' + // C50 E79 F49 O37 S10
-            ' && f[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
+            ' && (async()=>{})[Symbol.toStringTag] === "AsyncFunction"' + // C55 E15 F52 O42 S10.1
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
                 if (error || !window.es6s) {
@@ -3433,6 +3430,7 @@ else if (!browserUpdate) {
                     return;
                 }
                 jsl_start();
+                delete window.es6s;
             });
     };
     function jsl_load(xhri)
@@ -4189,5 +4187,14 @@ mBroadcaster.once('startMega', function() {
 
         checkPage(page);
         mBroadcaster.addListener('pagechange', checkPage);
+    }
+
+    if (window.uTagMT) {
+        var mt = window.uTagMT;
+        delete window.uTagMT;
+
+        setTimeout(function() {
+            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
     }
 });

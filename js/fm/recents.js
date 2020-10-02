@@ -75,14 +75,11 @@ function RecentsRender() {
 
     this._actionChildren = {};
 
-    if (!localStorage.recentsDays) {
-        localStorage.recentsDays = 90;
-    }
-    if (!localStorage.recentsNodeLimit) {
-        localStorage.recentsNodeLimit = 10000;
-    }
-    this._defaultRangeTimestamp = Math.floor((Date.now() - (localStorage.recentsDays * 86400000)) / 1000); // 90 days
-    this._defaultRangeLimit = localStorage.recentsNodeLimit;
+    var recentsDays = parseInt(localStorage.recentsDays) || 90;
+    var recentsNodeLimit = parseInt(localStorage.recentsNodeLimit) || 10000;
+
+    this._defaultRangeTimestamp = Math.floor((Date.now() - recentsDays * 86400000) / 1000); // 90 days
+    this._defaultRangeLimit = recentsNodeLimit;
 
     var self = this;
 

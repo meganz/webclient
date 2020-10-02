@@ -4,7 +4,7 @@
  */
 MegaData.prototype.renderMain = function(aUpdate) {
     "use strict";
-
+    var container;
     var numRenderedNodes = -1;
 
     if (d) {
@@ -18,23 +18,22 @@ MegaData.prototype.renderMain = function(aUpdate) {
         this.megaRender = new MegaRender(this.viewmode);
     }
 
-    var container;
+    if (this.previousdirid === "recents" && this.recentsRender) {
+        this.recentsRender.cleanup();
+    }
 
     // cleanupLayout will render an "empty grid" layout if there
     // are no nodes in the current list (Ie, M.v), if so no need
     // to call renderLayout therefore.
-    if (M.previousdirid && M.previousdirid === "recents" && M.recentsRender) {
-        M.recentsRender.cleanup();
-    }
     if (this.megaRender.cleanupLayout(aUpdate, this.v, this.fsViewSel)) {
 
         if (this.currentdirid === 'opc') {
             this.drawSentContactRequests(this.v, 'clearGrid');
-            container = $('.grid-scrolling-table.opc');
+            container = '.grid-scrolling-table.opc';
         }
         else if (this.currentdirid === 'ipc') {
             this.drawReceivedContactRequests(this.v, 'clearGrid');
-            container = $('.grid-scrolling-table.ipc');
+            container = '.grid-scrolling-table.ipc';
         }
         else {
             numRenderedNodes = this.megaRender.renderLayout(aUpdate, this.v);
@@ -59,6 +58,11 @@ MegaData.prototype.renderMain = function(aUpdate) {
     }
 
     this.initShortcutsAndSelection(container, aUpdate);
+
+    if (!container || typeof container === 'string') {
+        this.megaRender.destroy();
+        delete this.megaRender;
+    }
 
     if (d) {
         console.timeEnd('renderMain');
@@ -659,13 +663,29 @@ MegaData.prototype.rmSetupUIDelayed = function() {
 
 
 MegaData.prototype.megaListRenderNode = function(aHandle) {
+    'use strict';
     var megaRender = M.megaRender;
     if (!megaRender) {
-        return;
+        if (d) {
+            console.warn('Ignoring invalid MegaRender state..', aHandle);
+        }
+        return false;
+    }
+    if (!M.d[aHandle]) {
+        if (d) {
+            console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
+        }
+        return false;
     }
     megaRender.numInsertedDOMNodes++;
 
-    var node = megaRender.getDOMNode(aHandle, M.d[aHandle]);
+    var node = megaRender.getDOMNode(aHandle);
+    if (!node) {
+        if (d) {
+            console.warn('getDOMNode failed..', aHandle);
+        }
+        return false;
+    }
     var fnameWidth = $('td[megatype="fname"]', node).outerWidth();
 
     if (!node.__hasMegaColumnsWidth ||
@@ -692,9 +712,6 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
 
     if (M.d[aHandle]) {
         M.d[aHandle].seen = true;
-    }
-    else if (d > 1) {
-        console.warn("megaListRenderNode was called with aHandle '%s' which was not found in M.d", aHandle);
     }
 
     return node;

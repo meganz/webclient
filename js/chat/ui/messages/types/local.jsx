@@ -41,7 +41,7 @@ export default class Local extends AbstractGenericMessage {
     _getParticipantNames = message => (
         message.meta && message.meta.participants && !!message.meta.participants.length &&
         message.meta.participants.map(handle =>
-            `[[${M.getNameByHandle(handle)}]]`
+            `[[${escapeHTML(M.getNameByHandle(handle))}]]`
         )
     );
 

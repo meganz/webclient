@@ -561,6 +561,29 @@ export class ConversationPanel extends MegaRenderMixin {
         }
     }
 
+    onKeyboardScroll = ({ keyCode }) => {
+        const scrollbar = this.messagesListScrollable;
+        const domNode = scrollbar?.domNode;
+
+        if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
+            const scrollPositionY = scrollbar.getScrollPositionY();
+            const offset = parseInt(domNode.style.height);
+            const PAGE = { UP: 33, DOWN: 34 };
+
+            switch (keyCode) {
+                case PAGE.UP:
+                    scrollbar.scrollToY(scrollPositionY - offset, true);
+                    this.onMessagesScrollUserScroll(scrollbar, 100);
+                    break;
+                case PAGE.DOWN:
+                    if (!scrollbar.isAtBottom()) {
+                        scrollbar.scrollToY(scrollPositionY + offset, true);
+                    }
+                    break;
+            }
+        }
+    }
+
     componentDidMount() {
         super.componentDidMount();
         var self = this;
@@ -729,6 +752,7 @@ export class ConversationPanel extends MegaRenderMixin {
         window.removeEventListener('resize', self.handleWindowResize);
         window.removeEventListener('keydown', self.handleKeyDown);
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
+        $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
     }
     componentDidUpdate(prevProps, prevState) {
         var self = this;
@@ -913,7 +937,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
     }
 
-    onMessagesScrollUserScroll(ps) {
+    onMessagesScrollUserScroll(ps, offset = 5) {
         var self = this;
 
         var scrollPositionY = ps.getScrollPositionY();
@@ -938,7 +962,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory
-            && (isAtTop || scrollPositionY < 5 && ps.getScrollHeight() > 500)
+            && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500)
             && mb.haveMoreHistory()) {
 
             ps.disable();
@@ -1977,44 +2001,44 @@ export class ConversationPanel extends MegaRenderMixin {
                     <div className={"messages-block " + additionalClass}>
                         <div className="messages scroll-area">
                             <PerfectScrollbar
-                                   onFirstInit={(ps, node) => {
-                                        ps.scrollToBottom(true);
-                                        self.props.chatRoom.scrolledToBottom = 1;
-
-                                    }}
-                                   onReinitialise={self.onMessagesScrollReinitialise.bind(this)}
-                                   onUserScroll={self.onMessagesScrollUserScroll.bind(this)}
-                                   className="js-messages-scroll-area perfectScrollbarContainer"
-                                   messagesToggledInCall={self.state.messagesToggledInCall}
-                                   ref={(ref) => self.messagesListScrollable = ref}
-                                   chatRoom={self.props.chatRoom}
-                                   messagesBuff={self.props.chatRoom.messagesBuff}
-                                   editDomElement={self.state.editDomElement}
-                                   editingMessageId={self.state.editing}
-                                   confirmDeleteDialog={self.state.confirmDeleteDialog}
-                                   renderedMessagesCount={messagesList.length}
-                                   isLoading={
-                                       this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
-                                       this.props.chatRoom.activeSearches > 0 ||
-                                       this.loadingShown
-                                   }
-                                   options={{
-                                       'suppressScrollX': true
-                                   }}
-                                >
+                                onFirstInit={ps => {
+                                    ps.scrollToBottom(true);
+                                    this.props.chatRoom.scrolledToBottom = 1;
+                                }}
+                                onReinitialise={this.onMessagesScrollReinitialise.bind(this)}
+                                onUserScroll={this.onMessagesScrollUserScroll.bind(this)}
+                                className="js-messages-scroll-area perfectScrollbarContainer"
+                                messagesToggledInCall={this.state.messagesToggledInCall}
+                                ref={(ref) => {
+                                    this.messagesListScrollable = ref;
+                                    $(document).rebind(
+                                        'keydown.keyboardScroll_' + this.props.chatRoom.roomId,
+                                        this.onKeyboardScroll
+                                    );
+                                }}
+                                chatRoom={this.props.chatRoom}
+                                messagesBuff={this.props.chatRoom.messagesBuff}
+                                editDomElement={this.state.editDomElement}
+                                editingMessageId={this.state.editing}
+                                confirmDeleteDialog={this.state.confirmDeleteDialog}
+                                renderedMessagesCount={messagesList.length}
+                                isLoading={
+                                    this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                                    this.props.chatRoom.activeSearches > 0 ||
+                                    this.loadingShown
+                                }
+                                options={{ 'suppressScrollX': true }}>
                                 <div className="messages main-pad">
                                     <div className="messages content-area">
-                                        <div className={
-                                            "loading-spinner js-messages-loading light manual-management" + (
-                                                !self.loadingShown ? " hidden" : ""
-                                            )
-                                        }
-                                         key="loadingSpinner" style={{top: "50%"}}>
-                                            <div className="main-loader" style={{
-                                                'position': 'fixed',
-                                                'top': '50%',
-                                                'left': '50%'
-                                            }}></div>
+                                        <div
+                                            key="loadingSpinner" style={{ top: "50%" }}
+                                            className={`
+                                                loading-spinner js-messages-loading light manual-management
+                                                ${this.loadingShown ? '' : 'hidden'}
+                                            `}>
+                                            <div
+                                                className="main-loader"
+                                                style={{ 'position': 'fixed', 'top': '50%', 'left': '50%' }} />
                                         </div>
                                         {/* add a naive pre-pusher that would eventually keep the the scrollbar
                                         realistic */}

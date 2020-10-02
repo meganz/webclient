@@ -12207,7 +12207,7 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
-var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class;
+var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class, conversationpanel_temp;
 
 
 
@@ -12631,9 +12631,40 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins["MegaRenderMixin"] {
+let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = (conversationpanel_temp = class ConversationPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+
+    this.onKeyboardScroll = ({
+      keyCode
+    }) => {
+      const scrollbar = this.messagesListScrollable;
+      const domNode = scrollbar == null ? void 0 : scrollbar.domNode;
+
+      if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
+        const scrollPositionY = scrollbar.getScrollPositionY();
+        const offset = parseInt(domNode.style.height);
+        const PAGE = {
+          UP: 33,
+          DOWN: 34
+        };
+
+        switch (keyCode) {
+          case PAGE.UP:
+            scrollbar.scrollToY(scrollPositionY - offset, true);
+            this.onMessagesScrollUserScroll(scrollbar, 100);
+            break;
+
+          case PAGE.DOWN:
+            if (!scrollbar.isAtBottom()) {
+              scrollbar.scrollToY(scrollPositionY + offset, true);
+            }
+
+            break;
+        }
+      }
+    };
+
     this.state = {
       startCallPopupIsActive: false,
       localVideoIsMinimized: false,
@@ -12837,6 +12868,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     window.removeEventListener('resize', self.handleWindowResize);
     window.removeEventListener('keydown', self.handleKeyDown);
     $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
+    $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -12995,7 +13027,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }
   }
 
-  onMessagesScrollUserScroll(ps) {
+  onMessagesScrollUserScroll(ps, offset = 5) {
     var self = this;
     var scrollPositionY = ps.getScrollPositionY();
     var isAtTop = ps.isAtTop();
@@ -13017,7 +13049,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       self.props.chatRoom.scrolledToBottom = false;
     }
 
-    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < 5 && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
+    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
       ps.disable();
       self.scrollPullHistoryRetrieval = true;
       self.lastScrollPosition = scrollPositionY;
@@ -13942,18 +13974,21 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
       onFirstInit: ps => {
         ps.scrollToBottom(true);
-        self.props.chatRoom.scrolledToBottom = 1;
+        this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: self.onMessagesScrollReinitialise.bind(this),
-      onUserScroll: self.onMessagesScrollUserScroll.bind(this),
+      onReinitialise: this.onMessagesScrollReinitialise.bind(this),
+      onUserScroll: this.onMessagesScrollUserScroll.bind(this),
       className: "js-messages-scroll-area perfectScrollbarContainer",
-      messagesToggledInCall: self.state.messagesToggledInCall,
-      ref: ref => self.messagesListScrollable = ref,
-      chatRoom: self.props.chatRoom,
-      messagesBuff: self.props.chatRoom.messagesBuff,
-      editDomElement: self.state.editDomElement,
-      editingMessageId: self.state.editing,
-      confirmDeleteDialog: self.state.confirmDeleteDialog,
+      messagesToggledInCall: this.state.messagesToggledInCall,
+      ref: ref => {
+        this.messagesListScrollable = ref;
+        $(document).rebind('keydown.keyboardScroll_' + this.props.chatRoom.roomId, this.onKeyboardScroll);
+      },
+      chatRoom: this.props.chatRoom,
+      messagesBuff: this.props.chatRoom.messagesBuff,
+      editDomElement: this.state.editDomElement,
+      editingMessageId: this.state.editing,
+      confirmDeleteDialog: this.state.confirmDeleteDialog,
       renderedMessagesCount: messagesList.length,
       isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
       options: {
@@ -13964,11 +13999,11 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("div", {
       className: "messages content-area"
     }, external_React_default.a.createElement("div", {
-      className: "loading-spinner js-messages-loading light manual-management" + (!self.loadingShown ? " hidden" : ""),
       key: "loadingSpinner",
       style: {
         top: "50%"
-      }
+      },
+      className: "\n                                                loading-spinner js-messages-loading light manual-management\n                                                " + (this.loadingShown ? '' : 'hidden') + "\n                                            "
     }, external_React_default.a.createElement("div", {
       className: "main-loader",
       style: {
@@ -14088,7 +14123,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }))))))));
   }
 
-}, (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
+}, conversationpanel_temp), (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
   render() {
     var self = this;

@@ -98,8 +98,18 @@ function initMegasync() {
         $('.megaapp-windows', $content).addClass('hidden');
 
         if (osData === 'windows') {
+            if (ua.details.is64bit && !ua.details.isARM) {
+                // Download app for Windows 64bit
+                window.location = megasync.getMegaSyncUrl('windows');
+                $('.megaapp-windows-info.64bit', $content).addClass('hidden');
+            }
+            else {
+                // Download app for Windows 32bit
+                window.location = megasync.getMegaSyncUrl('windows_x32');
+                $('.megaapp-windows-info.32bit', $content).addClass('hidden');
+            }
+
             $('.megaapp-windows', $content).removeClass('hidden');
-            window.location = megasync.getMegaSyncUrl('windows');
             resetMegasync();
         }
         else if (osData === 'mac') {
@@ -117,8 +127,13 @@ function initMegasync() {
         return false;
     });
 
-    $('.megaapp-windows-info a', $content).rebind('click', function() {
+    $('.megaapp-windows-info.32bit a', $content).rebind('click.megasyncWin32', function() {
         window.location = megasync.getMegaSyncUrl('windows_x32');
+        return false;
+    });
+
+    $('.megaapp-windows-info.64bit a', $content).rebind('click.megasyncWin64', function() {
+        window.location = megasync.getMegaSyncUrl('windows');
         return false;
     });
 

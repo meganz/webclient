@@ -53,7 +53,6 @@ test-no-workflows:
 	SKIP_WORKFLOWS=true $(MAKE) $(SILENT_MAKE) test
 
 test: $(KARMA)
-	@rm -rf test/phantomjs-storage
 	$(HEADLESS_RUN) $(NODE) $(KARMA) start $(KARMA_FLAGS) karma.conf.js --browsers $(BROWSER) $(OPTIONS)
 
 test-ci: $(KARMA)

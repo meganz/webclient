@@ -242,15 +242,14 @@ module.exports = function(config) {
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary
+    // - ChromeHeadless
     // - Firefox
     // - FirefoxHeadless (Requires version 55+)
+    // - FirefoxNightlyHeadless
+    // - FirefoxDeveloperHeadless
     // - Opera (has to be installed with `npm install karma-opera-launcher`)
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
-    // - PhantomJS
-    // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
     browsers: [
-        'PhantomJS',
-        'PhantomJS_custom',
         'Firefox',
         'FirefoxHeadless',
         'Firefox_Extension',
@@ -264,15 +263,6 @@ module.exports = function(config) {
     ],
 
     customLaunchers: {
-        'PhantomJS_custom': {
-            base: 'PhantomJS',
-            // debug: true,
-            flags: [
-                // '--debug=true',
-                '--local-storage-path=./test/phantomjs-storage',
-                '--offline-storage-path=./test/phantomjs-storage'
-            ]
-        },
         'Firefox_NoCookies': {
             base: 'FirefoxHeadless',
             prefs: {

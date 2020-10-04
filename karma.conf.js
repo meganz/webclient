@@ -248,6 +248,7 @@ module.exports = function(config) {
         'Firefox_NoCookies',
         'Firefox_Incognito',
         'Chrome',
+        'ChromeHeadless',
         'Chrome_Incognito',
         'Chrome_Unlimited',
         'Chrome_NoCookies'
@@ -274,15 +275,15 @@ module.exports = function(config) {
             flags: ['-private']
         },
         'Chrome_NoCookies': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--disable-local-storage', '--disable-databases', '--unlimited-storage']
         },
         'Chrome_Incognito': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--incognito']
         },
         'Chrome_Unlimited': {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--unlimited-storage']
         },
         'Firefox_Extension': {

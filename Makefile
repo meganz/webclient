@@ -30,7 +30,7 @@ endif
 
 # If no browser set, run on our custom PhantomJS2.
 ifeq ($(BROWSER),)
-    BROWSER = PhantomJS_custom
+    BROWSER = ChromeHeadless
 endif
 
 # If no Karma flags set, set a default.

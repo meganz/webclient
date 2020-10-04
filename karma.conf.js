@@ -232,6 +232,13 @@ module.exports = function(config) {
     // Enable/disable watching file and executing tests whenever any file changes.
     autoWatch: true,
 
+    client: {
+        mocha: {
+            // Increase default timeout of 2000ms
+            timeout: 4000
+        }
+    },
+
     // Start these browsers, currently available:
     // - Chrome
     // - ChromeCanary

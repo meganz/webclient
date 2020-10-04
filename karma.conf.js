@@ -236,6 +236,7 @@ module.exports = function(config) {
     // - Chrome
     // - ChromeCanary
     // - Firefox
+    // - FirefoxHeadless (Requires version 55+)
     // - Opera (has to be installed with `npm install karma-opera-launcher`)
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     // - PhantomJS
@@ -244,6 +245,7 @@ module.exports = function(config) {
         'PhantomJS',
         'PhantomJS_custom',
         'Firefox',
+        'FirefoxHeadless',
         'Firefox_Extension',
         'Firefox_NoCookies',
         'Firefox_Incognito',
@@ -265,7 +267,7 @@ module.exports = function(config) {
             ]
         },
         'Firefox_NoCookies': {
-            base: 'Firefox',
+            base: 'FirefoxHeadless',
             prefs: {
                 'network.cookie.cookieBehavior': 2
             }

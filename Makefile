@@ -44,9 +44,9 @@ ifdef SINGLE_RUN
 endif
 
 # All browsers to test with on the test-all target.
-TESTALL_BROWSERS = PhantomJS_custom,Chrome_Unlimited,Firefox
+TESTALL_BROWSERS = ChromeHeadless,FirefoxHeadless,Chrome_Unlimited
 ifeq ($(OS), Windows_NT)
-    TESTALL_BROWSERS := $(TESTALL_BROWSERS),IE,FirefoxNightly,FirefoxDeveloper,Firefox_NoCookies,Chrome_NoCookies,Chrome_Incognito
+    TESTALL_BROWSERS := $(TESTALL_BROWSERS),FirefoxNightlyHeadless,FirefoxDeveloperHeadless,Firefox_NoCookies,Chrome_NoCookies,Chrome_Incognito
 endif
 
 all: test-ci api-doc ui-styleguide dist test-shared

@@ -43,7 +43,8 @@ var gfsttfbhosts = Object.create(null);
 var __ccXID = 0;
 
 if (localStorage.aTransfers) {
-    Soon(function() {
+    onIdle(function() {
+        'use strict';
         var data = {};
         var now = Date.now();
         try {

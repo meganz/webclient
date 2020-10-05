@@ -3705,6 +3705,20 @@ else if (!browserUpdate) {
                 gmf();
             }
 
+            if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
+                var n = page.split(/\W+/)[1];
+
+                if (n && n.length === 8) {
+                    xhr('&n=' + n, null, function(res) {
+                        res |= 0;
+
+                        if (res === -9 || res === -16) {
+                            window['preflight-folder-link-error'] = res;
+                        }
+                    });
+                }
+            }
+
             if (loginresponse) {
                 xhr('&sid=' + u_storage.sid, {'a': 'ug'}, function(response) {
                     loginresponse = false;

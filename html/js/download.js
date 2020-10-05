@@ -647,7 +647,7 @@ function dl_g(res, ctx) {
             // Show file not found overlay
             $('#mobile-ui-notFound').removeClass('hidden');
 
-            if (!dlpage_key) {
+            if (!dlpage_key && !msg && res !== EBLOCKED && res !== ENOENT) {
                 msg = l[7945] + '<p>' + l[7946];
             }
             else if (res === ETOOMANY) {

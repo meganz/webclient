@@ -2819,10 +2819,7 @@ function pagemetadata() {
     document.title = mega_title;
     megatitle();
 
-    if (pagemetadata.last === page) {
-        console.error('Re-invoking pagemetadata() for the same page...', page);
-    }
-    else {
+    if (pagemetadata.last !== page) {
         mBroadcaster.sendMessage('pagemetadata', metas);
     }
     pagemetadata.last = page;

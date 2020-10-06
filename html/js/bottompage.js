@@ -443,6 +443,10 @@ var bottompage = {
             }
             else if (topPos <= 300 && topPos >= 50) {
                 $topHeader.removeClass('activated');
+
+                // Hide all popup as top bar not visisble for this part
+                notify.closePopup();
+                alarm.hideAllWarningPopups(true);
             }
             else {
                 $topHeader.removeClass('floating activated').css('width',  '');

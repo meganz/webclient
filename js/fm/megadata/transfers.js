@@ -1910,6 +1910,11 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
 
         $toast.find('.toast-col:first-child span').safeHTML(nt_txt);
 
+        if (!u_type) {
+            // If not logged in, do not display the "Show me" button in the toast information
+            $('.toast-button', $toast).addClass('hidden');
+        }
+
         if ($second_toast.hasClass('visible')) {
             $second_toast.addClass('second');
         }

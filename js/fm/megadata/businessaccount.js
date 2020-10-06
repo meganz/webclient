@@ -155,26 +155,28 @@ BusinessAccount.prototype.editSubAccount =
         request.lp = 1;
     }
 
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'string') {
-                operationPromise.resolve(1); // user edit succeeded
-            }
-            else if (typeof res === 'object') {
-                operationPromise.resolve(1, res, request); // user edit involved email change
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                if (d) {
-                    console.error('API returned error, ret=' + res);
+        api_req(
+            request,
+            {
+                callback: function(res) {
+                    if ($.isNumeric(res)) {
+                        operationPromise.reject(0, res, 'API returned error');
+                    }
+                    else if (typeof res === 'string') {
+                        operationPromise.resolve(1, null, request); // user edit succeeded
+                    }
+                    else if (typeof res === 'object') {
+                        operationPromise.resolve(1, res, request); // user edit involved email change
+                    }
+                    else {
+                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+                        if (d) {
+                            console.error('API returned error, ret=' + res);
+                        }
+                    }
                 }
-            }
-        }
 
-    });
+            });
 
     return operationPromise;
 };

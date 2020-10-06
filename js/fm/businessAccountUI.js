@@ -3052,13 +3052,31 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
         else {
             // no extra info ... just show operation success message
             if (!res) {
-                msgDialog('info', '', l[19525]);
+                var infoSubMessage = '';
+                if (subUser && subUser.s === 11 && req && req.email) {
+                    // The admin changed a disabled user's email
+                    infoSubMessage = l[24073];
+                }
+                msgDialog('info', '', l[19525], infoSubMessage);
             }
             else {
                 // we received LP + handle --> changes included email change
                 // calling show add sub-user dialog with "result" passed will show the result dialog
                 res.m = req.email;
-                mySelf.showAddSubUserDialog(res);
+                if (subUser && subUser.s === 11) {
+                    msgDialog(
+                        'info',
+                        '',
+                        l[24073],
+                        '',
+                        function() {
+                            mySelf.showAddSubUserDialog(res);
+                        }
+                    );
+                }
+                else {
+                    mySelf.showAddSubUserDialog(res);
+                }
             }
 
         }

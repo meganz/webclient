@@ -2295,7 +2295,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             e.keyCode == 46 &&
             s.length > 0 &&
             !$.dialog &&
-            M.getNodeRights(M.currentdirid) > 1
+            (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView)
         ) {
             // delete
             fmremove(s);

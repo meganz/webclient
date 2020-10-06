@@ -415,6 +415,11 @@ ZipEntryIO.prototype.setCredentials = function() {
 };
 
 ZipEntryIO.prototype.push = function(obj) {
+    'use strict';
+    if (oIsFrozen(this.zipWriter)) {
+        console.warn('The ZipWriter instance have already been destroyed.', this);
+        return;
+    }
     this.queued++;
     obj.zfile = this;
     this.zipWriter.zwriter.push(obj, function() {

@@ -1227,6 +1227,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A2]', '<a href="" class="red a2">').replace('[/A2]', '</a>')
         .replace('[A3]', '<a href="" class="red a3">').replace('[/A3]', '</a>');
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
+    l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
 
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,

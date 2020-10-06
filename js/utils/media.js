@@ -431,6 +431,13 @@ mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
                     console.time(tag);
                 }
 
+                if (!window.pdfjsLib || typeof pdfjsLib.getPreviewImage !== 'function') {
+                    if (d) {
+                        logger.warn('unexpected pdf.js instance/state...');
+                    }
+                    return finish();
+                }
+
                 pdfjsLib.getPreviewImage(buffer).then(function(buffer) {
 
                     if (d) {

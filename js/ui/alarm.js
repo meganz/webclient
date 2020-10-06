@@ -222,18 +222,25 @@ var alarm = {
          */
         render: function() {
 
+            // Cache lookups
+            var $button = $('.top-icon.warning.astropay-payment-reminder');
+            var $dialog = $('.top-warning-popup.astropay-payment-reminder');
+
             // If their last payment info is not set by the API, then their plan is not currently expired.
             if (this.lastPayment === null) {
+                this.hideRepayWarn($button, $dialog);
                 return false;
             }
 
             // Don't show this dialog if they have already said they don't want to see it again
             if ((typeof this.lastPayment.dontShow !== 'undefined') && (this.lastPayment.dontShow === 1)) {
+                this.hideRepayWarn($button, $dialog);
                 return false;
             }
 
             // If they recently upgraded to Pro in this session, don't render the icon & dialog
             if (typeof u_attr !== 'undefined' && u_attr.p > 0) {
+                this.hideRepayWarn($button, $dialog);
                 return false;
             }
 
@@ -246,10 +253,6 @@ var alarm = {
             if (gatewayIgnoreList.indexOf(gatewayId) > -1) {
                 return false;
             }
-
-            // Cache lookups
-            var $button = $('.top-icon.warning.astropay-payment-reminder');
-            var $dialog = $('.top-warning-popup.astropay-payment-reminder');
 
             // Get PRO plan name e.g. PRO III
             var proNum = this.lastPayment.p;
@@ -289,6 +292,17 @@ var alarm = {
             alarm.hideAllWarningPopups();
             alarm.initWarningIconButton($button, $dialog);
             alarm.showWarningPopup($button, $dialog);
+        },
+
+        /**
+         * Hiding the repay top popup and the button in the banner
+         * @param {Object} $button      Top menu icon button
+         * @param {Object} $dialog      Top menu popup dialog
+         */
+        hideRepayWarn: function($button, $dialog) {
+            'use strict';
+            $button.addClass('hidden').removeClass('active');
+            $dialog.addClass('hidden');
         },
 
         /**

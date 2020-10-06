@@ -331,7 +331,7 @@ function browserdetails(useragent) {
     details.isExtension = (current && is_extension || useragent.indexOf('megext') > -1);
 
     // Determine device is ARM machine
-    details.isARM = /\b(ARM|ARM64)\b/.test(useragent);
+    details.isARM = /\barmv?[4-8]+l?\b/.test(useragent);
 
     if (useragent.indexOf(' MEGAext/') !== -1) {
         var ver = useragent.match(/ MEGAext\/([\d.]+)/);

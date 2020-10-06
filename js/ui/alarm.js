@@ -44,12 +44,16 @@ var alarm = {
     /**
      * Hides other warning dialogs if they are currently visible so there is no double up
      */
-    hideAllWarningPopups: function() {
+    hideAllWarningPopups: function(leaveButton) {
 
-        var $buttons = $('.top-icon.warning');
+        'use strict';
+
+        if (!leaveButton) {
+            var $buttons = $('.top-icon.warning');
+            $buttons.addClass('hidden').removeClass('active');
+        }
+
         var $dialogs = $('.top-warning-popup');
-
-        $buttons.addClass('hidden').removeClass('active');
         $dialogs.addClass('hidden');
     },
 

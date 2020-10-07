@@ -357,7 +357,7 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
 
     $userNameContainer
         .removeClass("hidden")
-        .text(M.getNameByHandle(action.user))
+        .text(M.getNameByHandle(action.user) || l[24061])
 
     if (!user.h) {
         // unknown/deleted contact, no business here...

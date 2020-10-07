@@ -510,21 +510,24 @@ var versiondialogid;
             });
 
             $('.fm-versioning .pad .top-column .default-white-button .rubbish-bin-icon').parent()
-                    .rebind('click', function() {
-                var apiReq = function(handle) {
-                    api_req({a: 'd',
-                             n: handle,
-                             v: 1
-                            });
-                };
-                if (!$(this).hasClass('disabled')) {
-                    msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
-                        if (e) {
-                            apiReq(current_sel_version);
-                            current_sel_version = false;
-                        }
-                    });
-                }
+                .rebind('click', function() {
+                    $('.fm-versioning.overlay').addClass('arrange-to-back');
+                    var apiReq = function(handle) {
+                        api_req({
+                            a: 'd',
+                            n: handle,
+                            v: 1
+                        });
+                    };
+                    if (!$(this).hasClass('disabled')) {
+                        msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
+                            if (e) {
+                                apiReq(current_sel_version);
+                                current_sel_version = false;
+                            }
+                            $('.fm-versioning.overlay').removeClass('arrange-to-back');
+                        });
+                    }
             });
 
             $('.fm-versioning .pad .top-column .default-white-button .reverted-clock').parent()
@@ -591,11 +594,13 @@ var versiondialogid;
                         };
                         var self = this;
                         if (!$(this).hasClass('disabled')) {
+                            $('.fm-versioning.overlay').addClass('arrange-to-back');
                             msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
                                 if (e) {
                                     apiReq(self.id.substring(4));
                                     current_sel_version = false;
                                 }
+                                $('.fm-versioning.overlay').removeClass('arrange-to-back');
                             });
                         }
                     });

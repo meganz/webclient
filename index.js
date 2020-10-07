@@ -1528,6 +1528,10 @@ function init_page() {
     else if (page === 'nas') {
         parsepage(pages.nas);
     }
+    else if (page === 'nzippmember' || page === 'nziphotographer') {
+        parsepage(pages.nzipp);
+        nzippCampaign.init();
+    }
     else if (page === 'refer') {
         parsepage(pages.affiliate);
         affiliateprogram.init();
@@ -2427,9 +2431,10 @@ function topmenuUI() {
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
-                    'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
-                    'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                    'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate', 'nas'
+                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'bird', 'privacy', 'gdpr', 'mobileapp',
+                    'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
+                    'nas'
                 ];
                 var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
 

@@ -3643,8 +3643,6 @@ else if (!browserUpdate) {
     var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
-    var linkCheckRes = false;
-
     (function _crossTabSession(u_storage) {
         'use strict';
 
@@ -3666,8 +3664,9 @@ else if (!browserUpdate) {
                     }
                 }
 
-                callback(response);
-                boot_done();
+                if (!callback(response)) {
+                    boot_done();
+                }
             };
 
             xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
@@ -3710,22 +3709,6 @@ else if (!browserUpdate) {
             if (!(u_sid = u_storage.sid)) {
                 loginresponse = false;
                 gmf();
-            }
-
-            if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
-                var n = page.split(/\W+/)[1];
-
-                if (n && n.length === 8) {
-                    linkCheckRes = true;
-                    xhr('&n=' + n, null, function(res) {
-                        linkCheckRes = false;
-                        res |= 0;
-
-                        if (res === -9 || res === -16) {
-                            window['preflight-folder-link-error'] = res;
-                        }
-                    });
-                }
             }
 
             if (loginresponse) {
@@ -3793,6 +3776,21 @@ else if (!browserUpdate) {
         // No session handling needed for
         if (is_drop || is_karma) {
             return;
+        }
+
+        if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
+            var n = page.split(/\W+/);
+
+            if (n && !n[2] && n[1] && n[1].length === 8) {
+                xhr('&n=' + n[1], null, function(res) {
+                    res |= 0;
+
+                    if (res === -9 || res === -16) {
+                        window['preflight-folder-link-error:' + n[1]] = res;
+                    }
+                    return -1;
+                });
+            }
         }
 
         if (!(parseInt(localStorage.voucherExpiry) > Date.now())) {
@@ -3884,8 +3882,8 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true
-            || !jsl_done || !jj_done || linkCheckRes) {
+        // eslint-disable-next-line max-len
+        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
             return;
         }
 

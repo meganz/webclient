@@ -525,8 +525,8 @@ function init_page() {
             closeDialog();
             eventlog(is_mobile ? 99631 : 99632, true);
 
-            if (pfid.length !== 8 || window['preflight-folder-link-error']) {
-                folderreqerr(false, window['preflight-folder-link-error'] || EARGS);
+            if (pfid.length !== 8 || window['preflight-folder-link-error:' + pfid]) {
+                folderreqerr(false, window['preflight-folder-link-error:' + pfid] || EARGS);
                 return false;
             }
 

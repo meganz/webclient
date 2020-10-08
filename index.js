@@ -605,7 +605,7 @@ function init_page() {
         return false;
     }
 
-    if ((pfkey || dlkey) && !location.hash) {
+    if ((pfkey && !flhashchange || dlkey) && !location.hash) {
         return location.replace(getAppBaseUrl());
     }
 

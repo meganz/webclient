@@ -310,7 +310,7 @@
     "909": "Senha",
     "913": "m\u00eas",
     "918": "Mensal",
-    "919": "Anual",
+    "919": "por ano",
     "922": "1 m\u00eas",
     "923": "1 ano",
     "924": "Voc\u00ea tem alguma pergunta sobre as [A]contas PRO[\/A]?",
@@ -1430,7 +1430,7 @@
     "16120": "[S]Transfer\u00eancia[\/S]",
     "16121": "Armazenamento usado",
     "16122": "Cota de transfer\u00eancia",
-    "16124": "O uso da [S]cota de transfer\u00eancia[\/S] \u00e9 registrado pelo endere\u00e7o IP para contas gratuitas (e pode incluir outros usu\u00e1rios com o mesmo IP). A cota de transfer\u00eancia para contas gratuitas \u00e9 din\u00e2mica, e depende da quantidade de largura de banda n\u00e3o utilizada dispon\u00edvel.[BR] Voc\u00ea pode aumentar a sua cota completando as [S]Conquistas[\/S] ou [A]fazendo upgrade para PRO[\/A].",
+    "16124": "O uso da [S]cota de transfer\u00eancia[\/S] \u00e9 registrado pelo endere\u00e7o IP para contas gratuitas (e pode incluir outros usu\u00e1rios com o mesmo IP). A cota de transfer\u00eancia para contas gratuitas \u00e9 din\u00e2mica, e depende da quantidade de largura de banda n\u00e3o utilizada dispon\u00edvel.[BR] Voc\u00ea pode aumentar a sua cota completando [S]Conquistas[\/S] ou [A]fazendo upgrade para PRO[\/A].",
     "16125": "Cota utilizada nas \u00faltimas 6 horas:",
     "16126": "Obter mais cota de transfer\u00eancia",
     "16127": "Cota de armazenamento",
@@ -3841,7 +3841,7 @@
     "24047": "Mai",
     "24059": "[A]%1 arquivos[\/A] criados por %3",
     "24060": "[A]%1 arquivos[\/A] alterados por %3",
-    "24061": "unknown",
+    "24061": "desconhecido",
     "24073": "Este usu\u00e1rio foi desativado. Se voc\u00ea n\u00e3o reativar esta conta, n\u00e3o ser\u00e1 poss\u00edvel confirmar a altera\u00e7\u00e3o do email.",
     "24074": "Tamb\u00e9m dispon\u00edvel para Windows: [A]vers\u00e3o de 64 bits[\/A]"
 }

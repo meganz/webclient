@@ -389,40 +389,6 @@
     <xhtml:link rel="alternative" hreflang="zh-tw" href="https://mega.nz/edge?zh-tw"/>
   </url>
   <url>
-    <loc>https://mega.nz/bird</loc>
-    <lastmod>2020-09-28</lastmod>
-    <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/bird?ar"/>
-    <xhtml:link rel="alternative" hreflang="br" href="https://mega.nz/bird?br"/>
-    <xhtml:link rel="alternative" hreflang="cn" href="https://mega.nz/bird?cn"/>
-    <xhtml:link rel="alternative" hreflang="ct" href="https://mega.nz/bird?ct"/>
-    <xhtml:link rel="alternative" hreflang="de" href="https://mega.nz/bird?de"/>
-    <xhtml:link rel="alternative" hreflang="en" href="https://mega.nz/bird?en"/>
-    <xhtml:link rel="alternative" hreflang="en-ph" href="https://mega.nz/bird?en-ph"/>
-    <xhtml:link rel="alternative" hreflang="es" href="https://mega.nz/bird?es"/>
-    <xhtml:link rel="alternative" hreflang="fr" href="https://mega.nz/bird?fr"/>
-    <xhtml:link rel="alternative" hreflang="id" href="https://mega.nz/bird?id"/>
-    <xhtml:link rel="alternative" hreflang="it" href="https://mega.nz/bird?it"/>
-    <xhtml:link rel="alternative" hreflang="ja" href="https://mega.nz/bird?ja"/>
-    <xhtml:link rel="alternative" hreflang="jp" href="https://mega.nz/bird?jp"/>
-    <xhtml:link rel="alternative" hreflang="ko" href="https://mega.nz/bird?ko"/>
-    <xhtml:link rel="alternative" hreflang="kr" href="https://mega.nz/bird?kr"/>
-    <xhtml:link rel="alternative" hreflang="nl" href="https://mega.nz/bird?nl"/>
-    <xhtml:link rel="alternative" hreflang="pl" href="https://mega.nz/bird?pl"/>
-    <xhtml:link rel="alternative" hreflang="pt" href="https://mega.nz/bird?pt"/>
-    <xhtml:link rel="alternative" hreflang="pt-br" href="https://mega.nz/bird?pt-br"/>
-    <xhtml:link rel="alternative" hreflang="ro" href="https://mega.nz/bird?ro"/>
-    <xhtml:link rel="alternative" hreflang="ru" href="https://mega.nz/bird?ru"/>
-    <xhtml:link rel="alternative" hreflang="ru-mo" href="https://mega.nz/bird?ru-mo"/>
-    <xhtml:link rel="alternative" hreflang="th" href="https://mega.nz/bird?th"/>
-    <xhtml:link rel="alternative" hreflang="vi" href="https://mega.nz/bird?vi"/>
-    <xhtml:link rel="alternative" hreflang="vn" href="https://mega.nz/bird?vn"/>
-    <xhtml:link rel="alternative" hreflang="zh" href="https://mega.nz/bird?zh"/>
-    <xhtml:link rel="alternative" hreflang="zh-cn" href="https://mega.nz/bird?zh-cn"/>
-    <xhtml:link rel="alternative" hreflang="zh-hk" href="https://mega.nz/bird?zh-hk"/>
-    <xhtml:link rel="alternative" hreflang="zh-sg" href="https://mega.nz/bird?zh-sg"/>
-    <xhtml:link rel="alternative" hreflang="zh-tw" href="https://mega.nz/bird?zh-tw"/>
-  </url>
-    <url>
     <loc>https://mega.nz/nas</loc>
     <lastmod>2020-09-28</lastmod>
     <xhtml:link rel="alternative" hreflang="ar" href="https://mega.nz/nas?ar"/>
@@ -1271,7 +1237,7 @@
     <xhtml:link rel="alternative" hreflang="zh-hk" href="https://mega.nz/about/privacy?zh-hk"/>
     <xhtml:link rel="alternative" hreflang="zh-sg" href="https://mega.nz/about/privacy?zh-sg"/>
     <xhtml:link rel="alternative" hreflang="zh-tw" href="https://mega.nz/about/privacy?zh-tw"/>
-  </url>  
+  </url>
   <url>
     <loc>https://mega.nz/about/jobs</loc>
     <lastmod>2020-09-28</lastmod>
@@ -1305,5 +1271,5 @@
     <xhtml:link rel="alternative" hreflang="zh-hk" href="https://mega.nz/about/jobs?zh-hk"/>
     <xhtml:link rel="alternative" hreflang="zh-sg" href="https://mega.nz/about/jobs?zh-sg"/>
     <xhtml:link rel="alternative" hreflang="zh-tw" href="https://mega.nz/about/jobs?zh-tw"/>
-  </url>  
+  </url>
 </urlset>

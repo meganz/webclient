@@ -627,7 +627,6 @@ function init_page() {
         && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
-        && (page !== 'bird')
         && (page !== 'cmd')
         && (page !== 'terms')
         && (page !== 'privacy')
@@ -1550,9 +1549,6 @@ function init_page() {
         var businessP = new BusinessProductPage();
         businessP.init();
     }
-    else if (page === 'bird') {
-        parsepage(pages['megabird']);
-    }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
         M.require('sync_js').then(function() {
@@ -2428,10 +2424,11 @@ function topmenuUI() {
                 topMenu(1);
 
                 var subpage;
+                /*  TODO: Add bird when its done */
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
-                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'bird', 'privacy', 'gdpr', 'mobileapp',
+                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
                     'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
                     'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
                     'nas'

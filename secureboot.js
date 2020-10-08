@@ -3643,6 +3643,8 @@ else if (!browserUpdate) {
     var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
+    var linkCheckRes = false;
+
     (function _crossTabSession(u_storage) {
         'use strict';
 
@@ -3714,7 +3716,9 @@ else if (!browserUpdate) {
                 var n = page.split(/\W+/)[1];
 
                 if (n && n.length === 8) {
+                    linkCheckRes = true;
                     xhr('&n=' + n, null, function(res) {
+                        linkCheckRes = false;
                         res |= 0;
 
                         if (res === -9 || res === -16) {
@@ -3880,7 +3884,8 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
+        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true
+            || !jsl_done || !jj_done || linkCheckRes) {
             return;
         }
 

@@ -10995,8 +10995,6 @@ class chatlinkDialog_ChatlinkDialog extends mixins["MegaRenderMixin"] {
     if (this.props.onClose) {
       this.props.onClose();
     }
-
-    affiliateUI.registeredDialog.show();
   }
 
   onTopicFieldChanged(e) {
@@ -18007,16 +18005,20 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
     var folderNodes = [];
     var fileNodes = [];
 
+    var handleRejct = function (reject, roomId, ex) {
+      if (d) {
+        self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+      }
+
+      reject(ex);
+    };
+
     var attachNodes = function (roomId) {
       return new MegaPromise(function (resolve, reject) {
         self.smartOpenChat(roomId).then(function (room) {
           room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
-        }).catch(function (ex) {
-          if (d) {
-            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
-          }
-
-          reject(ex);
+        }).catch(ex => {
+          handleRejct(reject, roomId, ex);
         });
       });
     };
@@ -18037,11 +18039,7 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
             createPublicLink(folderNodes[i], room);
           }
         }).catch(ex => {
-          if (d) {
-            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
-          }
-
-          reject(ex);
+          handleRejct(reject, roomId, ex);
         });
       });
     };

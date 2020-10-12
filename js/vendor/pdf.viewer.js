@@ -3403,7 +3403,7 @@ const defaultOptions = {
     kind: OptionKind.WORKER
   },
   workerSrc: {
-    value: (global.is_extension ? "" : "/") + "pdf.worker.js?v=2.6.181",
+    value: (global.is_extension ? "" : "/") + "pdf.worker.js?v=2.6.182",
     kind: OptionKind.WORKER
   }
 };

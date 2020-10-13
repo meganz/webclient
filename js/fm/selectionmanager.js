@@ -188,7 +188,9 @@ var SelectionManager = function($selectable, resume) {
      */
     this._getSafeListItem = function(item) {
         if (typeof item !== 'string') {
-            item = item && item[item.length - 1] || false;
+            if (!(item instanceof MegaNode)) {
+                item = item && item[item.length - 1] || false;
+            }
 
             if (item && typeof item !== 'string') {
                 item = idMapper(item) || false;

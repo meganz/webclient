@@ -175,6 +175,7 @@ function getCleanSitePath(path) {
     }
     else if (path[0].indexOf('mt=') === 0) {
         window.uTagMT = String(path[0]).replace('mt=', '');
+        path = [''];
     }
 
     return path[0];

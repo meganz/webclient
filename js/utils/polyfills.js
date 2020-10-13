@@ -255,3 +255,20 @@ mBroadcaster.once('boot_done', function() {
 
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
+
+
+// XXX: The following are not polyfills obviously, but given this file is included always let's place them here for now
+
+// @private
+var nop = function() {
+    'use strict';
+};
+
+// @private
+var echo = function(a) {
+    'use strict';
+    return a;
+};
+
+// @private
+var dump = console.warn.bind(console, '[dump]');

@@ -2404,6 +2404,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
+    jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -2774,6 +2775,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
         jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
         jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
+        jsl.push({f:'js/utils/track.js', n: 'js_utils_track_js', j: 1});
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});

@@ -2031,14 +2031,6 @@ function mDBcls() {
 
 // --------------------------------------------------------------------------
 
-// @private
-var nop = function() {
-    'use strict';
-};
-
-// @private
-var dump = console.warn.bind(console, '[dump]');
-
 /**
  * Wrapper around Dexie that remembers and removes deprecated databases.
  * @param {String} aUniqueID Unique Identified for this database.

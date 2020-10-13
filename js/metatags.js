@@ -7,16 +7,28 @@ mega.metatags = new function() {
      * @returns {Boolean}       true/false is excluded.
      */
     var isPageExcluded = function(page) {
-        var excludedPages = ['start', 'voucher', 'redeem', 'test', 'debug', 'reset', 'unsub', 'done',
-                             'repay', 'payment', 'recoveryparkchangepass', 'recoverykeychangepass', 'recoveryenterkey',
-                             'recoverybypark', 'recoverybykey', 'wiretransfer', 'cancel', 'backup', 'key', 'megadrop',
-                             'sms', 'twofactor', 'emailverify', 'confirm', 'businessinvite', 'businesssignup', 'verify',
-                             'downloadapp', 'download'
+        // XXX: add new items sorted alphabetically.
+        var excludedPages = [
+            'backup', 'businessinvite', 'businesssignup', 'cancel', 'confirm', 'debug',
+            'download', 'emailverify', 'key', 'megadrop', 'payment', 'recover',
+            'recoverybykey', 'recoverybypark', 'recoveryenterkey',
+            'recoverykeychangepass', 'recoveryparkchangepass',
+            'redeem', 'repay', 'reset', 'sms', 'start', 'test', 'twofactor',
+            'unsub', 'verify', 'voucher', 'wiretransfer'
         ];
 
-        if (!page || excludedPages.indexOf(page) !== -1) {
+        if (!page) {
             return true;
         }
+
+        for (var i = excludedPages.length; i--;) {
+            var ep = excludedPages[i];
+
+            if (page.substr(0, ep.length) === ep) {
+                return ep.length === page.length ? -1 : ep.length;
+            }
+        }
+
         return false;
     };
 
@@ -598,8 +610,11 @@ mega.metatags = new function() {
                 addCanonical(getBaseUrl());
             }
         }
-        else if (page && isPageExcluded(page)) {
-            mTags.excluded = true;
+        else if (page === 'downloadapp') {
+            mTags.mega_title = 'Desktop Onboarding - MEGA';
+            stopBots(metaRobots);
+        }
+        else if (page && (mTags.excluded = isPageExcluded(page))) {
             mTags.mega_title = page.charAt(0).toUpperCase() + page.slice(1) + ' - MEGA';
             stopBots(metaRobots);
         }
@@ -625,6 +640,7 @@ mega.metatags = new function() {
             mTags.image
         );
 
+        mTags.page = page;
         this.lastSetMetaTags = mTags;
 
         return mTags;

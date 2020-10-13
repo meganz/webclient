@@ -591,6 +591,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                             createTimeoutPromise(validate2, 300, 2000)
                                 .always(function() {
                                     chatRoom.trigger('showGetChatLinkDialog');
+                                    affiliateUI.registeredDialog.show();
                                 });
                         }
                     })

@@ -408,13 +408,7 @@ function dashboardUI() {
 
                 // Get more transfer quota button
                 $('.account.widget.bandwidth .free .more-quota').rebind('click', function() {
-                    // if the account have achievements, show them, otherwise #pro
-                    if (M.maf) {
-                        mega.achievem.achievementsListDialog();
-                    }
-                    else {
-                        loadSubPage('pro');
-                    }
+                    loadSubPage('pro');
                     return false;
                 });
             }

@@ -1339,7 +1339,7 @@
                 }
 
                 if (this.viewmode) {
-                    aTemplate.querySelector('.shared-folder-name').textContent = nicknames.getNicknameAndName(aNode.u);
+                    aTemplate.querySelector('.shared-folder-name').textContent = nicknames.getNickname(aNode.u);
                     aTemplate.querySelector('.shared-folder-info').textContent = aNode.m;
                 }
                 else {

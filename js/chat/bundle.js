@@ -14420,7 +14420,7 @@ class resultRow_MemberRow extends mixins["MegaRenderMixin"] {
         }
       }) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("span", {
         dangerouslySetInnerHTML: {
-          __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(nicknames.getNicknameAndName(data))), matches, true)
+          __html: highlight(megaChat.plugins.emoticonsFilter.processHtmlMessage(htmlentities(nicknames.getNickname(data))), matches, true)
         }
       }), external_React_default.a.createElement(contacts["ContactPresence"], {
         contact: contact
@@ -14429,7 +14429,7 @@ class resultRow_MemberRow extends mixins["MegaRenderMixin"] {
         className: "textual"
       }, isGroup ? external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement("span", null, external_React_default.a.createElement(utils["EmojiFormattedContent"], null, room.topic || room.getRoomTitle())), external_React_default.a.createElement(contacts["MembersAmount"], {
         room: room
-      })) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(utils["EmojiFormattedContent"], null, nicknames.getNicknameAndName(data)), external_React_default.a.createElement(contacts["LastActivity"], {
+      })) : external_React_default.a.createElement(external_React_default.a.Fragment, null, external_React_default.a.createElement(utils["EmojiFormattedContent"], null, nicknames.getNickname(data)), external_React_default.a.createElement(contacts["LastActivity"], {
         contact: contact,
         showLastGreen: true
       })))

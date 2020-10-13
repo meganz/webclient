@@ -1419,9 +1419,9 @@ var notify = {
                 // If the email is found
                 if (contactEmail === email) {
 
-                    // If the nickname is available use: Nickname (FirstName LastName
+                    // If the nickname is available use: Nickname
                     if (M.u[contactHandle].nickname !== '') {
-                        displayName = nicknames.getNicknameAndName(contactHandle);
+                        displayName = nicknames.getNickname(contactHandle);
                     }
                     else {
                         // Otherwise use: FirstName LastName (Email)

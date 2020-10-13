@@ -18,6 +18,7 @@ var slideshowid;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
+    var zoom_IO_times = 0;
 
     function slideshow_handle(raw) {
         var result;
@@ -474,7 +475,30 @@ var slideshowid;
         var $img = $overlay.find('img.active');
         var $percLabel = $overlay.find('.viewer-button-label.zoom');
         var perc = parseFloat($percLabel.attr('data-perc'));
-        var newPerc = ((perc * (zoomout ? .90 : 1.10) / 100) || 1) / devicePixelRatio;
+        var newPerc = perc / 100 || 1;
+
+        if (zoomout) {
+            if (zoom_IO_times <= 0) {
+                newPerc *= 0.9;
+            }
+            else {
+                // It was zoomed in previously
+                newPerc /= 1.1;
+            }
+            zoom_IO_times--;
+        }
+        else {
+            if (zoom_IO_times >= 0) {
+                newPerc *= 1.1;
+            }
+            else {
+                // It was zoomed out previously
+                newPerc /= 0.9;
+            }
+            zoom_IO_times++;
+        }
+
+        newPerc /= devicePixelRatio;
         var newImgWidth = origImgWidth * newPerc;
         var newImgHeight = origImgHeight * newPerc;
 
@@ -585,6 +609,7 @@ var slideshowid;
         var $overlay = $('.viewer-overlay');
         var $controls = $overlay.find('.viewer-top-bl, .viewer-bottom-bl, .viewer-slideshow-controls');
         var $document = $(document);
+        zoom_IO_times = 0;
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);

@@ -542,6 +542,7 @@
                     reselect(1);
                 }
                 mBroadcaster.sendMessage('mega:openfolder', id);
+                $.tresizer();
             }, 90);
         });
         var masterPromise = promise;

@@ -2845,7 +2845,7 @@ div.radioOn.small, div.radioOff.small {
     width: 16px;
     height: 16px;
 }
-input.radioOn, input.radioOff {
+.radioOn input, .radioOff input {
     width: 100%;
     height: 100%;
     left: 0;

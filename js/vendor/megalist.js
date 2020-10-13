@@ -1,6 +1,4 @@
 (function(scope, $) {
-    var isFirefox = navigator.userAgent.indexOf("Firefox") > -1;
-    var isIE = navigator.userAgent.indexOf('Edge/') > -1 || navigator.userAgent.indexOf('Trident/') > -1;
     var PUSH = Array.prototype.push;
 
     if (typeof lazy === 'undefined') lazy = function(a,b,c) { a[b] = c.call(a); }
@@ -197,8 +195,6 @@
             .addClass("megaList");
         this.listContainer = this.$listContainer[0];
 
-        this._lastScrollPosY = -1;
-
         var items = options.items;
         delete options.items;
         if (!items) {
@@ -253,46 +249,16 @@
         return "megalist" + this.listId;
     };
 
-
-    MegaList.prototype._actualOnScrollCode = function(e) {
-        var self = this;
-        if (self.options.enableUserScrollEvent) {
-            self.trigger('onUserScroll', e);
-        }
-        self._onScroll(e);
-    };
-
     MegaList.prototype.throttledOnScroll = function(e) {
-        var wait = isFirefox ? 30 : 5;
         var self = this;
-        if (!self._lastThrottledOnScroll) {
-            self._lastThrottledOnScroll = Date.now();
-        }
-
-        if ((self._lastThrottledOnScroll + wait - Date.now()) < 0) {
-            if (
-                self._lastScrollPosY !== e.target.scrollTop &&
-                self._isUserScroll === true &&
-                self.listContainer === e.target
-            ) {
-                self._lastScrollPosY = e.target.scrollTop;
-
-                if (isFirefox) {
-                    if (self._lastOnScrollTimer) {
-                        clearTimeout(self._lastOnScrollTimer);
-                    }
-
-                    self._lastOnScrollTimer = setTimeout(function() {
-                        self._actualOnScrollCode(e);
-                    }, 0);
+        delay('megalist:scroll:' + this.listId, function() {
+            if (self._isUserScroll === true && self.listContainer === e.target) {
+                if (self.options.enableUserScrollEvent) {
+                    self.trigger('onUserScroll', e);
                 }
-                else {
-                    self._actualOnScrollCode(e);
-                }
-
+                self._onScroll(e);
             }
-            self._lastThrottledOnScroll = Date.now();
-        }
+        }, 30);
     };
 
     /**
@@ -953,21 +919,13 @@
      * @private
      */
     MegaList.prototype._contentUpdated = function(forced) {
-        this._lastScrollPosY = -1;
-
         if (this._wasRendered || forced) {
             this._calculated = false;
             this._recalculate();
 
             if (this._lastContentHeight !== this._calculated['contentHeight']) {
                 this._lastContentHeight = this._calculated['contentHeight'];
-
-                if (this.content.tagName === "TBODY" && isIE) {
-                    this.content.parentNode.style.height = this._calculated['contentHeight'] + "px";
-                }
-                else {
-                    this.content.style.height = this._calculated['contentHeight'] + "px";
-                }
+                this.content.style.height = this._calculated['contentHeight'] + "px";
             }
 
             // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
@@ -1022,9 +980,13 @@
             var id = this.items[i];
 
             if (!this._currentlyRendered[id]) {
-                contentWasUpdated = true;
                 var renderedNode = this.options.itemRenderFunction(id);
+                if (!renderedNode) {
+                    console.warn('MegaList: Node not found...', id);
+                    continue;
+                }
 
+                contentWasUpdated = true;
                 if (this.options.renderAdapter._repositionRenderedItem) {
                     this.options.renderAdapter._repositionRenderedItem(id, renderedNode);
                 }
@@ -1088,13 +1050,13 @@
             }
 
             var self = this;
-            delay('megalist:content-updated', function() {
+            delay('megalist:content-updated:' + this.listId, function() {
                 self._isUserScroll = false;
                 self.scrollUpdate();
                 self._isUserScroll = true;
 
                 if (self.options.onContentUpdated) {
-                    delay('megalist:content-updated:feedback', self.options.onContentUpdated, 650);
+                    delay('megalist:content-updated:feedback:' + self.listId, self.options.onContentUpdated, 650);
                 }
             }, 300);
         }
@@ -1286,10 +1248,12 @@
     MegaList.RENDER_ADAPTERS.PositionAbsolute.prototype._repositionRenderedItem = function(itemId, node) {
         assert(this.megaList, 'megaList is not set.');
 
-        var self = this;
         var megaList = this.megaList;
         if (!node) {
             node = megaList._currentlyRendered[itemId];
+            if (!node) {
+                return;
+            }
         }
         var itemPos = megaList.items.indexOf(itemId);
 
@@ -1342,12 +1306,11 @@
     MegaList.RENDER_ADAPTERS.Table.prototype._repositionRenderedItem = function(itemId, node) {
         assert(this.megaList, 'megaList is not set.');
 
-        var self = this;
         var megaList = this.megaList;
         if (!node) {
             node = megaList._currentlyRendered[itemId];
         }
-        if (!node.classList.contains('megaListItem')) {
+        if (node && !node.classList.contains('megaListItem')) {
             node.classList.add('megaListItem');
         }
     };
@@ -1372,15 +1335,7 @@
 
     MegaList.RENDER_ADAPTERS.Table.prototype._rendered = function() {
         var megaList = this.megaList;
-        assert(megaList.$content, 'megaList.$content is not ready.');
-
-        if (megaList.content.tagName === "TBODY" && isIE) {
-            megaList.content.parentNode.style.height = megaList._calculated['contentHeight'] + "px";
-        }
-        else {
-            megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
-        }
-
+        megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
         Ps.update(megaList.listContainer);
     };
 

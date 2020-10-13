@@ -723,7 +723,7 @@
          */
         getDOMNode: function(aHandle, aNode) {
 
-            if (!this.nodeMap[aHandle]) {
+            if (!this.nodeMap[aHandle] && (aNode = aNode || M.getNodeByHandle(aHandle))) {
                 var template = this.template.cloneNode(true);
                 var properties = this.getNodeProperties(aNode, aHandle);
 
@@ -1530,14 +1530,10 @@
         }),
 
         destroy: function() {
-            // megaList can be undefined/empty if the current folder had no nodes in it.
-            if (DYNLIST_ENABLED && this.megaList) {
+            if (this.megaList) {
                 this.megaList.destroy();
-                if (window.selectionManager) {
-                    window.selectionManager.destroy();
-                }
-                window.selectionManager = false;
             }
+            oDestroy(this);
         },
 
         toString: function() {

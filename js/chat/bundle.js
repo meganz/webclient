@@ -5832,6 +5832,7 @@ var PerfectScrollbar = __webpack_require__(11).PerfectScrollbar;
 class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+    this.emojiSearchField = React.createRef();
     this.data_categories = null;
     this.data_emojis = null;
     this.data_emojiByCategory = null;
@@ -6196,40 +6197,44 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       }
     }
 
-    self.customCategoriesOrder.forEach(function (categoryName) {
-      var activeClass = activeCategoryName === categoryName ? " active" : "";
+    self.customCategoriesOrder.forEach(categoryName => {
       categoryButtons.push(React.createElement("div", {
-        visiblecategories: self.state.visibleCategories,
-        className: "button square-button emoji" + activeClass,
+        visiblecategories: this.state.visibleCategories,
+        className: "\n                        button square-button emoji\n                        " + (activeCategoryName === categoryName ? 'active' : '') + "\n                    ",
         key: categoryIcons[categoryName],
         onClick: e => {
+          var _this$emojiSearchFiel;
+
           e.stopPropagation();
           e.preventDefault();
-          self.setState({
+          this.setState({
             browsingCategory: categoryName,
             searchValue: ''
           });
-          self._cachedNodes = {};
-          var categoryPosition = self.data_categoryPositions[self.data_categories.indexOf(categoryName)] + 10;
-          self.scrollableArea.scrollToY(categoryPosition);
+          this._cachedNodes = {};
+          const categoryPosition = this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
+          this.scrollableArea.scrollToY(categoryPosition);
 
-          self._onScrollChanged(categoryPosition);
+          this._onScrollChanged(categoryPosition);
+
+          (_this$emojiSearchFiel = this.emojiSearchField) == null ? void 0 : _this$emojiSearchFiel.current.focus();
         }
       }, React.createElement("i", {
         className: "small-icon " + categoryIcons[categoryName]
       })));
     });
-    return React.createElement("div", null, React.createElement("div", {
+    return React.createElement(React.Fragment, null, React.createElement("div", {
       className: "popup-header emoji"
-    }, preview ? preview : React.createElement("div", {
+    }, preview || React.createElement("div", {
       className: "search-block emoji"
     }, React.createElement("i", {
       className: "small-icon search-icon"
     }), React.createElement("input", {
+      ref: this.emojiSearchField,
       type: "search",
       placeholder: __(l[102]),
-      ref: "emojiSearchField",
       onChange: this.onSearchChange,
+      autoFocus: true,
       value: this.state.searchValue
     }))), React.createElement(PerfectScrollbar, {
       className: "popup-scroll-area emoji perfectScrollbarContainer",
@@ -6237,15 +6242,15 @@ class emojiDropdown_DropdownEmojiSelector extends mixins["MegaRenderMixin"] {
       onUserScroll: this.onUserScroll,
       visibleCategories: this.state.visibleCategories,
       ref: ref => {
-        self.scrollableArea = ref;
+        this.scrollableArea = ref;
       }
     }, React.createElement("div", {
       className: "popup-scroll-content emoji"
     }, React.createElement("div", {
       style: {
-        height: self.state.totalScrollHeight
+        height: this.state.totalScrollHeight
       }
-    }, self._emojiReactElements))), React.createElement("div", {
+    }, this._emojiReactElements))), React.createElement("div", {
       className: "popup-footer emoji"
     }, categoryButtons));
   }
@@ -7951,7 +7956,7 @@ class local_Local extends abstractGenericMessage_AbstractGenericMessage {
 
     this._roomIsGroup = () => this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
 
-    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + M.getNameByHandle(handle) + "]]");
+    this._getParticipantNames = message => message.meta && message.meta.participants && !!message.meta.participants.length && message.meta.participants.map(handle => "[[" + escapeHTML(M.getNameByHandle(handle)) + "]]");
 
     this._getExtraInfo = message => {
       const participantNames = this._getParticipantNames(message);
@@ -12202,7 +12207,7 @@ class conversationaudiovideopanel_ConversationAVPanel extends mixins["MegaRender
 // CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
-var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class;
+var conversationpanel_dec, conversationpanel_dec2, _dec3, _dec4, conversationpanel_class, conversationpanel_temp;
 
 
 
@@ -12626,9 +12631,40 @@ class conversationpanel_ConversationRightArea extends mixins["MegaRenderMixin"] 
 conversationpanel_ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins["MegaRenderMixin"] {
+let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), conversationpanel_dec2 = utils["default"].SoonFcWrap(50), _dec3 = Object(mixins["SoonFcWrap"])(450, true), _dec4 = Object(mixins["timing"])(0.7, 9), (conversationpanel_class = (conversationpanel_temp = class ConversationPanel extends mixins["MegaRenderMixin"] {
   constructor(props) {
     super(props);
+
+    this.onKeyboardScroll = ({
+      keyCode
+    }) => {
+      const scrollbar = this.messagesListScrollable;
+      const domNode = scrollbar == null ? void 0 : scrollbar.domNode;
+
+      if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
+        const scrollPositionY = scrollbar.getScrollPositionY();
+        const offset = parseInt(domNode.style.height);
+        const PAGE = {
+          UP: 33,
+          DOWN: 34
+        };
+
+        switch (keyCode) {
+          case PAGE.UP:
+            scrollbar.scrollToY(scrollPositionY - offset, true);
+            this.onMessagesScrollUserScroll(scrollbar, 100);
+            break;
+
+          case PAGE.DOWN:
+            if (!scrollbar.isAtBottom()) {
+              scrollbar.scrollToY(scrollPositionY + offset, true);
+            }
+
+            break;
+        }
+      }
+    };
+
     this.state = {
       startCallPopupIsActive: false,
       localVideoIsMinimized: false,
@@ -12832,6 +12868,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     window.removeEventListener('resize', self.handleWindowResize);
     window.removeEventListener('keydown', self.handleKeyDown);
     $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
+    $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -12990,7 +13027,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }
   }
 
-  onMessagesScrollUserScroll(ps) {
+  onMessagesScrollUserScroll(ps, offset = 5) {
     var self = this;
     var scrollPositionY = ps.getScrollPositionY();
     var isAtTop = ps.isAtTop();
@@ -13012,7 +13049,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
       self.props.chatRoom.scrolledToBottom = false;
     }
 
-    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < 5 && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
+    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
       ps.disable();
       self.scrollPullHistoryRetrieval = true;
       self.lastScrollPosition = scrollPositionY;
@@ -13937,18 +13974,21 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement(perfectScrollbar["PerfectScrollbar"], {
       onFirstInit: ps => {
         ps.scrollToBottom(true);
-        self.props.chatRoom.scrolledToBottom = 1;
+        this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: self.onMessagesScrollReinitialise.bind(this),
-      onUserScroll: self.onMessagesScrollUserScroll.bind(this),
+      onReinitialise: this.onMessagesScrollReinitialise.bind(this),
+      onUserScroll: this.onMessagesScrollUserScroll.bind(this),
       className: "js-messages-scroll-area perfectScrollbarContainer",
-      messagesToggledInCall: self.state.messagesToggledInCall,
-      ref: ref => self.messagesListScrollable = ref,
-      chatRoom: self.props.chatRoom,
-      messagesBuff: self.props.chatRoom.messagesBuff,
-      editDomElement: self.state.editDomElement,
-      editingMessageId: self.state.editing,
-      confirmDeleteDialog: self.state.confirmDeleteDialog,
+      messagesToggledInCall: this.state.messagesToggledInCall,
+      ref: ref => {
+        this.messagesListScrollable = ref;
+        $(document).rebind('keydown.keyboardScroll_' + this.props.chatRoom.roomId, this.onKeyboardScroll);
+      },
+      chatRoom: this.props.chatRoom,
+      messagesBuff: this.props.chatRoom.messagesBuff,
+      editDomElement: this.state.editDomElement,
+      editingMessageId: this.state.editing,
+      confirmDeleteDialog: this.state.confirmDeleteDialog,
       renderedMessagesCount: messagesList.length,
       isLoading: this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() || this.props.chatRoom.activeSearches > 0 || this.loadingShown,
       options: {
@@ -13959,11 +13999,11 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }, external_React_default.a.createElement("div", {
       className: "messages content-area"
     }, external_React_default.a.createElement("div", {
-      className: "loading-spinner js-messages-loading light manual-management" + (!self.loadingShown ? " hidden" : ""),
       key: "loadingSpinner",
       style: {
         top: "50%"
-      }
+      },
+      className: "\n                                                loading-spinner js-messages-loading light manual-management\n                                                " + (this.loadingShown ? '' : 'hidden') + "\n                                            "
     }, external_React_default.a.createElement("div", {
       className: "main-loader",
       style: {
@@ -14083,7 +14123,7 @@ let conversationpanel_ConversationPanel = (conversationpanel_dec = utils["defaul
     }))))))));
   }
 
-}, (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
+}, conversationpanel_temp), (applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "onMessagesScrollReinitialise", [conversationpanel_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMessagesScrollReinitialise"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "enableScrollbar", [_dec3], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "enableScrollbar"), conversationpanel_class.prototype), applyDecoratedDescriptor_default()(conversationpanel_class.prototype, "render", [_dec4], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class conversationpanel_ConversationPanels extends mixins["MegaRenderMixin"] {
   render() {
     var self = this;
@@ -16125,7 +16165,7 @@ __webpack_require__(21);
 const EMOJI_DATASET_VERSION = 3;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
-  'image/gif': 2e6,
+  'image/gif': 4e6,
   'image/png': 2e5,
   'image/webp': 2e5
 };
@@ -17964,12 +18004,39 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
 
   return new MegaPromise(function (resolve, reject) {
     var promises = [];
+    var folderNodes = [];
+    var fileNodes = [];
 
     var attachNodes = function (roomId) {
       return new MegaPromise(function (resolve, reject) {
         self.smartOpenChat(roomId).then(function (room) {
-          room.attachNodes(nodes).then(resolve.bind(self, room)).catch(reject);
+          room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
         }).catch(function (ex) {
+          if (d) {
+            self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+          }
+
+          reject(ex);
+        });
+      });
+    };
+
+    var attachFolders = roomId => {
+      return new MegaPromise((resolve, reject) => {
+        var createPublicLink = (nodeId, room) => {
+          M.createPublicLink(nodeId).then(({
+            link
+          }) => {
+            room.sendMessage(link);
+            resolve(room);
+          }).catch(reject);
+        };
+
+        self.smartOpenChat(roomId).then(room => {
+          for (var i = folderNodes.length; i--;) {
+            createPublicLink(folderNodes[i], room);
+          }
+        }).catch(ex => {
           if (d) {
             self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
           }
@@ -17983,36 +18050,58 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes) {
       targets = [targets];
     }
 
-    for (var i = targets.length; i--;) {
-      promises.push(attachNodes(targets[i]));
+    for (var i = nodes.length; i--;) {
+      if (M.d[nodes[i]].t) {
+        folderNodes.push(nodes[i]);
+      } else {
+        fileNodes.push(nodes[i]);
+      }
     }
 
-    MegaPromise.allDone(promises).unpack(function (result) {
-      var room;
+    var _afterMDcheck = () => {
+      for (var i = targets.length; i--;) {
+        if (fileNodes.length > 0) {
+          promises.push(attachNodes(targets[i]));
+        }
 
-      for (var i = result.length; i--;) {
-        if (result[i] instanceof ChatRoom) {
-          room = result[i];
-          break;
+        if (folderNodes.length > 0) {
+          promises.push(attachFolders(targets[i]));
         }
       }
 
-      if (room) {
-        showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-        var roomUrl = room.getRoomUrl().replace("fm/", "");
-        M.openFolder(roomUrl).always(resolve);
-      } else {
+      MegaPromise.allDone(promises).unpack(function (result) {
+        var room;
+
+        for (var i = result.length; i--;) {
+          if (result[i] instanceof ChatRoom) {
+            room = result[i];
+            break;
+          }
+        }
+
+        if (room) {
+          showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+          var roomUrl = room.getRoomUrl().replace("fm/", "");
+          M.openFolder(roomUrl).always(resolve);
+        } else {
+          if (d) {
+            self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+          }
+
+          reject(result);
+        }
+
         if (d) {
-          self.logger.warn('openChatAndAttachNodes failed in whole...', result);
+          console.groupEnd();
         }
+      });
+    };
 
-        reject(result);
-      }
-
-      if (d) {
-        console.groupEnd();
-      }
-    });
+    if (mega.megadrop.isDropExist(folderNodes).length) {
+      mega.megadrop.showRemoveWarning(folderNodes).then(_afterMDcheck);
+    } else {
+      _afterMDcheck();
+    }
   });
 };
 

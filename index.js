@@ -37,7 +37,6 @@ var login_next = false;
 var loggedout = false;
 var anonymouschat = false;
 var flhashchange = false;
-var folderLinkVisitLogged = false;
 var avatars = {};
 var mega_title = 'MEGA';
 var pchandle = false;
@@ -277,8 +276,6 @@ function topPopupAlign(button, popup, topPos) {
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
-    var mobilePageParsed = false;
-    var ar;
 
     if (!window.M) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -454,77 +451,6 @@ function init_page() {
     }
 
     var newLinkSelector = '';
-
-    var processFolderLink = function() {
-        // If the visit to the folder link has not been logged yet
-        if (folderLinkVisitLogged === false) {
-
-            // Log to see how many public folder views on mobile webclient
-            if (is_mobile) {
-                api_req({ a: 'log', e: 99631, m: 'Loaded public folder link on mobile webclient' });
-            }
-            else {
-                // Otherwise log to see how many public folder views on regular webclient
-                api_req({ a: 'log', e: 99632, m: 'Loaded public folder link on regular webclient' });
-            }
-
-            // Don't log this again for this session
-            folderLinkVisitLogged = true;
-        }
-
-        n_h = pfid;
-        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
-
-            closeDialog();
-
-            if (pfid.length !== 8) {
-                folderreqerr(false, EARGS);
-                return false;
-            }
-
-            if (pfkey.length === 22) {
-                api_setfolder(n_h);
-                if (waitxhr) {
-                    waitsc();
-                }
-                u_n = pfid;
-            }
-            else {
-                // If mobile, show the decryption key overlay
-                if (is_mobile) {
-                    mobile.initDOM();
-                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
-                }
-                else {
-                    // Insert placeholder background page while waiting for user input
-                    parsepage(pages['placeholder']);
-
-                    // Show the decryption key dialog on top
-                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
-                        .fail(function() {
-                            loadSubPage('start');
-                        });
-                    pfkey = false;
-                }
-                return false;
-            }
-
-            if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
-                // Clean up internal state in case we're navigating back to a folderlink
-                M.currentdirid = M.RootID = undefined;
-                delete $.onImportCopyNodes;
-                delete $.mcImport;
-            }
-        }
-        if (pfhandle) {
-            page = 'fm/' + pfhandle;
-        }
-        else {
-            page = 'fm';
-        }
-        return true;
-    };
-
     if (page.substr(0, 7) === 'folder/') {
         var phLen = page.indexOf('#');
         var possibleS = -1;
@@ -594,10 +520,57 @@ function init_page() {
 
         }
 
-        if (!processFolderLink()) {
-            return;
+        n_h = pfid;
+        if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
+            closeDialog();
+            eventlog(is_mobile ? 99631 : 99632, true);
+
+            if (pfid.length !== 8 || window['preflight-folder-link-error']) {
+                folderreqerr(false, window['preflight-folder-link-error'] || EARGS);
+                return false;
+            }
+
+            if (pfkey.length === 22) {
+                api_setfolder(n_h);
+                if (waitxhr) {
+                    waitsc();
+                }
+                u_n = pfid;
+            }
+            else {
+                // If mobile, show the decryption key overlay
+                if (is_mobile) {
+                    mobile.initDOM();
+                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
+                }
+                else {
+                    // Insert placeholder background page while waiting for user input
+                    parsepage(pages.placeholder);
+
+                    // Show the decryption key dialog on top
+                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                        .fail(function() {
+                            loadSubPage('start');
+                        });
+                    pfkey = false;
+                }
+                return false;
+            }
+
+            if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
+                // Clean up internal state in case we're navigating back to a folderlink
+                M.currentdirid = M.RootID = undefined;
+                delete $.onImportCopyNodes;
+                delete $.mcImport;
+            }
         }
 
+        if (pfhandle) {
+            page = 'fm/' + pfhandle;
+        }
+        else {
+            page = 'fm';
+        }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
         n_h = false;
@@ -654,7 +627,6 @@ function init_page() {
         && (page !== 'uwp')
         && (page !== 'extensions')
         && (page !== 'sync')
-        && (page !== 'bird')
         && (page !== 'cmd')
         && (page !== 'terms')
         && (page !== 'privacy')
@@ -706,60 +678,16 @@ function init_page() {
         return false;
     }
 
-    // Password protected link decryption dialog
     if (page.substr(0, 2) === 'P!' && page.length > 2) {
-        // Check if TextEncoder function is available for the stringToByteArray function
-        // and we need to exclude Edge explicitly, since now it has supported Text Encoder but it doesnt support
-        // SubtleCrypto.importKey() with 'PBKDF2' (the algorithm we are using).
-        // And we need to exclude IE explicitly, since it returns non promise type to SubtleCrypto.importKey() call
-        if (window.TextEncoder && ua.details.browser !== 'Edge' && ua.details.browser !== 'Internet Explorer') {
-            // Show the password overlay for mobile
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-                mobile.decryptionPasswordOverlay.show(page);
-                mobilePageParsed = true;
-            }
-            else {
-                // Otherwise insert background page, show the password
-                // decryption dialog and pass in the current URL hash
-                parsepage(pages['placeholder']);
-                exportPassword.decrypt.init(page);
-            }
-        }
-        else { // not supported browser, appologize from user
-            var msgToUser = l[18420];
-            if (!is_mobile) {
-                if (u_type) {
-                    mBroadcaster.once('boot_done', function () {
-                        setTimeout(
-                            msgDialog('info', 'Pwssword protected link not supported', // not visible
-                                msgToUser), 1000);
-                    });
-                    page = 'fm';
-                }
-                else {
-                    msgDialog('info', 'Pwssword protected link not supported', // not visible
-                        msgToUser);
-                    page = 'start';
-                }
-            }
-            else {
-                if (u_type) {
-                    loadSubPage('fm');
-                }
-                else {
-                    parsepage(pages['mobile']);
-                    mobile.signin.show();
-                }
-                msgDialog('info', 'Pwssword protected link not supported', // not visible
-                    msgToUser);
-                mobilePageParsed = true;
-            }
-        }
-    }
+        // Password protected link decryption dialog
+        parsepage(pages.placeholder);
 
-    if (mobilePageParsed) {
-        mobilePageParsed = false;
+        if (is_mobile) {
+            mobile.decryptionPasswordOverlay.show(page);
+        }
+        else {
+            exportPassword.decrypt.init(page);
+        }
     }
     else if (page.substr(0, 10) == 'blogsearch') {
         blogsearch = decodeURIComponent(page.substr(11, page.length - 1));
@@ -770,8 +698,6 @@ function init_page() {
         parsepage(pages['blogarticle']);
         init_blog();
     }
-
-
     else if (page.substr(0, 6) == 'verify') {
         parsepage(pages['change_email']);
         emailchange.main();
@@ -1601,6 +1527,10 @@ function init_page() {
     else if (page === 'nas') {
         parsepage(pages.nas);
     }
+    else if (page === 'nzippmember' || page === 'nziphotographer') {
+        parsepage(pages.nzipp);
+        nzippCampaign.init();
+    }
     else if (page === 'refer') {
         parsepage(pages.affiliate);
         affiliateprogram.init();
@@ -1618,9 +1548,6 @@ function init_page() {
         $('body').addClass('business');
         var businessP = new BusinessProductPage();
         businessP.init();
-    }
-    else if (page === 'bird') {
-        parsepage(pages['megabird']);
     }
     else if (page.substr(0, 4) == 'sync') {
         parsepage(pages['sync']);
@@ -2497,12 +2424,14 @@ function topmenuUI() {
                 topMenu(1);
 
                 var subpage;
+                /*  TODO: Add bird when its done */
                 var subPages = [
                     'about', 'account', 'backup', 'blog', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'doc', 'extensions',
-                    'help', 'login', 'mega', 'bird', 'privacy', 'gdpr', 'mobileapp','mobile', 'privacycompany',
-                    'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode', 'support',
-                    'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate', 'nas'
+                    'help', 'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'gdpr', 'mobileapp',
+                    'mobile', 'privacycompany', 'register', 'resellers', 'sdk', 'sync', 'sitemap', 'sourcecode',
+                    'support', 'sync', 'takedown', 'terms', 'start', 'uwp', 'security', 'downloadapp', 'affiliate',
+                    'nas'
                 ];
                 var moveTo = { 'account': 'fm/account', 'affiliate': 'refer', 'about': 'about/main' };
 
@@ -2818,7 +2747,14 @@ function pagemetadata() {
     $('head').append('<meta name="description" content="' + String(mega_desc).replace(/[<">]/g, '') + '">');
     document.title = mega_title;
     megatitle();
+
+    if (pagemetadata.last !== page) {
+        mBroadcaster.sendMessage('pagemetadata', metas);
+    }
+    pagemetadata.last = page;
 }
+
+pagemetadata.last = null;
 
 
 function parsepage(pagehtml) {

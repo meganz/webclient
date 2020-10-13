@@ -267,7 +267,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         var viewChat = true;
         for (var i = $.selected.length; i--;) {
             var n = M.d[$.selected[i]];
-            if (!n || n.t) {
+            if (!n || (n.t && sourceRoot !== M.RootID)) {
                 viewChat = false;
                 break;
             }

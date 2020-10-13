@@ -39,7 +39,6 @@
         ["sync"],
         ["cmd"],
         ["extensions", "chrome", "firefox", "edge"],
-        ["bird"],
         ["nas"],
         ["help"],
         ["about/main"],

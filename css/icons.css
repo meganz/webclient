@@ -1984,6 +1984,15 @@
     background-position: -82px -1312px;
 }
 
+/* Top sprite */
+.top-sprite, i.top-sprite {
+    background-image: url(../images/mega/top-sprite_v8.png);
+    background-repeat: no-repeat;
+}
+.top-sprite.medium-icon.white-right-arrow {
+    background-position: -5px -2040px;
+}
+
 /* Account Icons */
 i.account-icon {
     width: 26px;

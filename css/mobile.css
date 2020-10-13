@@ -5587,12 +5587,16 @@ input.radioOn, input.radioOff {
 .mobile.my-account-page .content-cell {
     vertical-align: top;
 }
+.mobile.my-account-page .account-page-contents {
+    height: calc(100vh - 68px);
+    margin-top: 68px;
+    overflow: scroll;
+}
 .mobile.my-account-page .avatar-name-block {
     opacity: 0.9;
     background-color: #fff;
     position: relative;
     padding: 20px 0;
-    margin-top: 68px;
     box-shadow: 0 1px 0 0 #DADADA;
 }
 .mobile.my-account-page .main-avatar {
@@ -10424,8 +10428,10 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     box-shadow: 0 2px 6px 0 rgba(0,0,0,0.07);
 }
 .mobile.top-hr-pad {
-    padding-top: 66px;
+    margin-top: 66px;
+    max-height: calc(100vh - 66px);
     vertical-align: top;
+    overflow: scroll;
 }
 .mobile .horizontal-plans.nav-dots-container .nav-dot-style {
     display: block;
@@ -13500,7 +13506,8 @@ p a.blog-new-read-more {
 
 /* Affiliate redemption history */
 .affiliate-history-page .mobile.top-hr-pad {
-    padding-top: 106px;
+    margin-top: 106px;
+    max-height: calc(100vh - 106px);
 }
 .mobile.affiliate-history-dropdown {
     font-size: 0;

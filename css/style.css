@@ -1385,17 +1385,6 @@ div.radioOn.green-active::after {
     font-weight: normal;
     padding: 0 0 12px 0;
 }
-.blog-date {
-    display: block;
-    background-image: url(../images/mega/account_sprite.png);
-    background-position: left -1094px;
-    background-repeat: no-repeat;
-    font-size: 15px;
-    line-height: 24px;
-    color: #68696b;
-    padding: 1px 0 2px 36px;
-    float: left;
-}
 .blog-short-content {
     font-size: 15px;
     line-height: 24px;
@@ -1413,31 +1402,6 @@ div.radioOn.green-active::after {
     font-size: 14px;
     display: block;
     margin: 23px 0 20px 0;
-}
-.blog-button-block {
-    height: 90px;
-    background-image: url(../images/mega/help_bg.png);
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    padding-top: 29px;
-    position: relative;
-}
-.blog-button-bg1 {
-    height: inherit;
-    background-image: url(../images/mega/help_bg.png);
-    position: absolute;
-    width: 100%;
-    right: 0;
-    margin: -29px 979px 0 0;
-}
-.blog-button-bg2 {
-    height: inherit;
-    background-image: url(../images/mega/help_bg.png);
-    position: absolute;
-    width: 100%;
-    left: 0;
-    margin: -29px 0 0 979px;
 }
 .blog-button, a.blog-button, a.blog-button:link, a.blog-button:visited, a.blog-button:active {
     display: block;
@@ -2448,14 +2412,6 @@ p a.blog-new-read-more:hover {
     box-sizing: border-box;
 }
 .blog-new-right h1 {
-}
-.blog-new-right-bg {
-    position: absolute;
-    height: 100%;
-    width: 800%;
-    top: 0;
-    left: 319px;
-    background-image: url(../images/mega/blog-new-bg2.png);
 }
 .blog-new-search {
     height: 30px;

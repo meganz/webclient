@@ -19,6 +19,7 @@ var ep_node = false;
 
 function startMega() {
     'use strict';
+    jsl = [];
     mBroadcaster.sendMessage('startMega');
     eventlog(99686, true);
     init_page();

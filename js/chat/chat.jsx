@@ -1559,6 +1559,7 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
 
     M.currentdirid = String(page = location).replace('fm/', '');
     history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
+    mBroadcaster.sendMessage('pagechange', page);
 });
 
 if (is_mobile) {

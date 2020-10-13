@@ -17360,6 +17360,7 @@ Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, l
   history[method]({
     subpage: location
   }, "", (hashLogic ? '#' : '/') + location);
+  mBroadcaster.sendMessage('pagechange', page);
 });
 
 if (is_mobile) {

@@ -75,12 +75,13 @@ var QuickFinder = function(searchable_elements, containers) {
 
 
             var foundIds = [];
+            var isCopyToChat = false;
 
             charTyped = charTyped.toLowerCase();
 
             var nodesList = M.v;
             if ($.dialog && allowedDialogs[$.dialog]) {
-                // Assign different nodes list depending on different dialogs
+                // Assign different nodes list depending on different panels
                 var activePanel = $('.dialog-content-block').closest('.fm-picker-dialog-tree-panel.active');
                 if (activePanel.hasClass('cloud-drive')) {
                     nodesList = Object.values(M.tree[M.RootID]);
@@ -88,17 +89,31 @@ var QuickFinder = function(searchable_elements, containers) {
                 else if (activePanel.hasClass('shared-with-me')) {
                     nodesList = Object.values(M.tree.shares);
                 }
+                else if (activePanel.hasClass('conversations')) {
+                    isCopyToChat = true;
+                    nodesList = [];
+                    var allContactElements = $('span.nw-contact-item', activePanel).get();
+
+                    for (var c = 0; c < allContactElements.length; c++) {
+                        var $contactElement = $(allContactElements[c]);
+                        var contactHandle = $contactElement.attr('id').replace('cpy-dlg-chat-itm-spn-', '');
+                        var contactName = $('span.nw-contact-name', $contactElement).text();
+                        nodesList.push({name: contactName, h: contactHandle});
+                    }
+                }
                 else {
-                    // Other tabs rather than cloud-drive and sharing
+                    // Other panels rather than cloud-drive, share-with-me and send-to-chat
                     return;
                 }
 
-                // Sort the node list by name
-                nodesList.sort(function(a, b) {
-                    var aName = a.name.toUpperCase();
-                    var bName = b.name.toUpperCase();
-                    return M.compareStrings(aName, bName, d);
-                });
+                if (!isCopyToChat) {
+                    // Sort the node list by name except for the conversations panel
+                    nodesList.sort(function(a, b) {
+                        var aName = a.name.toUpperCase();
+                        var bName = b.name.toUpperCase();
+                        return M.compareStrings(aName, bName, d);
+                    });
+                }
             }
 
             foundIds = nodesList.filter(function(v) {
@@ -127,15 +142,22 @@ var QuickFinder = function(searchable_elements, containers) {
                     var dialogQuickIndex = 0;
                     var $dialogQuickFindNode;
 
-                    for (var i = 0; i < foundIds.length; i++) {
-                        $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
-                        if (!$dialogQuickFindNode.hasClass('disabled')) {
-                            // cloud-drive panel: Acquire the first node except for $.selected itself
-                            // share-with-me panel: Acquire the first node with the write permission
-                            break;
+                    if (isCopyToChat) {
+                        // When it's in the conversations panel
+                        $dialogQuickFindNode = $('#cpy-dlg-chat-itm-spn-' + foundIds[0].h);
+                    }
+                    else {
+                        // When it's in the cloud-drive or share-with-me panel
+                        for (var i = 0; i < foundIds.length; i++) {
+                            $dialogQuickFindNode = $('.nw-fm-tree-item#mctreea_' + foundIds[dialogQuickIndex].h);
+                            if (!$dialogQuickFindNode.hasClass('disabled')) {
+                                // cloud-drive panel: Acquire the first node except for $.selected itself
+                                // share-with-me panel: Acquire the first node with the write permission
+                                break;
+                            }
+                            $dialogQuickFindNode = null;
+                            dialogQuickIndex++;
                         }
-                        $dialogQuickFindNode = null;
-                        dialogQuickIndex++;
                     }
 
                     if ($dialogQuickFindNode && !$dialogQuickFindNode.hasClass('selected')) {

@@ -1,4 +1,5 @@
-var Message = function(chatRoom, messagesBuff, vals) {
+function Message(chatRoom, messagesBuff, vals) {
+    'use strict';
     var self = this;
 
     self.chatRoom = chatRoom;
@@ -22,17 +23,21 @@ var Message = function(chatRoom, messagesBuff, vals) {
             'updated': false,
             'sent': Message.STATE.NOT_SENT,
             'deleted': false,
-            'revoked': false
+            'revoked': false,
+            '_reactions': false,
+            '_queuedReactions': false,
         },
         vals
     );
 
     self._parent = chatRoom.messagesBuff;
-};
+}
 
 inherits(Message, MegaDataObject);
 
 Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
+    "use strict";
+
     if (!msg) {
         return {
             messageId: msgId,
@@ -237,6 +242,12 @@ Message.getContactForMessage = function(message) {
 
     return contact;
 };
+
+/** @property Message.reacts */
+lazy(Message.prototype, 'reacts', function() {
+    "use strict";
+    return new Reactions(this);
+});
 
 Message.prototype.hasAttachments = function() {
     return !!M.chc[this.messageId];
@@ -471,17 +482,7 @@ Message.prototype._onAttachmentUpdated = function() {
  * @returns {*}
  * @private
  */
-Message.prototype._safeParseJSON = function(data) {
-    'use strict';
-
-    try {
-        return JSON.parse(data);
-    }
-    catch (ex) {
-        console.warn(ex, this, [data]);
-    }
-    return false;
-};
+Message.prototype._safeParseJSON = tryCatch(JSON.parse.bind(JSON));
 
 Message.prototype.getStateText = function(state) {
     'use strict';
@@ -544,6 +545,19 @@ Message.prototype.getState = function() {
         }
     }
 };
+
+
+Message.prototype.isSentOrReceived = function() {
+    "use strict";
+    var state = this.getState();
+    return (
+        state === Message.STATE.DELIVERED ||
+        state === Message.STATE.SENT  ||
+        state === Message.STATE.SEEN ||
+        state === Message.STATE.NOT_SEEN
+    );
+};
+
 
 Message.STATE = {
     'NULL': 0,
@@ -659,7 +673,9 @@ Message.prototype.toPersistableObject = function() {
         'textContents',
         'references',
         'msgIdentity',
-        'metaType'
+        'metaType',
+        '_reactions',
+        '_queuedReactions',
     ].forEach(function(k) {
         if (typeof self[k] !== 'undefined') {
             r[k] = self[k];
@@ -668,6 +684,56 @@ Message.prototype.toPersistableObject = function() {
 
     return r;
 };
+
+
+Message.fromPersistableObject = function(chatRoom, msgData) {
+    "use strict";
+    var msgObj = msgData.msgObject;
+    var msg = new Message(
+        chatRoom,
+        chatRoom.messagesBuff,
+        {
+            'messageId': msgData.msgId,
+            'userId': msgData.userId,
+            'keyid': msgData.keyId,
+            'textContents': msgObj.textContents,
+            'delay': msgObj.delay,
+            'orderValue': msgData.orderValue,
+            'updated': msgObj.updated,
+            'sent': msgData.userId === u_handle ? Message.STATE.SENT : Message.STATE.NOT_SENT,
+            'deleted': msgObj.deleted,
+            'revoked': msgObj.revoked,
+            '_reactions': msgObj._reactions,
+            '_queuedReactions': msgObj._queuedReactions,
+        }
+    );
+    // move non Message's internal DataStruct properties manually.
+    [
+        'meta',
+        'dialogType',
+        'references',
+        'msgIdentity',
+        'metaType'
+    ].forEach(function(k) {
+        if (typeof msgObj[k] !== 'undefined') {
+            msg[k] = msgObj[k];
+        }
+    });
+
+    msg.source = Message.SOURCE.IDB;
+
+    return msg;
+};
+Message.prototype.addReaction = function(userId, utf) {
+    "use strict";
+    this.reacts.react(userId, utf).then(nop).catch(dump);
+};
+
+Message.prototype.delReaction = function(userId, utf) {
+    "use strict";
+    this.reacts.unreact(userId, utf).then(nop).catch(dump);
+};
+
 
 /**
  * Simple interface/structure wrapper for inline dialogs
@@ -949,6 +1015,7 @@ function MessagesBuff(chatRoom, chatdInt) {
     self.chatRoom.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
         var chatRoom = self.chatRoom;
 
+        Reactions.clearQueuedReactionsForChat(chatRoom.chatId);
         var requestedMessagesCount;
         if (self.isRetrievingSharedFiles) {
             requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
@@ -1208,7 +1275,9 @@ function MessagesBuff(chatRoom, chatdInt) {
                     'updated': eventData.updated,
                     'delay' : eventData.ts ? eventData.ts : timestamp,
                     'orderValue': eventData.id,
-                    'sent': true
+                    'sent': true,
+                    '_reactions': originalMessage ? originalMessage._reactions : undefined,
+                    '_queuedReactions': originalMessage ? originalMessage._queuedReactions : undefined,
                 }
             );
 
@@ -1547,6 +1616,21 @@ function MessagesBuff(chatRoom, chatdInt) {
         }
     });
 
+    self.chatRoom.rebind('onAddReaction.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.onAddReaction(eventData);
+    });
+
+    self.chatRoom.rebind('onDelReaction.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.onDelReaction(eventData);
+    });
+
+    self.chatRoom.rebind('onReactionSn.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.onReactionSn(eventData);
+    });
+    self.chatRoom.rebind('onAddDelReactionReject.messagesBuff' + chatRoomId, function(e, eventData) {
+        self.onReactionReject(eventData);
+    });
+
     self.initChatdPersistEvents();
 };
 
@@ -1862,7 +1946,7 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     var timeoutPromise = createTimeoutPromise(function() {
         return !self.$msgsHistoryLoading;
     }, 500, 6e4 * 5)
-        .fail(function() {
+        .catch(function() {
             if (self.$msgsHistoryLoading) {
                 self.$msgsHistoryLoading.reject();
                 delete self.$msgsHistoryLoading;
@@ -1949,6 +2033,24 @@ MessagesBuff.prototype.getMessageById = function(messageId) {
 
     var self = this;
     return self.messages[messageId] || false;
+};
+
+/**
+ * Get message by orderValue
+ * @param {String|Number} orderValue orderValue
+ * @returns {Message|boolean} the found message or false
+ */
+MessagesBuff.prototype.getMessageByOrderValue = function(orderValue) {
+    "use strict";
+    var self = this;
+    for (var i = 0; i < self.messages.length; i++) {
+        var v = self.messages.getItem(i);
+        if (v && v.orderValue === orderValue) {
+            return v;
+        }
+    }
+
+    return false;
 };
 
 MessagesBuff.prototype.removeMessageById = function(messageId) {
@@ -2101,6 +2203,10 @@ MessagesBuff.prototype.restoreMessage = function(msgObject) {
         msgObject,
         true
     );
+
+    if (msgObject._queuedReactions) {
+        Reactions._initIntrnlVarsForQueuedRctn(this.chatRoom.chatId, msgObject);
+    }
 
 };
 
@@ -2337,4 +2443,391 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
     }
 
     return renderableSummary;
+};
+
+/**
+ * Does an XOR add on 2 arrays
+ *
+ * @param {Array|Uint32Array} a
+ * @param {Array|Uint32Array} b
+ * @private
+ */
+MessagesBuff._XOR_ARR = function(a, b) {
+    "use strict";
+    for (var i = 0; i < a.length; i++) {
+        a[i] ^= b[i % b.length];
+    }
+};
+
+/**
+ * Does what it says
+ *
+ * @param {Number} num
+ * @param {Number} x
+ * @returns {number}
+ * @private
+ */
+MessagesBuff._roundToNearestMultipleOf = function(num, x) {
+    "use strict";
+    return Math.ceil(num / x) * x;
+};
+
+/**
+ * Add padding \0 to a string
+ *
+ * @param {String} s16
+ * @param {Number} fixLength
+ * @returns {String}
+ * @private
+ */
+MessagesBuff._padString = function(s16, fixLength) {
+    "use strict";
+    return s16 && fixLength ? s16.padStart(fixLength, "\0") : s16;
+};
+
+/**
+ * Utility to depad \0s from the beginging of a string
+ *
+ * @param {String} s
+ * @returns {*}
+ * @private
+ */
+MessagesBuff._depadString = function(s) {
+    "use strict";
+    return s.replace(/^(\0+)/g, '');
+};
+
+/**
+ * Private code that is used for encrypting reaction data to be sent to chatd
+ *
+ * @private
+ * @param {String} msgId Message id
+ * @param {Object} meta data
+ * @param {String} key computed key
+ * @param {Message} [msg] Message from DB
+ * @returns {Promise}
+ */
+MessagesBuff.prototype.encryptReaction = promisify(function(resolve, reject, msgId, meta, key, msg) {
+    "use strict";
+    if (!meta || !meta.u) {
+        return reject(EARGS);
+    }
+
+    msg = msg || this.getMessageById(msgId);
+    var pk = this.chatRoom.protocolHandler.participantKeys;
+    key = key || (
+        msg.keyid
+            ? pk[msg.userId] && pk[msg.userId][a32_to_str([msg.keyid])]
+            : base64urldecode(this.chatRoom.protocolHandler.getUnifiedKey())
+    );
+
+    if (!key) {
+        var cdp = megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+        if (!cdp) {
+            return reject(EKEY);
+        }
+
+        var self = this;
+        cdp.getKey(self.chatRoom.chatId, msg.userId, msg.keyid)
+            .then(function(r) {
+                self.chatRoom.protocolHandler.seedKeys([
+                    {
+                        userId: msg.userId,
+                        keyid: msg.keyid,
+                        keylen: r.key.length,
+                        key: r.key
+                    }
+                ]);
+                var decryptedKey = self.chatRoom.protocolHandler.participantKeys[msg.userId][a32_to_str([msg.keyid])];
+
+                if (decryptedKey) {
+                    self.encryptReaction(msgId, meta, decryptedKey).then(resolve).catch(reject);
+                }
+                else {
+                    reject(EKEY);
+                }
+            })
+            .catch(function(ex) {
+                if (d) {
+                    self.logger.warn("Retrieve and seedKeys failed:", ex);
+                }
+                reject(EKEY);
+            });
+        return;
+    }
+
+    if (!key) {
+        this.logger.warn("Key not found for encryptReaction", msgId);
+    }
+    key = new Uint32Array(str_to_a32(key));
+    var msgId32 = new Uint32Array(str_to_a32(msgId));
+    MessagesBuff._XOR_ARR(key, msgId32);
+
+    var emoji = to8(meta.u);
+
+    // pad s to min 4 characters.
+    // xxtea won't work with <4 characters.
+    emoji = MessagesBuff._padString(
+        emoji,
+        MessagesBuff._roundToNearestMultipleOf(emoji.length, 4)
+    );
+
+    var plaintext = msgId.substr(0, 4) + emoji;
+
+    resolve(a32_to_str(xxtea.encryptUint32Array(new Uint32Array(str_to_a32(plaintext)), key)));
+});
+
+/**
+ * Private code that is used for decrypting reaction data received from the chatd
+ *
+ * @private
+ * @param {String} msgId
+ * @param {String} s
+ * @param {String} key
+ * @param {String} [isRetry]
+ * @param {Message} [msg] Message from DB
+ * @returns {Promise}
+ */
+MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msgId, s, key, isRetry, msg) {
+    "use strict";
+    var self = this;
+    msg = msg || this.getMessageById(msgId);
+    if (msg === false && !isRetry && this.isRetrievingHistory) {
+        // in case the message is not yet decrypted and put into the msgs buff, wait and retry
+        self.chatRoom.one('onHistoryDecryptedDone', function() {
+            self.decryptReaction(msgId, s, key, true).then(resolve).catch(reject);
+        });
+        return;
+    }
+
+    var pk = this.chatRoom.protocolHandler.participantKeys;
+    key = key || (
+        msg.keyid
+            ? pk[msg.userId] && pk[msg.userId][a32_to_str([msg.keyid])]
+            : base64urldecode(this.chatRoom.protocolHandler.getUnifiedKey())
+    );
+
+    if (!key) {
+        var cdp = megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+        if (!cdp) {
+            console.error("Cant decrypt reaction", msgId, s, key, key);
+            return reject(EKEY);
+        }
+
+        cdp.getKey(self.chatRoom.chatId, msg.userId, msg.keyid)
+            .then(function(r) {
+                self.chatRoom.protocolHandler.seedKeys([
+                    {
+                        userId: msg.userId,
+                        keyid: msg.keyid,
+                        keylen: r.key.length,
+                        key: r.key
+                    }
+                ]);
+                var decryptedKey = self.chatRoom.protocolHandler.participantKeys[msg.userId][a32_to_str([msg.keyid])];
+
+                if (decryptedKey) {
+                    self.decryptReaction(msgId, s, decryptedKey, undefined, msg).then(resolve).catch(reject);
+                }
+                else {
+                    reject(EKEY);
+                }
+            })
+            .catch(function(ex) {
+                if (d) {
+                    self.logger.warn("Retrieve and seedKeys failed [2]:", ex);
+                }
+                reject(EKEY);
+            });
+        return;
+    }
+
+    if (!key) {
+        this.logger.warn("Key not found for decryptReaction", msgId);
+    }
+    key = new Uint32Array(str_to_a32(key));
+    var msgId32 = new Uint32Array(str_to_a32(msgId));
+    MessagesBuff._XOR_ARR(key, msgId32);
+
+    var res = a32_to_str(xxtea.decryptUint32Array(new Uint32Array(str_to_a32(s)), key));
+    resolve(from8(MessagesBuff._depadString(res.substr(4))));
+});
+
+
+/**
+ * Called when the user triggers a reaction in the UI
+ *
+ * @param {Number} op
+ * @param {String} msgId
+ * @param {String} slug
+ * @param {Object} meta
+ * @private
+ */
+MessagesBuff.prototype._userReaction = function(op, msgId, slug, meta) {
+    "use strict";
+    var self = this;
+    return self.encryptReaction(msgId, meta)
+        .then(function(r) {
+            Reactions.sendAndQueueOperation(
+                op,
+                self.chatRoom,
+                self.getMessageById(msgId),
+                msgId,
+                slug,
+                meta,
+                r
+            );
+        })
+        .catch(dump);
+
+};
+
+/**
+ * Called when the user triggers a add reaction in the UI
+ *
+ * @param {String} msgId
+ * @param {String} slug
+ * @param {Object} meta
+ */
+MessagesBuff.prototype.userAddReaction = function(msgId, slug, meta) {
+    "use strict";
+    return this._userReaction(Reactions.OPERATIONS.ADD, msgId, slug, meta);
+};
+
+/**
+ * Called when the user triggers a del reaction in the UI
+ *
+ * @param {String} msgId
+ * @param {String} slug
+ * @param {Object} meta
+ */
+MessagesBuff.prototype.userDelReaction = function(msgId, slug, meta) {
+    "use strict";
+    return this._userReaction(Reactions.OPERATIONS.REMOVE, msgId, slug, meta);
+};
+
+/**
+ * Sends the add reaction opcode to chatd
+ *
+ * @param {String} msgId
+ * @param {String} slug
+ * @param {String} meta
+ * @param {String} r
+ */
+MessagesBuff.prototype.sendAddReaction = function(msgId, slug, meta, r) {
+    "use strict";
+    var self = this;
+    self.chatRoom.megaChat.plugins.chatdIntegration.chatd.addReaction(
+        self.chatRoom.chatIdBin,
+        base64urldecode(msgId),
+        base64urldecode(u_handle),
+        r
+    );
+};
+
+/**
+ * Sends the del reaction opcode to chatd
+ *
+ * @param {String} msgId
+ * @param {String} slug
+ * @param {String} meta
+ * @param {String} r
+ */
+MessagesBuff.prototype.sendDelReaction = function(msgId, slug, meta, r) {
+    "use strict";
+    var self = this;
+    self.chatRoom.megaChat.plugins.chatdIntegration.chatd.delReaction(
+        self.chatRoom.chatIdBin,
+        base64urldecode(msgId),
+        base64urldecode(u_handle),
+        r
+    );
+};
+
+/**
+ * The main handling code for all chatd reaction opcodes
+ *
+ * @param {String} eventName
+ * @param {Object} eventData
+ * @param {Function} cb
+ * @param {Boolean} isRetry
+ * @param {Message} msgFromDb
+ * @private
+ */
+MessagesBuff.prototype._onReactionEvent = function(eventName, eventData, cb, isRetry, msgFromDb) {
+    "use strict";
+    var msgId = eventData.msgId;
+    var msg = msgFromDb || this.getMessageById(msgId);
+    var self = this;
+
+    if (!msg) {
+        if (!isRetry && self.isRetrievingHistory) {
+            self.chatRoom.one('onHistoryDecrypted.' + eventName + eventData.msgId, function() {
+                self._onReactionEvent(eventName, eventData, cb,true);
+            });
+        }
+        else {
+            megaChat.getMessageByMessageId(self.chatRoom.chatId, eventData.msgId)
+                .then(function(r) {
+                    self._onReactionEvent(eventName, eventData, cb, true, r);
+                })
+                .catch(nop);
+        }
+        return;
+    }
+
+    this.decryptReaction(msgId, eventData.emoji, undefined, undefined, msg)
+        .then(function(r) {
+            msg[cb](eventData.userId, r);
+
+            if (eventData.userId === u_handle) {
+                Reactions.deQueueOperation(self.chatRoom, msg, msg.messageId, cb, r);
+            }
+        })
+        .catch(dump.bind(null, 'onReactionEvent'));
+};
+
+/**
+ *
+ * @param {Object} eventData the event data of the ADDREACTION opcode
+ * @param {Boolean} isRetry
+ * @returns {undefined}
+ */
+MessagesBuff.prototype.onAddReaction = function(eventData, isRetry) {
+    "use strict";
+    return this._onReactionEvent('onAddReaction', eventData, 'addReaction', isRetry);
+};
+
+/**
+ * Called on DELRECTION on chatd
+ * @param {Object} eventData the event data of the DELREACTION opcode
+ * @param {Boolean} isRetry
+ * @returns {undefined}
+ */
+MessagesBuff.prototype.onDelReaction = function(eventData, isRetry) {
+    "use strict";
+    return this._onReactionEvent('onDelReaction', eventData, 'delReaction', isRetry);
+};
+
+/**
+ * Called on chatd REACTIONSN
+ *
+ * @param {Object} eventData the event data of the REACTIONSN opcode
+ */
+MessagesBuff.prototype.onReactionSn = function(eventData) {
+    "use strict";
+    Reactions.setSn(eventData.chatId, eventData.sn)
+        .always(function() {
+            Reactions.flushQueuedReactionsForChat(eventData.chatId);
+        });
+};
+
+/**
+ * Called on chatd REJECT for a specific reaction
+ *
+ * @param {Object} eventData the event data of the REJECT opcode
+ */
+MessagesBuff.prototype.onReactionReject = function(eventData) {
+    "use strict";
+    Reactions.clearQueuedReactionsForChat(eventData.chatId, eventData.msgId);
 };

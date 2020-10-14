@@ -775,10 +775,10 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 }, 100);
 
 /**
- * Destroy all MegaChat databases.
+ * Drop all MegaChat databases.
  * @returns {Promise}
  */
-Chat.prototype.destroyDatabases = promisify(function(resolve, reject) {
+Chat.prototype.dropAllDatabases = promisify(function(resolve, reject) {
     const chatd = this.plugins.chatdIntegration.chatd || false;
     const promises = [];
 
@@ -790,8 +790,13 @@ Chat.prototype.destroyDatabases = promisify(function(resolve, reject) {
         promises.push(chatd.messagesQueueKvStorage.clear());
     }
 
+    if (Reactions.hasOwnProperty('_db')) {
+        promises.push(Reactions._db.clear());
+    }
+
     Promise.allSettled(promises).then(resolve).catch(reject);
 });
+
 
 /**
  * Destroy this MegaChat instance (leave all rooms then disconnect)
@@ -2160,6 +2165,9 @@ Chat.prototype.getEmojiDataSet = function(name) {
         }).then(function(ev, data) {
             self._emojiData[name] = data;
             delete self._emojiDataLoading[name];
+            if (name === "emojis") {
+                self._mapEmojisToAliases();
+            }
             promise.resolve(data);
         }).catch(function(ev, error) {
             if (d) {
@@ -2173,20 +2181,37 @@ Chat.prototype.getEmojiDataSet = function(name) {
     }
 };
 
+
+Chat.prototype._mapEmojisToAliases = function() {
+    var self = this;
+    var emojis = self._emojiData.emojis;
+    if (!emojis) {
+        return;
+    }
+
+    self._emojiData.emojisSlug = {};
+    self._emojiData.emojisUtf = {};
+    for (var i = 0; i < emojis.length; i++) {
+        var emoji = emojis[i];
+        self._emojiData.emojisSlug[emoji.n] = emoji;
+        self._emojiData.emojisUtf[emoji.u] = emoji;
+    }
+};
+
 /**
  * Method for checking if an emoji by that slug exists
  * @param slug
  */
 Chat.prototype.isValidEmojiSlug = function(slug) {
     var self = this;
-    var emojiData = self._emojiData['emojis'];
+    var emojiData = self._emojiData.emojis;
     if (!emojiData) {
         self.getEmojiDataSet('emojis');
         return false;
     }
 
     for (var i = 0; i < emojiData.length; i++) {
-        if (emojiData[i]['n'] === slug) {
+        if (emojiData[i].n === slug) {
             return true;
         }
     }
@@ -2288,6 +2313,33 @@ Chat.prototype.getChatById = function(chatdId) {
     });
     return found;
 };
+
+
+/**
+ * Retrieves a message of idb if not in memory
+ *
+ * @param {String} chatId chatId
+ * @param {String} messageId messageId
+ * @returns {Promise}
+ * @private
+ */
+Chat.prototype.getMessageByMessageId = promisify(function(resolve, reject, chatId, messageId) {
+    var chatRoom = this.getChatById(chatId);
+    var msg = chatRoom.messagesBuff.getMessageById(messageId);
+    if (msg) {
+        return resolve(msg);
+    }
+
+    var cdp = this.plugins.chatdIntegration.chatd.chatdPersist;
+    if (!cdp) {
+        return reject();
+    }
+
+    cdp.getMessageByMessageId(chatId, messageId)
+        .then(r => Message.fromPersistableObject(chatRoom, r[0]))
+        .then(resolve)
+        .catch(reject);
+});
 
 /**
  * Returns true if there is a chat room with an active (started/starting) call.

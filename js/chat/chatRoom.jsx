@@ -1645,16 +1645,16 @@ ChatRoom.prototype.attachContacts = function(ids) {
  */
 ChatRoom.prototype.getMessageById = function(messageId) {
     var self = this;
-    var found = false;
-    $.each(self.messagesBuff.messages, function(k, v) {
-        if (v.messageId === messageId) {
-            found = v;
-            // break;
-            return false;
+    var msgs = self.messagesBuff.messages;
+    var msgKeys = msgs.keys();
+    for (var i = 0; i < msgKeys.length; i++) {
+        var k = msgKeys[i];
+        var v = msgs[k];
+        if (v && v.messageId === messageId) {
+            return v;
         }
-    });
-
-    return found;
+    }
+    return false;
 };
 
 /**

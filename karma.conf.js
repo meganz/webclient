@@ -125,6 +125,7 @@ module.exports = function(config) {
         'js/cms.js',
         'js/keepAlive.js',
         'js/metatags.js',
+        'js/utils/trans.js',
 
         // Transfers
         'js/transfers/meths/filesystem.js',
@@ -140,6 +141,7 @@ module.exports = function(config) {
         'js/transfers/meths.js',
         {pattern: 'aesasm.js', included: false},
         {pattern: 'encrypter.js', included: false},
+
 
         // Our chat code.
         'js/chat/strongvelope.js',
@@ -183,7 +185,7 @@ module.exports = function(config) {
     // Fix up to make it work on the Jenkins server.
     urlRoot: '/base',
     proxies: {
-        '/': '/'
+        '/': './'
     },
 
     // Test results reporter to use.

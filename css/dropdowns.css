@@ -1027,3 +1027,10 @@
     top: -19px;
     margin-left: -18px;
 }
+
+.dropdown.reactions-dropdown .dropdown-white-arrow {
+    display: none !important;
+}
+.dropdown.body.up-arrow {
+    margin-top: -20px;
+}

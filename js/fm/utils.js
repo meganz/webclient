@@ -642,7 +642,7 @@ MegaUtils.prototype.reload = function megaUtilsReload() {
                     ];
 
                     if (window.megaChatIsReady) {
-                        waitingPromises.push(megaChat.destroyDatabases());
+                        waitingPromises.push(megaChat.dropAllDatabases());
                     }
 
                     MegaPromise.allDone(waitingPromises).then(function(r) {
@@ -1055,7 +1055,7 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
             }
 
             if (fmconfig.dbDropOnLogout) {
-                promises.push(megaChat.destroyDatabases());
+                promises.push(megaChat.dropAllDatabases());
             }
         }
 

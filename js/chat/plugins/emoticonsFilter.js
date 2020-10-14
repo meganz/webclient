@@ -28,6 +28,7 @@ var EmoticonsFilter = function(megaChat) {
         self.processOutgoingMessage(e, messageObject);
     });
 
+
     return this;
 };
 
@@ -134,6 +135,28 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
             'class="emoji"',
             'class="emoji big"'
         );
+    }
+
+    var found = false;
+    messageContents = messageContents.replace(/alt="([^"]+)"/g, function(match, p1) {
+        if (megaChat._emojiData.emojisUtf[p1]) {
+            found = true;
+
+            return match
+                .replace(
+                    match,
+                    'alt="' + p1 + '" data-simpletip=":' + megaChat._emojiData.emojisUtf[p1].n + ':"'
+                );
+        }
+
+        return match;
+    });
+
+
+    if (found) {
+        messageContents = messageContents
+            .replace(/class="emoji"/g, 'class="emoji simpletip"')
+            .replace(/class="emoji big"/g, 'class="emoji big simpletip"');
     }
 
     return messageContents;

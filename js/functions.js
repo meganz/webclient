@@ -711,8 +711,10 @@ function createTimeoutPromise(validateFunction, tick, timeout,
  */
 function AssertionFailed(message) {
     this.message = message;
-    this.stack = M.getStack();
+    // karma env?
+    this.stack = M && M.getStack ? M.getStack() : String(new Error().stack);
 }
+
 AssertionFailed.prototype = Object.create(Error.prototype);
 AssertionFailed.prototype.name = 'AssertionFailed';
 
@@ -1613,32 +1615,6 @@ function mLogout(aCallback, force) {
     else {
         M.logout();
     }
-}
-
-/**
- * Perform a strict logout, by removing databases
- * and cleaning sessionStorage/localStorage.
- *
- * @param {String} aUserHandle optional
- */
-function mCleanestLogout(aUserHandle) {
-    if (u_type !== 0 && u_type !== 3) {
-        throw new Error('Operation not permitted.');
-    }
-
-    mLogout(function() {
-        MegaDB.dropAllDatabases(aUserHandle)
-            .always(function(r) {
-                console.debug('mCleanestLogout', r);
-
-                localStorage.clear();
-                sessionStorage.clear();
-
-                setTimeout(function() {
-                    location.reload(true);
-                }, 7e3);
-            });
-    });
 }
 
 // Initialize Rubbish-Bin Cleaning Scheduler

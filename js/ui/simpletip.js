@@ -21,19 +21,20 @@
      * 1) Add "simpletip" class name to any element in the DOM
      * 2) To set the content of the tooltip, pass an attribute w/ the text named `data-simpletip`
      * Example:
-     * ```<a href="#" data-simpletip="Hello world!">Mouse over me</a>```
+     * ```<a href="#" class="simpletip" data-simpletip="Hello world!">Mouse over me</a>```
      *
      * Optionally, you can control:
      * A) The wrapper in which the tooltip should try to fit in (and position on top/bottom, depending on whether there
      * is enough space) by passing a selector that matches a parent of the element in attribute named
      * `data-simpletipwrapper`
      * Example:
-     * ```<a href="#" data-simpletip="Hey!" data-simpletipwrapper="#call-block">Mouse over me</a>```
+     * ```<a href="#" class="simpletip" data-simpletip="Hey!" data-simpletipwrapper="#call-block">Mouse over me</a>```
      *
      * B) Change the default position to be "above" (top) of the element, instead of bottom/below by passing attribute
      * `data-simpletipposition="top"`
      * Example:
-     * ```<a href="#" data-simpletip="Hey! Show on top, if I fit" data-simpletipposition="top">Mouse over me</a>```
+     * ```<a href="#" class="simpletip" data-simpletip="Hey! Show on top, if I fit"
+     *      data-simpletipposition="top">Mouse over me</a>```
      *
      * C) Manually add extra top/bottom offset by passing `data-simpletipoffset="10"`
      * Example:
@@ -70,7 +71,9 @@
         return escapeHTML(contents).replace(/\[BR\]/g, '<br>')
             .replace(/\[I\]/g, '<i>').replace(/\[\/I\]/g, '</i>')
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
-            .replace(/\[U\]/g, '<u>').replace(/\[\/U\]/g, '</u>');
+            .replace(/\[U]/g, '<u>').replace(/\[\/U]/g, '</u>')
+            .replace(/\[G]/g, '<span class="gray-text">')
+            .replace(/\[\/G]/g, '</span>');
     };
 
     var unmount = function() {

@@ -256,6 +256,7 @@ lang/strings_prod.json
 
 nbproject/
 .vscode
+jsconfig.json #vscode js config
 /.vs
 /Words.pdf
 /webclient.sln

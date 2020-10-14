@@ -140,6 +140,8 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             onClick={(e) => {
                 if (self.props.onClick) {
                     self.props.onClick(e, emoji.n, emoji);
+
+                    $(document).trigger('closeDropdowns');
                 }
             }}
         >
@@ -554,6 +556,9 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                 }
                 else {
                     self.setState({'isActive': true});
+                }
+                if (self.props.onActiveChange) {
+                    self.props.onActiveChange(newValue);
                 }
             }}
             searchValue={self.state.searchValue}

@@ -26427,6 +26427,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations, body.megaChatDisabled .fm-
 }
 /* end terms page index table */
 
+.simpletip-tooltip .gray-text {
+    color: #868686;
+}
+
 /* Transfer tooltips */
 .float-widget.transfer-prorgess * {
     font-family: 'latoWeb', 'source_sans_proregular', sans-serif;

@@ -1379,7 +1379,9 @@
                         'delay': msg.msgObject.delay,
                         'orderValue': msg.orderValue,
                         'updated': messageInfo.updated,
-                        'sent': messageInfo.sent
+                        'sent': messageInfo.sent,
+                        '_reactions': messageInfo._reactions,
+                        '_queuedReactions': messageInfo._queuedReactions
                     }
                 );
 
@@ -1396,6 +1398,42 @@
     };
 
     /**
+     * Persist message's reactions.
+     * @param {Message} message The message instance
+     * @returns {Promise} whether succeeded
+     */
+    ChatdPersist.prototype.modifyPersistedReactions = function(message) {
+        var self = this;
+        return new Promise(function(resolve, reject) {
+            assert(message instanceof Message, 'Not a message instance.');
+            const chatId = message.chatRoom.chatId;
+            self.getMessageByMessageId(chatId, message.messageId)
+                .then(function(r) {
+                    if (r && r[0]) {
+                        assert(r[0].msgId === message.messageId, 'Unexpected message.');
+                        r[0].msgObject._reactions = message._reactions;
+                        self.persistMessageBatched(
+                            "replace",
+                            chatId,
+                            [undefined, Message.fromPersistableObject(megaChat.getChatById(chatId), r[0])]
+                        );
+                        return r[0].msgId;
+                    }
+                })
+                .then(resolve)
+                .catch(function(ex) {
+                    if (Array.isArray(ex) && !ex.length) {
+                        self.logger.debug('Message is not yet persisted, deferring saving reactions...', message);
+                        return resolve();
+                    }
+
+                    self.logger.error('Cannot persist message reactions...', ex);
+                    reject(ex);
+                });
+        });
+    };
+
+    /**
      * Clear the internally stored data for all chats.
      *
      * @returns {MegaPromise}
@@ -1408,7 +1446,7 @@
         promises.push(MegaPromise.asMegaPromiseProxy(self.db.ptrs.clear()));
 
         return MegaPromise.allDone(promises)
-            .done(function() {
+            .then(function() {
                 if (localStorage.chatdPersistDebug) {
                     console.warn('ChatdPersist.clear finished.');
                 }

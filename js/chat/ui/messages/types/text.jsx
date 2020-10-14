@@ -10,9 +10,6 @@ import { Button } from '../../../../ui/buttons.jsx';
 import utils from '../../../../ui/utils.jsx';
 
 export default class Text extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
 
     isRichPreview = message => message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
     isGeoLocation = message => message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
@@ -32,6 +29,135 @@ export default class Text extends AbstractGenericMessage {
         `;
     }
 
+
+    getMessageActionButtons() {
+        const {chatRoom, message, isBeingEdited} = this.props;
+
+        if (isBeingEdited()) {
+            return [];
+        }
+
+        let extraPreButtons = [];
+        let messageActionButtons = null;
+        const IS_GEOLOCATION = this.isGeoLocation(message);
+
+        // some pre-buttons (message specific buttons that are shown before edit and delete)
+        if (!message.deleted && this.isRichPreview(message)) {
+            if (!message.meta.requiresConfirmation) {
+                if (message.isEditable()) {
+                    if (message.meta.isLoading) {
+                        // still loading, cancel loading?
+                        extraPreButtons = [
+                            ...extraPreButtons,
+                            <DropdownItem
+                                icon="icons-sprite bold-crossed-eye"
+                                key="stop-link-preview"
+                                label={l[18684] /* `Remove preview` */}
+                                className=""
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    chatRoom.megaChat.plugins.richpreviewsFilter.cancelLoading(chatRoom, message);
+                                }}
+                            />
+                        ];
+                    }
+                    else {
+                        extraPreButtons = [
+                            ...extraPreButtons,
+                            <DropdownItem
+                                key="remove-link-preview"
+                                icon="icons-sprite bold-crossed-eye"
+                                label={l[18684] /* `Remove preview` */}
+                                className=""
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    chatRoom.megaChat.plugins.richpreviewsFilter.revertToText(chatRoom, message);
+                                }}
+                            />
+                        ];
+                    }
+                }
+            }
+            else if (!isBeingEdited() && !(message.source === Message.SOURCE.SENT || message.confirmed === true)) {
+                extraPreButtons = [
+                    ...extraPreButtons,
+                    <DropdownItem
+                        key="insert-link-preview"
+                        icon="icons-sprite bold-eye"
+                        label={l[18683] /* `Insert preview` */}
+                        className=""
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            chatRoom.megaChat.plugins.richpreviewsFilter.insertPreview(message);
+                        }}
+                    />
+                ];
+            }
+        }
+
+        // edit and delete
+        if (!message.deleted) {
+            const contact = this.getContact();
+
+            if (
+                contact && contact.u === u_handle &&
+                unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT &&
+                isBeingEdited() !== true &&
+                chatRoom.isReadOnly() === false &&
+                !message.requiresManualRetry
+            ) {
+                const editButton = !IS_GEOLOCATION && (
+                    <DropdownItem
+                        icon="icons-sprite writing-pencil"
+                        label={__(l[1342]) /* `Edit` */}
+                        onClick={() => this.props.onEditToggle(true)} />
+                );
+                messageActionButtons = (
+                    <Button
+                        key="delete-msg"
+                        className="default-white-button tiny-button"
+                        icon="tiny-icon icons-sprite grey-dots">
+                        <Dropdown
+                            className="white-context-menu attachments-dropdown"
+                            noArrow={true}
+                            positionMy="left bottom"
+                            positionAt="right bottom"
+                            horizOffset={4}>
+                            {extraPreButtons}
+                            {editButton}
+                            {editButton ? <hr/> : null}
+                            <DropdownItem
+                                icon="red-cross"
+                                label={__(l[1730]) /* `Delete` */}
+                                className="red"
+                                onClick={e => this.props.onDelete(e, message)}
+                            />
+                        </Dropdown>
+                    </Button>
+                );
+            }
+        }
+
+
+        var parentButtons;
+        if (super.getMessageActionButtons) {
+            parentButtons = super.getMessageActionButtons();
+        }
+
+
+
+        let returnedButtons = [];
+        if (messageActionButtons) {
+            returnedButtons.push(messageActionButtons);
+        }
+        if (parentButtons) {
+            returnedButtons.push(parentButtons);
+        }
+        return returnedButtons;
+    }
     getContents() {
         const { message, chatRoom, onUpdate, isBeingEdited, spinnerElement } = this.props;
 
@@ -46,7 +172,6 @@ export default class Text extends AbstractGenericMessage {
         }
 
         let subMessageComponent = [];
-        let extraPreButtons = [];
 
         if (!message.deleted) {
             if (this.isRichPreview(message)) {
@@ -55,63 +180,12 @@ export default class Text extends AbstractGenericMessage {
                         ...subMessageComponent,
                         <MetaRichpreview key="richprev" message={message} chatRoom={chatRoom} />
                     ];
-                    if (message.isEditable()) {
-                        if (message.meta.isLoading) {
-                            // still loading, cancel loading?
-                            extraPreButtons = [
-                                ...extraPreButtons,
-                                <DropdownItem
-                                    icon="icons-sprite bold-crossed-eye"
-                                    key="stop-link-preview"
-                                    label={l[18684] /* `Remove preview` */}
-                                    className=""
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        e.preventDefault();
-                                        chatRoom.megaChat.plugins.richpreviewsFilter.cancelLoading(chatRoom, message);
-                                    }}
-                                />
-                            ];
-                        }
-                        else {
-                            extraPreButtons = [
-                                ...extraPreButtons,
-                                <DropdownItem
-                                    key="remove-link-preview"
-                                    icon="icons-sprite bold-crossed-eye"
-                                    label={l[18684] /* `Remove preview` */}
-                                    className=""
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        e.preventDefault();
-                                        chatRoom.megaChat.plugins.richpreviewsFilter.revertToText(chatRoom, message);
-                                    }}
-                                />
-                            ];
-                        }
-                    }
                 }
                 else if (!isBeingEdited()) {
                     if (message.source === Message.SOURCE.SENT || message.confirmed === true) {
                         subMessageComponent = [
                             ...subMessageComponent,
                             <MetaRichprevConfirmation key="confirm" message={message} chatRoom={chatRoom} />
-                        ];
-                    }
-                    else {
-                        extraPreButtons = [
-                            ...extraPreButtons,
-                            <DropdownItem
-                                key="insert-link-preview"
-                                icon="icons-sprite bold-eye"
-                                label={l[18683] /* `Insert preview` */}
-                                className=""
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                    chatRoom.megaChat.plugins.richpreviewsFilter.insertPreview(message);
-                                }}
-                            />
                         ];
                     }
                 }
@@ -125,13 +199,11 @@ export default class Text extends AbstractGenericMessage {
             }
         }
 
-        let messageActionButtons = null;
         if (
             message &&
             message.getState &&
             (message.getState() === Message.STATE.NOT_SENT || message.getState() === Message.STATE.NOT_SENT_EXPIRED)
         ) {
-            messageActionButtons = null;
             if (!spinnerElement) {
                 if (message.requiresManualRetry) {
                     if (isBeingEdited() !== true) {
@@ -210,50 +282,10 @@ export default class Text extends AbstractGenericMessage {
             }
         }
 
-        if (!message.deleted) {
-            const contact = this.getContact();
 
-            if (
-                contact && contact.u === u_handle &&
-                unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT &&
-                isBeingEdited() !== true &&
-                chatRoom.isReadOnly() === false &&
-                !message.requiresManualRetry
-            ) {
-                const editButton = !IS_GEOLOCATION && (
-                    <DropdownItem
-                        icon="icons-sprite writing-pencil"
-                        label={__(l[1342]) /* `Edit` */}
-                        onClick={() => this.props.onEditToggle(true)} />
-                );
-                messageActionButtons = (
-                    <Button
-                        className="default-white-button tiny-button"
-                        icon="tiny-icon icons-sprite grey-dots">
-                        <Dropdown
-                            className="white-context-menu attachments-dropdown"
-                            noArrow={true}
-                            positionMy="left bottom"
-                            positionAt="right bottom"
-                            horizOffset={4}>
-                            {extraPreButtons}
-                            {editButton}
-                            {editButton ? <hr/> : null}
-                            <DropdownItem
-                                icon="red-cross"
-                                label={__(l[1730]) /* `Delete` */}
-                                className="red"
-                                onClick={e => this.props.onDelete(e, message)}
-                            />
-                        </Dropdown>
-                    </Button>
-                );
-            }
-        }
 
         return (
             <>
-                {this.props.hideActionButtons ? null : messageActionButtons}
                 {messageNotSendIndicator}
                 {IS_GEOLOCATION ? null : messageDisplayBlock}
                 {subMessageComponent}

@@ -106,7 +106,7 @@ export class Button extends MegaRenderMixin {
         if (!e || !$(e.target).closest(this.buttonClass).is(this.findDOMNode())) {
             this.setState({ focused: false }, () => {
                 this.unbindEvents();
-                this.forceUpdate();
+                this.safeForceUpdate();
             });
         }
     }
@@ -158,6 +158,7 @@ export class Button extends MegaRenderMixin {
     render() {
         const { className, disabled, style, icon, label } = this.props;
 
+        var extraAttrs = this.props.attrs;
         return (
             <div
                 className={`
@@ -167,7 +168,8 @@ export class Button extends MegaRenderMixin {
                     ${this.state.focused ? 'active' : ''}
                 `}
                 style={style}
-                onClick={this.onClick}>
+                onClick={this.onClick}
+                {...extraAttrs}>
                 {icon && <i className={`small-icon ${icon}`} />}
                 {label && <span>{label}</span>}
                 {this.renderChildren()}

@@ -523,14 +523,16 @@
 .fm-affiliate.redeem-table .expanded + .fm-affiliate.redeem-details {
     display: table-row;
 }
-.fm-affiliate.redeem-table .expanded .link.open {
-    visibility: hidden;
-    pointer-events: none;
+.fm-affiliate.redeem-table .expanded .link.open, .fm-affiliate.redeem-table .redeem-summary .link.close {
+    display: none;
+}
+.fm-affiliate.redeem-table .expanded.redeem-summary .link.close {
+    display: inline-block;
 }
 .fm-affiliate.redeem-table .expanded, .fm-affiliate.redeem-summary:hover {
     background-color: #FAFAFA;
 }
-.fm-affiliate.redeem-table .link.close {
+.fm-affiliate.redeem-table .redeem-details .link.close {
     position: relative;
     top: -2px;
     margin: 0 0 5px 0;

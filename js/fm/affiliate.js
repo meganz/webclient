@@ -1651,7 +1651,7 @@ affiliateUI.redemptionHistory = {
             }
             else {
                 $table.removeClass('expanded-item');
-                $this.closest('tr').prev().removeClass('expanded');
+                $this.closest('tr').removeClass('expanded').prev().removeClass('expanded');
                 self.initRedeemResizeNScroll();
             }
         });
